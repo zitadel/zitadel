@@ -54,9 +54,8 @@ export async function registerPasskeyLink(
 }
 
 export async function verifyPasskey(command: VerifyPasskeyCommand) {
-  let { passkeyId, passkeyName, publicKeyCredential, sessionId } = command;
-
   // if no name is provided, try to generate one from the user agent
+  let passkeyName = command.passkeyName;
   if (!!!passkeyName) {
     const headersList = headers();
     const userAgentStructure = { headers: headersList };
@@ -67,7 +66,9 @@ export async function verifyPasskey(command: VerifyPasskeyCommand) {
     }${os.name}${os.name ? ", " : ""}${browser.name}`;
   }
 
-  const sessionCookie = await getSessionCookieById({ sessionId });
+  const sessionCookie = await getSessionCookieById({
+    sessionId: command.sessionId,
+  });
   const session = await getSession(sessionCookie.id, sessionCookie.token);
   const userId = session?.session?.factors?.user?.id;
 
@@ -77,9 +78,9 @@ export async function verifyPasskey(command: VerifyPasskeyCommand) {
 
   return verifyPasskeyRegistration(
     create(VerifyPasskeyRegistrationRequestSchema, {
-      passkeyId,
+      passkeyId: command.passkeyId,
+      publicKeyCredential: command.publicKeyCredential,
       passkeyName,
-      publicKeyCredential,
       userId,
     }),
   );

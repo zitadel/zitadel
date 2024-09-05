@@ -18,11 +18,10 @@ export type SendLoginnameCommand = {
   organization?: string;
 };
 
-export async function sendLoginname(options: SendLoginnameCommand) {
-  const { loginName, authRequestId, organization } = options;
+export async function sendLoginname(command: SendLoginnameCommand) {
   const users = await listUsers({
-    userName: loginName,
-    organizationId: organization,
+    userName: command.loginName,
+    organizationId: command.organization,
   });
 
   if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
@@ -31,7 +30,7 @@ export async function sendLoginname(options: SendLoginnameCommand) {
       userId,
       undefined,
       undefined,
-      authRequestId,
+      command.authRequestId,
     );
 
     if (!session.factors?.user?.id) {
@@ -49,14 +48,14 @@ export async function sendLoginname(options: SendLoginnameCommand) {
     };
   }
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings(command.organization);
   // TODO: check if allowDomainDiscovery has to be allowed too, to redirect to the register page
   // user not found, check if register is enabled on organization
 
   if (loginSettings?.allowRegister && !loginSettings?.allowUsernamePassword) {
     // TODO redirect to loginname page with idp hint
     const identityProviders = await getActiveIdentityProviders(
-      organization,
+      command.organization,
     ).then((resp) => {
       return resp.identityProviders;
     });
@@ -70,12 +69,12 @@ export async function sendLoginname(options: SendLoginnameCommand) {
 
       const params = new URLSearchParams();
 
-      if (authRequestId) {
-        params.set("authRequestId", authRequestId);
+      if (command.authRequestId) {
+        params.set("authRequestId", command.authRequestId);
       }
 
-      if (organization) {
-        params.set("organization", organization);
+      if (command.organization) {
+        params.set("organization", command.organization);
       }
 
       return startIdentityProviderFlow({
@@ -98,18 +97,19 @@ export async function sendLoginname(options: SendLoginnameCommand) {
     loginSettings?.allowRegister &&
     loginSettings?.allowUsernamePassword
   ) {
-    const params: any = { organization };
-    if (authRequestId) {
-      params.authRequestId = authRequestId;
+    const params = new URLSearchParams();
+
+    if (command.organization) {
+      params.set("organization", command.organization);
     }
-    if (loginName) {
-      params.email = loginName;
+    if (command.authRequestId) {
+      params.set("authRequestId", command.authRequestId);
+    }
+    if (command.loginName) {
+      params.set("loginName", command.loginName);
     }
 
-    const registerUrl = new URL(
-      "/register?" + new URLSearchParams(params),
-      //   request.url,
-    );
+    const registerUrl = new URL("/register?" + params);
 
     return redirect(registerUrl.toString());
   }

@@ -23,19 +23,17 @@ export type SetOTPCommand = {
 };
 
 export async function setOTP(command: SetOTPCommand) {
-  const { loginName, sessionId, organization, authRequestId, code, method } =
-    command;
-
-  const recentPromise = sessionId
-    ? getSessionCookieById({ sessionId }).catch((error) => {
+  const recentPromise = command.sessionId
+    ? getSessionCookieById({ sessionId: command.sessionId }).catch((error) => {
         return Promise.reject(error);
       })
-    : loginName
-      ? getSessionCookieByLoginName({ loginName, organization }).catch(
-          (error) => {
-            return Promise.reject(error);
-          },
-        )
+    : command.loginName
+      ? getSessionCookieByLoginName({
+          loginName: command.loginName,
+          organization: command.organization,
+        }).catch((error) => {
+          return Promise.reject(error);
+        })
       : getMostRecentSessionCookie().catch((error) => {
           return Promise.reject(error);
         });
@@ -43,17 +41,17 @@ export async function setOTP(command: SetOTPCommand) {
   return recentPromise.then((recent) => {
     const checks = create(ChecksSchema, {});
 
-    if (method === "time-based") {
+    if (command.method === "time-based") {
       checks.totp = create(CheckTOTPSchema, {
-        code,
+        code: command.code,
       });
-    } else if (method === "sms") {
+    } else if (command.method === "sms") {
       checks.otpSms = create(CheckOTPSchema, {
-        code,
+        code: command.code,
       });
-    } else if (method === "email") {
+    } else if (command.method === "email") {
       checks.otpEmail = create(CheckOTPSchema, {
-        code,
+        code: command.code,
       });
     }
 
@@ -61,7 +59,7 @@ export async function setOTP(command: SetOTPCommand) {
       recent,
       checks,
       undefined,
-      authRequestId,
+      command.authRequestId,
     ).then((session) => {
       return {
         sessionId: session.id,

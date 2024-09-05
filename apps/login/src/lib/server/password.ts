@@ -8,10 +8,9 @@ type ResetPasswordCommand = {
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
-  const { loginName, organization } = command;
   const users = await listUsers({
-    userName: loginName,
-    organizationId: organization,
+    userName: command.loginName,
+    organizationId: command.organization,
   });
 
   if (

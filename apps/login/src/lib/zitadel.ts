@@ -7,7 +7,6 @@ import {
   makeReqCtx,
   createOrganizationServiceClient,
 } from "@zitadel/client/v2";
-import { createManagementServiceClient } from "@zitadel/client/v1";
 import { createServerTransport } from "@zitadel/node";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";

@@ -8,8 +8,7 @@ type VerifyUserByEmailCommand = {
 };
 
 export async function verifyUserByEmail(command: VerifyUserByEmailCommand) {
-  const { userId, code } = command;
-  return verifyEmail(userId, code);
+  return verifyEmail(command.userId, command.code);
 }
 
 type resendVerifyEmailCommand = {
@@ -17,8 +16,5 @@ type resendVerifyEmailCommand = {
 };
 
 export async function resendVerifyEmail(command: resendVerifyEmailCommand) {
-  const { userId } = command;
-
-  // replace with resend Mail method once its implemented
-  return resendEmailCode(userId);
+  return resendEmailCode(command.userId);
 }

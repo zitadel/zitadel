@@ -12,15 +12,12 @@ type RegisterUserCommand = {
   authRequestId?: string;
 };
 export async function registerUser(command: RegisterUserCommand) {
-  const { email, password, firstName, lastName, organization, authRequestId } =
-    command;
-
   const human = await addHumanUser({
-    email: email,
-    firstName,
-    lastName,
-    password: password ? password : undefined,
-    organization,
+    email: command.email,
+    firstName: command.firstName,
+    lastName: command.lastName,
+    password: command.password ? command.password : undefined,
+    organization: command.organization,
   });
   if (!human) {
     throw Error("Could not create user");
@@ -28,9 +25,9 @@ export async function registerUser(command: RegisterUserCommand) {
 
   return createSessionForUserIdAndUpdateCookie(
     human.userId,
-    password,
+    command.password,
     undefined,
-    authRequestId,
+    command.authRequestId,
   ).then((session) => {
     return {
       userId: human.userId,

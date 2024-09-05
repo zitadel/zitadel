@@ -19,9 +19,9 @@ type VerifyU2FCommand = {
 };
 
 export async function addU2F(command: RegisterU2FCommand) {
-  const { sessionId } = command;
-
-  const sessionCookie = await getSessionCookieById({ sessionId });
+  const sessionCookie = await getSessionCookieById({
+    sessionId: command.sessionId,
+  });
 
   const session = await getSession(sessionCookie.id, sessionCookie.token);
 
@@ -40,8 +40,7 @@ export async function addU2F(command: RegisterU2FCommand) {
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
-  let { passkeyName, sessionId } = command;
-
+  let passkeyName = command.passkeyName;
   if (!!!passkeyName) {
     const headersList = headers();
     const userAgentStructure = { headers: headersList };
@@ -51,7 +50,9 @@ export async function verifyU2F(command: VerifyU2FCommand) {
       device.vendor || device.model ? ", " : ""
     }${os.name}${os.name ? ", " : ""}${browser.name}`;
   }
-  const sessionCookie = await getSessionCookieById({ sessionId });
+  const sessionCookie = await getSessionCookieById({
+    sessionId: command.sessionId,
+  });
 
   const session = await getSession(sessionCookie.id, sessionCookie.token);
 

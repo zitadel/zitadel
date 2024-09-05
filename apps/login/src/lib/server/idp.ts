@@ -9,13 +9,11 @@ export type StartIDPFlowCommand = {
 };
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
-  const { idpId, successUrl, failureUrl } = command;
-
   return startIdentityProviderFlow({
-    idpId,
+    idpId: command.idpId,
     urls: {
-      successUrl,
-      failureUrl,
+      successUrl: command.successUrl,
+      failureUrl: command.failureUrl,
     },
   });
 }
