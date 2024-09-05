@@ -18,6 +18,7 @@ type InstanceFeatures struct {
 	ImprovedPerformance             FeatureSource[[]feature.ImprovedPerformanceType]
 	WebKey                          FeatureSource[bool]
 	DebugOIDCParentError            FeatureSource[bool]
+	OIDCSingleV1SessionTermination  FeatureSource[bool]
 	InMemoryProjections             FeatureSource[bool]
 }
 

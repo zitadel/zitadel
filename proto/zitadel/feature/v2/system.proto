@@ -62,7 +62,14 @@ message SetSystemFeaturesRequest{
     }
   ];
 
-  optional bool allow_in_memory_projections = 8 [
+  optional bool oidc_single_v1_session_termination = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
+    }
+  ];
+
+  optional bool allow_in_memory_projections = 9 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enables the POC for in-memory projections. This feature is not production-ready yet and should only be enabled for testing purposes.";
@@ -133,7 +140,14 @@ message GetSystemFeaturesResponse {
     }
   ];
 
-  FeatureFlag allow_in_memory_projections = 9 [
+  FeatureFlag oidc_single_v1_session_termination = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
+    }
+  ];
+
+  FeatureFlag allow_in_memory_projections = 10 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enables the POC for in-memory projections. This feature is not production-ready yet and should only be enabled for testing purposes.";

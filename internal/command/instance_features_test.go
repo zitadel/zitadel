@@ -228,6 +228,10 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
+						feature_v2.InstanceOIDCSingleV1SessionTerminationEventType, true,
+					),
+					feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
 						feature_v2.InstanceInMemoryProjectionsEventType, true,
 					),
 				),
@@ -238,6 +242,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
 				Actions:                         gu.Ptr(true),
+				OIDCSingleV1SessionTermination:  gu.Ptr(true),
 				InMemoryProjections:             gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
@@ -269,6 +274,10 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceLegacyIntrospectionEventType, true,
 					)),
+					feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.InstanceOIDCSingleV1SessionTerminationEventType, false,
+					),
 				),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
@@ -285,6 +294,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				LoginDefaultOrg:                 gu.Ptr(true),
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
+				OIDCSingleV1SessionTermination:  gu.Ptr(false),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",

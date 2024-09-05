@@ -19,6 +19,7 @@ var (
 	SystemTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTokenExchange)
 	SystemActionsEventType                         = setEventTypeFromFeature(feature.LevelSystem, feature.KeyActions)
 	SystemImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyImprovedPerformance)
+	SystemOIDCSingleV1SessionTerminationEventType  = setEventTypeFromFeature(feature.LevelSystem, feature.KeyOIDCSingleV1SessionTermination)
 	SystemInMemoryProjectionsEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyInMemoryProjections)
 
 	InstanceResetEventType                           = resetEventTypeFromFeature(feature.LevelInstance)
@@ -31,6 +32,7 @@ var (
 	InstanceImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyImprovedPerformance)
 	InstanceWebKeyEventType                          = setEventTypeFromFeature(feature.LevelInstance, feature.KeyWebKey)
 	InstanceDebugOIDCParentErrorEventType            = setEventTypeFromFeature(feature.LevelInstance, feature.KeyDebugOIDCParentError)
+	InstanceOIDCSingleV1SessionTerminationEventType  = setEventTypeFromFeature(feature.LevelInstance, feature.KeyOIDCSingleV1SessionTermination)
 	InstanceInMemoryProjectionsEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyInMemoryProjections)
 )
 

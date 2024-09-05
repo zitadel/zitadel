@@ -25,6 +25,7 @@ type InstanceFeatures struct {
 	ImprovedPerformance             []feature.ImprovedPerformanceType
 	WebKey                          *bool
 	DebugOIDCParentError            *bool
+	OIDCSingleV1SessionTermination  *bool
 	InMemoryProjections             *bool
 }
 
@@ -39,6 +40,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.ImprovedPerformance == nil &&
 		m.WebKey == nil &&
 		m.DebugOIDCParentError == nil &&
+		m.OIDCSingleV1SessionTermination == nil &&
 		m.InMemoryProjections == nil
 }
 

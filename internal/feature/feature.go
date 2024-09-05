@@ -16,6 +16,7 @@ const (
 	KeyImprovedPerformance
 	KeyWebKey
 	KeyDebugOIDCParentError
+	KeyOIDCSingleV1SessionTermination
 	KeyInMemoryProjections
 )
 
@@ -42,6 +43,7 @@ type Features struct {
 	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
 	WebKey                          bool                      `json:"web_key,omitempty"`
 	DebugOIDCParentError            bool                      `json:"debug_oidc_parent_error,omitempty"`
+	OIDCSingleV1SessionTermination  bool                      `json:"terminate_single_v1_session,omitempty"`
 	InMemoryProjections             bool                      `json:"in_memory_projections,omitempty"`
 }
 

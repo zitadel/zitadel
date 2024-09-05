@@ -14,6 +14,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemTokenExchangeEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemActionsEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemImprovedPerformanceEventType, eventstore.GenericEventMapper[SetEvent[[]feature.ImprovedPerformanceType]])
+	eventstore.RegisterFilterEventMapper(AggregateType, InstanceOIDCSingleV1SessionTerminationEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemInMemoryProjectionsEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceResetEventType, eventstore.GenericEventMapper[ResetEvent])
@@ -26,5 +27,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceImprovedPerformanceEventType, eventstore.GenericEventMapper[SetEvent[[]feature.ImprovedPerformanceType]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceWebKeyEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceDebugOIDCParentErrorEventType, eventstore.GenericEventMapper[SetEvent[bool]])
+	eventstore.RegisterFilterEventMapper(AggregateType, InstanceOIDCSingleV1SessionTerminationEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceInMemoryProjectionsEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 }

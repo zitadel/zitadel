@@ -97,6 +97,10 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
+				Event:  feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
+				Reduce: reduceInstanceSetFeature[bool],
+			},
+			{
 				Event:  feature_v2.InstanceInMemoryProjectionsEventType,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
