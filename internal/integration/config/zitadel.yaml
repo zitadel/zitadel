@@ -1,15 +1,19 @@
 Log:
-  Level: debug
+  Level: info
 
 ExternalSecure: false
 
 TLS:
   Enabled: false
 
+Quotas:
+  Access:
+    Enabled: true
+
 Telemetry:
   Enabled: true
   Endpoints:
-  - http://localhost:8081
+  - http://localhost:8081/milestone
   Headers:
     single-value: "single-value"
     multi-value:
@@ -27,14 +31,15 @@ LogStore:
       Enabled: true
 
 Projections:
-  HandleActiveInstances: 60s
+  HandleActiveInstances: 30m
+  RequeueEvery: 5s
+  TransactionDuration: 1m
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
+    telemetry:
       HandleActiveInstances: 60s
-    Telemetry:
-      RequeueEvery: 5s
-      HandleActiveInstances: 60s
+      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:

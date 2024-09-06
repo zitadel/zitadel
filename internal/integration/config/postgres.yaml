@@ -1,10 +1,12 @@
 Database:
+  EventPushConnRatio: 0.2 # 4
+  ProjectionSpoolerConnRatio: 0.3 # 6
   postgres:
     Host: localhost
     Port: 5432
     Database: zitadel
-    MaxOpenConns: 15
-    MaxIdleConns: 10
+    MaxOpenConns: 20
+    MaxIdleConns: 20
     User:
       Username: zitadel
       SSL:
