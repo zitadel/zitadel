@@ -64,7 +64,7 @@
     "@types/tinycolor2": "1.4.3",
     "@types/uuid": "^10.0.0",
     "@vercel/git-hooks": "1.0.0",
-    "@zitadel/prettier-config": "workspace:^",
+    "@zitadel/prettier-config": "workspace:*",
     "@zitadel/tsconfig": "workspace:*",
     "autoprefixer": "10.4.20",
     "concurrently": "^8.1.0",
