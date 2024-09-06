@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/readmodel"
 )
 
 type Queries struct {
@@ -40,6 +41,8 @@ type Queries struct {
 	zitadelRoles                        []authz.RoleMapping
 	multifactors                        domain.MultifactorConfigs
 	defaultAuditLogRetention            time.Duration
+
+	instanceCache *readmodel.AuthZInstances
 }
 
 func StartQueries(
@@ -77,6 +80,7 @@ func StartQueries(
 		defaultAuditLogRetention: defaultAuditLogRetention,
 	}
 
+	repo.instanceCache = readmodel.NewAuthZInstances(ctx, es, repo)
 	repo.checkPermission = permissionCheck(repo)
 
 	err = projection.Create(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)

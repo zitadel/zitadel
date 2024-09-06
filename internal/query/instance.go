@@ -195,6 +195,8 @@ var (
 	instanceByIDQuery string
 )
 
+type cacheUsedKey bool
+
 func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
@@ -203,6 +205,11 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 		}
 		span.EndWithError(err)
 	}()
+
+	if ctx.Value(cacheUsedKey(true)) == nil {
+		ctx = context.WithValue(ctx, cacheUsedKey(true), &struct{}{})
+		return q.instanceCache.InstanceByHost(ctx, instanceHost, publicHost)
+	}
 
 	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
@@ -219,6 +226,12 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if ctx.Value(cacheUsedKey(true)) == nil {
+		ctx = context.WithValue(ctx, cacheUsedKey(true), &struct{}{})
+		return q.instanceCache.InstanceByID(ctx, id)
+	}
+
 	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
