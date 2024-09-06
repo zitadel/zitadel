@@ -719,7 +719,7 @@ service AdminService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "SMS Provider";
       summary: "Update HTTP SMS Provider";
-      description: "Change the configuration of an SMS provider of the type HTTP.  A provider has to be activated to be able to send notifications."
+      description: "Change the configuration of an SMS provider of the type HTTP. A provider has to be activated to be able to send notifications."
     };
   }
 
@@ -4559,6 +4559,7 @@ message UpdateSMSProviderTwilioRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string sid = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
             min_length: 1;
@@ -4567,6 +4568,7 @@ message UpdateSMSProviderTwilioRequest {
     ];
     string sender_number = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
             min_length: 1;
@@ -4575,6 +4577,7 @@ message UpdateSMSProviderTwilioRequest {
     ];
     string description = 4 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
             min_length: 1;
@@ -4625,6 +4628,7 @@ message UpdateSMSProviderHTTPRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string endpoint = 2 [
         (validate.rules).string = {min_len: 1, max_len: 2048},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"http://relay.example.com/provider\"";
             min_length: 1;
@@ -4633,6 +4637,7 @@ message UpdateSMSProviderHTTPRequest {
     ];
     string description = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
             min_length: 1;

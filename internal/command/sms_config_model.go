@@ -12,22 +12,21 @@ import (
 type IAMSMSConfigWriteModel struct {
 	eventstore.WriteModel
 
-	ID     string
-	Twilio *TwilioConfig
-	HTTP   *HTTPConfig
-	State  domain.SMSConfigState
+	ID          string
+	Description string
+	Twilio      *TwilioConfig
+	HTTP        *HTTPConfig
+	State       domain.SMSConfigState
 }
 
 type TwilioConfig struct {
-	Description  string
 	SID          string
 	Token        *crypto.CryptoValue
 	SenderNumber string
 }
 
 type HTTPConfig struct {
-	Description string
-	Endpoint    string
+	Endpoint string
 }
 
 func NewIAMSMSConfigWriteModel(instanceID, id string) *IAMSMSConfigWriteModel {
@@ -53,10 +52,14 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 				Token:        e.Token,
 				SenderNumber: e.SenderNumber,
 			}
+			wm.Description = e.Description
 			wm.State = domain.SMSConfigStateInactive
 		case *instance.SMSConfigTwilioChangedEvent:
 			if wm.ID != e.ID {
 				continue
+			}
+			if e.Description != nil {
+				wm.Description = *e.Description
 			}
 			if e.SID != nil {
 				wm.Twilio.SID = *e.SID
@@ -76,10 +79,14 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			wm.HTTP = &HTTPConfig{
 				Endpoint: e.Endpoint,
 			}
+			wm.Description = e.Description
 			wm.State = domain.SMSConfigStateInactive
 		case *instance.SMSConfigHTTPChangedEvent:
 			if wm.ID != e.ID {
 				continue
+			}
+			if e.Description != nil {
+				wm.Description = *e.Description
 			}
 			if e.Endpoint != nil {
 				wm.HTTP.Endpoint = *e.Endpoint
@@ -151,7 +158,7 @@ func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, agg
 		return nil, false, nil
 	}
 
-	if description != nil && wm.Twilio.Description != *description {
+	if description != nil && wm.Description != *description {
 		changes = append(changes, instance.ChangeSMSConfigTwilioDescription(*description))
 	}
 	if sid != nil && wm.Twilio.SID != *sid {
@@ -179,7 +186,7 @@ func (wm *IAMSMSConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggre
 		return nil, false, nil
 	}
 
-	if description != nil && wm.HTTP.Description != *description {
+	if description != nil && wm.Description != *description {
 		changes = append(changes, instance.ChangeSMSConfigHTTPDescription(*description))
 	}
 	if endpoint != nil && wm.HTTP.Endpoint != *endpoint {
