@@ -108,8 +108,6 @@ export default function PasswordForm({
         m !== AuthenticationMethodType.PASSKEY,
     );
 
-    console.log(availableSecondFactors, loginSettings);
-
     if (availableSecondFactors.length == 1) {
       const params = new URLSearchParams({
         loginName: submitted.factors.user.loginName,
@@ -224,7 +222,6 @@ export default function PasswordForm({
           autoComplete="password"
           {...register("password", { required: "This field is required" })}
           label="Password"
-          //   error={errors.username?.message as string}
         />
         <button
           className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
@@ -236,7 +233,12 @@ export default function PasswordForm({
         </button>
 
         {loginName && (
-          <input type="hidden" name="loginName" value={loginName} />
+          <input
+            type="hidden"
+            name="loginName"
+            autoComplete="username"
+            value={loginName}
+          />
         )}
       </div>
 
