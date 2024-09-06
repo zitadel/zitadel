@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -140,7 +141,7 @@ func (q *Queries) accessTokenByOIDCSessionAndTokenID(ctx context.Context, oidcSe
 
 // checkSessionNotTerminatedAfter checks if a [session.TerminateType] event (or user events leading to a session termination)
 // occurred after a certain time and will return an error if so.
-func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID, userID string, position float64, fingerprintID string) (err error) {
+func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID, userID string, position decimal.Decimal, fingerprintID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -162,7 +163,7 @@ func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID,
 }
 
 type sessionTerminatedModel struct {
-	position      float64
+	position      decimal.Decimal
 	sessionID     string
 	userID        string
 	fingerPrintID string
@@ -182,7 +183,7 @@ func (s *sessionTerminatedModel) AppendEvents(events ...eventstore.Event) {
 
 func (s *sessionTerminatedModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		PositionAfter(s.position).
+		PositionGreaterEqual(s.position).
 		AddQuery().
 		AggregateTypes(session.AggregateType).
 		AggregateIDs(s.sessionID).
