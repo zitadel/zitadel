@@ -192,11 +192,13 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 		require.NoError(t, err)
 	}
 	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
-		resp, err := instance.Client.FeatureV2.GetInstanceFeatures(iamCTX, &feature.GetInstanceFeaturesRequest{
-			Inheritance: true,
-		})
-		require.NoError(ttt, err)
-		assert.Equal(ttt, enableFeature, resp.GetWebKey().GetEnabled())
+		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
+		if enableFeature {
+			assert.NoError(ttt, err)
+			assert.Len(t, resp.GetWebKeys(), 2)
+		} else {
+			assert.Error(t, err)
+		}
 	}, time.Minute, time.Second)
 
 	return instance, iamCTX
