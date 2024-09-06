@@ -6,6 +6,12 @@ import (
 )
 
 type Config struct {
-	TwilioConfig  *twilio.Config
-	WebhookConfig *webhook.Config
+	ProviderConfig *Provider
+	TwilioConfig   *twilio.Config
+	WebhookConfig  *webhook.Config
+}
+
+type Provider struct {
+	ID          string `json:"id,omitempty"`
+	Description string `json:"description,omitempty"`
 }

@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/logging"
 
@@ -13,9 +14,10 @@ import (
 )
 
 type serializableData struct {
-	templates.TemplateData
+	TemplateData templates.TemplateData `json:"templateData,omitempty"`
 
-	Args map[string]interface{}
+	ContextInfo map[string]interface{} `json:"contextInfo,omitempty"`
+	Args        map[string]interface{} `json:"args,omitempty"`
 }
 
 func generateSms(
@@ -32,7 +34,10 @@ func generateSms(
 	if smsChannels == nil || smsChannels.Len() == 0 {
 		return zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
 	}
-
+	recipient := user.VerifiedPhone
+	if lastPhone {
+		recipient = user.LastPhone
+	}
 	if config.TwilioConfig != nil {
 		number := ""
 		if err == nil {
@@ -40,20 +45,28 @@ func generateSms(
 		}
 		message := &messages.SMS{
 			SenderPhoneNumber:    number,
-			RecipientPhoneNumber: user.VerifiedPhone,
+			RecipientPhoneNumber: recipient,
 			Content:              data.Text,
 			TriggeringEvent:      triggeringEvent,
-		}
-		if lastPhone {
-			message.RecipientPhoneNumber = user.LastPhone
 		}
 		return smsChannels.HandleMessage(message)
 	}
 	if config.WebhookConfig != nil {
+		caseArgs := make(map[string]interface{}, len(args))
+		for k, v := range args {
+			caseArgs[strings.ToLower(string(k[0]))+k[1:]] = v
+		}
+		contextInfo := map[string]interface{}{
+			"recipientPhoneNumber": recipient,
+			"eventType":            triggeringEvent.Type(),
+			"provider":             config.ProviderConfig,
+		}
+
 		message := &messages.JSON{
 			Serializable: &serializableData{
 				TemplateData: data,
-				Args:         args,
+				Args:         caseArgs,
+				ContextInfo:  contextInfo,
 			},
 			TriggeringEvent: triggeringEvent,
 		}
