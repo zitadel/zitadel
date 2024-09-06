@@ -253,6 +253,7 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -293,6 +294,7 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -367,6 +369,7 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:

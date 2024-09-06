@@ -33,6 +33,7 @@ If you encounter issues with an enterprise supported feature and you are eligibl
 
 - LDAP Identity Provider
 - [Terraform Provider](https://github.com/zitadel/terraform-provider-zitadel)
+- [Helm Chart](https://github.com/zitadel/zitadel-charts)
 
 ### Community supported
 

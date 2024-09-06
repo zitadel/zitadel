@@ -38,6 +38,7 @@ type ToggleStates = {
   userSchema?: FeatureState;
   oidcTokenExchange?: FeatureState;
   actions?: FeatureState;
+  oidcSingleV1SessionTermination?: FeatureState;
 };
 
 @Component({
@@ -135,6 +136,12 @@ export class FeaturesComponent implements OnDestroy {
         req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
         changed = true;
       }
+      if (this.toggleStates?.oidcSingleV1SessionTermination?.state !== ToggleState.INHERITED) {
+        req.setOidcSingleV1SessionTermination(
+          this.toggleStates?.oidcSingleV1SessionTermination?.state === ToggleState.ENABLED,
+        );
+        changed = true;
+      }
 
       if (changed) {
         this.featureService
@@ -215,6 +222,16 @@ export class FeaturesComponent implements OnDestroy {
                 ? ToggleState.ENABLED
                 : ToggleState.DISABLED,
         },
+        oidcSingleV1SessionTermination: {
+          source: this.featureData.oidcSingleV1SessionTermination?.source || Source.SOURCE_SYSTEM,
+          state:
+            this.featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_SYSTEM ||
+            this.featureData.oidcSingleV1SessionTermination?.source === Source.SOURCE_UNSPECIFIED
+              ? ToggleState.INHERITED
+              : !!this.featureData.oidcSingleV1SessionTermination?.enabled
+                ? ToggleState.ENABLED
+                : ToggleState.DISABLED,
+        },
       };
     });
   }
@@ -231,25 +248,5 @@ export class FeaturesComponent implements OnDestroy {
       .catch((error) => {
         this.toast.showError(error);
       });
-  }
-
-  public saveFeatures(): void {
-    if (this.featureData) {
-      const req = new SetInstanceFeaturesRequest();
-      req.setLoginDefaultOrg(!!this.featureData.loginDefaultOrg?.enabled);
-      req.setOidcLegacyIntrospection(!!this.featureData.oidcLegacyIntrospection?.enabled);
-      req.setOidcTokenExchange(!!this.featureData.oidcTokenExchange?.enabled);
-      req.setOidcTriggerIntrospectionProjections(!!this.featureData.oidcTriggerIntrospectionProjections?.enabled);
-      req.setUserSchema(!!this.featureData.userSchema?.enabled);
-
-      this.featureService
-        .setInstanceFeatures(req)
-        .then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
   }
 }
