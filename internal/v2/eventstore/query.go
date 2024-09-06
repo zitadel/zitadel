@@ -25,6 +25,9 @@ type Query struct {
 }
 
 func (q *Query) Instance() database.Condition {
+	if q.instances == nil {
+		return nil
+	}
 	return q.instances.condition
 }
 
@@ -45,12 +48,12 @@ func (q *Query) Reduce(events ...*StorageEvent) error {
 	return q.reducer.Reduce(events...)
 }
 
-func NewQuery(instance string, reducer Reducer, opts ...QueryOpt) *Query {
+func NewQuery(reducer Reducer, opts ...QueryOpt) *Query {
 	query := &Query{
 		reducer: reducer,
 	}
 
-	for _, opt := range append([]QueryOpt{SetInstance(instance)}, opts...) {
+	for _, opt := range opts {
 		opt(query)
 	}
 

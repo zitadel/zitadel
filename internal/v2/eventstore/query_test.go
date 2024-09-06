@@ -787,7 +787,7 @@ func TestFilterOpt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewFilter(tt.args.opts...)
-			parent := NewQuery("instance", nil)
+			parent := NewQuery(nil)
 			got.parent = parent
 			tt.want.parent = parent
 
@@ -820,10 +820,6 @@ func TestQueryOpt(t *testing.T) {
 				},
 			},
 			want: &Query{
-				instances: &filter[[]string]{
-					condition: database.NewTextEqual("instance"),
-					value:     toPtr([]string{"instance"}),
-				},
 				pagination: &Pagination{
 					pagination: &database.Pagination{
 						Limit: 1,
@@ -839,10 +835,6 @@ func TestQueryOpt(t *testing.T) {
 				},
 			},
 			want: &Query{
-				instances: &filter[[]string]{
-					condition: database.NewTextEqual("instance"),
-					value:     toPtr([]string{"instance"}),
-				},
 				tx: &tx,
 			},
 		},
@@ -867,12 +859,7 @@ func TestQueryOpt(t *testing.T) {
 					InstancesEqual(),
 				},
 			},
-			want: &Query{
-				instances: &filter[[]string]{
-					condition: database.NewTextEqual("instance"),
-					value:     toPtr([]string{"instance"}),
-				},
-			},
+			want: &Query{},
 		},
 		{
 			name: "InstanceEqual 1 param",
@@ -910,12 +897,7 @@ func TestQueryOpt(t *testing.T) {
 					InstancesContains(),
 				},
 			},
-			want: &Query{
-				instances: &filter[[]string]{
-					condition: database.NewTextEqual("instance"),
-					value:     toPtr([]string{"instance"}),
-				},
-			},
+			want: &Query{},
 		},
 		{
 			name: "InstancesContains 1 param",
@@ -953,12 +935,7 @@ func TestQueryOpt(t *testing.T) {
 					InstancesNotContains(),
 				},
 			},
-			want: &Query{
-				instances: &filter[[]string]{
-					condition: database.NewTextEqual("instance"),
-					value:     toPtr([]string{"instance"}),
-				},
-			},
+			want: &Query{},
 		},
 		{
 			name: "InstancesNotContains 1 param",
@@ -998,10 +975,6 @@ func TestQueryOpt(t *testing.T) {
 				},
 			},
 			want: &Query{
-				instances: &filter[[]string]{
-					condition: database.NewTextEqual("instance"),
-					value:     toPtr([]string{"instance"}),
-				},
 				filters: make([]*Filter, 2),
 			},
 		},
@@ -1014,10 +987,6 @@ func TestQueryOpt(t *testing.T) {
 				},
 			},
 			want: &Query{
-				instances: &filter[[]string]{
-					condition: database.NewTextEqual("instance"),
-					value:     toPtr([]string{"instance"}),
-				},
 				filters: make([]*Filter, 2),
 			},
 		},
@@ -1030,17 +999,13 @@ func TestQueryOpt(t *testing.T) {
 				},
 			},
 			want: &Query{
-				instances: &filter[[]string]{
-					condition: database.NewTextEqual("instance"),
-					value:     toPtr([]string{"instance"}),
-				},
 				filters: make([]*Filter, 1),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewQuery("instance", nil, tt.args.opts...)
+			got := NewQuery(nil, tt.args.opts...)
 
 			if !reflect.DeepEqual(tt.want.Instance(), got.Instance()) {
 				t.Errorf("unexpected instances %v, want: %v", got.instances, tt.want.instances)

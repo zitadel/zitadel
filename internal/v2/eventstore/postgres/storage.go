@@ -38,7 +38,7 @@ func initPushStmt(typ string) string {
 	case "cockroach":
 		return ", hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp()"
 	case "postgres":
-		return ", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())"
+		return ", statement_timestamp(), EXTRACT(EPOCH FROM transaction_timestamp())"
 	default:
 		logging.WithFields("database_type", typ).Panic("position statement for type not implemented")
 		return ""

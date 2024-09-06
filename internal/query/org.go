@@ -119,8 +119,8 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	eventCount, err := q.eventStoreV4.Query(
 		ctx,
 		eventstore.NewQuery(
-			authz.GetInstance(ctx).InstanceID(),
 			foundOrg,
+			eventstore.SetInstance(authz.GetInstance(ctx).InstanceID()),
 			eventstore.AppendFilters(foundOrg.Filter()...),
 		),
 	)

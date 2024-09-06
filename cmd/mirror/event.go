@@ -18,8 +18,8 @@ func queryLastSuccessfulMigration(ctx context.Context, destinationES *eventstore
 	_, err := destinationES.Query(
 		ctx,
 		eventstore.NewQuery(
-			system.AggregateInstance,
 			lastSuccess,
+			eventstore.SetInstance(system.AggregateInstance),
 			eventstore.SetFilters(lastSuccess.Filter()),
 		),
 	)
