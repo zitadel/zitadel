@@ -4820,7 +4820,7 @@ message UpdateEmailProviderSMTPRequest {
         (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"replyto@m.zitadel.cloud\"";
-            min_length: 1;
+            min_length: 0;
             max_length: 200;
         }
     ];
@@ -4833,7 +4833,7 @@ message UpdateEmailProviderSMTPRequest {
         (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
-            min_length: 1;
+            min_length: 0;
             max_length: 200;
         }
     ];
@@ -4898,7 +4898,7 @@ message UpdateEmailProviderHTTPRequest {
         (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
-            min_length: 1;
+            min_length: 0;
             max_length: 200;
         }
     ];
