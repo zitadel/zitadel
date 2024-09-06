@@ -230,6 +230,8 @@ module.exports = {
                 "guides/integrate/login/oidc/oauth-recommended-flows",
                 "guides/integrate/login/oidc/device-authorization",
                 "guides/integrate/login/oidc/logout",
+                "guides/integrate/login/oidc/webkeys",
+
               ],
             },
             "guides/integrate/login/saml",

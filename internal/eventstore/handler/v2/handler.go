@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"math"
 	"math/rand"
 	"slices"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -379,7 +379,7 @@ func (h *Handler) existingInstances(ctx context.Context) ([]string, error) {
 
 type triggerConfig struct {
 	awaitRunning bool
-	maxPosition  float64
+	maxPosition  decimal.Decimal
 }
 
 type TriggerOpt func(conf *triggerConfig)
@@ -390,7 +390,7 @@ func WithAwaitRunning() TriggerOpt {
 	}
 }
 
-func WithMaxPosition(position float64) TriggerOpt {
+func WithMaxPosition(position decimal.Decimal) TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.maxPosition = position
 	}
@@ -500,7 +500,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
+	if !config.maxPosition.Equal(decimal.Decimal{}) && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
@@ -576,7 +576,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
 	for i, statement := range statements {
-		if statement.Position == currentState.position &&
+		if statement.Position.Equal(currentState.position) &&
 			statement.AggregateID == currentState.aggregateID &&
 			statement.AggregateType == currentState.aggregateType &&
 			statement.Sequence == currentState.sequence {
@@ -609,14 +609,14 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 		return nil
 	}
 
-	_, err = tx.Exec("SAVEPOINT exec")
+	_, err = tx.ExecContext(ctx, "SAVEPOINT exec")
 	if err != nil {
 		h.log().WithError(err).Debug("create savepoint failed")
 		return err
 	}
 	var shouldContinue bool
 	defer func() {
-		_, errSave := tx.Exec("RELEASE SAVEPOINT exec")
+		_, errSave := tx.ExecContext(ctx, "RELEASE SAVEPOINT exec")
 		if err == nil {
 			err = errSave
 		}
@@ -644,9 +644,8 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	if currentState.position > 0 {
-		// decrease position by 10 because builder.PositionAfter filters for position > and we need position >=
-		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 10))
+	if currentState.position.GreaterThan(decimal.Decimal{}) {
+		builder = builder.PositionGreaterEqual(currentState.position)
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
 		}
