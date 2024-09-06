@@ -43,7 +43,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			return err
 		}
 
-		if err = es.handleNotifications(ctx, tx, commands); err != nil {
+		if err = es.handleNotifications(ctx, tx, events); err != nil {
 			return err
 		}
 
@@ -66,17 +66,17 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	return events, nil
 }
 
-func (es *Eventstore) handleNotifications(ctx context.Context, tx *sql.Tx, cmds []eventstore.Command) error {
+func (es *Eventstore) handleNotifications(ctx context.Context, tx *sql.Tx, events []eventstore.Event) error {
 	if !authz.GetFeatures(ctx).InMemoryProjections {
 		return nil
 	}
 
-	for _, cmd := range cmds {
-		_, hasSubscribers := es.subscribedEventTypes[cmd.Type()]
+	for _, event := range events {
+		_, hasSubscribers := es.subscribedEventTypes[event.Type()]
 		if !hasSubscribers {
 			continue
 		}
-		_, err := tx.ExecContext(ctx, "SELECT pg_notify($1)", cmd.Type())
+		_, err := tx.ExecContext(ctx, "SELECT pg_notify($1, $2)", event.Type(), event.Position())
 		if err != nil {
 			return err
 		}

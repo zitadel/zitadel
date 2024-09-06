@@ -27,7 +27,7 @@ func NewEventstore(client *database.DB) *Eventstore {
 		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp(), $%d)"
 		uniqueConstraintPlaceholderFmt = "('%s', '%s', '%s')"
 	case "postgres":
-		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp()), $%d)"
+		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM transaction_timestamp()), $%d)"
 		uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 	}
 
