@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Button, ButtonVariants } from "./Button";
-import { TextInput } from "./Input";
-import { PrivacyPolicyCheckboxes } from "./PrivacyPolicyCheckboxes";
-import { FieldValues, useForm } from "react-hook-form";
+import { registerUser } from "@/lib/server/register";
+import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { useRouter } from "next/navigation";
-import { Spinner } from "./Spinner";
+import { useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import Alert from "./Alert";
 import AuthenticationMethodRadio, {
   methods,
 } from "./AuthenticationMethodRadio";
-import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
-import { first } from "node_modules/cypress/types/lodash";
+import { Button, ButtonVariants } from "./Button";
+import { TextInput } from "./Input";
+import { PrivacyPolicyCheckboxes } from "./PrivacyPolicyCheckboxes";
+import { Spinner } from "./Spinner";
 
 type Inputs =
   | {
@@ -57,24 +57,19 @@ export default function RegisterFormWithoutPassword({
 
   async function submitAndRegister(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/api/registeruser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: values.email,
-        firstName: values.firstname,
-        lastName: values.lastname,
-        organization: organization,
-      }),
+    const response = await registerUser({
+      email: values.email,
+      firstName: values.firstname,
+      lastName: values.lastname,
+      organization: organization,
+    }).catch((error) => {
+      setError(error.message ?? "Could not register user");
+      setLoading(false);
     });
+
     setLoading(false);
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.details);
-    }
-    return res.json();
+
+    return response;
   }
 
   async function submitAndContinue(
@@ -91,28 +86,28 @@ export default function RegisterFormWithoutPassword({
       registerParams.authRequestId = authRequestId;
     }
 
-    return withPassword
-      ? router.push(`/register?` + new URLSearchParams(registerParams))
-      : submitAndRegister(value)
-          .then((session) => {
-            setError("");
+    if (withPassword) {
+      return router.push(`/register?` + new URLSearchParams(registerParams));
+    } else {
+      const session = await submitAndRegister(value).catch((error) => {
+        setError(error.message ?? "Could not register user");
+      });
 
-            const params: any = { loginName: session.factors.user.loginName };
+      const params = new URLSearchParams({});
+      if (session?.factors?.user?.loginName) {
+        params.set("loginName", session.factors?.user?.loginName);
+      }
 
-            if (organization) {
-              params.organization = organization;
-            }
+      if (organization) {
+        params.set("organization", organization);
+      }
 
-            if (authRequestId) {
-              params.authRequestId = authRequestId;
-            }
+      if (authRequestId) {
+        params.set("authRequestId", authRequestId);
+      }
 
-            return router.push(`/passkey/add?` + new URLSearchParams(params));
-          })
-          .catch((errorDetails: Error) => {
-            setLoading(false);
-            setError(errorDetails.message);
-          });
+      return router.push(`/passkey/add?` + new URLSearchParams(params));
+    }
   }
 
   const { errors } = formState;

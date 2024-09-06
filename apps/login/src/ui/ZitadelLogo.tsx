@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { ZitadelLogoDark } from "./ZitadelLogoDark";
-import { ZitadelLogoLight } from "./ZitadelLogoLight";
 type Props = {
   height?: number;
   width?: number;

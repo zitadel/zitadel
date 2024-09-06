@@ -1,6 +1,7 @@
 {
   "name": "@zitadel/login",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "test": "concurrently --timings --kill-others-on-fail 'npm:test:unit' 'npm:test:integration'",
@@ -37,10 +38,8 @@
     "@tailwindcss/forms": "0.5.7",
     "@vercel/analytics": "^1.2.2",
     "@zitadel/client": "workspace:*",
-    "@zitadel/next": "workspace:*",
     "@zitadel/node": "workspace:*",
     "@zitadel/proto": "workspace:*",
-    "@zitadel/react": "workspace:*",
     "clsx": "1.2.1",
     "copy-to-clipboard": "^3.3.3",
     "moment": "^2.29.4",
@@ -57,7 +56,7 @@
   "devDependencies": {
     "@bufbuild/buf": "^1.36.0",
     "@testing-library/jest-dom": "^6.4.5",
-    "@testing-library/react": "^16.0.0",
+    "@testing-library/react": "^16.0.1",
     "@types/ms": "0.7.34",
     "@types/node": "22.1.0",
     "@types/react": "18.3.3",
@@ -74,6 +73,7 @@
     "env-cmd": "^10.1.0",
     "eslint-config-zitadel": "workspace:*",
     "grpc-tools": "1.12.4",
+    "jsdom": "^25.0.0",
     "lint-staged": "15.2.8",
     "make-dir-cli": "4.0.0",
     "nodemon": "^3.1.4",

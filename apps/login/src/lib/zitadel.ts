@@ -1,29 +1,30 @@
 import {
+  createIdpServiceClient,
   createOIDCServiceClient,
+  createOrganizationServiceClient,
   createSessionServiceClient,
   createSettingsServiceClient,
   createUserServiceClient,
-  createIdpServiceClient,
   makeReqCtx,
-  createOrganizationServiceClient,
 } from "@zitadel/client/v2";
-import { createManagementServiceClient } from "@zitadel/client/v1";
 import { createServerTransport } from "@zitadel/node";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 
-import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { create } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import { PartialMessage, PlainMessage } from "@zitadel/client";
-import { SearchQuery as UserSearchQuery } from "@zitadel/proto/zitadel/user/v2/query_pb";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import {
+  SearchQuery,
+  SearchQuerySchema,
+} from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3000;
@@ -122,8 +123,8 @@ export async function getPasswordComplexitySettings(organization?: string) {
 }
 
 export async function createSessionFromChecks(
-  checks: PlainMessage<Checks>,
-  challenges: PlainMessage<RequestChallenges> | undefined,
+  checks: Checks,
+  challenges: RequestChallenges | undefined,
 ) {
   return sessionService.createSession(
     {
@@ -166,7 +167,7 @@ export async function setSession(
   sessionId: string,
   sessionToken: string,
   challenges: RequestChallenges | undefined,
-  checks?: PlainMessage<Checks>,
+  checks?: Checks,
 ) {
   return sessionService.setSession(
     {
@@ -249,48 +250,49 @@ export async function listUsers({
   email?: string;
   organizationId?: string;
 }) {
-  const queries: PartialMessage<UserSearchQuery>[] = [];
+  const queries: SearchQuery[] = [];
 
   if (userName) {
-    queries.push({
-      query: {
-        case: "userNameQuery",
-        value: {
-          userName,
-          method: TextQueryMethod.EQUALS,
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "userNameQuery",
+          value: {
+            userName,
+            method: TextQueryMethod.EQUALS,
+          },
         },
-      },
-    });
+      }),
+    );
   }
 
   if (organizationId) {
-    queries.push({
-      query: {
-        case: "organizationIdQuery",
-        value: {
-          organizationId,
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "organizationIdQuery",
+          value: {
+            organizationId,
+          },
         },
-      },
-    });
+      }),
+    );
   }
 
   if (email) {
-    queries.push({
-      query: {
-        case: "emailQuery",
-        value: {
-          emailAddress: email,
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "emailQuery",
+          value: {
+            emailAddress: email,
+          },
         },
-      },
-    });
+      }),
+    );
   }
 
-  return userService.listUsers(
-    {
-      queries: queries,
-    },
-    {},
-  );
+  return userService.listUsers({ queries: queries });
 }
 
 export async function getOrgsByDomain(domain: string) {
@@ -314,7 +316,7 @@ export async function startIdentityProviderFlow({
   urls,
 }: {
   idpId: string;
-  urls: PlainMessage<RedirectURLs>;
+  urls: RedirectURLsJson;
 }) {
   return userService.startIdentityProviderIntent({
     idpId,
@@ -345,7 +347,7 @@ export async function getAuthRequest({
   });
 }
 
-export async function createCallback(req: PlainMessage<CreateCallbackRequest>) {
+export async function createCallback(req: CreateCallbackRequest) {
   return oidcService.createCallback(req);
 }
 
@@ -478,7 +480,7 @@ export async function registerU2F(userId: string, domain: string) {
  * @returns the newly set email
  */
 export async function verifyU2FRegistration(
-  request: PlainMessage<VerifyU2FRegistrationRequest>,
+  request: VerifyU2FRegistrationRequest,
 ) {
   return userService.verifyU2FRegistration(request, {});
 }
@@ -496,10 +498,8 @@ export async function getActiveIdentityProviders(orgId?: string) {
  * @returns the newly set email
  */
 export async function verifyPasskeyRegistration(
-  request: PartialMessage<VerifyPasskeyRegistrationRequest>,
+  request: VerifyPasskeyRegistrationRequest,
 ) {
-  // TODO: find a better way to handle this
-  request = VerifyPasskeyRegistrationRequest.fromJson(request as any);
   return userService.verifyPasskeyRegistration(request, {});
 }
 

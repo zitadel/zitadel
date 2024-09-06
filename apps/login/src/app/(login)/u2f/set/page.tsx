@@ -1,9 +1,9 @@
-import { getBrandingSettings, sessionService } from "@/lib/zitadel";
+import { loadMostRecentSession } from "@/lib/session";
+import { getBrandingSettings } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterU2F from "@/ui/RegisterU2F";
 import UserAvatar from "@/ui/UserAvatar";
-import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -12,7 +12,7 @@ export default async function Page({
 }) {
   const { loginName, organization, authRequestId } = searchParams;
 
-  const sessionFactors = await loadMostRecentSession(sessionService, {
+  const sessionFactors = await loadMostRecentSession({
     loginName,
     organization,
   });

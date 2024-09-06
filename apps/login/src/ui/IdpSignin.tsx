@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Spinner } from "./Spinner";
-import Alert from "./Alert";
+import { createNewSession } from "@/lib/server/session";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Alert from "./Alert";
+import { Spinner } from "./Spinner";
 
 type Props = {
   userId: string;
@@ -15,66 +16,54 @@ type Props = {
   authRequestId?: string;
 };
 
-export default function IdpSignin(props: Props) {
+export default function IdpSignin({
+  userId,
+  idpIntent: { idpIntentId, idpIntentToken },
+  authRequestId,
+}: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 
-  async function createSessionForIdp() {
-    setLoading(true);
-    const res = await fetch("/api/session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: props.userId,
-        idpIntent: props.idpIntent,
-        authRequestId: props.authRequestId,
-        // organization: props.organization,
-      }),
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw error.details.details;
-    }
-    return res.json();
-  }
-
   useEffect(() => {
-    createSessionForIdp()
+    createNewSession({
+      userId,
+      idpIntent: {
+        idpIntentId,
+        idpIntentToken,
+      },
+      authRequestId,
+      // organization: props.organization,
+    })
       .then((session) => {
-        setLoading(false);
-        if (props.authRequestId && session && session.sessionId) {
+        if (authRequestId && session && session.id) {
           return router.push(
             `/login?` +
               new URLSearchParams({
-                sessionId: session.sessionId,
-                authRequest: props.authRequestId,
+                sessionId: session.id,
+                authRequest: authRequestId,
               }),
           );
         } else {
-          return router.push(
-            `/signedin?` +
-              new URLSearchParams(
-                props.authRequestId
-                  ? {
-                      loginName: session.factors.user.loginName,
-                      authRequestId: props.authRequestId,
-                    }
-                  : {
-                      loginName: session.factors.user.loginName,
-                    },
-              ),
-          );
+          const params = new URLSearchParams({});
+          if (session.factors?.user?.loginName) {
+            params.set("loginName", session.factors?.user?.loginName);
+          }
+
+          if (authRequestId) {
+            params.set("authRequestId", authRequestId);
+          }
+
+          return router.push(`/signedin?` + params);
         }
       })
       .catch((error) => {
-        setLoading(false);
         setError(error.message);
+        return;
       });
+
+    setLoading(false);
   }, []);
 
   return (

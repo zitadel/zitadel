@@ -1,11 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { BadgeState, StateBadge } from "./StateBadge";
-import clsx from "clsx";
-import { CheckIcon } from "@heroicons/react/24/outline";
-import { EMAIL, SMS, TOTP, U2F } from "./AuthMethods";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { EMAIL, SMS, TOTP, U2F } from "./AuthMethods";
 
 type Props = {
   loginName?: string;

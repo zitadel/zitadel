@@ -1,15 +1,15 @@
 "use client";
-import { QRCodeSVG } from "qrcode.react";
-import Alert, { AlertType } from "./Alert";
+import { verifyTOTP } from "@/lib/server-actions";
 import Link from "next/link";
-import CopyToClipboard from "./CopyToClipboard";
-import { TextInput } from "./Input";
-import { Button, ButtonVariants } from "./Button";
-import { Spinner } from "./Spinner";
+import { useRouter } from "next/navigation";
+import { QRCodeSVG } from "qrcode.react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { verifyTOTP } from "@/lib/server-actions";
+import Alert from "./Alert";
+import { Button, ButtonVariants } from "./Button";
+import CopyToClipboard from "./CopyToClipboard";
+import { TextInput } from "./Input";
+import { Spinner } from "./Spinner";
 
 type Inputs = {
   code: string;

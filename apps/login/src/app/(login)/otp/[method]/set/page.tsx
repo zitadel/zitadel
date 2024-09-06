@@ -1,9 +1,9 @@
+import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,
   addOTPSMS,
   getBrandingSettings,
   registerTOTP,
-  sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
@@ -11,9 +11,8 @@ import { Button, ButtonVariants } from "@/ui/Button";
 import DynamicTheme from "@/ui/DynamicTheme";
 import TOTPRegister from "@/ui/TOTPRegister";
 import UserAvatar from "@/ui/UserAvatar";
-import Link from "next/link";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { loadMostRecentSession } from "@zitadel/next";
+import Link from "next/link";
 
 export default async function Page({
   searchParams,
@@ -27,7 +26,7 @@ export default async function Page({
   const { method } = params;
 
   const branding = await getBrandingSettings(organization);
-  const session = await loadMostRecentSession(sessionService, {
+  const session = await loadMostRecentSession({
     loginName,
     organization,
   });

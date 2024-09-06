@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Button, ButtonVariants } from "./Button";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { Spinner } from "./Spinner";
-import Alert from "./Alert";
+import { addU2F, verifyU2F } from "@/lib/server/u2f";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { Button, ButtonVariants } from "./Button";
+import { Spinner } from "./Spinner";
 
 type Inputs = {};
 
@@ -23,38 +22,11 @@ export default function RegisterU2F({
   organization,
   authRequestId,
 }: Props) {
-  const { register, handleSubmit, formState } = useForm<Inputs>({
-    mode: "onBlur",
-  });
-
   const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
-
-  async function submitRegister() {
-    setError("");
-    setLoading(true);
-    const res = await fetch("/api/u2f", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sessionId,
-      }),
-    });
-
-    const response = await res.json();
-
-    setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
-    return response;
-  }
 
   async function submitVerify(
     u2fId: string,
@@ -63,120 +35,119 @@ export default function RegisterU2F({
     sessionId: string,
   ) {
     setLoading(true);
-    const res = await fetch("/api/u2f/verify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        u2fId,
-        passkeyName,
-        publicKeyCredential,
-        sessionId,
-      }),
+    const response = await verifyU2F({
+      u2fId,
+      passkeyName,
+      publicKeyCredential,
+      sessionId,
+    }).catch((error: Error) => {
+      setLoading(false);
+      setError(error.message);
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
+
     return response;
   }
 
-  function submitRegisterAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitRegister().then((resp: RegisterU2FResponse) => {
-      const u2fId = resp.u2fId;
-      const options: CredentialCreationOptions =
-        (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
-        {};
-
-      if (options.publicKey) {
-        options.publicKey.challenge = coerceToArrayBuffer(
-          options.publicKey.challenge,
-          "challenge",
-        );
-        options.publicKey.user.id = coerceToArrayBuffer(
-          options.publicKey.user.id,
-          "userid",
-        );
-        if (options.publicKey.excludeCredentials) {
-          options.publicKey.excludeCredentials.map((cred: any) => {
-            cred.id = coerceToArrayBuffer(
-              cred.id as string,
-              "excludeCredentials.id",
-            );
-            return cred;
-          });
-        }
-
-        navigator.credentials
-          .create(options)
-          .then((resp) => {
-            if (
-              resp &&
-              (resp as any).response.attestationObject &&
-              (resp as any).response.clientDataJSON &&
-              (resp as any).rawId
-            ) {
-              const attestationObject = (resp as any).response
-                .attestationObject;
-              const clientDataJSON = (resp as any).response.clientDataJSON;
-              const rawId = (resp as any).rawId;
-
-              const data = {
-                id: resp.id,
-                rawId: coerceToBase64Url(rawId, "rawId"),
-                type: resp.type,
-                response: {
-                  attestationObject: coerceToBase64Url(
-                    attestationObject,
-                    "attestationObject",
-                  ),
-                  clientDataJSON: coerceToBase64Url(
-                    clientDataJSON,
-                    "clientDataJSON",
-                  ),
-                },
-              };
-              return submitVerify(u2fId, "", data, sessionId).then(() => {
-                const params = new URLSearchParams();
-
-                if (organization) {
-                  params.set("organization", organization);
-                }
-
-                if (authRequestId) {
-                  params.set("authRequestId", authRequestId);
-                  params.set("sessionId", sessionId);
-                  // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
-                  // params.set("loginName", resp.loginName);
-
-                  router.push("/u2f?" + params);
-                } else {
-                  router.push("/accounts?" + params);
-                }
-              });
-            } else {
-              setLoading(false);
-              setError("An error on registering passkey");
-              return null;
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            setLoading(false);
-            setError(error);
-
-            return null;
-          });
-      }
+  async function submitRegisterAndContinue(): Promise<boolean | void> {
+    setError("");
+    setLoading(true);
+    const response = await addU2F({
+      sessionId,
+    }).catch((error) => {
+      setLoading(false);
+      setError(error.message);
     });
-  }
 
-  const { errors } = formState;
+    if (!response) {
+      setLoading(false);
+      setError("An error on registering passkey");
+      return;
+    }
+
+    const u2fId = response?.u2fId;
+    const options: CredentialCreationOptions =
+      (response?.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
+      {};
+
+    if (options.publicKey) {
+      options.publicKey.challenge = coerceToArrayBuffer(
+        options.publicKey.challenge,
+        "challenge",
+      );
+      options.publicKey.user.id = coerceToArrayBuffer(
+        options.publicKey.user.id,
+        "userid",
+      );
+      if (options.publicKey.excludeCredentials) {
+        options.publicKey.excludeCredentials.map((cred: any) => {
+          cred.id = coerceToArrayBuffer(
+            cred.id as string,
+            "excludeCredentials.id",
+          );
+          return cred;
+        });
+      }
+
+      const resp = await navigator.credentials.create(options);
+
+      if (
+        !resp ||
+        !(resp as any).response.attestationObject ||
+        !(resp as any).response.clientDataJSON ||
+        !(resp as any).rawId
+      ) {
+        setError("An error on registering passkey");
+        setLoading(false);
+        return;
+      }
+
+      const attestationObject = (resp as any).response.attestationObject;
+      const clientDataJSON = (resp as any).response.clientDataJSON;
+      const rawId = (resp as any).rawId;
+
+      const data = {
+        id: resp.id,
+        rawId: coerceToBase64Url(rawId, "rawId"),
+        type: resp.type,
+        response: {
+          attestationObject: coerceToBase64Url(
+            attestationObject,
+            "attestationObject",
+          ),
+          clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
+        },
+      };
+
+      const submitResponse = await submitVerify(u2fId, "", data, sessionId);
+
+      if (!submitResponse) {
+        setLoading(false);
+        setError("An error on verifying passkey");
+        return;
+      }
+
+      const params = new URLSearchParams();
+
+      if (organization) {
+        params.set("organization", organization);
+      }
+
+      if (authRequestId) {
+        params.set("authRequestId", authRequestId);
+        params.set("sessionId", sessionId);
+        // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
+        // params.set("loginName", resp.loginName);
+
+        router.push("/u2f?" + params);
+      } else {
+        router.push("/accounts?" + params);
+      }
+    }
+
+    setLoading(false);
+  }
 
   return (
     <form className="w-full">
@@ -194,8 +165,8 @@ export default function RegisterU2F({
           type="submit"
           className="self-end"
           variant={ButtonVariants.Primary}
-          disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitRegisterAndContinue)}
+          disabled={loading}
+          onClick={submitRegisterAndContinue}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

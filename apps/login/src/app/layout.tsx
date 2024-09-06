@@ -1,13 +1,10 @@
 import "@/styles/globals.scss";
 import { AddressBar } from "@/ui/AddressBar";
 import { GlobalNav } from "@/ui/GlobalNav";
-import { Lato } from "next/font/google";
-import { LayoutProviders } from "@/ui/LayoutProviders";
-import { Analytics } from "@vercel/analytics/react";
-import ThemeWrapper from "@/ui/ThemeWrapper";
-import { getBrandingSettings } from "@/lib/zitadel";
-import ThemeProvider from "@/ui/ThemeProvider";
 import Theme from "@/ui/Theme";
+import ThemeProvider from "@/ui/ThemeProvider";
+import { Analytics } from "@vercel/analytics/react";
+import { Lato } from "next/font/google";
 
 const lato = Lato({
   weight: ["400", "700", "900"],

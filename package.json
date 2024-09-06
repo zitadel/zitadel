@@ -13,7 +13,7 @@
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "clean": "turbo run clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --check \"**/*.{ts,tsx,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build --filter=login^... && changeset publish"
@@ -28,6 +28,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "eslint": "8.57.0",
     "eslint-config-zitadel": "workspace:*",
+    "@zitadel/prettier-config": "workspace:*",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^4.0.0",
     "tsup": "^8.2.4",

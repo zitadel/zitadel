@@ -1,13 +1,9 @@
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  sessionService,
-} from "@/lib/zitadel";
+import { loadMostRecentSession } from "@/lib/session";
+import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import PasswordForm from "@/ui/PasswordForm";
 import UserAvatar from "@/ui/UserAvatar";
-import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -17,7 +13,7 @@ export default async function Page({
   const { loginName, organization, promptPasswordless, authRequestId, alt } =
     searchParams;
 
-  const sessionFactors = await loadMostRecentSession(sessionService, {
+  const sessionFactors = await loadMostRecentSession({
     loginName,
     organization,
   });
@@ -31,7 +27,7 @@ export default async function Page({
         <h1>{sessionFactors?.factors?.user?.displayName ?? "Password"}</h1>
         <p className="ztdl-p mb-6 block">Enter your password.</p>
 
-        {!sessionFactors && (
+        {(!sessionFactors || !loginName) && (
           <div className="py-4">
             <Alert>
               Could not get the context of the user. Make sure to enter the
@@ -49,14 +45,16 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        <PasswordForm
-          loginName={loginName}
-          authRequestId={authRequestId}
-          organization={organization}
-          loginSettings={loginSettings}
-          promptPasswordless={promptPasswordless === "true"}
-          isAlternative={alt === "true"}
-        />
+        {loginName && (
+          <PasswordForm
+            loginName={loginName}
+            authRequestId={authRequestId}
+            organization={organization}
+            loginSettings={loginSettings}
+            promptPasswordless={promptPasswordless === "true"}
+            isAlternative={alt === "true"}
+          />
+        )}
       </div>
     </DynamicTheme>
   );

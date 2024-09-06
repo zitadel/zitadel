@@ -1,7 +1,14 @@
+import {
+  CreateCallbackRequestSchema,
+  SessionSchema,
+} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
 
+import { getAllSessions } from "@/lib/cookies";
+import { idpTypeToSlug } from "@/lib/idp";
 import {
   createCallback,
   getActiveIdentityProviders,
@@ -10,15 +17,13 @@ import {
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { getAllSessions } from "@zitadel/next";
-import { NextRequest, NextResponse } from "next/server";
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { create } from "@zitadel/client";
 import {
   AuthRequest,
   Prompt,
 } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { idpTypeToSlug } from "@/lib/idp";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { NextRequest, NextResponse } from "next/server";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
@@ -98,13 +103,15 @@ export async function GET(request: NextRequest) {
 
         // works not with _rsc request
         try {
-          const { callbackUrl } = await createCallback({
-            authRequestId,
-            callbackKind: {
-              case: "session",
-              value: session,
-            },
-          });
+          const { callbackUrl } = await createCallback(
+            create(CreateCallbackRequestSchema, {
+              authRequestId,
+              callbackKind: {
+                case: "session",
+                value: create(SessionSchema, session),
+              },
+            }),
+          );
           if (callbackUrl) {
             return NextResponse.redirect(callbackUrl);
           } else {
@@ -262,13 +269,15 @@ export async function GET(request: NextRequest) {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
-            const { callbackUrl } = await createCallback({
-              authRequestId,
-              callbackKind: {
-                case: "session",
-                value: session,
-              },
-            });
+            const { callbackUrl } = await createCallback(
+              create(CreateCallbackRequestSchema, {
+                authRequestId,
+                callbackKind: {
+                  case: "session",
+                  value: create(SessionSchema, session),
+                },
+              }),
+            );
             return NextResponse.redirect(callbackUrl);
           } else {
             return NextResponse.json(
@@ -297,13 +306,15 @@ export async function GET(request: NextRequest) {
               sessionToken: cookie?.token,
             };
             try {
-              const { callbackUrl } = await createCallback({
-                authRequestId,
-                callbackKind: {
-                  case: "session",
-                  value: session,
-                },
-              });
+              const { callbackUrl } = await createCallback(
+                create(CreateCallbackRequestSchema, {
+                  authRequestId,
+                  callbackKind: {
+                    case: "session",
+                    value: create(SessionSchema, session),
+                  },
+                }),
+              );
               if (callbackUrl) {
                 return NextResponse.redirect(callbackUrl);
               } else {

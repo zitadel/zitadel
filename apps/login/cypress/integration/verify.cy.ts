@@ -14,6 +14,6 @@ describe("/verify", () => {
     // TODO: Avoid uncaught exception in application
     cy.once("uncaught:exception", () => false);
     cy.visit("/verify?userId=123&code=abc&submit=true");
-    cy.contains("error validating code");
+    cy.contains("Could not verify email");
   });
 });

@@ -1,6 +1,5 @@
 "use client";
 
-import { ZitadelReactProvider } from "@zitadel/react";
 import { useTheme } from "next-themes";
 
 type Props = {
@@ -12,8 +11,6 @@ export function LayoutProviders({ children }: Props) {
   const isDark = resolvedTheme === "dark";
 
   return (
-    <div className={`${isDark ? "ui-dark" : "ui-light"} `}>
-      <ZitadelReactProvider dark={isDark}>{children}</ZitadelReactProvider>
-    </div>
+    <div className={`${isDark ? "ui-dark" : "ui-light"} `}>{children}</div>
   );
 }

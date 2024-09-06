@@ -1,8 +1,8 @@
+import { CheckIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import Link from "next/link";
-import { BadgeState, StateBadge } from "./StateBadge";
-import { CheckIcon } from "@heroicons/react/24/solid";
 import { ReactNode } from "react";
+import { BadgeState, StateBadge } from "./StateBadge";
 
 const cardClasses = (alreadyAdded: boolean) =>
   clsx(

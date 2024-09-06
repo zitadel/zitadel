@@ -1,14 +1,14 @@
 "use server";
 
-import { loadMostRecentSession } from "@zitadel/next";
-import { sessionService, verifyTOTPRegistration } from "./zitadel";
+import { loadMostRecentSession } from "./session";
+import { verifyTOTPRegistration } from "./zitadel";
 
 export async function verifyTOTP(
   code: string,
   loginName?: string,
   organization?: string,
 ) {
-  return loadMostRecentSession(sessionService, {
+  return loadMostRecentSession({
     loginName,
     organization,
   }).then((session) => {

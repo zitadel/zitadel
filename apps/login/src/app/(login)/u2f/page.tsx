@@ -1,9 +1,10 @@
-import { getBrandingSettings, getSession, sessionService } from "@/lib/zitadel";
+import { getSessionCookieById } from "@/lib/cookies";
+import { loadMostRecentSession } from "@/lib/session";
+import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
 import UserAvatar from "@/ui/UserAvatar";
-import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -16,7 +17,7 @@ export default async function Page({
 
   const sessionFactors = sessionId
     ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession(sessionService, { loginName, organization });
+    : await loadMostRecentSession({ loginName, organization });
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });

@@ -1,13 +1,12 @@
 "use client";
 
 import { setTheme } from "@/utils/colors";
-import { useEffect } from "react";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
-import { PartialMessage } from "@zitadel/client";
+import { ReactNode, useEffect } from "react";
 
 type Props = {
-  branding: PartialMessage<BrandingSettings> | undefined;
-  children: React.ReactNode;
+  branding: BrandingSettings | undefined;
+  children: ReactNode;
 };
 
 const ThemeWrapper = ({ children, branding }: Props) => {

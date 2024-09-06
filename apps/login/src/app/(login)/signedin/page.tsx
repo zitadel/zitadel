@@ -1,20 +1,30 @@
+import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
 import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@zitadel/next";
+import { create } from "@zitadel/client";
+import {
+  CreateCallbackRequestSchema,
+  SessionSchema,
+} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { redirect } from "next/navigation";
 
 async function loadSession(loginName: string, authRequestId?: string) {
   const recent = await getMostRecentCookieWithLoginname({ loginName });
 
   if (authRequestId) {
-    return createCallback({
-      authRequestId,
-      callbackKind: {
-        case: "session",
-        value: { sessionId: recent.id, sessionToken: recent.token },
-      },
-    }).then(({ callbackUrl }) => {
+    return createCallback(
+      create(CreateCallbackRequestSchema, {
+        authRequestId,
+        callbackKind: {
+          case: "session",
+          value: create(SessionSchema, {
+            sessionId: recent.id,
+            sessionToken: recent.token,
+          }),
+        },
+      }),
+    ).then(({ callbackUrl }) => {
       return redirect(callbackUrl);
     });
   }
@@ -42,7 +52,7 @@ export default async function Page({ searchParams }: { searchParams: any }) {
           displayName={sessionFactors?.factors?.user?.displayName}
           showDropdown
           searchParams={searchParams}
-        ></UserAvatar>
+        />
       </div>
     </DynamicTheme>
   );

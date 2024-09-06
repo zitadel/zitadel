@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { updateSession } from "@/lib/server/session";
+import { create } from "@zitadel/client";
+import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { useRouter } from "next/navigation";
-import { Button, ButtonVariants } from "./Button";
-import Alert, { AlertType } from "./Alert";
-import { Spinner } from "./Spinner";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextInput } from "./Input";
+import Alert, { AlertType } from "./Alert";
 import BackButton from "./BackButton";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { PlainMessage } from "@zitadel/client";
-import { Challenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Button, ButtonVariants } from "./Button";
+import { TextInput } from "./Input";
+import { Spinner } from "./Spinner";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -64,36 +65,35 @@ export default function LoginOTP({
   }, []);
 
   async function updateSessionForOTPChallenge() {
-    const challenges: PlainMessage<Challenges> = {};
+    let challenges;
 
     if (method === "email") {
-      challenges.otpEmail = "";
+      challenges = create(RequestChallengesSchema, {
+        otpEmail: { deliveryType: { case: "sendCode", value: {} } },
+      });
     }
 
     if (method === "sms") {
-      challenges.otpSms = "";
+      challenges = create(RequestChallengesSchema, {
+        otpSms: { returnCode: true },
+      });
     }
+
     setLoading(true);
-    const res = await fetch("/api/session", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName,
-        sessionId,
-        organization,
-        challenges,
-        authRequestId,
-      }),
+    const response = await updateSession({
+      loginName,
+      sessionId,
+      organization,
+      challenges,
+      authRequestId,
+    }).catch((error) => {
+      setError(error.message ?? "Could not request OTP challenge");
+      setLoading(false);
     });
 
     setLoading(false);
-    if (!res.ok) {
-      const error = await res.json();
-      throw error.details.details;
-    }
-    return res.json();
+
+    return response;
   }
 
   async function submitCode(values: Inputs, organization?: string) {
@@ -112,41 +112,38 @@ export default function LoginOTP({
       body.authRequestId = authRequestId;
     }
 
-    const checks: PlainMessage<Checks> = {};
+    let checks;
+
     if (method === "sms") {
-      checks.otpSms = { code: values.code };
+      checks = create(ChecksSchema, {
+        otpSms: { code: values.code },
+      });
     }
     if (method === "email") {
-      checks.otpEmail = { code: values.code };
+      checks = create(ChecksSchema, {
+        otpEmail: { code: values.code },
+      });
     }
     if (method === "time-based") {
-      checks.totp = { code: values.code };
+      checks = create(ChecksSchema, {
+        totp: { code: values.code },
+      });
     }
 
-    const res = await fetch("/api/session", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName,
-        sessionId,
-        organization,
-        checks,
-        authRequestId,
-      }),
+    const response = await updateSession({
+      loginName,
+      sessionId,
+      organization,
+      checks,
+      authRequestId,
+    }).catch((error) => {
+      setError(error.message ?? "Could not verify OTP code");
+      setLoading(false);
     });
 
     setLoading(false);
-    if (!res.ok) {
-      const response = await res.json();
 
-      setError(response.details.details ?? "An internal error occurred");
-      return Promise.reject(
-        response.details.details ?? "An internal error occurred",
-      );
-    }
-    return res.json();
+    return response;
   }
 
   function setCodeAndContinue(values: Inputs, organization?: string) {
@@ -163,16 +160,13 @@ export default function LoginOTP({
 
         return router.push(`/login?` + params);
       } else {
-        const params = new URLSearchParams(
-          authRequestId
-            ? {
-                loginName: response.factors.user.loginName,
-                authRequestId,
-              }
-            : {
-                loginName: response.factors.user.loginName,
-              },
-        );
+        const params = new URLSearchParams();
+        if (response?.factors?.user?.loginName) {
+          params.append("loginName", response.factors.user.loginName);
+        }
+        if (authRequestId) {
+          params.append("authRequestId", authRequestId);
+        }
 
         if (organization) {
           params.append("organization", organization);
@@ -182,8 +176,6 @@ export default function LoginOTP({
       }
     });
   }
-
-  const { errors } = formState;
 
   return (
     <form className="w-full">

@@ -1,11 +1,11 @@
-import { expect, describe, test, beforeEach, afterEach } from "vitest";
 import {
-  render,
   cleanup,
+  render,
   screen,
   waitFor,
   within,
 } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import PasswordComplexity from "./PasswordComplexity";
 
 const matchesTitle = `Matches`;

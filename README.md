@@ -2,13 +2,13 @@
 
 This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL
 Login UI.
-The repo makes use of the [build system Turbo](https://turbo.build/repo) and
-the [Changesets CLI for versioning the packages](https://github.com/changesets/changesets).
 
 **⚠️ This repo and packages are in alpha state and subject to change ⚠️**
 
-The scope of functionality of this repo and packages is limited and under active development.
-Once the package structure is set and all APIs are fully implemented we'll move this repo to beta state.
+The scope of functionality of this repo and packages is under active development.
+
+The `@zitadel/client` and `@zitadel/node` packages are using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme) and its [2.0.0-alpha](https://github.com/connectrpc/connect-es/releases/tag/v2.0.0-alpha.1) release which might still change.
+
 You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
 Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
 a [GitHub issue](https://github.com/zitadel/typescript/issues).
@@ -28,11 +28,9 @@ We think the easiest path of getting up and running, is the following:
 ## Included Apps And Packages
 
 - `login`: The login UI used by ZITADEL Cloud, powered by Next.js
-- `@zitadel/node`: core components for establishing node client connection, grpc stub
+- `@zitadel/node`: core components for establishing node client connection
 - `@zitadel/client`: shared client utilities
 - `@zitadel/proto`: shared protobuf types
-- `@zitadel/react`: shared React utilities and components built with tailwindcss
-- `@zitadel/next`: shared Next.js utilities
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
 
@@ -53,13 +51,13 @@ You can already use the current state, and extend it with your needs.
 - [x] Local User Registration (with Password)
 - [x] User Registration and Login with external Provider
   - [x] Google
-  - [ ] GitHub
-  - [ ] GitHub Enterprise
+  - [x] GitHub
+  - [x] GitHub Enterprise
   - [x] GitLab
-  - [ ] GitLab Enterprise
-  - [ ] Azure
+  - [x] GitLab Enterprise
+  - [x] Azure
   - [ ] Apple
-  - [ ] Generic OIDC
+  - [x] Generic OIDC
   - [ ] Generic OAuth
   - [ ] Generic JWT
   - [ ] LDAP
@@ -70,7 +68,7 @@ You can already use the current state, and extend it with your needs.
   - [x] OTP: Email Code
   - [x] OTP: SMS Code
 - [ ] Password Change/Reset
-- [ ] Domain Discovery
+- [x] Domain Discovery
 - [x] Branding
 - OIDC Standard
   - [x] Authorization Code Flow with PKCE
@@ -84,7 +82,7 @@ You can already use the current state, and extend it with your needs.
   - Scopes
     - [x] `openid email profile address``
     - [x] `offline access`
-    - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
+    - [x] `urn:zitadel:iam:org:idp:id:{idp_id}`
     - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
     - [x] `urn:zitadel:iam:org:id:{orgid}`
     - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
@@ -118,22 +116,6 @@ settings. The [Changesets bot](https://github.com/apps/changeset-bot) should als
 
 Read the [changesets documentation](https://github.com/changesets/changesets/blob/main/docs/automating-changesets.md)
 for more information about this automation
-
-### NPM
-
-If you want to publish a package to the public npm registry and make them publicly available, this is already setup.
-
-To publish packages to a private npm organization scope, **remove** the following from each of the `package.json`'s
-
-```diff
-- "publishConfig": {
--  "access": "public"
-- },
-```
-
-### GitHub Package Registry
-
-See [working with the npm registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#publishing-a-package-using-publishconfig-in-the-packagejson-file)
 
 ### Run Login UI
 

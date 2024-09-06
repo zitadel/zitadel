@@ -2,10 +2,10 @@
 
 import { demos, type Item } from "@/lib/demos";
 import { ZitadelLogo } from "@/ui/ZitadelLogo";
-import Link from "next/link";
-import { useSelectedLayoutSegment, usePathname } from "next/navigation";
-import clsx from "clsx";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
+import Link from "next/link";
+import { usePathname, useSelectedLayoutSegment } from "next/navigation";
 import { useState } from "react";
 import Theme from "./Theme";
 

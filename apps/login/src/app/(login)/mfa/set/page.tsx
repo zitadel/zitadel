@@ -1,17 +1,17 @@
+import { getSessionCookieById } from "@/lib/cookies";
+import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getLoginSettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-  sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
 import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
-import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -29,7 +29,7 @@ export default async function Page({
     loginName?: string,
     organization?: string,
   ) {
-    return loadMostRecentSession(sessionService, {
+    return loadMostRecentSession({
       loginName,
       organization,
     }).then((session) => {
