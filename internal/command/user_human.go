@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -301,9 +300,7 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 func addLink(ctx context.Context, filter preparation.FilterToQueryReducer, a *user.Aggregate, link *AddLink) (eventstore.Command, error) {
 	exists, err := ExistsIDPOnOrgOrInstance(ctx, filter, authz.GetInstance(ctx).InstanceID(), a.ResourceOwner, link.IDPID)
 	if !exists || err != nil {
-		err = zerrors.ThrowPreconditionFailed(err, "COMMAND-39nf2", "Errors.IDPConfig.NotExisting")
-		logging.WithError(err).Warn("add link")
-		return nil, err
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39nf2", "Errors.IDPConfig.NotExisting")
 	}
 	return user.NewUserIDPLinkAddedEvent(ctx, &a.Aggregate, link.IDPID, link.DisplayName, link.IDPExternalID), nil
 }

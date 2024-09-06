@@ -19,11 +19,10 @@ import (
 )
 
 var (
-	SystemCTX context.Context
-	IamCTX    context.Context
-	OrgCTX    context.Context
-	Instance  *integration.Instance
-	Client    feature.FeatureServiceClient
+	IamCTX   context.Context
+	OrgCTX   context.Context
+	Instance *integration.Instance
+	Client   feature.FeatureServiceClient
 )
 
 func TestMain(m *testing.M) {
