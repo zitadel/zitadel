@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"time"
 
+	v2 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -45,6 +46,8 @@ type Event interface {
 	CreatedAt() time.Time
 	// Position is the global position of the event
 	Position() float64
+	// InTxOrder is the sequence inside a single transaction
+	InTxOrder() uint32
 
 	// Unmarshal parses the payload and stores the result
 	// in the value pointed to by ptr. If ptr is nil or not a pointer,
@@ -53,6 +56,31 @@ type Event interface {
 
 	// Deprecated: only use for migration
 	DataAsBytes() []byte
+}
+
+type v2Event struct{}
+
+func EventToV2(event Event) *v2.StorageEvent {
+	return &v2.StorageEvent{
+		Action: v2.Action[v2.Unmarshal]{
+			Creator:  event.Creator(),
+			Type:     string(event.Type()),
+			Revision: event.Revision(),
+			Payload:  event.Unmarshal,
+		},
+		Aggregate: v2.Aggregate{
+			ID:       event.Aggregate().ID,
+			Type:     string(event.Aggregate().Type),
+			Instance: event.Aggregate().InstanceID,
+			Owner:    event.Aggregate().ResourceOwner,
+		},
+		CreatedAt: event.CreatedAt(),
+		Position: v2.GlobalPosition{
+			Position:        event.Position(),
+			InPositionOrder: event.InTxOrder(),
+		},
+		Sequence: uint32(event.Sequence()),
+	}
 }
 
 type EventType string

@@ -211,6 +211,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 				&event.Typ,
 				&event.Seq,
 				position,
+				&event.TXOrder,
 				&event.Data,
 				&event.EditorUser,
 				&event.ResourceOwner,

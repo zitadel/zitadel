@@ -144,7 +144,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 		}
 		sequence.sequence++
 
-		events[i], err = commandToEvent(sequence, command)
+		events[i], err = commandToEvent(sequence, command, uint32(i))
 		if err != nil {
 			return nil, nil, nil, err
 		}

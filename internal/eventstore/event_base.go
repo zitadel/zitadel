@@ -22,6 +22,7 @@ type BaseEvent struct {
 
 	Seq                           uint64
 	Pos                           float64
+	TxOrder                       uint32
 	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
@@ -36,6 +37,10 @@ type BaseEvent struct {
 // Position implements Event.
 func (e *BaseEvent) Position() float64 {
 	return e.Pos
+}
+
+func (e *BaseEvent) InTxOrder() uint32 {
+	return e.TxOrder
 }
 
 // EditorService implements Command
@@ -109,6 +114,7 @@ func BaseEventFromRepo(event Event) *BaseEvent {
 		User:      event.Creator(),
 		Data:      event.DataAsBytes(),
 		Pos:       event.Position(),
+		TxOrder:   event.InTxOrder(),
 	}
 }
 

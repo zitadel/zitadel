@@ -326,6 +326,7 @@ func (db *CRDB) eventQuery(useV1 bool) string {
 		", event_type" +
 		`, "sequence"` +
 		`, "position"` +
+		", in_tx_order" +
 		", payload" +
 		", creator" +
 		`, "owner"` +

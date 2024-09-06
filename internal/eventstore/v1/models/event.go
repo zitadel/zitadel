@@ -21,6 +21,7 @@ type Event struct {
 	ID               string
 	Seq              uint64
 	Pos              float64
+	TXOrder          uint32
 	CreationDate     time.Time
 	Typ              eventstore.EventType
 	PreviousSequence uint64
@@ -82,6 +83,11 @@ func (e *Event) Sequence() uint64 {
 // Position implements [eventstore.Event]
 func (e *Event) Position() float64 {
 	return e.Pos
+}
+
+// InTxOrder implements [eventstore.Event]
+func (e *Event) InTxOrder() uint32 {
+	return e.TXOrder
 }
 
 // Type implements [eventstore.action]

@@ -22,10 +22,11 @@ type event struct {
 	createdAt time.Time
 	sequence  uint64
 	position  float64
+	inTxOrder uint32
 	payload   Payload
 }
 
-func commandToEvent(sequence *latestSequence, command eventstore.Command) (_ *event, err error) {
+func commandToEvent(sequence *latestSequence, command eventstore.Command, inTxOrder uint32) (_ *event, err error) {
 	var payload Payload
 	if command.Payload() != nil {
 		payload, err = json.Marshal(command.Payload())
@@ -41,6 +42,7 @@ func commandToEvent(sequence *latestSequence, command eventstore.Command) (_ *ev
 		typ:       command.Type(),
 		payload:   payload,
 		sequence:  sequence.sequence,
+		inTxOrder: inTxOrder,
 	}, nil
 }
 
@@ -87,6 +89,11 @@ func (e *event) Sequence() uint64 {
 // Sequence implements [eventstore.Event]
 func (e *event) Position() float64 {
 	return e.position
+}
+
+// InTxOrder implements [eventstore.Event]
+func (e *event) InTxOrder() uint32 {
+	return e.inTxOrder
 }
 
 // Unmarshal implements [eventstore.Event]

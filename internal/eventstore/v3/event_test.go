@@ -119,7 +119,7 @@ func Test_commandToEvent(t *testing.T) {
 			}
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := commandToEvent(tt.args.sequence, tt.args.command)
+			got, err := commandToEvent(tt.args.sequence, tt.args.command, 0)
 
 			tt.want.err(t, err)
 			assert.Equal(t, tt.want.event, got)

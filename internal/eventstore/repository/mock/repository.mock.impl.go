@@ -190,6 +190,10 @@ func (e *mockEvent) Position() float64 {
 	return 0
 }
 
+func (e *mockEvent) InTxOrder() uint32 {
+	return 0
+}
+
 func (e *mockEvent) CreatedAt() time.Time {
 	return e.createdAt
 }

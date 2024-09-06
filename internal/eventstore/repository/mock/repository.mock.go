@@ -156,7 +156,7 @@ func (mr *MockPusherMockRecorder) Push(arg0 any, arg1 ...any) *gomock.Call {
 }
 
 // Subscribe mocks base method.
-func (m *MockPusher) Subscribe(arg0 eventstore.EventType, arg1 chan<- eventstore.Event) {
+func (m *MockPusher) Subscribe(arg0 eventstore.EventType, arg1 chan<- float64) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Subscribe", arg0, arg1)
 }
