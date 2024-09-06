@@ -96,9 +96,7 @@ export default function UsernameForm({
 
           if (
             loginSettings?.passkeysType &&
-            (loginSettings?.passkeysType === PasskeysType.ALLOWED ||
-              (loginSettings.passkeysType as string) ===
-                "PASSKEYS_TYPE_ALLOWED")
+            loginSettings?.passkeysType === PasskeysType.ALLOWED
           ) {
             paramsPassword.promptPasswordless = `true`;
           }
