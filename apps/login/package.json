@@ -1,7 +1,6 @@
 {
   "name": "@zitadel/login",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev",
     "test": "concurrently --timings --kill-others-on-fail 'npm:test:unit' 'npm:test:integration'",

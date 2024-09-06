@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "Prettier configuration",
   "private": true,
-  "type": "module",
   "exports": {
     ".": "./index.js"
   }
