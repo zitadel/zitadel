@@ -4541,10 +4541,10 @@ message AddSMSProviderTwilioRequest {
         }
     ];
     string description = 4 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
-            min_length: 1;
+            min_length: 0;
             max_length: 200;
         }
     ];
@@ -4576,11 +4576,10 @@ message UpdateSMSProviderTwilioRequest {
         }
     ];
     string description = 4 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
-            min_length: 1;
+            min_length: 0;
             max_length: 200;
         }
     ];
@@ -4610,10 +4609,10 @@ message AddSMSProviderHTTPRequest {
         }
     ];
     string description = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
-            min_length: 1;
+            min_length: 0;
             max_length: 200;
         }
     ];
@@ -4636,11 +4635,10 @@ message UpdateSMSProviderHTTPRequest {
         }
     ];
     string description = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
-            min_length: 1;
+            min_length: 0;
             max_length: 200;
         }
     ];
