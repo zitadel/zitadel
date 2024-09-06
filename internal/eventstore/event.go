@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	v2 "github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -45,7 +47,7 @@ type Event interface {
 	// CreatedAt is the time the event was created at
 	CreatedAt() time.Time
 	// Position is the global position of the event
-	Position() float64
+	Position() decimal.Decimal
 	// InTxOrder is the sequence inside a single transaction
 	InTxOrder() uint32
 

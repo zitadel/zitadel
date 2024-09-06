@@ -3,6 +3,8 @@ package eventstore
 import (
 	"context"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -18,7 +20,7 @@ type Eventstore struct {
 	client *database.DB
 	// used to send a pgnotify event on push to the postgres channel named after the event type
 	// the channels can be used to send a trigger to the projection
-	subscribedEventTypes map[eventstore.EventType][]chan<- float64
+	subscribedEventTypes map[eventstore.EventType][]chan<- decimal.Decimal
 }
 
 func NewEventstore(client *database.DB) *Eventstore {
@@ -31,10 +33,10 @@ func NewEventstore(client *database.DB) *Eventstore {
 		uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 	}
 
-	return &Eventstore{client: client, subscribedEventTypes: make(map[eventstore.EventType][]chan<- float64)}
+	return &Eventstore{client: client, subscribedEventTypes: make(map[eventstore.EventType][]chan<- decimal.Decimal)}
 }
 
-func (es *Eventstore) Subscribe(queue chan<- float64, eventTypes ...eventstore.EventType) {
+func (es *Eventstore) Subscribe(queue chan<- decimal.Decimal, eventTypes ...eventstore.EventType) {
 	for _, eventType := range eventTypes {
 		es.subscribedEventTypes[eventType] = append(es.subscribedEventTypes[eventType], queue)
 	}

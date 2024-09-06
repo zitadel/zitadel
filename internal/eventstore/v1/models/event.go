@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -20,7 +22,7 @@ var _ eventstore.Event = (*Event)(nil)
 type Event struct {
 	ID               string
 	Seq              uint64
-	Pos              float64
+	Pos              decimal.Decimal
 	TXOrder          uint32
 	CreationDate     time.Time
 	Typ              eventstore.EventType
@@ -81,7 +83,7 @@ func (e *Event) Sequence() uint64 {
 }
 
 // Position implements [eventstore.Event]
-func (e *Event) Position() float64 {
+func (e *Event) Position() decimal.Decimal {
 	return e.Pos
 }
 

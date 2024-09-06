@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/database/mock"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -541,13 +543,13 @@ func Test_writeFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewFilter(
 					eventstore.FilterPagination(
-						eventstore.PositionGreater(123.4, 0),
+						eventstore.PositionGreater(decimal.NewFromFloat(123.4), 0),
 					),
 				),
 			},
 			want: wantQuery{
 				query: " WHERE instance_id = $1 AND position > $2 ORDER BY position, in_tx_order",
-				args:  []any{"i1", 123.4},
+				args:  []any{"i1", decimal.NewFromFloat(123.4)},
 			},
 		},
 		{
@@ -555,18 +557,18 @@ func Test_writeFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewFilter(
 					eventstore.FilterPagination(
-						// 	eventstore.PositionGreater(123.4, 0),
+						// 	eventstore.PositionGreater(decimal.NewFromFloat(123.4), 0),
 						// 	eventstore.PositionLess(125.4, 10),
 						eventstore.PositionBetween(
-							&eventstore.GlobalPosition{Position: 123.4},
-							&eventstore.GlobalPosition{Position: 125.4, InPositionOrder: 10},
+							&eventstore.GlobalPosition{Position: decimal.NewFromFloat(123.4)},
+							&eventstore.GlobalPosition{Position: decimal.NewFromFloat(125.4), InPositionOrder: 10},
 						),
 					),
 				),
 			},
 			want: wantQuery{
 				query: " WHERE instance_id = $1 AND ((position = $2 AND in_tx_order < $3) OR position < $4) AND position > $5 ORDER BY position, in_tx_order",
-				args:  []any{"i1", 125.4, uint32(10), 125.4, 123.4},
+				args:  []any{"i1", decimal.NewFromFloat(125.4), uint32(10), decimal.NewFromFloat(125.4), decimal.NewFromFloat(123.4)},
 				// TODO: (adlerhurst) would require some refactoring to reuse existing args
 				// query: " WHERE instance_id = $1 AND position > $2 AND ((position = $3 AND in_tx_order < $4) OR position < $3) ORDER BY position, in_tx_order",
 				// args:  []any{"i1", 123.4, 125.4, uint32(10)},
@@ -577,13 +579,13 @@ func Test_writeFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewFilter(
 					eventstore.FilterPagination(
-						eventstore.PositionGreater(123.4, 12),
+						eventstore.PositionGreater(decimal.NewFromFloat(123.4), 12),
 					),
 				),
 			},
 			want: wantQuery{
 				query: " WHERE instance_id = $1 AND ((position = $2 AND in_tx_order > $3) OR position > $4) ORDER BY position, in_tx_order",
-				args:  []any{"i1", 123.4, uint32(12), 123.4},
+				args:  []any{"i1", decimal.NewFromFloat(123.4), uint32(12), decimal.NewFromFloat(123.4)},
 			},
 		},
 		{
@@ -593,13 +595,13 @@ func Test_writeFilter(t *testing.T) {
 					eventstore.FilterPagination(
 						eventstore.Limit(10),
 						eventstore.Offset(3),
-						eventstore.PositionGreater(123.4, 12),
+						eventstore.PositionGreater(decimal.NewFromFloat(123.4), 12),
 					),
 				),
 			},
 			want: wantQuery{
 				query: " WHERE instance_id = $1 AND ((position = $2 AND in_tx_order > $3) OR position > $4) ORDER BY position, in_tx_order LIMIT $5 OFFSET $6",
-				args:  []any{"i1", 123.4, uint32(12), 123.4, uint32(10), uint32(3)},
+				args:  []any{"i1", decimal.NewFromFloat(123.4), uint32(12), decimal.NewFromFloat(123.4), uint32(10), uint32(3)},
 			},
 		},
 		{
@@ -609,14 +611,14 @@ func Test_writeFilter(t *testing.T) {
 					eventstore.FilterPagination(
 						eventstore.Limit(10),
 						eventstore.Offset(3),
-						eventstore.PositionGreater(123.4, 12),
+						eventstore.PositionGreater(decimal.NewFromFloat(123.4), 12),
 					),
 					eventstore.AppendAggregateFilter("user"),
 				),
 			},
 			want: wantQuery{
 				query: " WHERE instance_id = $1 AND aggregate_type = $2 AND ((position = $3 AND in_tx_order > $4) OR position > $5) ORDER BY position, in_tx_order LIMIT $6 OFFSET $7",
-				args:  []any{"i1", "user", 123.4, uint32(12), 123.4, uint32(10), uint32(3)},
+				args:  []any{"i1", "user", decimal.NewFromFloat(123.4), uint32(12), decimal.NewFromFloat(123.4), uint32(10), uint32(3)},
 			},
 		},
 		{
@@ -626,7 +628,7 @@ func Test_writeFilter(t *testing.T) {
 					eventstore.FilterPagination(
 						eventstore.Limit(10),
 						eventstore.Offset(3),
-						eventstore.PositionGreater(123.4, 12),
+						eventstore.PositionGreater(decimal.NewFromFloat(123.4), 12),
 					),
 					eventstore.AppendAggregateFilter("user"),
 					eventstore.AppendAggregateFilter(
@@ -637,7 +639,7 @@ func Test_writeFilter(t *testing.T) {
 			},
 			want: wantQuery{
 				query: " WHERE instance_id = $1 AND (aggregate_type = $2 OR (aggregate_type = $3 AND aggregate_id = $4)) AND ((position = $5 AND in_tx_order > $6) OR position > $7) ORDER BY position, in_tx_order LIMIT $8 OFFSET $9",
-				args:  []any{"i1", "user", "org", "o1", 123.4, uint32(12), 123.4, uint32(10), uint32(3)},
+				args:  []any{"i1", "user", "org", "o1", decimal.NewFromFloat(123.4), uint32(12), decimal.NewFromFloat(123.4), uint32(10), uint32(3)},
 			},
 		},
 	}
@@ -959,7 +961,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							),
 							eventstore.FilterPagination(
 								// used because we need to check for first login and an app which is not console
-								eventstore.PositionGreater(12, 4),
+								eventstore.PositionGreater(decimal.NewFromInt(12), 4),
 							),
 						),
 						eventstore.NewFilter(
@@ -1068,9 +1070,9 @@ func Test_writeQueryUse_examples(t *testing.T) {
 					"instance",
 					"user",
 					"user.token.added",
-					float64(12),
+					decimal.NewFromInt(12),
 					uint32(4),
-					float64(12),
+					decimal.NewFromInt(12),
 					"instance",
 					"instance",
 					[]string{"instance.idp.config.added", "instance.idp.oauth.added", "instance.idp.oidc.added", "instance.idp.jwt.added", "instance.idp.azure.added", "instance.idp.github.added", "instance.idp.github.enterprise.added", "instance.idp.gitlab.added", "instance.idp.gitlab.selfhosted.added", "instance.idp.google.added", "instance.idp.ldap.added", "instance.idp.config.apple.added", "instance.idp.saml.added"},
@@ -1204,7 +1206,7 @@ func Test_executeQuery(t *testing.T) {
 						time.Now(),
 						"event.type",
 						uint32(23),
-						float64(123),
+						decimal.NewFromInt(123).String(),
 						uint32(0),
 						nil,
 						"gigi",
@@ -1238,7 +1240,7 @@ func Test_executeQuery(t *testing.T) {
 						time.Now(),
 						"event.type",
 						uint32(23),
-						float64(123),
+						decimal.NewFromInt(123).String(),
 						uint32(0),
 						[]byte(`{"name": "gigi"}`),
 						"gigi",
@@ -1272,7 +1274,7 @@ func Test_executeQuery(t *testing.T) {
 						time.Now(),
 						"event.type",
 						uint32(23),
-						float64(123),
+						decimal.NewFromInt(123).String(),
 						uint32(0),
 						nil,
 						"gigi",
@@ -1286,7 +1288,7 @@ func Test_executeQuery(t *testing.T) {
 						time.Now(),
 						"event.type",
 						uint32(24),
-						float64(124),
+						decimal.NewFromInt(124).String(),
 						uint32(0),
 						[]byte(`{"name": "gigi"}`),
 						"gigi",
@@ -1320,7 +1322,7 @@ func Test_executeQuery(t *testing.T) {
 						time.Now(),
 						"event.type",
 						uint32(23),
-						float64(123),
+						decimal.NewFromInt(123).String(),
 						uint32(0),
 						nil,
 						"gigi",
@@ -1334,7 +1336,7 @@ func Test_executeQuery(t *testing.T) {
 						time.Now(),
 						"event.type",
 						uint32(24),
-						float64(124),
+						decimal.NewFromInt(124).String(),
 						uint32(0),
 						[]byte(`{"name": "gigi"}`),
 						"gigi",
