@@ -14,10 +14,9 @@ import (
 )
 
 type serializableData struct {
+	ContextInfo  map[string]interface{} `json:"contextInfo,omitempty"`
 	TemplateData templates.TemplateData `json:"templateData,omitempty"`
-
-	ContextInfo map[string]interface{} `json:"contextInfo,omitempty"`
-	Args        map[string]interface{} `json:"args,omitempty"`
+	Args         map[string]interface{} `json:"args,omitempty"`
 }
 
 func generateSms(
