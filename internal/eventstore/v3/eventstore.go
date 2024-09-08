@@ -20,7 +20,7 @@ type Eventstore struct {
 	client *database.DB
 	// used to send a pgnotify event on push to the postgres channel named after the event type
 	// the channels can be used to send a trigger to the projection
-	subscribedEventTypes map[eventstore.EventType][]chan<- decimal.Decimal
+	subscriptions *subscriptions
 }
 
 func NewEventstore(client *database.DB) *Eventstore {
@@ -33,13 +33,11 @@ func NewEventstore(client *database.DB) *Eventstore {
 		uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 	}
 
-	return &Eventstore{client: client, subscribedEventTypes: make(map[eventstore.EventType][]chan<- decimal.Decimal)}
+	return &Eventstore{client: client, subscriptions: newSubscriptions()}
 }
 
 func (es *Eventstore) Subscribe(queue chan<- decimal.Decimal, eventTypes ...eventstore.EventType) {
-	for _, eventType := range eventTypes {
-		es.subscribedEventTypes[eventType] = append(es.subscribedEventTypes[eventType], queue)
-	}
+	es.subscriptions.Add(queue, eventTypes...)
 }
 
 func (es *Eventstore) Health(ctx context.Context) error {
