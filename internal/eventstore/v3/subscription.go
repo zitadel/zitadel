@@ -29,13 +29,6 @@ func (s *subscriptions) Add(ch chan<- decimal.Decimal, eventTypes ...eventstore.
 	s.mutex.Unlock()
 }
 
-func (s *subscriptions) Has(typ eventstore.EventType) bool {
-	s.mutex.RLock()
-	_, has := s.eventTypes[typ]
-	s.mutex.RUnlock()
-	return has
-}
-
 func (s *subscriptions) GetSubscribedEvents(events []eventstore.Event) []eventstore.Event {
 	out := make([]eventstore.Event, 0, len(events))
 
@@ -48,13 +41,6 @@ func (s *subscriptions) GetSubscribedEvents(events []eventstore.Event) []eventst
 	s.mutex.RUnlock()
 
 	return out
-}
-
-func (s *subscriptions) GetSubscribers(typ eventstore.EventType) []chan<- decimal.Decimal {
-	s.mutex.RLock()
-	subsribers := s.eventTypes[typ]
-	s.mutex.RUnlock()
-	return subsribers
 }
 
 func buildPgNotifyQuery(events []eventstore.Event) (query string, args []any, ok bool) {
