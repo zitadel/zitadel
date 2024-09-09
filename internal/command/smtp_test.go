@@ -1323,6 +1323,49 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "activate smtp config, already active, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"test",
+								true,
+								"from",
+								"name",
+								"",
+								"host:587",
+								"user",
+								&crypto.CryptoValue{},
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigActivatedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"ID",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:         authz.WithInstanceID(context.Background(), "INSTANCE"),
+				id:          "ID",
+				instanceID:  "INSTANCE",
+				activatedId: "",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

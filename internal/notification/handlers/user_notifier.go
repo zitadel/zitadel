@@ -283,7 +283,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		}
 		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
 		if e.NotificationType == domain.NotificationTypeSms {
-			notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
+			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e)
 		}
 		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
@@ -373,7 +373,7 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, event)
+	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event)
 	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
 	if err != nil {
 		return nil, err
@@ -709,7 +709,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if err != nil {
 			return err
 		}
-		err = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e).
+		err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e).
 			SendPhoneVerificationCode(ctx, code)
 		if err != nil {
 			return err

@@ -342,6 +342,7 @@ service AdminService {
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -921,6 +922,40 @@ service AdminService {
             description: "Change the token of the SMS provider of the type Twilio."
         };
     }
+
+  rpc AddSMSProviderHTTP(AddSMSProviderHTTPRequest) returns (AddSMSProviderHTTPResponse) {
+    option (google.api.http) = {
+      post: "/sms/http";
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "iam.write";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "SMS Provider";
+      summary: "Add HTTP SMS Provider";
+      description: "Configure a new SMS provider of the type HTTP. A provider has to be activated to be able to send notifications."
+    };
+  }
+
+  rpc UpdateSMSProviderHTTP(UpdateSMSProviderHTTPRequest) returns (UpdateSMSProviderHTTPResponse) {
+    option (google.api.http) = {
+      put: "/sms/http/{id}";
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "iam.write";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "SMS Provider";
+      summary: "Update HTTP SMS Provider";
+      description: "Change the configuration of an SMS provider of the type HTTP. A provider has to be activated to be able to send notifications."
+    };
+  }
 
     rpc ActivateSMSProvider(ActivateSMSProviderRequest) returns (ActivateSMSProviderResponse) {
         option (google.api.http) = {
@@ -5053,6 +5088,14 @@ message AddSMSProviderTwilioRequest {
             max_length: 200;
         }
     ];
+    string description = 4 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
 }
 
 message AddSMSProviderTwilioResponse {
@@ -5080,6 +5123,14 @@ message UpdateSMSProviderTwilioRequest {
             max_length: 200;
         }
     ];
+    string description = 4 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
 }
 
 message UpdateSMSProviderTwilioResponse {
@@ -5092,6 +5143,56 @@ message UpdateSMSProviderTwilioTokenRequest {
 }
 
 message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddSMSProviderHTTPRequest {
+    string endpoint = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 2048},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://relay.example.com/provider\"";
+            min_length: 1;
+            max_length: 2048;
+        }
+    ];
+    string description = 2 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+}
+
+message AddSMSProviderHTTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSMSProviderHTTPRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string endpoint = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 2048},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://relay.example.com/provider\"";
+            min_length: 1;
+            max_length: 2048;
+        }
+    ];
+    string description = 3 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+}
+
+message UpdateSMSProviderHTTPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

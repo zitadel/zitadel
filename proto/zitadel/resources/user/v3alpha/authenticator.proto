@@ -383,21 +383,21 @@ message ReturnWebAuthNRegistrationCode {}
 message RedirectURLs {
   // URL to which the user will be redirected after a successful login.
   string success_url = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (validate.rules).string = {min_len: 1, max_len: 2048, uri_ref: true},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 2048;
       example: "\"https://custom.com/login/idp/success\"";
     }
   ];
   // URL to which the user will be redirected after a failed login.
   string failure_url = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (validate.rules).string = {min_len: 1, max_len: 2048, uri_ref: true},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
-      max_length: 200;
+      max_length: 2048;
       example: "\"https://custom.com/login/idp/fail\"";
     }
   ];
