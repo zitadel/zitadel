@@ -8,10 +8,14 @@ import (
 )
 
 const (
-	eventPrefix = "user."
-	CreatedType = eventPrefix + "created"
-	UpdatedType = eventPrefix + "updated"
-	DeletedType = eventPrefix + "deleted"
+	eventPrefix     = "user."
+	CreatedType     = eventPrefix + "created"
+	UpdatedType     = eventPrefix + "updated"
+	DeletedType     = eventPrefix + "deleted"
+	LockedType      = eventPrefix + "locked"
+	UnlockedType    = eventPrefix + "unlocked"
+	DeactivatedType = eventPrefix + "deactivated"
+	ReactivatedType = eventPrefix + "reactivated"
 )
 
 type CreatedEvent struct {
@@ -139,6 +143,122 @@ func NewDeletedEvent(
 			ctx,
 			aggregate,
 			DeletedType,
+		),
+	}
+}
+
+type LockedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+}
+
+func (e *LockedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
+
+func (e *LockedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *LockedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewLockedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *LockedEvent {
+	return &LockedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			LockedType,
+		),
+	}
+}
+
+type UnlockedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+}
+
+func (e *UnlockedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
+
+func (e *UnlockedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *UnlockedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewUnlockedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *UnlockedEvent {
+	return &UnlockedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UnlockedType,
+		),
+	}
+}
+
+type DeactivatedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+}
+
+func (e *DeactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
+
+func (e *DeactivatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *DeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewDeactivatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *DeactivatedEvent {
+	return &DeactivatedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			DeactivatedType,
+		),
+	}
+}
+
+type ReactivatedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+}
+
+func (e *ReactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
+
+func (e *ReactivatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *ReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewReactivatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+) *ReactivatedEvent {
+	return &ReactivatedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			ReactivatedType,
 		),
 	}
 }

@@ -22,13 +22,13 @@ type UserSchemaWriteModel struct {
 	Revision               uint64
 }
 
-func NewUserSchemaWriteModel(resourceOwner, schemaID, ty string) *UserSchemaWriteModel {
+func NewUserSchemaWriteModel(resourceOwner, schemaID string, revision uint64) *UserSchemaWriteModel {
 	return &UserSchemaWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   schemaID,
 			ResourceOwner: resourceOwner,
 		},
-		SchemaType: ty,
+		Revision: revision,
 	}
 }
 
@@ -79,8 +79,8 @@ func (wm *UserSchemaWriteModel) Query() *eventstore.SearchQueryBuilder {
 			schema.DeletedType,
 		)
 
-	if wm.SchemaType != "" {
-		query = query.EventData(map[string]interface{}{"schemaType": wm.SchemaType})
+	if wm.Revision != 0 {
+		query = query.EventData(map[string]interface{}{"revision": wm.Revision})
 	}
 
 	return query.Builder()

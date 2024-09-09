@@ -192,3 +192,11 @@ func (c *Commands) getSchemaWriteModelByID(ctx context.Context, resourceOwner, i
 	}
 	return writeModel, nil
 }
+
+func (c *Commands) getSchemaWriteModelByIDAndRevision(ctx context.Context, resourceOwner, id string, revision uint64) (*UserSchemaWriteModel, error) {
+	writeModel := NewUserSchemaWriteModel(resourceOwner, id, revision)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
