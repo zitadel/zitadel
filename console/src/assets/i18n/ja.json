@@ -1381,7 +1381,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1468,6 +1469,8 @@
       "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "ACTIONS": "アクション",
       "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 セッション終了",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
       "STATES": {
         "INHERITED": "継承",
         "ENABLED": "有効",
@@ -1609,7 +1612,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2544,7 +2548,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

@@ -451,6 +451,55 @@ func TestNewUpsertStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "correct all *onlySetValueInCase",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conflictCols: []Column{
+					NewCol("col1", nil),
+				},
+				values: []Column{
+					{
+						Name:  "col1",
+						Value: "val1",
+					},
+					{
+						Name: "col2",
+						Value: &onlySetValueInCase{
+							Table: "some.table",
+							Value: "val2",
+							Condition: ConditionOr(
+								ColumnChangedCondition("some.table", "val3", 0, 1),
+								ColumnIsNullCondition("some.table", "val3"),
+							),
+						},
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					params: []params{
+						{
+							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = CASE WHEN some.table.val3 = $3 AND EXCLUDED.val3 = $4 OR some.table.val3 IS NULL THEN EXCLUDED.col2 ELSE some.table.col2 END",
+							args:  []interface{}{"val1", "val2", 0, 1},
+						},
+					},
+					shouldExecute: true,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

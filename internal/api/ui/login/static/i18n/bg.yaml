@@ -250,6 +250,7 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -289,6 +290,7 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -357,6 +359,7 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:

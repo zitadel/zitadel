@@ -253,6 +253,7 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -293,6 +294,7 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -367,6 +369,7 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
 
 DeviceAuth:
   Title: Autoryzacja urządzenia
