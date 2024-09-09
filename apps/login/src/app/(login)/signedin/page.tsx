@@ -1,6 +1,7 @@
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
 import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
+import SelfServiceMenu from "@/ui/SelfServiceMenu";
 import UserAvatar from "@/ui/UserAvatar";
 import { create } from "@zitadel/client";
 import {
@@ -53,6 +54,10 @@ export default async function Page({ searchParams }: { searchParams: any }) {
           showDropdown
           searchParams={searchParams}
         />
+
+        {sessionFactors?.id && (
+          <SelfServiceMenu sessionId={sessionFactors?.id} />
+        )}
       </div>
     </DynamicTheme>
   );
