@@ -65,7 +65,7 @@ func (*smtpConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMTPConfigColumnDescription, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigColumnState, handler.ColumnTypeEnum),
 		},
-			handler.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnResourceOwner, SMTPConfigColumnAggregateID, SMTPConfigColumnID),
+			handler.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnID),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(SMTPConfigSMTPColumnID, handler.ColumnTypeText),
