@@ -27,10 +27,11 @@ type authzInstanceQueries interface {
 }
 
 func NewAuthZInstances(ctx context.Context, eventStore *eventstore.Eventstore, query authzInstanceQueries) *AuthZInstances {
-	return &AuthZInstances{
-		cache:   NewCachedReadModel[*AuthZInstance](ctx, eventStore),
+	instances := &AuthZInstances{
 		queries: query,
 	}
+	instances.cache = NewCachedReadModel[*AuthZInstance](ctx, eventStore, instances.Reduce)
+	return instances
 }
 
 func (instances *AuthZInstances) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (authz.Instance, error) {
@@ -68,6 +69,46 @@ func (instances *AuthZInstances) ByHost(ctx context.Context, instanceHost, publi
 	return instance, nil
 }
 
+// InterestedIn implements model.
+func (i *AuthZInstances) InterestedIn() map[eventstore.AggregateType][]eventstore.EventType {
+	return map[eventstore.AggregateType][]eventstore.EventType{
+		eventstore.AggregateType(instance.AggregateType): {
+			eventstore.EventType(instance.AddedType),
+			eventstore.EventType(instance.ChangedType),
+			eventstore.EventType(instance.DefaultOrgSetType),
+			eventstore.EventType(instance.ProjectSetType),
+			eventstore.EventType(instance.ConsoleSetType),
+			eventstore.EventType(instance.DefaultLanguageSetType),
+			eventstore.EventType(instance.RemovedType),
+		},
+	}
+}
+
+// Reduce implements model.
+func (i *AuthZInstances) Reduce(events ...*v2_es.StorageEvent) error {
+	for _, event := range events {
+		if event.Type == instance.AddedType {
+			instance := NewAuthZInstanceFromEvent(event)
+			if err := i.cache.set(instance.ID, instance); err != nil {
+				return err
+			}
+			continue
+		}
+		instance, ok := i.cache.get(event.Aggregate.ID)
+		if !ok {
+			continue
+		}
+		err := instance.Reduce(event)
+		if err != nil {
+			return err
+		}
+		if er := i.cache.set(instance.ID, instance); er != nil {
+			return er
+		}
+	}
+	return nil
+}
+
 var (
 	_ authz.Instance = (*AuthZInstance)(nil)
 	_ model          = (*AuthZInstance)(nil)
@@ -75,6 +116,12 @@ var (
 
 type AuthZInstance struct {
 	projection.AuthZInstance
+}
+
+func NewAuthZInstanceFromEvent(event *v2_es.StorageEvent) *AuthZInstance {
+	return &AuthZInstance{
+		AuthZInstance: *projection.NewAuthZInstanceFromEvent(event),
+	}
 }
 
 func AuthZInstanceFromAuthZ(authZInstance authz.Instance) *AuthZInstance {

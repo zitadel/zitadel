@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -20,6 +21,17 @@ type AuthZInstance struct {
 	DefaultLanguage language.Tag
 
 	State *InstanceState
+}
+
+func NewAuthZInstanceFromEvent(event *v2_es.StorageEvent) *AuthZInstance {
+	state := NewInstanceStateProjection(event.Aggregate.ID)
+	err := state.Reduce(event)
+	logging.OnError(err).Debug("failed to reduce state on added")
+
+	return &AuthZInstance{
+		ID:    event.Aggregate.ID,
+		State: state,
+	}
 }
 
 // InterestedIn implements model.

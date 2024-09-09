@@ -17,6 +17,7 @@ type CachedReadModel[T model] struct {
 	notifications  chan decimal.Decimal
 	latestPosition decimal.Decimal
 	interestedIn   map[eventstore.AggregateType][]eventstore.EventType
+	reduce         v2_es.Reduce
 }
 
 // Reduce implements [eventstore.reducer]
@@ -36,20 +37,21 @@ func (c *CachedReadModel[T]) AppendEvents(events ...eventstore.Event) {
 	if len(storageEvents) == 0 {
 		return
 	}
-	for _, object := range c.getAll() {
-		err := object.Reduce(storageEvents...)
-		logging.OnError(err).Error("could not reduce events")
-	}
+
+	err := c.reduce(storageEvents...)
+	logging.OnError(err).Error("could not reduce events")
+
 	c.latestPosition = storageEvents[len(storageEvents)-1].Position.Position
 }
 
-func NewCachedReadModel[T model](ctx context.Context, eventStore *eventstore.Eventstore) *CachedReadModel[T] {
+func NewCachedReadModel[T model](ctx context.Context, eventStore *eventstore.Eventstore, reduce v2_es.Reduce) *CachedReadModel[T] {
 	var t T
 	readModel := &CachedReadModel[T]{
 		cache:         newMapCache[T](),
 		eventStore:    eventStore,
 		notifications: make(chan decimal.Decimal),
 		interestedIn:  t.InterestedIn(),
+		reduce:        reduce,
 	}
 	go readModel.subscription(ctx)
 	readModel.createSubscription()
@@ -82,11 +84,8 @@ func (c *CachedReadModel[T]) subscription(ctx context.Context) {
 					Builder()
 			}
 			err := c.eventStore.FilterToReducer(ctx, builder, c)
-			if err != nil {
-				// TODO: how to handle retries?
-				logging.WithError(err).Error("could not filter to cached read model")
-				continue
-			}
+			// TODO: how to handle retries?
+			logging.OnError(err).Error("could not filter to cached read model")
 		}
 	}
 }
