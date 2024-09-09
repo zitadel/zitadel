@@ -64,8 +64,6 @@ type UpdatedEvent struct {
 	SchemaID       *string         `json:"schemaID,omitempty"`
 	SchemaRevision *uint64         `json:"schemaRevision,omitempty"`
 	Data           json.RawMessage `json:"schema,omitempty"`
-	oldSchemaID    string
-	oldRevision    uint64
 }
 
 func (e *UpdatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -99,16 +97,14 @@ func NewUpdatedEvent(
 
 type Changes func(event *UpdatedEvent)
 
-func ChangeSchemaID(oldSchemaID, schemaID string) func(event *UpdatedEvent) {
+func ChangeSchemaID(schemaID string) func(event *UpdatedEvent) {
 	return func(e *UpdatedEvent) {
 		e.SchemaID = &schemaID
-		e.oldSchemaID = oldSchemaID
 	}
 }
-func ChangeSchemaRevision(oldSchemaRevision, schemaRevision uint64) func(event *UpdatedEvent) {
+func ChangeSchemaRevision(schemaRevision uint64) func(event *UpdatedEvent) {
 	return func(e *UpdatedEvent) {
 		e.SchemaRevision = &schemaRevision
-		e.oldRevision = oldSchemaRevision
 	}
 }
 

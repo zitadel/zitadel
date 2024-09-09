@@ -61,7 +61,7 @@ func (wm *UserV3WriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *schemauser.CreatedEvent:
 			wm.SchemaID = e.SchemaID
-			wm.SchemaRevision = 1
+			wm.SchemaRevision = e.SchemaRevision
 			wm.Data = e.Data
 
 			wm.State = domain.UserStateActive
@@ -97,6 +97,14 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.IsPhoneVerified = true
 		case *schemauser.PhoneVerificationFailedEvent:
 			wm.PhoneVerifiedFailedCount += 1
+		case *schemauser.LockedEvent:
+			wm.State = domain.UserStateLocked
+		case *schemauser.UnlockedEvent:
+			wm.State = domain.UserStateActive
+		case *schemauser.DeactivatedEvent:
+			wm.State = domain.UserStateInactive
+		case *schemauser.ReactivatedEvent:
+			wm.State = domain.UserStateActive
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -139,18 +147,18 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *UserV3WriteModel) NewUpdatedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,
-	schemaID *string,
-	schemaRevision *uint64,
+	schemaID string,
+	schemaRevision uint64,
 	data json.RawMessage,
 ) *schemauser.UpdatedEvent {
 	changes := make([]schemauser.Changes, 0)
-	if schemaID != nil && wm.SchemaID != *schemaID {
-		changes = append(changes, schemauser.ChangeSchemaID(wm.SchemaID, *schemaID))
+	if wm.SchemaID != schemaID {
+		changes = append(changes, schemauser.ChangeSchemaID(schemaID))
 	}
-	if schemaRevision != nil && wm.SchemaRevision != *schemaRevision {
-		changes = append(changes, schemauser.ChangeSchemaRevision(wm.SchemaRevision, *schemaRevision))
+	if wm.SchemaRevision != schemaRevision {
+		changes = append(changes, schemauser.ChangeSchemaRevision(schemaRevision))
 	}
-	if !bytes.Equal(wm.Data, data) {
+	if data != nil && !bytes.Equal(wm.Data, data) {
 		changes = append(changes, schemauser.ChangeData(data))
 	}
 	if len(changes) == 0 {

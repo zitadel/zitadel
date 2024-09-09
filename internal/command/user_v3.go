@@ -206,6 +206,12 @@ func (s *UpdateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 }
 
 func (s *UpdateSchemaUser) ValidData(ctx context.Context, c *Commands, existingUser *UserV3WriteModel) (err error) {
+	// get role for permission check in schema through extension
+	role, err := c.getSchemaRoleForWrite(ctx, existingUser.ResourceOwner, existingUser.AggregateID)
+	if err != nil {
+		return err
+	}
+
 	if s.schemaWriteModel == nil {
 		s.schemaWriteModel, err = c.getSchemaWriteModelByIDAndRevision(ctx, "", existingUser.SchemaID, existingUser.SchemaRevision)
 		if err != nil {
@@ -213,25 +219,26 @@ func (s *UpdateSchemaUser) ValidData(ctx context.Context, c *Commands, existingU
 		}
 	}
 
-	// get role for permission check in schema through extension
-	role, err := c.getSchemaRoleForWrite(ctx, existingUser.ResourceOwner, existingUser.AggregateID)
-	if err != nil {
-		return err
-	}
-
 	schema, err := domain_schema.NewSchema(role, bytes.NewReader(s.schemaWriteModel.Schema))
 	if err != nil {
 		return err
 	}
 
+	// if data not changed but a new schema or revision should be used
+	data := s.Data
+	if s.Data == nil {
+		data = existingUser.Data
+	}
+
 	var v interface{}
-	if err := json.Unmarshal(s.Data, &v); err != nil {
+	if err := json.Unmarshal(data, &v); err != nil {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-7o3ZGxtXUz", "Errors.User.Invalid")
 	}
 
 	if err := schema.Validate(v); err != nil {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SlKXqLSeL6", "Errors.UserSchema.Data.Invalid")
 	}
+	return nil
 }
 
 func (c *Commands) UpdateSchemaUser(ctx context.Context, user *UpdateSchemaUser, alg crypto.EncryptionAlgorithm) (err error) {
@@ -243,21 +250,25 @@ func (c *Commands) UpdateSchemaUser(ctx context.Context, user *UpdateSchemaUser,
 	if err != nil {
 		return err
 	}
-	if writeModel.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.AlreadyExists")
+	if !writeModel.Exists() {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.NotFound")
 	}
 
 	userAgg := UserV3AggregateFromWriteModel(&writeModel.WriteModel)
-	writeModel.NewUpdatedEvent(ctx,
-		userAgg,
-		user.schemaWriteModel.AggregateID,
-		user.schemaWriteModel.Revision,
-		user.Data,
-	)
-	events := []eventstore.Command{
-		schemauser.NewCreatedEvent(ctx,
+	events := make([]eventstore.Command, 0, 3)
+	if user.Data != nil || user.SchemaID != nil {
+		if err := user.ValidData(ctx, c, writeModel); err != nil {
+			return err
+		}
+		updateEvent := writeModel.NewUpdatedEvent(ctx,
 			userAgg,
-		),
+			user.schemaWriteModel.AggregateID,
+			user.schemaWriteModel.Revision,
+			user.Data,
+		)
+		if updateEvent != nil {
+			events = append(events, updateEvent)
+		}
 	}
 	if user.Email != nil {
 		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, events, userAgg, user.Email, alg)
@@ -271,7 +282,10 @@ func (c *Commands) UpdateSchemaUser(ctx context.Context, user *UpdateSchemaUser,
 			return err
 		}
 	}
-
+	if len(events) == 0 {
+		user.Details = writeModelToObjectDetails(&writeModel.WriteModel)
+		return nil
+	}
 	if err := c.pushAppendAndReduce(ctx, writeModel, events...); err != nil {
 		return err
 	}
@@ -279,7 +293,7 @@ func (c *Commands) UpdateSchemaUser(ctx context.Context, user *UpdateSchemaUser,
 	return nil
 }
 
-func (c *Commands) LockedSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) LockSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Eu8I2VAfjF", "Errors.IDMissing")
 	}
@@ -329,7 +343,7 @@ func (c *Commands) UnlockSchemaUser(ctx context.Context, id string) (*domain.Obj
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) DeactiveSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeactivateSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-pjJhge86ZV", "Errors.IDMissing")
 	}
@@ -354,7 +368,7 @@ func (c *Commands) DeactiveSchemaUser(ctx context.Context, id string) (*domain.O
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) ReactiveSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) ReactivateSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-17XupGvxBJ", "Errors.IDMissing")
 	}
