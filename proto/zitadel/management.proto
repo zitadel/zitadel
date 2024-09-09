@@ -3976,7 +3976,7 @@ service ManagementService {
             tags: "Project Grants"
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List Project Members";
+            summary: "List Project Grant Members";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked."
             parameters: {
                 headers: {
