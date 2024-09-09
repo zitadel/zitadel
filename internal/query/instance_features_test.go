@@ -46,7 +46,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 			wantErr: io.ErrClosedPipe,
 		},
 		{
-			name: "no features setSMS, not cascaded",
+			name: "no features set, not cascaded",
 			eventstore: expectEventstore(
 				expectFilter(),
 			),
@@ -57,7 +57,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "no features setSMS, cascaded",
+			name: "no features set, cascaded",
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectFilter(),
@@ -82,7 +82,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "all features setSMS",
+			name: "all features set",
 			eventstore: expectEventstore(
 				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent[bool](
 					context.Background(), aggregate,
@@ -139,7 +139,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "all features setSMS, reset, setSMS some feature, cascaded",
+			name: "all features set, reset, set some feature, cascaded",
 			eventstore: expectEventstore(
 				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent[bool](
 					context.Background(), aggregate,
@@ -204,7 +204,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "all features setSMS, reset, setSMS some feature, not cascaded",
+			name: "all features set, reset, set some feature, not cascaded",
 			eventstore: expectEventstore(
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](

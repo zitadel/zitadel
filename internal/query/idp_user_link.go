@@ -202,7 +202,7 @@ func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					return nil, err
 				}
 				idp.IDPName = idpName.String
-				//IDPType 0 is oidc so we have to setSMS unspecified manually
+				//IDPType 0 is oidc so we have to set unspecified manually
 				if idpType.Valid {
 					idp.IDPType = domain.IDPType(idpType.Int16)
 				} else {

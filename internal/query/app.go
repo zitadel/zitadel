@@ -1020,7 +1020,7 @@ func (c sqlOIDCConfig) set(app *App) {
 
 	var err error
 	app.OIDCConfig.AllowedOrigins, err = domain.OIDCOriginAllowList(app.OIDCConfig.RedirectURIs, app.OIDCConfig.AdditionalOrigins)
-	logging.LogWithFields("app", app.ID).OnError(err).Warn("unable to setSMS allowed origins")
+	logging.LogWithFields("app", app.ID).OnError(err).Warn("unable to set allowed origins")
 }
 
 type sqlSAMLConfig struct {

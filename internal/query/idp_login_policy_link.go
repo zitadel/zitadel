@@ -157,7 +157,7 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase, re
 					return nil, err
 				}
 				link.IDPName = idpName.String
-				//IDPType 0 is oidc so we have to setSMS unspecified manually
+				//IDPType 0 is oidc so we have to set unspecified manually
 				if idpType.Valid {
 					link.IDPType = domain.IDPType(idpType.Int16)
 				} else {
