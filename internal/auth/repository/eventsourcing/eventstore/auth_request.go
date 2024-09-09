@@ -106,6 +106,7 @@ type idpUserLinksProvider interface {
 type userEventProvider interface {
 	UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
 	PasswordCodeExists(ctx context.Context, userID string) (exists bool, err error)
+	InviteCodeExists(ctx context.Context, userID string) (exists bool, err error)
 }
 
 type userCommandProvider interface {
@@ -1250,8 +1251,18 @@ func (repo *AuthRequestRepo) firstFactorChecked(ctx context.Context, request *do
 
 	if user.PasswordInitRequired {
 		if !user.IsEmailVerified {
+			// If the user was created through the user resource API,
+			// they can either have an invite code...
+			exists, err := repo.UserEventProvider.InviteCodeExists(ctx, user.ID)
+			logging.WithFields("userID", user.ID).OnError(err).Error("unable to check if invite code exists")
+			if err == nil && exists {
+				return &domain.VerifyInviteStep{}
+			}
+			// or were created with an explicit email verification mail
 			return &domain.VerifyEMailStep{InitPassword: true}
 		}
+		// If they were created with a verified mail, they might have never received mail to set their password,
+		// e.g. when created through a user resource API. In this case we'll just create and send one now.
 		exists, err := repo.UserEventProvider.PasswordCodeExists(ctx, user.ID)
 		logging.WithFields("userID", user.ID).OnError(err).Error("unable to check if password code exists")
 		if err == nil && !exists {

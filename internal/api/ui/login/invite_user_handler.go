@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -13,8 +14,7 @@ const (
 	queryInviteUserUserID    = "userID"
 	queryInviteUserLoginName = "loginname"
 
-	tmplInviteUser     = "inviteuser"
-	tmplInviteUserDone = "inviteuserdone"
+	tmplInviteUser = "inviteuser"
 )
 
 type inviteUserFormData struct {
@@ -23,6 +23,7 @@ type inviteUserFormData struct {
 	Password        string `schema:"password"`
 	PasswordConfirm string `schema:"passwordconfirm"`
 	UserID          string `schema:"userID"`
+	OrgID           string `schema:"orgID"`
 	Resend          bool   `schema:"resend"`
 }
 
@@ -52,9 +53,10 @@ func InviteUserLink(origin, userID, loginName, code, orgID string, authRequestID
 func (l *Login) handleInviteUser(w http.ResponseWriter, r *http.Request) {
 	authReq := l.checkOptionalAuthRequestOfEmailLinks(r)
 	userID := r.FormValue(queryInviteUserUserID)
+	orgID := r.FormValue(queryOrgID)
 	code := r.FormValue(queryInviteUserCode)
 	loginName := r.FormValue(queryInviteUserLoginName)
-	l.renderInviteUser(w, r, authReq, userID, loginName, code, nil)
+	l.renderInviteUser(w, r, authReq, userID, orgID, loginName, code, nil)
 }
 
 func (l *Login) handleInviteUserCheck(w http.ResponseWriter, r *http.Request) {
@@ -66,48 +68,53 @@ func (l *Login) handleInviteUserCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if data.Resend {
-		l.resendUserInvite(w, r, authReq, data.UserID, data.LoginName)
+		l.resendUserInvite(w, r, authReq, data.UserID, data.OrgID, data.LoginName)
 		return
 	}
-	l.checkUserInviteCode(w, r, authReq, data, nil)
+	l.checkUserInviteCode(w, r, authReq, data)
 }
 
-func (l *Login) checkUserInviteCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *inviteUserFormData, err error) {
+func (l *Login) checkUserInviteCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *inviteUserFormData) {
 	if data.Password != data.PasswordConfirm {
-		err := zerrors.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
-		l.renderInviteUser(w, r, authReq, data.UserID, data.LoginName, data.Code, err)
+		err := zerrors.ThrowInvalidArgument(nil, "VIEW-KJS3h", "Errors.User.Password.ConfirmationWrong")
+		l.renderInviteUser(w, r, authReq, data.UserID, data.OrgID, data.LoginName, data.Code, err)
 		return
 	}
 	userOrgID := ""
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
-	//userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	//err = l.command.VerifyInviteCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, userAgentID)
-	//if err != nil {
-	//	l.renderInviteUser(w, r, authReq, data.UserID, data.LoginName, "", err)
-	//	return
-	//}
-	l.renderInviteUserDone(w, r, authReq, userOrgID)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	_, err := l.command.VerifyInviteCodeSetPassword(setUserContext(r.Context(), data.UserID, userOrgID), data.UserID, data.Code, data.Password, userAgentID)
+	if err != nil {
+		l.renderInviteUser(w, r, authReq, data.UserID, data.OrgID, data.LoginName, "", err)
+		return
+	}
+	if authReq == nil {
+		l.defaultRedirect(w, r)
+		return
+	}
+	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) resendUserInvite(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, loginName string) {
+func (l *Login) resendUserInvite(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, orgID, loginName string) {
 	var userOrgID, authRequestID string
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 		authRequestID = authReq.ID
 	}
-	_, err := l.command.ResendInviteCode(setContext(r.Context(), userOrgID), userID, userOrgID, authRequestID)
-	l.renderInviteUser(w, r, authReq, userID, loginName, "", err)
+	_, err := l.command.ResendInviteCode(setUserContext(r.Context(), userID, userOrgID), userID, userOrgID, authRequestID)
+	l.renderInviteUser(w, r, authReq, userID, orgID, loginName, "", err)
 }
 
-func (l *Login) renderInviteUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, loginName string, code string, err error) {
+func (l *Login) renderInviteUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, orgID, loginName string, code string, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if authReq != nil {
 		userID = authReq.UserID
+		orgID = authReq.UserOrgID
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)
@@ -145,13 +152,4 @@ func (l *Login) renderInviteUser(w http.ResponseWriter, r *http.Request, authReq
 		}
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInviteUser], data, nil)
-}
-
-func (l *Login) renderInviteUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
-	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "InviteUserDone.Title", "InviteUserDone.Description", "", "")
-	if authReq == nil {
-		l.customTexts(r.Context(), translator, orgID)
-	}
-	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInviteUserDone], data, nil)
 }

@@ -139,4 +139,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretHashUpdatedType, eventstore.GenericEventMapper[MachineSecretHashUpdatedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanInviteCodeAddedType, eventstore.GenericEventMapper[HumanInviteCodeAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanInviteCodeSentType, eventstore.GenericEventMapper[HumanInviteCodeSentEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, HumanInviteCheckSucceededType, eventstore.GenericEventMapper[HumanInviteCheckSucceededEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, HumanInviteCheckFailedType, eventstore.GenericEventMapper[HumanInviteCheckFailedEvent])
 }

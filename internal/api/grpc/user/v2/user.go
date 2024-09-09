@@ -643,6 +643,26 @@ func (s *Server) CreateInviteCode(ctx context.Context, req *user.CreateInviteCod
 	}, nil
 }
 
+func (s *Server) ResendInviteCode(ctx context.Context, req *user.ResendInviteCodeRequest) (*user.ResendInviteCodeResponse, error) {
+	details, err := s.command.ResendInviteCode(ctx, req.GetUserId(), "", "")
+	if err != nil {
+		return nil, err
+	}
+	return &user.ResendInviteCodeResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) VerifyInviteCode(ctx context.Context, req *user.VerifyInviteCodeRequest) (*user.VerifyInviteCodeResponse, error) {
+	details, err := s.command.VerifyInviteCode(ctx, req.GetUserId(), req.GetVerificationCode())
+	if err != nil {
+		return nil, err
+	}
+	return &user.VerifyInviteCodeResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
 func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*command.CreateUserInvite, error) {
 	switch v := req.GetVerification().(type) {
 	case *user.CreateInviteCodeRequest_SendCode:

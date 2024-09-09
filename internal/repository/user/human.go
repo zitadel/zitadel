@@ -23,6 +23,8 @@ const (
 	HumanInitializedCheckFailedType    = humanEventPrefix + "initialization.check.failed"
 	HumanInviteCodeAddedType           = humanEventPrefix + "invite.code.added_test"
 	HumanInviteCodeSentType            = humanEventPrefix + "invite.code.sent_test"
+	HumanInviteCheckSucceededType      = humanEventPrefix + "invite.check.succeeded"
+	HumanInviteCheckFailedType         = humanEventPrefix + "invite.check.failed"
 	HumanSignedOutType                 = humanEventPrefix + "signed.out"
 )
 
@@ -456,6 +458,58 @@ func NewHumanInviteCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggr
 			ctx,
 			aggregate,
 			HumanInviteCodeSentType,
+		),
+	}
+}
+
+type HumanInviteCheckSucceededEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanInviteCheckSucceededEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *HumanInviteCheckSucceededEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *HumanInviteCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanInviteCheckSucceededEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInviteCheckSucceededEvent {
+	return &HumanInviteCheckSucceededEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanInviteCheckSucceededType,
+		),
+	}
+}
+
+type HumanInviteCheckFailedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanInviteCheckFailedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *HumanInviteCheckFailedEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *HumanInviteCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanInviteCheckFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInviteCheckFailedEvent {
+	return &HumanInviteCheckFailedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanInviteCheckFailedType,
 		),
 	}
 }
