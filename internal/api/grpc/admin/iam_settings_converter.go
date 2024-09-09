@@ -165,6 +165,7 @@ func updateSMTPToConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigReque
 func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 	if smtp.SMTPConfig != nil {
 		return &settings_pb.SMTPConfig{
+			Description:    smtp.Description,
 			Tls:            smtp.SMTPConfig.TLS,
 			SenderAddress:  smtp.SMTPConfig.SenderAddress,
 			SenderName:     smtp.SMTPConfig.SenderName,
