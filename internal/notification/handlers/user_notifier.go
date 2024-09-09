@@ -769,9 +769,6 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 			return err
 		}
 		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
-		//if e.NotificationType == domain.NotificationTypeSms {
-		//	notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
-		//}
 		err = notify.SendInviteCode(ctx, notifyUser, code, e.ApplicationName, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err

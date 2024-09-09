@@ -39,13 +39,13 @@ func (c *Commands) CreateInviteCode(ctx context.Context, invite *CreateUserInvit
 	if !wm.CreationAllowed() {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-EF34g", "Errors.User.AlreadyInitialised")
 	}
-	code, err := c.newUserInviteCode(ctx, c.eventstore.Filter, c.userEncryption)
+	code, err := c.newUserInviteCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint
 	if err != nil {
 		return nil, nil, err
 	}
 	err = c.pushAppendAndReduce(ctx, wm, user.NewHumanInviteCodeAddedEvent(
 		ctx,
-		UserAggregateFromWriteModel(&wm.WriteModel),
+		UserAggregateFromWriteModelCtx(ctx, &wm.WriteModel),
 		code.Crypted,
 		code.Expiry,
 		invite.URLTemplate,
@@ -87,7 +87,7 @@ func (c *Commands) ResendInviteCode(ctx context.Context, userID, resourceOwner, 
 	if existingCode.InviteCode == nil || existingCode.CodeReturned {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr3gq", "Errors.User.Code.NotFound")
 	}
-	code, err := c.newUserInviteCode(ctx, c.eventstore.Filter, c.userEncryption)
+	code, err := c.newUserInviteCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (c *Commands) ResendInviteCode(ctx context.Context, userID, resourceOwner, 
 	err = c.pushAppendAndReduce(ctx, existingCode,
 		user.NewHumanInviteCodeAddedEvent(
 			ctx,
-			UserAggregateFromWriteModel(&existingCode.WriteModel),
+			UserAggregateFromWriteModelCtx(ctx, &existingCode.WriteModel),
 			code.Crypted,
 			code.Expiry,
 			existingCode.URLTemplate,
@@ -125,7 +125,7 @@ func (c *Commands) InviteCodeSent(ctx context.Context, userID, orgID string) (er
 	if existingCode.InviteCode == nil || existingCode.CodeReturned {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Wr3gq", "Errors.User.Code.NotFound")
 	}
-	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &existingCode.WriteModel)
 	_, err = c.eventstore.Push(ctx, user.NewHumanInviteCodeSentEvent(ctx, userAgg))
 	return err
 }
@@ -145,7 +145,7 @@ func (c *Commands) VerifyInviteCodeSetPassword(ctx context.Context, userID, code
 	if !wm.UserState.Exists() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-F5g2h", "Errors.User.NotFound")
 	}
-	userAgg := UserAggregateFromWriteModel(&wm.WriteModel)
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &wm.WriteModel)
 	err = crypto.VerifyCode(wm.InviteCodeCreationDate, wm.InviteCodeExpiry, wm.InviteCode, code, c.userEncryption)
 	if err != nil {
 		_, err = c.eventstore.Push(ctx, user.NewHumanInviteCheckFailedEvent(ctx, userAgg))

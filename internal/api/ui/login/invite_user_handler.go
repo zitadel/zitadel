@@ -146,9 +146,8 @@ func (l *Login) renderInviteUser(w http.ResponseWriter, r *http.Request, authReq
 		}
 	}
 	if authReq == nil {
-		user, err := l.query.GetUserByID(r.Context(), false, userID)
 		if err == nil {
-			l.customTexts(r.Context(), translator, user.ResourceOwner)
+			l.customTexts(r.Context(), translator, orgID)
 		}
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplInviteUser], data, nil)
