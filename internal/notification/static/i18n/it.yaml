@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Ciao {{.DisplayName}},
   Text: La password del vostro utente è cambiata; se questa modifica non è stata fatta da voi, vi consigliamo di reimpostare immediatamente la vostra password.
   ButtonText: Login
+InviteUser:
+  Title: Invito a {{.ApplicationName}}
+  PreHeader: Invito a {{.ApplicationName}}
+  Subject: Invito a {{.ApplicationName}}
+  Greeting: 'Ciao {{.DisplayName}},'
+  Text: Il tuo utente è stato invitato a {{.ApplicationName}}. Clicca sul pulsante qui sotto per completare il processo di invito. Se non hai richiesto questa email, ignorala.
+  ButtonText: Accetta invito

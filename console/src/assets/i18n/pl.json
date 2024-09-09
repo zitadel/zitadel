@@ -197,7 +197,8 @@
           "VE": "Gdy użytkownik zmieni swój adres e-mail, otrzyma e-mail z linkiem do weryfikacji nowego adresu.",
           "VP": "Gdy użytkownik zmieni swój numer telefonu, otrzyma SMS z kodem do weryfikacji nowego numeru.",
           "VEO": "Gdy użytkownik doda metodę jednorazowego hasła przez e-mail, musi ją aktywować, wprowadzając kod wysłany na jego adres e-mail.",
-          "VSO": "Gdy użytkownik doda metodę jednorazowego hasła przez SMS, musi ją aktywować, wprowadzając kod wysłany na jego numer telefonu."
+          "VSO": "Gdy użytkownik doda metodę jednorazowego hasła przez SMS, musi ją aktywować, wprowadzając kod wysłany na jego numer telefonu.",
+          "IU": "Kiedy zostanie utworzony kod zaproszenia użytkownika, otrzyma on e-mail z linkiem do ustawienia swojej metody uwierzytelniania."
         }
       },
       "LOGIN_TEXTS": {
@@ -1666,7 +1667,8 @@
         "PR": "Resetowanie hasła",
         "DC": "Rejestracja domeny",
         "PL": "Bez hasła",
-        "PC": "Zmiana hasła"
+        "PC": "Zmiana hasła",
+        "IU": "Zaproś użytkownika"
       },
       "CHIPS": {
         "firstname": "Imię",
@@ -1686,7 +1688,8 @@
         "tempUsername": "Tymczasowa nazwa użytkownika",
         "otp": "Hasło jednorazowe",
         "verifyUrl": "URL do weryfikacji hasła jednorazowego",
-        "expiry": "Wygaśnięcie"
+        "expiry": "Wygaśnięcie",
+        "applicationName": "Nazwa aplikacji"
       },
       "TOAST": {
         "UPDATED": "Teksty niestandardowe zapisane."

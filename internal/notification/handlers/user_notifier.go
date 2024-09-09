@@ -759,7 +759,7 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 		if err != nil {
 			return err
 		}
-		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.InviteCodeMessageType)
+		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.InviteUserMessageType)
 		if err != nil {
 			return err
 		}

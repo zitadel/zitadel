@@ -125,6 +125,20 @@ func (mr *MockCommandsMockRecorder) HumanPhoneVerificationCodeSent(arg0, arg1, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanPhoneVerificationCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanPhoneVerificationCodeSent), arg0, arg1, arg2)
 }
 
+// InviteCodeSent mocks base method.
+func (m *MockCommands) InviteCodeSent(arg0 context.Context, arg1, arg2 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InviteCodeSent", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InviteCodeSent indicates an expected call of InviteCodeSent.
+func (mr *MockCommandsMockRecorder) InviteCodeSent(arg0, arg1, arg2 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InviteCodeSent", reflect.TypeOf((*MockCommands)(nil).InviteCodeSent), arg0, arg1, arg2)
+}
+
 // MilestonePushed mocks base method.
 func (m *MockCommands) MilestonePushed(arg0 context.Context, arg1 milestone.Type, arg2 []string, arg3 string) error {
 	m.ctrl.T.Helper()
