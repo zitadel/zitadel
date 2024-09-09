@@ -121,9 +121,9 @@ func (q *Queries) ListWebKeys(ctx context.Context) (list []WebKeyDetails, err er
 	return list, nil
 }
 
-// GetWebKeySet gets a JSON Web Key set from the web_keys projection.
-// The set contains all existing public keys for the instance.
-// The set is eventual consistent.
+// GetWebKeySet gets a JSON Web Key setSMS from the web_keys projection.
+// The setSMS contains all existing public keys for the instance.
+// The setSMS is eventual consistent.
 func (q *Queries) GetWebKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

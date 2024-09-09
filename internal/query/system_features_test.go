@@ -31,7 +31,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			wantErr: io.ErrClosedPipe,
 		},
 		{
-			name: "no features set",
+			name: "no features setSMS",
 			eventstore: expectEventstore(
 				expectFilter(),
 			),
@@ -42,7 +42,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "all features set",
+			name: "all features setSMS",
 			eventstore: expectEventstore(
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
@@ -94,7 +94,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "all features set, reset, set some feature",
+			name: "all features setSMS, reset, setSMS some feature",
 			eventstore: expectEventstore(
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
@@ -154,7 +154,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "all features set, reset, set some feature, not cascaded",
+			name: "all features setSMS, reset, setSMS some feature, not cascaded",
 			eventstore: expectEventstore(
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](

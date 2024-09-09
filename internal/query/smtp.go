@@ -149,10 +149,6 @@ type SMTP struct {
 	Password       *crypto.CryptoValue
 }
 
-type HTTP struct {
-	Endpoint string
-}
-
 func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -254,7 +250,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			}
 			smtpConfig.password = password
 			smtpConfig.set(config)
-			httpConfig.set(config)
+			httpConfig.setSMTP(config)
 			return config, nil
 		}
 }
@@ -322,7 +318,7 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				}
 				smtpConfig.password = password
 				smtpConfig.set(config)
-				httpConfig.set(config)
+				httpConfig.setSMTP(config)
 				configs.Configs = append(configs.Configs, config)
 			}
 			return configs, nil
@@ -379,12 +375,7 @@ func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
 	}
 }
 
-type sqlHTTPConfig struct {
-	id       sql.NullString
-	endpoint sql.NullString
-}
-
-func (c sqlHTTPConfig) set(smtpConfig *SMTPConfig) {
+func (c sqlHTTPConfig) setSMTP(smtpConfig *SMTPConfig) {
 	if !c.id.Valid {
 		return
 	}

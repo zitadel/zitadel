@@ -35,10 +35,6 @@ type SMTPConfig struct {
 	ReplyToAddress string
 }
 
-type HTTPConfig struct {
-	Endpoint string
-}
-
 func NewIAMSMTPConfigWriteModel(instanceID, id, domain string) *IAMSMTPConfigWriteModel {
 	return &IAMSMTPConfigWriteModel{
 		WriteModel: eventstore.WriteModel{

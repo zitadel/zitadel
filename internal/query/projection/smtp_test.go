@@ -41,7 +41,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"user": "user"		
 					}`,
 						),
-					), instance.SMTPConfigChangedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigChangedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
 			want: wantReduce{
@@ -91,7 +91,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"description": "test"					
 					}`,
 						),
-					), instance.SMTPConfigChangedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigChangedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
 			want: wantReduce{
@@ -128,7 +128,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"senderAddress": "sender"
 					}`,
 						),
-					), instance.SMTPConfigChangedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigChangedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigChanged,
 			want: wantReduce{
@@ -173,7 +173,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"endpoint": "endpoint"
 					}`,
 						),
-					), instance.SMTPConfigHTTPChangedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigHTTPChangedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigHTTPChanged,
 			want: wantReduce{
@@ -218,7 +218,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"description": "test"					
 					}`,
 						),
-					), instance.SMTPConfigHTTPChangedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigHTTPChangedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigHTTPChanged,
 			want: wantReduce{
@@ -255,7 +255,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"endpoint": "endpoint"
 					}`,
 						),
-					), instance.SMTPConfigHTTPChangedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigHTTPChangedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigHTTPChanged,
 			want: wantReduce{
@@ -309,7 +309,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							"keyId": "key-id"
 						}
 					}`),
-					), instance.SMTPConfigAddedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigAddedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigAdded,
 			want: wantReduce{
@@ -365,7 +365,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"senderAddress": "sender",
 						"endpoint": "endpoint"
 					}`),
-					), instance.SMTPConfigHTTPAddedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigHTTPAddedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigHTTPAdded,
 			want: wantReduce{
@@ -411,7 +411,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"aggregate_id": "agg-id",
 						"id": "config-id"		
 					}`),
-				), instance.SMTPConfigActivatedEventMapper),
+				), eventstore.GenericEventMapper[instance.SMTPConfigActivatedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigActivated,
 			want: wantReduce{
@@ -456,7 +456,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"aggregate_id": "agg-id",
 						"id": "config-id"		
 					}`),
-				), instance.SMTPConfigDeactivatedEventMapper),
+				), eventstore.GenericEventMapper[instance.SMTPConfigDeactivatedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigDeactivated,
 			want: wantReduce{
@@ -496,7 +496,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							"keyId": "key-id"
 						}
 					}`),
-					), instance.SMTPConfigPasswordChangedEventMapper),
+					), eventstore.GenericEventMapper[instance.SMTPConfigPasswordChangedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigPasswordChanged,
 			want: wantReduce{
@@ -537,7 +537,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						"aggregate_id": "agg-id",
 						"id": "config-id"
 }`),
-				), instance.SMTPConfigRemovedEventMapper),
+				), eventstore.GenericEventMapper[instance.SMTPConfigRemovedEvent]),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigRemoved,
 			want: wantReduce{
