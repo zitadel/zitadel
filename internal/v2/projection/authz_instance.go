@@ -38,6 +38,9 @@ func (i *AuthZInstance) InterestedIn() map[eventstore.AggregateType][]eventstore
 
 func (i *AuthZInstance) Reduce(events ...*v2_es.StorageEvent) (err error) {
 	for _, event := range events {
+		if event.Aggregate.ID != i.ID {
+			continue
+		}
 		i.projection.reduce(event)
 		switch event.Type {
 		case instance.AddedType:

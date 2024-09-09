@@ -35,6 +35,10 @@ func (i *Instance) InterestedIn() map[eventstore.AggregateType][]eventstore.Even
 
 func (i *Instance) Reduce(events ...*v2_es.StorageEvent) (err error) {
 	for _, event := range events {
+		if event.Aggregate.ID != i.ID {
+			continue
+		}
+
 		if err = i.AuthZInstance.Reduce(event); err != nil {
 			return err
 		}
