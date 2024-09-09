@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/notification/senders"
@@ -78,20 +78,20 @@ func (c *channels) Email(ctx context.Context) (*senders.Chain, *smtp.Config, err
 	return chain, smtpCfg, err
 }
 
-func (c *channels) SMS(ctx context.Context) (*senders.Chain, *twilio.Config, error) {
-	twilioCfg, err := c.q.GetTwilioConfig(ctx)
+func (c *channels) SMS(ctx context.Context) (*senders.Chain, *sms.Config, error) {
+	smsCfg, err := c.q.GetActiveSMSConfig(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 	chain, err := senders.SMSChannels(
 		ctx,
-		twilioCfg,
+		smsCfg,
 		c.q.GetFileSystemProvider,
 		c.q.GetLogProvider,
 		c.counters.success.sms,
 		c.counters.failed.sms,
 	)
-	return chain, twilioCfg, err
+	return chain, smsCfg, err
 }
 
 func (c *channels) Webhook(ctx context.Context, cfg webhook.Config) (*senders.Chain, error) {
