@@ -2,15 +2,14 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -28,21 +27,23 @@ type subscriptions struct {
 	background context.Context
 	cancelBg   context.CancelFunc
 
-	pool       *pgxpool.Pool
+	db         *sql.DB
 	eventTypes map[eventstore.EventType][]chan<- *eventstore.Notification
 	mutex      sync.RWMutex
 	waitGroup  sync.WaitGroup
 }
 
-func newSubscriptions(pool *pgxpool.Pool) *subscriptions {
+func newSubscriptions(db *sql.DB) (*subscriptions, error) {
 	s := &subscriptions{
-		pool:       pool,
+		db:         db,
 		eventTypes: make(map[eventstore.EventType][]chan<- *eventstore.Notification),
 	}
 	s.background, s.cancelBg = context.WithCancel(context.Background())
 	s.waitGroup.Add(1)
-	go s.listen()
-	return s
+
+	err := make(chan error)
+	go s.listen(err)
+	return s, <-err
 }
 
 func (s *subscriptions) Close() {
@@ -114,42 +115,71 @@ func (s *subscriptions) notifyAll() {
 }
 
 // listen for zitadel_events on a notification channel.
-// Rebuilds connections and waiter until the background context is cancelled.
-func (s *subscriptions) listen() {
+// Rebuilds connections and waits for notification
+// until the background context is cancelled.
+// An error from the first connection setup is pushed on `ec`.
+// If the first connection was successful `nil` is pushed on `ec`.
+func (s *subscriptions) listen(ec chan<- error) {
+	defer s.waitGroup.Done()
+
+	var once sync.Once
+	sendFirstError := func(err error) {
+		once.Do(func() {
+			ec <- err
+			if err != nil {
+				s.cancelBg() // terminate the listener
+			}
+		})
+	}
+
 	for {
-		err := s.waitForNotifications()
-		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		if err := s.background.Err(); err != nil {
+			sendFirstError(err)
+		}
+
+		ctx, cancel := context.WithTimeout(s.background, time.Second)
+		defer cancel()
+
+		conn, err := s.db.Conn(ctx)
+		if err != nil {
+			logging.WithError(err).Error("subscription listener connection")
+			sendFirstError(err)
+			continue
+		}
+
+		err = conn.Raw(func(driverConn any) (err error) {
+			defer conn.Close()
+			conn, ok := driverConn.(*pgx.Conn)
+			if !ok {
+				return fmt.Errorf("wrong connection type %T expected %T", driverConn, conn)
+			}
+			_, err = conn.Exec(ctx, notificationListenQuery)
+			if err != nil {
+				return err
+			}
+			defer func() {
+				_, err = conn.Exec(ctx, notificationUnlistenQuery)
+			}()
+			sendFirstError(nil)
+			s.notifyAll()
+			return s.waitForNotifications(conn)
+		})
+		sendFirstError(err)
+		select {
+		case <-s.background.Done():
 			logging.WithError(err).Info("subscription listener terminated")
 			return
+		case <-time.After(time.Second):
+			logging.WithError(err).Error("subscription listener restarting")
 		}
-		logging.WithError(err).Error("subscription listener restarting")
-		time.Sleep(time.Second)
 	}
 }
 
-// waitForNotifications hijacks a connection from the pool and LISTENs on the zitadel_events notification channel,
-// until the background context is canceled or the connection returns an error.
-// Upon termination the connection is closed and not returned to the pool.
-// This is to prevent active LISTENing connections in the pool.
+// waitForNotifications waits and pushes every notification received from conn,
+// until the background context is canceled and/or the connection returns an error.
 // The returned error is never nil.
-func (s *subscriptions) waitForNotifications() error {
-	ctx, cancel := context.WithTimeout(s.background, 5*time.Second)
-	conn, err := s.getListenerConn(ctx)
-	cancel()
-	if err != nil {
-		return err
-	}
-	defer func(ctx context.Context) {
-		ctx, cancel := context.WithTimeout(ctx, time.Second)
-		_, err := conn.Exec(ctx, notificationUnlistenQuery)
-		err = errors.Join(err, conn.Close(ctx))
-		cancel()
-		logging.OnError(err).Warn("subscription listener cleanup")
-	}(s.background)
-
-	s.notifyAll()
-	logging.Info("subscription listener started")
-
+func (s *subscriptions) waitForNotifications(conn *pgx.Conn) error {
+	logging.Info("wait for notification started")
 	for {
 		notification, err := conn.WaitForNotification(s.background)
 		if err != nil {
@@ -159,37 +189,6 @@ func (s *subscriptions) waitForNotifications() error {
 		err = json.Unmarshal([]byte(notification.Payload), &payload)
 		logging.OnError(err).Error("invalid notification payload")
 		s.push(payload)
-	}
-}
-
-// getListenerConn acquires a connection and issue LISTEN commands for all event types.
-// On error it retries until the context is expires.
-// The returned conn is hijacked and should be closed by the caller.
-func (s *subscriptions) getListenerConn(ctx context.Context) (*pgx.Conn, error) {
-	for {
-		conn, err := func() (*pgxpool.Conn, error) {
-			conn, err := s.pool.Acquire(ctx)
-			if err != nil {
-				return nil, err
-			}
-			_, err = conn.Exec(ctx, notificationListenQuery)
-			if err != nil {
-				conn.Release()
-				return nil, err
-			}
-			return conn, nil
-		}()
-		if err != nil {
-			logging.WithError(err).Error("get listener connection")
-			select {
-			case <-ctx.Done():
-				return nil, err
-			case <-time.After(time.Second):
-				continue // try again
-			}
-		}
-		// Hijack so the pool knows it's never getting this connection back.
-		return conn.Hijack(), nil
 	}
 }
 

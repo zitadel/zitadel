@@ -30,7 +30,12 @@ func NewEventstore(client *database.DB) *Eventstore {
 		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM transaction_timestamp()), $%d)"
 		uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 	}
-	return &Eventstore{client: client, subscriptions: newSubscriptions(client.Pool)}
+	subscriptions, err := newSubscriptions(client.DB)
+	if err != nil {
+		// TODO: return
+		panic(err)
+	}
+	return &Eventstore{client: client, subscriptions: subscriptions}
 }
 
 func (es *Eventstore) Subscribe(eventTypes ...eventstore.EventType) <-chan *eventstore.Notification {
