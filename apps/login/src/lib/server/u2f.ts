@@ -54,7 +54,10 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     sessionId: command.sessionId,
   });
 
-  const session = await getSession(sessionCookie.id, sessionCookie.token);
+  const session = await getSession({
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
 
   const userId = session?.session?.factors?.user?.id;
 
