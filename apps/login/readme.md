@@ -8,14 +8,17 @@ You can overwrite the default configuration by creating a `custom-config.ts` fil
 
 ### Example `custom-config.ts`
 
-```typescript
-import { Config } from "./default-config";
-
-const customConfig: Partial<Config> = {
+```js
+const customConfig = {
   session: {
     lifetime_in_seconds: 7200,
   },
+  selfservice: {
+    change_password: {
+      enabled: false,
+    },
+  },
 };
 
-export default customConfig;
+module.exports = customConfig;
 ```
