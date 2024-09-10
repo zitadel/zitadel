@@ -205,7 +205,17 @@ export default function UsernameForm({
         {allowRegister && (
           <button
             className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
-            onClick={() => router.push("/register")}
+            onClick={() => {
+              const registerParams = new URLSearchParams();
+              if (organization) {
+                registerParams.append("organization", organization);
+              }
+              if (authRequestId) {
+                registerParams.append("authRequestId", authRequestId);
+              }
+
+              router.push("/register?" + registerParams);
+            }}
             type="button"
             disabled={loading}
           >
