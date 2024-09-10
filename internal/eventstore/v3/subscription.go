@@ -160,7 +160,7 @@ func (s *subscriptions) listen(ec chan<- error) {
 			defer func() {
 				_, err = conn.Exec(ctx, notificationUnlistenQuery)
 			}()
-			sendFirstError(nil)
+			sendFirstError(nil) // setup went ok, tell the caller.
 			s.notifyAll()
 			return s.waitForNotifications(conn)
 		})
