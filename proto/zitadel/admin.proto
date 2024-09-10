@@ -780,7 +780,6 @@ service AdminService {
             tags: "Email Provider";
             summary: "Deactivate Email Provider";
             description: "Deactivate an Email provider. After deactivating the provider, the users will not be able to receive Email notifications from that provider anymore."
-            deprecated: true;
         };
     }
 
