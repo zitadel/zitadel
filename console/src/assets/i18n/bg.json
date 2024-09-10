@@ -1367,7 +1367,7 @@
       "ALLOWED_SAVED": "Разрешените езици са запазени успешно.",
       "OPTIONS": {
         "de": "Deutsch",
-        "en": "Английски",
+        "en": "English",
         "es": "Español",
         "fr": "Français",
         "it": "Италиано",
@@ -1380,7 +1380,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1467,6 +1468,8 @@
       "USERSCHEMA_DESCRIPTION": "Потребителските схеми позволяват управление на данните за схемите на потребителите. Ако е активиран флагът, ще можете да използвате новото API и неговите функции.",
       "ACTIONS": "Действия",
       "ACTIONS_DESCRIPTION": "Действия v2 позволяват управление на выполнения на данни и цели. Ако флагът е активиран, ще можете да използвате новия API и неговите функции.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Завършване на сесия",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Ако флагът е активиран, ще можете да прекратите единична сесия от UI за вход, като предоставите id_token с `sid` претенция като id_token_hint на крайната точка на end_session. Имайте предвид, че в момента всички сесии от същия потребителски агент (браузър) се прекратяват в UI за вход. Сесиите, управлявани чрез API на сесията, вече позволяват прекратяването на единични сесии.",
       "STATES": {
         "INHERITED": "Наследено",
         "ENABLED": "Активирано",
@@ -1599,7 +1602,7 @@
       "LANGUAGE": "Език",
       "LANGUAGES": {
         "de": "Deutsch",
-        "en": "Английски",
+        "en": "English",
         "es": "Español",
         "fr": "Français",
         "it": "Италиано",
@@ -1612,7 +1615,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверката на имейл е извършена",
@@ -2535,7 +2539,7 @@
   },
   "LANGUAGES": {
     "de": "Deutsch",
-    "en": "Английски",
+    "en": "English",
     "es": "Español",
     "fr": "Français",
     "it": "Италиано",
@@ -2548,7 +2552,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Добавяне на мениджър",

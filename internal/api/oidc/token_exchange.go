@@ -298,6 +298,7 @@ func (s *Server) createExchangeAccessToken(
 		reason,
 		actor,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
+		"",
 	)
 	if err != nil {
 		return "", "", "", 0, err
@@ -342,6 +343,7 @@ func (s *Server) createExchangeJWT(
 		reason,
 		actor,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
+		"",
 	)
 	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, roleAssertion, getSigner)
 	if err != nil {
