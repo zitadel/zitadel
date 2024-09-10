@@ -50,7 +50,7 @@ func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeleteSchemaUser(ctx, req.GetId())
+	details, err := s.command.DeleteSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserReq
 		return nil, err
 	}
 
-	details, err := s.command.DeactivateSchemaUser(ctx, req.GetId())
+	details, err := s.command.DeactivateSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (s *Server) ReactivateUser(ctx context.Context, req *user.ReactivateUserReq
 		return nil, err
 	}
 
-	details, err := s.command.ReactivateSchemaUser(ctx, req.GetId())
+	details, err := s.command.ReactivateSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *us
 		return nil, err
 	}
 
-	details, err := s.command.LockSchemaUser(ctx, req.GetId())
+	details, err := s.command.LockSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_
 		return nil, err
 	}
 
-	details, err := s.command.UnlockSchemaUser(ctx, req.GetId())
+	details, err := s.command.UnlockSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
 	if err != nil {
 		return nil, err
 	}

@@ -325,6 +325,40 @@ func TestServer_PatchUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "user patch, not found",
+			ctx:  IAMOwnerCTX,
+			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
+				return nil
+			},
+			req: &user.PatchUserRequest{
+				Id: "notexisting",
+				User: &user.PatchUser{
+					Data: unmarshalJSON("{\"name\": \"user\"}"),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "user patch, not found, org",
+			ctx:  IAMOwnerCTX,
+			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
+				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
+				return nil
+			},
+			req: &user.PatchUserRequest{
+				Organization: &object.Organization{
+					Property: &object.Organization_OrgId{
+						OrgId: "not existing",
+					},
+				},
+				User: &user.PatchUser{
+					Data: unmarshalJSON("{\"name\": \"user\"}"),
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "user patch, no change",
 			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
@@ -524,6 +558,23 @@ func TestServer_DeleteUser(t *testing.T) {
 					},
 				},
 				Id: "notexisting",
+			},
+			wantErr: true,
+		},
+		{
+			name: "user delete, not existing, org",
+			ctx:  IAMOwnerCTX,
+			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
+				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
+				return nil
+			},
+			req: &user.DeleteUserRequest{
+				Organization: &object.Organization{
+					Property: &object.Organization_OrgId{
+						OrgId: "notexisting",
+					},
+				},
 			},
 			wantErr: true,
 		},

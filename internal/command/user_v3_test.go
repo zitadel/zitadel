@@ -905,6 +905,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 	type (
 		args struct {
 			ctx    context.Context
+			orgID  string
 			userID string
 		}
 	)
@@ -1089,7 +1090,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.DeleteSchemaUser(tt.args.ctx, tt.args.userID)
+			got, err := r.DeleteSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1111,6 +1112,7 @@ func TestCommandSide_LockSchemaUser(t *testing.T) {
 	type (
 		args struct {
 			ctx    context.Context
+			orgID  string
 			userID string
 		}
 	)
@@ -1329,7 +1331,7 @@ func TestCommandSide_LockSchemaUser(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.LockSchemaUser(tt.args.ctx, tt.args.userID)
+			got, err := r.LockSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1351,6 +1353,7 @@ func TestCommandSide_UnlockSchemaUser(t *testing.T) {
 	type (
 		args struct {
 			ctx    context.Context
+			orgID  string
 			userID string
 		}
 	)
@@ -1579,7 +1582,7 @@ func TestCommandSide_UnlockSchemaUser(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.UnlockSchemaUser(tt.args.ctx, tt.args.userID)
+			got, err := r.UnlockSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1601,6 +1604,7 @@ func TestCommandSide_DeactivateSchemaUser(t *testing.T) {
 	type (
 		args struct {
 			ctx    context.Context
+			orgID  string
 			userID string
 		}
 	)
@@ -1819,7 +1823,7 @@ func TestCommandSide_DeactivateSchemaUser(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.DeactivateSchemaUser(tt.args.ctx, tt.args.userID)
+			got, err := r.DeactivateSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1841,6 +1845,7 @@ func TestCommandSide_ReactivateSchemaUser(t *testing.T) {
 	type (
 		args struct {
 			ctx    context.Context
+			orgID  string
 			userID string
 		}
 	)
@@ -2069,7 +2074,7 @@ func TestCommandSide_ReactivateSchemaUser(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := r.ReactivateSchemaUser(tt.args.ctx, tt.args.userID)
+			got, err := r.ReactivateSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

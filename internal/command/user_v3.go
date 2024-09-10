@@ -139,11 +139,11 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser,
 	return nil
 }
 
-func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeleteSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Vs4wJCME7T", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserExists(ctx, "", id)
+	writeModel, err := c.getSchemaUserExists(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
@@ -294,11 +294,11 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser,
 	return nil
 }
 
-func (c *Commands) LockSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) LockSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Eu8I2VAfjF", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserExists(ctx, "", id)
+	writeModel, err := c.getSchemaUserExists(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
@@ -319,11 +319,11 @@ func (c *Commands) LockSchemaUser(ctx context.Context, id string) (*domain.Objec
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) UnlockSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) UnlockSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-krXtYscQZh", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserExists(ctx, "", id)
+	writeModel, err := c.getSchemaUserExists(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
@@ -344,11 +344,11 @@ func (c *Commands) UnlockSchemaUser(ctx context.Context, id string) (*domain.Obj
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) DeactivateSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeactivateSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-pjJhge86ZV", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserExists(ctx, "", id)
+	writeModel, err := c.getSchemaUserExists(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +369,7 @@ func (c *Commands) DeactivateSchemaUser(ctx context.Context, id string) (*domain
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) ReactivateSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) ReactivateSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-17XupGvxBJ", "Errors.IDMissing")
 	}
