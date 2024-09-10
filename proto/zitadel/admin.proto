@@ -831,7 +831,6 @@ service AdminService {
             tags: "SMTP EMailProvider";
             summary: "Test SMTP Email Provider";
             description: "Test an SMTP Email provider. After testing the provider, the users will receive information about the test results."
-            deprecated: true;
         };
     }
 
