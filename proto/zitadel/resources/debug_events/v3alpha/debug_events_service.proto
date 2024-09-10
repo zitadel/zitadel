@@ -131,7 +131,7 @@ service ZITADELDebugEvents {
     };
   }
 
-  rpc GetDebugEventsStateByID(GetDebugEventsStateByIDRequest) returns (GetDebugEventsStateByIDResponse) {
+  rpc GetDebugEventsStateById(GetDebugEventsStateByIdRequest) returns (GetDebugEventsStateByIdResponse) {
     option (google.api.http) = {
       get: "/v3alpha/debug_events/{id}"
     };
@@ -196,7 +196,7 @@ message CreateDebugEventsResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
 }
 
-message GetDebugEventsStateByIDRequest {
+message GetDebugEventsStateByIdRequest {
   // unique identifier of the aggregate.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -210,7 +210,7 @@ message GetDebugEventsStateByIDRequest {
   bool trigger_bulk = 2;
 }
 
-message GetDebugEventsStateByIDResponse {
+message GetDebugEventsStateByIdResponse {
   State state = 1;
 }
 

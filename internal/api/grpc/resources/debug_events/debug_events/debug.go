@@ -23,7 +23,7 @@ func (s *Server) CreateDebugEvents(ctx context.Context, req *debug_events.Create
 	}, nil
 }
 
-func (s *Server) GetDebugEventsStateByID(ctx context.Context, req *debug_events.GetDebugEventsStateByIDRequest) (_ *debug_events.GetDebugEventsStateByIDResponse, err error) {
+func (s *Server) GetDebugEventsStateById(ctx context.Context, req *debug_events.GetDebugEventsStateByIdRequest) (_ *debug_events.GetDebugEventsStateByIdResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -32,7 +32,7 @@ func (s *Server) GetDebugEventsStateByID(ctx context.Context, req *debug_events.
 		return nil, err
 	}
 
-	return &debug_events.GetDebugEventsStateByIDResponse{
+	return &debug_events.GetDebugEventsStateByIdResponse{
 		State: eventsStateToPB(state),
 	}, nil
 }
