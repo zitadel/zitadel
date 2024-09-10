@@ -23,7 +23,10 @@ export async function addU2F(command: RegisterU2FCommand) {
     sessionId: command.sessionId,
   });
 
-  const session = await getSession(sessionCookie.id, sessionCookie.token);
+  const session = await getSession({
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
 
   const domain = headers().get("host");
 
