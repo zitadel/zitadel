@@ -264,7 +264,7 @@ func TestServer_PatchUser(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "user create, no context",
+			name: "user patch, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
@@ -284,7 +284,7 @@ func TestServer_PatchUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user create, no permission",
+			name: "user patch, no permission",
 			ctx:  UserCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
@@ -304,7 +304,7 @@ func TestServer_PatchUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user create, invalid schema permission, owner",
+			name: "user patch, invalid schema permission, owner",
 			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
@@ -325,7 +325,7 @@ func TestServer_PatchUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user create, no change",
+			name: "user patch, no change",
 			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				data := "{\"name\": \"user\"}"
@@ -350,7 +350,7 @@ func TestServer_PatchUser(t *testing.T) {
 			},
 		},
 		{
-			name: "user update, schema, ok",
+			name: "user patch, schema, ok",
 			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
@@ -373,7 +373,7 @@ func TestServer_PatchUser(t *testing.T) {
 			},
 		},
 		{
-			name: "user update, schema and data, ok",
+			name: "user patch, schema and data, ok",
 			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
@@ -398,7 +398,7 @@ func TestServer_PatchUser(t *testing.T) {
 			},
 		},
 		{
-			name: "user update, ok",
+			name: "user patch, ok",
 			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
@@ -421,7 +421,7 @@ func TestServer_PatchUser(t *testing.T) {
 			},
 		},
 		{
-			name: "user update, full contact, ok",
+			name: "user patch, full contact, ok",
 			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
