@@ -31,6 +31,8 @@ import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = config.session.lifetime_in_seconds;
 
+console.log("Session lifetime", SESSION_LIFETIME_S);
+
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
   {

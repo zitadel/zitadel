@@ -1,16 +1,20 @@
+// import config from "@/../config";
 import Link from "next/link";
 
 export default function SelfServiceMenu({ sessionId }: { sessionId: string }) {
-  const list = [
-    {
-      link:
-        `/me/change-password?` +
-        new URLSearchParams({
-          sessionId: sessionId,
-        }),
-      name: "Change password",
-    },
-  ];
+  const list: any[] = [];
+
+  // if (!!config.selfservice.change_password.enabled) {
+  //   list.push({
+  //     link:
+  //       `/me/change-password?` +
+  //       new URLSearchParams({
+  //         sessionId: sessionId,
+  //       }),
+  //     name: "Change password",
+  //   });
+  // }
+
   return (
     <div className="w-full flex flex-col space-y-2">
       {list.map((menuitem, index) => {
