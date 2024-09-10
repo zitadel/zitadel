@@ -215,9 +215,9 @@ func assertFeatureDisabledError(t *testing.T, err error) {
 func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integration.Instance, nKeys int, expectActiveKeyID string, config any) {
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
-		require.NoError(t, err)
+		require.NoError(collect, err)
 		list := resp.GetWebKeys()
-		assert.Len(t, list, nKeys)
+		assert.Len(collect, list, nKeys)
 
 		now := time.Now()
 		var gotActiveKeyID string
@@ -230,10 +230,10 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integrati
 					Id:   instance.ID(),
 				},
 			}, key.GetDetails())
-			assert.WithinRange(t, key.GetDetails().GetChanged().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
-			assert.NotEqual(t, webkey.WebKeyState_STATE_UNSPECIFIED, key.GetState())
-			assert.NotEqual(t, webkey.WebKeyState_STATE_REMOVED, key.GetState())
-			assert.Equal(t, config, key.GetConfig().GetConfig())
+			assert.WithinRange(collect, key.GetDetails().GetChanged().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
+			assert.NotEqual(collect, webkey.WebKeyState_STATE_UNSPECIFIED, key.GetState())
+			assert.NotEqual(collect, webkey.WebKeyState_STATE_REMOVED, key.GetState())
+			assert.Equal(collect, config, key.GetConfig().GetConfig())
 
 			if key.GetState() == webkey.WebKeyState_STATE_ACTIVE {
 				gotActiveKeyID = key.GetDetails().GetId()
