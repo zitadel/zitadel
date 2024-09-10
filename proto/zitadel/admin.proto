@@ -746,7 +746,6 @@ service AdminService {
             tags: "SMTP";
             summary: "Update SMTP Password";
             description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
-            deprecated: true;
         };
     }
 
