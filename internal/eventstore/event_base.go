@@ -28,6 +28,7 @@ type BaseEvent struct {
 	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
+	Rev                           uint16
 
 	//User who created the event
 	User string `json:"-"`
@@ -91,8 +92,8 @@ func (e *BaseEvent) DataAsBytes() []byte {
 }
 
 // Revision implements action
-func (*BaseEvent) Revision() uint16 {
-	return 0
+func (e *BaseEvent) Revision() uint16 {
+	return e.Rev
 }
 
 // Unmarshal implements Event
@@ -117,6 +118,7 @@ func BaseEventFromRepo(event Event) *BaseEvent {
 		Data:      event.DataAsBytes(),
 		Pos:       event.Position(),
 		TxOrder:   event.InTxOrder(),
+		Rev:       event.Revision(),
 	}
 }
 

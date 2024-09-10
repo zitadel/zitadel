@@ -10,61 +10,70 @@ import (
 	v2_es "github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
-type CachedReadModel[T model] struct {
+type CachedReadModel[M objectManager, T cacheModel] struct {
 	cache[T]
 
 	eventStore     *eventstore.Eventstore
 	notifications  chan decimal.Decimal
-	latestPosition decimal.Decimal
-	interestedIn   map[eventstore.AggregateType][]eventstore.EventType
-	reduce         v2_es.Reduce
+	latestPosition v2_es.GlobalPosition
+	// interestedIn   map[eventstore.AggregateType][]eventstore.EventType
+	// reduce         v2_es.Reduce
+
+	manager M
 }
 
 // Reduce implements [eventstore.reducer]
-func (c *CachedReadModel[T]) Reduce() error {
+func (c *CachedReadModel[M, T]) Reduce() error {
 	return nil
 }
 
 // AppendEvents implements [eventstore.reducer]
-func (c *CachedReadModel[T]) AppendEvents(events ...eventstore.Event) {
-	storageEvents := make([]*v2_es.StorageEvent, 0, len(events))
+func (c *CachedReadModel[M, T]) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
-		if event.Position() == c.latestPosition {
+		storageEvent := eventstore.EventToV2(event)
+		if storageEvent.Position.IsLessOrEqual(c.latestPosition) {
 			continue
 		}
-		storageEvents = append(storageEvents, eventstore.EventToV2(event))
-	}
-	if len(storageEvents) == 0 {
-		return
-	}
 
-	err := c.reduce(storageEvents...)
-	logging.OnError(err).Error("could not reduce events")
+		reduce := c.manager.Reducers()[string(event.Aggregate().Type)][string(event.Type())]
+		if reduce == nil {
+			continue
+		}
+		err := reduce(storageEvent)
+		logging.WithFields("position", event.Position().String(), "in_tx_order", event.InTxOrder()).OnError(err).Error("could not reduce events")
 
-	c.latestPosition = storageEvents[len(storageEvents)-1].Position.Position
+		c.latestPosition = storageEvent.Position
+	}
 }
 
-func NewCachedReadModel[T model](ctx context.Context, eventStore *eventstore.Eventstore, reduce v2_es.Reduce) *CachedReadModel[T] {
-	var t T
-	readModel := &CachedReadModel[T]{
+func NewCachedReadModel[M objectManager, T cacheModel](ctx context.Context, manager M, eventStore *eventstore.Eventstore) *CachedReadModel[M, T] {
+	readModel := &CachedReadModel[M, T]{
 		cache:         newMapCache[T](),
 		eventStore:    eventStore,
 		notifications: make(chan decimal.Decimal),
-		interestedIn:  t.InterestedIn(),
-		reduce:        reduce,
+		manager:       manager,
 	}
 	go readModel.subscription(ctx)
 	readModel.createSubscription()
 	return readModel
 }
 
-func (c *CachedReadModel[T]) createSubscription() {
-	for _, eventTypes := range c.interestedIn {
-		c.eventStore.Subscribe(c.notifications, eventTypes...)
+func (c *CachedReadModel[M, T]) createSubscription() {
+	for _, eventTypes := range c.manager.Reducers() {
+		for eventType := range eventTypes {
+			c.eventStore.Subscribe(c.notifications, eventstore.EventType(eventType))
+		}
 	}
 }
 
-func (c *CachedReadModel[T]) subscription(ctx context.Context) {
+func (c *CachedReadModel[M, T]) subscription(ctx context.Context) {
+	eventFilters := make(map[eventstore.AggregateType][]eventstore.EventType, len(c.manager.Reducers()))
+	for aggregateType, eventTypes := range c.manager.Reducers() {
+		for eventType := range eventTypes {
+			eventFilters[eventstore.AggregateType(aggregateType)] = append(eventFilters[eventstore.AggregateType(aggregateType)], eventstore.EventType(eventType))
+		}
+	}
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -75,11 +84,11 @@ func (c *CachedReadModel[T]) subscription(ctx context.Context) {
 			_ = position
 			builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 				AwaitOpenTransactions().
-				PositionGreaterEqual(c.latestPosition).
+				PositionGreaterEqual(c.latestPosition.Position).
 				OrderAsc()
-			for aggregateType, eventTypes := range c.interestedIn {
+			for aggregateType, eventTypes := range eventFilters {
 				builder = builder.AddQuery().
-					AggregateTypes(aggregateType).
+					AggregateTypes(eventstore.AggregateType(aggregateType)).
 					EventTypes(eventTypes...).
 					Builder()
 			}
@@ -90,17 +99,17 @@ func (c *CachedReadModel[T]) subscription(ctx context.Context) {
 	}
 }
 
-type cache[T model] interface {
+type cache[T cacheModel] interface {
 	get(key string) (T, bool)
 	getAll() []T
 	set(key string, value T) error
 }
 
-var _ cache[model] = (*MapCache[model])(nil)
+var _ cache[cacheModel] = (*MapCache[cacheModel])(nil)
 
-type MapCache[T model] map[string]T
+type MapCache[T cacheModel] map[string]T
 
-func newMapCache[T model]() *MapCache[T] {
+func newMapCache[T cacheModel]() *MapCache[T] {
 	m := make(MapCache[T])
 	return &m
 }
@@ -128,7 +137,10 @@ func (m *MapCache[T]) set(key string, value T) error {
 	return nil
 }
 
-type model interface {
-	InterestedIn() map[eventstore.AggregateType][]eventstore.EventType
-	Reduce(events ...*v2_es.StorageEvent) error
+type objectManager interface {
+	Reducers() map[string]map[string]v2_es.ReduceEvent
+}
+
+type cacheModel interface {
+	// Reducers() map[string]map[string]v2_es.ReduceEvent
 }

@@ -1,10 +1,11 @@
 package projection
 
 import (
+	"slices"
+
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
 	v2_es "github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/instance"
 )
@@ -20,109 +21,180 @@ type AuthZInstance struct {
 	ConsoleAppID    string
 	DefaultLanguage language.Tag
 
+	Domains []*InstanceDomain
+
 	State *InstanceState
 }
 
 func NewAuthZInstanceFromEvent(event *v2_es.StorageEvent) *AuthZInstance {
-	state := NewInstanceStateProjection(event.Aggregate.ID)
-	err := state.Reduce(event)
-	logging.OnError(err).Debug("failed to reduce state on added")
-
-	return &AuthZInstance{
-		ID:    event.Aggregate.ID,
-		State: state,
+	instance := &AuthZInstance{
+		ID: event.Aggregate.ID,
 	}
+	err := instance.reduceAdded(event)
+	logging.OnError(err).Error("could not reduce added event")
+
+	return instance
 }
 
-// InterestedIn implements model.
-func (i *AuthZInstance) InterestedIn() map[eventstore.AggregateType][]eventstore.EventType {
-	return map[eventstore.AggregateType][]eventstore.EventType{
-		eventstore.AggregateType(instance.AggregateType): {
-			eventstore.EventType(instance.AddedType),
-			eventstore.EventType(instance.DefaultOrgSetType),
-			eventstore.EventType(instance.ProjectSetType),
-			eventstore.EventType(instance.ConsoleSetType),
-			eventstore.EventType(instance.DefaultLanguageSetType),
-			eventstore.EventType(instance.RemovedType),
+func (i *AuthZInstance) Reducers() map[string]map[string]v2_es.ReduceEvent {
+	if i.reducers != nil {
+		return i.reducers
+	}
+	i.reducers = map[string]map[string]v2_es.ReduceEvent{
+		instance.AggregateType: {
+			instance.AddedType:              i.reduceAdded,
+			instance.DefaultOrgSetType:      i.reduceDefaultOrgSet,
+			instance.ProjectSetType:         i.reduceProjectSet,
+			instance.ConsoleSetType:         i.reduceConsoleSet,
+			instance.DefaultLanguageSetType: i.reduceDefaultLanguageSet,
+			instance.RemovedType:            i.reduceRemoved,
+
+			instance.DomainAddedType:      i.reduceDomainAdded,
+			instance.DomainVerifiedType:   i.reduceDomainVerified,
+			instance.DomainPrimarySetType: i.reduceDomainPrimarySet,
+			instance.DomainRemovedType:    i.reduceDomainRemoved,
 		},
 	}
-}
 
-func (i *AuthZInstance) Reduce(events ...*v2_es.StorageEvent) (err error) {
-	for _, event := range events {
-		if event.Aggregate.ID != i.ID {
-			continue
-		}
-		i.projection.reduce(event)
-		switch event.Type {
-		case instance.AddedType:
-			err = i.reduceAdded(event)
-		case instance.DefaultOrgSetType:
-			err = i.reduceDefaultOrgSet(event)
-		case instance.ProjectSetType:
-			err = i.reduceProjectSet(event)
-		case instance.ConsoleSetType:
-			err = i.reduceConsoleSet(event)
-		case instance.DefaultLanguageSetType:
-			err = i.reduceDefaultLanguageSet(event)
-		}
-		if err != nil {
-			return err
-		}
-		if i.State == nil {
-			i.State = NewInstanceStateProjection(i.ID)
-		}
-		if err = i.State.Reduce(event); err != nil {
-			return err
-		}
-
-		i.position = event.Position
-	}
-	return nil
+	return i.Reducers()
 }
 
 func (i *AuthZInstance) reduceAdded(event *v2_es.StorageEvent) error {
-	e, err := instance.AddedEventFromStorage(event)
-	if err != nil {
-		return err
+	if !i.ShouldReduce(event) {
+		return nil
 	}
-	i.ID = e.Aggregate.ID
-	return nil
+
+	if i.State == nil {
+		i.State = NewInstanceStateProjection(i.ID)
+	}
+	return i.projection.reduce(event, i.State.reduceAdded)
 }
 
 func (i *AuthZInstance) reduceDefaultOrgSet(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
 	e, err := instance.DefaultOrgSetEventFromStorage(event)
 	if err != nil {
 		return err
 	}
 	i.DefaultOrgID = e.Payload.OrgID
+	i.projection.set(event)
 	return nil
 }
 
 func (i *AuthZInstance) reduceProjectSet(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
 	e, err := instance.ProjectSetEventFromStorage(event)
 	if err != nil {
 		return err
 	}
 	i.ProjectID = e.Payload.ProjectID
+	i.projection.set(event)
 	return nil
 }
 
 func (i *AuthZInstance) reduceConsoleSet(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
 	e, err := instance.ConsoleSetEventFromStorage(event)
 	if err != nil {
 		return err
 	}
 	i.ConsoleAppID = e.Payload.AppID
 	i.ConsoleClientID = e.Payload.ClientID
+	i.projection.set(event)
 	return nil
 }
 
 func (i *AuthZInstance) reduceDefaultLanguageSet(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
 	e, err := instance.DefaultLanguageSetEventFromStorage(event)
 	if err != nil {
 		return err
 	}
 	i.DefaultLanguage = e.Payload.Language
+	i.projection.set(event)
 	return nil
+}
+
+func (i *AuthZInstance) reduceRemoved(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
+	return i.projection.reduce(event, i.State.reduceRemoved)
+}
+
+func (i *AuthZInstance) reduceDomainAdded(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
+	i.Domains = append(i.Domains, NewInstanceDomainFromEvent(event))
+	return nil
+}
+
+func (i *AuthZInstance) reduceDomainVerified(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
+	domains := slices.Clone(i.Domains)
+	for _, domain := range domains {
+		err := domain.reduceVerified(event)
+		if err != nil {
+			return err
+		}
+	}
+	i.Domains = domains
+	i.projection.set(event)
+	return nil
+}
+
+func (i *AuthZInstance) reduceDomainPrimarySet(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
+	domains := slices.Clone(i.Domains)
+	for _, domain := range domains {
+		err := domain.reducePrimarySet(event)
+		if err != nil {
+			return err
+		}
+	}
+	i.Domains = domains
+	i.projection.set(event)
+	return nil
+}
+
+func (i *AuthZInstance) reduceDomainRemoved(event *v2_es.StorageEvent) error {
+	if !i.ShouldReduce(event) {
+		return nil
+	}
+
+	e, err := instance.DomainRemovedEventFromStorage(event)
+	if err != nil {
+		return err
+	}
+
+	i.Domains = slices.DeleteFunc(i.Domains, func(domain *InstanceDomain) bool {
+		return domain.Name == e.Payload.Name
+	})
+	i.projection.set(event)
+	return nil
+}
+
+func (i *AuthZInstance) ShouldReduce(event *v2_es.StorageEvent) bool {
+	return event.Aggregate.ID == i.ID && i.projection.ShouldReduce(event)
 }

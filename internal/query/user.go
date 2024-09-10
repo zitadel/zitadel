@@ -366,9 +366,9 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if shouldTriggerBulk {
-		triggerUserProjections(ctx)
-	}
+	// if shouldTriggerBulk {
+	// 	triggerUserProjections(ctx)
+	// }
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {

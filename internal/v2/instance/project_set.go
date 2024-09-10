@@ -8,7 +8,7 @@ import (
 const ProjectSetType = eventTypePrefix + "iam.project.set"
 
 type projectSetPayload struct {
-	ProjectID string `json:"projectId"`
+	ProjectID string `json:"iamProjectId"`
 }
 
 type ProjectSetEvent eventstore.Event[projectSetPayload]

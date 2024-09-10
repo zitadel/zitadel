@@ -137,10 +137,10 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		CreationDate:  foundOrg.CreationDate,
 		ChangeDate:    foundOrg.ChangeDate,
 		ResourceOwner: foundOrg.Owner,
-		State:         domain_pkg.OrgState(foundOrg.State.State),
-		Sequence:      uint64(foundOrg.Sequence),
-		Name:          foundOrg.Name,
-		Domain:        foundOrg.PrimaryDomain.Domain,
+		// State:         domain_pkg.OrgState(foundOrg.State.State),
+		Sequence: uint64(foundOrg.Sequence),
+		Name:     foundOrg.Name,
+		// Domain:        foundOrg.PrimaryDomain.Domain,
 	}, nil
 }
 

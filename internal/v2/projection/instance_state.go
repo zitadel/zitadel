@@ -7,7 +7,6 @@ import (
 
 type InstanceState struct {
 	projection
-
 	id string
 
 	instance.State
@@ -19,21 +18,33 @@ func NewInstanceStateProjection(id string) *InstanceState {
 	}
 }
 
-func (p *InstanceState) Reduce(events ...*eventstore.StorageEvent) error {
-	for _, event := range events {
-		if !p.shouldReduce(event) {
-			continue
-		}
-
-		switch event.Type {
-		case instance.AddedType:
-			p.State = instance.ActiveState
-		case instance.RemovedType:
-			p.State = instance.RemovedState
-		default:
-			continue
-		}
-		p.position = event.Position
+func (s *InstanceState) Reducers() map[string]map[string]func(*eventstore.StorageEvent) error {
+	return map[string]map[string]func(*eventstore.StorageEvent) error{
+		instance.AggregateType: {
+			instance.AddedType:   s.reduceAdded,
+			instance.RemovedType: s.reduceRemoved,
+		},
 	}
+}
+
+func (s *InstanceState) reduceAdded(event *eventstore.StorageEvent) error {
+	if !s.ShouldReduce(event) {
+		return nil
+	}
+	s.State = instance.ActiveState
+	s.projection.set(event)
 	return nil
+}
+
+func (s *InstanceState) reduceRemoved(event *eventstore.StorageEvent) error {
+	if !s.ShouldReduce(event) {
+		return nil
+	}
+	s.State = instance.RemovedState
+	s.projection.set(event)
+	return nil
+}
+
+func (s *InstanceState) ShouldReduce(event *eventstore.StorageEvent) bool {
+	return event.Aggregate.ID == s.id && s.projection.ShouldReduce(event)
 }

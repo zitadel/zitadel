@@ -1,4 +1,4 @@
-package org
+package instance
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/domain"
@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const DomainAddedType = "org." + domain.AddedTypeSuffix
+const DomainAddedType = eventTypePrefix + domain.AddedTypeSuffix
 
 type DomainAddedEvent eventstore.Event[domain.AddedPayload]
 
@@ -19,7 +19,7 @@ func (c *DomainAddedEvent) ActionType() string {
 
 func DomainAddedEventFromStorage(event *eventstore.StorageEvent) (e *DomainAddedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-CXVe3", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-CXVe3", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[domain.AddedPayload](event.Payload)
@@ -46,7 +46,7 @@ func (c *DomainVerifiedEvent) ActionType() string {
 
 func DomainVerifiedEventFromStorage(event *eventstore.StorageEvent) (e *DomainVerifiedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-RAwdb", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-RAwdb", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[domain.VerifiedPayload](event.Payload)
@@ -73,7 +73,7 @@ func (c *DomainPrimarySetEvent) ActionType() string {
 
 func DomainPrimarySetEventFromStorage(event *eventstore.StorageEvent) (e *DomainPrimarySetEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-7P3Iz", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-7P3Iz", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[domain.PrimarySetPayload](event.Payload)
@@ -100,7 +100,7 @@ func (c *DomainRemovedEvent) ActionType() string {
 
 func DomainRemovedEventFromStorage(event *eventstore.StorageEvent) (e *DomainRemovedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-ndpL2", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-ndpL2", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[domain.RemovedPayload](event.Payload)

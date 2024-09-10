@@ -48,19 +48,19 @@ type TypeChecker interface {
 	ActionType() string
 }
 
-func Type[T TypeChecker]() string {
-	var t T
-	return t.ActionType()
-}
+// func Type[T TypeChecker]() string {
+// 	var t T
+// 	return t.ActionType()
+// }
 
-func IsType[T TypeChecker](types ...string) bool {
-	gotten := Type[T]()
+// func IsType[T TypeChecker](types ...string) bool {
+// 	gotten := Type[T]()
 
-	for _, typ := range types {
-		if gotten == typ {
-			return true
-		}
-	}
+// 	for _, typ := range types {
+// 		if gotten == typ {
+// 			return true
+// 		}
+// 	}
 
-	return false
-}
+// 	return false
+// }

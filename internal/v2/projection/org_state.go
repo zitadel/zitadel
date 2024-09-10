@@ -20,48 +20,63 @@ func NewStateProjection(id string) *OrgState {
 	}
 }
 
-func (p *OrgState) Filter() []*eventstore.Filter {
-	return []*eventstore.Filter{
-		eventstore.NewFilter(
-			eventstore.FilterPagination(
-				eventstore.Descending(),
-				eventstore.GlobalPositionGreater(&p.position),
-			),
-			eventstore.AppendAggregateFilter(
-				org.AggregateType,
-				eventstore.AggregateIDs(p.id),
-				eventstore.AppendEvent(
-					eventstore.SetEventTypes(
-						org.AddedType,
-						org.DeactivatedType,
-						org.ReactivatedType,
-						org.RemovedType,
-					),
-				),
-			),
-		),
+func (s *OrgState) Reducers() map[string]map[string]eventstore.ReduceEvent {
+	if s.reducers != nil {
+		return s.reducers
 	}
+
+	s.reducers = map[string]map[string]eventstore.ReduceEvent{
+		org.AggregateType: {
+			org.AddedType:       s.reduceAdded,
+			org.DeactivatedType: s.reduceDeactivated,
+			org.ReactivatedType: s.reduceReactivated,
+			org.RemovedType:     s.reduceRemoved,
+		},
+	}
+
+	return s.reducers
 }
 
-func (p *OrgState) Reduce(events ...*eventstore.StorageEvent) error {
-	for _, event := range events {
-		if !p.shouldReduce(event) {
-			continue
-		}
-
-		switch event.Type {
-		case org.AddedType:
-			p.State = org.ActiveState
-		case org.DeactivatedType:
-			p.State = org.InactiveState
-		case org.ReactivatedType:
-			p.State = org.ActiveState
-		case org.RemovedType:
-			p.State = org.RemovedState
-		default:
-			continue
-		}
-		p.position = event.Position
+func (s *OrgState) reduceAdded(event *eventstore.StorageEvent) error {
+	if !s.ShouldReduce(event) {
+		return nil
 	}
+
+	s.State = org.ActiveState
+	s.set(event)
 	return nil
+}
+
+func (s *OrgState) reduceDeactivated(event *eventstore.StorageEvent) error {
+	if !s.ShouldReduce(event) {
+		return nil
+	}
+
+	s.State = org.InactiveState
+	s.set(event)
+	return nil
+}
+
+func (s *OrgState) reduceReactivated(event *eventstore.StorageEvent) error {
+	if !s.ShouldReduce(event) {
+		return nil
+	}
+
+	s.State = org.ActiveState
+	s.set(event)
+	return nil
+}
+
+func (s *OrgState) reduceRemoved(event *eventstore.StorageEvent) error {
+	if !s.ShouldReduce(event) {
+		return nil
+	}
+
+	s.State = org.RemovedState
+	s.set(event)
+	return nil
+}
+
+func (s *OrgState) ShouldReduce(event *eventstore.StorageEvent) bool {
+	return event.Aggregate.ID == s.id && s.projection.ShouldReduce(event)
 }
