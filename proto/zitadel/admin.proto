@@ -797,7 +797,6 @@ service AdminService {
             tags: "Email";
             summary: "Remove Email provider";
             description: "Remove the Email provider, be aware that the users will not get an E-Mail if no provider is set."
-            deprecated: true;
         };
     }
 
