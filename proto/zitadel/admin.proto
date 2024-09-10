@@ -813,7 +813,6 @@ service AdminService {
             tags: "SMTP Email Provider";
             summary: "Test SMTP Email Provider";
             description: "Test an SMTP Email provider identified by its ID. After testing the provider, the users will receive information about the test results."
-            deprecated: true;
         };
     }
 
