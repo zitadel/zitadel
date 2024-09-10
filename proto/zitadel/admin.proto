@@ -746,7 +746,6 @@ service AdminService {
             tags: "SMTP";
             summary: "Update SMTP Password";
             description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
-            deprecated: true;
         };
     }
 
@@ -764,7 +763,6 @@ service AdminService {
             tags: "Email Provider";
             summary: "Activate Email Provider";
             description: "Activate an Email provider."
-            deprecated: true;
         };
     }
 
@@ -782,7 +780,6 @@ service AdminService {
             tags: "Email Provider";
             summary: "Deactivate Email Provider";
             description: "Deactivate an Email provider. After deactivating the provider, the users will not be able to receive Email notifications from that provider anymore."
-            deprecated: true;
         };
     }
 
@@ -799,7 +796,6 @@ service AdminService {
             tags: "Email";
             summary: "Remove Email provider";
             description: "Remove the Email provider, be aware that the users will not get an E-Mail if no provider is set."
-            deprecated: true;
         };
     }
 
@@ -817,7 +813,6 @@ service AdminService {
             tags: "SMTP Email Provider";
             summary: "Test SMTP Email Provider";
             description: "Test an SMTP Email provider identified by its ID. After testing the provider, the users will receive information about the test results."
-            deprecated: true;
         };
     }
 
@@ -835,7 +830,6 @@ service AdminService {
             tags: "SMTP EMailProvider";
             summary: "Test SMTP Email Provider";
             description: "Test an SMTP Email provider. After testing the provider, the users will receive information about the test results."
-            deprecated: true;
         };
     }
 
