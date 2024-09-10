@@ -1206,7 +1206,8 @@ func TestCommandSide_LockSchemaUser(t *testing.T) {
 						"name": "user"
 					}`),
 							),
-						), eventFromEventPusher(
+						),
+						eventFromEventPusher(
 							schemauser.NewLockedEvent(context.Background(),
 								&schemauser.NewAggregate("user1", "org1").Aggregate,
 							),
@@ -2082,7 +2083,7 @@ func TestCommandSide_ReactivateSchemaUser(t *testing.T) {
 	}
 }
 
-func TestCommands_UpdateSchemaUser(t *testing.T) {
+func TestCommands_ChangeSchemaUser(t *testing.T) {
 	type fields struct {
 		eventstore      func(t *testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -2090,7 +2091,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 	}
 	type args struct {
 		ctx  context.Context
-		user *UpdateSchemaUser
+		user *ChangeSchemaUser
 	}
 	type res struct {
 		returnCodeEmail string
@@ -2112,7 +2113,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx:  authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{},
+				user: &ChangeSchemaUser{},
 			},
 			res{
 				err: func(err error) bool {
@@ -2130,7 +2131,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("type"),
 				},
@@ -2149,7 +2150,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:    "user1",
 					Email: &Email{Address: "noemail"},
 				},
@@ -2168,7 +2169,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:    "user1",
 					Phone: &Phone{Number: "invalid"},
 				},
@@ -2201,7 +2202,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID: "user1",
 					Data: json.RawMessage(`{
 						"name": "user"
@@ -2268,7 +2269,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID: "user1",
 					Data: json.RawMessage(`{
 						"name": "user2"
@@ -2331,7 +2332,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("id2"),
 				},
@@ -2397,7 +2398,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("id2"),
 					Data: json.RawMessage(`{
@@ -2484,7 +2485,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID: "user1",
 					Data: json.RawMessage(`{
 						"name2": "user2"
@@ -2553,7 +2554,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("id2"),
 					Data: json.RawMessage(`{
@@ -2611,7 +2612,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("id1"),
 					Data: json.RawMessage(`{
@@ -2668,7 +2669,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("type"),
 					Data: json.RawMessage(`{
@@ -2723,7 +2724,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("type"),
 					Data: json.RawMessage(`{
@@ -2792,7 +2793,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("id1"),
 					Data: json.RawMessage(`{
@@ -2849,7 +2850,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("type"),
 					Data: json.RawMessage(`{
@@ -2923,7 +2924,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:       "user1",
 					SchemaID: gu.Ptr("id1"),
 					Email: &Email{
@@ -2978,7 +2979,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID: "user1",
 					Email: &Email{
 						Address:     "test@example.com",
@@ -3030,7 +3031,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID: "user1",
 					Phone: &Phone{
 						Number:     "+41791234567",
@@ -3083,7 +3084,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID: "user1",
 					Phone: &Phone{
 						Number: "+41791234567",
@@ -3132,7 +3133,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &UpdateSchemaUser{
+				user: &ChangeSchemaUser{
 					ID:    "user1",
 					Email: &Email{Address: "test@example.com", Verified: true},
 					Phone: &Phone{Number: "+41791234567", Verified: true},
@@ -3152,7 +3153,7 @@ func TestCommands_UpdateSchemaUser(t *testing.T) {
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
 			}
-			err := c.UpdateSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			err := c.ChangeSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

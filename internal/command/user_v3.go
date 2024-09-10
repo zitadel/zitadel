@@ -161,14 +161,15 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.Obj
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-type UpdateSchemaUser struct {
+type ChangeSchemaUser struct {
 	Details *domain.ObjectDetails
 
 	SchemaID         *string
 	schemaWriteModel *UserSchemaWriteModel
 
-	ID   string
-	Data json.RawMessage
+	ResourceOwner string
+	ID            string
+	Data          json.RawMessage
 
 	Email           *Email
 	ReturnCodeEmail string
@@ -176,7 +177,7 @@ type UpdateSchemaUser struct {
 	ReturnCodePhone string
 }
 
-func (s *UpdateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
+func (s *ChangeSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 	if s.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-gEJR1QOGHb", "TODO")
 	}
@@ -205,7 +206,7 @@ func (s *UpdateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 	return nil
 }
 
-func (s *UpdateSchemaUser) ValidData(ctx context.Context, c *Commands, existingUser *UserV3WriteModel) (err error) {
+func (s *ChangeSchemaUser) ValidData(ctx context.Context, c *Commands, existingUser *UserV3WriteModel) (err error) {
 	// get role for permission check in schema through extension
 	role, err := c.getSchemaRoleForWrite(ctx, existingUser.ResourceOwner, existingUser.AggregateID)
 	if err != nil {
@@ -241,12 +242,12 @@ func (s *UpdateSchemaUser) ValidData(ctx context.Context, c *Commands, existingU
 	return nil
 }
 
-func (c *Commands) UpdateSchemaUser(ctx context.Context, user *UpdateSchemaUser, alg crypto.EncryptionAlgorithm) (err error) {
+func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser, alg crypto.EncryptionAlgorithm) (err error) {
 	if err := user.Valid(ctx, c); err != nil {
 		return err
 	}
 
-	writeModel, err := c.getSchemaUserWriteModelByID(ctx, "", user.ID)
+	writeModel, err := c.getSchemaUserWriteModelByID(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return err
 	}

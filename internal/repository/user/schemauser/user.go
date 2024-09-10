@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	eventPrefix     = "user.v3."
+	eventPrefix     = "schemauser."
 	CreatedType     = eventPrefix + "created"
 	UpdatedType     = eventPrefix + "updated"
 	DeletedType     = eventPrefix + "deleted"
