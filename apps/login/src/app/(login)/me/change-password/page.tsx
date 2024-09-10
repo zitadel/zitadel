@@ -2,6 +2,7 @@ import { getSessionCookieById } from "@/lib/cookies";
 import {
   getBrandingSettings,
   getPasswordComplexitySettings,
+  getSession,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import ChangePasswordForm from "@/ui/ChangePasswordForm";
@@ -23,20 +24,22 @@ export default async function Page({
     );
   }
 
-  const session = await getSessionCookieById({
+  const sessionCookie = await getSessionCookieById({
     sessionId,
   });
 
-  const sessionFactors = await loadMostRecentSession({
-    loginName,
-    organization,
+  const { session } = await getSession({
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
   });
 
   const passwordComplexitySettings = await getPasswordComplexitySettings(
-    session.organization,
+    session?.factors?.user?.organizationId,
   );
 
-  const branding = await getBrandingSettings(session.organization);
+  const branding = await getBrandingSettings(
+    session?.factors?.user?.organizationId,
+  );
 
   return (
     <DynamicTheme branding={branding}>
@@ -44,7 +47,7 @@ export default async function Page({
         <h1>Set Password</h1>
         <p className="ztdl-p">Set the password for your account</p>
 
-        {(!sessionFactors || !loginName) && (
+        {!session && (
           <div className="py-4">
             <Alert>
               Could not get the context of the user. Make sure to enter the
@@ -53,19 +56,19 @@ export default async function Page({
           </div>
         )}
 
-        {sessionFactors && (
+        {session && (
           <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
+            loginName={session.factors?.user?.loginName}
+            displayName={session.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
         )}
 
-        {passwordComplexitySettings && (
+        {passwordComplexitySettings && session?.factors?.user?.id && (
           <ChangePasswordForm
             passwordComplexitySettings={passwordComplexitySettings}
-            userId={""}
+            userId={session.factors.user.id}
             sessionId={sessionId}
           ></ChangePasswordForm>
         )}

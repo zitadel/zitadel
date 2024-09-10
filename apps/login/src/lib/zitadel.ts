@@ -188,7 +188,13 @@ export async function setSession(
   );
 }
 
-export async function getSession(sessionId: string, sessionToken: string) {
+export async function getSession({
+  sessionId,
+  sessionToken,
+}: {
+  sessionId: string;
+  sessionToken: string;
+}) {
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 

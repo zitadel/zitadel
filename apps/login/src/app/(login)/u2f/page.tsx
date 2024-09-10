@@ -21,7 +21,10 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById({ sessionId, organization });
-    return getSession(recent.id, recent.token).then((response) => {
+    return getSession({
+      sessionId: recent.id,
+      sessionToken: recent.token,
+    }).then((response) => {
       if (response?.session) {
         return response.session;
       }

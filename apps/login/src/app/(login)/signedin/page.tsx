@@ -29,11 +29,13 @@ async function loadSession(loginName: string, authRequestId?: string) {
       return redirect(callbackUrl);
     });
   }
-  return getSession(recent.id, recent.token).then((response) => {
-    if (response?.session) {
-      return response.session;
-    }
-  });
+  return getSession({ sessionId: recent.id, sessionToken: recent.token }).then(
+    (response) => {
+      if (response?.session) {
+        return response.session;
+      }
+    },
+  );
 }
 
 export default async function Page({ searchParams }: { searchParams: any }) {
