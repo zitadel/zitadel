@@ -50,7 +50,7 @@ func EmailChannels(
 			"instance", authz.GetInstance(ctx).InstanceID(),
 			"callurl", emailConfig.WebhookConfig.CallURL,
 		).OnError(err).Debug("initializing JSON channel failed")
-		if err != nil {
+		if err == nil {
 			channels = append(
 				channels,
 				instrumenting.Wrap(
