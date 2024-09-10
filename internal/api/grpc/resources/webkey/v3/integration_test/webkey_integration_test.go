@@ -239,9 +239,9 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integrati
 				gotActiveKeyID = key.GetDetails().GetId()
 			}
 		}
-		assert.NotEmpty(t, gotActiveKeyID)
+		assert.NotEmpty(collect, gotActiveKeyID)
 		if expectActiveKeyID != "" {
-			assert.Equal(t, expectActiveKeyID, gotActiveKeyID)
+			assert.Equal(collect, expectActiveKeyID, gotActiveKeyID)
 		}
 	}, time.Minute, time.Second)
 }
