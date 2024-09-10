@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	eventPrefix     = "user."
+	eventPrefix     = "user.v3."
 	CreatedType     = eventPrefix + "created"
 	UpdatedType     = eventPrefix + "updated"
 	DeletedType     = eventPrefix + "deleted"
