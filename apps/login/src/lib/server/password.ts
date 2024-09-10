@@ -15,8 +15,8 @@ export async function resetPassword(command: ResetPasswordCommand) {
 
   if (
     !users.details ||
-    Number(users.details.totalResult) !== 1 ||
-    users.result[0].userId
+    users.details.totalResult !== BigInt(1) ||
+    !users.result[0].userId
   ) {
     throw Error("Could not find user");
   }

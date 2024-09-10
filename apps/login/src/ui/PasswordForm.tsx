@@ -9,7 +9,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import Alert from "./Alert";
+import Alert, { AlertType } from "./Alert";
 import BackButton from "./BackButton";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
@@ -40,6 +40,7 @@ export default function PasswordForm({
     mode: "onBlur",
   });
 
+  const [info, setInfo] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -69,6 +70,7 @@ export default function PasswordForm({
 
   async function resetPasswordAndContinue() {
     setError("");
+    setInfo("");
     setLoading(true);
 
     const response = await resetPassword({
@@ -81,6 +83,10 @@ export default function PasswordForm({
 
     setLoading(false);
 
+    if (response) {
+      setInfo("Password was reset. Please check your email.");
+    }
+
     return response;
   }
 
@@ -88,6 +94,7 @@ export default function PasswordForm({
     value: Inputs,
   ): Promise<boolean | void> {
     const submitted = await submitPassword(value);
+    setInfo("");
     // if user has mfa -> /otp/[method] or /u2f
     // if mfa is forced and user has no mfa -> /mfa/set
     // if no passwordless -> /passkey/add
@@ -241,6 +248,12 @@ export default function PasswordForm({
           />
         )}
       </div>
+
+      {info && (
+        <div className="py-4">
+          <Alert type={AlertType.INFO}>{info}</Alert>
+        </div>
+      )}
 
       {error && (
         <div className="py-4">

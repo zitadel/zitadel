@@ -15,7 +15,7 @@ const defaultConfig: Config = {
   },
   selfservice: {
     change_password: {
-      enabled: true,
+      enabled: false,
     },
   },
 };
