@@ -17,6 +17,8 @@ import (
 )
 
 const (
+	NotificationChannelSize = 100 // To be discussed
+
 	notificationChannelName   = "zitadel_events"
 	notificationListenQuery   = "listen " + notificationChannelName
 	notificationUnlistenQuery = "unlisten " + notificationChannelName
@@ -57,10 +59,11 @@ func (s *subscriptions) Close() {
 	s.mutex.Unlock()
 }
 
-// Add creates a notification channel.
+// Add creates a notification channel with buffer size [NotificationChannelSize].
+// When the buffer is full, payloads will be dropped and logged.
 // The returned chan will be closed when the subscriptions are closed.
 func (s *subscriptions) Add(eventTypes ...eventstore.EventType) <-chan *eventstore.Notification {
-	ch := make(chan *eventstore.Notification) // TBD: Do we need a buffered channel?
+	ch := make(chan *eventstore.Notification, NotificationChannelSize)
 	s.mutex.Lock()
 	for _, typ := range eventTypes {
 		s.eventTypes[typ] = append(s.eventTypes[typ], ch)
@@ -88,7 +91,11 @@ func (s *subscriptions) GetSubscribedEvents(events []eventstore.Event) []eventst
 func (s *subscriptions) push(payload *eventstore.Notification) {
 	s.mutex.RLock()
 	for _, ch := range s.eventTypes[payload.EventType] {
-		ch <- payload
+		select {
+		case ch <- payload:
+		default:
+			logging.WithFields("payload", payload).Warn("skipped push to full channel")
+		}
 	}
 	s.mutex.RUnlock()
 }
