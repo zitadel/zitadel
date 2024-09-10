@@ -763,7 +763,6 @@ service AdminService {
             tags: "Email Provider";
             summary: "Activate Email Provider";
             description: "Activate an Email provider."
-            deprecated: true;
         };
     }
 
