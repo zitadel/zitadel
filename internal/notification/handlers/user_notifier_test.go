@@ -16,8 +16,8 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
+	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -1463,7 +1463,7 @@ func (c *channels) Email(context.Context) (*senders.Chain, *smtp.Config, error) 
 	return &c.Chain, nil, nil
 }
 
-func (c *channels) SMS(context.Context) (*senders.Chain, *twilio.Config, error) {
+func (c *channels) SMS(context.Context) (*senders.Chain, *sms.Config, error) {
 	return &c.Chain, nil, nil
 }
 
