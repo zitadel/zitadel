@@ -471,10 +471,9 @@ func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email
 	}
 
 	smtpConfig := &smtp.Config{
-		Description: smtpConfigWriteModel.Description,
-		Tls:         smtpConfigWriteModel.SMTPConfig.TLS,
-		From:        smtpConfigWriteModel.SMTPConfig.SenderAddress,
-		FromName:    smtpConfigWriteModel.SMTPConfig.SenderName,
+		Tls:      smtpConfigWriteModel.SMTPConfig.TLS,
+		From:     smtpConfigWriteModel.SMTPConfig.SenderAddress,
+		FromName: smtpConfigWriteModel.SMTPConfig.SenderName,
 		SMTP: smtp.SMTP{
 			Host:     smtpConfigWriteModel.SMTPConfig.Host,
 			User:     smtpConfigWriteModel.SMTPConfig.User,

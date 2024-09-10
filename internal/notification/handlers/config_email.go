@@ -18,14 +18,18 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.
 	if err != nil {
 		return nil, err
 	}
+	provider := &email.Provider{
+		ID:          config.ID,
+		Description: config.Description,
+	}
 	if config.SMTPConfig != nil {
 		password, err := crypto.DecryptString(config.SMTPConfig.Password, n.SMTPPasswordCrypto)
 		if err != nil {
 			return nil, err
 		}
 		return &email.Config{
+			ProviderConfig: provider,
 			SMTPConfig: &smtp.Config{
-				Description:    config.Description,
 				From:           config.SMTPConfig.SenderAddress,
 				FromName:       config.SMTPConfig.SenderName,
 				ReplyToAddress: config.SMTPConfig.ReplyToAddress,
@@ -40,6 +44,7 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.
 	}
 	if config.HTTPConfig != nil {
 		return &email.Config{
+			ProviderConfig: provider,
 			WebhookConfig: &webhook.Config{
 				CallURL: config.HTTPConfig.Endpoint,
 				Method:  http.MethodPost,
