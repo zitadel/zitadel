@@ -191,13 +191,13 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 		})
 		require.NoError(t, err)
 	}
-	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
 		if enableFeature {
-			assert.NoError(ttt, err)
-			assert.Len(t, resp.GetWebKeys(), 2)
+			assert.NoError(collect, err)
+			assert.Len(collect, resp.GetWebKeys(), 2)
 		} else {
-			assert.Error(t, err)
+			assert.Error(collect, err)
 		}
 	}, time.Minute, time.Second)
 
