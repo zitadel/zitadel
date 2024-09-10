@@ -12,7 +12,7 @@ if (fs.existsSync(customConfigPath)) {
       customConfig = module.default;
     })
     .catch((error) => {
-      console.warn("Error loading custom configuration:", error);
+      console.warn("Could not find custom configuration:", error);
     });
 } else {
   console.info("No custom configuration file found!");

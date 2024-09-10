@@ -73,10 +73,16 @@ export default function UsernameForm({
   ) {
     const response = await submitLoginName(values, organization);
 
+    if (!response) {
+      setError("An internal error occurred");
+      return;
+    }
+
     if (response?.authMethodTypes && response.authMethodTypes.length === 0) {
       setError(
         "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",
       );
+      return;
     }
 
     if (response?.authMethodTypes.length == 1) {

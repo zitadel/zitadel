@@ -62,7 +62,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const host = headers().get("host");
-      console.log("host", host);
       const identityProviderType = identityProviders[0].type;
 
       const provider = idpTypeToSlug(identityProviderType);
@@ -109,9 +108,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       params.set("loginName", command.loginName);
     }
 
-    const registerUrl = new URL("/register?" + params);
+    const registerUrl = "/register?" + params;
 
-    return redirect(registerUrl.toString());
+    return redirect(registerUrl);
   }
 
   throw Error("Could not find user");
