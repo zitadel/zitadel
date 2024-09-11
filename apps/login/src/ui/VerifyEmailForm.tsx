@@ -2,6 +2,7 @@
 
 import { resendVerifyEmail, verifyUserByEmail } from "@/lib/server/email";
 import Alert from "@/ui/Alert";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,20 +16,26 @@ type Inputs = {
 
 type Props = {
   userId: string;
+  loginName: string;
   code: string;
   submit: boolean;
   organization?: string;
   authRequestId?: string;
   sessionId?: string;
+  loginSettings?: LoginSettings;
+  hasMfaSetUp: boolean;
 };
 
 export default function VerifyEmailForm({
   userId,
+  loginName,
   code,
   submit,
   organization,
   authRequestId,
   sessionId,
+  loginSettings,
+  hasMfaSetUp,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -71,7 +78,7 @@ export default function VerifyEmailForm({
       userId,
     }).catch((error: Error) => {
       setLoading(false);
-      setError(error.message);
+      setError(error.message ?? "Could not verify email");
     });
 
     setLoading(false);
@@ -79,6 +86,24 @@ export default function VerifyEmailForm({
     if (!verifyResponse) {
       setError("Could not verify email");
       return;
+    }
+
+    if (loginSettings && loginSettings.forceMfa && !hasMfaSetUp) {
+      const params = new URLSearchParams({ checkAfter: "true" });
+
+      if (loginName) {
+        params.set("organization", loginName);
+      }
+      if (organization) {
+        params.set("organization", organization);
+      }
+
+      if (authRequestId && sessionId) {
+        params.set("authRequest", authRequestId);
+        params.set("sessionId", sessionId);
+      }
+
+      return router.push(`/mfa/set?` + params);
     }
 
     const params = new URLSearchParams({});

@@ -75,19 +75,23 @@ export default function SetPasswordForm({
       setError("Could not register user");
       return;
     }
-    const params: any = { userId: response.userId };
 
+    const params = new URLSearchParams({ userId: response.userId });
+
+    if (response.factors?.user?.loginName) {
+      params.append("loginName", response.factors.user.loginName);
+    }
     if (authRequestId) {
-      params.authRequestId = authRequestId;
+      params.append("authRequestId", authRequestId);
     }
     if (organization) {
-      params.organization = organization;
+      params.append("organization", organization);
     }
     if (response && response.sessionId) {
-      params.sessionId = response.sessionId;
+      params.append("sessionId", response.sessionId);
     }
 
-    return router.push(`/verify?` + new URLSearchParams(params));
+    return router.push(`/verify?` + params);
   }
 
   const { errors } = formState;

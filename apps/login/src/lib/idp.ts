@@ -35,6 +35,57 @@ export type OIDC_USER = {
   };
 };
 
+const OIDC_MAPPING = (idp: IDPInformation) => {
+  const rawInfo = idp.rawInformation as OIDC_USER;
+
+  return create(AddHumanUserRequestSchema, {
+    username: idp.userName,
+    email: {
+      email: rawInfo.User?.email,
+      verification: { case: "isVerified", value: true },
+    },
+    profile: {
+      displayName: rawInfo.User?.name ?? "",
+      givenName: rawInfo.User?.given_name ?? "",
+      familyName: rawInfo.User?.family_name ?? "",
+    },
+    idpLinks: [
+      {
+        idpId: idp.idpId,
+        userId: idp.userId,
+        userName: idp.userName,
+      },
+    ],
+  });
+};
+
+const GITHUB_MAPPING = (idp: IDPInformation) => {
+  const rawInfo = idp.rawInformation as {
+    email: string;
+    name: string;
+  };
+
+  return create(AddHumanUserRequestSchema, {
+    username: idp.userName,
+    email: {
+      email: rawInfo.email,
+      verification: { case: "isVerified", value: true },
+    },
+    profile: {
+      displayName: rawInfo.name ?? "",
+      givenName: rawInfo.name ?? "",
+      familyName: rawInfo.name ?? "",
+    },
+    idpLinks: [
+      {
+        idpId: idp.idpId,
+        userId: idp.userId,
+        userName: idp.userName,
+      },
+    ],
+  });
+};
+
 export const PROVIDER_MAPPING: {
   [provider: string]: (rI: IDPInformation) => AddHumanUserRequest;
 } = {
@@ -62,6 +113,11 @@ export const PROVIDER_MAPPING: {
       ],
     });
   },
+  [idpTypeToSlug(IdentityProviderType.GITLAB)]: OIDC_MAPPING,
+  [idpTypeToSlug(IdentityProviderType.GITLAB_SELF_HOSTED)]: OIDC_MAPPING,
+  [idpTypeToSlug(IdentityProviderType.OIDC)]: OIDC_MAPPING,
+  // check
+  [idpTypeToSlug(IdentityProviderType.OAUTH)]: OIDC_MAPPING,
   [idpTypeToSlug(IdentityProviderType.AZURE_AD)]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation as {
       jobTitle: string;
@@ -75,8 +131,6 @@ export const PROVIDER_MAPPING: {
       officeLocation?: string;
       userPrincipalName: string;
     };
-
-    console.log(rawInfo, rawInfo.userPrincipalName);
 
     return create(AddHumanUserRequestSchema, {
       username: idp.userName,
@@ -98,22 +152,26 @@ export const PROVIDER_MAPPING: {
       ],
     });
   },
-  [idpTypeToSlug(IdentityProviderType.GITHUB)]: (idp: IDPInformation) => {
+  [idpTypeToSlug(IdentityProviderType.GITHUB)]: GITHUB_MAPPING,
+  [idpTypeToSlug(IdentityProviderType.GITHUB_ES)]: GITHUB_MAPPING,
+  [idpTypeToSlug(IdentityProviderType.APPLE)]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation as {
-      email: string;
-      name: string;
+      name?: string;
+      firstName?: string;
+      lastName?: string;
+      email?: string;
     };
 
     return create(AddHumanUserRequestSchema, {
       username: idp.userName,
       email: {
-        email: rawInfo.email,
+        email: rawInfo.email ?? "",
         verification: { case: "isVerified", value: true },
       },
       profile: {
         displayName: rawInfo.name ?? "",
-        givenName: rawInfo.name ?? "",
-        familyName: rawInfo.name ?? "",
+        givenName: rawInfo.firstName ?? "",
+        familyName: rawInfo.lastName ?? "",
       },
       idpLinks: [
         {
