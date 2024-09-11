@@ -20,7 +20,7 @@ export type SendLoginnameCommand = {
 
 export async function sendLoginname(command: SendLoginnameCommand) {
   const users = await listUsers({
-    userName: command.loginName,
+    loginName: command.loginName,
     organizationId: command.organization,
   });
 

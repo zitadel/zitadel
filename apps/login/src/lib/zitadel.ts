@@ -258,15 +258,31 @@ export async function getUserByID(userId: string) {
 }
 
 export async function listUsers({
+  loginName,
   userName,
   email,
   organizationId,
 }: {
+  loginName?: string;
   userName?: string;
   email?: string;
   organizationId?: string;
 }) {
   const queries: SearchQuery[] = [];
+
+  if (loginName) {
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "loginNameQuery",
+          value: {
+            loginName: loginName,
+            method: TextQueryMethod.EQUALS,
+          },
+        },
+      }),
+    );
+  }
 
   if (userName) {
     queries.push(
@@ -274,7 +290,7 @@ export async function listUsers({
         query: {
           case: "userNameQuery",
           value: {
-            userName,
+            userName: userName,
             method: TextQueryMethod.EQUALS,
           },
         },
