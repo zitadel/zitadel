@@ -34,7 +34,7 @@ func TestServer_CreateUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
 	permissionSchema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 			"type": "object",
@@ -48,8 +48,8 @@ func TestServer_CreateUser(t *testing.T) {
 			}
 		}
 	}`)
-	permissionSchemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
-	orgResp := Instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	permissionSchemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -209,7 +209,7 @@ func TestServer_CreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Instance.Client.UserV3Alpha.CreateUser(tt.ctx, tt.req)
+			got, err := instance.Client.UserV3Alpha.CreateUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -241,7 +241,7 @@ func TestServer_PatchUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
 	permissionSchema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 			"type": "object",
@@ -255,8 +255,8 @@ func TestServer_PatchUser(t *testing.T) {
 			}
 		}
 	}`)
-	permissionSchemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
-	orgResp := Instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	permissionSchemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -275,7 +275,7 @@ func TestServer_PatchUser(t *testing.T) {
 			name: "user patch, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -295,7 +295,7 @@ func TestServer_PatchUser(t *testing.T) {
 			name: "user patch, no permission",
 			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -315,7 +315,7 @@ func TestServer_PatchUser(t *testing.T) {
 			name: "user patch, invalid schema permission, owner",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -350,7 +350,7 @@ func TestServer_PatchUser(t *testing.T) {
 			name: "user patch, not found, org",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -372,7 +372,7 @@ func TestServer_PatchUser(t *testing.T) {
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
 				data := "{\"name\": \"user\"}"
 				schemaID := schemaResp.GetDetails().GetId()
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaID, []byte(data))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaID, []byte(data))
 				req.Id = userResp.GetDetails().GetId()
 				req.User.Data = unmarshalJSON(data)
 				req.User.SchemaId = gu.Ptr(schemaID)
@@ -395,9 +395,9 @@ func TestServer_PatchUser(t *testing.T) {
 			name: "user patch, schema, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				changedSchemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+				changedSchemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
 				req.User.SchemaId = gu.Ptr(changedSchemaResp.Details.Id)
 				return nil
 			},
@@ -418,9 +418,9 @@ func TestServer_PatchUser(t *testing.T) {
 			name: "user patch, schema and data, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				changedSchemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+				changedSchemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
 				req.User.SchemaId = gu.Ptr(changedSchemaResp.Details.Id)
 				return nil
 			},
@@ -443,7 +443,7 @@ func TestServer_PatchUser(t *testing.T) {
 			name: "user patch, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -466,7 +466,7 @@ func TestServer_PatchUser(t *testing.T) {
 			name: "user patch, full contact, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.PatchUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -504,7 +504,7 @@ func TestServer_PatchUser(t *testing.T) {
 				err := tt.dep(tt.ctx, tt.req)
 				require.NoError(t, err)
 			}
-			got, err := Instance.Client.UserV3Alpha.PatchUser(tt.ctx, tt.req)
+			got, err := instance.Client.UserV3Alpha.PatchUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -536,8 +536,8 @@ func TestServer_DeleteUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := Instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -577,7 +577,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, not existing, org",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -594,7 +594,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -611,7 +611,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, no permission",
 			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -628,7 +628,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -654,7 +654,7 @@ func TestServer_DeleteUser(t *testing.T) {
 				err := tt.dep(tt.ctx, tt.req)
 				require.NoError(t, err)
 			}
-			got, err := Instance.Client.UserV3Alpha.DeleteUser(tt.ctx, tt.req)
+			got, err := instance.Client.UserV3Alpha.DeleteUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -688,8 +688,8 @@ func TestServer_LockUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := Instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -729,7 +729,7 @@ func TestServer_LockUser(t *testing.T) {
 			name: "user lock, not existing in org",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.LockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -746,7 +746,7 @@ func TestServer_LockUser(t *testing.T) {
 			name: "user lock, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.LockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -763,7 +763,7 @@ func TestServer_LockUser(t *testing.T) {
 			name: "user lock, no permission",
 			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
 			dep: func(ctx context.Context, req *user.LockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -780,7 +780,7 @@ func TestServer_LockUser(t *testing.T) {
 			name: "user lock, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.LockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -803,9 +803,9 @@ func TestServer_LockUser(t *testing.T) {
 			name: "user lock, already locked",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.LockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.LockSchemaUser(ctx, "", req.Id)
+				instance.LockSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.LockUserRequest{
@@ -821,9 +821,9 @@ func TestServer_LockUser(t *testing.T) {
 			name: "user lock, deactivated",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.LockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.DeactivateSchemaUser(ctx, "", req.Id)
+				instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.LockUserRequest{
@@ -842,7 +842,7 @@ func TestServer_LockUser(t *testing.T) {
 				err := tt.dep(tt.ctx, tt.req)
 				require.NoError(t, err)
 			}
-			got, err := Instance.Client.UserV3Alpha.LockUser(tt.ctx, tt.req)
+			got, err := instance.Client.UserV3Alpha.LockUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -867,8 +867,8 @@ func TestServer_UnlockUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := Instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -908,9 +908,9 @@ func TestServer_UnlockUser(t *testing.T) {
 			name: "user unlock, not existing in org",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.UnlockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.LockSchemaUser(ctx, "", req.Id)
+				instance.LockSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.UnlockUserRequest{
@@ -926,9 +926,9 @@ func TestServer_UnlockUser(t *testing.T) {
 			name: "user unlock, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.UnlockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.LockSchemaUser(ctx, "", req.Id)
+				instance.LockSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.UnlockUserRequest{
@@ -944,9 +944,9 @@ func TestServer_UnlockUser(t *testing.T) {
 			name: "user unlock, no permission",
 			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
 			dep: func(ctx context.Context, req *user.UnlockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.LockSchemaUser(ctx, "", req.Id)
+				instance.LockSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.UnlockUserRequest{
@@ -962,9 +962,9 @@ func TestServer_UnlockUser(t *testing.T) {
 			name: "user unlock, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.UnlockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.LockSchemaUser(ctx, "", req.Id)
+				instance.LockSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.UnlockUserRequest{
@@ -986,10 +986,10 @@ func TestServer_UnlockUser(t *testing.T) {
 			name: "user unlock, already unlocked",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.UnlockUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.LockSchemaUser(ctx, "", req.Id)
-				Instance.UnlockSchemaUser(ctx, "", req.Id)
+				instance.LockSchemaUser(ctx, "", req.Id)
+				instance.UnlockSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.UnlockUserRequest{
@@ -1008,7 +1008,7 @@ func TestServer_UnlockUser(t *testing.T) {
 				err := tt.dep(tt.ctx, tt.req)
 				require.NoError(t, err)
 			}
-			got, err := Instance.Client.UserV3Alpha.UnlockUser(tt.ctx, tt.req)
+			got, err := instance.Client.UserV3Alpha.UnlockUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -1033,8 +1033,8 @@ func TestServer_DeactivateUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := Instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -1074,7 +1074,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 			name: "user deactivate, not existing in org",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.DeactivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -1091,7 +1091,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 			name: "user deactivate, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.DeactivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -1108,7 +1108,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 			name: "user deactivate, no permission",
 			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
 			dep: func(ctx context.Context, req *user.DeactivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -1125,7 +1125,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 			name: "user deactivate, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.DeactivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -1148,9 +1148,9 @@ func TestServer_DeactivateUser(t *testing.T) {
 			name: "user deactivate, already deactivated",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.DeactivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.DeactivateSchemaUser(ctx, "", req.Id)
+				instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.DeactivateUserRequest{
@@ -1166,9 +1166,9 @@ func TestServer_DeactivateUser(t *testing.T) {
 			name: "user deactivate, locked",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.DeactivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.LockSchemaUser(ctx, "", req.Id)
+				instance.LockSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.DeactivateUserRequest{
@@ -1187,7 +1187,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 				err := tt.dep(tt.ctx, tt.req)
 				require.NoError(t, err)
 			}
-			got, err := Instance.Client.UserV3Alpha.DeactivateUser(tt.ctx, tt.req)
+			got, err := instance.Client.UserV3Alpha.DeactivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -1212,8 +1212,8 @@ func TestServer_ActivateUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := Instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	schemaResp := instance.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -1253,9 +1253,9 @@ func TestServer_ActivateUser(t *testing.T) {
 			name: "user activate, not existing in org",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.DeactivateSchemaUser(ctx, "", req.Id)
+				instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.ActivateUserRequest{
@@ -1271,9 +1271,9 @@ func TestServer_ActivateUser(t *testing.T) {
 			name: "user activate, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.DeactivateSchemaUser(ctx, "", req.Id)
+				instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.ActivateUserRequest{
@@ -1289,9 +1289,9 @@ func TestServer_ActivateUser(t *testing.T) {
 			name: "user activate, no permission",
 			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
 			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.DeactivateSchemaUser(ctx, "", req.Id)
+				instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.ActivateUserRequest{
@@ -1307,9 +1307,9 @@ func TestServer_ActivateUser(t *testing.T) {
 			name: "user activate, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.DeactivateSchemaUser(ctx, "", req.Id)
+				instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.ActivateUserRequest{
@@ -1331,10 +1331,10 @@ func TestServer_ActivateUser(t *testing.T) {
 			name: "user activate, already activated",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
-				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				Instance.DeactivateSchemaUser(ctx, "", req.Id)
-				Instance.ActivateSchemaUser(ctx, "", req.Id)
+				instance.DeactivateSchemaUser(ctx, "", req.Id)
+				instance.ActivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
 			req: &user.ActivateUserRequest{
@@ -1353,7 +1353,7 @@ func TestServer_ActivateUser(t *testing.T) {
 				err := tt.dep(tt.ctx, tt.req)
 				require.NoError(t, err)
 			}
-			got, err := Instance.Client.UserV3Alpha.ActivateUser(tt.ctx, tt.req)
+			got, err := instance.Client.UserV3Alpha.ActivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
