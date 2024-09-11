@@ -977,6 +977,28 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"password not set (email not verified), invite code exists, invite step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordInitRequired: true,
+				},
+				userEventProvider: &mockEventUser{
+					InvitationCodeExists: true,
+				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
+			[]domain.NextStep{&domain.VerifyInviteStep{}},
+			nil,
+		},
+		{
 			"password not set (email not verified), init password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},

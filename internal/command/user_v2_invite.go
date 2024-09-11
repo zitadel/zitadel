@@ -23,14 +23,15 @@ type CreateUserInvite struct {
 }
 
 func (c *Commands) CreateInviteCode(ctx context.Context, invite *CreateUserInvite) (details *domain.ObjectDetails, returnCode *string, err error) {
-	if strings.TrimSpace(invite.UserID) == "" {
+	invite.UserID = strings.TrimSpace(invite.UserID)
+	if invite.UserID == "" {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4jio3", "Errors.User.UserIDMissing")
 	}
 	wm, err := c.userInviteCodeWriteModel(ctx, invite.UserID, "")
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, invite.UserID); err != nil {
+	if err := c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, nil, err
 	}
 	if !wm.UserState.Exists() {

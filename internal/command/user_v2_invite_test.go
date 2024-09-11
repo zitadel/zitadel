@@ -11,6 +11,7 @@ import (
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -555,6 +556,76 @@ func TestCommands_ResendInviteCode(t *testing.T) {
 			},
 			args{
 				ctx:           context.Background(),
+				userID:        "userID",
+				authRequestID: "authRequestID2",
+			},
+			want{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "userID",
+				},
+			},
+		},
+		{
+			"resend with own user ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								"username", "firstName",
+								"lastName",
+								"nickName",
+								"displayName",
+								language.Afrikaans,
+								domain.GenderUnspecified,
+								"email",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"authRequestID",
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							user.NewHumanInviteCodeAddedEvent(authz.NewMockContext("instanceID", "org1", "userID"),
+								&user.NewAggregate("userID", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								"",
+								false,
+								"",
+								"authRequestID2",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckNotAllowed(), // user does not have permission, is allowed in the own context
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
+			},
+			args{
+				ctx:           authz.NewMockContext("instanceID", "org1", "userID"),
 				userID:        "userID",
 				authRequestID: "authRequestID2",
 			},
