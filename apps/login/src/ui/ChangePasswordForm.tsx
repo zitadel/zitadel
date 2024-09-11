@@ -55,13 +55,13 @@ export default function ChangePasswordForm({
       userId: userId,
       password: values.password,
     }).catch((error: Error) => {
-      setError(error.message ?? "Could not register user");
+      setError(error.message ?? "Could not change password");
     });
 
     setLoading(false);
 
     if (!response) {
-      setError("Could not register user");
+      setError("Could not change password");
       return;
     }
 
