@@ -7,6 +7,8 @@ Database:
     Database: zitadel
     MaxOpenConns: 20
     MaxIdleConns: 20
+    MaxConnLifetime: 1h
+    MaxConnIdleTime: 5m
     User:
       Username: zitadel
       SSL:
