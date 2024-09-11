@@ -51,5 +51,5 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 		return nil, err
 	}
 
-	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, false, false))
+	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, true, false))
 }
