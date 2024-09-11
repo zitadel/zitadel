@@ -1046,7 +1046,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
 				idpUserLinksProvider: &mockIDPUserLinks{},
 			},
-			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
+			args{
+				&domain.AuthRequest{
+					UserID: "UserID",
+					LoginPolicy: &domain.LoginPolicy{
+						AllowUsernamePassword: true,
+					},
+				},
+				false,
+			},
 			[]domain.NextStep{&domain.VerifyInviteStep{}},
 			nil,
 		},
