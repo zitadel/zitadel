@@ -110,8 +110,9 @@ func (m *mockViewNoUser) UserByID(context.Context, string, string) (*user_view_m
 }
 
 type mockEventUser struct {
-	Events     []eventstore.Event
-	CodeExists bool
+	Events               []eventstore.Event
+	PwCodeExists         bool
+	InvitationCodeExists bool
 }
 
 func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, changeDate time.Time, types []eventstore.EventType) ([]eventstore.Event, error) {
@@ -119,7 +120,11 @@ func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, changeDat
 }
 
 func (m *mockEventUser) PasswordCodeExists(ctx context.Context, userID string) (bool, error) {
-	return m.CodeExists, nil
+	return m.PwCodeExists, nil
+}
+
+func (m *mockEventUser) InviteCodeExists(ctx context.Context, userID string) (bool, error) {
+	return m.InvitationCodeExists, nil
 }
 
 func (m *mockEventUser) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
@@ -137,6 +142,10 @@ func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, change
 }
 
 func (m *mockEventErrUser) PasswordCodeExists(ctx context.Context, userID string) (bool, error) {
+	return false, zerrors.ThrowInternal(nil, "id", "internal error")
+}
+
+func (m *mockEventErrUser) InviteCodeExists(ctx context.Context, userID string) (bool, error) {
 	return false, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -1020,6 +1029,36 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"password not set (email not verified), invite code exists, invite step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordInitRequired: true,
+				},
+				userEventProvider: &mockEventUser{
+					InvitationCodeExists: true,
+				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{
+				&domain.AuthRequest{
+					UserID: "UserID",
+					LoginPolicy: &domain.LoginPolicy{
+						AllowUsernamePassword: true,
+					},
+				},
+				false,
+			},
+			[]domain.NextStep{&domain.VerifyInviteStep{}},
+			nil,
+		},
+		{
 			"password not set (email not verified), init password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
@@ -1056,7 +1095,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified:      true,
 				},
 				userEventProvider: &mockEventUser{
-					CodeExists: true,
+					PwCodeExists: true,
 				},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
@@ -1088,7 +1127,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified:      true,
 				},
 				userEventProvider: &mockEventUser{
-					CodeExists: false,
+					PwCodeExists: false,
 				},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
