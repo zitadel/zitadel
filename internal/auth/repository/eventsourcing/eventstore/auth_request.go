@@ -1092,7 +1092,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 	if !user.IsEmailVerified {
 		steps = append(steps, &domain.VerifyEMailStep{
-			InitPassword: !user.PasswordSet,
+			InitPassword: !user.PasswordSet && len(idps.Links) == 0,
 		})
 	}
 	if user.UsernameChangeRequired {
