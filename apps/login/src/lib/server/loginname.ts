@@ -76,7 +76,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.set("organization", command.organization);
       }
 
-      return startIdentityProviderFlow({
+      const resp = await startIdentityProviderFlow({
         idpId: identityProviders[0].id,
         urls: {
           successUrl:
@@ -84,14 +84,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           failureUrl:
             `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
         },
-      }).then((resp: any) => {
-        if (resp.authUrl) {
-          return redirect(resp.authUrl);
-        }
       });
-    } else {
-      throw Error("Could not find user");
+
+      if (resp?.nextStep.case === "authUrl") {
+        return redirect(resp.nextStep.value);
+      }
     }
+
+    throw Error("Could not find user");
   } else if (
     loginSettings?.allowRegister &&
     loginSettings?.allowUsernamePassword

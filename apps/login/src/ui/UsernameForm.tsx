@@ -59,7 +59,6 @@ export default function UsernameForm({
       authRequestId,
     }).catch((error: Error) => {
       setError(error.message ?? "An internal error occurred");
-      return Promise.reject(error ?? "An internal error occurred");
     });
 
     setLoading(false);
@@ -74,30 +73,29 @@ export default function UsernameForm({
     const response = await submitLoginName(values, organization);
 
     if (!response) {
-      setError("An internal error occurred");
       return;
     }
 
-    if (response?.authMethodTypes && response.authMethodTypes.length === 0) {
+    if (response.authMethodTypes && response.authMethodTypes.length === 0) {
       setError(
         "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",
       );
       return;
     }
 
-    if (response?.authMethodTypes.length == 1) {
+    if (response.authMethodTypes.length == 1) {
       const method = response.authMethodTypes[0];
       switch (method) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
           const paramsPassword: any = {
-            loginName: response?.factors?.user?.loginName,
+            loginName: response.factors?.user?.loginName,
           };
 
           // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
 
-          if (organization || response?.factors?.user?.organizationId) {
+          if (organization || response.factors?.user?.organizationId) {
             paramsPassword.organization =
-              organization ?? response?.factors?.user?.organizationId;
+              organization ?? response.factors?.user?.organizationId;
           }
 
           if (
@@ -120,9 +118,9 @@ export default function UsernameForm({
             paramsPasskey.authRequestId = authRequestId;
           }
 
-          if (organization || response?.factors?.user?.organizationId) {
+          if (organization || response.factors?.user?.organizationId) {
             paramsPasskey.organization =
-              organization ?? response?.factors?.user?.organizationId;
+              organization ?? response.factors?.user?.organizationId;
           }
 
           return router.push(
@@ -139,9 +137,9 @@ export default function UsernameForm({
             paramsPasskeyDefault.authRequestId = authRequestId;
           }
 
-          if (organization || response?.factors?.user?.organizationId) {
+          if (organization || response.factors?.user?.organizationId) {
             paramsPasskeyDefault.organization =
-              organization ?? response?.factors?.user?.organizationId;
+              organization ?? response.factors?.user?.organizationId;
           }
 
           return router.push(
@@ -150,7 +148,7 @@ export default function UsernameForm({
       }
     } else {
       // prefer passkey in favor of other methods
-      if (response?.authMethodTypes.includes(2)) {
+      if (response.authMethodTypes.includes(2)) {
         const passkeyParams: any = {
           loginName: values.loginName,
           altPassword: `${response.authMethodTypes.includes(1)}`, // show alternative password option
@@ -160,9 +158,9 @@ export default function UsernameForm({
           passkeyParams.authRequestId = authRequestId;
         }
 
-        if (organization || response?.factors?.user?.organizationId) {
+        if (organization || response.factors?.user?.organizationId) {
           passkeyParams.organization =
-            organization ?? response?.factors?.user?.organizationId;
+            organization ?? response.factors?.user?.organizationId;
         }
 
         return router.push(
@@ -180,9 +178,9 @@ export default function UsernameForm({
           paramsPasswordDefault.authRequestId = authRequestId;
         }
 
-        if (organization || response?.factors?.user?.organizationId) {
+        if (organization || response.factors?.user?.organizationId) {
           paramsPasswordDefault.organization =
-            organization ?? response?.factors?.user?.organizationId;
+            organization ?? response.factors?.user?.organizationId;
         }
 
         return router.push(
