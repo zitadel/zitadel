@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Weiter
   CancelButtonText: Abbrechen
 
+InviteUser:
+  Title: Benutzer aktivieren
+  Description: Bestätige deine E-Mail-Adresse mit dem unten stehenden Code und lege dein Passwort fest.
+  CodeLabel: Code
+  NewPasswordLabel: Neues Passwort
+  NewPasswordConfirm: Passwort bestätigen
+  NextButtonText: Weiter
+  ResendButtonText: Code erneut senden
+
 InitMFAPrompt:
   Title: Zweitfaktor hinzufügen
   Description: Die Zwei-Faktor-Authentifizierung gibt dir eine zusätzliche Sicherheit für dein Benutzerkonto. Damit stellst du sicher, dass nur du Zugriff auf dein Konto hast.

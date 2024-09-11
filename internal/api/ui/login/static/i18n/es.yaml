@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: siguiente
   CancelButtonText: cancelar
 
+InviteUser:
+  Title: Activar usuario
+  Description: Verifica tu email con el siguiente código y establece tu contraseña.
+  CodeLabel: Código
+  NewPasswordLabel: Nueva contraseña
+  NewPasswordConfirm: Confirmar contraseña
+  NextButtonText: siguiente
+  ResendButtonText: reenviar código
+
 InitMFAPrompt:
   Title: Configuración de doble factor
   Description: La autenticación de doble factor te proporciona seguridad adicional para tu cuenta de usuario. Ésta asegura que solo tú tienes acceso a tu cuenta.

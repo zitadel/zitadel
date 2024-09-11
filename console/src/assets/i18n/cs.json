@@ -197,7 +197,8 @@
           "VE": "Když uživatel změní svou e-mailovou adresu, obdrží e-mail s odkazem na ověření nové adresy.",
           "VP": "Když uživatel změní své telefonní číslo, obdrží SMS s kódem pro ověření nového čísla.",
           "VEO": "Když uživatel přidá metodu jednorázového hesla přes e-mail, musí ji aktivovat zadáním kódu poslaného na jeho e-mailovou adresu.",
-          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo."
+          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo.",
+          "IU": "Když se vytvoří pozvánka pro uživatele, obdrží e-mail s odkazem na nastavení své metody ověřování."
         }
       },
       "LOGIN_TEXTS": {
@@ -1667,7 +1668,8 @@
         "PR": "Reset hesla",
         "DC": "Nárok na doménu",
         "PL": "Bezheslový",
-        "PC": "Změna hesla"
+        "PC": "Změna hesla",
+        "IU": "Pozvat uživatele"
       },
       "CHIPS": {
         "firstname": "Křestní jméno",
@@ -1687,7 +1689,8 @@
         "tempUsername": "Dočasné uživatelské jméno",
         "otp": "Jednorázové heslo",
         "verifyUrl": "Ověřovací URL jednorázového hesla",
-        "expiry": "Expirace"
+        "expiry": "Expirace",
+        "applicationName": "Název aplikace"
       },
       "TOAST": {
         "UPDATED": "Vlastní texty uloženy."

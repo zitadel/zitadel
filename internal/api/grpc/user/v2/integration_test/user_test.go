@@ -2437,3 +2437,310 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_CreateInviteCode(t *testing.T) {
+	type args struct {
+		ctx     context.Context
+		req     *user.CreateInviteCodeRequest
+		prepare func(request *user.CreateInviteCodeRequest) error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.CreateInviteCodeResponse
+		wantErr bool
+	}{
+		{
+			name: "create, not existing",
+			args: args{
+				CTX,
+				&user.CreateInviteCodeRequest{
+					UserId: "notexisting",
+				},
+				func(request *user.CreateInviteCodeRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "create, ok",
+			args: args{
+				ctx: CTX,
+				req: &user.CreateInviteCodeRequest{},
+				prepare: func(request *user.CreateInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			want: &user.CreateInviteCodeResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "create, invalid template",
+			args: args{
+				ctx: CTX,
+				req: &user.CreateInviteCodeRequest{
+					Verification: &user.CreateInviteCodeRequest_SendCode{
+						SendCode: &user.SendInviteCode{
+							UrlTemplate: gu.Ptr("{{"),
+						},
+					},
+				},
+				prepare: func(request *user.CreateInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "create, valid template",
+			args: args{
+				ctx: CTX,
+				req: &user.CreateInviteCodeRequest{
+					Verification: &user.CreateInviteCodeRequest_SendCode{
+						SendCode: &user.SendInviteCode{
+							UrlTemplate:     gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+							ApplicationName: gu.Ptr("TestApp"),
+						},
+					},
+				},
+				prepare: func(request *user.CreateInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			want: &user.CreateInviteCodeResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "create, return code, ok",
+			args: args{
+				ctx: CTX,
+				req: &user.CreateInviteCodeRequest{
+					Verification: &user.CreateInviteCodeRequest_ReturnCode{
+						ReturnCode: &user.ReturnInviteCode{},
+					},
+				},
+				prepare: func(request *user.CreateInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			want: &user.CreateInviteCodeResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+				InviteCode: gu.Ptr("something"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.prepare(tt.args.req)
+			require.NoError(t, err)
+
+			got, err := Client.CreateInviteCode(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			integration.AssertDetails(t, tt.want, got)
+			if tt.want.GetInviteCode() != "" {
+				assert.NotEmpty(t, got.GetInviteCode())
+			} else {
+				assert.Empty(t, got.GetInviteCode())
+			}
+		})
+	}
+}
+
+func TestServer_ResendInviteCode(t *testing.T) {
+	type args struct {
+		ctx     context.Context
+		req     *user.ResendInviteCodeRequest
+		prepare func(request *user.ResendInviteCodeRequest) error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.ResendInviteCodeResponse
+		wantErr bool
+	}{
+		{
+			name: "user not existing",
+			args: args{
+				CTX,
+				&user.ResendInviteCodeRequest{
+					UserId: "notexisting",
+				},
+				func(request *user.ResendInviteCodeRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "code not existing",
+			args: args{
+				ctx: CTX,
+				req: &user.ResendInviteCodeRequest{},
+				prepare: func(request *user.ResendInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "code not sent before",
+			args: args{
+				ctx: CTX,
+				req: &user.ResendInviteCodeRequest{},
+				prepare: func(request *user.ResendInviteCodeRequest) error {
+					userResp := Instance.CreateHumanUser(CTX)
+					request.UserId = userResp.GetUserId()
+					Instance.CreateInviteCode(CTX, userResp.GetUserId())
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "resend, ok",
+			args: args{
+				ctx: CTX,
+				req: &user.ResendInviteCodeRequest{},
+				prepare: func(request *user.ResendInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					_, err := Instance.Client.UserV2.CreateInviteCode(CTX, &user.CreateInviteCodeRequest{
+						UserId: resp.GetUserId(),
+					})
+					return err
+				},
+			},
+			want: &user.ResendInviteCodeResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.prepare(tt.args.req)
+			require.NoError(t, err)
+
+			got, err := Client.ResendInviteCode(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestServer_VerifyInviteCode(t *testing.T) {
+	type args struct {
+		ctx     context.Context
+		req     *user.VerifyInviteCodeRequest
+		prepare func(request *user.VerifyInviteCodeRequest) error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.VerifyInviteCodeResponse
+		wantErr bool
+	}{
+		{
+			name: "user not existing",
+			args: args{
+				CTX,
+				&user.VerifyInviteCodeRequest{
+					UserId: "notexisting",
+				},
+				func(request *user.VerifyInviteCodeRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "code not existing",
+			args: args{
+				ctx: CTX,
+				req: &user.VerifyInviteCodeRequest{},
+				prepare: func(request *user.VerifyInviteCodeRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid code",
+			args: args{
+				ctx: CTX,
+				req: &user.VerifyInviteCodeRequest{
+					VerificationCode: "invalid",
+				},
+				prepare: func(request *user.VerifyInviteCodeRequest) error {
+					userResp := Instance.CreateHumanUser(CTX)
+					request.UserId = userResp.GetUserId()
+					Instance.CreateInviteCode(CTX, userResp.GetUserId())
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "verify, ok",
+			args: args{
+				ctx: CTX,
+				req: &user.VerifyInviteCodeRequest{},
+				prepare: func(request *user.VerifyInviteCodeRequest) error {
+					userResp := Instance.CreateHumanUser(CTX)
+					request.UserId = userResp.GetUserId()
+					codeResp := Instance.CreateInviteCode(CTX, userResp.GetUserId())
+					request.VerificationCode = codeResp.GetInviteCode()
+					return nil
+				},
+			},
+			want: &user.VerifyInviteCodeResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.prepare(tt.args.req)
+			require.NoError(t, err)
+
+			got, err := Client.VerifyInviteCode(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}

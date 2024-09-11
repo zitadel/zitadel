@@ -197,7 +197,8 @@
           "VE": "Lorsqu'un utilisateur change son adresse e-mail, il recevra un e-mail avec un lien pour vérifier la nouvelle adresse.",
           "VP": "Lorsqu'un utilisateur change son numéro de téléphone, il recevra un SMS avec un code pour vérifier le nouveau numéro.",
           "VEO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via e-mail, il doit l'activer en entrant un code envoyé à son adresse e-mail.",
-          "VSO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone."
+          "VSO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone.",
+          "IU": "Lorsqu'un code d'invitation d'utilisateur est créé, il recevra un e-mail avec un lien pour configurer sa méthode d'authentification."
         }
       },
       "LOGIN_TEXTS": {
@@ -1667,7 +1668,8 @@
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
         "PL": "Sans mot de passe",
-        "PC": "Modification du mot de passe"
+        "PC": "Modification du mot de passe",
+        "IU": "Inviter un utilisateur"
       },
       "CHIPS": {
         "firstname": "Prénom",
@@ -1687,7 +1689,8 @@
         "tempUsername": "Nom d'utilisateur temporaire",
         "otp": "Mot de passe à usage unique",
         "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
-        "expiry": "Expiration"
+        "expiry": "Expiration",
+        "applicationName": "Nom de l'application"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."
