@@ -355,7 +355,7 @@ LinkingUsersDone:
 
 ExternalNotFound:
   Title: External User Not Found
-  Description: External user not found. Do you want to link your user or auto register a new one.
+  Description: External user not found. Do you want to link your user or auto-register a new one?
   LinkButtonText: Link
   AutoRegisterButtonText: Register
   TosAndPrivacyLabel: Terms and conditions
