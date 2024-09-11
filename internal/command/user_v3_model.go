@@ -116,25 +116,21 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 	if wm.ResourceOwner != "" {
 		builder = builder.ResourceOwner(wm.ResourceOwner)
 	}
-
-	query := builder.AddQuery().
-		AggregateTypes(schemauser.AggregateType).
-		AggregateIDs(wm.AggregateID).
-		EventTypes(
-			schemauser.CreatedType,
-			schemauser.DeletedType,
-			schemauser.ActivatedType,
-			schemauser.DeactivatedType,
-			schemauser.LockedType,
-			schemauser.UnlockedType,
-		)
+	eventtypes := []eventstore.EventType{
+		schemauser.CreatedType,
+		schemauser.DeletedType,
+		schemauser.ActivatedType,
+		schemauser.DeactivatedType,
+		schemauser.LockedType,
+		schemauser.UnlockedType,
+	}
 	if wm.DataWM {
-		query = query.Or().EventTypes(
+		eventtypes = append(eventtypes,
 			schemauser.UpdatedType,
 		)
 	}
 	if wm.EmailWM {
-		query = query.Or().EventTypes(
+		eventtypes = append(eventtypes,
 			schemauser.EmailUpdatedType,
 			schemauser.EmailVerifiedType,
 			schemauser.EmailCodeAddedType,
@@ -142,14 +138,17 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 		)
 	}
 	if wm.PhoneWM {
-		query = query.Or().EventTypes(
+		eventtypes = append(eventtypes,
 			schemauser.PhoneUpdatedType,
 			schemauser.PhoneVerifiedType,
 			schemauser.PhoneCodeAddedType,
 			schemauser.PhoneVerificationFailedType,
 		)
 	}
-	return query.Builder()
+	return builder.AddQuery().
+		AggregateTypes(schemauser.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(eventtypes...).Builder()
 }
 
 func (wm *UserV3WriteModel) NewUpdatedEvent(
