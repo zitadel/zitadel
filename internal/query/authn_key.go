@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
 	"time"
 
@@ -247,6 +248,44 @@ func NewAuthNKeyAggregateIDQuery(id string) (SearchQuery, error) {
 
 func NewAuthNKeyObjectIDQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AuthNKeyColumnObjectID, id, TextEquals)
+}
+
+//go:embed authn_key_user.sql
+var authNKeyUserQuery string
+
+type AuthNKeyUser struct {
+	UserID        string
+	ResourceOwner string
+	Username      string
+	TokenType     domain.OIDCTokenType
+	PublicKey     []byte
+}
+
+func (q *Queries) GetAuthNKeyUser(ctx context.Context, keyID, userID string) (_ *AuthNKeyUser, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	dst := new(AuthNKeyUser)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		return row.Scan(
+			&dst.UserID,
+			&dst.ResourceOwner,
+			&dst.Username,
+			&dst.TokenType,
+			&dst.PublicKey,
+		)
+	},
+		authNKeyUserQuery,
+		authz.GetInstance(ctx).InstanceID(),
+		keyID, userID,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-Tha6f", "Errors.AuthNKey.NotFound")
+		}
+		return nil, zerrors.ThrowInternal(err, "QUERY-aen2A", "Errors.Internal")
+	}
+	return dst, nil
 }
 
 func prepareAuthNKeysQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*AuthNKeys, error)) {

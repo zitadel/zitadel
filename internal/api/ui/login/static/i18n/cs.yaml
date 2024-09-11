@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Další
   CancelButtonText: Zrušit
 
+InviteUser:
+  Title: Aktivace uživatele
+  Description: Ověřte svůj e-mail pomocí níže uvedeného kódu a nastavte si heslo.
+  CodeLabel: Kód
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirm: Potvrďte heslo
+  NextButtonText: Další
+  ResendButtonText: Odeslat kód znovu
+
 InitMFAPrompt:
   Title: Nastavení 2-faktorové autentizace
   Description: 2-faktorová autentizace vám poskytuje další zabezpečení pro váš uživatelský účet. Tím je zajištěno, že k vašemu účtu máte přístup pouze vy.

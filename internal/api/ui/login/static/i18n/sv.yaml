@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Fortsätt
   CancelButtonText: Avbryt
 
+InviteUser:
+  Title: Aktivera användare
+  Description: Verifiera din e-post med koden nedan och sätt ditt lösenord.
+  CodeLabel: Kod
+  NewPasswordLabel: Nytt lösenord
+  NewPasswordConfirm: Bekräfta lösenord
+  NextButtonText: Nästa
+  ResendButtonText: Skicka koden igen
+
 InitMFAPrompt:
   Title: tvåfaktorinställningar
   Description: 2-factor-identifiering ökar säkerheten för ditt konto. Enbart du som har tillgång till enheten kan logga in.
