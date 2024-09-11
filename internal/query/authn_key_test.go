@@ -8,6 +8,11 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -467,6 +472,68 @@ func Test_AuthNKeyPrepares(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+		})
+	}
+}
+
+func TestQueries_GetAuthNKeyUser(t *testing.T) {
+	expQuery := regexp.QuoteMeta(authNKeyUserQuery)
+	cols := []string{"user_id", "resource_owner", "username", "access_token_type", "public_key"}
+	pubkey := []byte(`-----BEGIN RSA PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2ufAL1b72bIy1ar+Ws6b
+GohJJQFB7dfRapDqeqM8Ukp6CVdPzq/pOz1viAq50yzWZJryF+2wshFAKGF9A2/B
+2Yf9bJXPZ/KbkFrYT3NTvYDkvlaSTl9mMnzrU29s48F1PTWKfB+C3aMsOEG1BufV
+s63qF4nrEPjSbhljIco9FZq4XppIzhMQ0fDdA/+XygCJqvuaL0LibM1KrlUdnu71
+YekhSJjEPnvOisXIk4IXywoGIOwtjxkDvNItQvaMVldr4/kb6uvbgdWwq5EwBZXq
+low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
+6QIDAQAB
+-----END RSA PUBLIC KEY-----`)
+
+	tests := []struct {
+		name    string
+		mock    sqlExpectation
+		want    *AuthNKeyUser
+		wantErr error
+	}{
+		{
+			name:    "no rows",
+			mock:    mockQueryErr(expQuery, sql.ErrNoRows, "instanceID", "keyID", "userID"),
+			wantErr: zerrors.ThrowNotFound(sql.ErrNoRows, "QUERY-Tha6f", "Errors.AuthNKey.NotFound"),
+		},
+		{
+			name:    "internal error",
+			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "instanceID", "keyID", "userID"),
+			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-aen2A", "Errors.Internal"),
+		},
+		{
+			name: "success",
+			mock: mockQuery(expQuery, cols,
+				[]driver.Value{"userID", "orgID", "username", domain.OIDCTokenTypeJWT, pubkey},
+				"instanceID", "keyID", "userID",
+			),
+			want: &AuthNKeyUser{
+				UserID:        "userID",
+				ResourceOwner: "orgID",
+				Username:      "username",
+				TokenType:     domain.OIDCTokenTypeJWT,
+				PublicKey:     pubkey,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			execMock(t, tt.mock, func(db *sql.DB) {
+				q := &Queries{
+					client: &database.DB{
+						DB:       db,
+						Database: &prepareDB{},
+					},
+				}
+				ctx := authz.NewMockContext("instanceID", "orgID", "userID")
+				got, err := q.GetAuthNKeyUser(ctx, "keyID", "userID")
+				require.ErrorIs(t, err, tt.wantErr)
+				assert.Equal(t, tt.want, got)
+			})
 		})
 	}
 }
