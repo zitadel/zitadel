@@ -191,13 +191,13 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 		})
 		require.NoError(t, err)
 	}
-	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
 		if enableFeature {
-			assert.NoError(ttt, err)
-			assert.Len(t, resp.GetWebKeys(), 2)
+			assert.NoError(collect, err)
+			assert.Len(collect, resp.GetWebKeys(), 2)
 		} else {
-			assert.Error(t, err)
+			assert.Error(collect, err)
 		}
 	}, time.Minute, time.Second)
 
@@ -213,33 +213,35 @@ func assertFeatureDisabledError(t *testing.T, err error) {
 }
 
 func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integration.Instance, nKeys int, expectActiveKeyID string, config any) {
-	resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
-	require.NoError(t, err)
-	list := resp.GetWebKeys()
-	require.Len(t, list, nKeys)
+	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
+		require.NoError(collect, err)
+		list := resp.GetWebKeys()
+		assert.Len(collect, list, nKeys)
 
-	now := time.Now()
-	var gotActiveKeyID string
-	for _, key := range list {
-		integration.AssertResourceDetails(t, &resource_object.Details{
-			Created: timestamppb.Now(),
-			Changed: timestamppb.Now(),
-			Owner: &object.Owner{
-				Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-				Id:   instance.ID(),
-			},
-		}, key.GetDetails())
-		assert.WithinRange(t, key.GetDetails().GetChanged().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
-		assert.NotEqual(t, webkey.WebKeyState_STATE_UNSPECIFIED, key.GetState())
-		assert.NotEqual(t, webkey.WebKeyState_STATE_REMOVED, key.GetState())
-		assert.Equal(t, config, key.GetConfig().GetConfig())
+		now := time.Now()
+		var gotActiveKeyID string
+		for _, key := range list {
+			integration.AssertResourceDetails(t, &resource_object.Details{
+				Created: timestamppb.Now(),
+				Changed: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   instance.ID(),
+				},
+			}, key.GetDetails())
+			assert.WithinRange(collect, key.GetDetails().GetChanged().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
+			assert.NotEqual(collect, webkey.WebKeyState_STATE_UNSPECIFIED, key.GetState())
+			assert.NotEqual(collect, webkey.WebKeyState_STATE_REMOVED, key.GetState())
+			assert.Equal(collect, config, key.GetConfig().GetConfig())
 
-		if key.GetState() == webkey.WebKeyState_STATE_ACTIVE {
-			gotActiveKeyID = key.GetDetails().GetId()
+			if key.GetState() == webkey.WebKeyState_STATE_ACTIVE {
+				gotActiveKeyID = key.GetDetails().GetId()
+			}
 		}
-	}
-	assert.NotEmpty(t, gotActiveKeyID)
-	if expectActiveKeyID != "" {
-		assert.Equal(t, expectActiveKeyID, gotActiveKeyID)
-	}
+		assert.NotEmpty(collect, gotActiveKeyID)
+		if expectActiveKeyID != "" {
+			assert.Equal(collect, expectActiveKeyID, gotActiveKeyID)
+		}
+	}, time.Minute, time.Second)
 }
