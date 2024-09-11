@@ -70,15 +70,15 @@ func (s *SystemFeatures) Name() string {
 }
 
 // Reducers implements objectManager.
-func (s *SystemFeatures) Reducers() map[string]map[string]v2_es.ReduceEvent {
+func (s *SystemFeatures) Reducers() projection.Reducers {
 	if s.reducers != nil {
 		return s.reducers
 	}
-	s.reducers = map[string]map[string]v2_es.ReduceEvent{
+	s.reducers = projection.Reducers{
 		system.AggregateType: make(map[string]v2_es.ReduceEvent, 8),
 	}
 
-	s.reducers = mergeReducers(
+	s.reducers = projection.MergeReducers(
 		s.LoginDefaultOrg.Reducers(),
 		s.TriggerIntrospectionProjections.Reducers(),
 		s.LegacyIntrospection.Reducers(),
@@ -161,12 +161,12 @@ func (i *InstanceFeatures) Name() string {
 }
 
 // Reducers implements objectManager.
-func (f *InstanceFeatures) Reducers() map[string]map[string]v2_es.ReduceEvent {
+func (f *InstanceFeatures) Reducers() projection.Reducers {
 	if f.reducers != nil {
 		return f.reducers
 	}
 
-	f.reducers = mergeReducers(
+	f.reducers = projection.MergeReducers(
 		f.WebKey.Reducers(),
 		f.DebugOIDCParentError.Reducers(),
 		f.InMemoryProjections.Reducers(),

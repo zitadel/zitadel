@@ -6,14 +6,14 @@ import (
 )
 
 type OrgState struct {
-	projection
+	Projection
 
 	id string
 
 	org.State
 }
 
-func NewStateProjection(id string) *OrgState {
+func NewOrgState(id string) *OrgState {
 	// TODO: check buffer for id and return from buffer if exists
 	return &OrgState{
 		id: id,
@@ -21,11 +21,11 @@ func NewStateProjection(id string) *OrgState {
 }
 
 func (s *OrgState) Reducers() map[string]map[string]eventstore.ReduceEvent {
-	if s.reducers != nil {
-		return s.reducers
+	if s.Projection.Reducers != nil {
+		return s.Projection.Reducers
 	}
 
-	s.reducers = map[string]map[string]eventstore.ReduceEvent{
+	s.Projection.Reducers = map[string]map[string]eventstore.ReduceEvent{
 		org.AggregateType: {
 			org.AddedType:       s.reduceAdded,
 			org.DeactivatedType: s.reduceDeactivated,
@@ -34,7 +34,7 @@ func (s *OrgState) Reducers() map[string]map[string]eventstore.ReduceEvent {
 		},
 	}
 
-	return s.reducers
+	return s.Projection.Reducers
 }
 
 func (s *OrgState) reduceAdded(event *eventstore.StorageEvent) error {
@@ -43,7 +43,7 @@ func (s *OrgState) reduceAdded(event *eventstore.StorageEvent) error {
 	}
 
 	s.State = org.ActiveState
-	s.set(event)
+	s.Set(event)
 	return nil
 }
 
@@ -53,7 +53,7 @@ func (s *OrgState) reduceDeactivated(event *eventstore.StorageEvent) error {
 	}
 
 	s.State = org.InactiveState
-	s.set(event)
+	s.Set(event)
 	return nil
 }
 
@@ -63,7 +63,7 @@ func (s *OrgState) reduceReactivated(event *eventstore.StorageEvent) error {
 	}
 
 	s.State = org.ActiveState
-	s.set(event)
+	s.Set(event)
 	return nil
 }
 
@@ -73,10 +73,10 @@ func (s *OrgState) reduceRemoved(event *eventstore.StorageEvent) error {
 	}
 
 	s.State = org.RemovedState
-	s.set(event)
+	s.Set(event)
 	return nil
 }
 
 func (s *OrgState) ShouldReduce(event *eventstore.StorageEvent) bool {
-	return event.Aggregate.ID == s.id && s.projection.ShouldReduce(event)
+	return event.Aggregate.ID == s.id && s.Projection.ShouldReduce(event)
 }

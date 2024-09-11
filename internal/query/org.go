@@ -17,8 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/readmodel"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -115,32 +113,20 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		return q.oldOrgByID(ctx, shouldTriggerBulk, id)
 	}
 
-	foundOrg := readmodel.NewOrg(id)
-	eventCount, err := q.eventStoreV4.Query(
-		ctx,
-		eventstore.NewQuery(
-			foundOrg,
-			eventstore.SetInstance(authz.GetInstance(ctx).InstanceID()),
-			eventstore.AppendFilters(foundOrg.Filter()...),
-		),
-	)
+	foundOrg, err := q.orgCache.ByID(ctx, id)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
-	}
-
-	if eventCount == 0 {
 		return nil, zerrors.ThrowNotFound(nil, "QUERY-leq5Q", "Errors.Org.NotFound")
 	}
 
 	return &Org{
 		ID:            foundOrg.ID,
-		CreationDate:  foundOrg.CreationDate,
-		ChangeDate:    foundOrg.ChangeDate,
+		CreationDate:  foundOrg.CreatedAt,
+		ChangeDate:    foundOrg.ChangedAt,
 		ResourceOwner: foundOrg.Owner,
-		// State:         domain_pkg.OrgState(foundOrg.State.State),
-		Sequence: uint64(foundOrg.Sequence),
-		Name:     foundOrg.Name,
-		// Domain:        foundOrg.PrimaryDomain.Domain,
+		State:         domain_pkg.OrgState(foundOrg.State.State),
+		Sequence:      uint64(foundOrg.Sequence),
+		Name:          foundOrg.Name,
+		Domain:        foundOrg.PrimaryDomain.Domain,
 	}, nil
 }
 

@@ -6,7 +6,7 @@ import (
 )
 
 type InstanceState struct {
-	projection
+	Projection
 	id string
 
 	instance.State
@@ -32,7 +32,7 @@ func (s *InstanceState) reduceAdded(event *eventstore.StorageEvent) error {
 		return nil
 	}
 	s.State = instance.ActiveState
-	s.projection.set(event)
+	s.Projection.Set(event)
 	return nil
 }
 
@@ -41,10 +41,10 @@ func (s *InstanceState) reduceRemoved(event *eventstore.StorageEvent) error {
 		return nil
 	}
 	s.State = instance.RemovedState
-	s.projection.set(event)
+	s.Projection.Set(event)
 	return nil
 }
 
 func (s *InstanceState) ShouldReduce(event *eventstore.StorageEvent) bool {
-	return event.Aggregate.ID == s.id && s.projection.ShouldReduce(event)
+	return event.Aggregate.ID == s.id && s.Projection.ShouldReduce(event)
 }

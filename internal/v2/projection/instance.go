@@ -8,7 +8,7 @@ import (
 )
 
 type Instance struct {
-	objectMetadata
+	ObjectMetadata
 
 	AuthZInstance
 
@@ -25,11 +25,11 @@ func NewInstanceFromEvent(event *v2_es.StorageEvent) *Instance {
 	return instance
 }
 
-func (i *Instance) Reducers() map[string]map[string]v2_es.ReduceEvent {
-	if i.objectMetadata.reducers != nil {
-		return i.objectMetadata.reducers
+func (i *Instance) Reducers() Reducers {
+	if i.ObjectMetadata.Reducers != nil {
+		return i.ObjectMetadata.Reducers
 	}
-	i.objectMetadata.reducers = map[string]map[string]v2_es.ReduceEvent{
+	i.ObjectMetadata.Reducers = Reducers{
 		instance.AggregateType: {
 			instance.AddedType:              i.reduceAdded,
 			instance.ChangedType:            i.reduceChanged,
@@ -46,18 +46,18 @@ func (i *Instance) Reducers() map[string]map[string]v2_es.ReduceEvent {
 		},
 	}
 
-	return i.objectMetadata.reducers
+	return i.ObjectMetadata.Reducers
 }
 
 func (i *Instance) reduce(event *v2_es.StorageEvent) error {
-	if !i.ShouldReduce(event) {
+	if !i.ObjectMetadata.ShouldReduce(event) {
 		return nil
 	}
-	return i.objectMetadata.reduce(event, i.AuthZInstance.Reducers()[event.Aggregate.Type][event.Type])
+	return i.ObjectMetadata.Reduce(event, i.AuthZInstance.Reducers()[event.Aggregate.Type][event.Type])
 }
 
 func (i *Instance) reduceAdded(event *v2_es.StorageEvent) error {
-	if !i.ShouldReduce(event) {
+	if !i.ObjectMetadata.ShouldReduce(event) {
 		return nil
 	}
 
@@ -66,7 +66,7 @@ func (i *Instance) reduceAdded(event *v2_es.StorageEvent) error {
 		return err
 	}
 
-	err = i.objectMetadata.reduce(event, i.AuthZInstance.reduceAdded)
+	err = i.ObjectMetadata.Reduce(event, i.AuthZInstance.reduceAdded)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (i *Instance) reduceAdded(event *v2_es.StorageEvent) error {
 }
 
 func (i *Instance) reduceChanged(event *v2_es.StorageEvent) error {
-	if !i.ShouldReduce(event) {
+	if !i.ObjectMetadata.ShouldReduce(event) {
 		return nil
 	}
 
@@ -85,6 +85,6 @@ func (i *Instance) reduceChanged(event *v2_es.StorageEvent) error {
 		return err
 	}
 	i.Name = e.Payload.Name
-	i.objectMetadata.set(event)
+	i.ObjectMetadata.Set(event)
 	return nil
 }

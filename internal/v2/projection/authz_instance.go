@@ -11,7 +11,7 @@ import (
 )
 
 type AuthZInstance struct {
-	projection
+	Projection
 
 	ID string
 
@@ -36,11 +36,11 @@ func NewAuthZInstanceFromEvent(event *v2_es.StorageEvent) *AuthZInstance {
 	return instance
 }
 
-func (i *AuthZInstance) Reducers() map[string]map[string]v2_es.ReduceEvent {
-	if i.reducers != nil {
-		return i.reducers
+func (i *AuthZInstance) Reducers() Reducers {
+	if i.Projection.Reducers != nil {
+		return i.Projection.Reducers
 	}
-	i.reducers = map[string]map[string]v2_es.ReduceEvent{
+	i.Projection.Reducers = Reducers{
 		instance.AggregateType: {
 			instance.AddedType:              i.reduceAdded,
 			instance.DefaultOrgSetType:      i.reduceDefaultOrgSet,
@@ -56,7 +56,7 @@ func (i *AuthZInstance) Reducers() map[string]map[string]v2_es.ReduceEvent {
 		},
 	}
 
-	return i.Reducers()
+	return i.Projection.Reducers
 }
 
 func (i *AuthZInstance) reduceAdded(event *v2_es.StorageEvent) error {
@@ -67,7 +67,7 @@ func (i *AuthZInstance) reduceAdded(event *v2_es.StorageEvent) error {
 	if i.State == nil {
 		i.State = NewInstanceStateProjection(i.ID)
 	}
-	return i.projection.reduce(event, i.State.reduceAdded)
+	return i.Projection.Reduce(event, i.State.reduceAdded)
 }
 
 func (i *AuthZInstance) reduceDefaultOrgSet(event *v2_es.StorageEvent) error {
@@ -80,7 +80,7 @@ func (i *AuthZInstance) reduceDefaultOrgSet(event *v2_es.StorageEvent) error {
 		return err
 	}
 	i.DefaultOrgID = e.Payload.OrgID
-	i.projection.set(event)
+	i.Projection.Set(event)
 	return nil
 }
 
@@ -94,7 +94,7 @@ func (i *AuthZInstance) reduceProjectSet(event *v2_es.StorageEvent) error {
 		return err
 	}
 	i.ProjectID = e.Payload.ProjectID
-	i.projection.set(event)
+	i.Projection.Set(event)
 	return nil
 }
 
@@ -109,7 +109,7 @@ func (i *AuthZInstance) reduceConsoleSet(event *v2_es.StorageEvent) error {
 	}
 	i.ConsoleAppID = e.Payload.AppID
 	i.ConsoleClientID = e.Payload.ClientID
-	i.projection.set(event)
+	i.Projection.Set(event)
 	return nil
 }
 
@@ -123,7 +123,7 @@ func (i *AuthZInstance) reduceDefaultLanguageSet(event *v2_es.StorageEvent) erro
 		return err
 	}
 	i.DefaultLanguage = e.Payload.Language
-	i.projection.set(event)
+	i.Projection.Set(event)
 	return nil
 }
 
@@ -132,7 +132,7 @@ func (i *AuthZInstance) reduceRemoved(event *v2_es.StorageEvent) error {
 		return nil
 	}
 
-	return i.projection.reduce(event, i.State.reduceRemoved)
+	return i.Projection.Reduce(event, i.State.reduceRemoved)
 }
 
 func (i *AuthZInstance) reduceDomainAdded(event *v2_es.StorageEvent) error {
@@ -157,7 +157,7 @@ func (i *AuthZInstance) reduceDomainVerified(event *v2_es.StorageEvent) error {
 		}
 	}
 	i.Domains = domains
-	i.projection.set(event)
+	i.Projection.Set(event)
 	return nil
 }
 
@@ -174,7 +174,7 @@ func (i *AuthZInstance) reduceDomainPrimarySet(event *v2_es.StorageEvent) error 
 		}
 	}
 	i.Domains = domains
-	i.projection.set(event)
+	i.Projection.Set(event)
 	return nil
 }
 
@@ -191,10 +191,10 @@ func (i *AuthZInstance) reduceDomainRemoved(event *v2_es.StorageEvent) error {
 	i.Domains = slices.DeleteFunc(i.Domains, func(domain *InstanceDomain) bool {
 		return domain.Name == e.Payload.Name
 	})
-	i.projection.set(event)
+	i.Projection.Set(event)
 	return nil
 }
 
 func (i *AuthZInstance) ShouldReduce(event *v2_es.StorageEvent) bool {
-	return event.Aggregate.ID == i.ID && i.projection.ShouldReduce(event)
+	return event.Aggregate.ID == i.ID && i.Projection.ShouldReduce(event)
 }

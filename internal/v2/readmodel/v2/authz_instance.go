@@ -29,12 +29,12 @@ type AuthZInstance struct {
 	*InstanceFeatures
 }
 
-func (i *AuthZInstance) Reducers() map[string]map[string]v2_es.ReduceEvent {
+func (i *AuthZInstance) Reducers() projection.Reducers {
 	if i.reducers != nil {
 		return i.reducers
 	}
 
-	i.reducers = mergeReducers(i.AuthZInstance.Reducers(), i.InstanceFeatures.Reducers())
+	i.reducers = projection.MergeReducers(i.AuthZInstance.Reducers(), i.InstanceFeatures.Reducers())
 
 	return i.reducers
 }
@@ -178,12 +178,12 @@ func (i *AuthZInstances) EventstoreV3Query(position decimal.Decimal) *eventstore
 }
 
 // Reducers implements manager.
-func (i *AuthZInstances) Reducers() map[string]map[string]v2_es.ReduceEvent {
+func (i *AuthZInstances) Reducers() projection.Reducers {
 	if i.reducers != nil {
 		return i.reducers
 	}
 
-	i.reducers = map[string]map[string]v2_es.ReduceEvent{
+	i.reducers = projection.Reducers{
 		instance.AggregateType: {
 			instance.AddedType:              i.reduceAdded,
 			instance.ChangedType:            i.reduce,

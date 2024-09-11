@@ -8,7 +8,7 @@ import (
 )
 
 type OrgDomain struct {
-	projection
+	Projection
 
 	Domain
 }
@@ -30,7 +30,7 @@ func (d *OrgDomain) reduceAdded(event *v2_es.StorageEvent) error {
 		return err
 	}
 	d.reduceAddedPayload(e.Payload)
-	d.projection.set(event)
+	d.Projection.Set(event)
 	return nil
 }
 
@@ -44,7 +44,7 @@ func (d *OrgDomain) reduceVerified(event *v2_es.StorageEvent) error {
 	}
 
 	d.reduceVerifiedPayload(e.Payload)
-	d.projection.set(event)
+	d.Projection.Set(event)
 	return nil
 }
 
@@ -54,6 +54,6 @@ func (d *OrgDomain) reducePrimarySet(event *v2_es.StorageEvent) error {
 		return err
 	}
 	d.reducePrimarySetPayload(e.Payload)
-	d.projection.set(event)
+	d.Projection.Set(event)
 	return nil
 }

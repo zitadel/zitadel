@@ -43,6 +43,7 @@ type Queries struct {
 	defaultAuditLogRetention            time.Duration
 
 	instanceCache *readmodel.AuthZInstances
+	orgCache      *readmodel.Orgs
 }
 
 func StartQueries(
@@ -81,6 +82,7 @@ func StartQueries(
 	}
 
 	repo.instanceCache = readmodel.NewAuthZInstances(ctx, es, readmodel.NewSystemFeatures(ctx, es), repo)
+	repo.orgCache = readmodel.NewOrgs(ctx, es)
 	repo.checkPermission = permissionCheck(repo)
 
 	err = projection.Create(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)

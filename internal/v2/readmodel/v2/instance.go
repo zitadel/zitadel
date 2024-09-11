@@ -50,12 +50,12 @@ func (i *Instances) EventstoreV3Query(position decimal.Decimal) *eventstore.Sear
 }
 
 // Reducers implements manager.
-func (i *Instances) Reducers() map[string]map[string]v2_es.ReduceEvent {
+func (i *Instances) Reducers() projection.Reducers {
 	if i.reducers != nil {
 		return i.reducers
 	}
 
-	i.reducers = map[string]map[string]v2_es.ReduceEvent{
+	i.reducers = projection.Reducers{
 		instance.AggregateType: {
 			instance.AddedType:              i.reduceAdded,
 			instance.ChangedType:            i.reduce,

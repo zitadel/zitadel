@@ -8,7 +8,7 @@ import (
 )
 
 type Feature[T any] struct {
-	projection
+	Projection
 
 	Level feature.Level
 	Key   feature.Key
@@ -27,18 +27,18 @@ func (f *Feature[T]) Value() T {
 }
 
 func (f *Feature[T]) Reducers() map[string]map[string]eventstore.ReduceEvent {
-	if f.reducers != nil {
-		return f.reducers
+	if f.Projection.Reducers != nil {
+		return f.Projection.Reducers
 	}
 
-	f.reducers = map[string]map[string]eventstore.ReduceEvent{
+	f.Projection.Reducers = map[string]map[string]eventstore.ReduceEvent{
 		feature.AggregateType: {
 			feature.ResetEventType(f.Level):      f.reduceFeatureReset,
 			feature.SetEventType(f.Level, f.Key): f.reduceFeatureSet,
 		},
 	}
 
-	return f.reducers
+	return f.Projection.Reducers
 }
 
 func (f *Feature[T]) reduceFeatureReset(event *eventstore.StorageEvent) error {

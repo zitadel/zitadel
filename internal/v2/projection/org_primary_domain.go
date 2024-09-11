@@ -6,7 +6,7 @@ import (
 )
 
 type OrgPrimaryDomain struct {
-	projection
+	Projection
 
 	id string
 
@@ -19,35 +19,18 @@ func NewOrgPrimaryDomain(id string) *OrgPrimaryDomain {
 	}
 }
 
-// func (p *OrgPrimaryDomain) Filter() []*eventstore.Filter {
-// 	return []*eventstore.Filter{
-// 		eventstore.NewFilter(
-// 			eventstore.FilterPagination(
-// 				eventstore.GlobalPositionGreater(&p.position),
-// 			),
-// 			eventstore.AppendAggregateFilter(
-// 				org.AggregateType,
-// 				eventstore.AggregateIDs(p.id),
-// 				eventstore.AppendEvent(
-// 					eventstore.SetEventTypes(org.DomainPrimarySetType),
-// 				),
-// 			),
-// 		),
-// 	}
-// }
-
 func (p *OrgPrimaryDomain) Reducers() map[string]map[string]eventstore.ReduceEvent {
-	if p.reducers != nil {
-		return p.reducers
+	if p.Projection.Reducers != nil {
+		return p.Projection.Reducers
 	}
 
-	p.reducers = map[string]map[string]eventstore.ReduceEvent{
+	p.Projection.Reducers = map[string]map[string]eventstore.ReduceEvent{
 		org.AggregateType: {
 			org.DomainPrimarySetType: p.reducePrimarySet,
 		},
 	}
 
-	return p.reducers
+	return p.Projection.Reducers
 }
 
 func (p *OrgPrimaryDomain) reducePrimarySet(event *eventstore.StorageEvent) error {
@@ -61,10 +44,10 @@ func (p *OrgPrimaryDomain) reducePrimarySet(event *eventstore.StorageEvent) erro
 	}
 
 	p.Domain = e.Payload.Name
-	p.projection.set(event)
+	p.Projection.Set(event)
 	return nil
 }
 
 func (s *OrgPrimaryDomain) ShouldReduce(event *eventstore.StorageEvent) bool {
-	return event.Aggregate.ID == s.id && s.projection.ShouldReduce(event)
+	return event.Aggregate.ID == s.id && s.Projection.ShouldReduce(event)
 }
