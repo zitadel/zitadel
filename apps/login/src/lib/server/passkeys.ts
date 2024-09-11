@@ -32,7 +32,10 @@ export async function registerPasskeyLink(
   const { sessionId } = command;
 
   const sessionCookie = await getSessionCookieById({ sessionId });
-  const session = await getSession(sessionCookie.id, sessionCookie.token);
+  const session = await getSession({
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
 
   const domain = headers().get("host");
 
@@ -71,7 +74,10 @@ export async function verifyPasskey(command: VerifyPasskeyCommand) {
   const sessionCookie = await getSessionCookieById({
     sessionId: command.sessionId,
   });
-  const session = await getSession(sessionCookie.id, sessionCookie.token);
+  const session = await getSession({
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
   const userId = session?.session?.factors?.user?.id;
 
   if (!userId) {

@@ -76,6 +76,7 @@ export default function LoginPasskey({
       ? UserVerificationRequirement.REQUIRED
       : UserVerificationRequirement.DISCOURAGED,
   ) {
+    setError("");
     setLoading(true);
     const session = await updateSession({
       loginName,

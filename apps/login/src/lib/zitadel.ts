@@ -25,9 +25,12 @@ import {
   SearchQuery,
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
+import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
-const SESSION_LIFETIME_S = 3000;
+const SESSION_LIFETIME_S = 3600;
+
+console.log("Session lifetime", SESSION_LIFETIME_S);
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
@@ -46,9 +49,15 @@ export const orgService = createOrganizationServiceClient(transport);
 export const settingsService = createSettingsServiceClient(transport);
 
 export async function getBrandingSettings(organization?: string) {
-  return settingsService
-    .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => resp.settings);
+  return unstable_cache(
+    async () => {
+      return await settingsService
+        .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
+        .then((resp) => resp.settings);
+    },
+    ["branding"],
+    { revalidate: 3600, tags: ["branding"] },
+  )();
 }
 
 export async function getLoginSettings(orgId?: string) {
@@ -181,7 +190,13 @@ export async function setSession(
   );
 }
 
-export async function getSession(sessionId: string, sessionToken: string) {
+export async function getSession({
+  sessionId,
+  sessionToken,
+}: {
+  sessionId: string;
+  sessionToken: string;
+}) {
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 
@@ -242,15 +257,31 @@ export async function getUserByID(userId: string) {
 }
 
 export async function listUsers({
+  loginName,
   userName,
   email,
   organizationId,
 }: {
+  loginName?: string;
   userName?: string;
   email?: string;
   organizationId?: string;
 }) {
   const queries: SearchQuery[] = [];
+
+  if (loginName) {
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "loginNameQuery",
+          value: {
+            loginName: loginName,
+            method: TextQueryMethod.EQUALS,
+          },
+        },
+      }),
+    );
+  }
 
   if (userName) {
     queries.push(
@@ -258,7 +289,7 @@ export async function listUsers({
         query: {
           case: "userNameQuery",
           value: {
-            userName,
+            userName: userName,
             method: TextQueryMethod.EQUALS,
           },
         },

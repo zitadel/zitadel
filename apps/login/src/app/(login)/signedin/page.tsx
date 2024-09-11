@@ -1,6 +1,7 @@
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
 import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
+import SelfServiceMenu from "@/ui/SelfServiceMenu";
 import UserAvatar from "@/ui/UserAvatar";
 import { create } from "@zitadel/client";
 import {
@@ -28,11 +29,13 @@ async function loadSession(loginName: string, authRequestId?: string) {
       return redirect(callbackUrl);
     });
   }
-  return getSession(recent.id, recent.token).then((response) => {
-    if (response?.session) {
-      return response.session;
-    }
-  });
+  return getSession({ sessionId: recent.id, sessionToken: recent.token }).then(
+    (response) => {
+      if (response?.session) {
+        return response.session;
+      }
+    },
+  );
 }
 
 export default async function Page({ searchParams }: { searchParams: any }) {
@@ -53,6 +56,10 @@ export default async function Page({ searchParams }: { searchParams: any }) {
           showDropdown
           searchParams={searchParams}
         />
+
+        {sessionFactors?.id && (
+          <SelfServiceMenu sessionId={sessionFactors?.id} />
+        )}
       </div>
     </DynamicTheme>
   );
