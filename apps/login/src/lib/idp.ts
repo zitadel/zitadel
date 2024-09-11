@@ -1,4 +1,5 @@
 import { create } from "@zitadel/client";
+import { IDPType } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
@@ -11,12 +12,22 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
   switch (idpType) {
     case IdentityProviderType.GITHUB:
       return "github";
+    case IdentityProviderType.GITHUB_ES:
+      return "github_es";
+    case IdentityProviderType.GITLAB:
+      return "gitlab";
+    case IdentityProviderType.GITLAB_SELF_HOSTED:
+      return "gitlab_es";
+    case IdentityProviderType.APPLE:
+      return "apple";
     case IdentityProviderType.GOOGLE:
       return "google";
     case IdentityProviderType.AZURE_AD:
       return "azure";
     case IdentityProviderType.SAML:
       return "saml";
+    case IdentityProviderType.OAUTH:
+      return "oauth";
     case IdentityProviderType.OIDC:
       return "oidc";
     default:
@@ -24,6 +35,45 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
   }
 }
 
+// TODO: this is ugly but needed atm as the getIDPByID returns a IDPType and not a IdentityProviderType
+export function idpTypeToIdentityProviderType(
+  idpType: IDPType,
+): IdentityProviderType {
+  switch (idpType) {
+    case IDPType.IDP_TYPE_GITHUB:
+      return IdentityProviderType.GITHUB;
+
+    case IDPType.IDP_TYPE_GITHUB_ES:
+      return IdentityProviderType.GITHUB_ES;
+
+    case IDPType.IDP_TYPE_GITLAB:
+      return IdentityProviderType.GITLAB;
+
+    case IDPType.IDP_TYPE_GITLAB_SELF_HOSTED:
+      return IdentityProviderType.GITLAB_SELF_HOSTED;
+
+    case IDPType.IDP_TYPE_APPLE:
+      return IdentityProviderType.APPLE;
+
+    case IDPType.IDP_TYPE_GOOGLE:
+      return IdentityProviderType.GOOGLE;
+
+    case IDPType.IDP_TYPE_AZURE_AD:
+      return IdentityProviderType.AZURE_AD;
+
+    case IDPType.IDP_TYPE_SAML:
+      return IdentityProviderType.SAML;
+
+    case IDPType.IDP_TYPE_OAUTH:
+      return IdentityProviderType.OAUTH;
+
+    case IDPType.IDP_TYPE_OIDC:
+      return IdentityProviderType.OIDC;
+
+    default:
+      throw new Error("Unknown identity provider type");
+  }
+}
 // this maps the IDPInformation to the AddHumanUserRequest which is used when creating a user or linking a user (email)
 // TODO: extend this object from a other file which can be overwritten by customers like map = { ...PROVIDER_MAPPING, ...customerMap }
 export type OIDC_USER = {
@@ -87,9 +137,9 @@ const GITHUB_MAPPING = (idp: IDPInformation) => {
 };
 
 export const PROVIDER_MAPPING: {
-  [provider: string]: (rI: IDPInformation) => AddHumanUserRequest;
+  [provider: number]: (rI: IDPInformation) => AddHumanUserRequest;
 } = {
-  [idpTypeToSlug(IdentityProviderType.GOOGLE)]: (idp: IDPInformation) => {
+  [IdentityProviderType.GOOGLE]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation as OIDC_USER;
     console.log(rawInfo);
 
@@ -113,12 +163,12 @@ export const PROVIDER_MAPPING: {
       ],
     });
   },
-  [idpTypeToSlug(IdentityProviderType.GITLAB)]: OIDC_MAPPING,
-  [idpTypeToSlug(IdentityProviderType.GITLAB_SELF_HOSTED)]: OIDC_MAPPING,
-  [idpTypeToSlug(IdentityProviderType.OIDC)]: OIDC_MAPPING,
+  [IdentityProviderType.GITLAB]: OIDC_MAPPING,
+  [IdentityProviderType.GITLAB_SELF_HOSTED]: OIDC_MAPPING,
+  [IdentityProviderType.OIDC]: OIDC_MAPPING,
   // check
-  [idpTypeToSlug(IdentityProviderType.OAUTH)]: OIDC_MAPPING,
-  [idpTypeToSlug(IdentityProviderType.AZURE_AD)]: (idp: IDPInformation) => {
+  [IdentityProviderType.OAUTH]: OIDC_MAPPING,
+  [IdentityProviderType.AZURE_AD]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation as {
       jobTitle: string;
       mail: string;
@@ -152,9 +202,9 @@ export const PROVIDER_MAPPING: {
       ],
     });
   },
-  [idpTypeToSlug(IdentityProviderType.GITHUB)]: GITHUB_MAPPING,
-  [idpTypeToSlug(IdentityProviderType.GITHUB_ES)]: GITHUB_MAPPING,
-  [idpTypeToSlug(IdentityProviderType.APPLE)]: (idp: IDPInformation) => {
+  [IdentityProviderType.GITHUB]: GITHUB_MAPPING,
+  [IdentityProviderType.GITHUB_ES]: GITHUB_MAPPING,
+  [IdentityProviderType.APPLE]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation as {
       name?: string;
       firstName?: string;
