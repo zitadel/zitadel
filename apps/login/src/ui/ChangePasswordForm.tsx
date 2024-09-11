@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Alert from "./Alert";
+import BackButton from "./BackButton";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
 import PasswordComplexity from "./PasswordComplexity";
@@ -129,9 +130,7 @@ export default function ChangePasswordForm({
       {error && <Alert>{error}</Alert>}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <Button type="button" variant={ButtonVariants.Secondary}>
-          back
-        </Button>
+        <BackButton />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
