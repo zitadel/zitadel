@@ -112,9 +112,12 @@ func (wm *UserV3WriteModel) Reduce() error {
 }
 
 func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+	if wm.ResourceOwner != "" {
+		builder = builder.ResourceOwner(wm.ResourceOwner)
+	}
+
+	query := builder.AddQuery().
 		AggregateTypes(schemauser.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
@@ -126,12 +129,12 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 			schemauser.UnlockedType,
 		)
 	if wm.DataWM {
-		query = query.EventTypes(
+		query = query.Or().EventTypes(
 			schemauser.UpdatedType,
 		)
 	}
 	if wm.EmailWM {
-		query = query.EventTypes(
+		query = query.Or().EventTypes(
 			schemauser.EmailUpdatedType,
 			schemauser.EmailVerifiedType,
 			schemauser.EmailCodeAddedType,
@@ -139,7 +142,7 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 		)
 	}
 	if wm.PhoneWM {
-		query = query.EventTypes(
+		query = query.Or().EventTypes(
 			schemauser.PhoneUpdatedType,
 			schemauser.PhoneVerifiedType,
 			schemauser.PhoneCodeAddedType,

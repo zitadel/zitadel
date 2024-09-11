@@ -120,13 +120,13 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser,
 		),
 	}
 	if user.Email != nil {
-		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, events, userAgg, user.Email, alg)
+		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, writeModel, events, userAgg, user.Email, alg)
 		if err != nil {
 			return err
 		}
 	}
 	if user.Phone != nil {
-		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, events, userAgg, user.Phone, alg)
+		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, writeModel, events, userAgg, user.Phone, alg)
 		if err != nil {
 			return err
 		}
@@ -272,13 +272,13 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser,
 		}
 	}
 	if user.Email != nil {
-		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, events, userAgg, user.Email, alg)
+		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, writeModel, events, userAgg, user.Email, alg)
 		if err != nil {
 			return err
 		}
 	}
 	if user.Phone != nil {
-		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, events, userAgg, user.Phone, alg)
+		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, writeModel, events, userAgg, user.Phone, alg)
 		if err != nil {
 			return err
 		}
@@ -392,7 +392,10 @@ func (c *Commands) ActivateSchemaUser(ctx context.Context, resourceOwner, id str
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
+func (c *Commands) updateSchemaUserEmail(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, agg *eventstore.Aggregate, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
+	if existing.Email == string(email.Address) {
+		return events, plainCode, nil
+	}
 
 	events = append(events, schemauser.NewEmailUpdatedEvent(ctx,
 		agg,
@@ -418,7 +421,11 @@ func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstor
 	return events, plainCode, nil
 }
 
-func (c *Commands) updateSchemaUserPhone(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
+func (c *Commands) updateSchemaUserPhone(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, agg *eventstore.Aggregate, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
+	if existing.Phone == string(phone.Number) {
+		return events, plainCode, nil
+	}
+
 	events = append(events, schemauser.NewPhoneChangedEvent(ctx,
 		agg,
 		phone.Number,

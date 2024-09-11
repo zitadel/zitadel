@@ -85,10 +85,13 @@ func (s *Server) PatchUser(ctx context.Context, req *user.PatchUserRequest) (_ *
 	}, nil
 }
 
-func patchUserRequestToChangeSchemaUser(ctx context.Context, req *user.PatchUserRequest) (*command.ChangeSchemaUser, error) {
-	data, err := req.GetUser().GetData().MarshalJSON()
-	if err != nil {
-		return nil, err
+func patchUserRequestToChangeSchemaUser(ctx context.Context, req *user.PatchUserRequest) (_ *command.ChangeSchemaUser, err error) {
+	var data []byte
+	if req.GetUser().Data != nil {
+		data, err = req.GetUser().GetData().MarshalJSON()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var email *command.Email
