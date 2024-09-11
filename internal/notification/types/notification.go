@@ -54,8 +54,9 @@ func SendEmail(
 			ctx,
 			channels,
 			user,
-			data.Subject,
 			template,
+			data,
+			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
 		)
