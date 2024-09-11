@@ -257,15 +257,15 @@ service ZITADELUsers {
     };
   }
 
-  // Reactivate a user
+  // Activate a user
   //
-  // Reactivate a previously deactivated user and change the state to 'active'.
+  // Activate a previously deactivated user and change the state to 'active'.
   // The user will be able to log in again.
   //
   // The endpoint returns an error if the user is not in the state 'deactivated'.
-  rpc ReactivateUser (ReactivateUserRequest) returns (ReactivateUserResponse) {
+  rpc ActivateUser (ActivateUserRequest) returns (ActivateUserResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/_reactivate"
+      post: "/resources/v3alpha/users/{id}/_activate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -278,7 +278,7 @@ service ZITADELUsers {
       responses: {
         key: "200";
         value: {
-          description: "User successfully reactivated";
+          description: "User successfully activated";
         };
       };
     };
@@ -1172,7 +1172,7 @@ message DeactivateUserResponse {
 }
 
 
-message ReactivateUserRequest {
+message ActivateUserRequest {
   optional zitadel.object.v3alpha.Instance instance = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       default: "\"domain from HOST or :authority header\""
@@ -1192,7 +1192,7 @@ message ReactivateUserRequest {
   ];
 }
 
-message ReactivateUserResponse {
+message ActivateUserResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
 }
 

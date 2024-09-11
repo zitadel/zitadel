@@ -15,7 +15,7 @@ const (
 	LockedType      = eventPrefix + "locked"
 	UnlockedType    = eventPrefix + "unlocked"
 	DeactivatedType = eventPrefix + "deactivated"
-	ReactivatedType = eventPrefix + "reactivated"
+	ActivatedType   = eventPrefix + "activated"
 )
 
 type CreatedEvent struct {
@@ -230,31 +230,31 @@ func NewDeactivatedEvent(
 	}
 }
 
-type ReactivatedEvent struct {
+type ActivatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 }
 
-func (e *ReactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+func (e *ActivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *ReactivatedEvent) Payload() interface{} {
+func (e *ActivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *ReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *ActivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewReactivatedEvent(
+func NewActivatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-) *ReactivatedEvent {
-	return &ReactivatedEvent{
+) *ActivatedEvent {
+	return &ActivatedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			ReactivatedType,
+			ActivatedType,
 		),
 	}
 }

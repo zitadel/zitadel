@@ -29,7 +29,8 @@ type UserV3WriteModel struct {
 
 	Data json.RawMessage
 
-	State domain.UserState
+	Locked bool
+	State  domain.UserState
 }
 
 func NewExistsUserV3WriteModel(resourceOwner, userID string) *UserV3WriteModel {
@@ -98,12 +99,12 @@ func (wm *UserV3WriteModel) Reduce() error {
 		case *schemauser.PhoneVerificationFailedEvent:
 			wm.PhoneVerifiedFailedCount += 1
 		case *schemauser.LockedEvent:
-			wm.State = domain.UserStateLocked
+			wm.Locked = true
 		case *schemauser.UnlockedEvent:
-			wm.State = domain.UserStateActive
+			wm.Locked = false
 		case *schemauser.DeactivatedEvent:
 			wm.State = domain.UserStateInactive
-		case *schemauser.ReactivatedEvent:
+		case *schemauser.ActivatedEvent:
 			wm.State = domain.UserStateActive
 		}
 	}
@@ -119,6 +120,10 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			schemauser.CreatedType,
 			schemauser.DeletedType,
+			schemauser.ActivatedType,
+			schemauser.DeactivatedType,
+			schemauser.LockedType,
+			schemauser.UnlockedType,
 		)
 	if wm.DataWM {
 		query = query.EventTypes(

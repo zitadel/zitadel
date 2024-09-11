@@ -294,6 +294,10 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser,
 	return nil
 }
 
+func (c *Commands) checkPermissionUpdateUserState(ctx context.Context, resourceOwner, userID string) error {
+	return c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID)
+}
+
 func (c *Commands) LockSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Eu8I2VAfjF", "Errors.IDMissing")
@@ -305,10 +309,10 @@ func (c *Commands) LockSchemaUser(ctx context.Context, resourceOwner, id string)
 	if !writeModel.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-G4LOrnjY7q", "Errors.User.NotFound")
 	}
-	if writeModel.State != domain.UserStateActive {
+	if writeModel.Locked {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUserState(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
 		return nil, err
 	}
 	if err := c.pushAppendAndReduce(ctx, writeModel,
@@ -330,10 +334,10 @@ func (c *Commands) UnlockSchemaUser(ctx context.Context, resourceOwner, id strin
 	if !writeModel.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound")
 	}
-	if writeModel.State != domain.UserStateLocked {
+	if !writeModel.Locked {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
 	}
-	if err := c.checkPermissionUpdateUser(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUserState(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
 		return nil, err
 	}
 	if err := c.pushAppendAndReduce(ctx, writeModel,
@@ -352,13 +356,10 @@ func (c *Commands) DeactivateSchemaUser(ctx context.Context, resourceOwner, id s
 	if err != nil {
 		return nil, err
 	}
-	if !writeModel.Exists() {
+	if writeModel.State != domain.UserStateActive {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Ob6lR5iFTe", "Errors.User.NotFound")
 	}
-	if writeModel.State != domain.UserStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
-	}
-	if err := c.checkPermissionUpdateUser(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUserState(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
 		return nil, err
 	}
 	if err := c.pushAppendAndReduce(ctx, writeModel,
@@ -369,7 +370,7 @@ func (c *Commands) DeactivateSchemaUser(ctx context.Context, resourceOwner, id s
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) ReactivateSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) ActivateSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-17XupGvxBJ", "Errors.IDMissing")
 	}
@@ -377,17 +378,14 @@ func (c *Commands) ReactivateSchemaUser(ctx context.Context, resourceOwner, id s
 	if err != nil {
 		return nil, err
 	}
-	if !writeModel.Exists() {
+	if writeModel.State != domain.UserStateInactive {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotFound")
 	}
-	if writeModel.State != domain.UserStateInactive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
-	}
-	if err := c.checkPermissionUpdateUser(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+	if err := c.checkPermissionUpdateUserState(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
 		return nil, err
 	}
 	if err := c.pushAppendAndReduce(ctx, writeModel,
-		schemauser.NewReactivatedEvent(ctx, UserV3AggregateFromWriteModel(&writeModel.WriteModel)),
+		schemauser.NewActivatedEvent(ctx, UserV3AggregateFromWriteModel(&writeModel.WriteModel)),
 	); err != nil {
 		return nil, err
 	}

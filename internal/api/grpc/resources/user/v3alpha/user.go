@@ -142,16 +142,16 @@ func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserReq
 	}, nil
 }
 
-func (s *Server) ReactivateUser(ctx context.Context, req *user.ReactivateUserRequest) (_ *user.ReactivateUserResponse, err error) {
+func (s *Server) ActivateUser(ctx context.Context, req *user.ActivateUserRequest) (_ *user.ActivateUserResponse, err error) {
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
 
-	details, err := s.command.ReactivateSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
+	details, err := s.command.ActivateSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
 	if err != nil {
 		return nil, err
 	}
-	return &user.ReactivateUserResponse{
+	return &user.ActivateUserResponse{
 		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
 	}, nil
 }

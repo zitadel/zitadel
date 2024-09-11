@@ -1198,7 +1198,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 	}
 }
 
-func TestServer_ReactivateUser(t *testing.T) {
+func TestServer_ActivateUser(t *testing.T) {
 	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
@@ -1218,15 +1218,15 @@ func TestServer_ReactivateUser(t *testing.T) {
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		dep     func(ctx context.Context, req *user.ReactivateUserRequest) error
-		req     *user.ReactivateUserRequest
+		dep     func(ctx context.Context, req *user.ActivateUserRequest) error
+		req     *user.ActivateUserRequest
 		want    *resource_object.Details
 		wantErr bool
 	}{
 		{
-			name: "user reactivate, no userID",
+			name: "user activate, no userID",
 			ctx:  isolatedIAMOwnerCTX,
-			req: &user.ReactivateUserRequest{
+			req: &user.ActivateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
 						OrgId: orgResp.GetOrganizationId(),
@@ -1237,9 +1237,9 @@ func TestServer_ReactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user reactivate, not existing",
+			name: "user activate, not existing",
 			ctx:  isolatedIAMOwnerCTX,
-			req: &user.ReactivateUserRequest{
+			req: &user.ActivateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
 						OrgId: orgResp.GetOrganizationId(),
@@ -1250,15 +1250,15 @@ func TestServer_ReactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user reactivate, not existing in org",
+			name: "user activate, not existing in org",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, req *user.ReactivateUserRequest) error {
+			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
 				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				Instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
-			req: &user.ReactivateUserRequest{
+			req: &user.ActivateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
 						OrgId: "notexisting",
@@ -1268,15 +1268,15 @@ func TestServer_ReactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user reactivate, no context",
+			name: "user activate, no context",
 			ctx:  context.Background(),
-			dep: func(ctx context.Context, req *user.ReactivateUserRequest) error {
+			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
 				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				Instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
-			req: &user.ReactivateUserRequest{
+			req: &user.ActivateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
 						OrgId: orgResp.GetOrganizationId(),
@@ -1286,15 +1286,15 @@ func TestServer_ReactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user reactivate, no permission",
+			name: "user activate, no permission",
 			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
-			dep: func(ctx context.Context, req *user.ReactivateUserRequest) error {
+			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
 				userResp := Instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				Instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
-			req: &user.ReactivateUserRequest{
+			req: &user.ActivateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
 						OrgId: orgResp.GetOrganizationId(),
@@ -1304,15 +1304,15 @@ func TestServer_ReactivateUser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user reactivate, ok",
+			name: "user activate, ok",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, req *user.ReactivateUserRequest) error {
+			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
 				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				Instance.DeactivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
-			req: &user.ReactivateUserRequest{
+			req: &user.ActivateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
 						OrgId: orgResp.GetOrganizationId(),
@@ -1328,16 +1328,16 @@ func TestServer_ReactivateUser(t *testing.T) {
 			},
 		},
 		{
-			name: "user reactivate, already reactivated",
+			name: "user activate, already activated",
 			ctx:  isolatedIAMOwnerCTX,
-			dep: func(ctx context.Context, req *user.ReactivateUserRequest) error {
+			dep: func(ctx context.Context, req *user.ActivateUserRequest) error {
 				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				Instance.DeactivateSchemaUser(ctx, "", req.Id)
-				Instance.ReactivateSchemaUser(ctx, "", req.Id)
+				Instance.ActivateSchemaUser(ctx, "", req.Id)
 				return nil
 			},
-			req: &user.ReactivateUserRequest{
+			req: &user.ActivateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
 						OrgId: orgResp.GetOrganizationId(),
@@ -1353,7 +1353,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 				err := tt.dep(tt.ctx, tt.req)
 				require.NoError(t, err)
 			}
-			got, err := Instance.Client.UserV3Alpha.ReactivateUser(tt.ctx, tt.req)
+			got, err := Instance.Client.UserV3Alpha.ActivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

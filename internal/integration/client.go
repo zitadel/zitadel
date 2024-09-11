@@ -824,12 +824,12 @@ func (i *Instance) DeactivateSchemaUser(ctx context.Context, orgID string, userI
 	return user
 }
 
-func (i *Instance) ReactivateSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.ReactivateUserResponse {
+func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.ActivateUserResponse {
 	var org *object_v3alpha.Organization
 	if orgID != "" {
 		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
 	}
-	user, err := i.Client.UserV3Alpha.ReactivateUser(ctx, &user_v3alpha.ReactivateUserRequest{
+	user, err := i.Client.UserV3Alpha.ActivateUser(ctx, &user_v3alpha.ActivateUserRequest{
 		Organization: org,
 		Id:           userID,
 	})
