@@ -154,6 +154,7 @@ type SecretGenerators struct {
 	DomainVerification       *crypto.GeneratorConfig
 	OTPSMS                   *crypto.GeneratorConfig
 	OTPEmail                 *crypto.GeneratorConfig
+	InviteCode               *crypto.GeneratorConfig
 }
 
 type ZitadelConfig struct {

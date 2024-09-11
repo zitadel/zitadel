@@ -1,6 +1,8 @@
 package command
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -120,6 +122,10 @@ func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func UserAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, user.AggregateType, user.AggregateVersion)
+}
+
+func UserAggregateFromWriteModelCtx(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return eventstore.AggregateFromWriteModelCtx(ctx, wm, user.AggregateType, user.AggregateVersion)
 }
 
 func isUserStateExists(state domain.UserState) bool {

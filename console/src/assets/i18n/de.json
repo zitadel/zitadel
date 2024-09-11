@@ -197,7 +197,8 @@
           "VE": "Wenn ein Benutzer seine E-Mail-Adresse ändert, erhält er eine E-Mail mit einem Link zur Verifizierung der neuen Adresse.",
           "VP": "Wenn ein Benutzer seine Telefonnummer ändert, erhält er eine SMS mit einem Code zur Verifizierung der neuen Nummer.",
           "VEO": "Wenn ein Benutzer eine Einmalpasswort-Methode per E-Mail hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine E-Mail-Adresse gesendet wurde.",
-          "VSO": "Wenn ein Benutzer eine Einmalpasswort-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde."
+          "VSO": "Wenn ein Benutzer eine Einmalpasswort-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde.",
+          "IU": "Wenn ein Benutzer-Einladungscode erstellt wird, erhält er eine E-Mail mit einem Link zur Einstellung seiner Authentifizierungsmethode."
         }
       },
       "LOGIN_TEXTS": {
@@ -1667,7 +1668,8 @@
         "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
         "PL": "Passwortlos",
-        "PC": "Passwordwechsel"
+        "PC": "Passwordwechsel",
+        "IU": "Benutzer einladen"
       },
       "CHIPS": {
         "firstname": "Vorname",
@@ -1687,7 +1689,8 @@
         "tempUsername": "Temp. Username",
         "otp": "Einmalpasswort",
         "verifyUrl": "URL zur Überprüfung des Einmalpassworts",
-        "expiry": "Ablauf"
+        "expiry": "Ablauf",
+        "applicationName": "Anwendungsname"
       },
       "TOAST": {
         "UPDATED": "Benutzerdefinierte Texte gespeichert."

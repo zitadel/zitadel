@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: 继续
   CancelButtonText: 取消
 
+InviteUser:
+  Title: 激活用户
+  Description: 使用以下代码验证您的电子邮件并设置您的密码。
+  CodeLabel: 代码
+  NewPasswordLabel: 新密码
+  NewPasswordConfirm: 确认密码
+  NextButtonText: 下一步
+  ResendButtonText: 重新发送代码
+
 InitMFAPrompt:
   Title: 两步验证设置
   Description: 两步验证为您的账户提供了额外的安全保障。这确保只有你能访问你的账户。

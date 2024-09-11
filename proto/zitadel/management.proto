@@ -3976,7 +3976,7 @@ service ManagementService {
             tags: "Project Grants"
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List Project Members";
+            summary: "List Project Grant Members";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked."
             parameters: {
                 headers: {
@@ -6485,6 +6485,103 @@ service ManagementService {
             tags: "Message Texts";
             summary: "Reset Custom Password Changed Message Text to Default";
             description: "Removes the custom text of the password-changed message from the organization and therefore the default texts from the instance or translation files will be triggered for the users."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc GetCustomInviteUserMessageText(GetCustomInviteUserMessageTextRequest) returns (GetCustomInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/invite_user/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Invite User Message Text";
+            description: "Get the custom text of the password-changed message/email that is configured on the organization. The message is sent when an invite code email is requested."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc GetDefaultInviteUserMessageText(GetDefaultInviteUserMessageTextRequest) returns (GetDefaultInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/invite_user/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Invite User Message Text";
+            description: "Get the default text of the invite user message/email that is configured on the instance or as translation files in ZITADEL itself. The message is sent when an invite code email is requested."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc SetCustomInviteUserMessageCustomText(SetCustomInviteUserMessageTextRequest) returns (SetCustomInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/invite_user/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Custom Invite User Message Text";
+            description: "Set the custom text of the invite user message/email for the organization. The message is sent when an invite code email is requested. The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}} {{.ApplicationName}}"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ResetCustomInviteUserMessageTextToDefault(ResetCustomInviteUserMessageTextToDefaultRequest) returns (ResetCustomInviteUserMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/invite_user/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Invite User Message Text to Default";
+            description: "Removes the custom text of the invite user message from the organization and therefore the default texts from the instance or translation files will be triggered for the users."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -11916,6 +12013,86 @@ message ResetCustomPasswordChangeMessageTextToDefaultRequest {
 }
 
 message ResetCustomPasswordChangeMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetCustomInviteUserMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomInviteUserMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetDefaultInviteUserMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultInviteUserMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetCustomInviteUserMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string pre_header = 3 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string subject = 4 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string greeting = 5 [
+        (validate.rules).string = {max_bytes: 4000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Hello {{.DisplayName}},\""
+            max_length: 1000;
+        }
+    ];
+    string text = 6 [
+        (validate.rules).string = {max_bytes: 40000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Your user has been invited to {{.ApplicationName}}. Please click the button below to finish the invite process. If you didn't ask for this mail, please ignore it.\""
+            max_length: 10000;
+        }
+    ];
+    string button_text = 7 [
+        (validate.rules).string = {max_bytes: 4000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Accept invite\""
+            max_length: 500;
+        }
+    ];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+}
+
+message SetCustomInviteUserMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomInviteUserMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomInviteUserMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
