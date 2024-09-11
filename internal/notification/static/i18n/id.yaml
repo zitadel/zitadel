@@ -1,0 +1,68 @@
+InitCode:
+  Title: Inisialisasi Pengguna
+  PreHeader: Inisialisasi Pengguna
+  Subject: Inisialisasi Pengguna
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: Pengguna ini telah dibuat. {{.PreferredLoginName}} untuk masuk.  {{.Code}}) Jika Anda tidak meminta email ini, abaikan saja.
+  ButtonText: Selesaikan inisialisasi
+PasswordReset:
+  Title: Setel ulang kata sandi
+  PreHeader: Setel ulang kata sandi
+  Subject: Setel ulang kata sandi
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: Kami menerima permintaan pengaturan ulang kata sandi. {{.Code}}) Jika Anda tidak meminta email ini, abaikan saja.
+  ButtonText: Setel ulang kata sandi
+VerifyEmail:
+  Title: Verifikasi email
+  PreHeader: Verifikasi email
+  Subject: Verifikasi email
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: Email baru telah ditambahkan. {{.Code}}) Jika Anda tidak menambahkan email baru, harap abaikan email ini.
+  ButtonText: Verifikasi email
+VerifyPhone:
+  Title: Verifikasi telepon
+  PreHeader: Verifikasi telepon
+  Subject: Verifikasi telepon
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: 'Nomor telepon baru telah ditambahkan. {{.Code}}'
+  ButtonText: Verifikasi telepon
+VerifyEmailOTP:
+  Title: Verifikasi Kata Sandi Sekali Pakai
+  PreHeader: Verifikasi Kata Sandi Sekali Pakai
+  Subject: Verifikasi Kata Sandi Sekali Pakai
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: Silakan gunakan kata sandi satu kali {{.OTP}} untuk mengautentikasi dalam lima menit berikutnya atau klik tombol "Otentikasi".
+  ButtonText: Otentikasi
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} adalah kata sandi satu kali Anda untuk {{ .Domain }}. {{.Expiry}}.
+
+    {{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domain telah diklaim
+  PreHeader: Ganti email/nama pengguna
+  Subject: Domain telah diklaim
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: Domainnya {{.Domain}} telah diklaim oleh suatu organisasi. {{.Username}} bukan bagian dari organisasi ini. {{.TempUsername}}) untuk login ini.
+  ButtonText: Login
+PasswordlessRegistration:
+  Title: Tambahkan Login Tanpa Kata Sandi
+  PreHeader: Tambahkan Login Tanpa Kata Sandi
+  Subject: Tambahkan Login Tanpa Kata Sandi
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: Kami menerima permintaan untuk menambahkan token untuk login tanpa kata sandi. 
+  ButtonText: Tambahkan Login Tanpa Kata Sandi
+PasswordChange:
+  Title: Kata sandi pengguna telah berubah
+  PreHeader: Ubah kata sandi
+  Subject: Kata sandi pengguna telah berubah
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: 'Kata sandi pengguna Anda telah berubah. '
+  ButtonText: Login
+InviteUser:
+  Title: Undangan ke {{.ApplicationName}}
+  PreHeader: Undangan ke {{.ApplicationName}}
+  Subject: Undangan ke {{.ApplicationName}}
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: Pengguna Anda telah diundang ke {{.ApplicationName}}. Silakan klik tombol di bawah ini untuk menyelesaikan proses undangan. Jika Anda tidak meminta email ini, harap abaikan.
+  ButtonText: Terima undangan

@@ -27,3 +27,11 @@ message Instance {
     string domain = 2;
   }
 }
+
+message Organization {
+  oneof property {
+    option (validate.required) = true;
+    string org_id = 1;
+    string org_domain = 2;
+  }
+}

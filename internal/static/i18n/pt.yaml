@@ -571,6 +571,11 @@ Errors:
     NotActive: Esquema do usuário não ativo
     NotInactive: Esquema do usuário não inativo
     NotExists: O esquema do usuário não existe
+    ID:
+      Missing: ID do esquema do utilizador em falta
+    Invalid: Esquema de utilizador inválido
+    Data:
+      Invalid: Dados inválidos para o esquema do utilizador
   TokenExchange:
     FeatureDisabled: O recurso Token Exchange está desabilitado para sua instância. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -677,6 +682,13 @@ EventTypes:
         check:
           succeeded: Verificação de inicialização bem-sucedida
           failed: Verificação de inicialização falhou
+      invite:
+        code:
+          added: Código de convite gerado
+          sent: Código de convite enviado
+        check:
+          succeeded: Verificação do convite bem-sucedida
+          failed: Verificação do convite falhou
       username:
         reserved: Nome de usuário reservado
         released: Nome de usuário liberado
@@ -1311,6 +1323,26 @@ EventTypes:
     deactivated: Esquema de usuário desativado
     reactivated: Esquema do usuário reativado
     deleted: Esquema do usuário excluído
+    user:
+      created: Utilizador criado
+      updated: Utilizador atualizado
+      deleted: Utilizador excluído
+      email:
+        updated: Endereço de e-mail alterado
+        verified: Endereço de e-mail verificado
+        verification:
+          failed: Falha na verificação do endereço de e-mail
+        code:
+          added: Código de verificação do endereço de e-mail gerado
+          sent: Código de verificação do endereço de e-mail enviado
+      phone:
+        updated: Número de telefone alterado
+        verified: Número de telefone verificado
+        verification:
+          failed: Falha na verificação do número de telefone
+        code:
+          added: Código de verificação do número de telefone gerado
+          sent: Código de verificação do número de telefone enviado
   web_key:
     added: Chave Web adicionada
     activated: Chave Web ativada

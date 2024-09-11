@@ -574,6 +574,11 @@ Errors:
     NotActive: Uživatelské schéma není aktivní
     NotInactive: Uživatelské schéma není neaktivní
     NotExists: Uživatelské schéma neexistuje
+    ID:
+      Missing: Chybí ID schématu uživatele
+    Invalid: Uživatelské schéma je neplatné
+    Data:
+      Invalid: Data neplatná pro uživatelské schéma
   TokenExchange:
     FeatureDisabled: Funkce Token Exchange je pro vaši instanci zakázána. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -680,6 +685,13 @@ EventTypes:
         check:
           succeeded: Kontrola inicializace byla úspěšná
           failed: Kontrola inicializace selhala
+      invite:
+        code:
+          added: Vygenerován pozvánkový kód
+          sent: Pozvánkový kód byl odeslán
+        check:
+          succeeded: Kontrola pozvánky byla úspěšná
+          failed: Kontrola pozvánky selhala
       username:
         reserved: Uživatelské jméno rezervováno
         released: Uživatelské jméno uvolněno
@@ -1317,6 +1329,26 @@ EventTypes:
     deactivated: Uživatelské schéma deaktivováno
     reactivated: Uživatelské schéma bylo znovu aktivováno
     deleted: Uživatelské schéma bylo smazáno
+    user:
+      created: Uživatel vytvořen
+      updated: Uživatel aktualizován
+      deleted: Uživatel byl smazán
+      email:
+        updated: E-mailová adresa změněna
+        verified: E-mailová adresa ověřena
+        verification:
+          failed: Ověření e-mailové adresy se nezdařilo
+        code:
+          added: Vygenerován ověřovací kód e-mailové adresy
+          sent: Ověřovací kód e-mailové adresy odeslán
+      phone:
+        updated: Telefonní číslo změněno
+        verified: Telefonní číslo ověřeno
+        verification:
+          failed: Ověření telefonního čísla se nezdařilo
+        code:
+          added: Byl vygenerován ověřovací kód telefonního čísla
+          sent: Ověřovací kód telefonního čísla odeslán
   web_key:
     added: Přidán webový klíč
     activated: Web Key aktivován

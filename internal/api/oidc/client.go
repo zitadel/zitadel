@@ -1035,18 +1035,19 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 	updated, err := s.hasher.Verify(client.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
-		s.command.OIDCSecretCheckFailed(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner)
 		return oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("invalid secret")
 	}
-	s.command.OIDCSecretCheckSucceeded(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner, updated)
+	if updated != "" {
+		s.command.OIDCUpdateSecret(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner, updated)
+	}
 	return nil
 }
 
-func (s *Server) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {
+func (s *Server) checkOrgScopes(ctx context.Context, resourceOwner string, scopes []string) ([]string, error) {
 	if slices.ContainsFunc(scopes, func(scope string) bool {
 		return strings.HasPrefix(scope, domain.OrgDomainPrimaryScope)
 	}) {
-		org, err := s.query.OrgByID(ctx, false, user.ResourceOwner)
+		org, err := s.query.OrgByID(ctx, false, resourceOwner)
 		if err != nil {
 			return nil, err
 		}
@@ -1059,7 +1060,7 @@ func (s *Server) checkOrgScopes(ctx context.Context, user *query.User, scopes []
 	}
 	return slices.DeleteFunc(scopes, func(scope string) bool {
 		if orgID, ok := strings.CutPrefix(scope, domain.OrgIDScope); ok {
-			return orgID != user.ResourceOwner
+			return orgID != resourceOwner
 		}
 		return false
 	}), nil
