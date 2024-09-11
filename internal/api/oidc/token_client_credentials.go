@@ -26,15 +26,15 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 	if err != nil {
 		return nil, err
 	}
-	scope, err = s.checkOrgScopes(ctx, client.user, scope)
+	scope, err = s.checkOrgScopes(ctx, client.resourceOwner, scope)
 	if err != nil {
 		return nil, err
 	}
 
 	session, err := s.command.CreateOIDCSession(ctx,
-		client.user.ID,
-		client.user.ResourceOwner,
-		"",
+		client.userID,
+		client.resourceOwner,
+		client.clientID,
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
@@ -51,5 +51,5 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 		return nil, err
 	}
 
-	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, false, false))
+	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, true, false))
 }

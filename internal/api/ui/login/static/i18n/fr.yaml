@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Suivant
   CancelButtonText: Annuler
 
+InviteUser:
+  Title: Activer l'utilisateur
+  Description: Vérifiez votre e-mail avec le code ci-dessous et définissez votre mot de passe.
+  CodeLabel: Code
+  NewPasswordLabel: Nouveau mot de passe
+  NewPasswordConfirm: Confirmer le mot de passe
+  NextButtonText: Suivant
+  ResendButtonText: Renvoyer le code
+
 InitMFAPrompt:
   Title: Configuration authentification à 2 facteurs
   Description: L'authentification authentification à 2 facteurs vous offre une sécurité supplémentaire pour votre compte d'utilisateur. Vous êtes ainsi assuré d'être le seul à avoir accès à votre compte.

@@ -776,6 +776,15 @@ func (i *Instance) CreateSchemaUser(ctx context.Context, orgID string, schemaID 
 	return user
 }
 
+func (i *Instance) CreateInviteCode(ctx context.Context, userID string) *user_v2.CreateInviteCodeResponse {
+	user, err := i.Client.UserV2.CreateInviteCode(ctx, &user_v2.CreateInviteCodeRequest{
+		UserId:       userID,
+		Verification: &user_v2.CreateInviteCodeRequest_ReturnCode{ReturnCode: &user_v2.ReturnInviteCode{}},
+	})
+	logging.OnError(err).Fatal("create invite code")
+	return user
+}
+
 func (i *Instance) LockSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.LockUserResponse {
 	var org *object_v3alpha.Organization
 	if orgID != "" {
