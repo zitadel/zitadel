@@ -25,7 +25,7 @@ export const SignInWithApple = forwardRef<
       {children ? (
         children
       ) : (
-        <span className="ml-4">{name ? name : "Sign in with Google"}</span>
+        <span className="ml-4">{name ? name : "Sign in with Apple"}</span>
       )}
     </button>
   ),
