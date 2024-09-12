@@ -680,6 +680,13 @@ EventTypes:
         check:
           succeeded: Pemeriksaan inisialisasi berhasil
           failed: Pemeriksaan inisialisasi gagal
+      invite:
+        code:
+          added: Kode undangan dihasilkan
+          sent: Kode undangan dikirim
+        check:
+          succeeded: Pemeriksaan undangan berhasil
+          failed: Pemeriksaan undangan gagal
       username:
         reserved: Nama pengguna dicadangkan
         released: Nama pengguna dirilis

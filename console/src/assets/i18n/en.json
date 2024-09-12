@@ -37,7 +37,7 @@
       "DESCRIPTION": "A project hosts one or more applications, that you can use to authenticate your users. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the projects owner or someone with the corresponding rights to gain access.",
       "OWNED": {
         "TITLE": "Owned Projects",
-        "DESCRIPTION": "These are the projects you own. You can manage theses projects settings, authorizations and applications."
+        "DESCRIPTION": "These are the projects you own. You can manage these project settings, authorizations and applications."
       },
       "GRANTED": {
         "TITLE": "Granted Projects",
@@ -197,7 +197,8 @@
           "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
           "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
           "VEO": "When a user adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
-          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number."
+          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number.",
+          "IU": "When a user invite code is created, they will receive an email with a link to set their authentication method."
         }
       },
       "LOGIN_TEXTS": {
@@ -235,11 +236,11 @@
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "External Login Check",
-            "DESCRIPTION": "Your users are redirected to their external identity proviers in theses periods."
+            "DESCRIPTION": "Your users are redirected to their external identity providers after this periods."
           },
           "MULTI_FACTOR_INIT": {
             "TITLE": "Multifactor Init Check",
-            "DESCRIPTION": "Your users will be prompted to set up a second factor or a Multifactor in these periods, if they haven't done so already. A lifetime of 0 deactivates this prompt."
+            "DESCRIPTION": "Your users will be prompted to set up a second factor or a Multifactor after this periods if they haven't done so already. A lifetime of 0 deactivates this prompt."
           },
           "SECOND_FACTOR_CHECK": {
             "TITLE": "Second Factor Check",
@@ -1667,7 +1668,8 @@
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passwordless",
-        "PC": "Password Change"
+        "PC": "Password Change",
+        "IU": "Invite User"
       },
       "CHIPS": {
         "firstname": "Given name",
@@ -1687,7 +1689,8 @@
         "tempUsername": "Temp username",
         "otp": "One-time password",
         "verifyUrl": "Verify One-time-password URL",
-        "expiry": "Expiry"
+        "expiry": "Expiry",
+        "applicationName": "Application name"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."

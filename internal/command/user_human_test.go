@@ -627,6 +627,67 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "add human (with password and unverified email), ok (no email code)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						newAddHumanEvent("$plain$x$password", false, true, "", AllowedLanguage),
+					),
+				),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:            mockEncryptedCode("emailCode", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					Password:  "password",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address:             "email@test.ch",
+						Verified:            false,
+						NoEmailVerification: true,
+					},
+					PreferredLanguage: AllowedLanguage,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   false,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
 			name: "add human email verified, ok",
 			fields: fields{
 				eventstore: expectEventstore(

@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Здраво {{.DisplayName}},
   Text: Лозинката на вашиот корисник е променета. Ако оваа промена не е извршена од вас, ве молиме веднаш ресетирајте ја вашата лозинка.
   ButtonText: Најава
+InviteUser:
+  Title: Покана за {{.ApplicationName}}
+  PreHeader: Покана за {{.ApplicationName}}
+  Subject: Покана за {{.ApplicationName}}
+  Greeting: Здраво {{.DisplayName}},
+  Text: Вашиот корисник е бил поканет за {{.ApplicationName}}. Ве молиме кликнете на копчето подолу за да го завршите процесот на покана. Ако не сте побарале овој мејл, ве молиме игнорирајте го.
+  ButtonText: Прифати покана

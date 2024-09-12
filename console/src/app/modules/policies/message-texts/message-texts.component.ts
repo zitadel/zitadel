@@ -7,6 +7,7 @@ import {
   GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
   GetDefaultPasswordChangeMessageTextRequest as AdminGetDefaultPasswordChangeMessageTextRequest,
   GetDefaultPasswordlessRegistrationMessageTextRequest as AdminGetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultInviteUserMessageTextRequest as AdminGetDefaultInviteUserMessageTextRequest,
   GetDefaultPasswordResetMessageTextRequest as AdminGetDefaultPasswordResetMessageTextRequest,
   GetDefaultVerifyEmailMessageTextRequest as AdminGetDefaultVerifyEmailMessageTextRequest,
   GetDefaultVerifyEmailOTPMessageTextRequest as AdminGetDefaultVerifyEmailOTPMessageTextRequest,
@@ -16,6 +17,7 @@ import {
   SetDefaultInitMessageTextRequest,
   SetDefaultPasswordChangeMessageTextRequest,
   SetDefaultPasswordlessRegistrationMessageTextRequest,
+  SetDefaultInviteUserMessageTextRequest,
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultVerifyEmailMessageTextRequest,
   SetDefaultVerifyEmailOTPMessageTextRequest,
@@ -27,6 +29,7 @@ import {
   GetCustomInitMessageTextRequest,
   GetCustomPasswordChangeMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextRequest,
+  GetCustomInviteUserMessageTextRequest,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomVerifyEmailMessageTextRequest,
   GetCustomVerifyEmailOTPMessageTextRequest,
@@ -36,6 +39,7 @@ import {
   GetDefaultInitMessageTextRequest,
   GetDefaultPasswordChangeMessageTextRequest,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultInviteUserMessageTextRequest,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultVerifyEmailMessageTextRequest,
   GetDefaultVerifyEmailOTPMessageTextRequest,
@@ -45,6 +49,7 @@ import {
   SetCustomInitMessageTextRequest,
   SetCustomPasswordChangeMessageTextRequest,
   SetCustomPasswordlessRegistrationMessageTextRequest,
+  SetCustomInviteUserMessageTextRequest,
   SetCustomPasswordResetMessageTextRequest,
   SetCustomVerifyEmailMessageTextRequest,
   SetCustomVerifyEmailOTPMessageTextRequest,
@@ -73,6 +78,7 @@ enum MESSAGETYPES {
   PASSWORDCHANGE = 'PC',
   VERIFYSMSOTP = 'VSO',
   VERIFYEMAILOTP = 'VEO',
+  INVITEUSER = 'IU',
 }
 
 const REQUESTMAP = {
@@ -229,6 +235,23 @@ const REQUESTMAP = {
         return req;
       },
     },
+    [MESSAGETYPES.INVITEUSER]: {
+      get: new GetCustomInviteUserMessageTextRequest(),
+      set: new SetCustomInviteUserMessageTextRequest(),
+      getDefault: new GetDefaultInviteUserMessageTextRequest(),
+      setFcn: (map: Partial<SetCustomInviteUserMessageTextRequest.AsObject>): SetCustomInviteUserMessageTextRequest => {
+        const req = new SetCustomInviteUserMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      },
+    },
   },
   [PolicyComponentServiceType.ADMIN]: {
     [MESSAGETYPES.PASSWORDCHANGE]: {
@@ -363,6 +386,22 @@ const REQUESTMAP = {
         map: Partial<SetDefaultPasswordlessRegistrationMessageTextRequest.AsObject>,
       ): SetDefaultPasswordlessRegistrationMessageTextRequest => {
         const req = new SetDefaultPasswordlessRegistrationMessageTextRequest();
+        req.setButtonText(map.buttonText ?? '');
+        req.setFooterText(map.footerText ?? '');
+        req.setGreeting(map.greeting ?? '');
+        req.setPreHeader(map.preHeader ?? '');
+        req.setSubject(map.subject ?? '');
+        req.setText(map.text ?? '');
+        req.setTitle(map.title ?? '');
+
+        return req;
+      },
+    },
+    [MESSAGETYPES.INVITEUSER]: {
+      get: new AdminGetDefaultInviteUserMessageTextRequest(),
+      set: new SetDefaultInviteUserMessageTextRequest(),
+      setFcn: (map: Partial<SetDefaultInviteUserMessageTextRequest.AsObject>): SetDefaultInviteUserMessageTextRequest => {
+        const req = new SetDefaultInviteUserMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
@@ -540,6 +579,21 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
     ],
+    [MESSAGETYPES.INVITEUSER]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.LastName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.applicationName', value: '{{.ApplicationName}}' },
+    ],
   };
 
   public language: string = 'en';
@@ -599,6 +653,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
         return this.stripEmail(this.service.getDefaultPasswordlessRegistrationMessageText(req));
       case MESSAGETYPES.PASSWORDCHANGE:
         return this.stripEmail(this.service.getDefaultPasswordChangeMessageText(req));
+      case MESSAGETYPES.INVITEUSER:
+        return this.stripEmail(this.service.getDefaultInviteUserMessageText(req));
     }
   }
 
@@ -622,6 +678,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
         return this.stripEmail(this.service.getCustomPasswordlessRegistrationMessageText(req));
       case MESSAGETYPES.PASSWORDCHANGE:
         return this.stripEmail(this.service.getCustomPasswordChangeMessageText(req));
+      case MESSAGETYPES.INVITEUSER:
+        return this.stripEmail(this.service.getCustomInviteUserMessageText(req));
       default:
         return undefined;
     }
@@ -690,6 +748,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           );
         case MESSAGETYPES.PASSWORDCHANGE:
           return handler((this.service as ManagementService).setCustomPasswordChangeMessageText(this.updateRequest));
+        case MESSAGETYPES.INVITEUSER:
+          return handler((this.service as ManagementService).setCustomInviteUserMessageText(this.updateRequest));
       }
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       switch (this.currentType) {
@@ -711,6 +771,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return handler((this.service as AdminService).setDefaultPasswordlessRegistrationMessageText(this.updateRequest));
         case MESSAGETYPES.PASSWORDCHANGE:
           return handler((this.service as AdminService).setDefaultPasswordChangeMessageText(this.updateRequest));
+        case MESSAGETYPES.INVITEUSER:
+          return handler((this.service as AdminService).setDefaultInviteUserMessageText(this.updateRequest));
       }
     }
   }
@@ -763,6 +825,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
           return handler(this.service.resetCustomPasswordlessRegistrationMessageTextToDefault(this.language));
         case MESSAGETYPES.PASSWORDCHANGE:
           return handler(this.service.resetCustomPasswordChangeMessageTextToDefault(this.language));
+        case MESSAGETYPES.INVITEUSER:
+          return handler(this.service.resetCustomInviteUserMessageTextToDefault(this.language));
         default:
           return Promise.reject();
       }

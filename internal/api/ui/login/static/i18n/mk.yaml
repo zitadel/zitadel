@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: следно
   CancelButtonText: откажи
 
+InviteUser:
+  Title: Активирање на корисникот
+  Description: Проверете го вашиот имејл со кодот подолу и поставете ја вашата лозинка.
+  CodeLabel: Код
+  NewPasswordLabel: Нова лозинка
+  NewPasswordConfirm: Потврди лозинка
+  NextButtonText: Следно
+  ResendButtonText: Повторно испрати код
+
 InitMFAPrompt:
   Title: Подесување на 2-факторска автентикација
   Description: 2-факторската автентикација ви дава дополнителна безбедност за вашата корисничка сметка. Ова обезбедува само вие да имате пристап до вашата сметка.

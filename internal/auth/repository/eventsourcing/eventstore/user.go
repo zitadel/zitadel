@@ -93,3 +93,41 @@ func (repo *UserRepo) PasswordCodeExists(ctx context.Context, userID string) (ex
 	}
 	return model.exists, nil
 }
+
+type inviteCodeCheck struct {
+	userID string
+
+	exists bool
+	events int
+}
+
+func (p *inviteCodeCheck) Reduce() error {
+	p.exists = p.events > 0
+	return nil
+}
+
+func (p *inviteCodeCheck) AppendEvents(events ...eventstore.Event) {
+	p.events += len(events)
+}
+
+func (p *inviteCodeCheck) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(p.userID).
+		EventTypes(
+			user.HumanInviteCodeAddedType,
+			user.HumanInviteCodeSentType).
+		Builder()
+}
+
+func (repo *UserRepo) InviteCodeExists(ctx context.Context, userID string) (exists bool, err error) {
+	model := &inviteCodeCheck{
+		userID: userID,
+	}
+	err = repo.Eventstore.FilterToQueryReducer(ctx, model)
+	if err != nil {
+		return false, zerrors.ThrowPermissionDenied(err, "EVENT-GJ2os", "Errors.Internal")
+	}
+	return model.exists, nil
+}

@@ -21,28 +21,30 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		err = oidcError(err)
 	}()
 
-	user, jwtReq, err := s.verifyJWTProfile(ctx, r.Data)
+	user, err := s.verifyJWTProfile(ctx, r.Data)
 	if err != nil {
 		return nil, err
 	}
 
 	client := &clientCredentialsClient{
-		id:   jwtReq.Subject,
-		user: user,
+		clientID:      user.Username,
+		userID:        user.UserID,
+		resourceOwner: user.ResourceOwner,
+		tokenType:     user.TokenType,
 	}
 	scope, err := op.ValidateAuthReqScopes(client, r.Data.Scope)
 	if err != nil {
 		return nil, err
 	}
-	scope, err = s.checkOrgScopes(ctx, client.user, scope)
+	scope, err = s.checkOrgScopes(ctx, client.resourceOwner, scope)
 	if err != nil {
 		return nil, err
 	}
 
 	session, err := s.command.CreateOIDCSession(ctx,
-		user.ID,
-		user.ResourceOwner,
-		"",
+		client.userID,
+		client.resourceOwner,
+		client.clientID,
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePrivateKey},
@@ -58,40 +60,36 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 	if err != nil {
 		return nil, err
 	}
-	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, false, false))
+	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, true, false))
 }
 
-func (s *Server) verifyJWTProfile(ctx context.Context, req *oidc.JWTProfileGrantRequest) (user *query.User, tokenRequest *oidc.JWTTokenRequest, err error) {
+func (s *Server) verifyJWTProfile(ctx context.Context, req *oidc.JWTProfileGrantRequest) (_ *query.AuthNKeyUser, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	checkSubject := func(jwt *oidc.JWTTokenRequest) (err error) {
-		user, err = s.query.GetUserByID(ctx, true, jwt.Subject)
-		return err
-	}
+	storage := &jwtProfileKeyStorage{query: s.query}
 	verifier := op.NewJWTProfileVerifier(
-		&jwtProfileKeyStorage{query: s.query},
-		op.IssuerFromContext(ctx),
+		storage, op.IssuerFromContext(ctx),
 		time.Hour, time.Second,
-		op.SubjectCheck(checkSubject),
 	)
-	tokenRequest, err = op.VerifyJWTAssertion(ctx, req.Assertion, verifier)
+	_, err = op.VerifyJWTAssertion(ctx, req.Assertion, verifier)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return user, tokenRequest, nil
+	return storage.user, nil
 }
 
 type jwtProfileKeyStorage struct {
 	query *query.Queries
+	user  *query.AuthNKeyUser // only populated after GetKeyByIDAndClientID is called
 }
 
-func (s *jwtProfileKeyStorage) GetKeyByIDAndClientID(ctx context.Context, keyID, userID string) (*jose.JSONWebKey, error) {
-	publicKeyData, err := s.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, userID)
+func (s *jwtProfileKeyStorage) GetKeyByIDAndClientID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
+	s.user, err = s.query.GetAuthNKeyUser(ctx, keyID, userID)
 	if err != nil {
 		return nil, err
 	}
-	publicKey, err := crypto.BytesToPublicKey(publicKeyData)
+	publicKey, err := crypto.BytesToPublicKey(s.user.PublicKey)
 	if err != nil {
 		return nil, err
 	}
