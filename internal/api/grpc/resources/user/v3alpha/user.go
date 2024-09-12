@@ -95,30 +95,32 @@ func patchUserRequestToChangeSchemaUser(ctx context.Context, req *user.PatchUser
 	}
 
 	var email *command.Email
-	if req.GetUser().GetContact().Email != nil {
-		email = &command.Email{
-			Address: domain.EmailAddress(req.GetUser().GetContact().Email.Address),
-		}
-		if req.GetUser().GetContact().Email.GetIsVerified() {
-			email.Verified = true
-		}
-		if req.GetUser().GetContact().Email.GetReturnCode() != nil {
-			email.ReturnCode = true
-		}
-		if req.GetUser().GetContact().Email.GetSendCode() != nil {
-			email.URLTemplate = req.GetUser().GetContact().Email.GetSendCode().GetUrlTemplate()
-		}
-	}
 	var phone *command.Phone
-	if req.GetUser().GetContact().Phone != nil {
-		phone = &command.Phone{
-			Number: domain.PhoneNumber(req.GetUser().GetContact().Phone.Number),
+	if req.GetUser().GetContact() != nil {
+		if req.GetUser().GetContact().GetEmail() != nil {
+			email = &command.Email{
+				Address: domain.EmailAddress(req.GetUser().GetContact().Email.Address),
+			}
+			if req.GetUser().GetContact().Email.GetIsVerified() {
+				email.Verified = true
+			}
+			if req.GetUser().GetContact().Email.GetReturnCode() != nil {
+				email.ReturnCode = true
+			}
+			if req.GetUser().GetContact().Email.GetSendCode() != nil {
+				email.URLTemplate = req.GetUser().GetContact().Email.GetSendCode().GetUrlTemplate()
+			}
 		}
-		if req.GetUser().GetContact().Phone.GetIsVerified() {
-			phone.Verified = true
-		}
-		if req.GetUser().GetContact().Phone.GetReturnCode() != nil {
-			phone.ReturnCode = true
+		if req.GetUser().GetContact().Phone != nil {
+			phone = &command.Phone{
+				Number: domain.PhoneNumber(req.GetUser().GetContact().Phone.Number),
+			}
+			if req.GetUser().GetContact().Phone.GetIsVerified() {
+				phone.Verified = true
+			}
+			if req.GetUser().GetContact().Phone.GetReturnCode() != nil {
+				phone.ReturnCode = true
+			}
 		}
 	}
 	return &command.ChangeSchemaUser{
