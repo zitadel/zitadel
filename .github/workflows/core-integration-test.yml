@@ -74,6 +74,15 @@ jobs:
           ZITADEL_MASTERKEY: MasterkeyNeedsToHave32Characters
           INTEGRATION_DB_FLAVOR: postgres
         run: make core_integration_test
+      -
+        name: upload server logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-server-logs
+          path: |
+           tmp/zitadel.log
+           tmp/race.log.*
       - 
         name: publish coverage
         uses: codecov/codecov-action@v4.3.0

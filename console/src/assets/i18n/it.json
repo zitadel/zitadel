@@ -197,7 +197,8 @@
           "VE": "Quando un utente cambia il suo indirizzo email, riceverà un'email con un link per verificare il nuovo indirizzo.",
           "VP": "Quando un utente cambia il suo numero di telefono, riceverà un SMS con un codice per verificare il nuovo numero.",
           "VEO": "Quando un utente aggiunge una Password Monouso tramite metodo email, deve attivarla inserendo un codice inviato al suo indirizzo email.",
-          "VSO": "Quando un utente aggiunge una Password Monouso tramite metodo SMS, deve attivarla inserendo un codice inviato al suo numero di telefono."
+          "VSO": "Quando un utente aggiunge una Password Monouso tramite metodo SMS, deve attivarla inserendo un codice inviato al suo numero di telefono.",
+          "IU": "Quando viene creato un codice di invito per un utente, riceverà un'e-mail con un collegamento per impostare il suo metodo di autenticazione."
         }
       },
       "LOGIN_TEXTS": {
@@ -1667,7 +1668,8 @@
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
         "PL": "Autenticazione Passwordless",
-        "PC": "Cambiamento della password"
+        "PC": "Cambiamento della password",
+        "IU": "Invita utente"
       },
       "CHIPS": {
         "firstname": "Nome",
@@ -1687,7 +1689,8 @@
         "tempUsername": "Nome utente temporaneo",
         "otp": "Password monouso",
         "verifyUrl": "URL per verificare la password monouso",
-        "expiry": "Scadenza"
+        "expiry": "Scadenza",
+        "applicationName": "Nome dell'applicazione"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."

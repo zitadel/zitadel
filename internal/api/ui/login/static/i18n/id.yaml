@@ -76,6 +76,14 @@ InitUserDone:
   Description: Email terverifikasi dan Kata Sandi berhasil ditetapkan
   NextButtonText: Berikutnya
   CancelButtonText: Membatalkan
+InviteUser:
+  Title: Aktifkan Pengguna
+  Description: Verifikasi email Anda dengan kode di bawah ini dan atur kata sandi Anda.
+  CodeLabel: Kode
+  NewPasswordLabel: Kata Sandi Baru
+  NewPasswordConfirm: Konfirmasi Kata Sandi
+  NextButtonText: Selanjutnya
+  ResendButtonText: Kirim Ulang Kode
 InitMFAPrompt:
   Title: Pengaturan 2 Faktor
   Description: Otentikasi 2 faktor memberi Anda keamanan tambahan untuk akun pengguna Anda. 

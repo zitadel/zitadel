@@ -79,6 +79,15 @@ InitUserDone:
   NextButtonText: 次へ
   CancelButtonText: キャンセル
 
+InviteUser:
+  Title: ユーザーの有効化
+  Description: 下のコードでメールアドレスを確認し、パスワードを設定してください。
+  CodeLabel: コード
+  NewPasswordLabel: 新しいパスワード
+  NewPasswordConfirm: パスワードの確認
+  NextButtonText: 次へ
+  ResendButtonText: コードを再送信
+
 InitMFAPrompt:
   Title: 二要素認証のセットアップ
   Description: 二要素認証でアカウントのセキュリティを強化します。

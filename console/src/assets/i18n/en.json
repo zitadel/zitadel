@@ -197,7 +197,8 @@
           "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
           "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
           "VEO": "When a user adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
-          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number."
+          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number.",
+          "IU": "When a user invite code is created, they will receive an email with a link to set their authentication method."
         }
       },
       "LOGIN_TEXTS": {
@@ -1667,7 +1668,8 @@
         "PR": "Password Reset",
         "DC": "Domain Claim",
         "PL": "Passwordless",
-        "PC": "Password Change"
+        "PC": "Password Change",
+        "IU": "Invite User"
       },
       "CHIPS": {
         "firstname": "Given name",
@@ -1687,7 +1689,8 @@
         "tempUsername": "Temp username",
         "otp": "One-time password",
         "verifyUrl": "Verify One-time-password URL",
-        "expiry": "Expiry"
+        "expiry": "Expiry",
+        "applicationName": "Application name"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."

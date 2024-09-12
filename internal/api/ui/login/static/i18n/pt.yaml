@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: próximo
   CancelButtonText: cancelar
 
+InviteUser:
+  Title: Ativar usuário
+  Description: Verifique seu e-mail com o código abaixo e defina sua senha.
+  CodeLabel: Código
+  NewPasswordLabel: Nova senha
+  NewPasswordConfirm: Confirmar senha
+  NextButtonText: Próximo
+  ResendButtonText: Reenviar código
+
 InitMFAPrompt:
   Title: Configuração de 2 fatores
   Description: A autenticação de 2 fatores fornece uma segurança adicional para sua conta de usuário. Isso garante que apenas você tenha acesso à sua conta.
