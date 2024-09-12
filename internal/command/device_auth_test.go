@@ -137,6 +137,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 		authTime          time.Time
 		preferredLanguage *language.Tag
 		userAgent         *domain.UserAgent
+		sessionID         string
 	}
 	tests := []struct {
 		name        string
@@ -161,6 +162,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 					Description:   gu.Ptr("firefox"),
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
+				"sessionID",
 			},
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound"),
 		},
@@ -188,6 +190,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 								Description:   gu.Ptr("firefox"),
 								Header:        http.Header{"foo": []string{"bar"}},
 							},
+							"sessionID",
 						),
 					),
 				),
@@ -201,6 +204,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 					Description:   gu.Ptr("firefox"),
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
+				"sessionID",
 			},
 			wantErr: pushErr,
 		},
@@ -228,6 +232,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 								Description:   gu.Ptr("firefox"),
 								Header:        http.Header{"foo": []string{"bar"}},
 							},
+							"sessionID",
 						),
 					),
 				),
@@ -241,6 +246,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 					Description:   gu.Ptr("firefox"),
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
+				"sessionID",
 			},
 			wantDetails: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
@@ -252,7 +258,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.userID, tt.args.userOrgID, tt.args.authMethods, tt.args.authTime, tt.args.preferredLanguage, tt.args.userAgent)
+			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.userID, tt.args.userOrgID, tt.args.authMethods, tt.args.authTime, tt.args.preferredLanguage, tt.args.userAgent, tt.args.sessionID)
 			require.ErrorIs(t, err, tt.wantErr)
 			assertObjectDetails(t, tt.wantDetails, gotDetails)
 		})
@@ -607,13 +613,14 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 									Description:   gu.Ptr("firefox"),
 									Header:        http.Header{"foo": []string{"bar"}},
 								},
+								"sessionID",
 							),
 						),
 					),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", &language.Afrikaans, &domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
 								IP:            net.ParseIP("1.2.3.4"),
@@ -657,7 +664,8 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					Description:   gu.Ptr("firefox"),
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
-				Reason: domain.TokenReasonAuthRequest,
+				Reason:    domain.TokenReasonAuthRequest,
+				SessionID: "sessionID",
 			},
 		},
 		{
@@ -687,13 +695,14 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 									Description:   gu.Ptr("firefox"),
 									Header:        http.Header{"foo": []string{"bar"}},
 								},
+								"sessionID",
 							),
 						),
 					),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", &language.Afrikaans, &domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
 								IP:            net.ParseIP("1.2.3.4"),
@@ -742,6 +751,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				},
 				Reason:       domain.TokenReasonAuthRequest,
 				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+				SessionID:    "sessionID",
 			},
 		},
 	}
