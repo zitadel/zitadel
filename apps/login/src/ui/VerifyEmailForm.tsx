@@ -23,7 +23,6 @@ type Props = {
   authRequestId?: string;
   sessionId?: string;
   loginSettings?: LoginSettings;
-  hasMfaSetUp: boolean;
 };
 
 export default function VerifyEmailForm({
@@ -35,7 +34,6 @@ export default function VerifyEmailForm({
   authRequestId,
   sessionId,
   loginSettings,
-  hasMfaSetUp,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -86,24 +84,6 @@ export default function VerifyEmailForm({
     if (!verifyResponse) {
       setError("Could not verify email");
       return;
-    }
-
-    if (loginSettings && loginSettings.forceMfa && !hasMfaSetUp) {
-      const params = new URLSearchParams({ checkAfter: "true" });
-
-      if (loginName) {
-        params.set("organization", loginName);
-      }
-      if (organization) {
-        params.set("organization", organization);
-      }
-
-      if (authRequestId && sessionId) {
-        params.set("authRequest", authRequestId);
-        params.set("sessionId", sessionId);
-      }
-
-      return router.push(`/mfa/set?` + params);
     }
 
     const params = new URLSearchParams({});
