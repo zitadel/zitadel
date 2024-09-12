@@ -26,11 +26,11 @@ type Config struct {
 }
 
 type GCPExporterConfig struct {
-	AddedAttributes map[string]string
+	Attributes map[string]string
 }
 
 func (g *GCPExporterConfig) ToAttributes() (attributes []log.KeyValue) {
-	for k, v := range g.AddedAttributes {
+	for k, v := range g.Attributes {
 		attributes = append(attributes, log.KeyValue{Key: k, Value: log.StringValue(fmt.Sprintf("%v", v))})
 	}
 	return attributes
