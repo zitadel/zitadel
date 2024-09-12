@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Hallo {{.DisplayName}},
   Text: Dein Passwort wurde geändert. Wenn diese Änderung nicht von dir gemacht wurde, empfehlen wir das sofortige Zurücksetzen deines Passworts.
   ButtonText: Login
+InviteUser:
+  Title: Einladung zu {{.ApplicationName}}
+  PreHeader: Einladung zu {{.ApplicationName}}
+  Subject: Einladung zu {{.ApplicationName}}
+  Greeting: Hallo {{.DisplayName}},
+  Text: Ihr Benutzer wurde zu {{.ApplicationName}} eingeladen. Bitte klicken Sie auf die Schaltfläche unten, um den Einladungsprozess abzuschließen. Wenn Sie diese E-Mail nicht angefordert haben, ignorieren Sie sie bitte.
+  ButtonText: Einladung annehmen
