@@ -100,7 +100,7 @@ func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, web
 	}
 	credentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
 	if err != nil {
-		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn credential could not be parsed")
+		logging.WithFields("error", tryExtractProtocolErrMsg(err), "err_id", "WEBAU-sEr8c").Debug("webauthn credential could not be parsed")
 		return nil, zerrors.ThrowInternal(err, "WEBAU-sEr8c", "Errors.User.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
@@ -115,7 +115,7 @@ func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, web
 		sessionData,
 		credentialData)
 	if err != nil {
-		logging.WithFields("error", tryExtractProtocolErrMsg(err)).Debug("webauthn credential could not be created")
+		logging.WithFields("error", tryExtractProtocolErrMsg(err), "err_id", "WEBAU-3Vb9s").Debug("webauthn credential could not be created")
 		return nil, zerrors.ThrowInternal(err, "WEBAU-3Vb9s", "Errors.User.WebAuthN.CreateCredentialFailed")
 	}
 

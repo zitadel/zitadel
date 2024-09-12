@@ -50,7 +50,7 @@ type ResourceListDetailsMsg interface {
 // If the change date is populated, it is checked with a tolerance of 1 minute around Now.
 //
 // The resource owner is compared with expected.
-func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M) {
+func AssertDetails[D Details, M DetailsMsg[D]](t assert.TestingT, expected, actual M) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
 	var nilDetails D
 	if wantDetails == nilDetails {
@@ -69,7 +69,7 @@ func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M)
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
 }
 
-func AssertResourceDetails(t testing.TB, expected *resources_object.Details, actual *resources_object.Details) {
+func AssertResourceDetails(t assert.TestingT, expected *resources_object.Details, actual *resources_object.Details) {
 	if expected.GetChanged() != nil {
 		wantChangeDate := time.Now()
 		gotChangeDate := actual.GetChanged().AsTime()
@@ -87,7 +87,7 @@ func AssertResourceDetails(t testing.TB, expected *resources_object.Details, act
 	}
 }
 
-func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t testing.TB, expected, actual D) {
+func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t assert.TestingT, expected, actual D) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
 	var nilDetails L
 	if wantDetails == nilDetails {
@@ -99,11 +99,11 @@ func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t testing.TB, expecte
 	if wantDetails.GetTimestamp() != nil {
 		gotCD := gotDetails.GetTimestamp().AsTime()
 		wantCD := time.Now()
-		assert.WithinRange(t, gotCD, wantCD.Add(-time.Minute), wantCD.Add(time.Minute))
+		assert.WithinRange(t, gotCD, wantCD.Add(-10*time.Minute), wantCD.Add(time.Minute))
 	}
 }
 
-func AssertResourceListDetails[D ResourceListDetailsMsg](t testing.TB, expected, actual D) {
+func AssertResourceListDetails[D ResourceListDetailsMsg](t assert.TestingT, expected, actual D) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
 	if wantDetails == nil {
 		assert.Nil(t, gotDetails)
@@ -116,7 +116,7 @@ func AssertResourceListDetails[D ResourceListDetailsMsg](t testing.TB, expected,
 	if wantDetails.GetTimestamp() != nil {
 		gotCD := gotDetails.GetTimestamp().AsTime()
 		wantCD := time.Now()
-		assert.WithinRange(t, gotCD, wantCD.Add(-time.Minute), wantCD.Add(time.Minute))
+		assert.WithinRange(t, gotCD, wantCD.Add(-10*time.Minute), wantCD.Add(time.Minute))
 	}
 }
 

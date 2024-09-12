@@ -686,6 +686,13 @@ EventTypes:
         check:
           succeeded: Vérification de l'initialisation réussie
           failed: La vérification de l'initialisation a échoué
+      invite:
+        code:
+          added: Code d'invitation généré
+          sent: Code d'invitation envoyé
+        check:
+          succeeded: Vérification de l'invitation réussie
+          failed: Vérification de l'invitation échouée
       username:
         reserved: Nom d'utilisateur réservé
         released: Nom d'utilisateur libéré

@@ -687,6 +687,13 @@ EventTypes:
         check:
           succeeded: Controllo dell'inizializzazione riuscito
           failed: Controllo dell'inizializzazione fallito
+      invite:
+        code:
+          added: Codice invito generato
+          sent: Codice invito inviato
+        check:
+          succeeded: Controllo invito riuscito
+          failed: Controllo invito fallito
       username:
         reserved: Nome utente riservato
         released: Nome utente rilasciato

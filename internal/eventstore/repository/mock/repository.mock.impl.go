@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -186,8 +187,8 @@ func (e *mockEvent) Sequence() uint64 {
 	return e.sequence
 }
 
-func (e *mockEvent) Position() float64 {
-	return 0
+func (e *mockEvent) Position() decimal.Decimal {
+	return decimal.Decimal{}
 }
 
 func (e *mockEvent) CreatedAt() time.Time {

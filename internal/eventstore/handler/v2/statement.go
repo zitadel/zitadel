@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 
@@ -83,7 +84,7 @@ type Statement struct {
 	AggregateType eventstore.AggregateType
 	AggregateID   string
 	Sequence      uint64
-	Position      float64
+	Position      decimal.Decimal
 	CreationDate  time.Time
 	InstanceID    string
 
@@ -337,6 +338,21 @@ func NewNoOpStatement(event eventstore.Event) *Statement {
 	return NewStatement(event, nil)
 }
 
+func NewSleepStatement(event eventstore.Event, d time.Duration, opts ...execOption) *Statement {
+	return NewStatement(
+		event,
+		exec(
+			execConfig{
+				args: []any{float64(d) / float64(time.Second)},
+			},
+			func(_ execConfig) string {
+				return "SELECT pg_sleep($1);"
+			},
+			opts,
+		),
+	)
+}
+
 func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Exec) *Statement {
 	if len(opts) == 0 {
 		return NewNoOpStatement(event)
@@ -381,6 +397,12 @@ func AddDeleteStatement(conditions []Condition, opts ...execOption) func(eventst
 func AddCopyStatement(conflict, from, to []Column, conditions []NamespacedCondition, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
 		return NewCopyStatement(event, conflict, from, to, conditions, opts...).Execute
+	}
+}
+
+func AddSleepStatement(d time.Duration, opts ...execOption) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
+		return NewSleepStatement(event, d, opts...).Execute
 	}
 }
 

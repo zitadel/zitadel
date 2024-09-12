@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/shopspring/decimal"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -180,7 +181,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
 }
 
-func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position float64, errs <-chan error) {
+func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position decimal.Decimal, errs <-chan error) {
 	joinedErrs := make([]error, 0, len(errs))
 	for err := range errs {
 		joinedErrs = append(joinedErrs, err)

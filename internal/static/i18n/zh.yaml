@@ -687,6 +687,13 @@ EventTypes:
         check:
           succeeded: 初始化检查成功
           failed: 初始化检查失败
+      invite:
+        code:
+          added: 生成了邀请码
+          sent: 发送了邀请码
+        check:
+          succeeded: 邀请检查成功
+          failed: 邀请检查失败
       username:
         reserved: 保留用户名
         released: 用户名已发布

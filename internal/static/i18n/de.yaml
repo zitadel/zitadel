@@ -688,6 +688,13 @@ EventTypes:
         check:
           succeeded: Benutzerinitialisierung erfolgreich
           failed: Benutzerinitialisierung fehlgeschlagen
+      invite:
+        code:
+          added: Einladungscode generiert
+          sent: Einladungscode gesendet
+        check:
+          succeeded: Einladungsprüfung erfolgreich
+          failed: Einladungsprüfung fehlgeschlagen
       username:
         reserved: Benutzername reserviert
         released: Benutzername freigegeben

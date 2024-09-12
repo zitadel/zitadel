@@ -284,6 +284,9 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 		}
 		return append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, initCode.Crypted, initCode.Expiry, human.AuthRequestID)), nil
 	}
+	if human.Email.NoEmailVerification {
+		return cmds, nil
+	}
 	if !human.Email.Verified {
 		emailCode, err := c.newEmailCode(ctx, filter, codeAlg)
 		if err != nil {
