@@ -85,6 +85,34 @@ export type OIDC_USER = {
   };
 };
 
+const GITLAB_MAPPING = (idp: IDPInformation) => {
+  const rawInfo = idp.rawInformation as {
+    name: string;
+    email: string;
+    email_verified: boolean;
+  };
+
+  return create(AddHumanUserRequestSchema, {
+    username: idp.userName,
+    email: {
+      email: rawInfo.email,
+      verification: { case: "isVerified", value: rawInfo.email_verified },
+    },
+    profile: {
+      displayName: rawInfo.name || idp.userName || "",
+      givenName: "",
+      familyName: "",
+    },
+    idpLinks: [
+      {
+        idpId: idp.idpId,
+        userId: idp.userId,
+        userName: idp.userName,
+      },
+    ],
+  });
+};
+
 const OIDC_MAPPING = (idp: IDPInformation) => {
   const rawInfo = idp.rawInformation as OIDC_USER;
 
@@ -163,8 +191,8 @@ export const PROVIDER_MAPPING: {
       ],
     });
   },
-  [IdentityProviderType.GITLAB]: OIDC_MAPPING,
-  [IdentityProviderType.GITLAB_SELF_HOSTED]: OIDC_MAPPING,
+  [IdentityProviderType.GITLAB]: GITLAB_MAPPING,
+  [IdentityProviderType.GITLAB_SELF_HOSTED]: GITLAB_MAPPING,
   [IdentityProviderType.OIDC]: OIDC_MAPPING,
   // check
   [IdentityProviderType.OAUTH]: OIDC_MAPPING,
