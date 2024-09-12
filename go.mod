@@ -2,7 +2,7 @@ module github.com/zitadel/zitadel
 
 go 1.22.2
 
-replace github.com/zitadel/logging => ../logging
+replace github.com/zitadel/logging => github.com/zitadel/logging v0.6.1-0.20240912202356-f9c0677d6cd4
 
 require (
 	cloud.google.com/go/profiler v0.4.1
@@ -53,6 +53,7 @@ require (
 	github.com/muhlemmer/gu v0.3.1
 	github.com/muhlemmer/httpforwarded v0.1.0
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/googlecloudexporter v0.108.0
 	github.com/pquerna/otp v1.4.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.11.0
@@ -69,6 +70,7 @@ require (
 	github.com/zitadel/passwap v0.6.0
 	github.com/zitadel/saml v0.2.0
 	github.com/zitadel/schema v1.3.0
+	go.opentelemetry.io/collector/exporter v0.108.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
 	go.opentelemetry.io/otel v1.30.0
@@ -133,7 +135,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/googlecloudexporter v0.108.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
@@ -152,7 +153,6 @@ require (
 	go.opentelemetry.io/collector/confmap v1.15.0 // indirect
 	go.opentelemetry.io/collector/consumer v0.109.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumerprofiles v0.109.0 // indirect
-	go.opentelemetry.io/collector/exporter v0.108.1 // indirect
 	go.opentelemetry.io/collector/extension v0.108.1 // indirect
 	go.opentelemetry.io/collector/featuregate v1.15.0 // indirect
 	go.opentelemetry.io/collector/pdata v1.15.0 // indirect
