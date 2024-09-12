@@ -2,7 +2,7 @@ module github.com/zitadel/zitadel
 
 go 1.22.2
 
-replace github.com/zitadel/logging => github.com/zitadel/logging v0.6.1-0.20240912202356-f9c0677d6cd4
+replace github.com/zitadel/logging => github.com/zitadel/logging v0.6.1-0.20240912223143-5e0ad4a3c07a
 
 require (
 	cloud.google.com/go/profiler v0.4.1
@@ -11,6 +11,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.24.1
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/benbjohnson/clock v1.3.5
 	github.com/boombuler/barcode v1.0.2
@@ -77,6 +78,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.28.0
 	go.opentelemetry.io/otel/exporters/prometheus v0.50.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.28.0
+	go.opentelemetry.io/otel/log v0.5.0
 	go.opentelemetry.io/otel/metric v1.30.0
 	go.opentelemetry.io/otel/sdk v1.30.0
 	go.opentelemetry.io/otel/sdk/metric v1.28.0
@@ -158,7 +160,6 @@ require (
 	go.opentelemetry.io/collector/pdata v1.15.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.109.0 // indirect
 	go.opentelemetry.io/collector/semconv v0.109.0 // indirect
-	go.opentelemetry.io/otel/log v0.5.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.4.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect

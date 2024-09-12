@@ -46,6 +46,8 @@ github.com/PuerkitoBio/goquery v1.5.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBK
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/VividCortex/gohistogram v1.0.0/go.mod h1:Pf5mBqqDxYaXu3hDrrU+w6nw50o/4+TcAqDqk/vUH7g=
+github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d h1:licZJFw2RwpHMqeKTCYkitsPqHNxTmd4SNR5r94FGM8=
+github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d/go.mod h1:asat636LX7Bqt5lYEZ27JNDcqxfjdBQuJ/MM4CN/Lzo=
 github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5/go.mod h1:SkGFH1ia65gfNATL8TAiHDNxPzPdmEL5uirI2Uyuz6c=
 github.com/ajstarks/deck v0.0.0-20200831202436-30c9fc6549a9/go.mod h1:JynElWSGnm/4RlzPXRlREEwqTHAN3T56Bv2ITsFT3gY=
 github.com/ajstarks/deck/generate v0.0.0-20210309230005-c3f852c02e19/go.mod h1:T13YZdzov6OU0A1+RfKZiZN9ca6VeKdBdyDV+BY97Tk=
@@ -762,8 +764,8 @@ github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9dec
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/zenazn/goji v1.0.1 h1:4lbD8Mx2h7IvloP7r2C0D6ltZP6Ufip8Hn0wmSK5LR8=
 github.com/zenazn/goji v1.0.1/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
-github.com/zitadel/logging v0.6.1-0.20240912202356-f9c0677d6cd4 h1:bP+Tu2aANh+qcUGOx/uaz8gp0fzemqv0mzHVcN+xg7k=
-github.com/zitadel/logging v0.6.1-0.20240912202356-f9c0677d6cd4/go.mod h1:Bvz8qRvEP7zdGiS4q8fYMrBZmqJ4jIkjain58J8czp0=
+github.com/zitadel/logging v0.6.1-0.20240912223143-5e0ad4a3c07a h1:hOQsHDxyDABpgtkbtjeIH9jIY6GbwNozZJTBnlpDJlw=
+github.com/zitadel/logging v0.6.1-0.20240912223143-5e0ad4a3c07a/go.mod h1:Bvz8qRvEP7zdGiS4q8fYMrBZmqJ4jIkjain58J8czp0=
 github.com/zitadel/oidc/v3 v3.28.1 h1:PsbFm5CzEMQq9HBXUNJ8yvnWmtVYxpwV5Cinj7TTsHo=
 github.com/zitadel/oidc/v3 v3.28.1/go.mod h1:WmDFu3dZ9YNKrIoZkmxjGG8QyUR4PbbhsVVSY+rpojM=
 github.com/zitadel/passwap v0.6.0 h1:m9F3epFC0VkBXu25rihSLGyHvWiNlCzU5kk8RoI+SXQ=
