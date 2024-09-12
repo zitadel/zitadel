@@ -34,11 +34,11 @@ var (
 
 type mockViewNoUserSession struct{}
 
-func (m *mockViewNoUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
+func (m *mockViewNoUserSession) UserSessionByIDs(context.Context, string, string, string) (*user_view_model.UserSessionView, error) {
 	return nil, zerrors.ThrowNotFound(nil, "id", "user session not found")
 }
 
-func (m *mockViewNoUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
+func (m *mockViewNoUserSession) UserSessionsByAgentID(context.Context, string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, nil
 }
 
@@ -48,11 +48,11 @@ func (m *mockViewNoUserSession) GetLatestUserSessionSequence(ctx context.Context
 
 type mockViewErrUserSession struct{}
 
-func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
+func (m *mockViewErrUserSession) UserSessionByIDs(context.Context, string, string, string) (*user_view_model.UserSessionView, error) {
 	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
-func (m *mockViewErrUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
+func (m *mockViewErrUserSession) UserSessionsByAgentID(context.Context, string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
@@ -76,7 +76,7 @@ type mockUser struct {
 	SessionState  domain.UserSessionState
 }
 
-func (m *mockViewUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
+func (m *mockViewUserSession) UserSessionByIDs(context.Context, string, string, string) (*user_view_model.UserSessionView, error) {
 	return &user_view_model.UserSessionView{
 		ExternalLoginVerification: sql.NullTime{Time: m.ExternalLoginVerification},
 		PasswordlessVerification:  sql.NullTime{Time: m.PasswordlessVerification},
@@ -86,7 +86,7 @@ func (m *mockViewUserSession) UserSessionByIDs(string, string, string) (*user_vi
 	}, nil
 }
 
-func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
+func (m *mockViewUserSession) UserSessionsByAgentID(context.Context, string, string) ([]*user_view_model.UserSessionView, error) {
 	sessions := make([]*user_view_model.UserSessionView, len(m.Users))
 	for i, user := range m.Users {
 		sessions[i] = &user_view_model.UserSessionView{

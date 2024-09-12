@@ -28,7 +28,7 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 }
 
 func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {
-	userSessions, err := repo.View.UserSessionsByAgentID(agentID, authz.GetInstance(ctx).InstanceID())
+	userSessions, err := repo.View.UserSessionsByAgentID(ctx, agentID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -39,6 +39,14 @@ func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID s
 		}
 	}
 	return userIDs, nil
+}
+
+func (repo *UserRepo) UserAgentIDBySessionID(ctx context.Context, sessionID string) (string, error) {
+	return repo.View.UserAgentIDBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
+}
+
+func (repo *UserRepo) ActiveUserIDsBySessionID(ctx context.Context, sessionID string) (userAgentID string, userIDs []string, err error) {
+	return repo.View.ActiveUserIDsBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
 }
 
 func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
