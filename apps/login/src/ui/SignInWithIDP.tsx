@@ -14,6 +14,7 @@ import { SignInWithAzureAD } from "./idps/SignInWithAzureAD";
 import { SignInWithGeneric } from "./idps/SignInWithGeneric";
 import { SignInWithGithub } from "./idps/SignInWithGithub";
 import { SignInWithGitlab } from "./idps/SignInWithGitlab";
+import { SignInWithGoogle } from "./idps/SignInWithGoogle";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -139,14 +140,14 @@ export function SignInWithIDP({
               );
             case IdentityProviderType.GOOGLE:
               return (
-                <SignInWithApple
+                <SignInWithGoogle
                   key={`idp-${i}`}
                   e2e="google"
                   name={idp.name}
                   onClick={() =>
                     navigateToAuthUrl(idp.id, IdentityProviderType.GOOGLE)
                   }
-                ></SignInWithApple>
+                ></SignInWithGoogle>
               );
             case IdentityProviderType.GITLAB:
               return (
