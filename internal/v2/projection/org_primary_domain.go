@@ -19,7 +19,7 @@ func NewOrgPrimaryDomain(id string) *OrgPrimaryDomain {
 	}
 }
 
-func (p *OrgPrimaryDomain) Reducers() map[string]map[string]eventstore.ReduceEvent {
+func (p *OrgPrimaryDomain) Reducers() Reducers {
 	if p.Projection.Reducers != nil {
 		return p.Projection.Reducers
 	}

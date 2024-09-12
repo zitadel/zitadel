@@ -24,6 +24,14 @@ type Org struct {
 	projection.ObjectMetadata
 }
 
+func NewOrg(id string) *Org {
+	return &Org{
+		ID:            id,
+		PrimaryDomain: projection.NewOrgPrimaryDomain(id),
+		State:         projection.NewOrgState(id),
+	}
+}
+
 func (o *Org) Reducers() projection.Reducers {
 	if o.ObjectMetadata.Reducers != nil {
 		return o.ObjectMetadata.Reducers
@@ -121,7 +129,7 @@ func (o *Orgs) Reducers() projection.Reducers {
 		return o.reducers
 	}
 
-	o.reducers = projection.OverwriteReduces(new(Org).Reducers(), o.reduce)
+	o.reducers = projection.OverwriteReduces(NewOrg("").Reducers(), o.reduce)
 	o.reducers[org.AggregateType][org.AddedType] = o.reduceAdded
 
 	return o.reducers
