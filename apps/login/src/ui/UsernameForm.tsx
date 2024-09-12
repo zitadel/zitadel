@@ -1,7 +1,6 @@
 "use client";
 
 import { sendLoginname } from "@/lib/server/loginname";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -16,7 +15,6 @@ type Inputs = {
 };
 
 type Props = {
-  loginSettings: LoginSettings | undefined;
   loginName: string | undefined;
   authRequestId: string | undefined;
   organization?: string;
@@ -26,7 +24,6 @@ type Props = {
 };
 
 export default function UsernameForm({
-  loginSettings,
   loginName,
   authRequestId,
   organization,

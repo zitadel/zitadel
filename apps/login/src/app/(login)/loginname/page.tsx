@@ -45,7 +45,6 @@ export default async function Page({
         <p className="ztdl-p">Enter your login data.</p>
 
         <UsernameForm
-          loginSettings={loginSettings}
           loginName={loginName}
           authRequestId={authRequestId}
           organization={organization}
