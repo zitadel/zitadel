@@ -16,6 +16,8 @@ RUN useradd -s "" --home / zitadel && \
 WORKDIR /app
 ENV PATH="/app:${PATH}"
 
+HEALTHCHECK CMD /app/zitadel ready
+
 USER zitadel
 ENTRYPOINT ["/app/entrypoint.sh"]
 
@@ -26,7 +28,7 @@ COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
 COPY --from=artifact /app/zitadel /app/zitadel
 
-HEALTHCHECK NONE
+HEALTHCHECK CMD /app/zitadel ready
 
 USER zitadel
 ENTRYPOINT ["/app/zitadel"]
