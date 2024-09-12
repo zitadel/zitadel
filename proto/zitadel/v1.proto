@@ -90,6 +90,8 @@ message DataOrg {
 
   repeated DataAppKey app_keys = 38;
   repeated DataMachineKey machine_keys = 39;
+
+  repeated zitadel.management.v1.SetCustomInviteUserMessageTextRequest invite_user_messages = 40;
 }
 
 message DataOIDCIDP{

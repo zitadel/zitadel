@@ -45,14 +45,6 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	if username == "" {
 		username = req.GetEmail().GetEmail()
 	}
-	var urlTemplate string
-	if req.GetEmail().GetSendCode() != nil {
-		urlTemplate = req.GetEmail().GetSendCode().GetUrlTemplate()
-		// test the template execution so the async notification will not fail because of it and the user won't realize
-		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
-			return nil, err
-		}
-	}
 	passwordChangeRequired := req.GetPassword().GetChangeRequired() || req.GetHashedPassword().GetChangeRequired()
 	metadata := make([]*command.AddMetadataEntry, len(req.Metadata))
 	for i, metadataEntry := range req.Metadata {
@@ -69,6 +61,10 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			DisplayName:   link.GetUserName(),
 		}
 	}
+	email, err := addUserRequestEmailToCommand(req.GetEmail())
+	if err != nil {
+		return nil, err
+	}
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
@@ -76,12 +72,7 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		LastName:    req.GetProfile().GetFamilyName(),
 		NickName:    req.GetProfile().GetNickName(),
 		DisplayName: req.GetProfile().GetDisplayName(),
-		Email: command.Email{
-			Address:     domain.EmailAddress(req.GetEmail().GetEmail()),
-			Verified:    req.GetEmail().GetIsVerified(),
-			ReturnCode:  req.GetEmail().GetReturnCode() != nil,
-			URLTemplate: urlTemplate,
-		},
+		Email:       email,
 		Phone: command.Phone{
 			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
 			Verified:   req.GetPhone().GetIsVerified(),
@@ -98,6 +89,25 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		Links:                  links,
 		TOTPSecret:             req.GetTotpSecret(),
 	}, nil
+}
+
+func addUserRequestEmailToCommand(email *user.SetHumanEmail) (command.Email, error) {
+	address := domain.EmailAddress(email.GetEmail())
+	switch v := email.GetVerification().(type) {
+	case *user.SetHumanEmail_ReturnCode:
+		return command.Email{Address: address, ReturnCode: true}, nil
+	case *user.SetHumanEmail_SendCode:
+		urlTemplate := v.SendCode.GetUrlTemplate()
+		// test the template execution so the async notification will not fail because of it and the user won't realize
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, "userID", "code", "orgID"); err != nil {
+			return command.Email{}, err
+		}
+		return command.Email{Address: address, URLTemplate: urlTemplate}, nil
+	case *user.SetHumanEmail_IsVerified:
+		return command.Email{Address: address, Verified: v.IsVerified, NoEmailVerification: true}, nil
+	default:
+		return command.Email{Address: address}, nil
+	}
 }
 
 func genderToDomain(gender user.Gender) domain.Gender {
@@ -615,5 +625,56 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	default:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
+	}
+}
+
+func (s *Server) CreateInviteCode(ctx context.Context, req *user.CreateInviteCodeRequest) (*user.CreateInviteCodeResponse, error) {
+	invite, err := createInviteCodeRequestToCommand(req)
+	if err != nil {
+		return nil, err
+	}
+	details, code, err := s.command.CreateInviteCode(ctx, invite)
+	if err != nil {
+		return nil, err
+	}
+	return &user.CreateInviteCodeResponse{
+		Details:    object.DomainToDetailsPb(details),
+		InviteCode: code,
+	}, nil
+}
+
+func (s *Server) ResendInviteCode(ctx context.Context, req *user.ResendInviteCodeRequest) (*user.ResendInviteCodeResponse, error) {
+	details, err := s.command.ResendInviteCode(ctx, req.GetUserId(), "", "")
+	if err != nil {
+		return nil, err
+	}
+	return &user.ResendInviteCodeResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) VerifyInviteCode(ctx context.Context, req *user.VerifyInviteCodeRequest) (*user.VerifyInviteCodeResponse, error) {
+	details, err := s.command.VerifyInviteCode(ctx, req.GetUserId(), req.GetVerificationCode())
+	if err != nil {
+		return nil, err
+	}
+	return &user.VerifyInviteCodeResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*command.CreateUserInvite, error) {
+	switch v := req.GetVerification().(type) {
+	case *user.CreateInviteCodeRequest_SendCode:
+		urlTemplate := v.SendCode.GetUrlTemplate()
+		// test the template execution so the async notification will not fail because of it and the user won't realize
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
+			return nil, err
+		}
+		return &command.CreateUserInvite{UserID: req.GetUserId(), URLTemplate: urlTemplate, ApplicationName: v.SendCode.GetApplicationName()}, nil
+	case *user.CreateInviteCodeRequest_ReturnCode:
+		return &command.CreateUserInvite{UserID: req.GetUserId(), ReturnCode: true}, nil
+	default:
+		return &command.CreateUserInvite{UserID: req.GetUserId()}, nil
 	}
 }

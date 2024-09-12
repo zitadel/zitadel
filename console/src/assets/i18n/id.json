@@ -185,7 +185,8 @@
           "VE": "Saat pengguna mengubah alamat emailnya, mereka akan menerima email berisi tautan untuk memverifikasi alamat baru.",
           "VP": "Saat pengguna mengganti nomor teleponnya, mereka akan menerima SMS berisi kode untuk memverifikasi nomor baru.",
           "VEO": "Ketika pengguna menambahkan Kata Sandi Sekali Pakai melalui metode email, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke alamat email mereka.",
-          "VSO": "Ketika pengguna menambahkan One-Time Password melalui metode SMS, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke nomor telepon mereka."
+          "VSO": "Ketika pengguna menambahkan One-Time Password melalui metode SMS, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke nomor telepon mereka.",
+          "IU": "Ketika kode undangan pengguna dibuat, mereka akan menerima email dengan tautan untuk mengatur metode otentikasi mereka."
         }
       },
       "LOGIN_TEXTS": {
@@ -1533,7 +1534,8 @@
         "PR": "Reset Kata Sandi",
         "DC": "Klaim Domain",
         "PL": "Tanpa kata sandi",
-        "PC": "Perubahan Kata Sandi"
+        "PC": "Perubahan Kata Sandi",
+        "IU": "Mengundang Pengguna"
       },
       "CHIPS": {
         "firstname": "Nama yang diberikan",
@@ -1553,7 +1555,8 @@
         "tempUsername": "Nama pengguna sementara",
         "otp": "Kata sandi satu kali",
         "verifyUrl": "Verifikasi URL kata sandi satu kali",
-        "expiry": "Kedaluwarsa"
+        "expiry": "Kedaluwarsa",
+        "applicationName": "Nama aplikasi"
       },
       "TOAST": { "UPDATED": "Teks Khusus disimpan." }
     },

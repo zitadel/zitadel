@@ -116,12 +116,21 @@ type InstanceSetup struct {
 	}
 	EmailTemplate     []byte
 	MessageTexts      []*domain.CustomMessageText
-	SMTPConfiguration *smtp.Config
+	SMTPConfiguration *SMTPConfiguration
 	OIDCSettings      *OIDCSettings
 	Quotas            *SetQuotas
 	Features          *InstanceFeatures
 	Limits            *SetLimits
 	Restrictions      *SetRestrictions
+}
+
+type SMTPConfiguration struct {
+	Description    string
+	SMTP           smtp.SMTP
+	Tls            bool
+	From           string
+	FromName       string
+	ReplyToAddress string
 }
 
 type OIDCSettings struct {
@@ -145,6 +154,7 @@ type SecretGenerators struct {
 	DomainVerification       *crypto.GeneratorConfig
 	OTPSMS                   *crypto.GeneratorConfig
 	OTPEmail                 *crypto.GeneratorConfig
+	InviteCode               *crypto.GeneratorConfig
 }
 
 type ZitadelConfig struct {
@@ -439,7 +449,7 @@ func setupOIDCSettings(commands *Commands, validations *[]preparation.Validation
 	)
 }
 
-func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation, smtpConfig *smtp.Config, instanceAgg *instance.Aggregate) {
+func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation, smtpConfig *SMTPConfiguration, instanceAgg *instance.Aggregate) {
 	if smtpConfig == nil {
 		return
 	}

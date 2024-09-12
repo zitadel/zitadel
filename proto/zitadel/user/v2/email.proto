@@ -23,7 +23,7 @@ message SetHumanEmail {
   oneof verification {
     SendEmailVerificationCode send_code = 2;
     ReturnEmailVerificationCode return_code = 3;
-    bool is_verified = 4 [(validate.rules).bool.const = true];
+    bool is_verified = 4;
   }
 }
 
