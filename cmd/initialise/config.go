@@ -25,7 +25,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 	)
 	logging.OnError(err).Fatal("unable to read config")
 
-	err = config.Log.SetLogger()
+	err = config.Log.SetLogger(logging.AddHooks())
 	logging.OnError(err).Fatal("unable to set logger")
 
 	id.Configure(config.Machine)

@@ -3,6 +3,7 @@ package saml
 import (
 	"context"
 	"encoding/json"
+	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
 	"time"
 
 	"github.com/dop251/goja"
@@ -15,7 +16,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
-	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"

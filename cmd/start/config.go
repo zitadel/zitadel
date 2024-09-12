@@ -30,13 +30,14 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
+	"github.com/zitadel/zitadel/internal/telemetry/logs"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
 	profiler "github.com/zitadel/zitadel/internal/telemetry/profiler/config"
 	tracing "github.com/zitadel/zitadel/internal/telemetry/tracing/config"
 )
 
 type Config struct {
-	Log                 *logging.Config
+	Log                 *logs.Config
 	Port                uint16
 	ExternalPort        uint16
 	ExternalDomain      string

@@ -5,12 +5,12 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
 	"time"
 
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
