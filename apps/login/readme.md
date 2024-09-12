@@ -10,12 +10,12 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
     A[Start] --> accounts
     A[Start] --> loginname
     A[Start] --> register
-    idp-success --> B[signedin]
+    A[Start] -- signInWithIDP --> idp
     idp --> idp-success
     idp --> idp-failure
+    idp-success --> B[signedin]
     idp-failure --> loginname
     loginname --> password
-    A[Start] -- signInWithIDP --> idp
     loginname -- hasPasskey --> passkey
     loginname -- allowRegister --> register
     passkey-add --passwordAllowed --> password
@@ -38,7 +38,6 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
     u2fset --> B[signedin]
     otpset --> B[signedin]
     accounts--> loginname
-
     password -- not verified yet -->verify
     register-- withpassword -->verify
     passkey-- notVerified --> verify
