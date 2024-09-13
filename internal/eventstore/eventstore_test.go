@@ -341,8 +341,11 @@ func (repo *testPusher) Health(ctx context.Context) error {
 	return nil
 }
 
-func (repo *testPusher) Subscribe(queue chan<- decimal.Decimal, eventTypes ...EventType) {
+func (repo *testPusher) Subscribe(eventTypes ...EventType) <-chan *Notification {
+	return make(<-chan *Notification)
 }
+
+func (repo *testPusher) Close() {}
 
 func (repo *testPusher) Push(ctx context.Context, commands ...Command) (events []Event, err error) {
 	if len(repo.errs) != 0 {

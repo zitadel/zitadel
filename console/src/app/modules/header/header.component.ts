@@ -30,7 +30,6 @@ export class HeaderComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public BreadcrumbType: any = BreadcrumbType;
   public ActionKeysType: any = ActionKeysType;
-  public docsLink = 'https://zitadel.com/docs';
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),

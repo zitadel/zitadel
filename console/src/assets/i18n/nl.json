@@ -197,7 +197,8 @@
           "VE": "Wanneer een gebruiker zijn e-mailadres wijzigt, ontvangt hij een e-mail met een link om het nieuwe adres te verifiëren.",
           "VP": "Wanneer een gebruiker zijn telefoonnummer wijzigt, ontvangt hij een SMS met een code om het nieuwe nummer te verifiëren.",
           "VEO": "Wanneer een gebruiker een eenmalig wachtwoord via e-mailmethode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun e-mailadres is verzonden.",
-          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden."
+          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden.",
+          "IU": "Wanneer een uitnodigingscode voor gebruikers wordt gemaakt, ontvangt de gebruiker een e-mail met een link om zijn verificatiemethode in te stellen."
         }
       },
       "LOGIN_TEXTS": {
@@ -1666,7 +1667,8 @@
         "PR": "Wachtwoord Reset",
         "DC": "Domein Claim",
         "PL": "Wachtwoordloos",
-        "PC": "Wachtwoord Verandering"
+        "PC": "Wachtwoord Verandering",
+        "IU": "Gebruiker uitnodigen"
       },
       "CHIPS": {
         "firstname": "Voornaam",
@@ -1686,7 +1688,8 @@
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
         "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
-        "expiry": "Vervaldatum"
+        "expiry": "Vervaldatum",
+        "applicationName": "Toepassingsnaam"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."

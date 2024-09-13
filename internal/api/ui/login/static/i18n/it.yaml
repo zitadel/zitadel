@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Avanti
   CancelButtonText: annulla
 
+InviteUser:
+  Title: Attiva utente
+  Description: Verifica la tua email con il codice seguente e imposta la tua password.
+  CodeLabel: Codice
+  NewPasswordLabel: Nuova password
+  NewPasswordConfirm: Conferma password
+  NextButtonText: Avanti
+  ResendButtonText: Reinvia codice
+
 InitMFAPrompt:
   Title: Impostazione a 2 fattori
   Description: L'autenticazione a due fattori offre un'ulteriore sicurezza al vostro account utente. Questo garantisce che solo voi possiate accedere al vostro account.

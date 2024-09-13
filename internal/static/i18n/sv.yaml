@@ -687,6 +687,13 @@ EventTypes:
         check:
           succeeded: Initialiseringskontroll lyckades
           failed: Initialiseringskontroll misslyckades
+      invite:
+        code:
+          added: Inbjudningskod genererad
+          sent: Inbjudningskod skickad
+        check:
+          succeeded: Inbjudningskontroll lyckad
+          failed: Inbjudningskontroll misslyckad
       username:
         reserved: Användarnamn reserverat
         released: Användarnamn släppt

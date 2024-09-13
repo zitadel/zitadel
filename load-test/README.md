@@ -53,3 +53,6 @@ Before you run the tests you need an initialized user. The tests don't implement
 * `make machine_jwt_profile_grant`  
   setup: generates private/public key, creates machine users, adds a key  
   test: creates a token and calls user info 
+* `make machine_jwt_profile_grant_single_user`  
+  setup: generates private/public key, creates machine user, adds a key  
+  test: creates a token and calls user info in parallel for the same user
