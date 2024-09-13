@@ -76,7 +76,7 @@ func (s *SystemTokenVerifierFromConfig) VerifySystemToken(ctx context.Context, t
 
 type systemJWTStorage struct {
 	keys       map[string]*SystemAPIUser
-	mutex      sync.Mutex
+	mutex      sync.RWMutex
 	cachedKeys map[string]*rsa.PublicKey
 }
 
@@ -98,7 +98,9 @@ func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
 }
 
 func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID string) (*jose.JSONWebKey, error) {
+	s.mutex.RLock()
 	cachedKey, ok := s.cachedKeys[userID]
+	s.mutex.RUnlock()
 	if ok {
 		return &jose.JSONWebKey{KeyID: userID, Key: cachedKey}, nil
 	}
