@@ -9,6 +9,7 @@ import { idpTypeToSlug } from "../idp";
 import {
   getActiveIdentityProviders,
   getLoginSettings,
+  getOrgsByDomain,
   listAuthenticationMethodTypes,
   listUsers,
   startIdentityProviderFlow,
@@ -19,6 +20,8 @@ export type SendLoginnameCommand = {
   authRequestId?: string;
   organization?: string;
 };
+
+const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
   const users = await listUsers({
@@ -181,9 +184,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  // TODO: check if allowDomainDiscovery has to be allowed too, to redirect to the register page
   // user not found, check if register is enabled on organization
-
   if (loginSettings?.allowRegister && !loginSettings?.allowUsernamePassword) {
     // TODO: do we need to handle login hints for IDPs here?
     await redirectUserToSingleIDPIfAvailable();
@@ -193,10 +194,31 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     loginSettings?.allowRegister &&
     loginSettings?.allowUsernamePassword
   ) {
+    let orgToRegisterOn: string | undefined = command.organization;
+
+    if (
+      !orgToRegisterOn &&
+      command.loginName &&
+      ORG_SUFFIX_REGEX.test(command.loginName)
+    ) {
+      const matched = ORG_SUFFIX_REGEX.exec(command.loginName);
+      const suffix = matched?.[1] ?? "";
+
+      // this just returns orgs where the suffix is set as primary domain
+      const orgs = await getOrgsByDomain(suffix);
+      const orgToCheckForDiscovery =
+        orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+
+      const orgLoginSettings = await getLoginSettings(orgToCheckForDiscovery);
+      if (orgLoginSettings?.allowDomainDiscovery) {
+        orgToRegisterOn = orgToCheckForDiscovery;
+      }
+    }
+
     const params = new URLSearchParams();
 
-    if (command.organization) {
-      params.set("organization", command.organization);
+    if (orgToRegisterOn) {
+      params.set("organization", orgToRegisterOn);
     }
     if (command.authRequestId) {
       params.set("authRequestId", command.authRequestId);
