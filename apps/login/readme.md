@@ -4,6 +4,8 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
 
 ## Flow Diagram
 
+> Back navigation or retrys are not displayed. The flows for reauthentication after registering Passkeys, OTP or U2F methods are not displayed either as these will be omitted in future UX.
+
 ```mermaid
     flowchart TD
     A[Start] --> register
@@ -12,7 +14,6 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
     loginname -- signInWithIDP --> idp-success
     loginname -- signInWithIDP --> idp-failure
     idp-success --> B[signedin]
-    idp-failure -- retry --> loginname
     loginname --> password
     loginname -- hasPasskey --> passkey
     loginname -- allowRegister --> register
