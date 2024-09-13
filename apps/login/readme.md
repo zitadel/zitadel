@@ -9,11 +9,10 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
     A[Start] --> register
     A[Start] --> accounts
     A[Start] --> loginname
-    A[Start] -- signInWithIDP --> idp
-    idp --> idp-success
-    idp --> idp-failure
+    loginname -- signInWithIDP --> idp-success
+    loginname -- signInWithIDP --> idp-failure
     idp-success --> B[signedin]
-    idp-failure --> loginname
+    idp-failure -- retry --> loginname
     loginname --> password
     loginname -- hasPasskey --> passkey
     loginname -- allowRegister --> register
