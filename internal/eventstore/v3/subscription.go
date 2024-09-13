@@ -148,7 +148,6 @@ func (s *subscriptions) listen(ec chan<- error) {
 		}
 
 		err = conn.Raw(func(driverConn any) (err error) {
-			defer conn.Close()
 			conn, ok := driverConn.(*pgx.Conn)
 			if !ok {
 				return fmt.Errorf("wrong connection type %T expected %T", driverConn, conn)
