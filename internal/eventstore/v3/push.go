@@ -26,39 +26,45 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	if err != nil {
 		return nil, err
 	}
+
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			logging.OnError(rollbackErr).Info("rollback failed")
+			return
+		}
+		err = tx.Commit()
+	}()
+
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
 	)
 
-	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		sequences, err = latestSequences(ctx, tx, commands)
-		if err != nil {
-			return err
-		}
-
-		events, err = insertEvents(ctx, tx, sequences, commands)
-		if err != nil {
-			return err
-		}
-
-		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
-			return err
-		}
-
-		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
-		// Thats why we enable it manually
-		if es.client.Type() == "cockroach" {
-			_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
-			if err != nil {
-				return err
-			}
-		}
-
-		return handleFieldCommands(ctx, tx, commands)
-	})
-
+	sequences, err = latestSequences(ctx, tx, commands)
 	if err != nil {
+		return nil, err
+	}
+
+	events, err = insertEvents(ctx, tx, sequences, commands)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+		return nil, err
+	}
+
+	// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
+	// Thats why we enable it manually
+	if es.client.Type() == "cockroach" {
+		_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if err = handleFieldCommands(ctx, tx, commands); err != nil {
 		return nil, err
 	}
 
