@@ -59,17 +59,10 @@ export default function UsernameForm({
     return res;
   }
 
-  async function setLoginNameAndGetAuthMethods(
-    values: Inputs,
-    organization?: string,
-  ) {
-    const response = await submitLoginName(values, organization);
-  }
-
   useEffect(() => {
     if (submit && loginName) {
       // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
-      setLoginNameAndGetAuthMethods({ loginName }, organization);
+      submitLoginName({ loginName }, organization);
     }
   }, []);
 
@@ -120,9 +113,7 @@ export default function UsernameForm({
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit((e) =>
-            setLoginNameAndGetAuthMethods(e, organization),
-          )}
+          onClick={handleSubmit((e) => submitLoginName(e, organization))}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

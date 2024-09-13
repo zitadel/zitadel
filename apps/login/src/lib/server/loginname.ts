@@ -28,6 +28,45 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const loginSettings = await getLoginSettings(command.organization);
 
+  const redirectUserToSingleIDPIfAvailable = async () => {
+    const identityProviders = await getActiveIdentityProviders(
+      command.organization,
+    ).then((resp) => {
+      return resp.identityProviders;
+    });
+
+    if (identityProviders.length === 1) {
+      const host = headers().get("host");
+      const identityProviderType = identityProviders[0].type;
+
+      const provider = idpTypeToSlug(identityProviderType);
+
+      const params = new URLSearchParams();
+
+      if (command.authRequestId) {
+        params.set("authRequestId", command.authRequestId);
+      }
+
+      if (command.organization) {
+        params.set("organization", command.organization);
+      }
+
+      const resp = await startIdentityProviderFlow({
+        idpId: identityProviders[0].id,
+        urls: {
+          successUrl:
+            `${host}/idp/${provider}/success?` + new URLSearchParams(params),
+          failureUrl:
+            `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
+        },
+      });
+
+      if (resp?.nextStep.case === "authUrl") {
+        return redirect(resp.nextStep.value);
+      }
+    }
+  };
+
   if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
     const userId = users.result[0].userId;
     const session = await createSessionForUserIdAndUpdateCookie(
@@ -115,13 +154,14 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         methods.authMethodTypes.includes(AuthenticationMethodType.IDP)
       ) {
         // TODO: redirect user to idp
+        await redirectUserToSingleIDPIfAvailable();
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)
       ) {
         // user has no passkey setup and login settings allow passkeys
         const paramsPasswordDefault: any = { loginName: command.loginName };
 
-        if (loginSettings?.passkeysType === 1) {
+        if (loginSettings?.passkeysType === PasskeysType.ALLOWED) {
           paramsPasswordDefault.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
         }
 
@@ -146,42 +186,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   if (loginSettings?.allowRegister && !loginSettings?.allowUsernamePassword) {
     // TODO redirect to loginname page with idp hint
-    const identityProviders = await getActiveIdentityProviders(
-      command.organization,
-    ).then((resp) => {
-      return resp.identityProviders;
-    });
-
-    if (identityProviders.length === 1) {
-      const host = headers().get("host");
-      const identityProviderType = identityProviders[0].type;
-
-      const provider = idpTypeToSlug(identityProviderType);
-
-      const params = new URLSearchParams();
-
-      if (command.authRequestId) {
-        params.set("authRequestId", command.authRequestId);
-      }
-
-      if (command.organization) {
-        params.set("organization", command.organization);
-      }
-
-      const resp = await startIdentityProviderFlow({
-        idpId: identityProviders[0].id,
-        urls: {
-          successUrl:
-            `${host}/idp/${provider}/success?` + new URLSearchParams(params),
-          failureUrl:
-            `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
-        },
-      });
-
-      if (resp?.nextStep.case === "authUrl") {
-        return redirect(resp.nextStep.value);
-      }
-    }
+    await redirectUserToSingleIDPIfAvailable();
 
     throw Error("Could not find user");
   } else if (
@@ -203,6 +208,24 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const registerUrl = "/register?" + params;
 
     return redirect(registerUrl);
+  }
+
+  if (loginSettings?.ignoreUnknownUsernames) {
+    const paramsPasswordDefault: any = { loginName: command.loginName };
+
+    if (loginSettings?.passkeysType === PasskeysType.ALLOWED) {
+      paramsPasswordDefault.promptPasswordless = `true`;
+    }
+
+    if (command.authRequestId) {
+      paramsPasswordDefault.authRequestId = command.authRequestId;
+    }
+
+    if (command.organization) {
+      paramsPasswordDefault.organization = command.organization;
+    }
+
+    return redirect("/password?" + new URLSearchParams(paramsPasswordDefault));
   }
 
   throw Error("Could not find user");
