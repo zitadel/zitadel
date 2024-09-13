@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -148,20 +149,21 @@ func (s *subscriptions) listen(ec chan<- error) {
 		}
 
 		err = conn.Raw(func(driverConn any) (err error) {
-			conn, ok := driverConn.(*pgx.Conn)
+			conn, ok := driverConn.(*stdlib.Conn)
 			if !ok {
 				return fmt.Errorf("wrong connection type %T expected %T", driverConn, conn)
 			}
-			_, err = conn.Exec(ctx, notificationListenQuery)
+			pgConn := conn.Conn()
+			_, err = pgConn.Exec(ctx, notificationListenQuery)
 			if err != nil {
 				return err
 			}
 			defer func() {
-				_, err = conn.Exec(ctx, notificationUnlistenQuery)
+				_, err = pgConn.Exec(ctx, notificationUnlistenQuery)
 			}()
 			sendFirstError(nil) // setup went ok, tell the caller.
 			s.notifyAll()
-			return s.waitForNotifications(conn)
+			return s.waitForNotifications(pgConn)
 		})
 		sendFirstError(err)
 		select {
