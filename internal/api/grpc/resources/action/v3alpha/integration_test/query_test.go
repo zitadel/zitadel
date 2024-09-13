@@ -215,18 +215,20 @@ func TestServer_GetTarget(t *testing.T) {
 			if tt.args.dep != nil {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
-				time.Sleep(2 * time.Second)
 			}
 			got, getErr := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				assert.Error(t, getErr, "Error: "+getErr.Error())
-			} else {
-				assert.NoError(t, getErr)
-				wantTarget := tt.want.GetTarget()
-				gotTarget := got.GetTarget()
-				integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
-				assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
-			}
+			assert.EventuallyWithT(t, func(collect *assert.CollectT) {
+				if tt.wantErr {
+					assert.Error(collect, getErr, "Error: "+getErr.Error())
+				} else {
+					assert.NoError(collect, getErr)
+					wantTarget := tt.want.GetTarget()
+					gotTarget := got.GetTarget()
+					integration.AssertResourceDetails(collect, wantTarget.GetDetails(), gotTarget.GetDetails())
+					assert.Equal(collect, wantTarget.GetConfig(), gotTarget.GetConfig())
+				}
+			},
+				time.Minute, time.Second)
 		})
 	}
 }
