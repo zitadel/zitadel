@@ -158,7 +158,8 @@ Track upcoming features on our [roadmap](https://zitadel.com/roadmap) and follow
 
 ## How To Contribute
 
-Find details about how you can contribute in our [Contribution Guide](./CONTRIBUTING.md)
+Find details about how you can contribute in our [Contribution Guide](./CONTRIBUTING.md).
+Join our [Discord Chat](https://zitadel.com/chat) to get help.
 
 ## Contributors
 
