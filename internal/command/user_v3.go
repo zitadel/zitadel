@@ -15,14 +15,14 @@ import (
 )
 
 type CreateSchemaUser struct {
-	Details       *domain.ObjectDetails
-	ResourceOwner string
+	Details *domain.ObjectDetails
 
 	SchemaID       string
 	schemaRevision uint64
 
-	ID   string
-	Data json.RawMessage
+	ResourceOwner string
+	ID            string
+	Data          json.RawMessage
 
 	Email           *Email
 	ReturnCodeEmail string
@@ -45,7 +45,7 @@ func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 	if !schemaWriteModel.Exists() {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-N9QOuN4F7o", "Errors.UserSchema.NotExists")
 	}
-	s.schemaRevision = schemaWriteModel.Revision
+	s.schemaRevision = schemaWriteModel.SchemaRevision
 
 	if s.ID == "" {
 		s.ID, err = c.idGenerator.Next()
@@ -214,7 +214,7 @@ func (s *ChangeSchemaUser) ValidData(ctx context.Context, c *Commands, existingU
 	}
 
 	if s.schemaWriteModel == nil {
-		s.schemaWriteModel, err = c.getSchemaWriteModelByIDAndRevision(ctx, "", existingUser.SchemaID, existingUser.SchemaRevision)
+		s.schemaWriteModel, err = c.getSchemaWriteModelByID(ctx, "", existingUser.SchemaID)
 		if err != nil {
 			return err
 		}
@@ -264,7 +264,7 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser,
 		updateEvent := writeModel.NewUpdatedEvent(ctx,
 			userAgg,
 			user.schemaWriteModel.AggregateID,
-			user.schemaWriteModel.Revision,
+			user.schemaWriteModel.SchemaRevision,
 			user.Data,
 		)
 		if updateEvent != nil {
@@ -426,7 +426,7 @@ func (c *Commands) updateSchemaUserPhone(ctx context.Context, existing *UserV3Wr
 		return events, plainCode, nil
 	}
 
-	events = append(events, schemauser.NewPhoneChangedEvent(ctx,
+	events = append(events, schemauser.NewPhoneUpdatedEvent(ctx,
 		agg,
 		phone.Number,
 	))

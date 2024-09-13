@@ -38,19 +38,35 @@ func createUserRequestToCreateSchemaUser(ctx context.Context, req *user.CreateUs
 	if err != nil {
 		return nil, err
 	}
+
 	return &command.CreateSchemaUser{
-		ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		ResourceOwner: organizationToCreateResourceOwner(ctx, req.Organization),
 		SchemaID:      req.GetUser().GetSchemaId(),
 		ID:            req.GetUser().GetUserId(),
 		Data:          data,
 	}, nil
 }
 
+func organizationToCreateResourceOwner(ctx context.Context, org *object.Organization) string {
+	resourceOwner := authz.GetCtxData(ctx).OrgID
+	if resourceOwnerReq := resource_object.ResourceOwnerFromOrganization(org); resourceOwnerReq != "" {
+		return resourceOwnerReq
+	}
+	return resourceOwner
+}
+
+func organizationToUpdateResourceOwner(org *object.Organization) string {
+	if resourceOwnerReq := resource_object.ResourceOwnerFromOrganization(org); resourceOwnerReq != "" {
+		return resourceOwnerReq
+	}
+	return ""
+}
+
 func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeleteSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
+	details, err := s.command.DeleteSchemaUser(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +86,7 @@ func (s *Server) PatchUser(ctx context.Context, req *user.PatchUserRequest) (_ *
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	schemauser, err := patchUserRequestToChangeSchemaUser(ctx, req)
+	schemauser, err := patchUserRequestToChangeSchemaUser(req)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +101,7 @@ func (s *Server) PatchUser(ctx context.Context, req *user.PatchUserRequest) (_ *
 	}, nil
 }
 
-func patchUserRequestToChangeSchemaUser(ctx context.Context, req *user.PatchUserRequest) (_ *command.ChangeSchemaUser, err error) {
+func patchUserRequestToChangeSchemaUser(req *user.PatchUserRequest) (_ *command.ChangeSchemaUser, err error) {
 	var data []byte
 	if req.GetUser().Data != nil {
 		data, err = req.GetUser().GetData().MarshalJSON()
@@ -124,7 +140,7 @@ func patchUserRequestToChangeSchemaUser(ctx context.Context, req *user.PatchUser
 		}
 	}
 	return &command.ChangeSchemaUser{
-		ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
 		ID:            req.GetId(),
 		SchemaID:      req.GetUser().SchemaId,
 		Data:          data,
@@ -138,7 +154,7 @@ func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserReq
 		return nil, err
 	}
 
-	details, err := s.command.DeactivateSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
+	details, err := s.command.DeactivateSchemaUser(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +168,7 @@ func (s *Server) ActivateUser(ctx context.Context, req *user.ActivateUserRequest
 		return nil, err
 	}
 
-	details, err := s.command.ActivateSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
+	details, err := s.command.ActivateSchemaUser(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +182,7 @@ func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *us
 		return nil, err
 	}
 
-	details, err := s.command.LockSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
+	details, err := s.command.LockSchemaUser(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +196,7 @@ func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_
 		return nil, err
 	}
 
-	details, err := s.command.UnlockSchemaUser(ctx, authz.GetCtxData(ctx).OrgID, req.GetId())
+	details, err := s.command.UnlockSchemaUser(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
 	if err != nil {
 		return nil, err
 	}

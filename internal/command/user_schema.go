@@ -186,15 +186,7 @@ func validateUserSchema(userSchema json.RawMessage) error {
 }
 
 func (c *Commands) getSchemaWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserSchemaWriteModel, error) {
-	writeModel := NewUserSchemaWriteModel(resourceOwner, id, 0)
-	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
-		return nil, err
-	}
-	return writeModel, nil
-}
-
-func (c *Commands) getSchemaWriteModelByIDAndRevision(ctx context.Context, resourceOwner, id string, revision uint64) (*UserSchemaWriteModel, error) {
-	writeModel := NewUserSchemaWriteModel(resourceOwner, id, revision)
+	writeModel := NewUserSchemaWriteModel(resourceOwner, id)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}

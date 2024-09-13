@@ -674,7 +674,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 						"name": "user"
 					}`),
 						),
-						schemauser.NewPhoneChangedEvent(context.Background(),
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"+41791234567",
 						),
@@ -752,7 +752,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 						"name": "user"
 					}`),
 						),
-						schemauser.NewPhoneChangedEvent(context.Background(),
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"+41791234567",
 						),
@@ -835,7 +835,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 						schemauser.NewEmailVerifiedEvent(context.Background(),
 							&schemauser.NewAggregate("id1", "org1").Aggregate,
 						),
-						schemauser.NewPhoneChangedEvent(context.Background(),
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"+41791234567",
 						),
@@ -2728,6 +2728,50 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			},
 		},
 		{
+			"user update, email not changed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewEmailUpdatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"test@example.com",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ChangeSchemaUser{
+					ID: "user1",
+					Email: &Email{
+						Address:     "test@example.com",
+						ReturnCode:  true,
+						URLTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
 			"user update, email return",
 			fields{
 				eventstore: expectEventstore(
@@ -2857,6 +2901,48 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			},
 		},
 		{
+			"user updated, phone no change",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"type",
+								1,
+								json.RawMessage(`{
+						"name": "user"
+					}`),
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewPhoneUpdatedEvent(context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"+41791234567",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ChangeSchemaUser{
+					ID: "user1",
+					Phone: &Phone{
+						Number:     "+41791234567",
+						ReturnCode: true,
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
 			"user updated, phone return",
 			fields{
 				eventstore: expectEventstore(
@@ -2872,7 +2958,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 						),
 					),
 					expectPush(
-						schemauser.NewPhoneChangedEvent(context.Background(),
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
 							"+41791234567",
 						),
@@ -2925,7 +3011,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 						),
 					),
 					expectPush(
-						schemauser.NewPhoneChangedEvent(context.Background(),
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
 							"+41791234567",
 						),
@@ -2983,7 +3069,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 						schemauser.NewEmailVerifiedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
 						),
-						schemauser.NewPhoneChangedEvent(context.Background(),
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
 							"+41791234567",
 						),

@@ -64,6 +64,7 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.SchemaID = e.SchemaID
 			wm.SchemaRevision = e.SchemaRevision
 			wm.Data = e.Data
+			wm.Locked = false
 
 			wm.State = domain.UserStateActive
 		case *schemauser.UpdatedEvent:
@@ -80,6 +81,8 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.State = domain.UserStateDeleted
 		case *schemauser.EmailUpdatedEvent:
 			wm.Email = string(e.EmailAddress)
+			wm.IsEmailVerified = false
+			wm.EmailVerifiedFailedCount = 0
 		case *schemauser.EmailCodeAddedEvent:
 			wm.IsEmailVerified = false
 			wm.EmailVerifiedFailedCount = 0
@@ -88,8 +91,10 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.EmailVerifiedFailedCount = 0
 		case *schemauser.EmailVerificationFailedEvent:
 			wm.EmailVerifiedFailedCount += 1
-		case *schemauser.PhoneChangedEvent:
+		case *schemauser.PhoneUpdatedEvent:
 			wm.Phone = string(e.PhoneNumber)
+			wm.IsPhoneVerified = false
+			wm.PhoneVerifiedFailedCount = 0
 		case *schemauser.PhoneCodeAddedEvent:
 			wm.IsPhoneVerified = false
 			wm.PhoneVerifiedFailedCount = 0
