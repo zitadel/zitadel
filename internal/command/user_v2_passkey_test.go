@@ -143,7 +143,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(*testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
@@ -163,7 +163,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 		{
 			name: "code verification error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
@@ -174,7 +174,6 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
 						),
 					),
-					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 					expectPush(
 						user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
 					),
@@ -192,7 +191,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 		{
 			name: "code verification ok, get human passwordless error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
@@ -203,7 +202,6 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
 						),
 					),
-					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 					expectFilterError(io.ErrClosedPipe),
 				),
 			},
@@ -220,7 +218,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore,
+				eventstore:     tt.fields.eventstore(t),
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
@@ -242,7 +240,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		userID        string
@@ -260,7 +258,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 		{
 			name: "filter error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
 			},
@@ -274,7 +272,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 		{
 			name: "code verification error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
@@ -285,7 +283,6 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
 						),
 					),
-					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 					expectPush(
 						user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
 					),
@@ -302,7 +299,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
@@ -313,7 +310,6 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
 						),
 					),
-					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 				),
 			},
 			args: args{
@@ -328,7 +324,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := c.verifyUserPasskeyCode(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.codeID, tt.args.code, alg)
 			require.ErrorIs(t, err, tt.wantErr)

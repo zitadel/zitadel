@@ -163,11 +163,11 @@ func prepareRoles(ctx context.Context, scope []string, projectID string, project
 }
 
 func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
-	out := new(oidc.UserInfo)
+	out := &oidc.UserInfo{
+		Subject: user.User.ID,
+	}
 	for _, s := range scope {
 		switch s {
-		case oidc.ScopeOpenID:
-			out.Subject = user.User.ID
 		case oidc.ScopeEmail:
 			if !userInfoAssertion {
 				continue

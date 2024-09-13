@@ -41,14 +41,6 @@ func newEncryptedCodeWithDefaultConfig(ctx context.Context, filter preparation.F
 	}, nil
 }
 
-func verifyEncryptedCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, creation time.Time, expiry time.Duration, crypted *crypto.CryptoValue, plain string) error {
-	gen, _, err := encryptedCodeGenerator(ctx, filter, typ, alg, emptyConfig)
-	if err != nil {
-		return err
-	}
-	return crypto.VerifyCode(creation, expiry, crypted, plain, gen.Alg())
-}
-
 func encryptedCodeGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (crypto.Generator, *crypto.GeneratorConfig, error) {
 	config, err := cryptoGeneratorConfigWithDefault(ctx, filter, typ, defaultConfig)
 	if err != nil {
