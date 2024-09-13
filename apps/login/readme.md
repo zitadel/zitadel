@@ -48,6 +48,8 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
 This page shows a loginname field and Identity Providers to login or register.
 If `loginSettings(org?).allowRegister` is `true`, if will also show a link to jump to /register
 
+Requests to the APIs made:
+
 - `getLoginSettings(org?)`
 - `getLegalAndSupportSettings(org?)`
 - `getIdentityProviders(org?)`
