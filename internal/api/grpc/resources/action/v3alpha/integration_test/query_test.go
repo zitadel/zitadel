@@ -215,7 +215,7 @@ func TestServer_GetTarget(t *testing.T) {
 			if tt.args.dep != nil {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
-				time.Sleep(500 * time.Millisecond)
+				time.Sleep(2 * time.Second)
 			}
 			got, getErr := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
