@@ -9,7 +9,9 @@ import {
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import Alert from "./Alert";
+import { SignInWithApple } from "./idps/SignInWithApple";
 import { SignInWithAzureAD } from "./idps/SignInWithAzureAD";
+import { SignInWithGeneric } from "./idps/SignInWithGeneric";
 import { SignInWithGithub } from "./idps/SignInWithGithub";
 import { SignInWithGitlab } from "./idps/SignInWithGitlab";
 import { SignInWithGoogle } from "./idps/SignInWithGoogle";
@@ -76,10 +78,41 @@ export function SignInWithIDP({
       {identityProviders &&
         identityProviders.map((idp, i) => {
           switch (idp.type) {
+            case IdentityProviderType.APPLE:
+              return (
+                <SignInWithApple
+                  key={`idp-${i}`}
+                  name={idp.name}
+                  onClick={() =>
+                    navigateToAuthUrl(idp.id, IdentityProviderType.APPLE)
+                  }
+                ></SignInWithApple>
+              );
+            case IdentityProviderType.OAUTH:
+              return (
+                <SignInWithGeneric
+                  key={`idp-${i}`}
+                  name={idp.name}
+                  onClick={() =>
+                    navigateToAuthUrl(idp.id, IdentityProviderType.OAUTH)
+                  }
+                ></SignInWithGeneric>
+              );
+            case IdentityProviderType.OIDC:
+              return (
+                <SignInWithGeneric
+                  key={`idp-${i}`}
+                  name={idp.name}
+                  onClick={() =>
+                    navigateToAuthUrl(idp.id, IdentityProviderType.OIDC)
+                  }
+                ></SignInWithGeneric>
+              );
             case IdentityProviderType.GITHUB:
               return (
                 <SignInWithGithub
                   key={`idp-${i}`}
+                  name={idp.name}
                   onClick={() =>
                     navigateToAuthUrl(idp.id, IdentityProviderType.GITHUB)
                   }
@@ -89,6 +122,7 @@ export function SignInWithIDP({
               return (
                 <SignInWithGithub
                   key={`idp-${i}`}
+                  name={idp.name}
                   onClick={() =>
                     navigateToAuthUrl(idp.id, IdentityProviderType.GITHUB_ES)
                   }
@@ -98,6 +132,7 @@ export function SignInWithIDP({
               return (
                 <SignInWithAzureAD
                   key={`idp-${i}`}
+                  name={idp.name}
                   onClick={() =>
                     navigateToAuthUrl(idp.id, IdentityProviderType.AZURE_AD)
                   }
@@ -118,6 +153,7 @@ export function SignInWithIDP({
               return (
                 <SignInWithGitlab
                   key={`idp-${i}`}
+                  name={idp.name}
                   onClick={() =>
                     navigateToAuthUrl(idp.id, IdentityProviderType.GITLAB)
                   }
@@ -127,6 +163,7 @@ export function SignInWithIDP({
               return (
                 <SignInWithGitlab
                   key={`idp-${i}`}
+                  name={idp.name}
                   onClick={() =>
                     navigateToAuthUrl(
                       idp.id,

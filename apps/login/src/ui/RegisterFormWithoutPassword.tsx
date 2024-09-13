@@ -89,9 +89,7 @@ export default function RegisterFormWithoutPassword({
     if (withPassword) {
       return router.push(`/register?` + new URLSearchParams(registerParams));
     } else {
-      const session = await submitAndRegister(value).catch((error) => {
-        setError(error.message ?? "Could not register user");
-      });
+      const session = await submitAndRegister(value);
 
       const params = new URLSearchParams({});
       if (session?.factors?.user?.loginName) {

@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import Alert from "./Alert";
+import BackButton from "./BackButton";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
 import PasswordComplexity from "./PasswordComplexity";
@@ -74,19 +75,23 @@ export default function SetPasswordForm({
       setError("Could not register user");
       return;
     }
-    const params: any = { userId: response.userId };
 
+    const params = new URLSearchParams({ userId: response.userId });
+
+    if (response.factors?.user?.loginName) {
+      params.append("loginName", response.factors.user.loginName);
+    }
     if (authRequestId) {
-      params.authRequestId = authRequestId;
+      params.append("authRequestId", authRequestId);
     }
     if (organization) {
-      params.organization = organization;
+      params.append("organization", organization);
     }
     if (response && response.sessionId) {
-      params.sessionId = response.sessionId;
+      params.append("sessionId", response.sessionId);
     }
 
-    return router.push(`/verify?` + new URLSearchParams(params));
+    return router.push(`/verify?` + params);
   }
 
   const { errors } = formState;
@@ -150,9 +155,7 @@ export default function SetPasswordForm({
       {error && <Alert>{error}</Alert>}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <Button type="button" variant={ButtonVariants.Secondary}>
-          back
-        </Button>
+        <BackButton />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}

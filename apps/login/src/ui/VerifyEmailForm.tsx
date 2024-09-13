@@ -2,6 +2,7 @@
 
 import { resendVerifyEmail, verifyUserByEmail } from "@/lib/server/email";
 import Alert from "@/ui/Alert";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,20 +16,24 @@ type Inputs = {
 
 type Props = {
   userId: string;
+  loginName: string;
   code: string;
   submit: boolean;
   organization?: string;
   authRequestId?: string;
   sessionId?: string;
+  loginSettings?: LoginSettings;
 };
 
 export default function VerifyEmailForm({
   userId,
+  loginName,
   code,
   submit,
   organization,
   authRequestId,
   sessionId,
+  loginSettings,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -71,7 +76,7 @@ export default function VerifyEmailForm({
       userId,
     }).catch((error: Error) => {
       setLoading(false);
-      setError(error.message);
+      setError(error.message ?? "Could not verify email");
     });
 
     setLoading(false);

@@ -1,4 +1,4 @@
-import { PROVIDER_MAPPING } from "@/lib/idp";
+import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
 import {
   addIDPLink,
   createUser,
@@ -51,11 +51,17 @@ export default async function Page({
           const idp = await getIDPByID(idpInformation.idpId);
           const options = idp?.config?.options;
 
+          if (!idp) {
+            throw new Error("IDP not found");
+          }
+
+          const providerType = idpTypeToIdentityProviderType(idp.type);
+
           // search for potential user via username, then link
           if (options?.isLinkingAllowed) {
             let foundUser;
             const email =
-              PROVIDER_MAPPING[provider](idpInformation).email?.email;
+              PROVIDER_MAPPING[providerType](idpInformation).email?.email;
 
             if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
               foundUser = await listUsers({ email }).then((response) => {
@@ -118,7 +124,7 @@ export default async function Page({
           }
 
           if (options?.isCreationAllowed && options.isAutoCreation) {
-            const newUser = await createUser(provider, idpInformation);
+            const newUser = await createUser(providerType, idpInformation);
 
             if (newUser) {
               return (

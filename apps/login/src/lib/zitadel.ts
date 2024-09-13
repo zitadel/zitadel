@@ -20,6 +20,7 @@ import {
 import { create } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   SearchQuery,
@@ -29,8 +30,6 @@ import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600;
-
-console.log("Session lifetime", SESSION_LIFETIME_S);
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
@@ -438,7 +437,10 @@ export function addIDPLink(
   );
 }
 
-export function createUser(provider: string, info: IDPInformation) {
+export function createUser(
+  provider: IdentityProviderType,
+  info: IDPInformation,
+) {
   const userData = PROVIDER_MAPPING[provider](info);
   console.log("ud", userData);
   return userService.addHumanUser(userData, {});
