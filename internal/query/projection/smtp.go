@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable = "projections.smtp_configs3"
+	SMTPConfigProjectionTable = "projections.smtp_configs4"
 	SMTPConfigTable           = SMTPConfigProjectionTable + "_" + smtpConfigSMTPTableSuffix
 	SMTPConfigHTTPTable       = SMTPConfigProjectionTable + "_" + smtpConfigHTTPTableSuffix
 
@@ -174,7 +174,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(SMTPConfigSMTPColumnID, e.ID),
+				handler.NewCol(SMTPConfigSMTPColumnID, id),
 				handler.NewCol(SMTPConfigSMTPColumnTLS, e.TLS),
 				handler.NewCol(SMTPConfigSMTPColumnSenderAddress, e.SenderAddress),
 				handler.NewCol(SMTPConfigSMTPColumnSenderName, e.SenderName),
