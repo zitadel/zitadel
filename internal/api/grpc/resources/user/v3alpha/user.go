@@ -27,7 +27,7 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (_
 		return nil, err
 	}
 	return &user.CreateUserResponse{
-		Details:   resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.ResourceOwner),
+		Details:   resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
 		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
 		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
 	}, nil
@@ -95,7 +95,7 @@ func (s *Server) PatchUser(ctx context.Context, req *user.PatchUserRequest) (_ *
 		return nil, err
 	}
 	return &user.PatchUserResponse{
-		Details:   resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.ResourceOwner),
+		Details:   resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
 		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
 		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
 	}, nil

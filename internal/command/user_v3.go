@@ -256,7 +256,7 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser,
 	}
 
 	userAgg := UserV3AggregateFromWriteModel(&writeModel.WriteModel)
-	events := make([]eventstore.Command, 0, 3)
+	events := make([]eventstore.Command, 0)
 	if user.Data != nil || user.SchemaID != nil {
 		if err := user.ValidData(ctx, c, writeModel); err != nil {
 			return err
