@@ -14,10 +14,14 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	tx, err := es.client.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -64,7 +68,10 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 //go:embed push.sql
 var pushStmt string
 
-func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
+func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) (_ []eventstore.Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	events, placeholders, args, err := mapCommands(commands, sequences)
 	if err != nil {
 		return nil, err
