@@ -9,7 +9,6 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
     A[Start] --> register
     A[Start] --> accounts
     A[Start] --> loginname
-    A[Start] --> register
     A[Start] -- signInWithIDP --> idp
     idp --> idp-success
     idp --> idp-failure
@@ -74,4 +73,4 @@ If no previous condition is met we throw an error stating the user was not found
 
 If the outcome after this order produces a no authentication methods found, or user not found, we check whether `loginSettings?.ignoreUnknownUsernames` is set to `true` as in this case we redirect to the /password page regardless (to not leak information about a registered user).
 
-> NOTE: We ignore `loginSettings.allowExternalIdp` as the information whether IDPs are available comes as response from `getActiveIdentityProviders(org?)`
+> NOTE: We ignore `loginSettings.allowExternalIdp` as the information whether IDPs are available comes as response from `getActiveIdentityProviders(org?)`.

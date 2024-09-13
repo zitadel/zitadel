@@ -185,7 +185,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // user not found, check if register is enabled on organization
 
   if (loginSettings?.allowRegister && !loginSettings?.allowUsernamePassword) {
-    // TODO redirect to loginname page with idp hint
+    // TODO: do we need to handle login hints for IDPs here?
     await redirectUserToSingleIDPIfAvailable();
 
     throw Error("Could not find user");
