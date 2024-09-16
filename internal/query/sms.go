@@ -256,7 +256,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				&twilioConfig.token,
 				&twilioConfig.senderNumber,
 
-				&httpConfig.smsID,
+				&httpConfig.id,
 				&httpConfig.endpoint,
 			)
 
@@ -268,7 +268,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			}
 
 			twilioConfig.set(config)
-			httpConfig.set(config)
+			httpConfig.setSMS(config)
 
 			return config, nil
 		}
@@ -322,7 +322,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 					&twilioConfig.token,
 					&twilioConfig.senderNumber,
 
-					&httpConfig.smsID,
+					&httpConfig.id,
 					&httpConfig.endpoint,
 
 					&configs.Count,
@@ -333,7 +333,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				}
 
 				twilioConfig.set(config)
-				httpConfig.set(config)
+				httpConfig.setSMS(config)
 
 				configs.Configs = append(configs.Configs, config)
 			}
@@ -361,12 +361,12 @@ func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
 }
 
 type sqlHTTPConfig struct {
-	smsID    sql.NullString
+	id       sql.NullString
 	endpoint sql.NullString
 }
 
-func (c sqlHTTPConfig) set(smsConfig *SMSConfig) {
-	if !c.smsID.Valid {
+func (c sqlHTTPConfig) setSMS(smsConfig *SMSConfig) {
+	if !c.id.Valid {
 		return
 	}
 	smsConfig.HTTPConfig = &HTTP{
