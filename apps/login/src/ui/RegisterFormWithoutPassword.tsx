@@ -1,6 +1,6 @@
 "use client";
 
-import { registerUser } from "@/lib/server/register";
+import { registerUser, RegisterUserResponse } from "@/lib/server/register";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -63,9 +63,14 @@ export default function RegisterFormWithoutPassword({
       lastName: values.lastname,
       organization: organization,
     }).catch((error) => {
-      setError(error.message ?? "Could not register user");
+      console.error(error);
+      setError("Could not register user");
       setLoading(false);
     });
+
+    if (response && "error" in response) {
+      setError(response.error);
+    }
 
     setLoading(false);
 
@@ -89,7 +94,7 @@ export default function RegisterFormWithoutPassword({
     if (withPassword) {
       return router.push(`/register?` + new URLSearchParams(registerParams));
     } else {
-      const session = await submitAndRegister(value);
+      const session = (await submitAndRegister(value)) as RegisterUserResponse;
 
       const params = new URLSearchParams({});
       if (session?.factors?.user?.loginName) {

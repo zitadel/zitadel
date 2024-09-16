@@ -23,6 +23,10 @@ export async function addU2F(command: RegisterU2FCommand) {
     sessionId: command.sessionId,
   });
 
+  if (!sessionCookie) {
+    return { error: "Could not get session" };
+  }
+
   const session = await getSession({
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
@@ -31,14 +35,15 @@ export async function addU2F(command: RegisterU2FCommand) {
   const domain = headers().get("host");
 
   if (!domain) {
-    throw Error("Could not get domain");
+    return { error: "Could not get domain" };
   }
 
   const userId = session?.session?.factors?.user?.id;
 
-  if (!userId) {
-    throw Error("Could not get session");
+  if (!session || !userId) {
+    return { error: "Could not get session" };
   }
+
   return registerU2F(userId, domain);
 }
 
@@ -65,7 +70,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   const userId = session?.session?.factors?.user?.id;
 
   if (!userId) {
-    throw new Error("Could not get session");
+    return { error: "Could not get session" };
   }
 
   const req = create(VerifyU2FRegistrationRequestSchema, {

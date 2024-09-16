@@ -2,6 +2,7 @@
 
 import { addHumanUser } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
+import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 type RegisterUserCommand = {
   email: string;
@@ -11,6 +12,13 @@ type RegisterUserCommand = {
   organization?: string;
   authRequestId?: string;
 };
+
+export type RegisterUserResponse = {
+  userId: string;
+  sessionId: string;
+  factors: Factors | undefined;
+};
+
 export async function registerUser(command: RegisterUserCommand) {
   const human = await addHumanUser({
     email: command.email,
@@ -19,8 +27,9 @@ export async function registerUser(command: RegisterUserCommand) {
     password: command.password ? command.password : undefined,
     organization: command.organization,
   });
+
   if (!human) {
-    throw Error("Could not create user");
+    return { error: "Could not create user" };
   }
 
   return createSessionForUserIdAndUpdateCookie(

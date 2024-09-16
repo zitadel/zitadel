@@ -1,6 +1,6 @@
 "use client";
 
-import { registerUser } from "@/lib/server/register";
+import { registerUser, RegisterUserResponse } from "@/lib/server/register";
 import {
   lowerCaseValidator,
   numberValidator,
@@ -66,8 +66,13 @@ export default function SetPasswordForm({
       authRequestId: authRequestId,
       password: values.password,
     }).catch((error: Error) => {
-      setError(error.message ?? "Could not register user");
+      console.error(error);
+      setError("Could not register user");
     });
+
+    if (response && "error" in response) {
+      setError(response.error);
+    }
 
     setLoading(false);
 
@@ -76,10 +81,12 @@ export default function SetPasswordForm({
       return;
     }
 
-    const params = new URLSearchParams({ userId: response.userId });
+    const userReponse = response as RegisterUserResponse;
 
-    if (response.factors?.user?.loginName) {
-      params.append("loginName", response.factors.user.loginName);
+    const params = new URLSearchParams({ userId: userReponse.userId });
+
+    if (userReponse.factors?.user?.loginName) {
+      params.append("loginName", userReponse.factors.user.loginName);
     }
     if (authRequestId) {
       params.append("authRequestId", authRequestId);
@@ -87,8 +94,8 @@ export default function SetPasswordForm({
     if (organization) {
       params.append("organization", organization);
     }
-    if (response && response.sessionId) {
-      params.append("sessionId", response.sessionId);
+    if (userReponse && userReponse.sessionId) {
+      params.append("sessionId", userReponse.sessionId);
     }
 
     return router.push(`/verify?` + params);

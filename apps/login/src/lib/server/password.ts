@@ -18,7 +18,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
     users.details.totalResult !== BigInt(1) ||
     !users.result[0].userId
   ) {
-    throw Error("Could not find user");
+    return { error: "Could not find user" };
   }
   const userId = users.result[0].userId;
 

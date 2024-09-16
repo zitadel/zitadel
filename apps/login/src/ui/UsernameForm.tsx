@@ -51,6 +51,7 @@ export default function UsernameForm({
       organization,
       authRequestId,
     }).catch((error: Error) => {
+      console.error(error);
       setError("An internal error occurred");
     });
 

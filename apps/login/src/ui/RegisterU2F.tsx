@@ -2,14 +2,13 @@
 
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Alert from "./Alert";
 import BackButton from "./BackButton";
 import { Button, ButtonVariants } from "./Button";
 import { Spinner } from "./Spinner";
-
-type Inputs = {};
 
 type Props = {
   sessionId: string;
@@ -41,8 +40,9 @@ export default function RegisterU2F({
       publicKeyCredential,
       sessionId,
     }).catch((error: Error) => {
+      console.error(error);
       setLoading(false);
-      setError(error.message);
+      setError("An error on verifying passkey occurred");
     });
 
     setLoading(false);
@@ -55,20 +55,27 @@ export default function RegisterU2F({
     setLoading(true);
     const response = await addU2F({
       sessionId,
-    }).catch((error) => {
+    }).catch((error: Error) => {
+      console.error(error);
       setLoading(false);
-      setError(error.message);
+      setError("An error on registering passkey");
     });
 
-    if (!response) {
+    if (response && "error" in response && response?.error) {
+      setError(response?.error);
+    }
+
+    if (!response || "u2fId" in response) {
       setLoading(false);
       setError("An error on registering passkey");
       return;
     }
 
-    const u2fId = response?.u2fId;
+    const u2fResponse = response as unknown as RegisterU2FResponse;
+
+    const u2fId = u2fResponse.u2fId;
     const options: CredentialCreationOptions =
-      (response?.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
+      (u2fResponse?.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
       {};
 
     if (options.publicKey) {

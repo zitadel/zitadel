@@ -451,7 +451,7 @@ export function createUser(
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function passwordReset(userId: string): Promise<any> {
+export async function passwordReset(userId: string) {
   return userService.passwordReset(
     {
       userId,

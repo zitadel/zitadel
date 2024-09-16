@@ -77,9 +77,14 @@ export default function PasswordForm({
       loginName,
       organization,
     }).catch((error: Error) => {
+      console.error(error);
       setLoading(false);
-      setError(error.message ?? "Could not reset password");
+      setError("Could not reset password");
     });
+
+    if (response && "error" in response) {
+      setError(response.error);
+    }
 
     setLoading(false);
 
