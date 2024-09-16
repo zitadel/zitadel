@@ -663,7 +663,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email providers";
+            tags: "Email Provider";
             summary: "List Email providers";
             description: "Returns a list of Email providers."
         };

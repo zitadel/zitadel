@@ -1,5 +1,5 @@
 ---
-title: Notifications Delivery Customization
+title: SMS, SMTP and HTTP Provider for Notifications 
 ---
 
 All Notifications send as SMS and Email are customizable as that you can define your own providers, 
