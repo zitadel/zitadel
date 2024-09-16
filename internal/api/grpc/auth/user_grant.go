@@ -55,5 +55,6 @@ func UserGrantToPb(grant *query.UserGrant) *auth_pb.UserGrant {
 		ProjectGrantId: grant.GrantID,
 		RoleKeys:       grant.Roles,
 		UserType:       user.TypeToPb(grant.UserType),
+		State:          user.UserGrantStateToPb(grant.State),
 	}
 }
