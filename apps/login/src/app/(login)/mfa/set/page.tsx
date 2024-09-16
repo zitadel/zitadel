@@ -18,8 +18,14 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, checkAfter, authRequestId, organization, sessionId } =
-    searchParams;
+  const {
+    loginName,
+    checkAfter,
+    force,
+    authRequestId,
+    organization,
+    sessionId,
+  } = searchParams;
 
   const sessionWithData = sessionId
     ? await loadSessionById(sessionId, organization)

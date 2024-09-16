@@ -1,6 +1,5 @@
 "use server";
 
-import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -108,13 +107,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               command.organization ?? session.factors?.user?.organizationId;
           }
 
-          if (
-            loginSettings?.passkeysType &&
-            loginSettings?.passkeysType === PasskeysType.ALLOWED
-          ) {
-            paramsPassword.promptPasswordless = `true`;
-          }
-
           if (command.authRequestId) {
             paramsPassword.authRequestId = command.authRequestId;
           }
@@ -163,10 +155,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       ) {
         // user has no passkey setup and login settings allow passkeys
         const paramsPasswordDefault: any = { loginName: command.loginName };
-
-        if (loginSettings?.passkeysType === PasskeysType.ALLOWED) {
-          paramsPasswordDefault.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
-        }
 
         if (command.authRequestId) {
           paramsPasswordDefault.authRequestId = command.authRequestId;
@@ -234,10 +222,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   if (loginSettings?.ignoreUnknownUsernames) {
     const paramsPasswordDefault: any = { loginName: command.loginName };
-
-    if (loginSettings?.passkeysType === PasskeysType.ALLOWED) {
-      paramsPasswordDefault.promptPasswordless = `true`;
-    }
 
     if (command.authRequestId) {
       paramsPasswordDefault.authRequestId = command.authRequestId;

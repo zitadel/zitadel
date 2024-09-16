@@ -80,3 +80,25 @@ If no previous condition is met we throw an error stating the user was not found
 **EXCEPTIONS:** If the outcome after this order produces a no authentication methods found, or user not found, we check whether `loginSettings?.ignoreUnknownUsernames` is set to `true` as in this case we redirect to the /password page regardless (to not leak information about a registered user).
 
 > NOTE: We ignore `loginSettings.allowExternalIdp` as the information whether IDPs are available comes as response from `getActiveIdentityProviders(org?)`.
+
+### /password
+
+<img src="./screenshots/password.png" alt="/password" width="400px" />
+
+This page shows a password field to hydrate the current session with password as a factor.
+Below the password field, a reset password link is shown which allows to send a reset email.
+
+Requests to the APIs made:
+
+- `getLoginSettings(org?)`
+- `getBrandingSettings(org?)`
+- `listAuthenticationMethodTypes`
+
+**MFA AVAILABLE:** After the password has been submitted, additional authentication Methods are loaded.
+If the user has set up an additional **single** second factor, it is redirected to add the next factor. Depending on the available method he is redirected to `/otp/time-based`,`/otp/sms?`, `/otp/email?` or `/u2f?`. If the user has multiple second factors, he is redirected to `/mfa` to select his preferred method to continue.
+
+**NO MFA, FORCE MFA:** If no MFA method is available, and the settings force MFA, the user is sent to `/mfa/set` which prompts to setup a second factor.
+
+**PROMPT PASSKEY** If the settings do not enforce MFA, we check if passkeys are allowed with `loginSettings?.passkeysType === PasskeysType.ALLOWED` and redirect the user to `/passkey/add` if no passkeys are setup. This step can be skipped.
+
+If none of the previous conditions apply, we continue to sign in.

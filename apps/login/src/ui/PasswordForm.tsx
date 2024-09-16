@@ -153,29 +153,10 @@ export default function PasswordForm({
       }
 
       return router.push(`/mfa?` + params);
-    } else if (
-      submitted.factors &&
-      !submitted.factors.webAuthN && // if session was not verified with a passkey
-      promptPasswordless && // if explicitly prompted due policy
-      !isAlternative // escaped if password was used as an alternative method
-    ) {
-      const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
-        promptPasswordless: "true",
-      });
-
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      return router.push(`/passkey/add?` + params);
     } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
       const params = new URLSearchParams({
         loginName: submitted.factors.user.loginName,
+        force: "true", // this defines if the mfa is forced in the settings
         checkAfter: "true", // this defines if the check is directly made after the setup
       });
 
@@ -189,6 +170,26 @@ export default function PasswordForm({
 
       // TODO: provide a way to setup passkeys on mfa page?
       return router.push(`/mfa/set?` + params);
+    } else if (
+      submitted.factors &&
+      !submitted.factors.webAuthN && // if session was not verified with a passkey
+      promptPasswordless && // if explicitly prompted due policy
+      !isAlternative // escaped if password was used as an alternative method
+    ) {
+      const params = new URLSearchParams({
+        loginName: submitted.factors.user.loginName,
+        prompt: "true",
+      });
+
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      return router.push(`/passkey/add?` + params);
     } else if (authRequestId && submitted.sessionId) {
       const params = new URLSearchParams({
         sessionId: submitted.sessionId,

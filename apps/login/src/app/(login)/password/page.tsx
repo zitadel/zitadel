@@ -4,14 +4,14 @@ import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import PasswordForm from "@/ui/PasswordForm";
 import UserAvatar from "@/ui/UserAvatar";
+import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, organization, promptPasswordless, authRequestId, alt } =
-    searchParams;
+  const { loginName, organization, authRequestId, alt } = searchParams;
 
   const sessionFactors = await loadMostRecentSession({
     loginName,
@@ -51,7 +51,9 @@ export default async function Page({
             authRequestId={authRequestId}
             organization={organization}
             loginSettings={loginSettings}
-            promptPasswordless={promptPasswordless === "true"}
+            promptPasswordless={
+              loginSettings?.passkeysType === PasskeysType.ALLOWED
+            }
             isAlternative={alt === "true"}
           />
         )}

@@ -10,18 +10,17 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, promptPasswordless, organization, authRequestId } =
-    searchParams;
+  const { loginName, prompt, organization, authRequestId } = searchParams;
 
   const session = await loadMostRecentSession({
     loginName,
     organization,
   });
 
-  const title = !!promptPasswordless
+  const title = !!prompt
     ? "Authenticate with a passkey"
     : "Use your passkey to confirm it's really you";
-  const description = !!promptPasswordless
+  const description = !!prompt
     ? "When set up, you will be able to authenticate without a password."
     : "Your device will ask for your fingerprint, face, or screen lock";
 
@@ -68,7 +67,7 @@ export default async function Page({
         {session?.id && (
           <RegisterPasskey
             sessionId={session.id}
-            isPrompt={!!promptPasswordless}
+            isPrompt={!!prompt}
             organization={organization}
             authRequestId={authRequestId}
           />
