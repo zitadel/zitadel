@@ -104,6 +104,7 @@ func (wm *IAMSMTPConfigWriteModel) Reduce() error {
 			wm.reduceSMTPConfigRemovedEvent(e)
 		case *instance.SMTPConfigActivatedEvent:
 			if wm.ID != e.ID {
+				wm.State = domain.SMTPConfigStateInactive
 				continue
 			}
 			wm.State = domain.SMTPConfigStateActive
