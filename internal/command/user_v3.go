@@ -179,7 +179,7 @@ type ChangeSchemaUser struct {
 
 func (s *ChangeSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 	if s.ID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-gEJR1QOGHb", "TODO")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-gEJR1QOGHb", "Errors.IDMissing")
 	}
 	if s.SchemaID != nil {
 		s.schemaWriteModel, err = c.getSchemaWriteModelByID(ctx, "", *s.SchemaID)
@@ -306,11 +306,8 @@ func (c *Commands) LockSchemaUser(ctx context.Context, resourceOwner, id string)
 	if err != nil {
 		return nil, err
 	}
-	if !writeModel.Exists() {
+	if !writeModel.Exists() || writeModel.Locked {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-G4LOrnjY7q", "Errors.User.NotFound")
-	}
-	if writeModel.Locked {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
 	}
 	if err := c.checkPermissionUpdateUserState(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
 		return nil, err
@@ -331,11 +328,8 @@ func (c *Commands) UnlockSchemaUser(ctx context.Context, resourceOwner, id strin
 	if err != nil {
 		return nil, err
 	}
-	if !writeModel.Exists() {
+	if !writeModel.Exists() || !writeModel.Locked {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound")
-	}
-	if !writeModel.Locked {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
 	}
 	if err := c.checkPermissionUpdateUserState(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
 		return nil, err

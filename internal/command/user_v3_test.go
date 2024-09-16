@@ -1224,7 +1224,7 @@ func TestCommandSide_LockSchemaUser(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-G4LOrnjY7q", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -1427,7 +1427,7 @@ func TestCommandSide_UnlockSchemaUser(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -1980,7 +1980,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-gEJR1QOGHb", "TODO"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-gEJR1QOGHb", "Errors.IDMissing"))
 				},
 			},
 		},
