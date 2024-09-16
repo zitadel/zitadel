@@ -46,13 +46,18 @@ export default function UsernameForm({
   async function submitLoginName(values: Inputs, organization?: string) {
     setLoading(true);
 
-    const res = await sendLoginname({
-      loginName: values.loginName,
-      organization,
-      authRequestId,
-    }).catch((error: Error) => {
-      setError(error.message ?? "An internal error occurred");
-    });
+    let res;
+    try {
+      res = await sendLoginname({
+        loginName: values.loginName,
+        organization,
+        authRequestId,
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message ?? "An internal error occurred");
+      }
+    }
 
     setLoading(false);
 
