@@ -12,7 +12,7 @@
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
 
     <div class="lgn-actions">
-        <a class="lgn-icon-button lgn-left-action" href="{{ loginNameChangeUrl .AuthReqID }}">
+        <a class="lgn-icon-button lgn-left-action" href="{{ if .AuthReqID }}{{ loginNameChangeUrl .AuthReqID }}{{ else }}{{ loginUrl }}{{ end }}">
             <i class="lgn-icon-arrow-left-solid"></i>
         </a>
     </div>
