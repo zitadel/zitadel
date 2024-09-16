@@ -65,7 +65,7 @@ export default function RegisterU2F({
       setError(response?.error);
     }
 
-    if (!response || "u2fId" in response) {
+    if (!response || !("u2fId" in response)) {
       setLoading(false);
       setError("An error on registering passkey");
       return;
