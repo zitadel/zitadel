@@ -68,7 +68,7 @@ After a loginname is entered, a `listUsers` request is made using the loginName 
 
 **USER FOUND:** If only one user is found, we query `listAuthenticationMethodTypes` to identify future steps.
 If no authentication methods are found, we render an error stating: _User has no available authentication methods._ (exception see below.)
-Now if only one method is found, we continue with the corresponding step (/password, /passkey/login).
+Now if only one method is found, we continue with the corresponding step (/password, /passkey).
 If multiple methods are set, we prefer passkeys over any other method, so we redirect to /passkey, second option is IDP, and third is password.
 If password is the next step, we check `loginSettings.passkeysType` for PasskeysType.ALLOWED, and prompt the user to setup passkeys afterwards.
 
@@ -123,3 +123,33 @@ If `email` or `sms` is requested as method, the current session of the user is u
 The `time-based` (TOTP) method does not require a trigger, therefore no `updateSession()` is performed and no resendLink under the code field is shown.
 
 The submission of the code updates the session and continues to sign in the user.
+
+### /u2f
+
+<img src="./screenshots/u2f.png" alt="/u2f" width="400px" />
+
+This page requests a webAuthN challenge for the user and updates the session afterwards.
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `updateSession()`
+
+When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.DISCOURAGED` as this will request the webAuthN method as second factor and not as primary method.
+After updating the session, the user is signed in.
+
+### /passkey
+
+<img src="./screenshots/passkey.png" alt="/passkey" width="400px" />
+
+This page requests a webAuthN challenge for the user and updates the session afterwards.
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `updateSession()`
+
+When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.REQUIRED` as this will request the webAuthN method as primary method to login.
+After updating the session, the user is signed in.

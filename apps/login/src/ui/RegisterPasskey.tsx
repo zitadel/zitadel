@@ -151,7 +151,7 @@ export default function RegisterPasskey({
       // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
       // params.set("loginName", resp.loginName);
 
-      router.push("/passkey/login?" + params);
+      router.push("/passkey?" + params);
     } else {
       router.push("/accounts?" + params);
     }

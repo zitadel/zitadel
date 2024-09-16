@@ -123,9 +123,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               command.organization ?? session.factors?.user?.organizationId;
           }
 
-          return redirect(
-            "/passkey/login?" + new URLSearchParams(paramsPasskey),
-          );
+          return redirect("/passkey?" + new URLSearchParams(paramsPasskey));
       }
     } else {
       // prefer passkey in favor of other methods
@@ -144,7 +142,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             command.organization ?? session.factors?.user?.organizationId;
         }
 
-        return redirect("/passkey/login?" + new URLSearchParams(passkeyParams));
+        return redirect("/passkey?" + new URLSearchParams(passkeyParams));
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.IDP)
       ) {
