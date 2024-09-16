@@ -79,7 +79,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     );
 
     if (!session.factors?.user?.id) {
-      throw Error("Could not create session for user");
+      return { error: "Could not create session for user" };
     }
 
     const methods = await listAuthenticationMethodTypes(
@@ -87,9 +87,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     );
 
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      throw Error(
-        "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",
-      );
+      return {
+        error:
+          "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",
+      };
     }
 
     if (methods.authMethodTypes.length == 1) {
@@ -175,7 +176,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     // TODO: do we need to handle login hints for IDPs here?
     await redirectUserToSingleIDPIfAvailable();
 
-    throw Error("Could not find user");
+    return { error: "Could not find user" };
   } else if (
     loginSettings?.allowRegister &&
     loginSettings?.allowUsernamePassword
@@ -232,5 +233,5 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     return redirect("/password?" + new URLSearchParams(paramsPasswordDefault));
   }
 
-  throw Error("Could not find user");
+  return { error: "Could not find user" };
 }
