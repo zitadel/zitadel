@@ -134,7 +134,7 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 		span.EndWithError(err)
 	}()
 
-	if strings.HasPrefix(id, command.IDPrefixV2) {
+	if command.HasIDPrefixV2(id) {
 		req, err := o.command.GetCurrentAuthRequest(ctx, id)
 		if err != nil {
 			return nil, err
@@ -173,10 +173,9 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 		span.EndWithError(err)
 	}()
 
-	if strings.HasPrefix(id, command.IDPrefixV2) {
+	if command.HasIDPrefixV2(id) {
 		return o.command.AddAuthRequestCode(ctx, id, code)
 	}
-
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		return zerrors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
@@ -303,7 +302,7 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 		span.EndWithError(err)
 	}()
 
-	if strings.HasPrefix(token, command.IDPrefixV2) {
+	if command.HasIDPrefixV2(token) {
 		err := o.command.RevokeOIDCSessionToken(ctx, token, clientID)
 		if err == nil {
 			return nil
@@ -357,12 +356,17 @@ func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, to
 	if err != nil {
 		return "", "", op.ErrInvalidRefreshToken
 	}
-	if strings.HasPrefix(plainToken, command.IDPrefixV2) {
+	if command.HasIDPrefixV2(plainToken) {
 		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, plainToken)
 		if err != nil {
 			return "", "", op.ErrInvalidRefreshToken
 		}
-		return oidcSession.UserID, oidcSession.OIDCRefreshTokenID(oidcSession.RefreshTokenID), nil
+		tokenID, err := oidcSession.OIDCRefreshTokenID(oidcSession.RefreshTokenID)
+		if err != nil {
+			return "", "", op.ErrInvalidRefreshToken
+		}
+
+		return oidcSession.UserID, tokenID, nil
 	}
 	refreshToken, err := o.repo.RefreshTokenByToken(ctx, token)
 	if err != nil {

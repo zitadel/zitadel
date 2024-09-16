@@ -62,7 +62,7 @@ func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (_ *accessTo
 		tokenID, subject = claims.JWTID, claims.Subject
 	}
 
-	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
+	if command.HasIDPrefixV2(tokenID) {
 		token, err := s.query.ActiveAccessTokenByToken(ctx, tokenID)
 		if err != nil {
 			return nil, err

@@ -97,7 +97,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if !ok {
 		return "", "", "", "", "", zerrors.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
 	}
-	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
+	if command.HasIDPrefixV2(tokenID) {
 		return repo.verifyAccessTokenV2(ctx, tokenID, verifierClientID, projectID)
 	}
 	if sessionID, ok := strings.CutPrefix(tokenID, authz.SessionTokenPrefix); ok {

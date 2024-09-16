@@ -1,8 +1,10 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -24,9 +26,6 @@ import (
 )
 
 const (
-	TokenDelimiter            = "-"
-	AccessTokenPrefix         = "at_"
-	RefreshTokenPrefix        = "rt_"
 	oidcTokenSubjectDelimiter = ":"
 	oidcTokenFormat           = "%s" + oidcTokenSubjectDelimiter + "%s"
 )
@@ -47,6 +46,12 @@ type OIDCSession struct {
 	Reason            domain.TokenReason
 	Actor             *domain.TokenActor
 	RefreshToken      string
+}
+
+type OIDCSessionToken struct {
+	ID           string `json:"id"`
+	AccessToken  string `json:"access_token,omitempty"`
+	RefreshToken string `json:"refresh_token,omitempty"`
 }
 
 type AuthRequestComplianceChecker func(context.Context, *AuthRequestWriteModel) error
@@ -217,17 +222,12 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 }
 
 func oidcSessionTokenIDsFromToken(token string) (oidcSessionID, refreshTokenID, accessTokenID string, err error) {
-	split := strings.Split(token, TokenDelimiter)
-	if len(split) != 2 {
-		return "", "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
+	sessionToken, err := DecodeOIDCSessionToken(token)
+	if err != nil || sessionToken.ID == "" || (sessionToken.RefreshToken == "" && sessionToken.AccessToken == "") {
+		return "", "", "", zerrors.ThrowPreconditionFailed(err, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
 	}
-	if strings.HasPrefix(split[1], RefreshTokenPrefix) {
-		return split[0], split[1], "", nil
-	}
-	if strings.HasPrefix(split[1], AccessTokenPrefix) {
-		return split[0], "", split[1], nil
-	}
-	return "", "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
+
+	return sessionToken.ID, sessionToken.RefreshToken, sessionToken.AccessToken, nil
 }
 
 // RevokeOIDCSessionToken revokes an access_token or refresh_token
@@ -308,13 +308,14 @@ func (c *Commands) decryptRefreshToken(refreshToken string) (sessionID, refreshT
 }
 
 func parseRefreshToken(refreshToken string) (oidcSessionID, refreshTokenID string, err error) {
-	split := strings.Split(refreshToken, TokenDelimiter)
-	if len(split) < 2 || !strings.HasPrefix(split[1], RefreshTokenPrefix) {
-		return "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid")
-	}
 	// the oidc library requires that every token has the format of <tokenID>:<userID>
 	// the V2 tokens don't use the userID anymore, so let's just remove it
-	return split[0], strings.Split(split[1], oidcTokenSubjectDelimiter)[0], nil
+	token, err := DecodeOIDCSessionToken(strings.Split(refreshToken, oidcTokenSubjectDelimiter)[0])
+	if err != nil || token.ID == "" || token.RefreshToken == "" {
+		return "", "", zerrors.ThrowPreconditionFailed(err, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid")
+	}
+
+	return token.ID, token.RefreshToken, nil
 }
 
 func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken string) (*OIDCSessionEvents, error) {
@@ -422,7 +423,7 @@ func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, 
 	if err != nil {
 		return err
 	}
-	c.accessTokenID = AccessTokenPrefix + accessTokenID
+	c.accessTokenID = accessTokenID
 	c.events = append(c.events, oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime, reason, actor))
 	if !authz.GetFeatures(ctx).DisableUserTokenEvent {
 		c.events = append(c.events, user.NewUserTokenV2AddedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, c.accessTokenID))
@@ -458,8 +459,12 @@ func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID,
 	if err != nil {
 		return "", "", err
 	}
-	refreshTokenID = RefreshTokenPrefix + refreshTokenID
-	token, err := c.encryptionAlg.Encrypt([]byte(fmt.Sprintf(oidcTokenFormat, c.oidcSessionWriteModel.OIDCRefreshTokenID(refreshTokenID), userID)))
+	tokenID, err := c.oidcSessionWriteModel.OIDCRefreshTokenID(refreshTokenID)
+	if err != nil {
+		return "", "", err
+	}
+
+	token, err := c.encryptionAlg.Encrypt([]byte(fmt.Sprintf(oidcTokenFormat, tokenID, userID)))
 	if err != nil {
 		return "", "", err
 	}
@@ -492,9 +497,13 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		RefreshToken:      c.refreshToken,
 	}
 	if c.accessTokenID != "" {
-		// prefix the returned id with the oidcSessionID so that we can retrieve it later on
-		// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
-		session.TokenID = c.oidcSessionWriteModel.AggregateID + TokenDelimiter + c.accessTokenID
+		session.TokenID, err = (&OIDCSessionToken{
+			ID:          c.oidcSessionWriteModel.AggregateID,
+			AccessToken: c.accessTokenID,
+		}).Encode()
+		if err != nil {
+			return nil, err
+		}
 	}
 	activity.Trigger(ctx, c.oidcSessionWriteModel.UserResourceOwner, c.oidcSessionWriteModel.UserID, tokenReasonToActivityMethodType(c.oidcSessionWriteModel.AccessTokenReason), c.eventstore.FilterToQueryReducer)
 	return session, nil
@@ -530,4 +539,27 @@ func tokenReasonToActivityMethodType(r domain.TokenReason) activity.TriggerMetho
 	}
 	// all other reasons result in an access token
 	return activity.OIDCAccessToken
+}
+
+func (c *OIDCSessionToken) Encode() (string, error) {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(data), nil
+}
+
+func DecodeOIDCSessionToken(token string) (*OIDCSessionToken, error) {
+	decoded, err := base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		return nil, err
+	}
+
+	var sessionToken OIDCSessionToken
+	err = json.NewDecoder(bytes.NewReader(decoded)).Decode(&sessionToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sessionToken, nil
 }

@@ -3,7 +3,6 @@ package oidc
 import (
 	"context"
 	"slices"
-	"strings"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -35,7 +34,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 	var (
 		session *command.OIDCSession
 	)
-	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
+	if command.HasIDPrefixV2(plainCode) {
 		session, _, err = s.command.CreateOIDCSessionFromAuthRequest(
 			setContextUserSystem(ctx),
 			plainCode,

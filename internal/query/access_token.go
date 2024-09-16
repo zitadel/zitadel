@@ -2,11 +2,11 @@ package query
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
@@ -107,11 +107,11 @@ func (q *Queries) ActiveAccessTokenByToken(ctx context.Context, token string) (m
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	split := strings.Split(token, "-")
-	if len(split) != 2 {
-		return nil, zerrors.ThrowUnauthenticated(nil, "QUERY-LJK2W", "Errors.OIDCSession.Token.Invalid")
+	sessionToken, err := command.DecodeOIDCSessionToken(token)
+	if err != nil || sessionToken.ID == "" || sessionToken.AccessToken == "" {
+		return nil, zerrors.ThrowUnauthenticated(err, "QUERY-LJK2W", "Errors.OIDCSession.Token.Invalid")
 	}
-	model, err = q.accessTokenByOIDCSessionAndTokenID(ctx, split[0], split[1])
+	model, err = q.accessTokenByOIDCSessionAndTokenID(ctx, sessionToken.ID, sessionToken.AccessToken)
 	if err != nil {
 		return nil, err
 	}
