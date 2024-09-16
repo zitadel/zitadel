@@ -61,6 +61,8 @@ Requests to the APIs made:
 - `listUsers(org?)`
 - `listAuthenticationMethodTypes`
 - `getOrgsByDomain`
+- `createSession()`
+- `getSession()`
 
 After a loginname is entered, a `listUsers` request is made using the loginName query to identify already registered users.
 
@@ -79,7 +81,7 @@ If no previous condition is met we throw an error stating the user was not found
 
 **EXCEPTIONS:** If the outcome after this order produces a no authentication methods found, or user not found, we check whether `loginSettings?.ignoreUnknownUsernames` is set to `true` as in this case we redirect to the /password page regardless (to not leak information about a registered user).
 
-> NOTE: We ignore `loginSettings.allowExternalIdp` as the information whether IDPs are available comes as response from `getActiveIdentityProviders(org?)`.
+> NOTE: We ignore `loginSettings.allowExternalIdp` as the information whether IDPs are available comes as response from `getActiveIdentityProviders(org?)`. If a user has a cookie for the same loginname, a new session is created regardless and overwrites the old session. The old session is not deleted from the login as for now.
 
 ### /password
 
@@ -93,6 +95,8 @@ Requests to the APIs made:
 - `getLoginSettings(org?)`
 - `getBrandingSettings(org?)`
 - `listAuthenticationMethodTypes`
+- `getSession()`
+- `updateSession()`
 
 **MFA AVAILABLE:** After the password has been submitted, additional authentication Methods are loaded.
 If the user has set up an additional **single** second factor, it is redirected to add the next factor. Depending on the available method he is redirected to `/otp/time-based`,`/otp/sms?`, `/otp/email?` or `/u2f?`. If the user has multiple second factors, he is redirected to `/mfa` to select his preferred method to continue.
@@ -102,3 +106,20 @@ If the user has set up an additional **single** second factor, it is redirected 
 **PROMPT PASSKEY** If the settings do not enforce MFA, we check if passkeys are allowed with `loginSettings?.passkeysType === PasskeysType.ALLOWED` and redirect the user to `/passkey/add` if no passkeys are setup. This step can be skipped.
 
 If none of the previous conditions apply, we continue to sign in.
+
+### /otp/[method]
+
+<img src="./screenshots/otp.png" alt="/otp/[method]" width="400px" />
+
+This page shows a code field to check an otp method. The session of the user is then hydrated with the respective factor. Supported methods are `time-based`, `sms` and `email`.
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `updateSession()`
+
+If `email` or `sms` is requested as method, the current session of the user is updated to request the challenge. This will trigger an email or sms which can be entered in the code field.
+The `time-based` (TOTP) method does not require a trigger, therefore no `updateSession()` is performed and no resendLink under the code field is shown.
+
+The submission of the code updates the session and continues to sign in the user.
