@@ -8,7 +8,13 @@ import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
-import { Type, UserGrant as MgmtUserGrant, UserGrantQuery, UserGrant } from 'src/app/proto/generated/zitadel/user_pb';
+import {
+  Type,
+  UserGrant as MgmtUserGrant,
+  UserGrant,
+  UserGrantQuery,
+  UserGrantState,
+} from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -66,6 +72,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public UserGrantContext: any = UserGrantContext;
   public Type: any = Type;
   public ActionKeysType: any = ActionKeysType;
+  public UserGrantState: any = UserGrantState;
   @Input() public type: Type | undefined = undefined;
 
   public filterOpen: boolean = false;
@@ -86,6 +93,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     'type',
     'creationDate',
     'changeDate',
+    'state',
     'roleNamesList',
     'actions',
   ];
