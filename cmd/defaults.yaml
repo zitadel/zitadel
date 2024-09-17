@@ -231,7 +231,7 @@ Projections:
   # The maximum duration a transaction remains open
   # before it spots left folding additional events
   # and updates the table.
-  TransactionDuration: 500ms # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
+  TransactionDuration: 1m # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
@@ -246,10 +246,7 @@ Projections:
   HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
-    Projects:
-      TransactionDuration: 2s
     custom_texts:
-      TransactionDuration: 2s
       BulkLimit: 400
     project_grant_fields:
       TransactionDuration: 0s
