@@ -12,6 +12,7 @@ import BackButton from "@/ui/BackButton";
 import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 export default async function Page({
   searchParams,
@@ -31,6 +32,28 @@ export default async function Page({
     ? await loadSessionById(sessionId, organization)
     : await loadSessionByLoginname(loginName, organization);
 
+  async function getAuthMethodsAndUser(session?: Session) {
+    const userId = session?.factors?.user?.id;
+
+    if (!userId) {
+      throw Error("Could not get user id from session");
+    }
+
+    return listAuthenticationMethodTypes(userId).then((methods) => {
+      return getUserByID(userId).then((user) => {
+        const humanUser =
+          user.user?.type.case === "human" ? user.user?.type.value : undefined;
+
+        return {
+          factors: session?.factors,
+          authMethods: methods.authMethodTypes ?? [],
+          phoneVerified: humanUser?.phone?.isVerified ?? false,
+          emailVerified: humanUser?.email?.isVerified ?? false,
+        };
+      });
+    });
+  }
+
   async function loadSessionByLoginname(
     loginName?: string,
     organization?: string,
@@ -39,24 +62,7 @@ export default async function Page({
       loginName,
       organization,
     }).then((session) => {
-      if (session && session.factors?.user?.id) {
-        const userId = session.factors.user.id;
-        return listAuthenticationMethodTypes(userId).then((methods) => {
-          return getUserByID(userId).then((user) => {
-            const humanUser =
-              user.user?.type.case === "human"
-                ? user.user?.type.value
-                : undefined;
-
-            return {
-              factors: session?.factors,
-              authMethods: methods.authMethodTypes ?? [],
-              phoneVerified: humanUser?.phone?.isVerified ?? false,
-              emailVerified: humanUser?.email?.isVerified ?? false,
-            };
-          });
-        });
-      }
+      return getAuthMethodsAndUser(session);
     });
   }
 
@@ -65,29 +71,15 @@ export default async function Page({
     return getSession({
       sessionId: recent.id,
       sessionToken: recent.token,
-    }).then((response) => {
-      if (response?.session && response.session.factors?.user?.id) {
-        const userId = response.session.factors.user.id;
-        return listAuthenticationMethodTypes(userId).then((methods) => {
-          return getUserByID(userId).then((user) => {
-            const humanUser =
-              user.user?.type.case === "human"
-                ? user.user?.type.value
-                : undefined;
-            return {
-              factors: response.session?.factors,
-              authMethods: methods.authMethodTypes ?? [],
-              phoneVerified: humanUser?.phone?.isVerified ?? false,
-              emailVerified: humanUser?.email?.isVerified ?? false,
-            };
-          });
-        });
-      }
+    }).then((sessionResponse) => {
+      return getAuthMethodsAndUser(sessionResponse.session);
     });
   }
 
   const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings(
+    sessionWithData.factors?.user?.organizationId,
+  );
 
   return (
     <DynamicTheme branding={branding}>

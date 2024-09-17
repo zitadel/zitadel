@@ -158,13 +158,19 @@ After updating the session, the user is signed in.
 
 <img src="./screenshots/mfaset.png" alt="/mfa/set" width="400px" />
 
-This page requests a webAuthN challenge for the user and updates the session afterwards.
+This page loads login Settings and the authentication methods for a user and shows setup options.
 
 Requests to the APIs made:
 
 - `getBrandingSettings(org?)`
+- `getLoginSettings(user.org)`
 - `getSession()`
-- `updateSession()`
+- `listAuthenticationMethodTypes()`
+- `getUserByID()`
 
-When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.REQUIRED` as this will request the webAuthN method as primary method to login.
-After updating the session, the user is signed in.
+If a user has already setup a certain method, a checkbox is shown alongside the button and the button is disabled.
+OTP Email and OTP SMS only show up if the user has verified email or phone.
+If the user chooses a method he is redirected to one of `/otp/time-based/set`, `/u2f/set`, `/otp/email/set`, or `/otp/sms/set`.
+At the moment, U2F methods are hidden if a method is already added on the users resource. Reasoning is that the page should only be invoked for prompts. A self service page which shows up multiple u2f factors is implemented at a later stage.
+
+> NOTE: The session and therefore the user factor defines which login settings are checked for available options.
