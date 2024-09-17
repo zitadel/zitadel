@@ -44,7 +44,7 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: "Could not get session" };
   }
 
-  return registerU2F(userId, domain);
+  return registerU2F(userId, domain, sessionCookie.token);
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {

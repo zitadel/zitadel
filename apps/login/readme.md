@@ -141,11 +141,12 @@ Requests to the APIs made:
 - `updateSession()`
 
 When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.DISCOURAGED` as this will request the webAuthN method as second factor and not as primary method.
-After updating the session, the user is signed in.
+After updating the session, the user is **always** signed in. :warning: required as this page is a follow up for setting up a u2f method.
 
 ### /passkey
 
 This page requests a webAuthN challenge for the user and updates the session afterwards.
+It is invoked directly after setting up a passkey `/passkey/set` or when loggin in a user after `/loginname`.
 
 <img src="./screenshots/passkey.png" alt="/passkey" width="400px" />
 
@@ -156,7 +157,7 @@ Requests to the APIs made:
 - `updateSession()`
 
 When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.REQUIRED` as this will request the webAuthN method as primary method to login.
-After updating the session, the user is signed in.
+After updating the session, the user is **always** signed in. :warning: required as this page is a follow up for setting up a passkey
 
 > NOTE: This page currently does not check whether a user contains passkeys. If this method is not available, this page should not be used.
 
@@ -185,19 +186,20 @@ At the moment, U2F methods are hidden if a method is already added on the users 
 
 ### /passkey/set
 
-<img src="./screenshots/passkeyset.png" alt="/passkey/set" width="400px" />
-
 This page sets a passkey method for a user. This page can be either enforced, or optional depending on the Login Settings.
+
+<img src="./screenshots/passkeyset.png" alt="/passkey/set" width="400px" />
 
 Requests to the APIs made:
 
 - `getBrandingSettings(org?)`
 - `getSession()`
-- `registerPasskeyLink()`
+- `createPasskeyRegistrationLink(token)` :warning: This request requires the session token
+- `registerPasskey()`
 - `verifyPasskey()`
 
 If the loginname decides to redirect the user to this page, a button to skip appears which will sign the user in afterwards.
-If a passkey is registered, we redirect the user to `/passkey` to again verify it and sign in with the new method.
+After a passkey is registered, we redirect the user to `/passkey` to verify it again and sign in with the new method. The `createPasskeyRegistrationLink()` uses the token of the session which is determined by the flow.
 
 > NOTE: Redirecting the user to `/passkey` will not be required in future and the currently used session will be hydrated directly after registering. (https://github.com/zitadel/zitadel/issues/8611)
 
@@ -205,7 +207,44 @@ If a passkey is registered, we redirect the user to `/passkey` to again verify i
 
 ### /u2f/set
 
+This page registers a U2F method for a user.
+
+<img src="./screenshots/u2fset.png" alt="/u2f/set" width="400px" />
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `registerU2F(token)` :warning: This request requires the session token
+- `verifyU2FRegistration()`
+
+After a u2f method is registered, we redirect the user to `/passkey` to verify it again and sign in with the new method. The `createPasskeyRegistrationLink()` uses the token of the session which is determined by the flow.
+
+> NOTE: Redirecting the user to `/passkey` will not be required in future and the currently used session will be hydrated directly after registering. (https://github.com/zitadel/zitadel/issues/8611)
+
 ### /register
+
+This page shows a register page, which gets firstname and lastname of a user as well as the email. It offers to setup a user, using password or passkeys.
+
+<img src="./screenshots/register.png" alt="/register" width="400px" />
+
+Requests to the APIs made:
+
+- `listOrganizations()` :warning: TODO: determine the default organization if no context is set
+- `getLegalAndSupportSettings(org)`
+- `getPasswordComplexitySettings()`
+- `getBrandingSettings()`
+- `addHumanUser()`
+- `createSession()`
+- `getSession()`
+
+To register a user, the organization where the resource will be created is determined first. If no context is provided via url, we fall back to the default organization of the instance.
+
+**PASSWORD:** If a password is set, the user is created as a resource, then a session using the password check is created immediately.
+
+**PASSKEY:** If passkey is selected, the user is created as a resource first, then a session using the userId is created immediately. This session does not yet contain a check, we therefore redirect the user to setup a passkey at `/passkey/set`. As the passkey set page verifies the passkey right afterwards, the process ends with a signed in user.
+
+> NOTE: https://github.com/zitadel/zitadel/issues/8616 to determine the default organization of an instance must be implemented in order to correctly use the legal-, login-, branding- and complexitysettings.
 
 ### /idp
 

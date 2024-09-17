@@ -442,7 +442,6 @@ export function createUser(
   info: IDPInformation,
 ) {
   const userData = PROVIDER_MAPPING[provider](info);
-  console.log("ud", userData);
   return userService.addHumanUser(userData, {});
 }
 
@@ -468,23 +467,15 @@ export async function passwordReset(userId: string) {
  */
 export async function createPasskeyRegistrationLink(
   userId: string,
-  token?: string,
+  token: string,
 ) {
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+  const transport = createServerTransport(token, {
+    baseUrl: process.env.ZITADEL_API_URL!,
+    httpVersion: "2",
+  });
 
-  return userService.createPasskeyRegistrationLink({
+  const service = createUserServiceClient(transport);
+  return service.createPasskeyRegistrationLink({
     userId,
     medium: {
       case: "returnCode",
@@ -499,8 +490,18 @@ export async function createPasskeyRegistrationLink(
  * @param domain the domain on which the factor is registered
  * @returns the newly set email
  */
-export async function registerU2F(userId: string, domain: string) {
-  return userService.registerU2F({
+export async function registerU2F(
+  userId: string,
+  domain: string,
+  token: string,
+) {
+  const transport = createServerTransport(token, {
+    baseUrl: process.env.ZITADEL_API_URL!,
+    httpVersion: "2",
+  });
+
+  const service = createUserServiceClient(transport);
+  return service.registerU2F({
     userId,
     domain,
   });
@@ -550,7 +551,6 @@ export async function registerPasskey(
     userId,
     code,
     domain,
-    // authenticator:
   });
 }
 
