@@ -111,7 +111,7 @@ describe("login", () => {
         cy.get('button[type="submit"]').click();
         cy.location("pathname", { timeout: 10_000 }).should(
           "eq",
-          "/passkey/add",
+          "/passkey/set",
         );
       });
     });

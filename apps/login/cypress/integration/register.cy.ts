@@ -17,6 +17,6 @@ describe("register", () => {
     cy.get('input[type="checkbox"][value="privacypolicy"]').check();
     cy.get('input[type="checkbox"][value="tos"]').check();
     cy.get('button[type="submit"]').click();
-    cy.location("pathname", { timeout: 10_000 }).should("eq", "/passkey/add");
+    cy.location("pathname", { timeout: 10_000 }).should("eq", "/passkey/set");
   });
 });

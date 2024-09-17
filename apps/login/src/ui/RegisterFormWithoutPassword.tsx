@@ -109,7 +109,7 @@ export default function RegisterFormWithoutPassword({
         params.set("authRequestId", authRequestId);
       }
 
-      return router.push(`/passkey/add?` + new URLSearchParams(params));
+      return router.push(`/passkey/set?` + new URLSearchParams(params));
     }
   }
 

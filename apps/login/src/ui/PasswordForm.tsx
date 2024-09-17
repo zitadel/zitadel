@@ -102,7 +102,7 @@ export default function PasswordForm({
     setInfo("");
     // if user has mfa -> /otp/[method] or /u2f
     // if mfa is forced and user has no mfa -> /mfa/set
-    // if no passwordless -> /passkey/add
+    // if no passwordless -> /passkey/set
 
     // exclude password and passwordless
     if (
@@ -194,7 +194,7 @@ export default function PasswordForm({
         params.append("organization", organization);
       }
 
-      return router.push(`/passkey/add?` + params);
+      return router.push(`/passkey/set?` + params);
     } else if (authRequestId && submitted.sessionId) {
       const params = new URLSearchParams({
         sessionId: submitted.sessionId,

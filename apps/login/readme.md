@@ -45,10 +45,10 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
 
 ### /loginname
 
-<img src="./screenshots/loginname.png" alt="/loginame" width="400px" />
-
 This page shows a loginname field and Identity Providers to login or register.
 If `loginSettings(org?).allowRegister` is `true`, if will also show a link to jump to /register
+
+<img src="./screenshots/loginname.png" alt="/loginame" width="400px" />
 
 Requests to the APIs made:
 
@@ -85,10 +85,10 @@ If no previous condition is met we throw an error stating the user was not found
 
 ### /password
 
-<img src="./screenshots/password.png" alt="/password" width="400px" />
-
 This page shows a password field to hydrate the current session with password as a factor.
 Below the password field, a reset password link is shown which allows to send a reset email.
+
+<img src="./screenshots/password.png" alt="/password" width="400px" />
 
 Requests to the APIs made:
 
@@ -103,15 +103,15 @@ If the user has set up an additional **single** second factor, it is redirected 
 
 **NO MFA, FORCE MFA:** If no MFA method is available, and the settings force MFA, the user is sent to `/mfa/set` which prompts to setup a second factor.
 
-**PROMPT PASSKEY** If the settings do not enforce MFA, we check if passkeys are allowed with `loginSettings?.passkeysType === PasskeysType.ALLOWED` and redirect the user to `/passkey/add` if no passkeys are setup. This step can be skipped.
+**PROMPT PASSKEY** If the settings do not enforce MFA, we check if passkeys are allowed with `loginSettings?.passkeysType === PasskeysType.ALLOWED` and redirect the user to `/passkey/set` if no passkeys are setup. This step can be skipped.
 
 If none of the previous conditions apply, we continue to sign in.
 
 ### /otp/[method]
 
-<img src="./screenshots/otp.png" alt="/otp/[method]" width="400px" />
-
 This page shows a code field to check an otp method. The session of the user is then hydrated with the respective factor. Supported methods are `time-based`, `sms` and `email`.
+
+<img src="./screenshots/otp.png" alt="/otp/[method]" width="400px" />
 
 Requests to the APIs made:
 
@@ -126,9 +126,9 @@ The submission of the code updates the session and continues to sign in the user
 
 ### /u2f
 
-<img src="./screenshots/u2f.png" alt="/u2f" width="400px" />
-
 This page requests a webAuthN challenge for the user and updates the session afterwards.
+
+<img src="./screenshots/u2f.png" alt="/u2f" width="400px" />
 
 Requests to the APIs made:
 
@@ -141,9 +141,9 @@ After updating the session, the user is signed in.
 
 ### /passkey
 
-<img src="./screenshots/passkey.png" alt="/passkey" width="400px" />
-
 This page requests a webAuthN challenge for the user and updates the session afterwards.
+
+<img src="./screenshots/passkey.png" alt="/passkey" width="400px" />
 
 Requests to the APIs made:
 
@@ -156,9 +156,9 @@ After updating the session, the user is signed in.
 
 ### /mfa/set
 
-<img src="./screenshots/mfaset.png" alt="/mfa/set" width="400px" />
-
 This page loads login Settings and the authentication methods for a user and shows setup options.
+
+<img src="./screenshots/mfaset.png" alt="/mfa/set" width="400px" />
 
 Requests to the APIs made:
 
@@ -176,6 +176,17 @@ At the moment, U2F methods are hidden if a method is already added on the users 
 > NOTE: The session and therefore the user factor defines which login settings are checked for available options.
 
 ### /passkey/set
+
+<img src="./screenshots/passkeyset.png" alt="/passkey/set" width="400px" />
+
+This page sets a passkey method for a user. This page can be either enforced, or optional depending on the Login Settings.
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `registerPasskeyLink()`
+- `verifyPasskey()`
 
 ### /otp/[method]/set
 
