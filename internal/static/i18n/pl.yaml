@@ -688,6 +688,13 @@ EventTypes:
         check:
           succeeded: Sprawdzenie inicjalizacji zakończone powodzeniem
           failed: Sprawdzenie inicjalizacji nie powiodło się
+      invite:
+        code:
+          added: Wygenerowano kod zaproszenia
+          sent: Kod zaproszenia został wysłany
+        check:
+          succeeded: Kontrola zaproszenia zakończona sukcesem
+          failed: Kontrola zaproszenia zakończona niepowodzeniem
       username:
         reserved: Zarezerwowano nazwę użytkownika
         released: Zwolniono nazwę użytkownika

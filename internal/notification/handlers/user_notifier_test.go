@@ -15,9 +15,10 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
+	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -1449,7 +1450,27 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			f.SMSTokenCrypto,
 		),
 		otpEmailTmpl: defaultOTPEmailTemplate,
-		channels:     &channels{Chain: *senders.ChainChannels(channel)},
+		channels: &channels{
+			Chain: *senders.ChainChannels(channel),
+			EmailConfig: &email.Config{
+				ProviderConfig: &email.Provider{
+					ID:          "ID",
+					Description: "Description",
+				},
+				SMTPConfig: &smtp.Config{
+					SMTP: smtp.SMTP{
+						Host:     "host",
+						User:     "user",
+						Password: "password",
+					},
+					Tls:            true,
+					From:           "from",
+					FromName:       "fromName",
+					ReplyToAddress: "replyToAddress",
+				},
+				WebhookConfig: nil,
+			},
+		},
 	}
 }
 
@@ -1457,13 +1478,14 @@ var _ types.ChannelChains = (*channels)(nil)
 
 type channels struct {
 	senders.Chain
+	EmailConfig *email.Config
 }
 
-func (c *channels) Email(context.Context) (*senders.Chain, *smtp.Config, error) {
-	return &c.Chain, nil, nil
+func (c *channels) Email(context.Context) (*senders.Chain, *email.Config, error) {
+	return &c.Chain, c.EmailConfig, nil
 }
 
-func (c *channels) SMS(context.Context) (*senders.Chain, *twilio.Config, error) {
+func (c *channels) SMS(context.Context) (*senders.Chain, *sms.Config, error) {
 	return &c.Chain, nil, nil
 }
 

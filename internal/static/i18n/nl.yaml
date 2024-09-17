@@ -688,6 +688,13 @@ EventTypes:
         check:
           succeeded: Initialisatiecontrole geslaagd
           failed: Initialisatiecontrole mislukt
+      invite:
+        code:
+          added: Uitnodigingscode gegenereerd
+          sent: Uitnodigingscode verzonden
+        check:
+          succeeded: Uitnodigingscontrole geslaagd
+          failed: Uitnodigingscontrole mislukt
       username:
         reserved: Gebruikersnaam gereserveerd
         released: Gebruikersnaam vrijgegeven

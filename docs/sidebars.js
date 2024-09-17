@@ -158,6 +158,7 @@ module.exports = {
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
             "guides/manage/customize/restrictions",
+            "guides/manage/customize/notifications",
           ],
         },
         {
@@ -230,6 +231,8 @@ module.exports = {
                 "guides/integrate/login/oidc/oauth-recommended-flows",
                 "guides/integrate/login/oidc/device-authorization",
                 "guides/integrate/login/oidc/logout",
+                "guides/integrate/login/oidc/webkeys",
+
               ],
             },
             "guides/integrate/login/saml",

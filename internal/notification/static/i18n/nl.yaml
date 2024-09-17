@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Hallo {{.DisplayName}},
   Text: Het wachtwoord van uw gebruiker is veranderd. Als deze wijziging niet door u is gedaan, wordt u geadviseerd om direct uw wachtwoord te resetten.
   ButtonText: Inloggen
+InviteUser:
+  Title: Uitnodiging voor {{.ApplicationName}}
+  PreHeader: Uitnodiging voor {{.ApplicationName}}
+  Subject: Uitnodiging voor {{.ApplicationName}}
+  Greeting: Hallo {{.DisplayName}},
+  Text: Uw gebruiker is uitgenodigd voor {{.ApplicationName}}. Klik op de onderstaande knop om het uitnodigingsproces te voltooien. Als u deze e-mail niet hebt aangevraagd, negeer deze dan.
+  ButtonText: Uitnodiging accepteren

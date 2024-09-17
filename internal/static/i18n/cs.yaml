@@ -686,6 +686,13 @@ EventTypes:
         check:
           succeeded: Kontrola inicializace byla úspěšná
           failed: Kontrola inicializace selhala
+      invite:
+        code:
+          added: Vygenerován pozvánkový kód
+          sent: Pozvánkový kód byl odeslán
+        check:
+          succeeded: Kontrola pozvánky byla úspěšná
+          failed: Kontrola pozvánky selhala
       username:
         reserved: Uživatelské jméno rezervováno
         released: Uživatelské jméno uvolněno

@@ -85,6 +85,15 @@ InitUserDone:
   NextButtonText: далее
   CancelButtonText: отмена
 
+InviteUser:
+  Title: Активировать пользователя
+  Description: Проверьте свой адрес электронной почты с помощью кода ниже и установите свой пароль.
+  CodeLabel: Код
+  NewPasswordLabel: Новый пароль
+  NewPasswordConfirm: Подтвердить пароль
+  NextButtonText: Далее
+  ResendButtonText: Отправить код повторно
+
 InitMFAPrompt:
   Title: Установка двухфакторной аутентификации
   Description: Двухфакторная аутентификация обеспечивает дополнительную защиту вашей учётной записи.

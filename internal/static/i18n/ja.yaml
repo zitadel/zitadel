@@ -677,6 +677,13 @@ EventTypes:
         check:
           succeeded: 初期化チェックの成功
           failed: 初期化チェックの失敗
+      invite:
+        code:
+          added: 招待コードが生成されました
+          sent: 招待コードが送信されました
+        check:
+          succeeded: 招待のチェックが成功しました
+          failed: 招待のチェックが失敗しました
       username:
         reserved: ユーザー名の予約
         released: ユーザー名の解放

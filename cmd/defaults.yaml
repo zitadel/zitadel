@@ -712,6 +712,13 @@ DefaultInstance:
       IncludeUpperLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDEUPPERLETTERS
       IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDEDIGITS
       IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDESYMBOLS
+    InviteCode:
+      Length: 6 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_LENGTH
+      Expiry: "72h" # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_EXPIRY
+      IncludeLowerLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDELOWERLETTERS
+      IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEUPPERLETTERS
+      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEDIGITS
+      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDESYMBOLS
   PasswordComplexityPolicy:
     MinLength: 8 # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_MINLENGTH
     HasLowercase: true # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_HASLOWERCASE
@@ -1033,6 +1040,8 @@ InternalAuthZ:
         - "iam.web_key.write"
         - "iam.web_key.delete"
         - "iam.web_key.read"
+        - "iam.debug.write"
+        - "iam.debug.read"
         - "org.read"
         - "org.global.read"
         - "org.create"
@@ -1110,6 +1119,7 @@ InternalAuthZ:
         - "iam.restrictions.read"
         - "iam.feature.read"
         - "iam.web_key.read"
+        - "iam.debug.read"
         - "org.read"
         - "org.member.read"
         - "org.idp.read"

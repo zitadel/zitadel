@@ -683,6 +683,13 @@ EventTypes:
         check:
           succeeded: Verificação de inicialização bem-sucedida
           failed: Verificação de inicialização falhou
+      invite:
+        code:
+          added: Código de convite gerado
+          sent: Código de convite enviado
+        check:
+          succeeded: Verificação do convite bem-sucedida
+          failed: Verificação do convite falhou
       username:
         reserved: Nome de usuário reservado
         released: Nome de usuário liberado

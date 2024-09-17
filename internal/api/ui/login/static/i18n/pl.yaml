@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: dalej
   CancelButtonText: anuluj
 
+InviteUser:
+  Title: Aktywuj użytkownika
+  Description: Zweryfikuj swój adres e-mail za pomocą poniższego kodu i ustaw swoje hasło.
+  CodeLabel: Kod
+  NewPasswordLabel: Nowe hasło
+  NewPasswordConfirm: Potwierdź hasło
+  NextButtonText: Dalej
+  ResendButtonText: Wyślij ponownie kod
+
 InitMFAPrompt:
   Title: Konfiguracja 2-etapowego uwierzytelniania
   Description: 2-etapowe uwierzytelnianie daje Ci dodatkową ochronę dla Twojego konta użytkownika. Dzięki temu masz pewność, że tylko Ty masz dostęp do swojego konta.

@@ -144,7 +144,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
-	latestSequence, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
+	latestState, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	memberships.State = latestSequence
+	memberships.State = latestState
 	return memberships, nil
 }
 
