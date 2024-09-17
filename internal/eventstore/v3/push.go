@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -13,20 +14,72 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+//go:embed push2.sql
+var push2StmtFmt string
+
+func pushStatement(ctx context.Context, commands []eventstore.Command) (events []eventstore.Event, stmt string, args []any, err error) {
+	args = make([]any, 0, len(commands)*8)
+	placeholders := make([]string, len(commands))
+	events = make([]eventstore.Event, len(commands))
+
+	for i, command := range commands {
+		events[i] = &event{
+			aggregate: command.Aggregate(),
+			creator:   command.Creator(),
+			revision:  command.Revision(),
+			typ:       command.Type(),
+		}
+		if events[i].(*event).aggregate.InstanceID == "" {
+			events[i].(*event).aggregate.InstanceID = authz.GetInstance(ctx).InstanceID()
+		}
+
+		if command.Payload() != nil {
+			events[i].(*event).payload, err = json.Marshal(command.Payload())
+			if err != nil {
+				logging.WithError(err).Warn("marshal payload failed")
+				return nil, "", nil, zerrors.ThrowInternal(err, "V3-zZW6A", "Errors.Internal")
+			}
+		}
+
+		args = append(args,
+			command.Aggregate().InstanceID,
+			command.Aggregate().ResourceOwner,
+			command.Aggregate().Type,
+			command.Aggregate().ID,
+			command.Revision(),
+			command.Creator(),
+			command.Type(),
+			events[i].(*event).payload,
+		)
+
+		placeholders[i] = fmt.Sprintf("($%d, $%d, $%d, $%d, $%d::SMALLINT, $%d, $%d, $%d::JSONB)", i*8+1, i*8+2, i*8+3, i*8+4, i*8+5, i*8+6, i*8+7, i*8+8)
+	}
+
+	return events, fmt.Sprintf(push2StmtFmt, strings.Join(placeholders, ", ")), args, nil
+}
+
+func (es *Eventstore) push(ctx context.Context, commands ...eventstore.Command) (_ []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	tx, err := es.client.BeginTx(ctx, nil)
+	events, pushStmt, pushArgs, err := pushStatement(ctx, commands)
 	if err != nil {
 		return nil, err
 	}
 
+	tx, err := es.client.BeginTx(ctx, &sql.TxOptions{
+		// Isolation: sql.LevelSerializable,
+		ReadOnly: false,
+	})
+	if err != nil {
+		return nil, err
+	}
 	defer func() {
 		if err != nil {
 			rollbackErr := tx.Rollback()
@@ -36,18 +89,24 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 		err = tx.Commit()
 	}()
 
-	// tx is not closed because [crdb.ExecuteInTx] takes care of that
-	var (
-		sequences []*latestSequence
-	)
-
-	sequences, err = latestSequences(ctx, tx, commands)
+	rows, err := tx.QueryContext(ctx, pushStmt, pushArgs...)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
-	events, err = insertEvents(ctx, tx, sequences, commands)
-	if err != nil {
+	for i := 0; rows.Next(); i++ {
+		if err := rows.Scan(
+			&events[i].(*event).sequence,
+			&events[i].(*event).createdAt,
+			&events[i].(*event).position,
+			&events[i].(*event).inPositionOrder,
+		); err != nil {
+			return nil, err
+		}
+	}
+
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
@@ -55,20 +114,67 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 		return nil, err
 	}
 
-	// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
-	// Thats why we enable it manually
-	if es.client.Type() == "cockroach" {
-		_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	if err = handleFieldCommands(ctx, tx, commands); err != nil {
 		return nil, err
 	}
 
 	return events, nil
+}
+
+func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	return es.push(ctx, commands...)
+	// ctx, span := tracing.NewSpan(ctx)
+	// defer func() { span.EndWithError(err) }()
+
+	// tx, err := es.client.BeginTx(ctx, &sql.TxOptions{
+	// 	Isolation: sql.LevelSerializable,
+	// 	ReadOnly:  false,
+	// })
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// defer func() {
+	// 	if err != nil {
+	// 		rollbackErr := tx.Rollback()
+	// 		logging.OnError(rollbackErr).Info("rollback failed")
+	// 		return
+	// 	}
+	// 	err = tx.Commit()
+	// }()
+
+	// // tx is not closed because [crdb.ExecuteInTx] takes care of that
+	// var (
+	// 	sequences []*latestSequence
+	// )
+
+	// sequences, err = latestSequences(ctx, tx, commands)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// events, err = insertEvents(ctx, tx, sequences, commands)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+	// 	return nil, err
+	// }
+
+	// // CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
+	// // Thats why we enable it manually
+	// if es.client.Type() == "cockroach" {
+	// 	_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
+
+	// if err = handleFieldCommands(ctx, tx, commands); err != nil {
+	// 	return nil, err
+	// }
+
+	// return events, nil
 }
 
 //go:embed push.sql
@@ -134,7 +240,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 		}
 		sequence.sequence++
 
-		events[i], err = commandToEvent(sequence, command)
+		events[i], err = commandToEventWithSequence(sequence, command)
 		if err != nil {
 			return nil, nil, nil, err
 		}

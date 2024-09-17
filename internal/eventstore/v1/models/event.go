@@ -3,9 +3,13 @@ package models
 import (
 	"encoding/json"
 	"reflect"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/shopspring/decimal"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -93,7 +97,9 @@ func (e *Event) Type() eventstore.EventType {
 
 // Type implements [eventstore.action]
 func (e *Event) Revision() uint16 {
-	return 0
+	revision, err := strconv.Atoi(strings.TrimPrefix(string(e.Aggregate().Version), "v"))
+	logging.OnError(err).Debug("failed to parse revision")
+	return uint16(revision)
 }
 
 func eventData(i interface{}) ([]byte, error) {
