@@ -20,6 +20,7 @@ keys as (
 )
 select config.app_id, config.client_id, config.client_secret, config.app_type, apps.project_id, apps.resource_owner, p.project_role_assertion, keys.public_keys
 from config
-join projections.apps7 apps on apps.id = config.app_id and apps.instance_id = config.instance_id
-join projections.projects4 p on p.id = apps.project_id and p.instance_id = $1
+join projections.apps7 apps on apps.id = config.app_id and apps.instance_id = config.instance_id and apps.state = 1
+join projections.projects4 p on p.id = apps.project_id and p.instance_id = $1 and p.state = 1
+join projections.orgs1 o on o.id = p.resource_owner and o.instance_id = config.instance_id and o.org_state = 1
 left join keys on keys.client_id = config.client_id;
