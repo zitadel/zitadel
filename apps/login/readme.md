@@ -153,3 +153,18 @@ Requests to the APIs made:
 
 When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.REQUIRED` as this will request the webAuthN method as primary method to login.
 After updating the session, the user is signed in.
+
+### /mfa/set
+
+<img src="./screenshots/mfaset.png" alt="/mfa/set" width="400px" />
+
+This page requests a webAuthN challenge for the user and updates the session afterwards.
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `updateSession()`
+
+When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.REQUIRED` as this will request the webAuthN method as primary method to login.
+After updating the session, the user is signed in.
