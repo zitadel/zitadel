@@ -81,6 +81,8 @@ If no previous condition is met we throw an error stating the user was not found
 
 **EXCEPTIONS:** If the outcome after this order produces a no authentication methods found, or user not found, we check whether `loginSettings?.ignoreUnknownUsernames` is set to `true` as in this case we redirect to the /password page regardless (to not leak information about a registered user).
 
+> NOTE: This page at this stage beeing ignores local sessions and executes a reauthentication. This is a feature which is not implemented yet.
+
 > NOTE: We ignore `loginSettings.allowExternalIdp` as the information whether IDPs are available comes as response from `getActiveIdentityProviders(org?)`. If a user has a cookie for the same loginname, a new session is created regardless and overwrites the old session. The old session is not deleted from the login as for now.
 
 > NOTE: `listAuthenticationMethodTypes()` does not consider different domains for u2f methods or passkeys. The check whether a user should be redirected to one of the pages `/passkey` or `/u2f`, should be extended to use a domain filter (https://github.com/zitadel/zitadel/issues/8615)
@@ -203,7 +205,15 @@ After a passkey is registered, we redirect the user to `/passkey` to verify it a
 
 > NOTE: Redirecting the user to `/passkey` will not be required in future and the currently used session will be hydrated directly after registering. (https://github.com/zitadel/zitadel/issues/8611)
 
-### /otp/[method]/set
+### /otp/time-based/set
+
+This page registers a time based OTP method for a user.
+
+<img src="./screenshots/otpset.png" alt="/otp/time-based/set" width="400px" />
+
+### /otp/email/set /otp/sms/set
+
+This page registers either an Email OTP method or SMS OTP method for a user.
 
 ### /u2f/set
 
@@ -266,4 +276,30 @@ Both /success and /failure pages are designed to intercept the responses from th
 
 ### /accounts
 
+This page shows an overview of all current sessions.
+Sessions with invalid token show a red dot on the right side, Valid session a green dot, and its last verified date.
+
+<img src="./screenshots/accounts.png" alt="/accounts" width="400px" />
+
+This page is a starting point for self management, reauthentication, or can be used to clear local sessions.
+This page is also shown if used with OIDC and `prompt: select_account`.
+
+On all pages, where the current user is shown, you can jump to this page. This way, a session can quickly be reused if valid.
+
+<img src="./screenshots/accounts_jumpto.png" alt="jump to accounts" width="250px" />
+
 ### /signedin
+
+This is a success page which shows a completed login flow for a user, which did navigate to the login without a OIDC auth requrest.
+
+<img src="./screenshots/signedin.png" alt="/signedin" width="400px" />
+
+In future, self service options to jump to are shown below, like:
+
+- change password
+- setup passkeys
+- setup mfa
+- change profile
+- logout
+
+> NOTE: This page has to be explicitly enabled or act as a fallback if no default redirect is set.
