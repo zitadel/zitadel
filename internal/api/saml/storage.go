@@ -55,12 +55,9 @@ type Storage struct {
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
+	app, err := p.query.ActiveAppBySAMLEntityID(ctx, entityID)
 	if err != nil {
 		return nil, err
-	}
-	if app.State != domain.AppStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
 	}
 	return serviceprovider.NewServiceProvider(
 		app.ID,
@@ -72,12 +69,9 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 }
 
 func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
-	app, err := p.query.AppByID(ctx, appID)
+	app, err := p.query.AppByID(ctx, appID, true)
 	if err != nil {
 		return "", err
-	}
-	if app.State != domain.AppStateActive {
-		return "", zerrors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
 	}
 	return app.SAMLConfig.EntityID, nil
 }
