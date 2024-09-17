@@ -1,8 +1,4 @@
-import {
-  getBrandingSettings,
-  getLegalAndSupportSettings,
-  settingsService,
-} from "@/lib/zitadel";
+import { getBrandingSettings, settingsService } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import { SignInWithIDP } from "@/ui/SignInWithIDP";
 import { makeReqCtx } from "@zitadel/client/v2";
@@ -23,8 +19,6 @@ export default async function Page({
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
-  const legal = await getLegalAndSupportSettings(organization);
-
   const identityProviders = await getIdentityProviders(organization);
 
   const host = process.env.VERCEL_URL
@@ -36,12 +30,12 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Register</h1>
+        <h1>Sign in with SSO</h1>
         <p className="ztdl-p">
-          Select one of the following providers to register
+          Select one of the following providers to sign in
         </p>
 
-        {legal && identityProviders && process.env.ZITADEL_API_URL && (
+        {identityProviders && (
           <SignInWithIDP
             host={host}
             identityProviders={identityProviders}

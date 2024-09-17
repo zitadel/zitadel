@@ -174,3 +174,19 @@ If the user chooses a method he is redirected to one of `/otp/time-based/set`, `
 At the moment, U2F methods are hidden if a method is already added on the users resource. Reasoning is that the page should only be invoked for prompts. A self service page which shows up multiple u2f factors is implemented at a later stage.
 
 > NOTE: The session and therefore the user factor defines which login settings are checked for available options.
+
+### /passkey/set
+
+### /otp/[method]/set
+
+### /u2f/set
+
+### /register
+
+### /idp/[method]/success /idp/[method]/failure
+
+### /verify
+
+### /accounts
+
+### /signedin
