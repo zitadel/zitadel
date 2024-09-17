@@ -83,6 +83,8 @@ If no previous condition is met we throw an error stating the user was not found
 
 > NOTE: We ignore `loginSettings.allowExternalIdp` as the information whether IDPs are available comes as response from `getActiveIdentityProviders(org?)`. If a user has a cookie for the same loginname, a new session is created regardless and overwrites the old session. The old session is not deleted from the login as for now.
 
+> NOTE: `listAuthenticationMethodTypes()` does not consider different domains for u2f methods or passkeys. The check whether a user should be redirected to one of the pages `/passkey` or `/u2f`, should be extended to use a domain filter (https://github.com/zitadel/zitadel/issues/8615)
+
 ### /password
 
 This page shows a password field to hydrate the current session with password as a factor.
@@ -106,6 +108,8 @@ If the user has set up an additional **single** second factor, it is redirected 
 **PROMPT PASSKEY** If the settings do not enforce MFA, we check if passkeys are allowed with `loginSettings?.passkeysType === PasskeysType.ALLOWED` and redirect the user to `/passkey/set` if no passkeys are setup. This step can be skipped.
 
 If none of the previous conditions apply, we continue to sign in.
+
+> NOTE: `listAuthenticationMethodTypes()` does not consider different domains for u2f methods or passkeys. The check whether a user should be redirected to one of the pages `/passkey` or `/u2f`, should be extended to use a domain filter (https://github.com/zitadel/zitadel/issues/8615)
 
 ### /otp/[method]
 
@@ -154,6 +158,8 @@ Requests to the APIs made:
 When updating the session for the webAuthN challenge, we set `userVerificationRequirement` to `UserVerificationRequirement.REQUIRED` as this will request the webAuthN method as primary method to login.
 After updating the session, the user is signed in.
 
+> NOTE: This page currently does not check whether a user contains passkeys. If this method is not available, this page should not be used.
+
 ### /mfa/set
 
 This page loads login Settings and the authentication methods for a user and shows setup options.
@@ -175,6 +181,8 @@ At the moment, U2F methods are hidden if a method is already added on the users 
 
 > NOTE: The session and therefore the user factor defines which login settings are checked for available options.
 
+> NOTE: `listAuthenticationMethodTypes()` does not consider different domains for u2f or passkeys. The check whether a user should be redirected to one of the pages `/passkey/set` or `/u2f/set`, should be extended to use a domain filter (https://github.com/zitadel/zitadel/issues/8615)
+
 ### /passkey/set
 
 <img src="./screenshots/passkeyset.png" alt="/passkey/set" width="400px" />
@@ -187,6 +195,11 @@ Requests to the APIs made:
 - `getSession()`
 - `registerPasskeyLink()`
 - `verifyPasskey()`
+
+If the loginname decides to redirect the user to this page, a button to skip appears which will sign the user in afterwards.
+If a passkey is registered, we redirect the user to `/passkey` to again verify it and sign in with the new method.
+
+> NOTE: Redirecting the user to `/passkey` will not be required in future and the currently used session will be hydrated directly after registering. (https://github.com/zitadel/zitadel/issues/8611)
 
 ### /otp/[method]/set
 

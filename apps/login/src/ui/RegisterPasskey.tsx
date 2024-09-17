@@ -148,12 +148,39 @@ export default function RegisterPasskey({
     if (authRequestId) {
       params.set("authRequestId", authRequestId);
       params.set("sessionId", sessionId);
-      // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
-      // params.set("loginName", resp.loginName);
 
       router.push("/passkey?" + params);
     } else {
-      router.push("/accounts?" + params);
+      continueAndLogin();
+    }
+  }
+
+  function continueAndLogin() {
+    if (authRequestId) {
+      const params = new URLSearchParams({
+        authRequest: authRequestId,
+      });
+
+      if (sessionId) {
+        params.set("sessionId", sessionId);
+      }
+
+      if (organization) {
+        params.set("organization", organization);
+      }
+
+      router.push("/login?" + params);
+    } else {
+      const params = new URLSearchParams();
+
+      if (sessionId) {
+        params.append("sessionId", sessionId);
+      }
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      router.push("/signedin?" + params);
     }
   }
 
@@ -171,32 +198,7 @@ export default function RegisterPasskey({
             type="button"
             variant={ButtonVariants.Secondary}
             onClick={() => {
-              if (authRequestId) {
-                const params = new URLSearchParams({
-                  authRequest: authRequestId,
-                });
-
-                if (sessionId) {
-                  params.set("sessionId", sessionId);
-                }
-
-                if (organization) {
-                  params.set("organization", organization);
-                }
-
-                router.push("/login?" + params);
-              } else {
-                const params = new URLSearchParams();
-
-                if (sessionId) {
-                  params.append("sessionId", sessionId);
-                }
-                if (organization) {
-                  params.append("organization", organization);
-                }
-
-                router.push("/signedin?" + params);
-              }
+              continueAndLogin();
             }}
           >
             skip
