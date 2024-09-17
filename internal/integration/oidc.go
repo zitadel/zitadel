@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
@@ -371,8 +372,8 @@ func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (mac
 	if err != nil {
 		return nil, "", "", "", err
 	}
-	_, err = i.Client.Mgmt.DeactivateUser(ctx, &management.DeactivateUserRequest{
-		Id: machine.GetUserId(),
+	_, err = i.Client.UserV2.DeactivateUser(ctx, &user_v2.DeactivateUserRequest{
+		UserId: machine.GetUserId(),
 	})
 	if err != nil {
 		return nil, "", "", "", err
