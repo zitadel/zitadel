@@ -330,6 +330,9 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	if err != nil {
 		return err
 	}
+	if user.State != domain.UserStateActive {
+		return zerrors.ThrowUnauthenticated(nil, "OIDC-S3tha", "Errors.Users.NotActive")
+	}
 	var allRoles bool
 	roles := make([]string, 0)
 	for _, scope := range scopes {

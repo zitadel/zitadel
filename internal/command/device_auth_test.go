@@ -126,7 +126,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 	pushErr := errors.New("pushErr")
 
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx               context.Context
@@ -149,7 +149,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 		{
 			name: "not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -169,7 +169,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 		{
 			name: "push error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(eventFromEventPusherWithInstanceID(
 						"instance1",
 						deviceauth.NewAddedEvent(
@@ -211,7 +211,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(eventFromEventPusherWithInstanceID(
 						"instance1",
 						deviceauth.NewAddedEvent(
@@ -256,7 +256,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.userID, tt.args.userOrgID, tt.args.authMethods, tt.args.authTime, tt.args.preferredLanguage, tt.args.userAgent, tt.args.sessionID)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -271,7 +271,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 	pushErr := errors.New("pushErr")
 
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
@@ -288,7 +288,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 		{
 			name: "not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -298,7 +298,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 		{
 			name: "push error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(eventFromEventPusherWithInstanceID(
 						"instance1",
 						deviceauth.NewAddedEvent(
@@ -323,7 +323,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 		{
 			name: "success/denied",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(eventFromEventPusherWithInstanceID(
 						"instance1",
 						deviceauth.NewAddedEvent(
@@ -350,7 +350,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 		{
 			name: "success/expired",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(eventFromEventPusherWithInstanceID(
 						"instance1",
 						deviceauth.NewAddedEvent(
@@ -378,7 +378,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			gotDetails, err := c.CancelDeviceAuth(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -587,6 +587,69 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			wantErr: DeviceAuthStateError(domain.DeviceAuthStateDone),
 		},
 		{
+			name: "user not active",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithInstanceID(
+							"instance1",
+							deviceauth.NewAddedEvent(
+								ctx,
+								deviceauth.NewAggregate("123", "instance1"),
+								"clientID", "123", "456", time.Now().Add(-time.Minute),
+								[]string{"openid", "offline_access"},
+								[]string{"audience"}, false,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"instance1",
+							deviceauth.NewApprovedEvent(ctx,
+								deviceauth.NewAggregate("123", "instance1"),
+								"userID", "org1",
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+								testNow, &language.Afrikaans, &domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+								"sessionID",
+							),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							ctx,
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.English,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+						user.NewUserDeactivatedEvent(
+							ctx,
+							&user.NewAggregate("userID", "org1").Aggregate,
+						),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx,
+				"123",
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive"),
+		},
+		{
 			name: "approved, success",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -615,6 +678,21 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								},
 								"sessionID",
 							),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							ctx,
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.English,
+							domain.GenderUnspecified,
+							"email",
+							false,
 						),
 					),
 					expectFilter(), // token lifetime
@@ -697,6 +775,21 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								},
 								"sessionID",
 							),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							ctx,
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.English,
+							domain.GenderUnspecified,
+							"email",
+							false,
 						),
 					),
 					expectFilter(), // token lifetime
