@@ -3,8 +3,6 @@ package eventstore
 import (
 	"context"
 
-	"github.com/shopspring/decimal"
-
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -20,7 +18,7 @@ type Eventstore struct {
 	client *database.DB
 	// used to send a pgnotify event on push to the postgres channel named after the event type
 	// the channels can be used to send a trigger to the projection
-	subscribedEventTypes map[eventstore.EventType][]chan<- decimal.Decimal
+	subscriptions *subscriptions
 }
 
 func NewEventstore(client *database.DB) *Eventstore {
@@ -32,16 +30,22 @@ func NewEventstore(client *database.DB) *Eventstore {
 		pushPlaceholderFmt = "($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, statement_timestamp(), EXTRACT(EPOCH FROM transaction_timestamp()), $%d)"
 		uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 	}
-
-	return &Eventstore{client: client, subscribedEventTypes: make(map[eventstore.EventType][]chan<- decimal.Decimal)}
+	subscriptions, err := newSubscriptions(client.DB)
+	if err != nil {
+		// TODO: return
+		panic(err)
+	}
+	return &Eventstore{client: client, subscriptions: subscriptions}
 }
 
-func (es *Eventstore) Subscribe(queue chan<- decimal.Decimal, eventTypes ...eventstore.EventType) {
-	for _, eventType := range eventTypes {
-		es.subscribedEventTypes[eventType] = append(es.subscribedEventTypes[eventType], queue)
-	}
+func (es *Eventstore) Subscribe(eventTypes ...eventstore.EventType) <-chan *eventstore.Notification {
+	return es.subscriptions.Add(eventTypes...)
 }
 
 func (es *Eventstore) Health(ctx context.Context) error {
 	return es.client.PingContext(ctx)
+}
+
+func (es *Eventstore) Close() {
+	es.subscriptions.Close()
 }

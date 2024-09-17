@@ -83,9 +83,13 @@ func (es *Eventstore) Health(ctx context.Context) error {
 }
 
 // Subscribe sends notifications to the queue every time a new event of the given type was pushed
-// TODO: what type should the queue have?
-func (es *Eventstore) Subscribe(queue chan<- decimal.Decimal, eventTypes ...EventType) {
-	es.pusher.Subscribe(queue, eventTypes...)
+func (es *Eventstore) Subscribe(eventTypes ...EventType) <-chan *Notification {
+	return es.pusher.Subscribe(eventTypes...)
+}
+
+// Close tells the Pusher to stop listening for notifications
+func (es *Eventstore) Close() {
+	es.pusher.Close()
 }
 
 // Push pushes the events in a single transaction
@@ -284,9 +288,17 @@ type Pusher interface {
 	Health(ctx context.Context) error
 	// Push stores the actions
 	Push(ctx context.Context, commands ...Command) (_ []Event, err error)
-	// Subscribe sends notifications to the queue every time a new event of the given type was pushed
-	// TODO: what type should the queue have?
-	Subscribe(queue chan<- decimal.Decimal, eventTypes ...EventType)
+	// Subscribe sends notifications to the returned channel every time a new event of the given type was pushed.
+	// The channel will be closed when the Pusher is closed.
+	Subscribe(eventTypes ...EventType) <-chan *Notification
+	Close()
+}
+
+type Notification struct {
+	EventType EventType `json:"event_type,omitempty"`
+
+	// Position may be 0 after a connection reset.
+	Position decimal.Decimal `json:"position,omitempty"`
 }
 
 type FillFieldsEvent interface {

@@ -70,13 +70,9 @@ func (es *Eventstore) handleNotifications(ctx context.Context, tx *sql.Tx, event
 	if !authz.GetFeatures(ctx).InMemoryProjections {
 		return nil
 	}
-
-	for _, event := range events {
-		_, hasSubscribers := es.subscribedEventTypes[event.Type()]
-		if !hasSubscribers {
-			continue
-		}
-		_, err := tx.ExecContext(ctx, "SELECT pg_notify($1, $2)", event.Type(), event.Position())
+	query, args, ok := buildPgNotifyQuery(es.subscriptions.GetSubscribedEvents(events))
+	if ok {
+		_, err := tx.ExecContext(ctx, query, args...)
 		if err != nil {
 			return err
 		}

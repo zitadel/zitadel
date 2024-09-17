@@ -122,6 +122,18 @@ func (m *MockPusher) EXPECT() *MockPusherMockRecorder {
 	return m.recorder
 }
 
+// Close mocks base method.
+func (m *MockPusher) Close() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Close")
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockPusherMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockPusher)(nil).Close))
+}
+
 // Health mocks base method.
 func (m *MockPusher) Health(arg0 context.Context) error {
 	m.ctrl.T.Helper()
@@ -157,18 +169,19 @@ func (mr *MockPusherMockRecorder) Push(arg0 any, arg1 ...any) *gomock.Call {
 }
 
 // Subscribe mocks base method.
-func (m *MockPusher) Subscribe(arg0 chan<- decimal.Decimal, arg1 ...eventstore.EventType) {
+func (m *MockPusher) Subscribe(arg0 ...eventstore.EventType) <-chan *eventstore.Notification {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0}
-	for _, a := range arg1 {
+	varargs := []any{}
+	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
-	m.ctrl.Call(m, "Subscribe", varargs...)
+	ret := m.ctrl.Call(m, "Subscribe", varargs...)
+	ret0, _ := ret[0].(<-chan *eventstore.Notification)
+	return ret0
 }
 
 // Subscribe indicates an expected call of Subscribe.
-func (mr *MockPusherMockRecorder) Subscribe(arg0 any, arg1 ...any) *gomock.Call {
+func (mr *MockPusherMockRecorder) Subscribe(arg0 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockPusher)(nil).Subscribe), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockPusher)(nil).Subscribe), arg0...)
 }
