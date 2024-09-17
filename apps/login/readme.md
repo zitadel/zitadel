@@ -183,7 +183,21 @@ At the moment, U2F methods are hidden if a method is already added on the users 
 
 ### /register
 
+### /idp
+
+This page doubles as /loginname but limits it to choose from IDPs
+
+<img src="./screenshots/idp.png" alt="/idp" width="400px" />
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getActiveIdentityProviders(org?)`
+- `startIdentityProviderFlow()`
+
 ### /idp/[method]/success /idp/[method]/failure
+
+Both /success and /failure pages are designed to intercept the responses from the IDPs and decide on how to continue with the process.
 
 ### /verify
 
