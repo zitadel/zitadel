@@ -74,39 +74,11 @@ export async function addOTPEmail(userId: string) {
   );
 }
 
-export async function addOTPSMS(userId: string, token?: string) {
-  // TODO: Follow up here, I do not understand the branching
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
-
+export async function addOTPSMS(userId: string) {
   return userService.addOTPSMS({ userId }, {});
 }
 
-export async function registerTOTP(userId: string, token?: string) {
-  // TODO: Follow up here, I do not understand the branching
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+export async function registerTOTP(userId: string) {
   return userService.registerTOTP({ userId }, {});
 }
 

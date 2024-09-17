@@ -204,6 +204,8 @@ Requests to the APIs made:
 If the loginname decides to redirect the user to this page, a button to skip appears which will sign the user in afterwards.
 After a passkey is registered, we redirect the user to `/passkey` to verify it again and sign in with the new method. The `createPasskeyRegistrationLink()` uses the token of the session which is determined by the flow.
 
+> NOTE: this page allows passkeys to be created only if the current session is valid (self service), or no authentication method is set (register). TODO: to be implemented.
+
 > NOTE: Redirecting the user to `/passkey` will not be required in future and the currently used session will be hydrated directly after registering. (https://github.com/zitadel/zitadel/issues/8611)
 
 ### /otp/time-based/set
@@ -212,9 +214,28 @@ This page registers a time based OTP method for a user.
 
 <img src="./screenshots/otpset.png" alt="/otp/time-based/set" width="400px" />
 
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `registerTOTP()`
+- `verifyTOTP()`
+
+After the setup is done, the user is redirected to verify the TOTP method on `/otp/time-based`.
+
+> NOTE: Redirecting the user to `/otp/time-based` will not be required in future and the currently used session will be hydrated directly. (https://github.com/zitadel/zitadel/issues/8611)
+
 ### /otp/email/set /otp/sms/set
 
 This page registers either an Email OTP method or SMS OTP method for a user.
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `addOTPEmail()` / `addOTPSMS()`
+
+This page directly calls `addOTPEmail()` or `addOTPSMS()` when invoked and shows a success message.
 
 ### /u2f/set
 
@@ -238,6 +259,8 @@ After a u2f method is registered, we redirect the user to `/passkey` to verify i
 This page shows a register page, which gets firstname and lastname of a user as well as the email. It offers to setup a user, using password or passkeys.
 
 <img src="./screenshots/register.png" alt="/register" width="400px" />
+
+<img src="./screenshots/register_password.png" alt="register with password" width="400px" />
 
 Requests to the APIs made:
 
@@ -274,6 +297,21 @@ Requests to the APIs made:
 Both /success and /failure pages are designed to intercept the responses from the IDPs and decide on how to continue with the process.
 
 ### /verify
+
+This page verifies the email to be valid. It page of the login can also be invoked without an active session.
+The context of the user is taken from the url and is set in the email template.
+
+<img src="./screenshots/accounts.png" alt="/accounts" width="400px" />
+
+Requests to the APIs made:
+
+- `getBrandingSettings(org?)`
+- `getLoginSettings(org?)`
+- `verifyEmail()`
+
+If the page is invoked with an active session (right after a register with password), the user is signed in or redirected to the loginname if no context is known.
+
+> NOTE: This page will be extended to support invitations. In such case, authentication methods of the user are loaded and if none available, shown as possible next step (`/passkey/set`, `password/set`).
 
 ### /accounts
 

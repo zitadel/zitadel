@@ -31,8 +31,7 @@ export default async function Page({
     organization,
   });
 
-  let totpResponse: RegisterTOTPResponse | undefined,
-    totpError: Error | undefined;
+  let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
       await registerTOTP(session.factors.user.id)
@@ -41,15 +40,21 @@ export default async function Page({
             totpResponse = resp;
           }
         })
-        .catch((error) => {
-          totpError = error;
+        .catch((err) => {
+          error = err;
         });
     } else if (method === "sms") {
       // does not work
-      await addOTPSMS(session.factors.user.id);
+      await addOTPSMS(session.factors.user.id).catch((error) => {
+        console.error(error);
+        error = new Error("Could not add OTP via SMS");
+      });
     } else if (method === "email") {
       // works
-      await addOTPEmail(session.factors.user.id);
+      await addOTPEmail(session.factors.user.id).catch((error) => {
+        console.error(error);
+        error = new Error("Could not add OTP via Email");
+      });
     } else {
       throw new Error("Invalid method");
     }
@@ -98,9 +103,9 @@ export default async function Page({
           </div>
         )}
 
-        {totpError && (
+        {error && (
           <div className="py-4">
-            <Alert>{totpError?.message}</Alert>
+            <Alert>{error?.message}</Alert>
           </div>
         )}
 
@@ -119,8 +124,6 @@ export default async function Page({
               Scan the QR Code or navigate to the URL manually.
             </p>
             <div>
-              {/* {auth && <div>{auth.to}</div>} */}
-
               <TOTPRegister
                 uri={totpResponse.uri as string}
                 secret={totpResponse.secret as string}
