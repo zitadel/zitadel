@@ -190,7 +190,8 @@ At the moment, U2F methods are hidden if a method is already added on the users 
 
 This page sets a passkey method for a user. This page can be either enforced, or optional depending on the Login Settings.
 
-<img src="./screenshots/passkeyset.png" alt="/passkey/set" width="400px" />
+<!-- screen is the same -->
+<img src="./screenshots/u2fset.png" alt="/passkey/set" width="400px" />
 
 Requests to the APIs made:
 
