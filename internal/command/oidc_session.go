@@ -333,9 +333,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	if err != nil {
 		return nil, err
 	}
-	// Prevent token refresh if the user was deleted or deactivated.
-	// Note: We allow locked users to refresh (and only prevent new token flows)
-	if !userStateWriteModel.UserState.Exists() || userStateWriteModel.UserState == domain.UserStateInactive {
+	if !userStateWriteModel.UserState.IsEnabled() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-J39h2", "Errors.User.NotActive")
 	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
