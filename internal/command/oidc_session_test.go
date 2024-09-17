@@ -206,6 +206,103 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 			},
 		},
 		{
+			"user not active",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid", "offline_access"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
+								&domain.OIDCCodeChallenge{
+									Challenge: "challenge",
+									Method:    domain.CodeChallengeMethodS256,
+								},
+								[]domain.Prompt{domain.PromptNone},
+								[]string{"en", "de"},
+								gu.Ptr(time.Duration(0)),
+								gu.Ptr("loginHint"),
+								gu.Ptr("hintUserID"),
+								true,
+							),
+						),
+						eventFromEventPusher(
+							authrequest.NewCodeAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
+						),
+						eventFromEventPusher(
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"sessionID",
+								"userID",
+								testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+								"userID", "org1", testNow, &language.Afrikaans),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+								testNow),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+						user.NewUserDeactivatedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+						),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:              authz.WithInstanceID(context.Background(), "instanceID"),
+				authRequestID:    "V2_authRequestID",
+				complianceCheck:  mockAuthRequestComplianceChecker(nil),
+				needRefreshToken: true,
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive"),
+			},
+		},
+		{
 			"add successful",
 			fields{
 				eventstore: expectEventstore(
@@ -264,6 +361,21 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
 								testNow),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
 						),
 					),
 					expectFilter(), // token lifetime
@@ -380,6 +492,21 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
 								testNow),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
 						),
 					),
 					expectFilter(), // token lifetime
@@ -521,9 +648,80 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 			wantErr: io.ErrClosedPipe,
 		},
 		{
+			name: "not active user",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+						user.NewUserDeactivatedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+						),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:               context.Background(),
+				userID:            "userID",
+				resourceOwner:     "org1",
+				clientID:          "clientID",
+				audience:          []string{"audience"},
+				scope:             []string{"openid", "offline_access"},
+				authMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:          testNow,
+				nonce:             "nonce",
+				preferredLanguage: &language.Afrikaans,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAuthRequest,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive"),
+		},
+		{
 			name: "without refresh token",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -605,6 +803,21 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 			name: "with refresh token",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -688,6 +901,21 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 			name: "impersonation not allowed",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
 					expectFilter(), // token lifetime
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID"),
@@ -729,6 +957,21 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 			name: "impersonation allowed",
 			fields: fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
 					expectFilter(), // token lifetime
 					expectPush(
 						user.NewUserImpersonatedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "clientID", &domain.TokenActor{
@@ -983,6 +1226,63 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 		},
 		{
+			"user not active",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+						user.NewUserDeactivatedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+						),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				scope:           []string{"openid", "offline_access"},
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-J39h2", "Errors.User.NotActive"),
+			},
+		},
+		{
 			"refresh successful",
 			fields{
 				eventstore: expectEventstore(
@@ -1001,6 +1301,21 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
 						),
 					),
 					expectFilter(), // token lifetime
@@ -1068,7 +1383,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 
 func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 	type fields struct {
-		eventstore                      *eventstore.Eventstore
+		eventstore                      func(*testing.T) *eventstore.Eventstore
 		idGenerator                     id.Generator
 		defaultAccessTokenLifetime      time.Duration
 		defaultRefreshTokenLifetime     time.Duration
@@ -1092,7 +1407,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 		{
 			"invalid refresh token format error",
 			fields{
-				eventstore:   eventstoreExpect(t),
+				eventstore:   expectEventstore(),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
@@ -1106,7 +1421,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 		{
 			"inactive session error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1122,7 +1437,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 		{
 			"invalid refresh token error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1150,7 +1465,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 		{
 			"expired refresh token error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1182,7 +1497,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 		{
 			"get successful",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1231,7 +1546,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:                      tt.fields.eventstore,
+				eventstore:                      tt.fields.eventstore(t),
 				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
@@ -1263,7 +1578,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 
 func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -1283,7 +1598,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 		{
 			"invalid token",
 			fields{
-				eventstore:   eventstoreExpect(t),
+				eventstore:   expectEventstore(),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
@@ -1297,7 +1612,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 		{
 			"refresh_token inactive",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1322,7 +1637,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 		{
 			"refresh_token invalid client",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1347,7 +1662,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 		{
 			"refresh_token revoked",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1383,7 +1698,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 		{
 			"access_token inactive session",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1408,7 +1723,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 		{
 			"access_token invalid client",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1433,7 +1748,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 		{
 			"access_token revoked",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -1470,7 +1785,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:   tt.fields.eventstore,
+				eventstore:   tt.fields.eventstore(t),
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
 			err := c.RevokeOIDCSessionToken(tt.args.ctx, tt.args.token, tt.args.clientID)
