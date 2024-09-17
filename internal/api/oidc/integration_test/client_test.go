@@ -196,10 +196,12 @@ func TestServer_VerifyClient(t *testing.T) {
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	project, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)
+	projectInactive, err := Instance.CreateProject(CTX)
+	require.NoError(t, err)
 
 	inactiveClient, err := Instance.CreateOIDCInactivateClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
-	inactiveProjectClient, err := Instance.CreateOIDCInactivateProjectClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	inactiveProjectClient, err := Instance.CreateOIDCInactivateProjectClient(CTX, redirectURI, logoutRedirectURI, projectInactive.GetId())
 	require.NoError(t, err)
 	nativeClient, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
