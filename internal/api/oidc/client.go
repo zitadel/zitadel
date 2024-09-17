@@ -50,7 +50,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 		err = oidcError(err)
 		span.EndWithError(err)
 	}()
-	client, err := o.query.GetOIDCClientByID(ctx, id, false)
+	client, err := o.query.ActiveOIDCClientByID(ctx, id, false)
 	if err != nil {
 		return nil, err
 	}
@@ -976,7 +976,7 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 	if err != nil {
 		return nil, err
 	}
-	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
+	client, err := s.query.ActiveOIDCClientByID(ctx, clientID, assertion)
 	if zerrors.IsNotFound(err) {
 		return nil, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("no active client not found")
 	}

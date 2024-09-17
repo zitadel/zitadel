@@ -300,8 +300,7 @@ func (q *Queries) AppByID(ctx context.Context, appID string, activeOnly bool) (a
 	return app, err
 }
 
-// AppBySAMLEntityID will always query for an active App
-func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (app *App, err error) {
+func (q *Queries) ActiveAppBySAMLEntityID(ctx context.Context, entityID string) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

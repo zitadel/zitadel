@@ -52,8 +52,7 @@ type IntrospectionClient struct {
 //go:embed introspection_client_by_id.sql
 var introspectionClientByIDQuery string
 
-// GetIntrospectionClientByID returns only an active IntrospectionClient
-func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID string, getKeys bool) (_ *IntrospectionClient, err error) {
+func (q *Queries) ActiveIntrospectionClientByID(ctx context.Context, clientID string, getKeys bool) (_ *IntrospectionClient, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

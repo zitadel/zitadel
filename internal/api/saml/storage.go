@@ -55,7 +55,7 @@ type Storage struct {
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
+	app, err := p.query.ActiveAppBySAMLEntityID(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
