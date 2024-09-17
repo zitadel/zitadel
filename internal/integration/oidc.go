@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Tester) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
@@ -313,6 +314,31 @@ func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (machine *mana
 		return nil, "", "", "", err
 	}
 	secret, err := s.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
+		UserId: machine.GetUserId(),
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
+}
+
+func (s *Tester) CreateOIDCCredentialsClientInactive(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
+	name = gofakeit.Username()
+	machine, err = s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+		Name:            name,
+		UserName:        name,
+		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	secret, err := s.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
+		UserId: machine.GetUserId(),
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	_, err = s.Client.UserV2.DeactivateUser(ctx, &user_v2.DeactivateUserRequest{
 		UserId: machine.GetUserId(),
 	})
 	if err != nil {
