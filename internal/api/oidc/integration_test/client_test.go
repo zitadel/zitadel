@@ -199,6 +199,8 @@ func TestServer_VerifyClient(t *testing.T) {
 
 	inactiveClient, err := Instance.CreateOIDCInactivateClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
+	inactiveProjectClient, err := Instance.CreateOIDCInactivateProjectClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	require.NoError(t, err)
 	nativeClient, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
 	basicWebClient, err := Instance.CreateOIDCWebClientBasic(CTX, redirectURI, logoutRedirectURI, project.GetId())
@@ -237,6 +239,14 @@ func TestServer_VerifyClient(t *testing.T) {
 			client: clientDetails{
 				authReqClientID: nativeClient.GetClientId(),
 				clientID:        inactiveClient.GetClientId(),
+			},
+			wantErr: true,
+		},
+		{
+			name: "client inactive (project) error",
+			client: clientDetails{
+				authReqClientID: nativeClient.GetClientId(),
+				clientID:        inactiveProjectClient.GetClientId(),
 			},
 			wantErr: true,
 		},

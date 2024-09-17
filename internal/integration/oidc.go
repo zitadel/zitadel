@@ -107,6 +107,20 @@ func (i *Instance) CreateOIDCInactivateClient(ctx context.Context, redirectURI, 
 	return client, err
 }
 
+func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+	client, err := i.CreateOIDCNativeClient(ctx, redirectURI, logoutRedirectURI, projectID, false)
+	if err != nil {
+		return nil, err
+	}
+	_, err = i.Client.Mgmt.DeactivateProject(ctx, &management.DeactivateProjectRequest{
+		Id: projectID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return client, err
+}
+
 func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string) (*management.AddOIDCAppResponse, error) {
 	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
 		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
