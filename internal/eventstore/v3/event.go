@@ -16,17 +16,18 @@ var (
 )
 
 type event struct {
-	aggregate *eventstore.Aggregate
-	creator   string
-	revision  uint16
-	typ       eventstore.EventType
-	createdAt time.Time
-	sequence  uint64
-	position  decimal.Decimal
-	payload   Payload
+	aggregate       *eventstore.Aggregate
+	creator         string
+	revision        uint16
+	typ             eventstore.EventType
+	createdAt       time.Time
+	sequence        uint64
+	position        decimal.Decimal
+	inPositionOrder uint32
+	payload         Payload
 }
 
-func commandToEvent(sequence *latestSequence, command eventstore.Command) (_ *event, err error) {
+func commandToEvent(command eventstore.Command) (_ *event, err error) {
 	var payload Payload
 	if command.Payload() != nil {
 		payload, err = json.Marshal(command.Payload())
@@ -36,13 +37,21 @@ func commandToEvent(sequence *latestSequence, command eventstore.Command) (_ *ev
 		}
 	}
 	return &event{
-		aggregate: sequence.aggregate,
-		creator:   command.Creator(),
-		revision:  command.Revision(),
-		typ:       command.Type(),
-		payload:   payload,
-		sequence:  sequence.sequence,
+		creator:  command.Creator(),
+		revision: command.Revision(),
+		typ:      command.Type(),
+		payload:  payload,
 	}, nil
+}
+
+func commandToEventWithSequence(sequence *latestSequence, command eventstore.Command) (_ *event, err error) {
+	event, err := commandToEvent(command)
+	if err != nil {
+		return nil, err
+	}
+	event.aggregate = sequence.aggregate
+	event.sequence = sequence.sequence
+	return event, nil
 }
 
 // CreationDate implements [eventstore.Event]
