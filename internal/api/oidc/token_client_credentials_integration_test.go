@@ -22,6 +22,9 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 	machine, name, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 
+	_, _, clientIDInactive, clientSecretInactive, err := Tester.CreateOIDCCredentialsClientInactive(CTX)
+	require.NoError(t, err)
+
 	type claims struct {
 		name                       string
 		username                   string
@@ -66,6 +69,13 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 				return name
 			}(),
 			clientSecret: clientSecret,
+			scope:        []string{oidc.ScopeOpenID},
+			wantErr:      true,
+		},
+		{
+			name:         "inactive machine user error",
+			clientID:     clientIDInactive,
+			clientSecret: clientSecretInactive,
 			scope:        []string{oidc.ScopeOpenID},
 			wantErr:      true,
 		},
