@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
@@ -23,6 +25,8 @@ type UserV3WriteModel struct {
 	Email                    string
 	IsEmailVerified          bool
 	EmailVerifiedFailedCount int
+	EmailCode                *VerifyCode
+
 	Phone                    string
 	IsPhoneVerified          bool
 	PhoneVerifiedFailedCount int
@@ -31,6 +35,12 @@ type UserV3WriteModel struct {
 
 	Locked bool
 	State  domain.UserState
+}
+
+type VerifyCode struct {
+	Code         *crypto.CryptoValue
+	CreationDate time.Time
+	Expiry       time.Duration
 }
 
 func NewExistsUserV3WriteModel(resourceOwner, userID string) *UserV3WriteModel {
@@ -54,6 +64,16 @@ func NewUserV3WriteModel(resourceOwner, userID string) *UserV3WriteModel {
 		PhoneWM: true,
 		EmailWM: true,
 		DataWM:  true,
+	}
+}
+
+func NewUserV3EmailWriteModel(resourceOwner, userID string) *UserV3WriteModel {
+	return &UserV3WriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		EmailWM: true,
 	}
 }
 
@@ -83,12 +103,19 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.Email = string(e.EmailAddress)
 			wm.IsEmailVerified = false
 			wm.EmailVerifiedFailedCount = 0
+			wm.EmailCode = nil
 		case *schemauser.EmailCodeAddedEvent:
 			wm.IsEmailVerified = false
 			wm.EmailVerifiedFailedCount = 0
+			wm.EmailCode = &VerifyCode{
+				Code:         e.Code,
+				CreationDate: e.CreationDate(),
+				Expiry:       e.Expiry,
+			}
 		case *schemauser.EmailVerifiedEvent:
 			wm.IsEmailVerified = true
 			wm.EmailVerifiedFailedCount = 0
+			wm.EmailCode = nil
 		case *schemauser.EmailVerificationFailedEvent:
 			wm.EmailVerifiedFailedCount += 1
 		case *schemauser.PhoneUpdatedEvent:

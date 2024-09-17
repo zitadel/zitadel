@@ -110,35 +110,7 @@ func patchUserRequestToChangeSchemaUser(req *user.PatchUserRequest) (_ *command.
 		}
 	}
 
-	var email *command.Email
-	var phone *command.Phone
-	if req.GetUser().GetContact() != nil {
-		if req.GetUser().GetContact().GetEmail() != nil {
-			email = &command.Email{
-				Address: domain.EmailAddress(req.GetUser().GetContact().Email.Address),
-			}
-			if req.GetUser().GetContact().Email.GetIsVerified() {
-				email.Verified = true
-			}
-			if req.GetUser().GetContact().Email.GetReturnCode() != nil {
-				email.ReturnCode = true
-			}
-			if req.GetUser().GetContact().Email.GetSendCode() != nil {
-				email.URLTemplate = req.GetUser().GetContact().Email.GetSendCode().GetUrlTemplate()
-			}
-		}
-		if req.GetUser().GetContact().Phone != nil {
-			phone = &command.Phone{
-				Number: domain.PhoneNumber(req.GetUser().GetContact().Phone.Number),
-			}
-			if req.GetUser().GetContact().Phone.GetIsVerified() {
-				phone.Verified = true
-			}
-			if req.GetUser().GetContact().Phone.GetReturnCode() != nil {
-				phone.ReturnCode = true
-			}
-		}
-	}
+	email, phone := setContactToContact(req.GetUser().GetContact())
 	return &command.ChangeSchemaUser{
 		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
 		ID:            req.GetId(),
@@ -147,6 +119,29 @@ func patchUserRequestToChangeSchemaUser(req *user.PatchUserRequest) (_ *command.
 		Email:         email,
 		Phone:         phone,
 	}, nil
+}
+
+func setContactToContact(contact *user.SetContact) (*command.Email, *command.Phone) {
+	if contact == nil {
+		return nil, nil
+	}
+	return setEmailToEmail(contact.GetEmail()), setPhoneToPhone(contact.GetPhone())
+}
+
+func setPhoneToPhone(setPhone *user.SetPhone) *command.Phone {
+	if setPhone == nil {
+		return nil
+	}
+	phone := &command.Phone{
+		Number: domain.PhoneNumber(setPhone.Number),
+	}
+	if setPhone.GetIsVerified() {
+		phone.Verified = true
+	}
+	if setPhone.GetReturnCode() != nil {
+		phone.ReturnCode = true
+	}
+	return phone
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {

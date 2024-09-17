@@ -386,35 +386,6 @@ func (c *Commands) ActivateSchemaUser(ctx context.Context, resourceOwner, id str
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) updateSchemaUserEmail(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, agg *eventstore.Aggregate, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	if existing.Email == string(email.Address) {
-		return events, plainCode, nil
-	}
-
-	events = append(events, schemauser.NewEmailUpdatedEvent(ctx,
-		agg,
-		email.Address,
-	))
-	if email.Verified {
-		events = append(events, schemauser.NewEmailVerifiedEvent(ctx, agg))
-	} else {
-		cryptoCode, err := c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
-		if err != nil {
-			return nil, "", err
-		}
-		if email.ReturnCode {
-			plainCode = cryptoCode.Plain
-		}
-		events = append(events, schemauser.NewEmailCodeAddedEvent(ctx, agg,
-			cryptoCode.Crypted,
-			cryptoCode.Expiry,
-			email.URLTemplate,
-			email.ReturnCode,
-		))
-	}
-	return events, plainCode, nil
-}
-
 func (c *Commands) updateSchemaUserPhone(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, agg *eventstore.Aggregate, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
 	if existing.Phone == string(phone.Number) {
 		return events, plainCode, nil
@@ -453,6 +424,14 @@ func (c *Commands) getSchemaUserExists(ctx context.Context, resourceOwner, id st
 
 func (c *Commands) getSchemaUserWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
 	writeModel := NewUserV3WriteModel(resourceOwner, id)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
+
+func (c *Commands) getSchemaUserEmailWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
+	writeModel := NewUserV3EmailWriteModel(resourceOwner, id)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
