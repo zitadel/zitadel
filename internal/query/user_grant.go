@@ -143,6 +143,10 @@ func NewUserGrantRoleQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantRoles, value, TextListContains)
 }
 
+func NewUserGrantStateQuery(value domain.UserGrantState) (SearchQuery, error) {
+	return NewNumberQuery(UserGrantState, value, NumberEquals)
+}
+
 func NewUserGrantWithGrantedQuery(owner string) (SearchQuery, error) {
 	orgQuery, err := NewUserGrantResourceOwnerSearchQuery(owner)
 	if err != nil {
