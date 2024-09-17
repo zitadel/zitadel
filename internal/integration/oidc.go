@@ -341,6 +341,31 @@ func (i *Instance) CreateOIDCCredentialsClient(ctx context.Context) (machine *ma
 	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
 }
 
+func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
+	name = gofakeit.Username()
+	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+		Name:            name,
+		UserName:        name,
+		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	secret, err := i.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
+		UserId: machine.GetUserId(),
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	_, err = i.Client.Mgmt.DeactivateUser(ctx, &management.DeactivateUserRequest{
+		Id: machine.GetUserId(),
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
+}
+
 func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
 	name = gofakeit.Username()
 	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
