@@ -280,6 +280,8 @@ To register a user, the organization where the resource will be created is deter
 
 > NOTE: https://github.com/zitadel/zitadel/issues/8616 to determine the default organization of an instance must be implemented in order to correctly use the legal-, login-, branding- and complexitysettings.
 
+> NOTE: TODO: check which methods are allowed in the login settings, loginSettings.allowUsernamePassword / check for passkey
+
 ### /idp
 
 This page doubles as /loginname but limits it to choose from IDPs
