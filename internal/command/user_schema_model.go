@@ -19,16 +19,15 @@ type UserSchemaWriteModel struct {
 	Schema                 json.RawMessage
 	PossibleAuthenticators []domain.AuthenticatorType
 	State                  domain.UserSchemaState
-	Revision               uint64
+	SchemaRevision         uint64
 }
 
-func NewUserSchemaWriteModel(resourceOwner, schemaID, ty string) *UserSchemaWriteModel {
+func NewUserSchemaWriteModel(resourceOwner, schemaID string) *UserSchemaWriteModel {
 	return &UserSchemaWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   schemaID,
 			ResourceOwner: resourceOwner,
 		},
-		SchemaType: ty,
 	}
 }
 
@@ -40,13 +39,13 @@ func (wm *UserSchemaWriteModel) Reduce() error {
 			wm.Schema = e.Schema
 			wm.PossibleAuthenticators = e.PossibleAuthenticators
 			wm.State = domain.UserSchemaStateActive
-			wm.Revision = 1
+			wm.SchemaRevision = 1
 		case *schema.UpdatedEvent:
 			if e.SchemaType != nil {
 				wm.SchemaType = *e.SchemaType
 			}
 			if e.SchemaRevision != nil {
-				wm.Revision = *e.SchemaRevision
+				wm.SchemaRevision = *e.SchemaRevision
 			}
 			if len(e.Schema) > 0 {
 				wm.Schema = e.Schema
@@ -79,10 +78,6 @@ func (wm *UserSchemaWriteModel) Query() *eventstore.SearchQueryBuilder {
 			schema.DeletedType,
 		)
 
-	if wm.SchemaType != "" {
-		query = query.EventData(map[string]interface{}{"schemaType": wm.SchemaType})
-	}
-
 	return query.Builder()
 }
 func (wm *UserSchemaWriteModel) NewUpdatedEvent(
@@ -99,7 +94,7 @@ func (wm *UserSchemaWriteModel) NewUpdatedEvent(
 	if !bytes.Equal(wm.Schema, userSchema) {
 		changes = append(changes, schema.ChangeSchema(userSchema))
 		// change revision if the content of the schema changed
-		changes = append(changes, schema.IncreaseRevision(wm.Revision))
+		changes = append(changes, schema.IncreaseRevision(wm.SchemaRevision))
 	}
 	if len(possibleAuthenticators) > 0 && slices.Compare(wm.PossibleAuthenticators, possibleAuthenticators) != 0 {
 		changes = append(changes, schema.ChangePossibleAuthenticators(possibleAuthenticators))
