@@ -28,7 +28,7 @@ import (
 	object_v3alpha "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
@@ -782,5 +782,57 @@ func (i *Instance) CreateInviteCode(ctx context.Context, userID string) *user_v2
 		Verification: &user_v2.CreateInviteCodeRequest_ReturnCode{ReturnCode: &user_v2.ReturnInviteCode{}},
 	})
 	logging.OnError(err).Fatal("create invite code")
+	return user
+}
+
+func (i *Instance) LockSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.LockUserResponse {
+	var org *object_v3alpha.Organization
+	if orgID != "" {
+		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
+	}
+	user, err := i.Client.UserV3Alpha.LockUser(ctx, &user_v3alpha.LockUserRequest{
+		Organization: org,
+		Id:           userID,
+	})
+	logging.OnError(err).Fatal("lock user")
+	return user
+}
+
+func (i *Instance) UnlockSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.UnlockUserResponse {
+	var org *object_v3alpha.Organization
+	if orgID != "" {
+		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
+	}
+	user, err := i.Client.UserV3Alpha.UnlockUser(ctx, &user_v3alpha.UnlockUserRequest{
+		Organization: org,
+		Id:           userID,
+	})
+	logging.OnError(err).Fatal("unlock user")
+	return user
+}
+
+func (i *Instance) DeactivateSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.DeactivateUserResponse {
+	var org *object_v3alpha.Organization
+	if orgID != "" {
+		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
+	}
+	user, err := i.Client.UserV3Alpha.DeactivateUser(ctx, &user_v3alpha.DeactivateUserRequest{
+		Organization: org,
+		Id:           userID,
+	})
+	logging.OnError(err).Fatal("deactivate user")
+	return user
+}
+
+func (i *Instance) ActivateSchemaUser(ctx context.Context, orgID string, userID string) *user_v3alpha.ActivateUserResponse {
+	var org *object_v3alpha.Organization
+	if orgID != "" {
+		org = &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}}
+	}
+	user, err := i.Client.UserV3Alpha.ActivateUser(ctx, &user_v3alpha.ActivateUserRequest{
+		Organization: org,
+		Id:           userID,
+	})
+	logging.OnError(err).Fatal("reactivate user")
 	return user
 }

@@ -33,7 +33,6 @@ LogStore:
 Projections:
   HandleActiveInstances: 30m
   RequeueEvery: 5s
-  TransactionDuration: 1m
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
