@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
+	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 	"time"
 
 	"github.com/dop251/goja"
@@ -151,7 +152,7 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	setUserinfo(user, userinfo, attributes, customAttributes)
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse, p.eventstore.FilterToQueryReducer)
+	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity_schemas.SAMLResponse, p.eventstore.FilterToQueryReducer)
 	return nil
 }
 

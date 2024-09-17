@@ -2,17 +2,12 @@ package record
 
 import (
 	"github.com/sirupsen/logrus"
-)
-
-type Stream string
-
-const (
-	StreamActivity Stream = "activity"
+	"github.com/zitadel/zitadel/pkg/streams"
 )
 
 type BaseStreamRecord struct {
 	Version           string
-	Stream            Stream
+	Stream            streams.Stream
 	ZITADELInstanceID string
 }
 

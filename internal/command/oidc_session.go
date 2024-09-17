@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
+	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 	"strings"
 	"time"
 
@@ -505,13 +506,13 @@ func (c *Commands) tokenTokenLifetimes(ctx context.Context) (accessTokenLifetime
 	return accessTokenLifetime, refreshTokenLifetime, refreshTokenIdleLifetime, nil
 }
 
-func tokenReasonToActivityMethodType(r domain.TokenReason) activity.TriggerMethod {
+func tokenReasonToActivityMethodType(r domain.TokenReason) activity_schemas.TriggerMethod {
 	if r == domain.TokenReasonUnspecified {
-		return activity.Unspecified
+		return activity_schemas.Unspecified
 	}
 	if r == domain.TokenReasonRefresh {
-		return activity.OIDCRefreshToken
+		return activity_schemas.OIDCRefreshToken
 	}
 	// all other reasons result in an access token
-	return activity.OIDCAccessToken
+	return activity_schemas.OIDCAccessToken
 }

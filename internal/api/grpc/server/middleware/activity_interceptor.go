@@ -10,6 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
+	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 )
 
 func ActivityInterceptor() grpc.UnaryServerInterceptor {
@@ -19,7 +20,7 @@ func ActivityInterceptor() grpc.UnaryServerInterceptor {
 		if isResourceAPI(info.FullMethod) {
 			code, _, _, _ := gerrors.ExtractZITADELError(err)
 			ctx = activity.ActivityInfoFromContext(ctx).SetGRPCStatus(code).IntoContext(ctx)
-			activity.TriggerGRPCWithContext(ctx, activity.ResourceAPI)
+			activity.TriggerGRPCWithContext(ctx, activity_schemas.ResourceAPI)
 		}
 		return resp, err
 	}
@@ -47,11 +48,11 @@ func activityInfoFromGateway(ctx context.Context) *activity.ActivityInfo {
 	if !ok {
 		return info
 	}
-	path := md.Get(activity.PathKey)
+	path := md.Get(string(activity_schemas.LogFieldKeyPath))
 	if len(path) != 1 {
 		return info
 	}
-	requestMethod := md.Get(activity.RequestMethodKey)
+	requestMethod := md.Get(string(activity_schemas.LogFieldKeyRequestMethod))
 	if len(requestMethod) != 1 {
 		return info
 	}

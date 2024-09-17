@@ -2,6 +2,7 @@ package logs
 
 import (
 	"fmt"
+	"github.com/zitadel/zitadel/pkg/streams"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -9,7 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/logging/otel"
-	"github.com/zitadel/zitadel/internal/telemetry/logs/record"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/otel/log"
 )
@@ -56,7 +56,8 @@ func (c *Config) SetLogger() (err error) {
 					err = decodeRawConfig(rawCfg, cfg)
 				}),
 				otel.WithInclude(func(entry *logrus.Entry) bool {
-					return entry.Data["stream"] == record.StreamActivity
+					stream, ok := entry.Data["stream"].(streams.Stream)
+					return ok && stream == streams.LogFieldValueStreamActivity
 				}),
 				otel.WithLevels([]logrus.Level{logrus.InfoLevel}),
 				otel.WithAttributes(addedAttributes.ToAttributes()),

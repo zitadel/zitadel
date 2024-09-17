@@ -5,7 +5,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/telemetry/logs/record"
+	"github.com/zitadel/zitadel/pkg/streams"
 	"google.golang.org/grpc/codes"
 	"strconv"
 
@@ -13,49 +13,16 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/logs/record"
+	"github.com/zitadel/zitadel/pkg/streams/activity"
 )
-
-const (
-	PathKey          = "zitadel-activity-path"
-	RequestMethodKey = "zitadel-activity-request-method"
-)
-
-type TriggerMethod int
-
-const (
-	Unspecified TriggerMethod = iota
-	ResourceAPI
-	OIDCAccessToken
-	OIDCRefreshToken
-	SessionAPI
-	SAMLResponse
-)
-
-func (t TriggerMethod) String() string {
-	switch t {
-	case Unspecified:
-		return "unspecified"
-	case ResourceAPI:
-		return "resourceAPI"
-	case OIDCRefreshToken:
-		return "refreshToken"
-	case OIDCAccessToken:
-		return "accessToken"
-	case SessionAPI:
-		return "sessionAPI"
-	case SAMLResponse:
-		return "samlResponse"
-	default:
-		return "unknown"
-	}
-}
 
 var _ record.StreamRecord = (*activityRecord)(nil)
 
 type activityRecord struct {
 	*record.BaseStreamRecord
 	OrgID, UserID, Domain, Method, Path, RequestMethod string
-	Trigger                                            TriggerMethod
+	Trigger                                            activity.TriggerMethod
 	GRPCStatus                                         *codes.Code
 	HTTPStatus                                         *int
 	IsSystemUser                                       bool
@@ -67,23 +34,23 @@ func (ar *activityRecord) Base() *record.BaseStreamRecord {
 
 func (ar *activityRecord) Fields() logrus.Fields {
 	fields := logrus.Fields{
-		"stream":        ar.Stream,
-		"version":       ar.Version,
-		"instance":      ar.ZITADELInstanceID,
-		"org":           ar.OrgID,
-		"user":          ar.UserID,
-		"domain":        ar.Domain,
-		"trigger":       ar.Trigger.String(),
-		"method":        ar.Method,
-		"path":          ar.Path,
-		"requestMethod": ar.RequestMethod,
-		"isSystemUser":  strconv.FormatBool(ar.IsSystemUser),
+		string(streams.LogFieldKeyStream):         ar.Stream,
+		string(streams.LogFieldKeyVersion):        ar.Version,
+		string(streams.LogFieldKeyInstanceID):     ar.ZITADELInstanceID,
+		string(activity.LogFieldKeyOrgID):         ar.OrgID,
+		string(activity.LogFieldKeyUserID):        ar.UserID,
+		string(activity.LogFieldKeyDomain):        ar.Domain,
+		string(activity.LogFieldKeyTrigger):       ar.Trigger.String(),
+		string(activity.LogFieldKeyMethod):        ar.Method,
+		string(activity.LogFieldKeyPath):          ar.Path,
+		string(activity.LogFieldKeyRequestMethod): ar.RequestMethod,
+		string(activity.LogFieldKeyIsSystemUser):  strconv.FormatBool(ar.IsSystemUser),
 	}
 	if ar.GRPCStatus != nil {
-		fields["grpcStatus"] = ar.GRPCStatus.String()
+		fields[string(activity.LogFieldKeyGRPCStatus)] = ar.GRPCStatus.String()
 	}
 	if ar.HTTPStatus != nil {
-		fields["httpStatus"] = strconv.FormatInt(int64(*ar.HTTPStatus), 10)
+		fields[string(activity.LogFieldKeyHTTPStatus)] = strconv.FormatInt(int64(*ar.HTTPStatus), 10)
 	}
 	for key, value := range fields {
 		if value == "" {
@@ -94,7 +61,7 @@ func (ar *activityRecord) Fields() logrus.Fields {
 }
 
 // Trigger is used to log a specific events for a user (e.g. session or oidc token creation)
-func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod, reducer func(ctx context.Context, r eventstore.QueryReducer) error) {
+func Trigger(ctx context.Context, orgID, userID string, trigger activity.TriggerMethod, reducer func(ctx context.Context, r eventstore.QueryReducer) error) {
 	if orgID == "" && userID != "" {
 		orgID = getOrgOfUser(ctx, userID, reducer)
 	}
@@ -114,7 +81,7 @@ func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod, r
 	)
 }
 
-func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
+func TriggerGRPCWithContext(ctx context.Context, trigger activity.TriggerMethod) {
 	ai := ActivityInfoFromContext(ctx)
 	httpStatus := runtime.HTTPStatusFromCode(ai.GRPCStatus)
 	triggerLog(
@@ -134,7 +101,7 @@ func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 
 func triggerLog(
 	instanceID, orgID, userID, domain string,
-	trigger TriggerMethod,
+	trigger activity.TriggerMethod,
 	method, path, requestMethod string,
 	grpcStatus *codes.Code,
 	httpStatus *int,
@@ -142,8 +109,8 @@ func triggerLog(
 ) {
 	r := &activityRecord{
 		BaseStreamRecord: &record.BaseStreamRecord{
-			Version:           "v1",
-			Stream:            record.StreamActivity,
+			Version:           string(streams.LogFieldValueStreamVersion),
+			Stream:            streams.LogFieldValueStreamActivity,
 			ZITADELInstanceID: instanceID,
 		},
 		OrgID:         orgID,
@@ -157,7 +124,7 @@ func triggerLog(
 		HTTPStatus:    httpStatus,
 		IsSystemUser:  isSystemUser,
 	}
-	logging.New().WithFields(r.Fields()).Info(record.StreamActivity)
+	logging.New().WithFields(r.Fields()).Info(streams.LogFieldValueStreamActivity)
 }
 
 func getOrgOfUser(ctx context.Context, userID string, reducer func(ctx context.Context, r eventstore.QueryReducer) error) string {
