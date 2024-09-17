@@ -13,7 +13,7 @@ import {
   UserGrant as MgmtUserGrant,
   UserGrant,
   UserGrantQuery,
-  UserGrantState
+  UserGrantState,
 } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';

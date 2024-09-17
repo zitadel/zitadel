@@ -161,7 +161,7 @@
             class="state"
             [ngClass]="{
               active: grant.state === UserGrantState.USER_GRANT_STATE_ACTIVE,
-              inactive: grant.state === UserGrantState.USER_GRANT_STATE_INACTIVE
+              inactive: grant.state === UserGrantState.USER_GRANT_STATE_INACTIVE,
             }"
           >
             {{ 'USER.DATA.STATE' + grant.state | translate }}
