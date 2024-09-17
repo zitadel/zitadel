@@ -60,7 +60,7 @@ var (
 	expectedAppQuery       = regexp.QuoteMeta(expectedAppQueryBase)
 	expectedActiveAppQuery = regexp.QuoteMeta(expectedAppQueryBase +
 		` LEFT JOIN projections.projects4 ON projections.apps7.project_id = projections.projects4.id AND projections.apps7.instance_id = projections.projects4.instance_id` +
-		` LEFT JOIN projections.orgs1 ON projections.apps7.resource_owner = projections.orgs1.id AND projections.apps7.instance_id = projections.orgs1.instance_id 222`)
+		` LEFT JOIN projections.orgs1 ON projections.apps7.resource_owner = projections.orgs1.id AND projections.apps7.instance_id = projections.orgs1.instance_id`)
 	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps7.id,` +
 		` projections.apps7.name,` +
 		` projections.apps7.project_id,` +
