@@ -158,6 +158,7 @@ module.exports = {
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
             "guides/manage/customize/restrictions",
+            "guides/manage/customize/notifications",
           ],
         },
         {

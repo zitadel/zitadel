@@ -20,17 +20,20 @@ func listSMTPConfigsToModel(req *admin_pb.ListSMTPConfigsRequest) (*query.SMTPCo
 }
 
 func SMTPConfigToProviderPb(config *query.SMTPConfig) *settings_pb.SMTPConfig {
-	return &settings_pb.SMTPConfig{
-		Details:       object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
-		Id:            config.ID,
-		Description:   config.Description,
-		Tls:           config.SMTPConfig.TLS,
-		Host:          config.SMTPConfig.Host,
-		User:          config.SMTPConfig.User,
-		State:         SMTPConfigStateToPb(config.State),
-		SenderAddress: config.SMTPConfig.SenderAddress,
-		SenderName:    config.SMTPConfig.SenderName,
+	ret := &settings_pb.SMTPConfig{
+		Details:     object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
+		Id:          config.ID,
+		Description: config.Description,
+		State:       SMTPConfigStateToPb(config.State),
 	}
+	if config.SMTPConfig != nil {
+		ret.Tls = config.SMTPConfig.TLS
+		ret.Host = config.SMTPConfig.Host
+		ret.User = config.SMTPConfig.User
+		ret.SenderAddress = config.SMTPConfig.SenderAddress
+		ret.SenderName = config.SMTPConfig.SenderName
+	}
+	return ret
 }
 
 func SMTPConfigsToPb(configs []*query.SMTPConfig) []*settings_pb.SMTPConfig {
