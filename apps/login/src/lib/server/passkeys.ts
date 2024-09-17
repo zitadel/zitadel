@@ -53,7 +53,7 @@ export async function registerPasskeyLink(
   // use session token to add the passkey
   const registerLink = await createPasskeyRegistrationLink(
     userId,
-    sessionCookie.token,
+    // sessionCookie.token,
   );
 
   if (!registerLink.code) {

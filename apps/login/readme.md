@@ -194,7 +194,7 @@ Requests to the APIs made:
 
 - `getBrandingSettings(org?)`
 - `getSession()`
-- `createPasskeyRegistrationLink(token)` :warning: This request requires the session token
+- `createPasskeyRegistrationLink()` TODO: check if this can be used with the session token (mfa required (AUTHZ-Kl3p0))
 - `registerPasskey()`
 - `verifyPasskey()`
 
@@ -215,7 +215,7 @@ Requests to the APIs made:
 
 - `getBrandingSettings(org?)`
 - `getSession()`
-- `registerU2F(token)` :warning: This request requires the session token
+- `registerU2F()` :warning: TODO: check if this can be used with the session token (mfa required (AUTHZ-Kl3p0))
 - `verifyU2FRegistration()`
 
 After a u2f method is registered, we redirect the user to `/passkey` to verify it again and sign in with the new method. The `createPasskeyRegistrationLink()` uses the token of the session which is determined by the flow.

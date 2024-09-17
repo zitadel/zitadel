@@ -465,17 +465,19 @@ export async function passwordReset(userId: string) {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
+
+// TODO check for token requirements!
 export async function createPasskeyRegistrationLink(
   userId: string,
-  token: string,
+  // token: string,
 ) {
-  const transport = createServerTransport(token, {
-    baseUrl: process.env.ZITADEL_API_URL!,
-    httpVersion: "2",
-  });
+  // const transport = createServerTransport(token, {
+  //   baseUrl: process.env.ZITADEL_API_URL!,
+  //   httpVersion: "2",
+  // });
 
-  const service = createUserServiceClient(transport);
-  return service.createPasskeyRegistrationLink({
+  // const service = createUserServiceClient(transport);
+  return userService.createPasskeyRegistrationLink({
     userId,
     medium: {
       case: "returnCode",
@@ -490,18 +492,20 @@ export async function createPasskeyRegistrationLink(
  * @param domain the domain on which the factor is registered
  * @returns the newly set email
  */
+
+// TODO check for token requirements!
 export async function registerU2F(
   userId: string,
   domain: string,
-  token: string,
+  // token: string,
 ) {
-  const transport = createServerTransport(token, {
-    baseUrl: process.env.ZITADEL_API_URL!,
-    httpVersion: "2",
-  });
+  // const transport = createServerTransport(token, {
+  //   baseUrl: process.env.ZITADEL_API_URL!,
+  //   httpVersion: "2",
+  // });
 
-  const service = createUserServiceClient(transport);
-  return service.registerU2F({
+  // const service = createUserServiceClient(transport);
+  return userService.registerU2F({
     userId,
     domain,
   });
