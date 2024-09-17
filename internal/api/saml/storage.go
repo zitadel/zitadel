@@ -330,10 +330,15 @@ func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (
 	if err != nil {
 		return nil, err
 	}
+	activeQuery, err := query.NewUserGrantStateQuery(domain.UserGrantStateActive)
+	if err != nil {
+		return nil, err
+	}
 	return p.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{
 			projectQuery,
 			userIDQuery,
+			activeQuery,
 		},
 	}, true)
 }

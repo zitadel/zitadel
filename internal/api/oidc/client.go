@@ -802,19 +802,24 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if projectID != "" {
 		roleAudience = append(roleAudience, projectID)
 	}
-	queries := make([]query.SearchQuery, 0, 2)
 	projectQuery, err := query.NewUserGrantProjectIDsSearchQuery(roleAudience)
 	if err != nil {
 		return nil, nil, err
 	}
-	queries = append(queries, projectQuery)
 	userIDQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
 		return nil, nil, err
 	}
-	queries = append(queries, userIDQuery)
+	activeQuery, err := query.NewUserGrantStateQuery(domain.UserGrantStateActive)
+	if err != nil {
+		return nil, nil, err
+	}
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: queries,
+		Queries: []query.SearchQuery{
+			projectQuery,
+			userIDQuery,
+			activeQuery,
+		},
 	}, true)
 	if err != nil {
 		return nil, nil, err
