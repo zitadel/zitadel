@@ -163,7 +163,7 @@ This page loads login Settings and the authentication methods for a user and sho
 Requests to the APIs made:
 
 - `getBrandingSettings(org?)`
-- `getLoginSettings(user.org)` > :warning: context taken from session
+- `getLoginSettings(user.org)` :warning: context taken from session
 - `getSession()`
 - `listAuthenticationMethodTypes()`
 - `getUserByID()`
