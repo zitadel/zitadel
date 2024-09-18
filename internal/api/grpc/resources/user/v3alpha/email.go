@@ -38,19 +38,12 @@ func setEmailToEmail(setEmail *user.SetEmail) *command.Email {
 	if setEmail == nil {
 		return nil
 	}
-	email := &command.Email{
-		Address: domain.EmailAddress(setEmail.Address),
+	return &command.Email{
+		Address:     domain.EmailAddress(setEmail.Address),
+		ReturnCode:  setEmail.GetReturnCode() != nil,
+		Verified:    setEmail.GetIsVerified() == true,
+		URLTemplate: setEmail.GetSendCode().GetUrlTemplate(),
 	}
-	if setEmail.GetIsVerified() {
-		email.Verified = true
-	}
-	if setEmail.GetReturnCode() != nil {
-		email.ReturnCode = true
-	}
-	if setEmail.GetSendCode() != nil {
-		email.URLTemplate = setEmail.GetSendCode().GetUrlTemplate()
-	}
-	return email
 }
 
 func (s *Server) VerifyContactEmail(ctx context.Context, req *user.VerifyContactEmailRequest) (_ *user.VerifyContactEmailResponse, err error) {
