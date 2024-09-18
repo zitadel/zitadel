@@ -37,25 +37,19 @@ func newObjectReadModel(ctx context.Context, manager objectManager, es *eventsto
 }
 
 func (rm *objectReadModel) subscribe(ctx context.Context) {
-	// TODO: we need the aggregate id so that we know which events to query
-	positions := make(chan decimal.Decimal)
-
-	for _, eventTypes := range rm.manager.Reducers() {
-		for eventType := range eventTypes {
-			rm.es.Subscribe(positions, eventstore.EventType(eventType))
-		}
-	}
-
+	notifications := rm.es.Subscribe(rm.manager.Reducers().EventTypes()...)
 	for {
 		select {
 		case <-ctx.Done():
-			// TODO: unsubscribe, close(positions)
 			return
-		case position := <-positions:
+		case n, ok := <-notifications:
+			if !ok {
+				return
+			}
 			// TODO: implement batching
 			err := rm.es.FilterToReducer(
 				ctx,
-				rm.manager.EventstoreV3Query(position).
+				rm.manager.EventstoreV3Query(n.Position).
 					OrderAsc().
 					AwaitOpenTransactions(),
 				rm,

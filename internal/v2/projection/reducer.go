@@ -3,10 +3,20 @@ package projection
 import (
 	"maps"
 
+	eventstore_v1 "github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
 type Reducers map[string]map[string]eventstore.ReduceEvent
+
+func (r Reducers) EventTypes() (eventTypes []eventstore_v1.EventType) {
+	for _, eventMap := range r {
+		for eventType := range eventMap {
+			eventTypes = append(eventTypes, eventstore_v1.EventType(eventType))
+		}
+	}
+	return eventTypes
+}
 
 // todo: does not work
 func MergeReducers(reducers ...Reducers) Reducers {

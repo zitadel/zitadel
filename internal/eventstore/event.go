@@ -60,8 +60,6 @@ type Event interface {
 	DataAsBytes() []byte
 }
 
-type v2Event struct{}
-
 func EventToV2(event Event) *v2.StorageEvent {
 	return &v2.StorageEvent{
 		Action: v2.Action[v2.Unmarshal]{

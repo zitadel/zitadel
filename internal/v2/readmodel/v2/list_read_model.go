@@ -3,7 +3,6 @@ package readmodel
 import (
 	"context"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -39,24 +38,20 @@ func newListReadModel(ctx context.Context, manager listManager, es *eventstore.E
 }
 
 func (rm *listReadModel) subscribe(ctx context.Context) {
-	positions := make(chan decimal.Decimal)
-
-	for _, eventTypes := range rm.manager.Reducers() {
-		for eventType := range eventTypes {
-			rm.es.Subscribe(positions, eventstore.EventType(eventType))
-		}
-	}
-
+	notifications := rm.es.Subscribe(rm.manager.Reducers().EventTypes()...)
 	for {
 		select {
 		case <-ctx.Done():
 			// TODO: unsubscribe, close(positions)
 			return
-		case position := <-positions:
+		case n, ok := <-notifications:
+			if !ok {
+				return
+			}
 			// TODO: implement batching
 			err := rm.es.FilterToReducer(
 				ctx,
-				rm.manager.EventstoreV3Query(position).
+				rm.manager.EventstoreV3Query(n.Position).
 					OrderAsc().
 					AwaitOpenTransactions().
 					PositionGreaterEqual(rm.LatestPosition.Position),

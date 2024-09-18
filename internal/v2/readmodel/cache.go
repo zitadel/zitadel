@@ -2,8 +2,8 @@ package readmodel
 
 import (
 	"context"
+	"slices"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,7 +14,7 @@ type CachedReadModel[M objectManager, T cacheModel] struct {
 	cache[T]
 
 	eventStore     *eventstore.Eventstore
-	notifications  chan decimal.Decimal
+	notifications  <-chan *eventstore.Notification
 	latestPosition v2_es.GlobalPosition
 	// interestedIn   map[eventstore.AggregateType][]eventstore.EventType
 	// reduce         v2_es.Reduce
@@ -35,7 +35,7 @@ func (c *CachedReadModel[M, T]) AppendEvents(events ...eventstore.Event) {
 			continue
 		}
 
-		reduce := c.manager.Reducers()[string(event.Aggregate().Type)][string(event.Type())]
+		reduce := c.manager.Reducers()[event.Aggregate().Type][event.Type()]
 		if reduce == nil {
 			continue
 		}
@@ -48,22 +48,24 @@ func (c *CachedReadModel[M, T]) AppendEvents(events ...eventstore.Event) {
 
 func NewCachedReadModel[M objectManager, T cacheModel](ctx context.Context, manager M, eventStore *eventstore.Eventstore) *CachedReadModel[M, T] {
 	readModel := &CachedReadModel[M, T]{
-		cache:         newMapCache[T](),
-		eventStore:    eventStore,
-		notifications: make(chan decimal.Decimal),
-		manager:       manager,
+		cache:      newMapCache[T](),
+		eventStore: eventStore,
+		manager:    manager,
 	}
-	go readModel.subscription(ctx)
 	readModel.createSubscription()
+	go readModel.subscription(ctx)
 	return readModel
 }
 
 func (c *CachedReadModel[M, T]) createSubscription() {
-	for _, eventTypes := range c.manager.Reducers() {
-		for eventType := range eventTypes {
-			c.eventStore.Subscribe(c.notifications, eventstore.EventType(eventType))
+	var eventTypes []eventstore.EventType
+	for _, eventMap := range c.manager.Reducers() {
+		eventTypes = slices.Grow(eventTypes, len(eventMap))
+		for eventType := range eventMap {
+			eventTypes = append(eventTypes, eventType)
 		}
 	}
+	c.notifications = c.eventStore.Subscribe(eventTypes...)
 }
 
 func (c *CachedReadModel[M, T]) subscription(ctx context.Context) {
@@ -138,7 +140,8 @@ func (m *MapCache[T]) set(key string, value T) error {
 }
 
 type objectManager interface {
-	Reducers() map[string]map[string]v2_es.ReduceEvent
+	// Reducers return a map of aggregate and event types to a reducer.
+	Reducers() map[eventstore.AggregateType]map[eventstore.EventType]v2_es.ReduceEvent
 }
 
 type cacheModel interface {
