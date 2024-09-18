@@ -285,7 +285,6 @@ export async function getMostRecentCookieWithLoginname<T>({
     if (latest) {
       return latest;
     } else {
-      console.error("sessions", sessions, loginName, organization);
       return Promise.reject("Could not get the context or retrieve a session");
     }
   } else {

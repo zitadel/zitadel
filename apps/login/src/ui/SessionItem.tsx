@@ -90,13 +90,13 @@ export default function SessionItem({
         />
       </div>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col overflow-hidden">
         <span className="">{session.factors?.user?.displayName}</span>
-        <span className="text-xs opacity-80">
+        <span className="text-xs opacity-80 text-ellipsis">
           {session.factors?.user?.loginName}
         </span>
         {validUser && (
-          <span className="text-xs opacity-80">
+          <span className="text-xs opacity-80 text-ellipsis">
             {validDate && moment(timestampDate(validDate)).fromNow()}
           </span>
         )}

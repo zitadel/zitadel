@@ -13,10 +13,17 @@ export default async function Page({
 }) {
   const { loginName, organization, authRequestId, alt } = searchParams;
 
-  const sessionFactors = await loadMostRecentSession({
-    loginName,
-    organization,
-  });
+  // also allow no session to be found (ignoreUnkownUsername)
+  let sessionFactors;
+  try {
+    sessionFactors = await loadMostRecentSession({
+      loginName,
+      organization,
+    });
+  } catch (error) {
+    // ignore error to continue to show the password form
+    console.warn(error);
+  }
 
   const branding = await getBrandingSettings(organization);
   const loginSettings = await getLoginSettings(organization);
@@ -27,14 +34,16 @@ export default async function Page({
         <h1>{sessionFactors?.factors?.user?.displayName ?? "Password"}</h1>
         <p className="ztdl-p mb-6 block">Enter your password.</p>
 
-        {(!sessionFactors || !loginName) && (
-          <div className="py-4">
-            <Alert>
-              Could not get the context of the user. Make sure to enter the
-              username first or provide a loginName as searchParam.
-            </Alert>
-          </div>
-        )}
+        {/* show error only if usernames should be shown to be unknown */}
+        {(!sessionFactors || !loginName) &&
+          !loginSettings?.ignoreUnknownUsernames && (
+            <div className="py-4">
+              <Alert>
+                Could not get the context of the user. Make sure to enter the
+                username first or provide a loginName as searchParam.
+              </Alert>
+            </div>
+          )}
 
         {sessionFactors && (
           <UserAvatar

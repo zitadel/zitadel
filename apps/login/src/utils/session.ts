@@ -7,16 +7,13 @@ import {
   getSession,
   setSession,
 } from "@/lib/zitadel";
-import { create, timestampDate, toDate } from "@zitadel/client";
+import { timestampDate } from "@zitadel/client";
 import {
   Challenges,
   RequestChallenges,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import {
-  Checks,
-  ChecksSchema,
-} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
 type CustomCookieData = {
   id: string;
@@ -30,76 +27,10 @@ type CustomCookieData = {
 };
 
 export async function createSessionAndUpdateCookie(
-  loginName: string,
-  password: string | undefined,
-  challenges: RequestChallenges | undefined,
-  organization?: string,
-  authRequestId?: string,
-) {
-  const checks = create(
-    ChecksSchema,
-    password
-      ? {
-          user: { search: { case: "loginName", value: loginName } },
-          password: { password },
-        }
-      : { user: { search: { case: "loginName", value: loginName } } },
-  );
-
-  const createdSession = await createSessionFromChecks(checks, challenges);
-
-  if (createdSession) {
-    return getSession({
-      sessionId: createdSession.sessionId,
-      sessionToken: createdSession.sessionToken,
-    }).then((response) => {
-      if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: CustomCookieData = {
-          id: createdSession.sessionId,
-          token: createdSession.sessionToken,
-          creationDate: `${toDate(response.session.creationDate)?.getTime() ?? ""}`,
-          expirationDate: `${toDate(response.session.expirationDate)?.getTime() ?? ""}`,
-          changeDate: `${toDate(response.session.changeDate)?.getTime() ?? ""}`,
-          loginName: response.session.factors.user.loginName ?? "",
-          organization: response.session.factors.user.organizationId ?? "",
-        };
-
-        if (authRequestId) {
-          sessionCookie.authRequestId = authRequestId;
-        }
-
-        if (organization) {
-          sessionCookie.organization = organization;
-        }
-
-        return addSessionToCookie<CustomCookieData>(sessionCookie).then(() => {
-          return response.session as Session;
-        });
-      } else {
-        throw "could not get session or session does not have loginName";
-      }
-    });
-  } else {
-    throw "Could not create session";
-  }
-}
-
-export async function createSessionForUserIdAndUpdateCookie(
-  userId: string,
-  password: string | undefined,
+  checks: Checks,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
 ): Promise<Session> {
-  const checks = create(
-    ChecksSchema,
-    password
-      ? {
-          user: { search: { case: "userId", value: userId } },
-          password: { password },
-          // totp: { code: totpCode },
-        }
-      : { user: { search: { case: "userId", value: userId } } },
-  );
   const createdSession = await createSessionFromChecks(checks, challenges);
 
   if (createdSession) {
@@ -150,7 +81,6 @@ export async function createSessionForIdpAndUpdateCookie(
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   },
-  organization: string | undefined,
   authRequestId: string | undefined,
 ): Promise<Session> {
   const createdSession = await createSessionForUserIdAndIdpIntent(
@@ -184,8 +114,9 @@ export async function createSessionForIdpAndUpdateCookie(
           sessionCookie.authRequestId = authRequestId;
         }
 
-        if (organization) {
-          sessionCookie.organization = organization;
+        if (response.session.factors.user.organizationId) {
+          sessionCookie.organization =
+            response.session.factors.user.organizationId;
         }
 
         return addSessionToCookie(sessionCookie).then(() => {

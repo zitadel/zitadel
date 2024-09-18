@@ -1,8 +1,10 @@
 "use server";
 
 import { addHumanUser } from "@/lib/zitadel";
-import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
+import { createSessionAndUpdateCookie } from "@/utils/session";
+import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
 type RegisterUserCommand = {
   email: string;
@@ -32,9 +34,13 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: "Could not create user" };
   }
 
-  return createSessionForUserIdAndUpdateCookie(
-    human.userId,
-    command.password,
+  const checks = create(ChecksSchema, {
+    user: { search: { case: "userId", value: human.userId } },
+    password: { password: command.password },
+  });
+
+  return createSessionAndUpdateCookie(
+    checks,
     undefined,
     command.authRequestId,
   ).then((session) => {

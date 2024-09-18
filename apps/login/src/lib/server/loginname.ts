@@ -1,9 +1,11 @@
 "use server";
 
+import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { createSessionForUserIdAndUpdateCookie } from "../../utils/session";
+import { createSessionAndUpdateCookie } from "../../utils/session";
 import { idpTypeToSlug } from "../idp";
 import {
   getActiveIdentityProviders,
@@ -71,9 +73,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
     const userId = users.result[0].userId;
-    const session = await createSessionForUserIdAndUpdateCookie(
-      userId,
-      undefined,
+
+    const checks = create(ChecksSchema, {
+      user: { search: { case: "userId", value: userId } },
+    });
+
+    const session = await createSessionAndUpdateCookie(
+      checks,
       undefined,
       command.authRequestId,
     );
@@ -202,36 +208,38 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
     }
 
-    const params = new URLSearchParams();
-
+    // TODO: check if ignoreUnknownUsernames or register has a higher priority
     if (orgToRegisterOn) {
-      params.set("organization", orgToRegisterOn);
-    }
-    if (command.authRequestId) {
-      params.set("authRequestId", command.authRequestId);
-    }
-    if (command.loginName) {
-      params.set("loginName", command.loginName);
-    }
+      const params = new URLSearchParams({ organization: orgToRegisterOn });
 
-    const registerUrl = "/register?" + params;
+      if (command.authRequestId) {
+        params.set("authRequestId", command.authRequestId);
+      }
+      if (command.loginName) {
+        params.set("loginName", command.loginName);
+      }
 
-    return redirect(registerUrl);
+      return redirect("/register?" + params);
+    }
   }
 
   if (loginSettings?.ignoreUnknownUsernames) {
-    const paramsPasswordDefault: any = { loginName: command.loginName };
+    const paramsPasswordDefault = new URLSearchParams({
+      loginName: command.loginName,
+    });
 
     if (command.authRequestId) {
-      paramsPasswordDefault.authRequestId = command.authRequestId;
+      paramsPasswordDefault.append("authRequestId", command.authRequestId);
     }
 
     if (command.organization) {
-      paramsPasswordDefault.organization = command.organization;
+      paramsPasswordDefault.append("organization", command.organization);
     }
 
-    return redirect("/password?" + new URLSearchParams(paramsPasswordDefault));
+    return redirect("/password?" + paramsPasswordDefault);
   }
+
+  // fallbackToPassword
 
   return { error: "Could not find user" };
 }

@@ -1,7 +1,6 @@
 "use client";
 
-import { resetPassword } from "@/lib/server/password";
-import { updateSession } from "@/lib/server/session";
+import { resetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -51,7 +50,7 @@ export default function PasswordForm({
     setError("");
     setLoading(true);
 
-    const response = await updateSession({
+    const response = await sendPassword({
       loginName,
       organization,
       checks: create(ChecksSchema, {

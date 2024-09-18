@@ -6,8 +6,12 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/utils/session";
+import { create } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import {
+  Checks,
+  ChecksSchema,
+} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import {
   getMostRecentSessionCookie,
@@ -24,35 +28,26 @@ type CreateNewSessionCommand = {
   };
   loginName?: string;
   password?: string;
-  organization?: string;
   authRequestId?: string;
 };
 
 export async function createNewSession(options: CreateNewSessionCommand) {
-  const {
-    userId,
-    idpIntent,
-    loginName,
-    password,
-    organization,
-    authRequestId,
-  } = options;
+  const { userId, idpIntent, loginName, password, authRequestId } = options;
 
   if (userId && idpIntent) {
-    return createSessionForIdpAndUpdateCookie(
-      userId,
-      idpIntent,
-      organization,
-      authRequestId,
-    );
+    return createSessionForIdpAndUpdateCookie(userId, idpIntent, authRequestId);
   } else if (loginName) {
-    return createSessionAndUpdateCookie(
-      loginName,
-      password,
-      undefined,
-      organization,
-      authRequestId,
+    const checks = create(
+      ChecksSchema,
+      password
+        ? {
+            user: { search: { case: "loginName", value: loginName } },
+            password: { password },
+          }
+        : { user: { search: { case: "loginName", value: loginName } } },
     );
+
+    return createSessionAndUpdateCookie(checks, undefined, authRequestId);
   } else {
     throw new Error("No userId or loginName provided");
   }
