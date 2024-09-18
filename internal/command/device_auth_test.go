@@ -607,7 +607,6 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 									Description:   gu.Ptr("firefox"),
 									Header:        http.Header{"foo": []string{"bar"}},
 								},
-								"sessionID",
 							),
 						),
 					),

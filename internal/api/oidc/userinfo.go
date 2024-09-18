@@ -69,7 +69,7 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		if !zerrors.IsNotFound(err) {
 			return nil, err
 		}
-		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("no active user").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("no active user").WithParent(err), http.StatusUnauthorized)
 	}
 	return op.NewResponse(userInfo), nil
 }
