@@ -190,6 +190,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     let orgToRegisterOn: string | undefined = command.organization;
 
     if (
+      !loginSettings?.ignoreUnknownUsernames &&
       !orgToRegisterOn &&
       command.loginName &&
       ORG_SUFFIX_REGEX.test(command.loginName)
@@ -208,8 +209,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
     }
 
-    // TODO: check if ignoreUnknownUsernames or register has a higher priority
-    if (orgToRegisterOn) {
+    // do not register user if ignoreUnknownUsernames is set
+    if (orgToRegisterOn && !loginSettings?.ignoreUnknownUsernames) {
       const params = new URLSearchParams({ organization: orgToRegisterOn });
 
       if (command.authRequestId) {
