@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 )
@@ -30,6 +31,7 @@ import (
 type Config struct {
 	ForMirror       bool
 	Database        database.Config
+	Caches          query.CachesConfig
 	SystemDefaults  systemdefaults.SystemDefaults
 	InternalAuthZ   internal_authz.Config
 	ExternalDomain  string

@@ -184,6 +184,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
+		config.Caches,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,

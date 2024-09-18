@@ -28,6 +28,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
@@ -48,6 +49,7 @@ type Config struct {
 	HTTP1HostHeader     string
 	WebAuthNName        string
 	Database            database.Config
+	Caches              query.CachesConfig
 	Tracing             tracing.Config
 	Metrics             metrics.Config
 	Profiler            profiler.Config

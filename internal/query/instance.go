@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/feature"
@@ -206,22 +208,47 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 
 	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
-	instance, scan := scanAuthzInstance()
-	// in case public domain is the same as the instance domain, we do not need to check it
-	// and can empty it for the check
-	if instanceDomain == publicDomain {
-		publicDomain = ""
+
+	instance, err := q.caches.instance.Get(ctx, cache.InstanceIndexByHost, instanceDomain)
+	if err == nil {
+		return instance, instance.checkDomain(instanceDomain, publicDomain)
 	}
-	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain, publicDomain)
-	return instance, err
+	// TBD: do we want to raise an Internal Server error here, or just try to continue on the database?
+	// For example, some cache implementations may not be H/A. Perhaps a Error log-line suffices?
+	if !errors.Is(err, cache.ErrCacheMiss) {
+		return nil, zerrors.ThrowInternal(err, "QUERY-aSaa6", "Errors.Internal")
+	}
+
+	instance, scan := scanAuthzInstance()
+	if err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain); err != nil {
+		return nil, err
+	}
+	if err = q.caches.instance.Set(ctx, instance); err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-quu2O", "Errors.Internal")
+	}
+	return instance, instance.checkDomain(instanceDomain, publicDomain)
 }
 
 func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	instance, err := q.caches.instance.Get(ctx, cache.InstanceIndexByID, id)
+	if err == nil {
+		return instance, nil
+	}
+	// TBD: do we want to raise an Internal Server error here, or just try to continue on the database?
+	// For example, some cache implementations may not be H/A. Perhaps a Error log-line suffices?
+	if !errors.Is(err, cache.ErrCacheMiss) {
+		return nil, zerrors.ThrowInternal(err, "QUERY-aSaa6", "Errors.Internal")
+	}
+
 	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
+	if err == nil {
+		err = q.caches.instance.Set(ctx, instance)
+	}
 	return instance, err
 }
 
@@ -431,6 +458,8 @@ type authzInstance struct {
 	block               *bool
 	auditLogRetention   *time.Duration
 	features            feature.Features
+	externalDomains     database.TextArray[string]
+	trustedDomains      database.TextArray[string]
 }
 
 type csp struct {
@@ -485,6 +514,31 @@ func (i *authzInstance) Features() feature.Features {
 	return i.features
 }
 
+var errPublicDomain = "public domain %q not trusted"
+
+func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
+	// in case public domain is empty, or the same as the instance domain, we do not need to check it
+	if publicDomain == "" || instanceDomain == publicDomain {
+		return nil
+	}
+	if !slices.Contains(i.trustedDomains, publicDomain) {
+		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.IAM.NotFound")
+	}
+	return nil
+}
+
+// Keys implements [cache.Entry]
+func (i *authzInstance) Keys(index cache.InstanceIndex) []string {
+	switch index {
+	case cache.InstanceIndexByID:
+		return []string{i.id}
+	case cache.InstanceIndexByHost:
+		return i.externalDomains
+	default:
+		return nil
+	}
+}
+
 func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 	instance := &authzInstance{}
 	return instance, func(row *sql.Row) error {
@@ -509,6 +563,8 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&auditLogRetention,
 			&block,
 			&features,
+			&instance.externalDomains,
+			&instance.trustedDomains,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
 			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")

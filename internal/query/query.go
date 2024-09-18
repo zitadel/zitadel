@@ -26,6 +26,7 @@ type Queries struct {
 	eventstore   *eventstore.Eventstore
 	eventStoreV4 es_v4.Querier
 	client       *database.DB
+	caches       Caches
 
 	keyEncryptionAlgorithm crypto.EncryptionAlgorithm
 	idpConfigEncryption    crypto.EncryptionAlgorithm
@@ -47,6 +48,7 @@ func StartQueries(
 	es *eventstore.Eventstore,
 	esV4 es_v4.Querier,
 	querySqlClient, projectionSqlClient *database.DB,
+	caches CachesConfig,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
@@ -85,6 +87,10 @@ func StartQueries(
 	}
 	if startProjections {
 		projection.Start(ctx)
+	}
+	repo.caches, err = caches.Start(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	return repo, nil

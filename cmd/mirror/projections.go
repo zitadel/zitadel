@@ -71,6 +71,7 @@ type ProjectionsConfig struct {
 	EncryptionKeys *encryption.EncryptionKeyConfig
 	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config
+	Caches         query.CachesConfig
 
 	Admin admin_es.Config
 	Auth  auth_es.Config
@@ -132,6 +133,7 @@ func projections(
 		esV4.Querier,
 		client,
 		client,
+		config.Caches,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,

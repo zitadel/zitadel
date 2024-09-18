@@ -8,6 +8,10 @@ import (
 
 // Cache stores objects with a value of type `V`.
 // Objects may be referred to by one or more indices.
+// Implementations may encode the value for storage.
+// This means non-exported fields may be lost and objects
+// with function values may fail to encode.
+// See https://pkg.go.dev/encoding/json#Marshal for example.
 //
 // `I` is the type by which indices are identified,
 // typically an enum for type-safe access.
@@ -18,7 +22,7 @@ import (
 // Due to the limitations in type constraints, all indices use the same key type.
 //
 // Implementations are free to use stricter type constraints or fixed typing.
-type Cache[I, K comparable, V any] interface {
+type Cache[I, K comparable, V Entry[I, K]] interface {
 	// Get an object through specified index.
 	// An [IndexUnknownError] may be returned if the index is unknown.
 	// [ErrCacheMiss] is returned if the key was not found in the index,
@@ -31,7 +35,7 @@ type Cache[I, K comparable, V any] interface {
 	// regardless if the object has other keys defined in the new entry.
 	// This to prevent ghost objects when an entry reduces the amount of keys
 	// for a given index.
-	Set(ctx context.Context, entry Entry[I, K, V]) error
+	Set(ctx context.Context, value V) error
 
 	// Invalidate an object through specified index.
 	// Implementations may choose to instantly delete the object,
@@ -61,17 +65,10 @@ type Cache[I, K comparable, V any] interface {
 //
 // `K` is the type used as key in an index.
 // Due to the limitations in type constraints, all indices use the same key type.
-type Entry[I, K comparable, V any] interface {
+type Entry[I, K comparable] interface {
 	// Keys returns which keys map to the object in a specified index.
 	// May return nil if the index in unknown or when there are no keys.
 	Keys(index I) (key []K)
-
-	// Value of the object which is cached.
-	// [Cache] implementations may encode the value for storage.
-	// This means non-exported fields may be lost and objects
-	// with function values may fail to encode.
-	// See https://pkg.go.dev/encoding/json#Marshal for example.
-	Value() V
 }
 
 type CacheConfig struct {

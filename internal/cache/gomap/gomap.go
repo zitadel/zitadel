@@ -10,14 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/cache"
 )
 
-type mapCache[I, K comparable, V any] struct {
+type mapCache[I, K comparable, V cache.Entry[I, K]] struct {
 	config   *cache.CacheConfig
 	indexMap map[I]*index[K, V]
 }
 
 // NewCache returns an in-memory Cache implementation based on the builtin go map type.
 // Object values are stored as-is and there is no encoding or decoding involved.
-func NewCache[I, K comparable, V any](background context.Context, indices []I, config cache.CacheConfig) cache.Cache[I, K, V] {
+func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, indices []I, config cache.CacheConfig) cache.Cache[I, K, V] {
 	m := &mapCache[I, K, V]{
 		config:   &config,
 		indexMap: make(map[I]*index[K, V], len(indices)),
@@ -43,13 +43,13 @@ func (c *mapCache[I, K, V]) Get(_ context.Context, index I, key K) (value V, err
 	return entry.value, nil
 }
 
-func (c *mapCache[I, K, V]) Set(_ context.Context, ce cache.Entry[I, K, V]) error {
+func (c *mapCache[I, K, V]) Set(_ context.Context, value V) error {
 	entry := &entry[V]{
-		value:   ce.Value(),
+		value:   value,
 		created: time.Now(),
 	}
 	for name, i := range c.indexMap {
-		keys := ce.Keys(name)
+		keys := value.Keys(name)
 		i.Invalidate(keys)
 		i.Set(keys, entry)
 	}
