@@ -16,7 +16,7 @@ func (s *Server) SetContactEmail(ctx context.Context, req *user.SetContactEmailR
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	schemauser := setContactEmailRequestToChangeSchemaUserEmail(ctx, req)
+	schemauser := setContactEmailRequestToChangeSchemaUserEmail(req)
 	if err := s.command.ChangeSchemaUserEmail(ctx, schemauser, s.userCodeAlg); err != nil {
 		return nil, err
 	}
@@ -26,9 +26,9 @@ func (s *Server) SetContactEmail(ctx context.Context, req *user.SetContactEmailR
 	}, nil
 }
 
-func setContactEmailRequestToChangeSchemaUserEmail(ctx context.Context, req *user.SetContactEmailRequest) *command.ChangeSchemaUserEmail {
+func setContactEmailRequestToChangeSchemaUserEmail(req *user.SetContactEmailRequest) *command.ChangeSchemaUserEmail {
 	return &command.ChangeSchemaUserEmail{
-		ResourceOwner: organizationToCreateResourceOwner(ctx, req.Organization),
+		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
 		ID:            req.GetId(),
 		Email:         setEmailToEmail(req.Email),
 	}
@@ -63,18 +63,19 @@ func (s *Server) ResendContactEmailCode(ctx context.Context, req *user.ResendCon
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	schemauser := resendContactEmailCodeRequestToResendSchemaUserEmailCode(ctx, req)
+	schemauser := resendContactEmailCodeRequestToResendSchemaUserEmailCode(req)
 	if err = s.command.ResendSchemaUserEmailCode(ctx, schemauser, s.userCodeAlg); err != nil {
 		return nil, err
 	}
 	return &user.ResendContactEmailCodeResponse{
-		Details: resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
+		Details:          resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
+		VerificationCode: gu.Ptr(schemauser.PlainCode),
 	}, nil
 }
 
-func resendContactEmailCodeRequestToResendSchemaUserEmailCode(ctx context.Context, req *user.ResendContactEmailCodeRequest) *command.ResendSchemaUserEmailCode {
+func resendContactEmailCodeRequestToResendSchemaUserEmailCode(req *user.ResendContactEmailCodeRequest) *command.ResendSchemaUserEmailCode {
 	return &command.ResendSchemaUserEmailCode{
-		ResourceOwner: organizationToCreateResourceOwner(ctx, req.Organization),
+		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
 		ID:            req.GetId(),
 		URLTemplate:   req.GetSendCode().GetUrlTemplate(),
 		ReturnCode:    req.GetReturnCode() != nil,

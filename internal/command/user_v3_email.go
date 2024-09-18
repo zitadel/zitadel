@@ -138,12 +138,13 @@ type EmailUpdate interface {
 }
 
 func (c *Commands) updateSchemaUserEmail(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, email EmailUpdate, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	if existing.Email != string(email.GetAddress()) {
-		events = append(events, schemauser.NewEmailUpdatedEvent(ctx,
-			UserV3AggregateFromWriteModel(&existing.WriteModel),
-			email.GetAddress(),
-		))
+	if existing.Email == string(email.GetAddress()) {
+		return events, plainCode, nil
 	}
+	events = append(events, schemauser.NewEmailUpdatedEvent(ctx,
+		UserV3AggregateFromWriteModel(&existing.WriteModel),
+		email.GetAddress(),
+	))
 	if email.IsVerified() {
 		return append(events, schemauser.NewEmailVerifiedEvent(ctx, UserV3AggregateFromWriteModel(&existing.WriteModel))), "", nil
 	}
