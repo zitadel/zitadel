@@ -3,6 +3,7 @@ package cache
 
 import (
 	"context"
+	"time"
 )
 
 // Cache stores objects with a value of type `V`.
@@ -46,9 +47,6 @@ type Cache[I, K comparable, V any] interface {
 	// It is safe to call Delete multiple times or on non-existing entries
 	Delete(ctx context.Context, index I, key ...K) error
 
-	// Prune deletes all invalidated or expired objects.
-	Prune(ctx context.Context) error
-
 	// Clear deletes all cached objects.
 	Clear(ctx context.Context) error
 
@@ -74,4 +72,21 @@ type Entry[I, K comparable, V any] interface {
 	// with function values may fail to encode.
 	// See https://pkg.go.dev/encoding/json#Marshal for example.
 	Value() V
+}
+
+type CacheConfig struct {
+	// Name used to refer to this cache.
+	// May be used for logging or storage specific needs,
+	// like a table name.
+	Name string
+
+	// Age since an object was added to the cache,
+	// after which the object is considered invalid.
+	// 0 disables max age checks.
+	MaxAge time.Duration
+
+	// Age since last use (Get) of an object,
+	// after which the object is considered invalid.
+	// 0 disables last use age checks.
+	LastUseAge time.Duration
 }
