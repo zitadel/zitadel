@@ -1382,7 +1382,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
