@@ -9,7 +9,6 @@ import LinuxUnix from "./_linuxunix.mdx";
 import Compose from "./_compose.mdx";
 import Helm from "./_helm.mdx";
 import CodeBlock from "@theme/CodeBlock";
-import DefaultsYamlSource from "!!raw-loader!./defaults.yaml";
 import StepsYamlSource from "!!raw-loader!./steps.yaml";
 
 This guide assumes you are familiar with [running ZITADEL using the least amount of configuration possible](/docs/self-hosting/deploy/overview).
@@ -18,18 +17,34 @@ This guide assumes you are familiar with [running ZITADEL using the least amount
 
 ### Runtime configuration file
 
-You can configure the runtime using the `--config` flag of the `zitadel` binary.
-Also, you can use the environment variables listed in the defaults.yaml.
+#### YAML
 
-:::tip
-For overwriting the default configuration for the first instance created by zitadel setup, use the FirstInstance section in the [database initialization file](#database-initialization-file).
+You can configure the runtime settings by using the file [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
+
+:::tip First Instance Configuration
+For overwriting the default configuration for the first instance created by ZITADEL setup, use the FirstInstance section in the [database initialization file](#database-initialization-file).
 :::
 
+#### CLI
 
-<details>
-  <summary>defaults.yaml</summary>
-  <CodeBlock language="yaml">{DefaultsYamlSource}</CodeBlock>
-</details>
+You can configure the runtime using the `--config` flag of the `zitadel` binary.
+
+#### Runtime Environment Variables
+
+You can use environment variables to configure the runtime.
+
+:::info Complete List of Environment Variables
+A complete list of environment variables can be found in the [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml).
+::: 
+
+Environment Variable | Description | Default Value
+--- | --- | ---
+ZITADEL_EXTERNALSECURE | True | ExternalSecure specifies if ZITADEL is exposed externally using HTTPS or HTTP. [Read more about external access](https://zitadel.com/docs/self-hosting/manage/custom-domain).
+ZITADEL_EXTERNALDOMAIN | localhost | ExternalPort is the domain on which end users access ZITADEL. [Read more about external access](https://zitadel.com/docs/self-hosting/manage/custom-domain).
+ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME | | [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml)
+ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE | | [defaults.yaml](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml)
+ZITADEL_LOG_LEVEL | info | 
+
 
 ### Database initialization file
 
