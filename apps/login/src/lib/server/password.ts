@@ -50,6 +50,8 @@ export async function sendPassword(command: UpdateSessionCommand) {
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
+  }).catch((error) => {
+    console.warn("Ignored error:", error);
   });
 
   let session;
@@ -70,42 +72,38 @@ export async function sendPassword(command: UpdateSessionCommand) {
         undefined,
         command.authRequestId,
       );
-
-      if (!session?.factors?.user?.id || !sessionCookie) {
-        return { error: "Could not create session for user" };
-      }
     }
 
     // this is a fake error message to hide that the user does not even exist
-    return { error: "The password is wrong!" };
+    return { error: "Could not verify password!" };
   } else {
-    const updatedSession = await setSessionAndUpdateCookie(
+    session = await setSessionAndUpdateCookie(
       sessionCookie,
       command.checks,
       undefined,
       command.authRequestId,
     );
-
-    // if password, check if user has MFA methods
-    let authMethods;
-    if (
-      command.checks &&
-      command.checks.password &&
-      updatedSession.factors?.user?.id
-    ) {
-      const response = await listAuthenticationMethodTypes(
-        updatedSession.factors.user.id,
-      );
-      if (response.authMethodTypes && response.authMethodTypes.length) {
-        authMethods = response.authMethodTypes;
-      }
-    }
-
-    return {
-      sessionId: updatedSession.id,
-      factors: updatedSession.factors,
-      challenges: updatedSession.challenges,
-      authMethods,
-    };
   }
+
+  if (!session?.factors?.user?.id || !sessionCookie) {
+    return { error: "Could not create session for user" };
+  }
+
+  // if password, check if user has MFA methods
+  let authMethods;
+  if (command.checks && command.checks.password && session.factors?.user?.id) {
+    const response = await listAuthenticationMethodTypes(
+      session.factors.user.id,
+    );
+    if (response.authMethodTypes && response.authMethodTypes.length) {
+      authMethods = response.authMethodTypes;
+    }
+  }
+
+  return {
+    sessionId: session.id,
+    factors: session.factors,
+    challenges: session.challenges,
+    authMethods,
+  };
 }

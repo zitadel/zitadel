@@ -62,6 +62,10 @@ export default function PasswordForm({
       setLoading(false);
     });
 
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+    }
+
     setLoading(false);
 
     return response;
@@ -109,7 +113,6 @@ export default function PasswordForm({
       !submitted.authMethods ||
       !submitted.factors?.user?.loginName
     ) {
-      setError("Could not verify password");
       return;
     }
 
@@ -119,9 +122,9 @@ export default function PasswordForm({
         m !== AuthenticationMethodType.PASSKEY,
     );
 
-    if (availableSecondFactors.length == 1) {
+    if (availableSecondFactors?.length == 1) {
       const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
+        loginName: submitted.factors?.user.loginName,
       });
 
       if (authRequestId) {
@@ -143,7 +146,7 @@ export default function PasswordForm({
       } else if (factor === AuthenticationMethodType.U2F) {
         return router.push(`/u2f?` + params);
       }
-    } else if (availableSecondFactors.length >= 1) {
+    } else if (availableSecondFactors?.length >= 1) {
       const params = new URLSearchParams({
         loginName: submitted.factors.user.loginName,
       });
