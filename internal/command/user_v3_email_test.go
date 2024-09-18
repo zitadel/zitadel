@@ -52,7 +52,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-lvoHfcR8zQ", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-0oj2PquNGA", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -339,7 +339,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 			}
 
 			if tt.res.returnCode != "" {
-				assert.Equal(t, tt.res.returnCode, tt.args.user.ReturnCodeEmail)
+				assert.Equal(t, tt.res.returnCode, tt.args.user.ReturnCode)
 			}
 		})
 	}
@@ -357,9 +357,8 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 		code          string
 	}
 	type res struct {
-		returnCode string
-		details    *domain.ObjectDetails
-		err        func(error) bool
+		details *domain.ObjectDetails
+		err     func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -395,7 +394,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-bRfVIJnYP6", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-nJ0TQFuRmP", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -417,6 +416,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -474,6 +474,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -560,7 +561,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 								"test@example.com",
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithCreationDateNow(
 							schemauser.NewEmailCodeAddedEvent(
 								context.Background(),
 								&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -585,7 +586,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"))
 				},
 			},
 		},
@@ -612,7 +613,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 								"test@example.com",
 							),
 						),
-						eventFromEventPusher(
+						eventFromEventPusherWithCreationDateNow(
 							schemauser.NewEmailCodeAddedEvent(
 								context.Background(),
 								&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -666,6 +667,380 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.details, details)
+			}
+		})
+	}
+}
+
+func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
+	type fields struct {
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
+		newCode         encrypedCodeFunc
+	}
+	type args struct {
+		ctx  context.Context
+		user *ResendSchemaUserEmailCode
+	}
+	type res struct {
+		returnCode string
+		details    *domain.ObjectDetails
+		err        func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"no userID, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ResendSchemaUserEmailCode{
+					ID: "",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-0oj2PquNGA", "Errors.IDMissing"))
+				},
+			},
+		},
+		{
+			"email code resend, user not found",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ResendSchemaUserEmailCode{
+					ID: "user1",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-nJ0TQFuRmP", "Errors.User.NotFound"))
+				},
+			},
+		},
+		{
+			"email code resend, no code",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ResendSchemaUserEmailCode{
+					ID: "user1",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-QRkNTBwF8q", "Errors.User.Code.Empty"))
+				},
+			},
+		},
+		{
+			"email code resend, already verified",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewEmailUpdatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"test@example.com",
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewEmailCodeAddedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("emailverify"),
+								},
+								time.Hour*1,
+								"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+								false,
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewEmailVerifiedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ResendSchemaUserEmailCode{
+					ID: "user1",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-QRkNTBwF8q", "Errors.User.Code.Empty"))
+				},
+			},
+		},
+		{
+			"email code resend, no permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewEmailUpdatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"test@example.com",
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewEmailCodeAddedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("emailverify"),
+								},
+								time.Hour*1,
+								"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+								false,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ResendSchemaUserEmailCode{
+					ID: "user1",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
+			"email code resend, ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewEmailUpdatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"test@example.com",
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							schemauser.NewEmailCodeAddedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("emailverify"),
+								},
+								time.Hour*1,
+								"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+								false,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							schemauser.NewEmailCodeAddedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("emailverify2"),
+								},
+								time.Hour*1,
+								"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+								false,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("emailverify2", time.Hour),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ResendSchemaUserEmailCode{
+					ID:          "user1",
+					URLTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"email code resend, return, ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+						eventFromEventPusher(
+							schemauser.NewEmailUpdatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"test@example.com",
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							schemauser.NewEmailCodeAddedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("emailverify"),
+								},
+								time.Hour*1,
+								"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+								false,
+							),
+						),
+					),
+					expectPush(
+						eventFromEventPusher(
+							schemauser.NewEmailCodeAddedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("emailverify2"),
+								},
+								time.Hour*1,
+								"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+								true,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("emailverify2", time.Hour),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ResendSchemaUserEmailCode{
+					ID:          "user1",
+					URLTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+					ReturnCode:  true,
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				returnCode: "emailverify2",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:       tt.fields.eventstore(t),
+				checkPermission:  tt.fields.checkPermission,
+				newEncryptedCode: tt.fields.newCode,
+			}
+			err := c.ResendSchemaUserEmailCode(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.returnCode, tt.args.user.PlainCode)
+				assertObjectDetails(t, tt.res.details, tt.args.user.Details)
 			}
 		})
 	}

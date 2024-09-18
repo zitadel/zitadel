@@ -120,7 +120,7 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser,
 		),
 	}
 	if user.Email != nil {
-		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, writeModel, events, userAgg, user.Email, alg)
+		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, writeModel, events, user.Email, alg)
 		if err != nil {
 			return err
 		}
@@ -272,7 +272,7 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser,
 		}
 	}
 	if user.Email != nil {
-		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, writeModel, events, userAgg, user.Email, alg)
+		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, writeModel, events, user.Email, alg)
 		if err != nil {
 			return err
 		}

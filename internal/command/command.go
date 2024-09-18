@@ -189,6 +189,9 @@ type AppendReducer interface {
 }
 
 func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
+	if len(cmds) == 0 {
+		return nil
+	}
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return err

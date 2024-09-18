@@ -65,3 +65,25 @@ func (s *Server) VerifyContactEmail(ctx context.Context, req *user.VerifyContact
 		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
 	}, nil
 }
+
+func (s *Server) ResendContactEmailCode(ctx context.Context, req *user.ResendContactEmailCodeRequest) (_ *user.ResendContactEmailCodeResponse, err error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
+	schemauser := resendContactEmailCodeRequestToResendSchemaUserEmailCode(ctx, req)
+	if err = s.command.ResendSchemaUserEmailCode(ctx, schemauser, s.userCodeAlg); err != nil {
+		return nil, err
+	}
+	return &user.ResendContactEmailCodeResponse{
+		Details: resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
+	}, nil
+}
+
+func resendContactEmailCodeRequestToResendSchemaUserEmailCode(ctx context.Context, req *user.ResendContactEmailCodeRequest) *command.ResendSchemaUserEmailCode {
+	return &command.ResendSchemaUserEmailCode{
+		ResourceOwner: organizationToCreateResourceOwner(ctx, req.Organization),
+		ID:            req.GetId(),
+		URLTemplate:   req.GetSendCode().GetUrlTemplate(),
+		ReturnCode:    req.GetReturnCode() != nil,
+	}
+}

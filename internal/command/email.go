@@ -29,3 +29,16 @@ func (e *Email) Validate() error {
 func (c *Commands) newEmailCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
 	return c.newEncryptedCode(ctx, filter, domain.SecretGeneratorTypeVerifyEmailCode, alg)
 }
+
+func (r *Email) GetAddress() domain.EmailAddress {
+	return r.Address
+}
+func (r *Email) IsVerified() bool {
+	return r.Verified
+}
+func (r *Email) IsReturnCode() bool {
+	return r.ReturnCode
+}
+func (r *Email) GetURLTemplate() string {
+	return r.URLTemplate
+}
