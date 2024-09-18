@@ -509,6 +509,7 @@ Errors:
     SQLStatement: SQL изразът не може да бъде създаден
     InvalidRequest: Заявката е невалидна
     TooManyNestingLevels: Твърде много нива на влагане на заявката (макс. 20)
+    LimitExceeded: Ограничението на заявката е превишено
   Quota:
     AlreadyExists: Вече съществува квота за тази единица
     NotFound: Не е намерена квота за тази единица
@@ -580,6 +581,8 @@ Errors:
     NotFound: Изпълнението не е намерено
     IncludeNotFound: Включването не е намерено
     NoTargets: Няма определени цели
+    Failed: неуспешно изпълнение
+    ResponseIsNotValidJSON: Отговорът не е валиден JSON
   UserSchema:
     NotEnabled: Функцията „Потребителска схема“ не е активирана
     Type:
@@ -590,6 +593,11 @@ Errors:
     NotActive: Потребителската схема не е активна
     NotInactive: Потребителската схема не е неактивна
     NotExists: Потребителската схема не съществува
+    ID:
+      Missing: Липсва идентификатор на потребителска схема
+    Invalid: Потребителската схема е невалидна
+    Data:
+      Invalid: Невалидни данни за потребителска схема
   TokenExchange:
     FeatureDisabled: Функцията Token Exchange е деактивирана за вашето копие. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -601,6 +609,13 @@ Errors:
       NotForAPI: Имитирани токени не са разрешени за API
     Impersonation:
       PolicyDisabled: Имитирането е деактивирано в политиката за сигурност на екземпляра
+  WebKey:
+    ActiveDelete: Не може да се изтрие активен уеб ключ
+    Config: Невалидна конфигурация на уеб ключ
+    Duplicate: ID на уеб ключ не е уникален
+    FeatureDisabled: Ключовата уеб функция е деактивирана
+    NoActive: Не е намерен активен уеб ключ
+    NotFound: Уеб ключът не е намерен
 
 AggregateTypes:
   action: Действие
@@ -624,6 +639,7 @@ AggregateTypes:
   restrictions: Ограничения
   system: Система
   session: Сесия
+  web_key: Уеб ключ
 
 EventTypes:
   execution:
@@ -688,6 +704,13 @@ EventTypes:
         check:
           succeeded: Проверката за инициализация е успешна
           failed: Проверката на инициализацията е неуспешна
+      invite:
+        code:
+          added: Генериран е код за покана
+          sent: Изпратен е код за покана
+        check:
+          succeeded: Проверката на поканата е успешна
+          failed: Проверката на поканата е неуспешна
       username:
         reserved: Потребителското име е запазено
         released: Потребителското име е освободено
@@ -1340,6 +1363,32 @@ EventTypes:
     deactivated: Потребителската схема е деактивирана
     reactivated: Потребителската схема е активирана отново
     deleted: Потребителската схема е изтрита
+    user:
+      created: Потребител е създаден
+      updated: Потребителят е актуализиран
+      deleted: Потребителят е изтрит
+      email:
+        updated: Имейл адресът е променен
+        verified: Имейл адресът е потвърден
+        verification:
+          failed: Проверката на имейл адреса не бе успешна
+        code:
+          added: Генериран код за потвърждение на имейл адрес
+          sent: Кодът за потвърждение на имейл адреса е изпратен
+      phone:
+        updated: Телефонният номер е променен
+        verified: Телефонният номер е потвърден
+        verification:
+          failed: Неуспешна проверка на телефонния номер
+        code:
+          added: Генериран код за потвърждение на телефонен номер
+          sent: Кодът за потвърждение на телефонния номер е изпратен
+  web_key:
+    added: Добавен уеб ключ
+    activated: Уеб ключът е активиран
+    deactivated: Уеб ключът е деактивиран
+    removed: Уеб ключът е премахнат
+
 Application:
   OIDC:
     UnsupportedVersion: Вашата OIDC версия не се поддържа

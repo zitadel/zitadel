@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 28.sql
-	addTwilioVerifyServiceSID string
+	addFieldTable string
 )
 
-type SMSConfigs2TwilioAddVerifyServiceSid struct {
+type AddFieldTable struct {
 	dbClient *database.DB
 }
 
-func (mig *SMSConfigs2TwilioAddVerifyServiceSid) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addTwilioVerifyServiceSID)
+func (mig *AddFieldTable) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addFieldTable)
 	return err
 }
 
-func (mig *SMSConfigs2TwilioAddVerifyServiceSid) String() string {
-	return "28_sms_configs2_twilio_add_verification_sid"
+func (mig *AddFieldTable) String() string {
+	return "28_add_search_table"
 }

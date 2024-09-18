@@ -1,5 +1,6 @@
 package domain
 
+//go:generate enumer -type SecretGeneratorType -transform snake -trimprefix SecretGeneratorType
 type SecretGeneratorType int32
 
 const (
@@ -13,6 +14,7 @@ const (
 	SecretGeneratorTypeAppSecret
 	SecretGeneratorTypeOTPSMS
 	SecretGeneratorTypeOTPEmail
+	SecretGeneratorTypeInviteCode
 
 	secretGeneratorTypeCount
 )

@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	"slices"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -40,6 +41,15 @@ func (q *IDPUserLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuild
 		query = q.toQuery(query)
 	}
 	return query
+}
+
+func (q *IDPUserLinksSearchQuery) hasUserID() bool {
+	for _, query := range q.Queries {
+		if query.Col() == IDPUserLinkUserIDCol {
+			return true
+		}
+	}
+	return false
 }
 
 var (
@@ -89,7 +99,33 @@ var (
 	}
 )
 
-func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, withOwnerRemoved bool) (idps *IDPUserLinks, err error) {
+func idpLinksCheckPermission(ctx context.Context, links *IDPUserLinks, permissionCheck domain.PermissionCheck) {
+	links.Links = slices.DeleteFunc(links.Links,
+		func(link *IDPUserLink) bool {
+			return userCheckPermission(ctx, link.ResourceOwner, link.UserID, permissionCheck) != nil
+		},
+	)
+}
+
+func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, permissionCheck domain.PermissionCheck) (idps *IDPUserLinks, err error) {
+	links, err := q.idpUserLinks(ctx, queries, false)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && len(links.Links) > 0 {
+		// when userID for query is provided, only one check has to be done
+		if queries.hasUserID() {
+			if err := userCheckPermission(ctx, links.Links[0].ResourceOwner, links.Links[0].UserID, permissionCheck); err != nil {
+				return nil, err
+			}
+		} else {
+			idpLinksCheckPermission(ctx, links, permissionCheck)
+		}
+	}
+	return links, nil
+}
+
+func (q *Queries) idpUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, withOwnerRemoved bool) (idps *IDPUserLinks, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

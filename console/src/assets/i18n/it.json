@@ -197,7 +197,8 @@
           "VE": "Quando un utente cambia il suo indirizzo email, riceverà un'email con un link per verificare il nuovo indirizzo.",
           "VP": "Quando un utente cambia il suo numero di telefono, riceverà un SMS con un codice per verificare il nuovo numero.",
           "VEO": "Quando un utente aggiunge una Password Monouso tramite metodo email, deve attivarla inserendo un codice inviato al suo indirizzo email.",
-          "VSO": "Quando un utente aggiunge una Password Monouso tramite metodo SMS, deve attivarla inserendo un codice inviato al suo numero di telefono."
+          "VSO": "Quando un utente aggiunge una Password Monouso tramite metodo SMS, deve attivarla inserendo un codice inviato al suo numero di telefono.",
+          "IU": "Quando viene creato un codice di invito per un utente, riceverà un'e-mail con un collegamento per impostare il suo metodo di autenticazione."
         }
       },
       "LOGIN_TEXTS": {
@@ -231,7 +232,7 @@
           "LABEL": "Durata Massima in ore",
           "PW_CHECK": {
             "TITLE": "Controllo Password",
-            "DESCRIPTION": "I tuoi utenti devono cambiare le loro password in questi periodi."
+            "DESCRIPTION": "Gli utenti dovranno ri-autentificarsi con la password dopo questo periodo."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Controllo Login Esterno",
@@ -1085,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Elimina le azioni selezionate?",
         "DESCRIPTION": "Sei sicuro di voler eliminare le azioni selezionate dal processo?"
-      }
+      },
+      "ABOUTNAME": "Il nome dell'azione e il nome della funzione nel javascript devono essere gli stessi"
     },
     "TOAST": {
       "ACTIONSSET": "Azioni salvate!",
@@ -1380,7 +1382,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1438,9 +1441,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Imposta il generatore di password",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Scadenza (in ore)",
+      "EXPIRY": "Scadenza (in minuti)",
       "INCLUDEDIGITS": "Contiene numeri",
       "INCLUDESYMBOLS": "Contiene simboli",
       "INCLUDELOWERLETTERS": "Contiene lettere minuscole",
@@ -1470,12 +1471,18 @@
       "USERSCHEMA_DESCRIPTION": "Gli schemi utente consentono di gestire gli schemi di dati degli utenti. Se la flag è attivata, sarà possibile utilizzare la nuova API e le sue funzionalità.",
       "ACTIONS": "Azioni",
       "ACTIONS_DESCRIPTION": "Le azioni v2 consentono di gestire le esecuzioni e gli obiettivi dei dati. Se l'indicatore è abilitato, potrai utilizzare la nuova API e le sue funzionalità.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Terminazione sessione",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se il flag è abilitato, sarai in grado di terminare una singola sessione dall'interfaccia utente di accesso fornendo un id_token con una richiesta `sid` come id_token_hint nel punto finale di end_session. Tieni presente che attualmente tutte le sessioni dello stesso agente utente (browser) vengono terminate nell'interfaccia utente di accesso. Le sessioni gestite tramite l'API di sessione consentono già la terminazione di singole sessioni.",
       "STATES": {
         "INHERITED": "Predefinito",
         "ENABLED": "Abilitato",
         "DISABLED": "Disabilitato"
       },
       "INHERITED_DESCRIPTION": "Questa impostazione imposta il valore predefinito del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Abilitato\" viene ereditato",
+        "DISABLED": "\"Disabilitato\" viene ereditato"
+      },
       "RESET": "Imposta tutto su predefinito"
     },
     "DIALOG": {
@@ -1611,7 +1618,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1626,7 +1634,6 @@
         "initPasswordText": "Inizializzazione della password",
         "initializeDoneText": "Inizializzazione utente finita",
         "initializeUserText": "Inizializzazione utente",
-        "linkingUserPromptText": "Testo di promemoria per collegare l'utente",
         "linkingUserDoneText": "Collegamento dell'utente finito",
         "loginText": "Accesso",
         "logoutText": "Logout",
@@ -1662,7 +1669,8 @@
         "PR": "Ripristino della password",
         "DC": "Rivendicazione del dominio",
         "PL": "Autenticazione Passwordless",
-        "PC": "Cambiamento della password"
+        "PC": "Cambiamento della password",
+        "IU": "Invita utente"
       },
       "CHIPS": {
         "firstname": "Nome",
@@ -1681,7 +1689,9 @@
         "username": "Nome utente",
         "tempUsername": "Nome utente temporaneo",
         "otp": "Password monouso",
-        "verifyUrl": "URL per verificare la password monouso"
+        "verifyUrl": "URL per verificare la password monouso",
+        "expiry": "Scadenza",
+        "applicationName": "Nome dell'applicazione"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."
@@ -1779,7 +1789,7 @@
       "TYPE": {
         "OWNED": "Progetti proprietari",
         "OWNED_SINGULAR": "Progetto proprietario",
-        "GRANTED_SINGULAR": "Progetto delegato"
+        "GRANTED_SINGULAR": "Progetto concesso di {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Impostazione branding",
@@ -2055,10 +2065,10 @@
       "ISAUTOCREATION_DESC": "Se selezionato, verrà creato un account se non esiste ancora.",
       "ISAUTOUPDATE": "Aggiornamento automatico",
       "ISAUTOUPDATE_DESC": "Se selezionato, gli account vengono aggiornati alla riautenticazione.",
-      "ISCREATIONALLOWED": "Creazione consentita",
-      "ISCREATIONALLOWED_DESC": "Determina se i conti possono essere creati.",
-      "ISLINKINGALLOWED": "Collegamento consentito",
-      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata a un account esistente.",
+      "ISCREATIONALLOWED": "Creazione account consentita (manualmente)",
+      "ISCREATIONALLOWED_DESC": "Determina se gli account possono essere creati utilizzando un account esterno. Disabilita se gli utenti non dovrebbero essere in grado di modificare le informazioni dell'account quando la creazione automatica è abilitata.",
+      "ISLINKINGALLOWED": "Collegamento account consentito (manualmente)",
+      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata manualmente a un account esistente. Disabilita se gli utenti dovrebbero essere autorizzati solo a collegare l'account proposto in caso di collegamento automatico attivo.",
       "AUTOLINKING_DESC": "Determina se un'identità verrà invitata a essere collegata a un account esistente.",
       "AUTOLINKINGTYPE": {
         "0": "Disabilitato",
@@ -2551,7 +2561,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

@@ -81,10 +81,11 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		authReq.AuthTime,
 		authReq.GetNonce(),
 		authReq.PreferredLanguage,
-		authReq.BrowserInfo.ToUserAgent(),
+		authReq.ToUserAgent(),
 		domain.TokenReasonAuthRequest,
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
+		authReq.SessionID,
 	)
 	if err != nil {
 		return nil, err

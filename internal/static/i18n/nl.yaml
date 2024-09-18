@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement kon niet worden gemaakt
     InvalidRequest: Verzoek is ongeldig
     TooManyNestingLevels: Te veel query nesting niveaus (Max 20)
+    LimitExceeded: Limiet overschreden
   Quota:
     AlreadyExists: Quota bestaat al voor deze eenheid
     NotFound: Quota niet gevonden voor deze eenheid
@@ -563,6 +564,8 @@ Errors:
     NotFound: Uitvoering niet gevonden
     IncludeNotFound: Inclusief niet gevonden
     NoTargets: Geen doelstellingen gedefinieerd
+    Failed: Uitvoering mislukt
+    ResponseIsNotValidJSON: Reactie is geen geldige JSON
   UserSchema:
     NotEnabled: Functie "Gebruikersschema" is niet ingeschakeld
     Type:
@@ -573,6 +576,11 @@ Errors:
     NotActive: Gebruikersschema niet actief
     NotInactive: Gebruikersschema niet inactief
     NotExists: Gebruikersschema bestaat niet
+    ID:
+      Missing: Недостасува ID на корисничка шема
+    Invalid: Корисничката шема е неважечка
+    Data:
+      Invalid: Податоците не се валидни за корисничка шема
   TokenExchange:
     FeatureDisabled: De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +592,13 @@ Errors:
       NotForAPI: Nagebootste tokens zijn niet toegestaan voor API
     Impersonation:
       PolicyDisabled: Nabootsing van identiteit is uitgeschakeld in het beveiligingsbeleid van de instantie.
+  WebKey:
+    ActiveDelete: Kan actieve websleutel niet verwijderen
+    Config: Ongeldige websleutelconfiguratie
+    Duplicate: Websleutel-ID niet uniek
+    FeatureDisabled: Websleutelfunctie uitgeschakeld
+    NoActive: Geen actieve websleutel gevonden
+    NotFound: Websleutel niet gevonden
 
 AggregateTypes:
   action: Actie
@@ -607,6 +622,7 @@ AggregateTypes:
   restrictions: Beperkingen
   system: Systeem
   session: Sessie
+  web_key: Websleutel
 
 EventTypes:
   execution:
@@ -671,6 +687,13 @@ EventTypes:
         check:
           succeeded: Initialisatiecontrole geslaagd
           failed: Initialisatiecontrole mislukt
+      invite:
+        code:
+          added: Uitnodigingscode gegenereerd
+          sent: Uitnodigingscode verzonden
+        check:
+          succeeded: Uitnodigingscontrole geslaagd
+          failed: Uitnodigingscontrole mislukt
       username:
         reserved: Gebruikersnaam gereserveerd
         released: Gebruikersnaam vrijgegeven
@@ -1303,6 +1326,31 @@ EventTypes:
     deactivated: Gebruikersschema gedeactiveerd
     reactivated: Gebruikersschema opnieuw geactiveerd
     deleted: Gebruikersschema verwijderd
+    user:
+      created: Gebruiker aangemaakt
+      updated: Gebruiker bijgewerkt
+      deleted: Gebruiker verwijderd
+      email:
+        updated: E-mailadres gewijzigd
+        verified: E-mailadres geverifieerd
+        verification:
+          failed: E-mailadres verificatie mislukt
+        code:
+          added: E-mailadres verificatiecode gegenereerd
+          sent: E-mailadres verificatiecode verzonden
+      phone:
+        updated: Telefoonnummer gewijzigd
+        verified: Telefoonnummer geverifieerd
+        verification:
+          failed: Telefoonnummer verificatie mislukt
+        code:
+          added: Telefoonnummer verificatiecode gegenereerd
+          sent: Telefoonnummer verificatiecode verzonden
+  web_key:
+    added: Web Key toegevoegd
+    activated: Web Key geactiveerd
+    deactivated: Web Key gedeactiveerd
+    removed: Web Key verwijderd
 
 Application:
   OIDC:

@@ -32,6 +32,7 @@ const (
 	UserSessionKeyPasswordlessVerification     = "passwordless_verification"
 	UserSessionKeyExternalLoginVerification    = "external_login_verification"
 	UserSessionKeySelectedIDPConfigID          = "selected_idp_config_id"
+	UserSessionKeyID                           = "id"
 )
 
 type UserSessionView struct {
@@ -59,6 +60,12 @@ type UserSessionView struct {
 	MultiFactorVerificationType  sql.NullInt32  `json:"-" gorm:"column:multi_factor_verification_type"`
 	Sequence                     uint64         `json:"-" gorm:"column:sequence"`
 	InstanceID                   string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	ID                           sql.NullString `json:"id" gorm:"-"`
+}
+
+type ActiveUserAgentUserIDs struct {
+	UserAgentID string
+	UserIDs     []string
 }
 
 type userAgentIDPayload struct {
@@ -95,6 +102,7 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		MultiFactorVerification:      userSession.MultiFactorVerification.Time,
 		MultiFactorVerificationType:  domain.MFAType(userSession.MultiFactorVerificationType.Int32),
 		Sequence:                     userSession.Sequence,
+		ID:                           userSession.ID.String,
 	}
 }
 
@@ -199,7 +207,8 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType,
 		user.UserLockedType,
-		user.UserDeactivatedType:
+		user.UserDeactivatedType,
+		user.UserRemovedType:
 		v.PasswordlessVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 		v.PasswordVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 		v.SecondFactorVerification = sql.NullTime{Time: time.Time{}, Valid: true}

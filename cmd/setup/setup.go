@@ -108,8 +108,11 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
-	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
+	esV3 := new_es.NewEventstore(esPusherDBClient)
+	config.Eventstore.Pusher = esV3
+	config.Eventstore.Searcher = esV3
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
+
 	logging.OnError(err).Fatal("unable to start eventstore")
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(queryDBClient, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
@@ -153,7 +156,12 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s25User11AddLowerFieldsToVerifiedEmail = &User11AddLowerFieldsToVerifiedEmail{dbClient: esPusherDBClient}
 	steps.s26AuthUsers3 = &AuthUsers3{dbClient: esPusherDBClient}
 	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: esPusherDBClient}
-	steps.s28SMSConfigs2TwilioAddVerifyServiceSid = &SMSConfigs2TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
+	steps.s28AddFieldTable = &AddFieldTable{dbClient: esPusherDBClient}
+	steps.s29FillFieldsForProjectGrant = &FillFieldsForProjectGrant{eventstore: eventstoreClient}
+	steps.s30FillFieldsForOrgDomainVerified = &FillFieldsForOrgDomainVerified{eventstore: eventstoreClient}
+	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: esPusherDBClient}
+	steps.s32AddAuthSessionID = &AddAuthSessionID{dbClient: esPusherDBClient}
+	steps.s33SMSConfigs3TwilioAddVerifyServiceSid = &SMSConfigs3TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -176,6 +184,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s14NewEventsTable,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
+		steps.s28AddFieldTable,
+		steps.s31AddAggregateIndexToFields,
 		steps.FirstInstance,
 		steps.s5LastFailed,
 		steps.s6OwnerRemoveColumns,
@@ -192,6 +202,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s23CorrectGlobalUniqueConstraints,
 		steps.s24AddActorToAuthTokens,
 		steps.s26AuthUsers3,
+		steps.s29FillFieldsForProjectGrant,
+		steps.s30FillFieldsForOrgDomainVerified,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -206,7 +218,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s21AddBlockFieldToLimits,
 		steps.s25User11AddLowerFieldsToVerifiedEmail,
 		steps.s27IDPTemplate6SAMLNameIDFormat,
-		steps.s28SMSConfigs2TwilioAddVerifyServiceSid,
+		steps.s32AddAuthSessionID,
+		steps.s33SMSConfigs3TwilioAddVerifyServiceSid,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}

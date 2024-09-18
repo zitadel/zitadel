@@ -38,6 +38,6 @@ func VerifyDatabase(databaseName string) func(*database.DB) error {
 	return func(db *database.DB) error {
 		logging.WithFields("database", databaseName).Info("verify database")
 
-		return exec(db, fmt.Sprintf(string(databaseStmt), databaseName), []string{dbAlreadyExistsCode})
+		return exec(db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
 	}
 }

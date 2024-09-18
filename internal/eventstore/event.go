@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -31,6 +33,8 @@ type Command interface {
 	Payload() any
 	// UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
 	UniqueConstraints() []*UniqueConstraint
+	// Fields should be added for fields which should be indexed for lookup, if nil fields will not be indexed
+	Fields() []*FieldOperation
 }
 
 // Event is a stored activity
@@ -42,7 +46,7 @@ type Event interface {
 	// CreatedAt is the time the event was created at
 	CreatedAt() time.Time
 	// Position is the global position of the event
-	Position() float64
+	Position() decimal.Decimal
 
 	// Unmarshal parses the payload and stores the result
 	// in the value pointed to by ptr. If ptr is nil or not a pointer,

@@ -7,7 +7,7 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -40,17 +40,8 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
-	if !domainPolicy.UserLoginMustBeDomain {
-		index := strings.LastIndex(userName, "@")
-		if index > 1 {
-			domainCheck := NewOrgDomainVerifiedWriteModel(userName[index+1:])
-			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
-				return nil, err
-			}
-			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
-			}
-		}
+	if err = c.userValidateDomain(ctx, orgID, userName, domainPolicy.UserLoginMustBeDomain); err != nil {
+		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
@@ -286,7 +277,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 		user.NewDomainClaimedEvent(
 			ctx,
 			userAgg,
-			fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
+			fmt.Sprintf("%s@temporary.%s", id, http_util.DomainContext(ctx).RequestedDomain()),
 			existingUser.UserName,
 			domainPolicy.UserLoginMustBeDomain),
 	}, changedUserGrant, nil
@@ -314,7 +305,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	return user.NewDomainClaimedEvent(
 		ctx,
 		userAgg,
-		fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
+		fmt.Sprintf("%s@temporary.%s", id, http_util.DomainContext(ctx).RequestedDomain()),
 		userWriteModel.UserName,
 		domainPolicy.UserLoginMustBeDomain), nil
 }
@@ -395,6 +386,10 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 
 func (c *Commands) newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
 	return c.newEncryptedCode(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
+}
+
+func (c *Commands) newUserInviteCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+	return c.newEncryptedCodeWithDefault(ctx, filter, domain.SecretGeneratorTypeInviteCode, alg, c.defaultSecretGenerators.InviteCode)
 }
 
 func userWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, resourceOwner string) (*UserWriteModel, error) {

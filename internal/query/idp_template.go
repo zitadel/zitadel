@@ -712,8 +712,29 @@ var (
 	}
 )
 
-// IDPTemplateByID searches for the requested id
-func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (template *IDPTemplate, err error) {
+// IDPTemplateByID searches for the requested id with permission check if necessary
+func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, permissionCheck domain.PermissionCheck, queries ...SearchQuery) (template *IDPTemplate, err error) {
+	idp, err := q.idpTemplateByID(ctx, shouldTriggerBulk, id, withOwnerRemoved, queries...)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil {
+		switch idp.OwnerType {
+		case domain.IdentityProviderTypeSystem:
+			if err := permissionCheck(ctx, domain.PermissionIDPRead, idp.ResourceOwner, idp.ID); err != nil {
+				return nil, err
+			}
+		case domain.IdentityProviderTypeOrg:
+			if err := permissionCheck(ctx, domain.PermissionOrgIDPRead, idp.ResourceOwner, idp.ID); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return idp, nil
+}
+
+// idpTemplateByID searches for the requested id
+func (q *Queries) idpTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (template *IDPTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

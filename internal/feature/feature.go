@@ -1,5 +1,7 @@
 package feature
 
+import "slices"
+
 //go:generate enumer -type Key -transform snake -trimprefix Key
 type Key int
 
@@ -12,6 +14,9 @@ const (
 	KeyTokenExchange
 	KeyActions
 	KeyImprovedPerformance
+	KeyWebKey
+	KeyDebugOIDCParentError
+	KeyOIDCSingleV1SessionTermination
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -35,6 +40,9 @@ type Features struct {
 	TokenExchange                   bool                      `json:"token_exchange,omitempty"`
 	Actions                         bool                      `json:"actions,omitempty"`
 	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
+	WebKey                          bool                      `json:"web_key,omitempty"`
+	DebugOIDCParentError            bool                      `json:"debug_oidc_parent_error,omitempty"`
+	OIDCSingleV1SessionTermination  bool                      `json:"terminate_single_v1_session,omitempty"`
 }
 
 type ImprovedPerformanceType int32
@@ -42,13 +50,12 @@ type ImprovedPerformanceType int32
 const (
 	ImprovedPerformanceTypeUnknown = iota
 	ImprovedPerformanceTypeOrgByID
+	ImprovedPerformanceTypeProjectGrant
+	ImprovedPerformanceTypeProject
+	ImprovedPerformanceTypeUserGrant
+	ImprovedPerformanceTypeOrgDomainVerified
 )
 
 func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {
-	for _, improvedType := range f.ImprovedPerformance {
-		if improvedType == typ {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(f.ImprovedPerformance, typ)
 }

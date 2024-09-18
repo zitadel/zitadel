@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
 )
@@ -21,7 +23,7 @@ type BaseEvent struct {
 	Agg *Aggregate
 
 	Seq                           uint64
-	Pos                           float64
+	Pos                           decimal.Decimal
 	Creation                      time.Time
 	previousAggregateSequence     uint64
 	previousAggregateTypeSequence uint64
@@ -34,7 +36,7 @@ type BaseEvent struct {
 }
 
 // Position implements Event.
-func (e *BaseEvent) Position() float64 {
+func (e *BaseEvent) Position() decimal.Decimal {
 	return e.Pos
 }
 
@@ -122,4 +124,8 @@ func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventTyp
 		Service:   service.FromContext(ctx),
 		EventType: typ,
 	}
+}
+
+func (*BaseEvent) Fields() []*FieldOperation {
+	return nil
 }

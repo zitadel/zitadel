@@ -495,6 +495,7 @@ Errors:
     SQLStatement: La sentencia SQL no pudo crearse
     InvalidRequest: La solicitud no es válida
     TooManyNestingLevels: Demasiados niveles de anidamiento de consultas (máximo 20)
+    LimitExceeded: Se ha superado el límite de resultados
   Quota:
     AlreadyExists: La cuota ya existe para esta unidad
     NotFound: Cuota no encontrada para esta unidad
@@ -563,6 +564,8 @@ Errors:
     NotFound: Ejecución no encontrada
     IncludeNotFound: Incluir no encontrado
     NoTargets: No hay objetivos definidos
+    Failed: Ejecución fallida
+    ResponseIsNotValidJSON: La respuesta no es un JSON válido
   UserSchema:
     NotEnabled: La función "Esquema de usuario" no está habilitada
     Type:
@@ -573,6 +576,11 @@ Errors:
     NotActive: Esquema de usuario no activo
     NotInactive: Esquema de usuario no inactivo
     NotExists: El esquema de usuario no existe
+    ID:
+      Missing: Falta el ID del esquema de usuario
+    Invalid: Esquema de usuario no válido
+    Data:
+      Invalid: Datos no válidos para el esquema de usuario
   TokenExchange:
     FeatureDisabled: La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +592,13 @@ Errors:
       NotForAPI: Tokens suplantados no permitidos para API
     Impersonation:
       PolicyDisabled: La suplantación está deshabilitada en la política de seguridad de la instancia.
+  WebKey:
+    ActiveDelete: No se puede eliminar la clave web activa
+    Config: Configuración de clave web no válida
+    Duplicate: ID de clave web no único
+    FeatureDisabled: Función de clave web deshabilitada
+    NoActive: No se encontró ninguna clave web activa
+    NotFound: Clave web no encontrada
 
 AggregateTypes:
   action: Acción
@@ -607,6 +622,7 @@ AggregateTypes:
   restrictions: Restricciones
   system: Sistema
   session: Sesión
+  web_key: Clave web
 
 EventTypes:
   execution:
@@ -671,6 +687,13 @@ EventTypes:
         check:
           succeeded: Comprobación exitosa de la inicialización
           failed: Fallo en la comprobación de la inicialización
+      invite:
+        code:
+          added: Código de invitación generado
+          sent: Código de invitación enviado
+        check:
+          succeeded: Comprobación de invitación correcta
+          failed: Comprobación de invitación fallida
       username:
         reserved: Nombre de usuario reservado
         released: Nombre de usuario liberado
@@ -1308,6 +1331,31 @@ EventTypes:
     deactivated: Esquema de usuario desactivado
     reactivated: Esquema de usuario reactivado
     deleted: Esquema de usuario eliminado
+    user:
+      created: Usuario creado
+      updated: Usuario actualizado
+      deleted: Usuario eliminado
+      email:
+        updated:  Dirección de correo electrónico modificada
+        verified: Dirección de correo electrónico verificada
+        verification:
+          failed: Error en la verificación de la dirección de correo electrónico
+        code:
+          added: Código de verificación de la dirección de correo electrónico generado
+          sent: Código de verificación de la dirección de correo electrónico enviado
+      phone:
+        updated: Número de teléfono modificado
+        verified: Número de teléfono verificado
+        verification:
+          failed: Error en la verificación del número de teléfono
+        code:
+          added: Código de verificación del número de teléfono generado
+          sent: Código de verificación del número de teléfono enviado
+  web_key:
+    added: Clave web añadida
+    activated: Clave web activada
+    deactivated: Clave web desactivada
+    removed: Clave web eliminada
 
 Application:
   OIDC:

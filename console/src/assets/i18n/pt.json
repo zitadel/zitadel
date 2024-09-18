@@ -197,7 +197,8 @@
           "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
           "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
           "VEO": "Quando um usuário adiciona um método de Senha Única via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
-          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone."
+          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
+          "IU": "Quando um código de convite de usuário é criado, eles receberão um e-mail com um link para configurar seu método de autenticação."
         }
       },
       "LOGIN_TEXTS": {
@@ -231,7 +232,7 @@
           "LABEL": "Duração Máxima em horas",
           "PW_CHECK": {
             "TITLE": "Verificação de Senha",
-            "DESCRIPTION": "Seus usuários devem mudar suas senhas nesses períodos."
+            "DESCRIPTION": "Os usuários serão obrigados a reautentificar-se com sua senha após este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificação de Login Externo",
@@ -1086,7 +1087,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Excluir Ações Selecionadas?",
         "DESCRIPTION": "Tem certeza de que deseja excluir as ações selecionadas do fluxo?"
-      }
+      },
+      "ABOUTNAME": "O nome da ação e o nome da função no javascript devem ser iguais"
     },
     "TOAST": {
       "ACTIONSSET": "Ações definidas",
@@ -1381,7 +1383,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1438,9 +1441,7 @@
         "7": "Senha única (OTP) - SMS",
         "8": "Senha única (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Definir aparência de segredo",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Expiração (em horas)",
+      "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
       "INCLUDESYMBOLS": "Incluir símbolos",
       "INCLUDELOWERLETTERS": "Incluir letras minúsculas",
@@ -1470,12 +1471,18 @@
       "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
       "ACTIONS": "Ações",
       "ACTIONS_DESCRIPTION": "Actions v2 permitem gerenciar execuções e destinos de dados. Se a flag estiver habilitada, você poderá usar a nova API e seus recursos.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Término de sessão",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
       "STATES": {
         "INHERITED": "Herdade",
         "ENABLED": "Habilitado",
         "DISABLED": "Desabilitado"
       },
       "INHERITED_DESCRIPTION": "Essa configuração define o valor para o padrão do sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" é herdado",
+        "DISABLED": "\"Desabilitado\" é herdado"
+      },
       "RESET": "Definir tudo para herdar"
     },
     "DIALOG": {
@@ -1611,7 +1618,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -1626,7 +1634,6 @@
         "initPasswordText": "Inicialização de senha",
         "initializeDoneText": "Inicialização de usuário concluída",
         "initializeUserText": "Inicializaçãode usuário",
-        "linkingUserPromptText": "Prompt de usuário para vinculação",
         "linkingUserDoneText": "Vinculação de usuário concluída",
         "loginText": "Login",
         "logoutText": "Logout",
@@ -1662,7 +1669,8 @@
         "PR": "Redefinição de Senha",
         "DC": "Reivindicação de Domínio",
         "PL": "Sem senha",
-        "PC": "Alteração de Senha"
+        "PC": "Alteração de Senha",
+        "IU": "Convidar usuário"
       },
       "CHIPS": {
         "firstname": "Nome próprio",
@@ -1681,7 +1689,9 @@
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único"
+        "verifyUrl": "URL para verificar a senha de uso único",
+        "expiry": "Data de expiração",
+        "applicationName": "Nome do aplicativo"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."
@@ -1777,7 +1787,7 @@
       "TYPE": {
         "OWNED": "Projetos Próprios",
         "OWNED_SINGULAR": "Projeto Próprio",
-        "GRANTED_SINGULAR": "Projeto Concedido"
+        "GRANTED_SINGULAR": "Projeto atribuído a {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Configuração de Marca",
@@ -2055,10 +2065,10 @@
       "ISAUTOCREATION_DESC": "Se selecionado, uma conta será criada se ainda não existir.",
       "ISAUTOUPDATE": "Atualização Automática",
       "ISAUTOUPDATE_DESC": "Se selecionado, as contas são atualizadas ao serem reautenticadas.",
-      "ISCREATIONALLOWED": "Criação de Conta Permitida",
-      "ISCREATIONALLOWED_DESC": "Determina se as contas podem ser criadas.",
-      "ISLINKINGALLOWED": "Vinculação de Conta Permitida",
-      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente.",
+      "ISCREATIONALLOWED": "Criação de conta permitida (manualmente)",
+      "ISCREATIONALLOWED_DESC": "Determina se contas podem ser criadas usando uma conta externa. Desative se os usuários não devem poder editar informações da conta quando a criação automática está ativada.",
+      "ISLINKINGALLOWED": "Vinculação de conta permitida (manualmente)",
+      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada manualmente a uma conta existente. Desative se os usuários só devem poder vincular a conta proposta em caso de vinculação automática ativa.",
       "AUTOLINKING_DESC": "Determina se uma identidade será solicitada a ser vinculada a uma conta existente.",
       "AUTOLINKINGTYPE": {
         "0": "Desativado",
@@ -2544,7 +2554,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

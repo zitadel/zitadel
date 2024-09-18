@@ -495,6 +495,7 @@ Errors:
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
     TooManyNestingLevels: 查询嵌套级别过多（最多 20 个）
+    LimitExceeded: 限制已超出
   Quota:
     AlreadyExists: 这个单位的配额已经存在
     NotFound: 没有找到该单位的配额
@@ -563,6 +564,8 @@ Errors:
     NotFound: 未找到执行
     IncludeNotFound: 包括未找到的内容
     NoTargets: 没有定义目标
+    Failed: 执行失败
+    ResponseIsNotValidJSON: 响应不是有效的 JSON
   UserSchema:
     NotEnabled: 未启用“用户架构”功能
     Type:
@@ -573,6 +576,11 @@ Errors:
     NotActive: 用户架构未激活
     NotInactive: 用户架构未处于非活动状态
     NotExists: 用户架构不存在
+    ID:
+      Missing: 缺少用户架构 ID
+    Invalid: 用户架构无效
+    Data:
+      Invalid: 用户架构的数据无效
   TokenExchange:
     FeatureDisabled: 您的实例已禁用令牌交换功能。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -584,6 +592,13 @@ Errors:
       NotForAPI: API 不允许使用模拟令牌
     Impersonation:
       PolicyDisabled: 实例安全策略中禁用模拟
+  WebKey:
+    ActiveDelete: 无法删除活动 Web 密钥
+    Config: 无效的 Web 密钥配置
+    Duplicate: Web 密钥 ID 不唯一
+    FeatureDisabled: Web 密钥功能已禁用
+    NoActive: 未找到活动 Web 密钥
+    NotFound: 未找到 Web 密钥
 
 AggregateTypes:
   action: 动作
@@ -607,6 +622,7 @@ AggregateTypes:
   restrictions: 限制
   system: 系统
   session: 会话
+  web_key: Web 密钥
 
 EventTypes:
   execution:
@@ -670,6 +686,13 @@ EventTypes:
         check:
           succeeded: 初始化检查成功
           failed: 初始化检查失败
+      invite:
+        code:
+          added: 生成了邀请码
+          sent: 发送了邀请码
+        check:
+          succeeded: 邀请检查成功
+          failed: 邀请检查失败
       username:
         reserved: 保留用户名
         released: 用户名已发布
@@ -1173,12 +1196,6 @@ EventTypes:
     deactivated: 停用动作
     reactivated: 启用动作
     removed: 删除动作
-  user_schema:
-    created: 已创建用户架构
-    updated: 用户架构已更新
-    deactivated: 用户架构已停用
-    reactivated: 用户架构已重新激活
-    deleted: 用户架构已删除
   instance:
     added: 实例已添加
     changed: 实例已更改
@@ -1307,6 +1324,37 @@ EventTypes:
         password:
           changed: SMTP 配置密码已更改
         removed: SMTP 配置已删除
+  user_schema:
+    created: 已创建用户架构
+    updated: 用户架构已更新
+    deactivated: 用户架构已停用
+    reactivated: 用户架构已重新激活
+    deleted: 用户架构已删除
+    user:
+      created: 用户已创建
+      updated: 用户已更新
+      deleted: 用户已删除
+      email:
+        updated: 电子邮件地址已更改
+        verified: 电子邮件地址已验证
+        verification:
+          failed: 电子邮件地址验证失败
+        code:
+          added: 电子邮件地址验证码已生成
+          sent: 电子邮件地址验证码已发送
+      phone:
+        updated: 电话号码已更改
+        verified: 电话号码已验证
+        verification:
+          failed: 电话号码验证失败
+        code:
+          added: 电话号码验证码已生成
+          sent: 电话号码验证码已发送
+  web_key:
+    added: 已添加 Web Key
+    activated: 已激活 Web Key
+    deactivated: 已停用 Web Key
+    removed: 已删除 Web Key
 
 Application:
   OIDC:

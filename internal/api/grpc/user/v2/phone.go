@@ -7,8 +7,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) SetPhone(ctx context.Context, req *user.SetPhoneRequest) (resp *user.SetPhoneResponse, err error) {
@@ -37,6 +37,23 @@ func (s *Server) SetPhone(ctx context.Context, req *user.SetPhoneRequest) (resp 
 			ResourceOwner: phone.ResourceOwner,
 		},
 		VerificationCode: phone.PlainCode,
+	}, nil
+}
+
+func (s *Server) RemovePhone(ctx context.Context, req *user.RemovePhoneRequest) (resp *user.RemovePhoneResponse, err error) {
+	details, err := s.command.RemoveUserPhone(ctx,
+		req.GetUserId(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.RemovePhoneResponse{
+		Details: &object.Details{
+			Sequence:      details.Sequence,
+			ChangeDate:    timestamppb.New(details.EventDate),
+			ResourceOwner: details.ResourceOwner,
+		},
 	}, nil
 }
 

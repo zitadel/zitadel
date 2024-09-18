@@ -197,7 +197,8 @@
           "VE": "当用户更改其电子邮件地址时，他们将收到一封带有验证新地址链接的电子邮件。",
           "VP": "当用户更改其电话号码时，他们将收到一条带有验证新号码的代码的短信。",
           "VEO": "当用户通过电子邮件方式添加一次性密码时，他们需要通过输入发送到其电子邮件地址的代码来激活它。",
-          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。"
+          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。",
+          "IU": "当创建用户邀请代码时，他们将收到一封包含设置其身份验证方法的链接的电子邮件。"
         }
       },
       "LOGIN_TEXTS": {
@@ -231,7 +232,7 @@
           "LABEL": "最大有效期（小时）",
           "PW_CHECK": {
             "TITLE": "密码检查",
-            "DESCRIPTION": "您的用户必须在这些时期内更改他们的密码。"
+            "DESCRIPTION": "此期间后，用户将需要使用密码重新验证。"
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "外部登录检查",
@@ -1086,7 +1087,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "删除选定的操作？",
         "DESCRIPTION": "您确定要从流中删除选定的操作吗？"
-      }
+      },
+      "ABOUTNAME": "javascript 中的操作名称和函数名称必须相同"
     },
     "TOAST": {
       "ACTIONSSET": "动作设置",
@@ -1380,7 +1382,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1437,9 +1440,7 @@
         "7": "一次性密码 (OTP) - SMS",
         "8": "一次性密码 (OTP) - 电子邮件"
       },
-      "ADDGENERATOR": "定义验证码外观",
-      "GENERATORTYPE": "类型",
-      "EXPIRY": "过期时间 (in hours)",
+      "EXPIRY": "过期时间 (以分钟为单位)",
       "INCLUDEDIGITS": "包含数字",
       "INCLUDESYMBOLS": "包含特殊符号",
       "INCLUDELOWERLETTERS": "包含小写字母",
@@ -1469,12 +1470,18 @@
       "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
       "ACTIONS": "操作",
       "ACTIONS_DESCRIPTION": "Actions v2 可以管理数据执行和目标。如果启用此标志，您将可以使用新的 API 及其功能。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 终止会话",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "STATES": {
         "INHERITED": "继承",
         "ENABLED": "已启用",
         "DISABLED": "已禁用"
       },
       "INHERITED_DESCRIPTION": "此设置将值设置为系统默认值。",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "“已启用” 是继承的",
+        "DISABLED": "“已禁用” 是继承的"
+      },
       "RESET": "全部设置为继承"
     },
     "DIALOG": {
@@ -1609,7 +1616,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1624,7 +1632,6 @@
         "initPasswordText": "初始化密码",
         "initializeDoneText": "初始化用户完成",
         "initializeUserText": "初始化用户",
-        "linkingUserPromptText": "用户链接提示",
         "linkingUserDoneText": "链接用户完成",
         "loginText": "登录",
         "logoutText": "登出",
@@ -1660,7 +1667,8 @@
         "PR": "重置密码",
         "DC": "域名声明",
         "PL": "无密码身份验证",
-        "PC": "修改密码"
+        "PC": "修改密码",
+        "IU": "邀请用户"
       },
       "CHIPS": {
         "firstname": "名",
@@ -1679,7 +1687,9 @@
         "username": "用户名",
         "tempUsername": "临时用户名",
         "otp": "一次性密码",
-        "verifyUrl": "验证一次性密码的URL"
+        "verifyUrl": "验证一次性密码的URL",
+        "expiry": "过期时间",
+        "applicationName": "应用程序名称"
       },
       "TOAST": {
         "UPDATED": "自定义文本已保存。"
@@ -1777,7 +1787,7 @@
       "TYPE": {
         "OWNED": "拥有的项目",
         "OWNED_SINGULAR": "拥有项目",
-        "GRANTED_SINGULAR": "被授予的项目"
+        "GRANTED_SINGULAR": "授予{{name}}的项目"
       },
       "PRIVATELABEL": {
         "TITLE": "品牌标识设置",
@@ -2053,10 +2063,10 @@
       "ISAUTOCREATION_DESC": "如果选择了，如果账户还不存在，就会创建一个账户。",
       "ISAUTOUPDATE": "正在自动更新",
       "ISAUTOUPDATE_DESC": "如果选择，账户将在重新认证时更新。",
-      "ISCREATIONALLOWED": "是否允许创作",
-      "ISCREATIONALLOWED_DESC": "确定是否可以创建账户。",
-      "ISLINKINGALLOWED": "是否允许连接",
-      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。",
+      "ISCREATIONALLOWED": "允许创建账户（手动）",
+      "ISCREATIONALLOWED_DESC": "确定是否可以使用外部账户创建账户。如果用户在启用自动创建时不应该能够编辑账户信息，请禁用。",
+      "ISLINKINGALLOWED": "允许链接账户（手动）",
+      "ISLINKINGALLOWED_DESC": "确定是否可以手动将身份链接到现有账户。如果用户只能在激活自动链接的情况下链接建议的账户，请禁用。",
       "AUTOLINKING_DESC": "确定是否提示将身份链接到现有帐户。",
       "AUTOLINKINGTYPE": {
         "0": "已禁用",
@@ -2549,7 +2559,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "添加管理者",

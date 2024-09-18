@@ -455,9 +455,9 @@ func (l *Login) handleExternalUserAuthenticated(
 // checkAutoLinking checks if a user with the provided information (username or email) already exists within ZITADEL.
 // The decision, which information will be checked is based on the IdP template option.
 // The function returns a boolean whether a user was found or not.
+// If single a user was found, it will be automatically linked.
 func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
 	queries := make([]query.SearchQuery, 0, 2)
-	var user *query.NotifyUser
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUnspecified:
 		// is auto linking is disable, we shouldn't even get here, but in case we do we can directly return
@@ -472,7 +472,7 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 			if err != nil {
 				return false
 			}
-			l.renderLinkingUserPrompt(w, r, authReq, user, nil)
+			l.autoLinkUser(w, r, authReq, user)
 			return true
 		}
 		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
@@ -501,8 +501,20 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 	if err != nil {
 		return false
 	}
-	l.renderLinkingUserPrompt(w, r, authReq, user, nil)
+	l.autoLinkUser(w, r, authReq, user)
 	return true
+}
+
+func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) {
+	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID); err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	if err := l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r)); err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	l.renderNextStep(w, r, authReq)
 }
 
 // externalUserNotExisting is called if an externalAuthentication couldn't find a corresponding externalID
@@ -533,9 +545,10 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 
-	// if auto creation or creation itself is disabled, send the user to the notFoundOption
-	if !provider.IsCreationAllowed || !provider.IsAutoCreation {
-		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
+	// if auto creation is disabled, send the user to the notFoundOption
+	// where they can either link or create an account (based on the available options)
+	if !provider.IsAutoCreation {
+		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, nil)
 		return
 	}
 
@@ -612,6 +625,10 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	idpTemplate, err := l.getIDPByID(r, idpLink.IDPConfigID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
+		return
+	}
+	if !idpTemplate.IsCreationAllowed && !idpTemplate.IsLinkingAllowed {
+		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-3kl44", "Errors.User.ExternalIDP.NoOptionAllowed"))
 		return
 	}
 
@@ -841,7 +858,7 @@ func (l *Login) updateExternalUsername(ctx context.Context, user *query.User, ex
 	if err != nil {
 		return err
 	}
-	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{externalIDQuery, idpIDQuery, userIDQuery}}, false)
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{externalIDQuery, idpIDQuery, userIDQuery}}, nil)
 	if err != nil || len(links.Links) == 0 {
 		return err
 	}
@@ -1042,7 +1059,7 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
 	}
 	opts = append(opts,
-		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),
+		saml.WithEntityID(http_utils.DomainContext(ctx).Origin()+"/idps/"+identityProvider.ID+"/saml/metadata"),
 		saml.WithCustomRequestTracker(
 			requesttracker.New(
 				func(ctx context.Context, authRequestID, samlRequestID string) error {
@@ -1321,6 +1338,6 @@ func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.
 				userIDQuery,
 				idpIDQuery,
 			},
-		}, false,
+		}, nil,
 	)
 }

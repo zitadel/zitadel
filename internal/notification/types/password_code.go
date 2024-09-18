@@ -13,7 +13,7 @@ import (
 func (notify Notify) SendPasswordCode(ctx context.Context, user *query.NotifyUser, code, urlTmpl, authRequestID string) error {
 	var url string
 	if urlTmpl == "" {
-		url = login.InitPasswordLink(http_utils.ComposedOrigin(ctx), user.ID, code, user.ResourceOwner, authRequestID)
+		url = login.InitPasswordLink(http_utils.DomainContext(ctx).Origin(), user.ID, code, user.ResourceOwner, authRequestID)
 	} else {
 		var buf strings.Builder
 		if err := domain.RenderConfirmURLTemplate(&buf, urlTmpl, user.ID, code, user.ResourceOwner); err != nil {

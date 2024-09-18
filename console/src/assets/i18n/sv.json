@@ -197,7 +197,8 @@
           "VE": "När en användare ändrar sin e-postadress, kommer de att få ett mail med en länk för att verifiera den nya adressen.",
           "VP": "När en användare ändrar sitt telefonnummer, kommer de att få ett SMS med en kod för att verifiera det nya numret.",
           "VEO": "När en användare lägger till en engångslösenord via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
-          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer."
+          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
+          "IU": "När en inbjudningskod för användare skapas, får de ett e-mail med en länk för att ställa in sin autentiseringsmetod."
         }
       },
       "LOGIN_TEXTS": {
@@ -231,7 +232,7 @@
           "LABEL": "Maximal livslängd i timmar",
           "PW_CHECK": {
             "TITLE": "Lösenordskontroll",
-            "DESCRIPTION": "Dina användare måste ändra sina lösenord under dessa perioder."
+            "DESCRIPTION": "Användare kommer att behöva autentisera om med sitt lösenord efter denna period."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Extern inloggningskontroll",
@@ -1086,7 +1087,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Radera valda åtgärder?",
         "DESCRIPTION": "Är du säker på att du vill radera de valda åtgärderna från flödet?"
-      }
+      },
+      "ABOUTNAME": "Namnet på åtgärden och namnet på funktionen i javascriptet måste vara detsamma"
     },
     "TOAST": {
       "ACTIONSSET": "Åtgärder sparade",
@@ -1384,7 +1386,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1441,9 +1444,7 @@
         "7": "Engångslösenord (OTP) - SMS",
         "8": "Engångslösenord (OTP) - E-post"
       },
-      "ADDGENERATOR": "Definiera hemlighetsgenerator",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Utgång (i timmar)",
+      "EXPIRY": "Utgång (på minuter)",
       "INCLUDEDIGITS": "Inkludera siffror",
       "INCLUDESYMBOLS": "Inkludera symboler",
       "INCLUDELOWERLETTERS": "Inkludera små bokstäver",
@@ -1473,12 +1474,18 @@
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "STATES": {
         "INHERITED": "Ärv",
         "ENABLED": "Aktiverad",
         "DISABLED": "Inaktiverad"
       },
       "INHERITED_DESCRIPTION": "Detta ställer in värdet till systemets standardvärde.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Aktiverad\" ärvs",
+        "DISABLED": "\"Inaktiverad\" ärvs"
+      },
       "RESET": "Återställ allt till arv"
     },
     "DIALOG": {
@@ -1614,7 +1621,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -1629,7 +1637,6 @@
         "initPasswordText": "Initiera lösenord",
         "initializeDoneText": "Initiera användare klart",
         "initializeUserText": "Initiera användare",
-        "linkingUserPromptText": "Länka användarprompt",
         "linkingUserDoneText": "Länka användare klart",
         "loginText": "Inloggning",
         "logoutText": "Utloggning",
@@ -1665,7 +1672,8 @@
         "PR": "Återställ Lösenord",
         "DC": "Domänkrav",
         "PL": "lösenordsfri",
-        "PC": "Lösenordsändring"
+        "PC": "Lösenordsändring",
+        "IU": "Bjud in användare"
       },
       "CHIPS": {
         "firstname": "Förnamn",
@@ -1684,7 +1692,9 @@
         "username": "Användarnamn",
         "tempUsername": "Tillfälligt användarnamn",
         "otp": "Engångslösenord",
-        "verifyUrl": "Verifiera Engångslösenord URL"
+        "verifyUrl": "Verifiera Engångslösenord URL",
+        "expiry": "Utgångsdatum",
+        "applicationName": "Applikationsnamn"
       },
       "TOAST": {
         "UPDATED": "Anpassade Texter sparade."
@@ -1782,7 +1792,7 @@
       "TYPE": {
         "OWNED": "Ägda Projekt",
         "OWNED_SINGULAR": "Ägt Projekt",
-        "GRANTED_SINGULAR": "Beviljat Projekt"
+        "GRANTED_SINGULAR": "Projekt tilldelat {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Varumärkesinställning",
@@ -2066,10 +2076,10 @@
       "ISAUTOCREATION_DESC": "Om valt, skapas ett konto om det inte redan finns.",
       "ISAUTOUPDATE": "Automatisk uppdatering",
       "ISAUTOUPDATE_DESC": "Om valt, uppdateras konton vid återautentisering.",
-      "ISCREATIONALLOWED": "Kontoskapande tillåtet",
-      "ISCREATIONALLOWED_DESC": "Avgör om konton kan skapas.",
-      "ISLINKINGALLOWED": "Kontolänkning tillåten",
-      "ISLINKINGALLOWED_DESC": "Avgör om en identitet kan länkas till ett befintligt konto.",
+      "ISCREATIONALLOWED": "Kontoinrättning tillåten (manuellt)",
+      "ISCREATIONALLOWED_DESC": "Bestämmer om konton kan skapas med hjälp av ett externt konto. Avaktivera om användare inte ska kunna redigera kontoinformation när automatisk skapelse är aktiverad.",
+      "ISLINKINGALLOWED": "Kontolänkning tillåten (manuellt)",
+      "ISLINKINGALLOWED_DESC": "Bestämmer om en identitet kan länkas manuellt till ett befintligt konto. Avaktivera om användare bara ska kunna länka det föreslagna kontot vid aktiv automatisk länkning.",
       "AUTOLINKING_DESC": "Avgör om en identitet kommer att uppmanas att länkas till ett befintligt konto.",
       "AUTOLINKINGTYPE": {
         "0": "Inaktiverad",
@@ -2573,12 +2583,13 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
-    "pt": "Português",
+    "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",

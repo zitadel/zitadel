@@ -21,7 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
+func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
@@ -310,7 +310,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -639,7 +639,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -856,7 +856,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -1105,7 +1105,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -1350,7 +1350,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -1566,7 +1566,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -1761,7 +1761,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -1988,7 +1988,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -2156,7 +2156,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -2354,7 +2354,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -2621,7 +2621,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -2921,7 +2921,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -3088,7 +3088,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -3284,7 +3284,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -3498,7 +3498,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -3743,7 +3743,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -3910,7 +3910,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -4106,7 +4106,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -4466,7 +4466,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -4865,7 +4865,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -5081,7 +5081,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -5328,7 +5328,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -5513,7 +5513,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -5741,7 +5741,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -5873,7 +5873,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

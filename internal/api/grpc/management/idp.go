@@ -91,7 +91,7 @@ func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequ
 	}
 	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{idpQuery},
-	}, true)
+	}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (s *Server) GetProviderByID(ctx context.Context, req *mgmt_pb.GetProviderBy
 	if err != nil {
 		return nil, err
 	}
-	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, orgIDQuery)
+	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, nil, orgIDQuery)
 	if err != nil {
 		return nil, err
 	}

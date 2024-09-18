@@ -6,23 +6,17 @@ import (
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (_ *user.GetUserByIDResponse, err error) {
-	resp, err := s.query.GetUserByID(ctx, true, req.GetUserId())
+	resp, err := s.query.GetUserByIDWithPermission(ctx, true, req.GetUserId(), s.checkPermission)
 	if err != nil {
 		return nil, err
-	}
-	if authz.GetCtxData(ctx).UserID != req.GetUserId() {
-		if err := s.checkPermission(ctx, domain.PermissionUserRead, resp.ResourceOwner, req.GetUserId()); err != nil {
-			return nil, err
-		}
 	}
 	return &user.GetUserByIDResponse{
 		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
@@ -39,11 +33,10 @@ func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*us
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries)
+	res, err := s.query.SearchUsers(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	res.RemoveNoPermission(ctx, s.checkPermission)
 	return &user.ListUsersResponse{
 		Result:  UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
 		Details: object.ToListDetails(res.SearchResponse),
@@ -60,7 +53,12 @@ func UsersToPb(users []*query.User, assetPrefix string) []*user.User {
 
 func userToPb(userQ *query.User, assetPrefix string) *user.User {
 	return &user.User{
-		UserId:             userQ.ID,
+		UserId: userQ.ID,
+		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
+			Sequence:      userQ.Sequence,
+			EventDate:     userQ.ChangeDate,
+			ResourceOwner: userQ.ResourceOwner,
+		}),
 		State:              userStateToPb(userQ.State),
 		Username:           userQ.Username,
 		LoginNames:         userQ.LoginNames,

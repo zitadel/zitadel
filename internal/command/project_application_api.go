@@ -35,7 +35,7 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp) preparation.Validation {
 				return nil, zerrors.ThrowNotFound(err, "PROJE-Sf2gb", "Errors.Project.NotFound")
 			}
 
-			app.ClientID, err = domain.NewClientID(c.idGenerator, project.Name)
+			app.ClientID, err = c.idGenerator.Next()
 			if err != nil {
 				return nil, zerrors.ThrowInternal(err, "V2-f0pgP", "Errors.Internal")
 			}
@@ -78,19 +78,19 @@ func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	if existingAPI.State != domain.AppStateUnspecified {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-mabu12", "Errors.Project.App.AlreadyExisting")
 	}
-	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
+	_, err = c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-9fnsa", "Errors.Project.NotFound")
 	}
 
-	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, project, appID)
+	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID)
 }
 
 func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp, resourceOwner string) (_ *domain.APIApp, err error) {
 	if apiApp == nil || apiApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Project.App.Invalid")
 	}
-	project, err := c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
+	_, err = c.getProjectByID(ctx, apiApp.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-9fnsf", "Errors.Project.NotFound")
 	}
@@ -104,10 +104,10 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 		return nil, err
 	}
 
-	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, project, appID)
+	return c.addAPIApplicationWithID(ctx, apiApp, resourceOwner, appID)
 }
 
-func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.APIApp, resourceOwner string, project *domain.Project, appID string) (_ *domain.APIApp, err error) {
+func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.APIApp, resourceOwner string, appID string) (_ *domain.APIApp, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -121,7 +121,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	}
 
 	var plain string
-	err = domain.SetNewClientID(apiApp, c.idGenerator, project)
+	err = domain.SetNewClientID(apiApp, c.idGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -250,22 +250,18 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
 	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
-	if err == nil {
-		c.apiSecretCheckSucceeded(ctx, projectAgg, app.AppID, updated)
-		return err
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
 	}
-	c.apiSecretCheckFailed(ctx, projectAgg, app.AppID)
-	return zerrors.ThrowInvalidArgument(err, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
+	if updated != "" {
+		c.apiUpdateSecret(ctx, projectAgg, app.AppID, updated)
+	}
+	return nil
 }
 
-func (c *Commands) APISecretCheckSucceeded(ctx context.Context, appID, projectID, resourceOwner, updated string) {
+func (c *Commands) APIUpdateSecret(ctx context.Context, appID, projectID, resourceOwner, updated string) {
 	agg := project_repo.NewAggregate(projectID, resourceOwner)
-	c.apiSecretCheckSucceeded(ctx, &agg.Aggregate, appID, updated)
-}
-
-func (c *Commands) APISecretCheckFailed(ctx context.Context, appID, projectID, resourceOwner string) {
-	agg := project_repo.NewAggregate(projectID, resourceOwner)
-	c.apiSecretCheckFailed(ctx, &agg.Aggregate, appID)
+	c.apiUpdateSecret(ctx, &agg.Aggregate, appID, updated)
 }
 
 func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (_ *APIApplicationWriteModel, err error) {
@@ -280,17 +276,6 @@ func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, re
 	return appWriteModel, nil
 }
 
-func (c *Commands) apiSecretCheckSucceeded(ctx context.Context, agg *eventstore.Aggregate, appID, updated string) {
-	cmds := append(
-		make([]eventstore.Command, 0, 2),
-		project_repo.NewAPIConfigSecretCheckSucceededEvent(ctx, agg, appID),
-	)
-	if updated != "" {
-		cmds = append(cmds, project_repo.NewAPIConfigSecretHashUpdatedEvent(ctx, agg, appID, updated))
-	}
-	c.asyncPush(ctx, cmds...)
-}
-
-func (c *Commands) apiSecretCheckFailed(ctx context.Context, agg *eventstore.Aggregate, appID string) {
-	c.asyncPush(ctx, project_repo.NewAPIConfigSecretCheckFailedEvent(ctx, agg, appID))
+func (c *Commands) apiUpdateSecret(ctx context.Context, agg *eventstore.Aggregate, appID, updated string) {
+	c.asyncPush(ctx, project_repo.NewAPIConfigSecretHashUpdatedEvent(ctx, agg, appID, updated))
 }

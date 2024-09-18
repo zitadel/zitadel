@@ -68,7 +68,7 @@ func NewMembershipUserIDQuery(userID string) (SearchQuery, error) {
 }
 
 func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(membershipOrgID, value, TextEquals)
+	return NewTextQuery(OrgMemberOrgID, value, TextEquals)
 }
 
 func NewMembershipResourceOwnersSearchQuery(ids ...string) (SearchQuery, error) {
@@ -84,15 +84,15 @@ func NewMembershipGrantedOrgIDSearchQuery(id string) (SearchQuery, error) {
 }
 
 func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(membershipProjectID, value, TextEquals)
+	return NewTextQuery(ProjectMemberProjectID, value, TextEquals)
 }
 
 func NewMembershipProjectGrantIDQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(membershipGrantID, value, TextEquals)
+	return NewTextQuery(ProjectGrantMemberGrantID, value, TextEquals)
 }
 
 func NewMembershipIsIAMQuery() (SearchQuery, error) {
-	return NewNotNullQuery(membershipIAMID)
+	return NewNotNullQuery(InstanceMemberIAMID)
 }
 
 func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -144,7 +144,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
-	latestSequence, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
+	latestState, err := q.latestState(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	memberships.State = latestSequence
+	memberships.State = latestState
 	return memberships, nil
 }
 
@@ -357,7 +357,7 @@ func prepareOrgMember(query *MembershipSearchQuery) (string, []interface{}) {
 	).From(orgMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name {
+		if q.Col().table.name == membershipAlias.name || q.Col().table.name == orgMemberTable.name {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -380,7 +380,7 @@ func prepareIAMMember(query *MembershipSearchQuery) (string, []interface{}) {
 	).From(instanceMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name {
+		if q.Col().table.name == membershipAlias.name || q.Col().table.name == instanceMemberTable.name {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -403,7 +403,7 @@ func prepareProjectMember(query *MembershipSearchQuery) (string, []interface{}) 
 	).From(projectMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name {
+		if q.Col().table.name == membershipAlias.name || q.Col().table.name == projectMemberTable.name {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -427,7 +427,7 @@ func prepareProjectGrantMember(query *MembershipSearchQuery) (string, []interfac
 	).From(projectGrantMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name {
+		if q.Col().table.name == membershipAlias.name || q.Col().table.name == projectMemberTable.name || q.Col().table.name == projectGrantMemberTable.name {
 			builder = q.toQuery(builder)
 		}
 	}

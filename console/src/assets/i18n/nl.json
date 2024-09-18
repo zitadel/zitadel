@@ -197,7 +197,8 @@
           "VE": "Wanneer een gebruiker zijn e-mailadres wijzigt, ontvangt hij een e-mail met een link om het nieuwe adres te verifiëren.",
           "VP": "Wanneer een gebruiker zijn telefoonnummer wijzigt, ontvangt hij een SMS met een code om het nieuwe nummer te verifiëren.",
           "VEO": "Wanneer een gebruiker een eenmalig wachtwoord via e-mailmethode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun e-mailadres is verzonden.",
-          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden."
+          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden.",
+          "IU": "Wanneer een uitnodigingscode voor gebruikers wordt gemaakt, ontvangt de gebruiker een e-mail met een link om zijn verificatiemethode in te stellen."
         }
       },
       "LOGIN_TEXTS": {
@@ -231,7 +232,7 @@
           "LABEL": "Maximale Levensduur in uren",
           "PW_CHECK": {
             "TITLE": "Wachtwoord Controle",
-            "DESCRIPTION": "Je gebruikers moeten hun wachtwoorden in deze perioden wijzigen."
+            "DESCRIPTION": "Gebruikers moeten na deze periode opnieuw worden geverifieerd met hun wachtwoord."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Externe Login Controle",
@@ -1086,7 +1087,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Geselecteerde acties verwijderen?",
         "DESCRIPTION": "Weet u zeker dat u de geselecteerde acties uit de flow wilt verwijderen?"
-      }
+      },
+      "ABOUTNAME": "De naam van de actie en de naam van de functie in het javascript moeten hetzelfde zijn"
     },
     "TOAST": {
       "ACTIONSSET": "Acties ingesteld",
@@ -1437,9 +1439,7 @@
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
       },
-      "ADDGENERATOR": "Definieer Secret Generator",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Vervaldatum (in uren)",
+      "EXPIRY": "Vervaldatum (in minuten)",
       "INCLUDEDIGITS": "Inclusief Nummers",
       "INCLUDESYMBOLS": "Inclusief Symbolen",
       "INCLUDELOWERLETTERS": "Inclusief Kleinletters",
@@ -1469,12 +1469,18 @@
       "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "ACTIONS": "Acties",
       "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sessiebeëindiging",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
         "DISABLED": "Uitgeschakeld"
       },
       "INHERITED_DESCRIPTION": "Deze instelling stelt de waarde in op de standaardwaarde van het systeem.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
+        "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
+      },
       "RESET": "Alles instellen op overgenomen"
     },
     "DIALOG": {
@@ -1610,7 +1616,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -1625,7 +1632,6 @@
         "initPasswordText": "Initialiseer wachtwoord",
         "initializeDoneText": "Gebruiker initialisatie voltooid",
         "initializeUserText": "Initialiseer gebruiker",
-        "linkingUserPromptText": "Gebruiker koppelingsprompt",
         "linkingUserDoneText": "Gebruiker koppeling voltooid",
         "loginText": "Login",
         "logoutText": "Uitloggen",
@@ -1661,7 +1667,8 @@
         "PR": "Wachtwoord Reset",
         "DC": "Domein Claim",
         "PL": "Wachtwoordloos",
-        "PC": "Wachtwoord Verandering"
+        "PC": "Wachtwoord Verandering",
+        "IU": "Gebruiker uitnodigen"
       },
       "CHIPS": {
         "firstname": "Voornaam",
@@ -1680,7 +1687,9 @@
         "username": "Gebruikersnaam",
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
-        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL"
+        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
+        "expiry": "Vervaldatum",
+        "applicationName": "Toepassingsnaam"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."
@@ -1778,7 +1787,7 @@
       "TYPE": {
         "OWNED": "Eigen Projecten",
         "OWNED_SINGULAR": "Eigen Project",
-        "GRANTED_SINGULAR": "Verleend Project"
+        "GRANTED_SINGULAR": "Project toegewezen {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Branding Instelling",
@@ -2062,10 +2071,10 @@
       "ISAUTOCREATION_DESC": "Als geselecteerd, wordt een account aangemaakt als het nog niet bestaat.",
       "ISAUTOUPDATE": "Automatische update",
       "ISAUTOUPDATE_DESC": "Als geselecteerd, worden accounts bijgewerkt bij opnieuw authenticeren.",
-      "ISCREATIONALLOWED": "Account creatie toegestaan",
-      "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt.",
-      "ISLINKINGALLOWED": "Account koppeling toegestaan",
-      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account.",
+      "ISCREATIONALLOWED": "Accountaanmaak toegestaan (handmatig)",
+      "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt met behulp van een extern account. Schakel uit als gebruikers accountinformatie niet mogen kunnen bewerken wanneer auto-aanmaak is ingeschakeld.",
+      "ISLINKINGALLOWED": "Accountkoppeling toegestaan (handmatig)",
+      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit handmatig kan worden gekoppeld aan een bestaand account. Schakel uit als gebruikers alleen het voorgestelde account mogen kunnen koppelen in geval van actieve auto-koppeling.",
       "AUTOLINKING_DESC": "Bepaalt of een identiteit wordt gevraagd om te worden gekoppeld aan een bestaand account.",
       "AUTOLINKINGTYPE": {
         "0": "Uitgeschakeld",
@@ -2567,7 +2576,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

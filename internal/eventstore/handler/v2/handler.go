@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"math"
 	"math/rand"
 	"slices"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -20,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type EventStore interface {
@@ -28,6 +27,7 @@ type EventStore interface {
 	FilterToQueryReducer(ctx context.Context, reducer eventstore.QueryReducer) error
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
+	FillFields(ctx context.Context, events ...eventstore.FillFieldsEvent) error
 }
 
 type Config struct {
@@ -379,7 +379,7 @@ func (h *Handler) existingInstances(ctx context.Context) ([]string, error) {
 
 type triggerConfig struct {
 	awaitRunning bool
-	maxPosition  float64
+	maxPosition  decimal.Decimal
 }
 
 type TriggerOpt func(conf *triggerConfig)
@@ -390,7 +390,7 @@ func WithAwaitRunning() TriggerOpt {
 	}
 }
 
-func WithMaxPosition(position float64) TriggerOpt {
+func WithMaxPosition(position decimal.Decimal) TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.maxPosition = position
 	}
@@ -476,9 +476,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		defer cancel()
 	}
 
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := h.client.BeginTx(txCtx, nil)
-	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return false, err
 	}
@@ -502,7 +500,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
+	if !config.maxPosition.Equal(decimal.Decimal{}) && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
@@ -542,7 +540,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState))
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil {
 		h.log().WithError(err).Debug("filter eventstore failed")
 		return nil, false, err
@@ -554,7 +552,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, err
 	}
 
-	idx := skipPreviouslyReduced(statements, currentState)
+	idx := skipPreviouslyReducedStatements(statements, currentState)
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
@@ -576,9 +574,9 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	return statements, additionalIteration, nil
 }
 
-func skipPreviouslyReduced(statements []*Statement, currentState *state) int {
+func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
 	for i, statement := range statements {
-		if statement.Position == currentState.position &&
+		if statement.Position.Equal(currentState.position) &&
 			statement.AggregateID == currentState.aggregateID &&
 			statement.AggregateType == currentState.aggregateType &&
 			statement.Sequence == currentState.sequence {
@@ -611,14 +609,14 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 		return nil
 	}
 
-	_, err = tx.Exec("SAVEPOINT exec")
+	_, err = tx.ExecContext(ctx, "SAVEPOINT exec")
 	if err != nil {
 		h.log().WithError(err).Debug("create savepoint failed")
 		return err
 	}
 	var shouldContinue bool
 	defer func() {
-		_, errSave := tx.Exec("RELEASE SAVEPOINT exec")
+		_, errSave := tx.ExecContext(ctx, "RELEASE SAVEPOINT exec")
 		if err == nil {
 			err = errSave
 		}
@@ -646,21 +644,19 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	if currentState.position > 0 {
-		// decrease position by 10 because builder.PositionAfter filters for position > and we need position >=
-		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 10))
+	if currentState.position.GreaterThan(decimal.Decimal{}) {
+		builder = builder.PositionGreaterEqual(currentState.position)
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
 		}
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {
-		query := builder.
+		builder = builder.
 			AddQuery().
 			AggregateTypes(aggregateType).
-			EventTypes(eventTypes...)
-
-		builder = query.Builder()
+			EventTypes(eventTypes...).
+			Builder()
 	}
 
 	return builder

@@ -12,6 +12,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 
 import { DetailFormComponent } from './detail-form.component';
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [DetailFormComponent, ProfilePictureComponent],
@@ -26,6 +27,7 @@ import { ProfilePictureComponent } from './profile-picture/profile-picture.compo
     MatButtonModule,
     MatTooltipModule,
     MatIconModule,
+    MatDialogModule,
     TranslateModule,
     InputModule,
   ],

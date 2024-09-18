@@ -19,6 +19,7 @@ type Commands interface {
 	HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string) error
 	PasswordChangeSent(ctx context.Context, orgID, userID string) error
 	HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string) error
+	InviteCodeSent(ctx context.Context, orgID, userID string) error
 	UsageNotificationSent(ctx context.Context, dueEvent *quota.NotificationDueEvent) error
 	MilestonePushed(ctx context.Context, msType milestone.Type, endpoints []string, primaryDomain string) error
 }

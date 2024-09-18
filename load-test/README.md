@@ -36,6 +36,9 @@ Before you run the tests you need an initialized user. The tests don't implement
 * `make machine_pat_login`  
   setup: creates machines and a pat for each machine  
   test: calls user info endpoint with the given pats
+* `make machine_client_credentials_login`  
+  setup: creates machines and a client credential secret for each machine  
+  test: calls token endpoint with the `client_credentials` grant type.
 * `make user_info`  
   setup: creates human users and signs them in  
   test: calls user info endpoint using the given humans
@@ -44,3 +47,12 @@ Before you run the tests you need an initialized user. The tests don't implement
 * `make introspect`  
   setup: creates projects, one api per project, one key per api and generates the jwt from the given keys  
   test: calls introspection endpoint using the given JWTs
+* `make add_session`  
+  setup: creates human users  
+  test: creates new sessions with user id check
+* `make machine_jwt_profile_grant`  
+  setup: generates private/public key, creates machine users, adds a key  
+  test: creates a token and calls user info 
+* `make machine_jwt_profile_grant_single_user`  
+  setup: generates private/public key, creates machine user, adds a key  
+  test: creates a token and calls user info in parallel for the same user

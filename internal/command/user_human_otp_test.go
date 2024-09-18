@@ -14,6 +14,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -534,7 +535,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
+				ctx:           http_util.WithRequestedHost(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
@@ -583,7 +584,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
+				ctx:           http_util.WithRequestedHost(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
 				resourceOwner: "org1",
 				userID:        "user2",
 			},
@@ -841,7 +842,8 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 
 func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type (
 		args struct {
@@ -891,7 +893,31 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 			},
 		},
 		{
-			name: "otp not existing, not found error",
+			name: "otp, no permission error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
+			name: "otp remove, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -908,6 +934,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -924,7 +951,8 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.HumanRemoveTOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -934,7 +962,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -1151,7 +1179,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 			}
 			got, err := r.AddHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -1278,7 +1306,7 @@ func TestCommandSide_AddHumanOTPSMSWithCheckSucceeded(t *testing.T) {
 			}
 			got, err := r.AddHumanOTPSMSWithCheckSucceeded(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -1393,7 +1421,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 			}
 			got, err := r.RemoveHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -2306,7 +2334,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 			}
 			got, err := r.AddHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -2433,7 +2461,7 @@ func TestCommandSide_AddHumanOTPEmailWithCheckSucceeded(t *testing.T) {
 			}
 			got, err := r.AddHumanOTPEmailWithCheckSucceeded(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -2548,7 +2576,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 			}
 			got, err := r.RemoveHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }

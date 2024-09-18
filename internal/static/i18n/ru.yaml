@@ -488,6 +488,7 @@ Errors:
     SQLStatement: SQL-запрос не может быть создан
     InvalidRequest: Запрос недействителен
     TooManyNestingLevels: слишком много уровней вложенности запросов (максимум 20)
+    LimitExceeded: Превышен лимит
   Quota:
     AlreadyExists: Квота для данного объекта уже существует
     NotFound: Квота для данного объекта не найдена
@@ -552,6 +553,8 @@ Errors:
     NotFound: Исполнение не найдено
     IncludeNotFound: Включить не найдено
     NoTargets: Цели не определены
+    Failed: Выполнение не удалось
+    ResponseIsNotValidJSON: Ответ не является допустимым JSON
   UserSchema:
     NotEnabled: Функция «Пользовательская схема» не включена
     Type:
@@ -562,6 +565,11 @@ Errors:
     NotActive: Пользовательская схема не активна
     NotInactive: Пользовательская схема не неактивна
     NotExists: Пользовательская схема не существует
+    ID:
+      Missing: Отсутствует идентификатор схемы пользователя
+    Invalid: Недействительная схема пользователя
+    Data:
+      Invalid: Данные недействительны для схемы пользователя
   TokenExchange:
     FeatureDisabled: Функция обмена токенами отключена для вашего экземпляра. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -573,6 +581,13 @@ Errors:
       NotForAPI: Олицетворенные токены не разрешены для API.
     Impersonation:
       PolicyDisabled: Олицетворение отключено в политике безопасности экземпляра.
+  WebKey:
+    ActiveDelete: Невозможно удалить активный веб-ключ
+    Config: Неверная конфигурация веб-ключа
+    Duplicate: Идентификатор веб-ключа не уникален
+    FeatureDisabled: Функция веб-ключа отключена
+    NoActive: Активный веб-ключ не найден
+    NotFound: Веб-ключ не найден
 
 AggregateTypes:
   action: Действие
@@ -596,6 +611,7 @@ AggregateTypes:
   restrictions: Ограничения
   system: Система
   session: Сеанс
+  web_key: Веб-ключ
 
 EventTypes:
   execution:
@@ -660,6 +676,13 @@ EventTypes:
         check:
           succeeded: Проверка инициализации прошла успешно
           failed: Проверка инициализации не удалась
+      invite:
+        code:
+          added: Сгенерирован код приглашения
+          sent: Код приглашения отправлен
+          check:
+            succeeded: Проверка приглашения успешно завершена
+            failed: Проверка приглашения завершилась неудачно
       username:
         reserved: Имя пользователя зарезервировано
         released: Имя пользователя опубликовано
@@ -1294,6 +1317,32 @@ EventTypes:
     deactivated: Пользовательская схема деактивирована
     reactivated: Пользовательская схема повторно активирована
     deleted: Пользовательская схема удалена
+    user:
+      created: Пользователь создан
+      updated: Пользователь обновлен
+      deleted: Пользователь удален
+      email:
+        updated: Адрес электронной почты изменен
+        verified: Адрес электронной почты проверен
+        verification:
+          failed: Проверка адреса электронной почты не удалась
+        code:
+          added: Сгенерирован код проверки адреса электронной почты
+          sent: Отправлен код проверки адреса электронной почты
+      phone:
+        updated: Номер телефона изменен
+        verified: Номер телефона проверен
+        verification:
+          failed: Проверка номера телефона не удалась
+        code:
+          added: Сгенерирован код проверки номера телефона
+          sent: Отправлен код проверки номера телефона
+  web_key:
+    added: Добавлен веб-ключ
+    activated: Веб-ключ активирован
+    deactivated: Веб-ключ деактивирован
+    removed: Веб-ключ удален
+
 Application:
   OIDC:
     UnsupportedVersion: Ваша версия OIDC не поддерживается

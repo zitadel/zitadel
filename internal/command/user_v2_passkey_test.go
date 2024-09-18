@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -25,7 +26,7 @@ import (
 
 func TestCommands_RegisterUserPasskey(t *testing.T) {
 	ctx := authz.NewMockContextWithPermissions("instance1", "org1", "user1", nil)
-	ctx = authz.WithRequestedDomain(ctx, "example.com")
+	ctx = http_util.WithRequestedHost(ctx, "example.com")
 
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
@@ -129,7 +130,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 }
 
 func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := http_util.WithRequestedHost(context.Background(), "example.com")
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,
@@ -142,7 +143,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(*testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
@@ -162,7 +163,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 		{
 			name: "code verification error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
@@ -173,7 +174,6 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
 						),
 					),
-					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 					expectPush(
 						user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
 					),
@@ -191,7 +191,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 		{
 			name: "code verification ok, get human passwordless error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
@@ -202,7 +202,6 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
 						),
 					),
-					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 					expectFilterError(io.ErrClosedPipe),
 				),
 			},
@@ -219,7 +218,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore,
+				eventstore:     tt.fields.eventstore(t),
 				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
@@ -231,7 +230,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 }
 
 func TestCommands_verifyUserPasskeyCode(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := http_util.WithRequestedHost(context.Background(), "example.com")
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
@@ -241,7 +240,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		userID        string
@@ -259,7 +258,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 		{
 			name: "filter error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
 			},
@@ -273,7 +272,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 		{
 			name: "code verification error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
@@ -284,7 +283,6 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
 						),
 					),
-					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 					expectPush(
 						user.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, "123"),
 					),
@@ -301,7 +299,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							user.NewHumanPasswordlessInitCodeRequestedEvent(context.Background(),
@@ -312,7 +310,6 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 							user.NewHumanPasswordlessInitCodeSentEvent(ctx, userAgg, "123"),
 						),
 					),
-					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 				),
 			},
 			args: args{
@@ -327,7 +324,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := c.verifyUserPasskeyCode(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.codeID, tt.args.code, alg)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -339,7 +336,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 }
 
 func TestCommands_pushUserPasskey(t *testing.T) {
-	ctx := authz.WithRequestedDomain(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
+	ctx := http_util.WithRequestedHost(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,
@@ -536,7 +533,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 			}
 			got, err := c.AddUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 }
@@ -644,7 +641,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 			}
 			got, err := c.AddUserPasskeyCodeURLTemplate(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 }
@@ -735,8 +732,13 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 				idGenerator:      tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCodeReturn(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				return
+			}
+			assert.Equal(t, tt.want.CodeID, got.CodeID)
+			assert.Equal(t, tt.want.Code, got.Code)
+			assertObjectDetails(t, tt.want.ObjectDetails, got.ObjectDetails)
 		})
 	}
 }
@@ -895,8 +897,13 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 				idGenerator:      tt.fields.idGenerator,
 			}
 			got, err := c.addUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, "", false)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				return
+			}
+			assert.Equal(t, tt.want.CodeID, got.CodeID)
+			assert.Equal(t, tt.want.Code, got.Code)
+			assertObjectDetails(t, tt.want.ObjectDetails, got.ObjectDetails)
 		})
 	}
 }
