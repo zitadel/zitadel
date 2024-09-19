@@ -1,5 +1,5 @@
 import { getSessionCookieById } from "@/lib/cookies";
-import { loadMostRecentSession } from "@/lib/session";
+import { isSessionValid, loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getLoginSettings,
@@ -49,6 +49,7 @@ export default async function Page({
           authMethods: methods.authMethodTypes ?? [],
           phoneVerified: humanUser?.phone?.isVerified ?? false,
           emailVerified: humanUser?.email?.isVerified ?? false,
+          expirationDate: session?.expirationDate,
         };
       });
     });
@@ -101,7 +102,15 @@ export default async function Page({
           <Alert>Provide your active session as loginName param</Alert>
         )}
 
-        {loginSettings && sessionWithData ? (
+        {isSessionValid(sessionWithData).valid && (
+          <Alert>
+            You have to have a valid session in order to set a second factor!
+          </Alert>
+        )}
+
+        {isSessionValid(sessionWithData).valid &&
+        loginSettings &&
+        sessionWithData ? (
           <ChooseSecondFactorToSetup
             loginName={loginName}
             sessionId={sessionId}

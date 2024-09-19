@@ -1,14 +1,14 @@
 "use server";
 
 import {
+  createSessionAndUpdateCookie,
+  setSessionAndUpdateCookie,
+} from "@/lib/server/cookie";
+import {
   listAuthenticationMethodTypes,
   listUsers,
   passwordReset,
 } from "@/lib/zitadel";
-import {
-  createSessionAndUpdateCookie,
-  setSessionAndUpdateCookie,
-} from "@/utils/session";
 import { create } from "@zitadel/client";
 import {
   Checks,

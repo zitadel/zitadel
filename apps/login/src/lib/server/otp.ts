@@ -1,6 +1,6 @@
 "use server";
 
-import { setSessionAndUpdateCookie } from "@/utils/session";
+import { setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import { create } from "@zitadel/client";
 import {
   CheckOTPSchema,

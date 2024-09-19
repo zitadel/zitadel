@@ -1,6 +1,7 @@
 "use client";
 
 import { cleanupSession } from "@/lib/server/session";
+import { isSessionValid } from "@/lib/session";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
@@ -32,14 +33,7 @@ export default function SessionItem({
     return response;
   }
 
-  const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
-
-  const validDate = validPassword || validPasskey;
-  const validUser = (validPassword || validPasskey) && stillValid;
+  const { valid, verifiedAt } = isSessionValid(session);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -47,14 +41,14 @@ export default function SessionItem({
     <Link
       prefetch={false}
       href={
-        validUser && authRequestId
+        valid && authRequestId
           ? `/login?` +
             new URLSearchParams({
               // loginName: session.factors?.user?.loginName as string,
               sessionId: session.id,
               authRequest: authRequestId,
             })
-          : !validUser
+          : !valid
             ? `/loginname?` +
               new URLSearchParams(
                 authRequestId
@@ -95,16 +89,16 @@ export default function SessionItem({
         <span className="text-xs opacity-80 text-ellipsis">
           {session.factors?.user?.loginName}
         </span>
-        {validUser && (
+        {valid && (
           <span className="text-xs opacity-80 text-ellipsis">
-            {validDate && moment(timestampDate(validDate)).fromNow()}
+            {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
           </span>
         )}
       </div>
 
       <span className="flex-grow"></span>
       <div className="relative flex flex-row items-center">
-        {validUser ? (
+        {valid ? (
           <div className="absolute h-2 w-2 bg-green-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
         ) : (
           <div className="absolute h-2 w-2 bg-red-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>

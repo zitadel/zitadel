@@ -1,11 +1,11 @@
 "use server";
 
-import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import {
   createSessionAndUpdateCookie,
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
-} from "@/utils/session";
+} from "@/lib/server/cookie";
+import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import {
@@ -143,6 +143,7 @@ export async function clearSession(options: ClearSessionOptions) {
 type CleanupSessionCommand = {
   sessionId: string;
 };
+
 export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
   const sessionCookie = await getSessionCookieById({ sessionId });
 

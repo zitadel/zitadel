@@ -5,7 +5,6 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { createSessionAndUpdateCookie } from "../../utils/session";
 import { idpTypeToSlug } from "../idp";
 import {
   getActiveIdentityProviders,
@@ -15,6 +14,7 @@ import {
   listUsers,
   startIdentityProviderFlow,
 } from "../zitadel";
+import { createSessionAndUpdateCookie } from "./cookie";
 
 export type SendLoginnameCommand = {
   loginName: string;

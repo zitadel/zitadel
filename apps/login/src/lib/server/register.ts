@@ -1,7 +1,7 @@
 "use server";
 
+import { createSessionAndUpdateCookie } from "@/lib/server/cookie";
 import { addHumanUser } from "@/lib/zitadel";
-import { createSessionAndUpdateCookie } from "@/utils/session";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
