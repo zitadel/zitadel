@@ -87,13 +87,11 @@ export default function PasswordForm({
 
     if (response && "error" in response) {
       setError(response.error);
+    } else {
+      setInfo("Password was reset. Please check your email.");
     }
 
     setLoading(false);
-
-    if (response) {
-      setInfo("Password was reset. Please check your email.");
-    }
 
     return response;
   }
