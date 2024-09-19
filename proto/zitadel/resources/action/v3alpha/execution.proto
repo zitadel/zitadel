@@ -14,7 +14,7 @@ import "zitadel/resources/object/v3alpha/object.proto";
 import "google/protobuf/timestamp.proto";
 import "zitadel/object/v3alpha/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/action/v3alpha;action";
 
 message Execution {
   // Ordered list of targets/includes called during the execution.

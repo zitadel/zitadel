@@ -8,7 +8,7 @@ import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
 import "zitadel/feature/v2/feature.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2;feature";
 
 message SetOrganizationFeaturesRequest {
   string organization_id = 1[

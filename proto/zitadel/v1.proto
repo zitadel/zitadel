@@ -14,7 +14,7 @@ import "validate/validate.proto";
 
 package zitadel.v1.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/v1";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/v1";
 
 message AddCustomOrgIAMPolicyRequest {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

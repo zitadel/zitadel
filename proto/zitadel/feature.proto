@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package zitadel.feature.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/feature";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/feature";
 
 enum InstanceFeature {
   INSTANCE_FEATURE_UNSPECIFIED = 0;

@@ -9,7 +9,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.event.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/event";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/event";
 
 message Event {
     Editor editor = 1;

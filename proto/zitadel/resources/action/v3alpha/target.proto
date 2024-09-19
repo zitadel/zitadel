@@ -12,7 +12,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "zitadel/resources/object/v3alpha/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/action/v3alpha;action";
 
 message Target {
   string name = 1 [

@@ -11,7 +11,7 @@ import "zitadel/resources/object/v3alpha/object.proto";
 import "zitadel/resources/user/v3alpha/authenticator.proto";
 import "zitadel/resources/user/v3alpha/communication.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/user/v3alpha;user";
 
 message CreateUser {
   // Define the schema the user's data schema by providing it's ID.

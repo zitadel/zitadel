@@ -9,7 +9,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/user/v3alpha;user";
 
 message Authenticators {
   // All of the user's usernames, which will be used for identification during authentication.

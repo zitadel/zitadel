@@ -20,7 +20,7 @@ import "validate/validate.proto";
 import "zitadel/org/v2/org.proto";
 import "zitadel/org/v2/query.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2;org";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/org/v2;org";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -34,7 +34,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/v2/blob/main/LICENSE";
     };
   };
   schemes: HTTPS;

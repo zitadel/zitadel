@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package zitadel.resources.action.v3alpha;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/action/v3alpha;action";
 
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";

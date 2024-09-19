@@ -4,7 +4,7 @@ package zitadel.resources.debug_events.v3alpha;
 
 import "zitadel/resources/object/v3alpha/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha;debug_events";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/debug_events/v3alpha;debug_events";
 
 message State {
   // Details provide some base information (such as the last change date) of the schema.

@@ -8,7 +8,7 @@ import "validate/validate.proto";
 import "zitadel/object/v2beta/object.proto";
 import "zitadel/feature/v2beta/feature.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta;feature";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2beta;feature";
 
 message SetInstanceFeaturesRequest{
   optional bool login_default_org = 1 [

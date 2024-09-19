@@ -11,7 +11,7 @@ import "validate/validate.proto";
 import "google/protobuf/duration.proto";
 
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/idp/v2;idp";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/idp/v2;idp";
 
 message IDP {
   // Unique identifier for the identity provider.

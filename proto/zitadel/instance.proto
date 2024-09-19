@@ -6,7 +6,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.instance.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/instance";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/instance";
 
 message Instance {
     string id = 1 [

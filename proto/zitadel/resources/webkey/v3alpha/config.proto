@@ -4,7 +4,7 @@ package zitadel.resources.webkey.v3alpha;
 
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha;webkey";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/webkey/v3alpha;webkey";
 
 message WebKeyRSAConfig {
   enum RSABits {

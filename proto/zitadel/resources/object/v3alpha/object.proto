@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package zitadel.resources.object.v3alpha;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha;object";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/object/v3alpha;object";
 
 import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";

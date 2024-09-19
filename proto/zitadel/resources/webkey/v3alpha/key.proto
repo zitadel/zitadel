@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "zitadel/resources/webkey/v3alpha/config.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha;webkey";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/webkey/v3alpha;webkey";
 
 enum WebKeyState {
   STATE_UNSPECIFIED = 0;

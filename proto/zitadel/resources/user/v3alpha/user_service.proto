@@ -16,7 +16,7 @@ import "zitadel/resources/user/v3alpha/communication.proto";
 import "zitadel/resources/user/v3alpha/query.proto";
 import "zitadel/resources/user/v3alpha/user.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/resources/user/v3alpha;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -30,7 +30,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
     license: {
       name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+      url: "https://github.com/zitadel/zitadel/v2/blob/main/LICENSE";
     };
   };
   schemes: HTTPS;

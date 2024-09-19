@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package zitadel.object.v2;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v2;object";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/object/v2;object";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -45,7 +45,7 @@ message ListQuery {
   uint32 limit = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "100";
-      description: "Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If the limit exceeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
+      description: "Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/v2/blob/new-eventstore/cmd/zitadel/startup.yaml. If the limit exceeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
     }
   ];
   bool asc = 3 [

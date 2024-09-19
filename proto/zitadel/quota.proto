@@ -5,7 +5,7 @@ import "validate/validate.proto";
 
 package zitadel.quota.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/quota";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/quota";
 
 enum Unit {
     UNIT_UNIMPLEMENTED = 0;
