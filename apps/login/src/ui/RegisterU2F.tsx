@@ -11,15 +11,19 @@ import { Button, ButtonVariants } from "./Button";
 import { Spinner } from "./Spinner";
 
 type Props = {
+  loginName?: string;
   sessionId: string;
   authRequestId?: string;
   organization?: string;
+  checkAfter: boolean;
 };
 
 export default function RegisterU2F({
+  loginName,
   sessionId,
   organization,
   authRequestId,
+  checkAfter,
 }: Props) {
   const [error, setError] = useState<string>("");
 
@@ -140,23 +144,31 @@ export default function RegisterU2F({
         return;
       }
 
-      const params = new URLSearchParams();
+      const paramsToContinue = new URLSearchParams({});
+      let urlToContinue = "/accounts";
 
-      if (organization) {
-        params.set("organization", organization);
+      if (sessionId) {
+        paramsToContinue.append("sessionId", sessionId);
       }
-
-      // redirect to verify or sign in
       if (authRequestId) {
-        params.set("authRequestId", authRequestId);
-        params.set("sessionId", sessionId);
-        // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
-        // params.set("loginName", resp.loginName);
-
-        router.push("/u2f?" + params);
-      } else {
-        router.push("/accounts?" + params);
+        paramsToContinue.append("authRequestId", authRequestId);
       }
+      if (loginName) {
+        paramsToContinue.append("loginName", loginName);
+      }
+      if (organization) {
+        paramsToContinue.append("organization", organization);
+      }
+
+      if (checkAfter) {
+        urlToContinue = `/u2f?` + paramsToContinue;
+      } else if (authRequestId && sessionId) {
+        urlToContinue = `/login?` + paramsToContinue;
+      } else if (loginName) {
+        urlToContinue = `/signedin?` + paramsToContinue;
+      }
+
+      router.push(urlToContinue);
     }
 
     setLoading(false);
