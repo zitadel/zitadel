@@ -81,12 +81,12 @@ export default function SetPasswordForm({
       return;
     }
 
-    const userReponse = response as RegisterUserResponse;
+    const userResponse = response as RegisterUserResponse;
 
-    const params = new URLSearchParams({ userId: userReponse.userId });
+    const params = new URLSearchParams({ userId: userResponse.userId });
 
-    if (userReponse.factors?.user?.loginName) {
-      params.append("loginName", userReponse.factors.user.loginName);
+    if (userResponse.factors?.user?.loginName) {
+      params.append("loginName", userResponse.factors.user.loginName);
     }
     if (authRequestId) {
       params.append("authRequestId", authRequestId);
@@ -94,11 +94,18 @@ export default function SetPasswordForm({
     if (organization) {
       params.append("organization", organization);
     }
-    if (userReponse && userReponse.sessionId) {
-      params.append("sessionId", userReponse.sessionId);
+    if (userResponse && userResponse.sessionId) {
+      params.append("sessionId", userResponse.sessionId);
     }
 
-    return router.push(`/verify?` + params);
+    // skip verification for now as it is an app based flow
+    // return router.push(`/verify?` + params);
+
+    if (authRequestId && userResponse.sessionId) {
+      return router.push(`/login?` + params);
+    } else {
+      return router.push(`/signedin?` + params);
+    }
   }
 
   const { errors } = formState;

@@ -13,6 +13,7 @@ import TOTPRegister from "@/ui/TOTPRegister";
 import UserAvatar from "@/ui/UserAvatar";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function Page({
   searchParams,
@@ -80,6 +81,10 @@ export default async function Page({
 
   if (checkAfter) {
     urlToContinue = `/otp/${method}?` + paramsToContinue;
+    // immediately check the OTP on the next page if sms or email was set up
+    if (["email", "sms"].includes(method)) {
+      return redirect(urlToContinue);
+    }
   } else if (authRequestId && sessionId) {
     urlToContinue = `/login?` + paramsToContinue;
   } else if (loginName) {

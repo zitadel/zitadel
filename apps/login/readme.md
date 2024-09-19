@@ -236,6 +236,7 @@ Requests to the APIs made:
 - `addOTPEmail()` / `addOTPSMS()`
 
 This page directly calls `addOTPEmail()` or `addOTPSMS()` when invoked and shows a success message.
+Right afterwards, redirects to verify the method.
 
 ### /u2f/set
 
@@ -274,7 +275,7 @@ Requests to the APIs made:
 
 To register a user, the organization where the resource will be created is determined first. If no context is provided via url, we fall back to the default organization of the instance.
 
-**PASSWORD:** If a password is set, the user is created as a resource, then a session using the password check is created immediately.
+**PASSWORD:** If a password is set, the user is created as a resource, then a session using the password check is created immediately. After creating the session, the user is directly logged in and eventually redirected back to the application.
 
 **PASSKEY:** If passkey is selected, the user is created as a resource first, then a session using the userId is created immediately. This session does not yet contain a check, we therefore redirect the user to setup a passkey at `/passkey/set`. As the passkey set page verifies the passkey right afterwards, the process ends with a signed in user.
 
