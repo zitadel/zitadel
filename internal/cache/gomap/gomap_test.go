@@ -44,7 +44,6 @@ func (o *testObject) Value() *testObject {
 
 func Test(t *testing.T) {
 	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.CacheConfig{
-		Name:       "tester",
 		MaxAge:     time.Second,
 		LastUseAge: time.Second / 4,
 	})

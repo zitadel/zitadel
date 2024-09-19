@@ -2,6 +2,8 @@ package gomap
 
 import (
 	"context"
+	"io"
+	"log/slog"
 	"maps"
 	"sync"
 	"sync/atomic"
@@ -13,6 +15,7 @@ import (
 type mapCache[I, K comparable, V cache.Entry[I, K]] struct {
 	config   *cache.CacheConfig
 	indexMap map[I]*index[K, V]
+	logger   *slog.Logger
 }
 
 // NewCache returns an in-memory Cache implementation based on the builtin go map type.
@@ -21,7 +24,15 @@ func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, 
 	m := &mapCache[I, K, V]{
 		config:   &config,
 		indexMap: make(map[I]*index[K, V], len(indices)),
+		logger: slog.New(slog.NewTextHandler(io.Discard, &slog.HandlerOptions{
+			Level: slog.LevelError + 1, // disabled
+		})),
 	}
+	if config.Log != nil {
+		m.logger = config.Log.Slog()
+	}
+	m.logger.InfoContext(background, "map cache logging enabled", "level", config.Log.Level)
+
 	for _, name := range indices {
 		m.indexMap[name] = &index[K, V]{
 			config:  m.config,
@@ -31,19 +42,21 @@ func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, 
 	return m
 }
 
-func (c *mapCache[I, K, V]) Get(_ context.Context, index I, key K) (value V, err error) {
+func (c *mapCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, err error) {
 	i, ok := c.indexMap[index]
 	if !ok {
 		return value, cache.NewIndexUnknownErr(index)
 	}
 	entry, err := i.Get(key)
 	if err != nil {
+		c.logger.InfoContext(ctx, "map cache get", "err", err, "index", index, "key", key)
 		return value, err
 	}
+	c.logger.DebugContext(ctx, "map cache get", "index", index, "key", key)
 	return entry.value, nil
 }
 
-func (c *mapCache[I, K, V]) Set(_ context.Context, value V) error {
+func (c *mapCache[I, K, V]) Set(ctx context.Context, value V) error {
 	entry := &entry[V]{
 		value:   value,
 		created: time.Now(),
@@ -52,38 +65,43 @@ func (c *mapCache[I, K, V]) Set(_ context.Context, value V) error {
 		keys := value.Keys(name)
 		i.Invalidate(keys)
 		i.Set(keys, entry)
+		c.logger.DebugContext(ctx, "map cache set", "index", name, "keys", keys)
 	}
 	return nil
 }
 
-func (c *mapCache[I, K, V]) Invalidate(_ context.Context, index I, key ...K) error {
+func (c *mapCache[I, K, V]) Invalidate(ctx context.Context, index I, keys ...K) error {
 	i, ok := c.indexMap[index]
 	if !ok {
 		return cache.NewIndexUnknownErr(index)
 	}
-	i.Invalidate(key)
+	i.Invalidate(keys)
+	c.logger.DebugContext(ctx, "map cache invalidate", "index", index, "keys", keys)
 	return nil
 }
 
-func (c *mapCache[I, K, V]) Delete(ctx context.Context, index I, key ...K) error {
+func (c *mapCache[I, K, V]) Delete(ctx context.Context, index I, keys ...K) error {
 	i, ok := c.indexMap[index]
 	if !ok {
 		return cache.NewIndexUnknownErr(index)
 	}
-	i.Delete(key)
+	i.Delete(keys)
+	c.logger.DebugContext(ctx, "map cache delete", "index", index, "keys", keys)
 	return nil
 }
 
-func (c *mapCache[I, K, V]) Prune(_ context.Context) error {
-	for _, index := range c.indexMap {
+func (c *mapCache[I, K, V]) Prune(ctx context.Context) error {
+	for name, index := range c.indexMap {
 		index.Prune()
+		c.logger.DebugContext(ctx, "map cache prune", "index", name)
 	}
 	return nil
 }
 
-func (c *mapCache[I, K, V]) Clear(_ context.Context) error {
-	for _, index := range c.indexMap {
+func (c *mapCache[I, K, V]) Clear(ctx context.Context) error {
+	for name, index := range c.indexMap {
 		index.Clear()
+		c.logger.DebugContext(ctx, "map cache clear", "index", name)
 	}
 	return nil
 }

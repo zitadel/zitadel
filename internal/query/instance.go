@@ -209,7 +209,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
 
-	instance, err := q.caches.instance.Get(ctx, cache.InstanceIndexByHost, instanceDomain)
+	instance, err := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
 	if err == nil {
 		return instance, instance.checkDomain(instanceDomain, publicDomain)
 	}
@@ -233,7 +233,7 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	instance, err := q.caches.instance.Get(ctx, cache.InstanceIndexByID, id)
+	instance, err := q.caches.instance.Get(ctx, instanceIndexByID, id)
 	if err == nil {
 		return instance, nil
 	}
@@ -528,11 +528,11 @@ func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
 }
 
 // Keys implements [cache.Entry]
-func (i *authzInstance) Keys(index cache.InstanceIndex) []string {
+func (i *authzInstance) Keys(index instanceIndex) []string {
 	switch index {
-	case cache.InstanceIndexByID:
+	case instanceIndexByID:
 		return []string{i.id}
-	case cache.InstanceIndexByHost:
+	case instanceIndexByHost:
 		return i.externalDomains
 	default:
 		return nil
@@ -590,3 +590,21 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		return nil
 	}
 }
+
+func (c *Caches) registerInstanceInvalidation() {
+	invalidate := cacheInvalidationFunc(c.instance, instanceIndexByID)
+	projection.InstanceProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceDomainProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceFeatureProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceTrustedDomainProjection.RegisterCacheInvalidation(invalidate)
+	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
+	projection.SecurityPolicyProjection.RegisterCacheInvalidation(invalidate)
+}
+
+type instanceIndex int16
+
+//go:generate enumer -type instanceIndex
+const (
+	instanceIndexByID instanceIndex = iota
+	instanceIndexByHost
+)

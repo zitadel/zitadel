@@ -62,6 +62,7 @@ type Handler struct {
 	triggeredInstancesSync sync.Map
 
 	triggerWithoutEvents Reduce
+	cacheInvalidations   []func(ctx context.Context, aggregateIDs ...string)
 }
 
 var _ migration.Migration = (*Handler)(nil)
@@ -418,6 +419,12 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 	}
 }
 
+// RegisterCacheInvalidation registers a function to be called when a cache needs to be invalidated.
+// In order to avoid race conditions, this method must be called before [Handler.Start] is called.
+func (h *Handler) RegisterCacheInvalidation(invalidate func(ctx context.Context, aggregateIDs ...string)) {
+	h.cacheInvalidations = append(h.cacheInvalidations, invalidate)
+}
+
 // lockInstance tries to lock the instance.
 // If the instance is already locked from another process no cancel function is returned
 // the instance can be skipped then
@@ -486,10 +493,6 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
 		}
-		commitErr := tx.Commit()
-		if err == nil {
-			err = commitErr
-		}
 	}()
 
 	currentState, err := h.currentState(ctx, tx, config)
@@ -509,6 +512,17 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	if err != nil {
 		return additionalIteration, err
 	}
+
+	defer func() {
+		commitErr := tx.Commit()
+		if err == nil {
+			err = commitErr
+		}
+		if err == nil && currentState.aggregateID != "" && len(statements) > 0 {
+			h.invalidateCaches(ctx, aggregateIDsFromStatements(statements)...)
+		}
+	}()
+
 	if len(statements) == 0 {
 		err = h.setState(tx, currentState)
 		return additionalIteration, err
@@ -665,4 +679,33 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 // ProjectionName returns the name of the underlying projection.
 func (h *Handler) ProjectionName() string {
 	return h.projection.Name()
+}
+
+func (h *Handler) invalidateCaches(ctx context.Context, aggregateIDs ...string) {
+	if len(h.cacheInvalidations) == 0 {
+		return
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(len(h.cacheInvalidations))
+
+	for _, invalidate := range h.cacheInvalidations {
+		go func(invalidate func(context.Context, ...string)) {
+			defer wg.Done()
+			invalidate(ctx, aggregateIDs...)
+		}(invalidate)
+	}
+	wg.Wait()
+}
+
+// aggregateIDsFromStatements returns the unique aggregate IDs from statements.
+// Duplicate aggregate IDs are omitted.
+func aggregateIDsFromStatements(statements []*Statement) []string {
+	ids := make([]string, 0, len(statements))
+	for _, statement := range statements {
+		if !slices.Contains(ids, statement.AggregateID) {
+			ids = append(ids, statement.AggregateID)
+		}
+	}
+	return ids
 }
