@@ -236,14 +236,16 @@ export default function PasswordForm({
           {...register("password", { required: "This field is required" })}
           label="Password"
         />
-        <button
-          className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
-          onClick={() => resetPasswordAndContinue()}
-          type="button"
-          disabled={loading}
-        >
-          Reset Password
-        </button>
+        {!loginSettings?.hidePasswordReset && (
+          <button
+            className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+            onClick={() => resetPasswordAndContinue()}
+            type="button"
+            disabled={loading}
+          >
+            Reset Password
+          </button>
+        )}
 
         {loginName && (
           <input
