@@ -183,10 +183,36 @@ Database:
         Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
         Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
-Caches:
-  Instance:
-    MaxAge: 0
-    LastUsage: 0
+# Caches are EXPERIMENTAL. The following config may have breaking changes in the future.
+# If no config is provided, caching is disabled by default.
+# Caches:
+  # Connectors are reused by caches.
+#  Connectors:
+    # Memory connector works with local server memory.
+    # It is the simplest (and probably fastest) cache implementation.
+    # Unsuitable for deployments with multiple containers,
+    # as each container's cache may hold a different state of the same object.
+#    Memory:
+#      Enabled: true
+      # AutoPrune removes invalidated or expired object from the cache.
+#      AutoPrune:
+#        Interval: 15m
+#        TimeOut: 30s
+
+  # Instance caches auth middleware instances, gettable by domain or ID.
+#  Instance:
+    # Connector must be enabled above.
+    # When connector is empty, this cache will be disabled.
+#    Connector: "memory"
+#    MaxAge: 1h
+#    LastUsage: 10m
+#
+    # Log enables cache-specific logging. Default to error log to stdout when omitted.
+#    Log:
+#      Level: debug
+#      AddSource: true
+#      Formatter:
+#        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.

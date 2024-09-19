@@ -25,6 +25,7 @@ import (
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
@@ -71,7 +72,7 @@ type ProjectionsConfig struct {
 	EncryptionKeys *encryption.EncryptionKeyConfig
 	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config
-	Caches         query.CachesConfig
+	Caches         *cache.CachesConfig
 
 	Admin admin_es.Config
 	Auth  auth_es.Config

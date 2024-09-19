@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
@@ -28,7 +29,6 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
@@ -49,7 +49,7 @@ type Config struct {
 	HTTP1HostHeader     string
 	WebAuthNName        string
 	Database            database.Config
-	Caches              query.CachesConfig
+	Caches              *cache.CachesConfig
 	Tracing             tracing.Config
 	Metrics             metrics.Config
 	Profiler            profiler.Config

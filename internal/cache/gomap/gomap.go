@@ -21,11 +21,11 @@ type mapCache[I, K comparable, V cache.Entry[I, K]] struct {
 
 // NewCache returns an in-memory Cache implementation based on the builtin go map type.
 // Object values are stored as-is and there is no encoding or decoding involved.
-func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, indices []I, config cache.CacheConfig) cache.Cache[I, K, V] {
+func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, indices []I, config cache.CacheConfig) cache.PrunerCache[I, K, V] {
 	m := &mapCache[I, K, V]{
 		config:   &config,
 		indexMap: make(map[I]*index[K, V], len(indices)),
-		logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		logger: slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 			AddSource: true,
 			Level:     slog.LevelError,
 		})),

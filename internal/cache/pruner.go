@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -11,6 +12,11 @@ import (
 type Pruner interface {
 	// Prune deletes all invalidated or expired objects.
 	Prune(ctx context.Context) error
+}
+
+type PrunerCache[I, K comparable, V Entry[I, K]] interface {
+	Cache[I, K, V]
+	Pruner
 }
 
 type AutoPruneConfig struct {
@@ -34,12 +40,20 @@ func (c AutoPruneConfig) StartAutoPrune(background context.Context, pruner Prune
 }
 
 func (c *AutoPruneConfig) pruneTimer(background context.Context, pruner Pruner) {
-	ticker := time.NewTicker(c.Interval)
+	// randomize the first interval
+	timer := time.NewTimer(time.Duration(rand.Int63n(int64(c.Interval))))
+	defer func() {
+		if !timer.Stop() {
+			<-timer.C
+		}
+	}()
+
 	for {
 		select {
 		case <-background.Done():
 			return
-		case <-ticker.C:
+		case <-timer.C:
+			timer.Reset(c.Interval)
 			err := c.doPrune(background, pruner)
 			logging.OnError(err).WithField("name", "").Error("cache auto prune")
 		}

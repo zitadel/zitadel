@@ -21,8 +21,12 @@ select
     l.audit_log_retention,
     l.block,
 	f.features
+    ed.domains as external_domains,
+	td.domains as trusted_domains
 from projections.instances i
 left join projections.security_policies2 s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id
+left join external_domains ed on i.id = ed.instance_id
+left join trusted_domains td on i.id = td.instance_id
 where i.id = $1;

@@ -15,6 +15,7 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -23,7 +24,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 )
@@ -31,7 +31,7 @@ import (
 type Config struct {
 	ForMirror       bool
 	Database        database.Config
-	Caches          query.CachesConfig
+	Caches          *cache.CachesConfig
 	SystemDefaults  systemdefaults.SystemDefaults
 	InternalAuthZ   internal_authz.Config
 	ExternalDomain  string

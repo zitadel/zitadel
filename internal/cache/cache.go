@@ -73,7 +73,18 @@ type Entry[I, K comparable] interface {
 	Keys(index I) (key []K)
 }
 
+type CachesConfig struct {
+	Connectors struct {
+		Memory MemoryConnectorConfig
+		// SQL database.Config
+		// Redis redis.Config?
+	}
+	Instance *CacheConfig
+}
+
 type CacheConfig struct {
+	Connector string
+
 	// Age since an object was added to the cache,
 	// after which the object is considered invalid.
 	// 0 disables max age checks.
@@ -84,5 +95,12 @@ type CacheConfig struct {
 	// 0 disables last use age checks.
 	LastUseAge time.Duration
 
+	// Log allows logging of the specific cache.
+	// By default only errors are logged to stdout.
 	Log *logging.Config
+}
+
+type MemoryConnectorConfig struct {
+	Enabled   bool
+	AutoPrune AutoPruneConfig
 }
