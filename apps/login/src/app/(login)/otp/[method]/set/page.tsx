@@ -71,6 +71,9 @@ export default async function Page({
   if (authRequestId) {
     paramsToContinue.append("authRequestId", authRequestId);
   }
+  if (loginName) {
+    paramsToContinue.append("loginName", loginName);
+  }
   if (organization) {
     paramsToContinue.append("organization", organization);
   }
