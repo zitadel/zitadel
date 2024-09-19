@@ -33,6 +33,7 @@ export default function RegisterU2F({
     publicKeyCredential: any,
     sessionId: string,
   ) {
+    setError("");
     setLoading(true);
     const response = await verifyU2F({
       u2fId,
@@ -44,6 +45,10 @@ export default function RegisterU2F({
       setLoading(false);
       setError("An error on verifying passkey occurred");
     });
+
+    if (response && "error" in response && response?.error) {
+      setError(response?.error);
+    }
 
     setLoading(false);
 
@@ -141,6 +146,7 @@ export default function RegisterU2F({
         params.set("organization", organization);
       }
 
+      // redirect to verify or sign in
       if (authRequestId) {
         params.set("authRequestId", authRequestId);
         params.set("sessionId", sessionId);

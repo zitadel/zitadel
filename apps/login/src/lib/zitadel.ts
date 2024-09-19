@@ -26,6 +26,7 @@ import {
   IdentityProviderType,
   LoginSettingsSchema,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   SearchQuery,
@@ -132,11 +133,17 @@ export async function getPasswordComplexitySettings(organization?: string) {
     async () => {
       return await settingsService
         .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-        .then((resp) => resp.settings);
+        .then((resp) =>
+          resp.settings
+            ? toJson(PasswordComplexitySettingsSchema, resp.settings)
+            : undefined,
+        );
     },
     ["complexitySettings", organization ?? "default"],
     { revalidate: 3600, tags: ["complexitySettings"] },
-  )();
+  )().then((resp) =>
+    resp ? fromJson(PasswordComplexitySettingsSchema, resp) : undefined,
+  );
 }
 
 export async function createSessionFromChecks(
