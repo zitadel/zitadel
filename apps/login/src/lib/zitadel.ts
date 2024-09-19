@@ -26,6 +26,7 @@ import {
   SearchQuery,
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
+import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600;
@@ -47,18 +48,18 @@ export const orgService = createOrganizationServiceClient(transport);
 export const settingsService = createSettingsServiceClient(transport);
 
 export async function getBrandingSettings(organization?: string) {
-  return await settingsService
-    .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => resp.settings);
-  // return unstable_cache(
-  //   async () => {
-  //     return await settingsService
-  //       .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-  //       .then((resp) => resp.settings);
-  //   },
-  //   ["branding"],
-  //   { revalidate: 3600, tags: ["branding"] },
-  // )();
+  // return await settingsService
+  //   .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
+  //   .then((resp) => resp.settings);
+  return unstable_cache(
+    async () => {
+      return await settingsService
+        .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
+        .then((resp) => resp.settings);
+    },
+    ["branding", organization ?? "default"],
+    { revalidate: 3600, tags: ["branding"] },
+  )();
 }
 
 export async function getLoginSettings(orgId?: string) {
