@@ -18,12 +18,12 @@ with domain as (
 	select ed.instance_id, array_agg(ed.domain) as domains
 	from domain d
 	join projections.instance_domains ed on d.instance_id = ed.instance_id
-	group by d.instance_id
+	group by ed.instance_id
 ), trusted_domains as (
 	select td.instance_id, array_agg(td.domain) as domains
 	from domain d
 	join projections.instance_trusted_domains td on d.instance_id = td.instance_id
-	group by d.instance_id
+	group by td.instance_id
 )
 select
     i.id,
