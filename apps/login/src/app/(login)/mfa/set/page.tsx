@@ -15,7 +15,7 @@ import UserAvatar from "@/ui/UserAvatar";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
-export function isSessionValid(session: Partial<Session>): {
+function isSessionValid(session: Partial<Session>): {
   valid: boolean;
   verifiedAt?: Timestamp;
 } {
