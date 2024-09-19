@@ -53,8 +53,8 @@ type Cache[I, K comparable, V Entry[I, K]] interface {
 	// It is safe to call Delete multiple times or on non-existing entries
 	Delete(ctx context.Context, index I, key ...K) error
 
-	// Clear deletes all cached objects.
-	Clear(ctx context.Context) error
+	// Truncate deletes all cached objects.
+	Truncate(ctx context.Context) error
 
 	// Close the cache. Subsequent calls to the cache are not allowed.
 	Close(ctx context.Context) error

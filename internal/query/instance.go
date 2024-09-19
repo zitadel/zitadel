@@ -586,6 +586,12 @@ func (c *Caches) registerInstanceInvalidation() {
 	projection.InstanceTrustedDomainProjection.RegisterCacheInvalidation(invalidate)
 	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
 	projection.SecurityPolicyProjection.RegisterCacheInvalidation(invalidate)
+
+	// System feature update should invalidate all instances, so Truncate the cache.
+	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ ...string) {
+		err := c.instance.Truncate(ctx)
+		logging.OnError(err).Warn("cache truncate failed")
+	})
 }
 
 type instanceIndex int16

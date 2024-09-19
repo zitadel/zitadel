@@ -101,9 +101,9 @@ func (c *mapCache[I, K, V]) Prune(ctx context.Context) error {
 	return nil
 }
 
-func (c *mapCache[I, K, V]) Clear(ctx context.Context) error {
+func (c *mapCache[I, K, V]) Truncate(ctx context.Context) error {
 	for name, index := range c.indexMap {
-		index.Clear()
+		index.Truncate()
 		c.logger.DebugContext(ctx, "map cache clear", "index", name)
 	}
 	return nil
@@ -163,7 +163,7 @@ func (c *index[K, V]) Prune() {
 	c.mutex.Unlock()
 }
 
-func (c *index[K, V]) Clear() {
+func (c *index[K, V]) Truncate() {
 	c.mutex.Lock()
 	c.entries = make(map[K]*entry[V])
 	c.mutex.Unlock()
