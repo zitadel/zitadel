@@ -1,5 +1,5 @@
 import { getSessionCookieById } from "@/lib/cookies";
-import { isSessionValid, loadMostRecentSession } from "@/lib/session";
+import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getLoginSettings,
@@ -11,6 +11,7 @@ import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
 import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
 import DynamicTheme from "@/ui/DynamicTheme";
+import { isSessionValid } from "@/ui/SessionItem";
 import UserAvatar from "@/ui/UserAvatar";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
