@@ -15,12 +15,12 @@ with domain as (
 	full outer join instance_features i using (instance_id, key)
 	group by instance_id
 ), external_domains as (
-	select d.instance_id, array_agg(ed.domain) as domains
+	select ed.instance_id, array_agg(ed.domain) as domains
 	from domain d
 	join projections.instance_domains ed on d.instance_id = ed.instance_id
 	group by d.instance_id
 ), trusted_domains as (
-	select d.instance_id, array_agg(td.domain) as domains
+	select td.instance_id, array_agg(td.domain) as domains
 	from domain d
 	join projections.instance_trusted_domains td on d.instance_id = td.instance_id
 	group by d.instance_id
