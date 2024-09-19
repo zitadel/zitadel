@@ -29,7 +29,7 @@ type Cache[I, K comparable, V Entry[I, K]] interface {
 	// An [IndexUnknownError] may be returned if the index is unknown.
 	// [ErrCacheMiss] is returned if the key was not found in the index,
 	// or the object is not valid.
-	Get(ctx context.Context, index I, key K) (V, error)
+	Get(ctx context.Context, index I, key K) (V, bool)
 
 	// Set an object.
 	// Keys are created on each index based in the [Entry.Keys] method.
@@ -37,7 +37,7 @@ type Cache[I, K comparable, V Entry[I, K]] interface {
 	// regardless if the object has other keys defined in the new entry.
 	// This to prevent ghost objects when an entry reduces the amount of keys
 	// for a given index.
-	Set(ctx context.Context, value V) error
+	Set(ctx context.Context, value V)
 
 	// Invalidate an object through specified index.
 	// Implementations may choose to instantly delete the object,

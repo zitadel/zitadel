@@ -17,7 +17,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/feature"
@@ -209,23 +208,16 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
 
-	instance, err := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
-	if err == nil {
+	instance, ok := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
+	if ok {
 		return instance, instance.checkDomain(instanceDomain, publicDomain)
 	}
-	// TBD: do we want to raise an Internal Server error here, or just try to continue on the database?
-	// For example, some cache implementations may not be H/A. Perhaps a Error log-line suffices?
-	if !errors.Is(err, cache.ErrCacheMiss) {
-		return nil, zerrors.ThrowInternal(err, "QUERY-aSaa6", "Errors.Internal")
-	}
-
 	instance, scan := scanAuthzInstance()
 	if err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain); err != nil {
 		return nil, err
 	}
-	if err = q.caches.instance.Set(ctx, instance); err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-quu2O", "Errors.Internal")
-	}
+	q.caches.instance.Set(ctx, instance)
+
 	return instance, instance.checkDomain(instanceDomain, publicDomain)
 }
 
@@ -233,21 +225,16 @@ func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	instance, err := q.caches.instance.Get(ctx, instanceIndexByID, id)
-	if err == nil {
+	instance, ok := q.caches.instance.Get(ctx, instanceIndexByID, id)
+	if ok {
 		return instance, nil
-	}
-	// TBD: do we want to raise an Internal Server error here, or just try to continue on the database?
-	// For example, some cache implementations may not be H/A. Perhaps a Error log-line suffices?
-	if !errors.Is(err, cache.ErrCacheMiss) {
-		return nil, zerrors.ThrowInternal(err, "QUERY-aSaa6", "Errors.Internal")
 	}
 
 	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
 	if err == nil {
-		err = q.caches.instance.Set(ctx, instance)
+		q.caches.instance.Set(ctx, instance)
 	}
 	return instance, err
 }

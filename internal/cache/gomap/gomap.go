@@ -2,9 +2,10 @@ package gomap
 
 import (
 	"context"
-	"io"
+	"errors"
 	"log/slog"
 	"maps"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -24,8 +25,9 @@ func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, 
 	m := &mapCache[I, K, V]{
 		config:   &config,
 		indexMap: make(map[I]*index[K, V], len(indices)),
-		logger: slog.New(slog.NewTextHandler(io.Discard, &slog.HandlerOptions{
-			Level: slog.LevelError + 1, // disabled
+		logger: slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			AddSource: true,
+			Level:     slog.LevelError,
 		})),
 	}
 	if config.Log != nil {
@@ -42,21 +44,24 @@ func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, 
 	return m
 }
 
-func (c *mapCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, err error) {
+func (c *mapCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, ok bool) {
 	i, ok := c.indexMap[index]
-	if !ok {
-		return value, cache.NewIndexUnknownErr(index)
+	if ok {
+		entry, err := i.Get(key)
+		if err == nil {
+			c.logger.DebugContext(ctx, "map cache get", "index", index, "key", key)
+			return entry.value, true
+		}
+		if errors.Is(err, cache.ErrCacheMiss) {
+			c.logger.InfoContext(ctx, "map cache get", "err", err, "index", index, "key", key)
+			return value, false
+		}
 	}
-	entry, err := i.Get(key)
-	if err != nil {
-		c.logger.InfoContext(ctx, "map cache get", "err", err, "index", index, "key", key)
-		return value, err
-	}
-	c.logger.DebugContext(ctx, "map cache get", "index", index, "key", key)
-	return entry.value, nil
+	c.logger.ErrorContext(ctx, "map cache get", "err", cache.NewIndexUnknownErr(index), "index", index, "key", key)
+	return value, false
 }
 
-func (c *mapCache[I, K, V]) Set(ctx context.Context, value V) error {
+func (c *mapCache[I, K, V]) Set(ctx context.Context, value V) {
 	entry := &entry[V]{
 		value:   value,
 		created: time.Now(),
@@ -67,7 +72,6 @@ func (c *mapCache[I, K, V]) Set(ctx context.Context, value V) error {
 		i.Set(keys, entry)
 		c.logger.DebugContext(ctx, "map cache set", "index", name, "keys", keys)
 	}
-	return nil
 }
 
 func (c *mapCache[I, K, V]) Invalidate(ctx context.Context, index I, keys ...K) error {

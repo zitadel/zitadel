@@ -5,8 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/zitadel/zitadel/internal/cache"
 )
 
@@ -48,6 +46,5 @@ func Test(t *testing.T) {
 		LastUseAge: time.Second / 4,
 	})
 	defer c.Close(context.Background())
-	err := c.Set(context.Background(), &testObject{})
-	require.NoError(t, err)
+	c.Set(context.Background(), &testObject{})
 }
