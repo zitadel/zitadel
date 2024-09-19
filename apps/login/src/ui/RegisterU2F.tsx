@@ -150,9 +150,7 @@ export default function RegisterU2F({
       if (sessionId) {
         paramsToContinue.append("sessionId", sessionId);
       }
-      if (authRequestId) {
-        paramsToContinue.append("authRequestId", authRequestId);
-      }
+
       if (loginName) {
         paramsToContinue.append("loginName", loginName);
       }
@@ -161,10 +159,19 @@ export default function RegisterU2F({
       }
 
       if (checkAfter) {
+        if (authRequestId) {
+          paramsToContinue.append("authRequestId", authRequestId);
+        }
         urlToContinue = `/u2f?` + paramsToContinue;
       } else if (authRequestId && sessionId) {
+        if (authRequestId) {
+          paramsToContinue.append("authRequest", authRequestId);
+        }
         urlToContinue = `/login?` + paramsToContinue;
       } else if (loginName) {
+        if (authRequestId) {
+          paramsToContinue.append("authRequestId", authRequestId);
+        }
         urlToContinue = `/signedin?` + paramsToContinue;
       }
 

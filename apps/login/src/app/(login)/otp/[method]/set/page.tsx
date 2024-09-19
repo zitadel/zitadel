@@ -69,9 +69,6 @@ export default async function Page({
   if (sessionId) {
     paramsToContinue.append("sessionId", sessionId);
   }
-  if (authRequestId) {
-    paramsToContinue.append("authRequestId", authRequestId);
-  }
   if (loginName) {
     paramsToContinue.append("loginName", loginName);
   }
@@ -80,14 +77,23 @@ export default async function Page({
   }
 
   if (checkAfter) {
+    if (authRequestId) {
+      paramsToContinue.append("authRequestId", authRequestId);
+    }
     urlToContinue = `/otp/${method}?` + paramsToContinue;
     // immediately check the OTP on the next page if sms or email was set up
     if (["email", "sms"].includes(method)) {
       return redirect(urlToContinue);
     }
   } else if (authRequestId && sessionId) {
+    if (authRequestId) {
+      paramsToContinue.append("authRequest", authRequestId);
+    }
     urlToContinue = `/login?` + paramsToContinue;
   } else if (loginName) {
+    if (authRequestId) {
+      paramsToContinue.append("authRequestId", authRequestId);
+    }
     urlToContinue = `/signedin?` + paramsToContinue;
   }
 

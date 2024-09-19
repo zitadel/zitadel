@@ -88,9 +88,6 @@ export default function SetPasswordForm({
     if (userResponse.factors?.user?.loginName) {
       params.append("loginName", userResponse.factors.user.loginName);
     }
-    if (authRequestId) {
-      params.append("authRequestId", authRequestId);
-    }
     if (organization) {
       params.append("organization", organization);
     }
@@ -102,8 +99,14 @@ export default function SetPasswordForm({
     // return router.push(`/verify?` + params);
 
     if (authRequestId && userResponse.sessionId) {
+      if (authRequestId) {
+        params.append("authRequest", authRequestId);
+      }
       return router.push(`/login?` + params);
     } else {
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
       return router.push(`/signedin?` + params);
     }
   }
