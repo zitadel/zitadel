@@ -7,7 +7,7 @@ We're excited to announce bi-weekly office hours.
 
 Dear community,
 
-This week's office hour is dedicated for you to drop by and ask any questions you may have about ZITADEL. We are happy to discuss anything from Actions to Zero downtime deployments. 
+This week's office hour is dedicated for you to drop by and ask any questions you may have about ZITADEL. We are happy to discuss anything, from Actions to Zero downtime deployments. 
 
 Join us on the stage or ask your questions in the chat next Wednesday in the office hours channel on Discord. We're looking forward to have a nice chat with you.
 
@@ -25,7 +25,7 @@ Join us on the stage or ask your questions in the chat next Wednesday in the off
 
 **In the meantime:**
 
-If you have questions upfront feel free to already post them in the chat of the [office hours channel](https://zitadel.com/office-hours) on our Discord server :gigi:
+If you have questions upfront, feel free to already post them in the chat of the [office hours channel](https://zitadel.com/office-hours) on our Discord server :gigi:
 
 We look forward to seeing you there\!
 
