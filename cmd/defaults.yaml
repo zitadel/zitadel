@@ -573,6 +573,7 @@ Actions:
     DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
       - localhost
       - "127.0.0.1"
+      - "::1"
 
 LogStore:
   Access:

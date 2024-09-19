@@ -47,9 +47,9 @@ Log:
 `},
 		want: func(t *testing.T, config *Config) {
 			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.DomainChecker{Domain: "localhost"},
-				&actions.IPChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.DomainChecker{Domain: "foobar"}})
+				&actions.HostChecker{Domain: "localhost"},
+				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&actions.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "actions deny list string ok",
@@ -63,9 +63,9 @@ Log:
 `},
 		want: func(t *testing.T, config *Config) {
 			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
-				&actions.DomainChecker{Domain: "localhost"},
-				&actions.IPChecker{IP: net.ParseIP("127.0.0.1")},
-				&actions.DomainChecker{Domain: "foobar"}})
+				&actions.HostChecker{Domain: "localhost"},
+				&actions.HostChecker{IP: net.ParseIP("127.0.0.1")},
+				&actions.HostChecker{Domain: "foobar"}})
 		},
 	}, {
 		name: "features ok",

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -19,17 +20,21 @@ import (
 func Test_isHostBlocked(t *testing.T) {
 	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil))
 	var denyList = []AddressChecker{
-		mustNewIPChecker(t, "192.168.5.0/24"),
-		mustNewIPChecker(t, "127.0.0.1"),
-		&DomainChecker{Domain: "test.com"},
+		mustNewHostChecker(t, "192.168.5.0/24"),
+		mustNewHostChecker(t, "127.0.0.1"),
+		mustNewHostChecker(t, "test.com"),
+	}
+	type fields struct {
+		lookup func(host string) ([]net.IP, error)
 	}
 	type args struct {
 		address *url.URL
 	}
 	tests := []struct {
-		name string
-		args args
-		want bool
+		name   string
+		fields fields
+		args   args
+		want   bool
 	}{
 		{
 			name: "in range",
@@ -47,6 +52,11 @@ func Test_isHostBlocked(t *testing.T) {
 		},
 		{
 			name: "address match",
+			fields: fields{
+				lookup: func(host string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("194.264.52.4")}, nil
+				},
+			},
 			args: args{
 				address: mustNewURL(t, "https://test.com:42/hodor"),
 			},
@@ -54,24 +64,44 @@ func Test_isHostBlocked(t *testing.T) {
 		},
 		{
 			name: "address not match",
+			fields: fields{
+				lookup: func(host string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("194.264.52.4")}, nil
+				},
+			},
 			args: args{
 				address: mustNewURL(t, "https://test2.com/hodor"),
 			},
 			want: false,
 		},
+		{
+			name: "looked up ip matches",
+			fields: fields{
+				lookup: func(host string) ([]net.IP, error) {
+					return []net.IP{net.ParseIP("127.0.0.1")}, nil
+				},
+			},
+			args: args{
+				address: mustNewURL(t, "https://test2.com/hodor"),
+			},
+			want: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isHostBlocked(denyList, tt.args.address); got != tt.want {
+			trans := &transport{
+				lookup: tt.fields.lookup,
+			}
+			if got := trans.isHostBlocked(denyList, tt.args.address); got != tt.want {
 				t.Errorf("isHostBlocked() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func mustNewIPChecker(t *testing.T, ip string) AddressChecker {
+func mustNewHostChecker(t *testing.T, ip string) AddressChecker {
 	t.Helper()
-	checker, err := NewIPChecker(ip)
+	checker, err := NewHostChecker(ip)
 	if err != nil {
 		t.Errorf("unable to parse cidr of %q because: %v", ip, err)
 		t.FailNow()
