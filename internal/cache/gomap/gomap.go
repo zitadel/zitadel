@@ -68,7 +68,6 @@ func (c *mapCache[I, K, V]) Set(ctx context.Context, value V) {
 	}
 	for name, i := range c.indexMap {
 		keys := value.Keys(name)
-		i.Invalidate(keys)
 		i.Set(keys, entry)
 		c.logger.DebugContext(ctx, "map cache set", "index", name, "keys", keys)
 	}
