@@ -33,7 +33,7 @@ func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, 
 	if config.Log != nil {
 		m.logger = config.Log.Slog()
 	}
-	m.logger.InfoContext(background, "map cache logging enabled", "level", config.Log.Level)
+	m.logger.InfoContext(background, "map cache logging enabled")
 
 	for _, name := range indices {
 		m.indexMap[name] = &index[K, V]{
@@ -62,10 +62,13 @@ func (c *mapCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, o
 }
 
 func (c *mapCache[I, K, V]) Set(ctx context.Context, value V) {
+	now := time.Now()
 	entry := &entry[V]{
 		value:   value,
-		created: time.Now(),
+		created: now,
 	}
+	entry.lastUse.Store(now.UnixMicro())
+
 	for name, i := range c.indexMap {
 		keys := value.Keys(name)
 		i.Set(keys, entry)
@@ -158,7 +161,7 @@ func (c *index[K, V]) Delete(keys []K) {
 func (c *index[K, V]) Prune() {
 	c.mutex.Lock()
 	maps.DeleteFunc(c.entries, func(_ K, entry *entry[V]) bool {
-		return entry.isValid(c.config)
+		return !entry.isValid(c.config)
 	})
 	c.mutex.Unlock()
 }
