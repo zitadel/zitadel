@@ -73,7 +73,7 @@ func (c *Config) SetLogger() (err error) {
 					}
 					entryCopy.Logger = lg
 					body, err = entryCopy.String()
-					return body
+					return strings.TrimSpace(body)
 				}),
 			)
 			if err != nil {
