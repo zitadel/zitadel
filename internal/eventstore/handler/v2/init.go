@@ -258,7 +258,7 @@ func NewViewCheck(selectStmt string, secondaryTables ...*SuffixedTable) *handler
 
 	return &handler.Check{
 		Executes: []func(handler.Executer, string) (bool, error){
-			execNextIfExists(config, create, nil, true),
+			execNextIfExists(config, create, nil, false),
 		},
 	}
 }

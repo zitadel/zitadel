@@ -592,7 +592,7 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements 
 	for i, statement := range statements {
 		select {
 		case <-ctx.Done():
-			return lastProcessedIndex, ctx.Err()
+			break
 		default:
 			err := h.executeStatement(ctx, tx, statement)
 			if err != nil {
@@ -609,7 +609,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *S
 		return nil
 	}
 
-	_, err = tx.ExecContext(ctx, "SAVEPOINT exec")
+	_, err = tx.ExecContext(ctx, "SAVEPOINT exec_stmt")
 	if err != nil {
 		h.log().WithError(err).Debug("create savepoint failed")
 		return err
