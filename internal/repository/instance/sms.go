@@ -33,7 +33,7 @@ type SMSConfigTwilioAddedEvent struct {
 	SID              string              `json:"sid,omitempty"`
 	Token            *crypto.CryptoValue `json:"token,omitempty"`
 	SenderNumber     string              `json:"senderNumber,omitempty"`
-	VerifyServiceSID string              `json:"verfiyServiceSid,omitempty"`
+	VerifyServiceSID string              `json:"verifyServiceSid,omitempty"`
 }
 
 func NewSMSConfigTwilioAddedEvent(

@@ -205,7 +205,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 		))
 	}
 
-	twilioColumns := make([]handler.Column, 0)
+	twilioColumns := make([]handler.Column, 0, 3)
 	if e.SID != nil {
 		twilioColumns = append(twilioColumns, handler.NewCol(SMSTwilioColumnSID, *e.SID))
 	}
@@ -213,7 +213,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 		twilioColumns = append(twilioColumns, handler.NewCol(SMSTwilioColumnSenderNumber, *e.SenderNumber))
 	}
 	if e.VerifyServiceSID != nil {
-		columns = append(columns, handler.NewCol(SMSTwilioColumnVerifyServiceSID, *e.VerifyServiceSID))
+		twilioColumns = append(twilioColumns, handler.NewCol(SMSTwilioColumnVerifyServiceSID, *e.VerifyServiceSID))
 	}
 	if len(twilioColumns) > 0 {
 		stmts = append(stmts, handler.AddUpdateStatement(

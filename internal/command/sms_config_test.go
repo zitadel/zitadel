@@ -82,8 +82,8 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				sms: &AddTwilioConfig{
-					ResourceOwner: "INSTANCE",
-					Description:   "description",
+					ResourceOwner:    "INSTANCE",
+					Description:      "description",
 					SID:              "sid",
 					Token:            "token",
 					SenderNumber:     "senderName",
@@ -217,12 +217,12 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				sms: &ChangeTwilioConfig{
-					ResourceOwner: "INSTANCE",
-					ID:            "providerid",
+					ResourceOwner:    "INSTANCE",
+					ID:               "providerid",
 					SID:              gu.Ptr("sid"),
 					Token:            gu.Ptr("token"),
 					SenderNumber:     gu.Ptr("senderName"),
-					VerifyServiceSID: "",
+					VerifyServiceSID: gu.Ptr(""),
 				},
 			},
 			res: res{
@@ -249,7 +249,8 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 									Algorithm:  "enc",
 									KeyID:      "id",
 									Crypted:    []byte("token"),
-								}, "",
+								},
+								"verifyServiceSid",
 							),
 						),
 					),
@@ -260,7 +261,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 							"sid2",
 							"senderName2",
 							"description2",
-							"",
+							"verifyServiceSid2",
 						),
 					),
 				),
@@ -268,13 +269,13 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				sms: &ChangeTwilioConfig{
-					ResourceOwner: "INSTANCE",
-					ID:            "providerid",
-					Description:   gu.Ptr("description2"),
-					SID:           gu.Ptr("sid2"),
-					Token:         gu.Ptr("token2"),
-					SenderNumber:  gu.Ptr("senderName2"),
-					VerifyServiceSID: gu.Ptr(""),
+					ResourceOwner:    "INSTANCE",
+					ID:               "providerid",
+					Description:      gu.Ptr("description2"),
+					SID:              gu.Ptr("sid2"),
+					Token:            gu.Ptr("token2"),
+					SenderNumber:     gu.Ptr("senderName2"),
+					VerifyServiceSID: gu.Ptr("verifyServiceSid2"),
 				},
 			},
 			res: res{

@@ -14,10 +14,11 @@ type AddTwilioConfig struct {
 	ResourceOwner string
 	ID            string
 
-	Description  string
-	SID          string
-	Token        string
-	SenderNumber string
+	Description      string
+	SID              string
+	Token            string
+	SenderNumber     string
+	VerifyServiceSID string
 }
 
 func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *AddTwilioConfig) (err error) {
@@ -67,10 +68,11 @@ type ChangeTwilioConfig struct {
 	ResourceOwner string
 	ID            string
 
-	Description  *string
-	SID          *string
-	Token        *string
-	SenderNumber *string
+	Description      *string
+	SID              *string
+	Token            *string
+	SenderNumber     *string
+	VerifyServiceSID *string
 }
 
 func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, config *ChangeTwilioConfig) (err error) {
