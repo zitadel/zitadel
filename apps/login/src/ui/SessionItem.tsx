@@ -2,14 +2,17 @@
 
 import { cleanupSession } from "@/lib/server/session";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import { timestampDate } from "@zitadel/client";
+import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
 import Link from "next/link";
 import { useState } from "react";
 import { Avatar } from "./Avatar";
 
-export function isSessionValid(session: Partial<Session>) {
+export function isSessionValid(session: Partial<Session>): {
+  valid: boolean;
+  verifiedAt?: Timestamp;
+} {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
   const stillValid = session.expirationDate
@@ -17,7 +20,7 @@ export function isSessionValid(session: Partial<Session>) {
     : true;
 
   const verifiedAt = validPassword || validPasskey;
-  const valid = (validPassword || validPasskey) && stillValid;
+  const valid = !!((validPassword || validPasskey) && stillValid);
 
   return { valid, verifiedAt };
 }

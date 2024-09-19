@@ -98,6 +98,8 @@ export default function SetPasswordForm({
     // skip verification for now as it is an app based flow
     // return router.push(`/verify?` + params);
 
+    // check for mfa force to continue with mfa setup
+
     if (authRequestId && userResponse.sessionId) {
       if (authRequestId) {
         params.append("authRequest", authRequestId);

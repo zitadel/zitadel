@@ -11,9 +11,25 @@ import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
 import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
 import DynamicTheme from "@/ui/DynamicTheme";
-import { isSessionValid } from "@/ui/SessionItem";
 import UserAvatar from "@/ui/UserAvatar";
+import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+
+export function isSessionValid(session: Partial<Session>): {
+  valid: boolean;
+  verifiedAt?: Timestamp;
+} {
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const stillValid = session.expirationDate
+    ? timestampDate(session.expirationDate) > new Date()
+    : true;
+
+  const verifiedAt = validPassword || validPasskey;
+  const valid = !!((validPassword || validPasskey) && stillValid);
+
+  return { valid, verifiedAt };
+}
 
 export default async function Page({
   searchParams,
@@ -83,6 +99,8 @@ export default async function Page({
     sessionWithData.factors?.user?.organizationId,
   );
 
+  const { valid } = isSessionValid(sessionWithData);
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
@@ -103,29 +121,28 @@ export default async function Page({
           <Alert>Provide your active session as loginName param</Alert>
         )}
 
-        {isSessionValid(sessionWithData).valid && (
+        {!valid && (
           <Alert>
             You have to have a valid session in order to set a second factor!
+            {/* TODO: show reauth button */}
           </Alert>
         )}
 
         {isSessionValid(sessionWithData).valid &&
-        loginSettings &&
-        sessionWithData ? (
-          <ChooseSecondFactorToSetup
-            loginName={loginName}
-            sessionId={sessionId}
-            authRequestId={authRequestId}
-            organization={organization}
-            loginSettings={loginSettings}
-            userMethods={sessionWithData.authMethods ?? []}
-            phoneVerified={sessionWithData.phoneVerified ?? false}
-            emailVerified={sessionWithData.emailVerified ?? false}
-            checkAfter={checkAfter === "true"}
-          ></ChooseSecondFactorToSetup>
-        ) : (
-          <Alert>No second factors available to setup.</Alert>
-        )}
+          loginSettings &&
+          sessionWithData && (
+            <ChooseSecondFactorToSetup
+              loginName={loginName}
+              sessionId={sessionId}
+              authRequestId={authRequestId}
+              organization={organization}
+              loginSettings={loginSettings}
+              userMethods={sessionWithData.authMethods ?? []}
+              phoneVerified={sessionWithData.phoneVerified ?? false}
+              emailVerified={sessionWithData.emailVerified ?? false}
+              checkAfter={checkAfter === "true"}
+            ></ChooseSecondFactorToSetup>
+          )}
 
         <div className="mt-8 flex w-full flex-row items-center">
           <BackButton />
