@@ -17,10 +17,15 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { create } from "@zitadel/client";
+import { create, fromJson, toJson } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { BrandingSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
+import { LegalAndSupportSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import {
+  IdentityProviderType,
+  LoginSettingsSchema,
+} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   SearchQuery,
@@ -52,11 +57,17 @@ export async function getBrandingSettings(organization?: string) {
     async () => {
       return await settingsService
         .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-        .then((resp) => resp.settings);
+        .then((resp) =>
+          resp.settings
+            ? toJson(BrandingSettingsSchema, resp.settings)
+            : undefined,
+        );
     },
     ["brandingSettings", organization ?? "default"],
     { revalidate: 3600, tags: ["brandingSettings"] },
-  )();
+  )().then((resp) =>
+    resp ? fromJson(BrandingSettingsSchema, resp) : undefined,
+  );
 }
 
 export async function getLoginSettings(orgId?: string) {
@@ -64,11 +75,15 @@ export async function getLoginSettings(orgId?: string) {
     async () => {
       return await settingsService
         .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
-        .then((resp) => resp.settings);
+        .then((resp) =>
+          resp.settings
+            ? toJson(LoginSettingsSchema, resp.settings)
+            : undefined,
+        );
     },
     ["loginSettings", orgId ?? "default"],
     { revalidate: 3600, tags: ["loginSettings"] },
-  )();
+  )().then((resp) => (resp ? fromJson(LoginSettingsSchema, resp) : undefined));
 }
 
 export async function addOTPEmail(userId: string) {
@@ -99,13 +114,17 @@ export async function getLegalAndSupportSettings(organization?: string) {
     async () => {
       return await settingsService
         .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-        .then((resp) => {
-          return resp.settings;
-        });
+        .then((resp) =>
+          resp.settings
+            ? toJson(LegalAndSupportSettingsSchema, resp.settings)
+            : undefined,
+        );
     },
     ["legalAndSupportSettings", organization ?? "default"],
     { revalidate: 3600, tags: ["legalAndSupportSettings"] },
-  )();
+  )().then((resp) =>
+    resp ? fromJson(LegalAndSupportSettingsSchema, resp) : undefined,
+  );
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
