@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/admin"
 )
 
 func UpdateLockoutPolicyToDomain(p *admin.UpdateLockoutPolicyRequest) *domain.LockoutPolicy {

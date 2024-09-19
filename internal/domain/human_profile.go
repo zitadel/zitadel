@@ -3,8 +3,8 @@ package domain
 import (
 	"golang.org/x/text/language"
 
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type Profile struct {

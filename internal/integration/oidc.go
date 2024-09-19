@@ -16,13 +16,13 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/pkg/grpc/app"
-	"github.com/zitadel/zitadel/pkg/grpc/authn"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/user"
-	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	oidc_internal "github.com/zitadel/zitadel/v2/internal/api/oidc"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/app"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/authn"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/user"
+	user_v2 "github.com/zitadel/zitadel/v2/pkg/grpc/user/v2"
 )
 
 func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {

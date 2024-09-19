@@ -3,8 +3,8 @@ package middleware
 import (
 	"net/http"
 
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/telemetry"
+	http_utils "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/telemetry"
 )
 
 func DefaultTelemetryHandler(handler http.Handler) http.Handler {

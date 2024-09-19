@@ -1,12 +1,12 @@
 package member
 
 import (
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/api/grpc/user"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	member_pb "github.com/zitadel/zitadel/pkg/grpc/member"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	member_pb "github.com/zitadel/zitadel/v2/pkg/grpc/member"
 )
 
 func MembersToPb(assetAPIPrefix string, members []*query.Member) []*member_pb.Member {

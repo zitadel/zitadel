@@ -11,10 +11,10 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
-	_ "github.com/zitadel/zitadel/internal/database/cockroach"
-	"github.com/zitadel/zitadel/internal/database/dialect"
-	_ "github.com/zitadel/zitadel/internal/database/postgres"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	_ "github.com/zitadel/zitadel/v2/internal/database/cockroach"
+	"github.com/zitadel/zitadel/v2/internal/database/dialect"
+	_ "github.com/zitadel/zitadel/v2/internal/database/postgres"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type Config struct {

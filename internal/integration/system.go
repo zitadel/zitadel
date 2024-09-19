@@ -10,8 +10,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/pkg/grpc/system"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 var (

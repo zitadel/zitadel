@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	v1 "github.com/zitadel/zitadel/pkg/grpc/v1"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/management"
+	v1 "github.com/zitadel/zitadel/v2/pkg/grpc/v1"
 )
 
 func TestServer_ImportData(t *testing.T) {

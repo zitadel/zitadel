@@ -7,12 +7,12 @@ import (
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
-	"github.com/zitadel/zitadel/internal/query"
-	idp_rp "github.com/zitadel/zitadel/internal/repository/idp"
-	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object/v2"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/idp/providers/azuread"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	idp_rp "github.com/zitadel/zitadel/v2/internal/repository/idp"
+	idp_pb "github.com/zitadel/zitadel/v2/pkg/grpc/idp/v2"
 )
 
 func (s *Server) GetIDPByID(ctx context.Context, req *idp_pb.GetIDPByIDRequest) (*idp_pb.GetIDPByIDResponse, error) {

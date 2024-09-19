@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/notification/channels/sms"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/sms"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 // GetActiveSMSConfig reads the active iam sms provider config

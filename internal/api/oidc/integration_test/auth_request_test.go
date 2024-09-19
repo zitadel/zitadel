@@ -14,12 +14,12 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/integration"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	http_utils "github.com/zitadel/zitadel/v2/internal/api/http"
+	oidc_api "github.com/zitadel/zitadel/v2/internal/api/oidc"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	oidc_pb "github.com/zitadel/zitadel/v2/pkg/grpc/oidc/v2"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/session/v2"
 )
 
 var (

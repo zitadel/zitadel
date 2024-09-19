@@ -3,9 +3,9 @@ package readmodel
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/org"
-	"github.com/zitadel/zitadel/internal/v2/projection"
+	"github.com/zitadel/zitadel/v2/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/v2/org"
+	"github.com/zitadel/zitadel/v2/internal/v2/projection"
 )
 
 type Org struct {

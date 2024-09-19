@@ -4,15 +4,15 @@ import (
 	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
 
-	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
-	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
+	idp_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/idp"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
+	idp_pb "github.com/zitadel/zitadel/v2/pkg/grpc/idp"
 )
 
 func addOIDCIDPRequestToDomain(req *admin_pb.AddOIDCIDPRequest) *domain.IDPConfig {

@@ -6,8 +6,8 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/idp"
 )
 
 const (

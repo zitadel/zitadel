@@ -3,7 +3,7 @@ package login
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 func (l *Login) getDefaultDomainPolicy(r *http.Request) (*query.DomainPolicy, error) {

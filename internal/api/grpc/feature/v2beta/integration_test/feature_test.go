@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	feature "github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2beta"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v2beta"
 )
 
 var (

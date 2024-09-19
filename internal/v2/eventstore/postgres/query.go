@@ -8,9 +8,9 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/v2/database"
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/v2/database"
+	"github.com/zitadel/zitadel/v2/internal/v2/eventstore"
 )
 
 func (s *Storage) Query(ctx context.Context, query *eventstore.Query) (eventCount int, err error) {

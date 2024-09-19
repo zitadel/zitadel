@@ -16,11 +16,11 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/protobuf/proto"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2"
+	oidc_pb "github.com/zitadel/zitadel/v2/pkg/grpc/oidc/v2"
 )
 
 func TestServer_Keys(t *testing.T) {

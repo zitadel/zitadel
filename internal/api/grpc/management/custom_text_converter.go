@@ -3,9 +3,9 @@ package management
 import (
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/text"
-	"github.com/zitadel/zitadel/internal/domain"
-	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/text"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	mgmt_pb "github.com/zitadel/zitadel/v2/pkg/grpc/management"
 )
 
 func SetInitCustomTextToDomain(msg *mgmt_pb.SetCustomInitMessageTextRequest) *domain.CustomMessageText {

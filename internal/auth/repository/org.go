@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	iam_model "github.com/zitadel/zitadel/v2/internal/iam/model"
 )
 
 type OrgRepository interface {

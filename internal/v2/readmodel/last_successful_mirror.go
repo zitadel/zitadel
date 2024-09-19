@@ -3,9 +3,9 @@ package readmodel
 import (
 	"github.com/shopspring/decimal"
 
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/system"
-	"github.com/zitadel/zitadel/internal/v2/system/mirror"
+	"github.com/zitadel/zitadel/v2/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/v2/system"
+	"github.com/zitadel/zitadel/v2/internal/v2/system/mirror"
 )
 
 type LastSuccessfulMirror struct {

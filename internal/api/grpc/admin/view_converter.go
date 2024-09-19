@@ -3,8 +3,8 @@ package admin
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/query"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
 )
 
 func CurrentSequencesToPb(database string, currentSequences *query.CurrentStates) []*admin_pb.View {

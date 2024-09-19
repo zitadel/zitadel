@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/user/model"
 )
 
 func TestAppendMFAOTPAddedEvent(t *testing.T) {

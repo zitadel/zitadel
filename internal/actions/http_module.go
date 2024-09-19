@@ -13,7 +13,7 @@ import (
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 func WithHTTP(ctx context.Context) Option {

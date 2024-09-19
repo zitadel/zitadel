@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
 
-	"github.com/zitadel/zitadel/internal/protoc/protoc-gen-authoption/authoption"
+	"github.com/zitadel/zitadel/v2/internal/protoc/protoc-gen-authoption/authoption"
 )
 
 var (

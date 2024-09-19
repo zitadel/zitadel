@@ -1,9 +1,9 @@
 package query
 
 import (
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
-	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/feature"
+	"github.com/zitadel/zitadel/v2/internal/repository/feature/feature_v2"
 )
 
 type SystemFeaturesReadModel struct {

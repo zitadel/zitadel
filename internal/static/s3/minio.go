@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/static"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/static"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 var _ static.Storage = (*Minio)(nil)

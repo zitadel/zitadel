@@ -5,14 +5,14 @@ import (
 
 	"github.com/muhlemmer/gu"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/feature"
-	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/command/preparation"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/feature"
+	"github.com/zitadel/zitadel/v2/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type InstanceFeatures struct {

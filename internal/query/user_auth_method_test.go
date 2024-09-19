@@ -12,9 +12,9 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 func TestUser_authMethodsCheckPermission(t *testing.T) {

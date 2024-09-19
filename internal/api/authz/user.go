@@ -3,7 +3,7 @@ package authz
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 // UserIDInCTX checks if the userID

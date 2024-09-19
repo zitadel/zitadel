@@ -19,10 +19,10 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
-	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	oidc_api "github.com/zitadel/zitadel/v2/internal/api/oidc"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2"
 )
 
 func setTokenExchangeFeature(t *testing.T, value bool) {

@@ -3,11 +3,11 @@ package user
 import (
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/server"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/crypto"
-	user "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/server"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	user "github.com/zitadel/zitadel/v2/pkg/grpc/resources/user/v3alpha"
 )
 
 var _ user.ZITADELUsersServer = (*Server)(nil)

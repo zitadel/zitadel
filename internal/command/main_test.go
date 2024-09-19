@@ -12,13 +12,13 @@ import (
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
-	"github.com/zitadel/zitadel/internal/feature"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/v2/internal/feature"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type expect func(mockRepository *mock.MockRepository)

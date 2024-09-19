@@ -3,7 +3,7 @@ package domain
 import (
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
 )
 
 const (

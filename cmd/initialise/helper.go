@@ -5,7 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/database"
 )
 
 func exec(db *database.DB, stmt string, possibleErrCodes []string, args ...interface{}) error {

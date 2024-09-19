@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 func ZitadelErrorToHTTPStatusCode(err error) (statusCode int, ok bool) {

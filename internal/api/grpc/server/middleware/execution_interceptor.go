@@ -8,13 +8,13 @@ import (
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/execution"
-	"github.com/zitadel/zitadel/internal/query"
-	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/execution"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	exec_repo "github.com/zitadel/zitadel/v2/internal/repository/execution"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {

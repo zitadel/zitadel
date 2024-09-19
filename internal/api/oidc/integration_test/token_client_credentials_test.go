@@ -12,10 +12,10 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
-	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/user"
+	oidc_api "github.com/zitadel/zitadel/v2/internal/api/oidc"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/user"
 )
 
 func TestServer_ClientCredentialsExchange(t *testing.T) {

@@ -3,10 +3,10 @@ package view
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
-	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	usr_view "github.com/zitadel/zitadel/v2/internal/user/repository/view"
+	"github.com/zitadel/zitadel/v2/internal/user/repository/view/model"
 )
 
 const (

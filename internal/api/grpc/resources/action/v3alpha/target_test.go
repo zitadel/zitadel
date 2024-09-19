@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	action "github.com/zitadel/zitadel/v2/pkg/grpc/resources/action/v3alpha"
 )
 
 func Test_createTargetToCommand(t *testing.T) {

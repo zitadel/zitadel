@@ -8,7 +8,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"sigs.k8s.io/yaml"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type ValidatableConfiguration interface {

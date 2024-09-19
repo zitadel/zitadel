@@ -13,8 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	milestone "github.com/zitadel/zitadel/internal/repository/milestone"
-	quota "github.com/zitadel/zitadel/internal/repository/quota"
+	milestone "github.com/zitadel/zitadel/v2/internal/repository/milestone"
+	quota "github.com/zitadel/zitadel/v2/internal/repository/quota"
 	gomock "go.uber.org/mock/gomock"
 )
 

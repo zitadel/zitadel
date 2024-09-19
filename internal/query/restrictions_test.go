@@ -10,7 +10,7 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/database"
 )
 
 var (

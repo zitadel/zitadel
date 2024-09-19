@@ -8,9 +8,9 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/repository/keypair"
 )
 
 func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string) error {

@@ -14,14 +14,14 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/integration/sink"
-	"github.com/zitadel/zitadel/pkg/grpc/app"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/object"
-	oidc_v2 "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/project"
-	"github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	"github.com/zitadel/zitadel/v2/internal/integration/sink"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/app"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/object"
+	oidc_v2 "github.com/zitadel/zitadel/v2/pkg/grpc/oidc/v2"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/project"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 func TestServer_TelemetryPushMilestones(t *testing.T) {

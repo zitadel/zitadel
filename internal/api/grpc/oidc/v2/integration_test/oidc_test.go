@@ -15,11 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/object/v2"
+	oidc_pb "github.com/zitadel/zitadel/v2/pkg/grpc/oidc/v2"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/session/v2"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/user/v2"
 )
 
 var (

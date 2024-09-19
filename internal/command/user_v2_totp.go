@@ -3,7 +3,7 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 func (c *Commands) AddUserTOTP(ctx context.Context, userID, resourceOwner string) (*domain.TOTP, error) {

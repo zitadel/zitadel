@@ -5,14 +5,14 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/notification/channels"
-	"github.com/zitadel/zitadel/internal/notification/channels/fs"
-	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
-	"github.com/zitadel/zitadel/internal/notification/channels/log"
-	"github.com/zitadel/zitadel/internal/notification/channels/sms"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/instrumenting"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/sms"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/webhook"
 )
 
 const twilioSpanName = "twilio.NotificationChannel"

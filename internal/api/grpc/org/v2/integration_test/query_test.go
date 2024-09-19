@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/org/v2"
 )
 
 type orgAttr struct {

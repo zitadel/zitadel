@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/feature"
-	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/feature"
+	"github.com/zitadel/zitadel/v2/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type SystemFeatures struct {

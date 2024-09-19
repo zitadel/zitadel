@@ -3,12 +3,12 @@ package webkey
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	resource_object "github.com/zitadel/zitadel/v2/internal/api/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	webkey "github.com/zitadel/zitadel/v2/pkg/grpc/resources/webkey/v3alpha"
 )
 
 func (s *Server) CreateWebKey(ctx context.Context, req *webkey.CreateWebKeyRequest) (_ *webkey.CreateWebKeyResponse, err error) {

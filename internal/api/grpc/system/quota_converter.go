@@ -4,8 +4,8 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/pkg/grpc/quota"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/quota"
 )
 
 type setQuotaRequest interface {

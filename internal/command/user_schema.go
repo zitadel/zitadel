@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
-	"github.com/zitadel/zitadel/internal/repository/user/schema"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	domain_schema "github.com/zitadel/zitadel/v2/internal/domain/schema"
+	"github.com/zitadel/zitadel/v2/internal/repository/user/schema"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type CreateUserSchema struct {

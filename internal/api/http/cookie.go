@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/securecookie"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 const (

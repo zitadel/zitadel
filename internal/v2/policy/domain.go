@@ -1,6 +1,6 @@
 package policy
 
-import "github.com/zitadel/zitadel/internal/v2/eventstore"
+import "github.com/zitadel/zitadel/v2/internal/v2/eventstore"
 
 const DomainPolicyAddedTypeSuffix = "policy.domain.added"
 

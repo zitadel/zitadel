@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/zitadel/zitadel/internal/crypto"
+import "github.com/zitadel/zitadel/v2/internal/crypto"
 
 type MFAState int32
 

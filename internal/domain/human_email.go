@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 var (

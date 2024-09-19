@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
 )
 
 func Test_composeOrigin(t *testing.T) {

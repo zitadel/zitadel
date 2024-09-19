@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/zitadel/zitadel/internal/telemetry/profiler/google"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/profiler/google"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type Config struct {

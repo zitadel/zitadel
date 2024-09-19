@@ -7,7 +7,7 @@ import (
 	grpc_trace "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 
-	grpc_utils "github.com/zitadel/zitadel/internal/api/grpc"
+	grpc_utils "github.com/zitadel/zitadel/v2/internal/api/grpc"
 )
 
 type GRPCMethod string

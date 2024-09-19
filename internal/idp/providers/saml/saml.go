@@ -11,9 +11,9 @@ import (
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/idp"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/idp"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 var _ idp.Provider = (*Provider)(nil)

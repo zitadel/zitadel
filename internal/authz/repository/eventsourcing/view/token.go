@@ -3,10 +3,10 @@ package view
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/query"
-	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
-	usr_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	usr_view "github.com/zitadel/zitadel/v2/internal/user/repository/view"
+	usr_view_model "github.com/zitadel/zitadel/v2/internal/user/repository/view/model"
 )
 
 const (

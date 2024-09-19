@@ -12,10 +12,10 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
-	schema "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/v2/pkg/grpc/resources/object/v3alpha"
+	schema "github.com/zitadel/zitadel/v2/pkg/grpc/resources/userschema/v3alpha"
 )
 
 func TestServer_CreateUserSchema(t *testing.T) {

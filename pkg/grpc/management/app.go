@@ -1,7 +1,7 @@
 package management
 
 import (
-	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/server/middleware"
 )
 
 func (a *ListAppsResponse) Localizers() []middleware.Localizer {

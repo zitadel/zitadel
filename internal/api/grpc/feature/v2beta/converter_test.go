@@ -8,12 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/feature"
-	"github.com/zitadel/zitadel/internal/query"
-	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/feature"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	feature_pb "github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2beta"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v2beta"
 )
 
 func Test_systemFeaturesToCommand(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
 )
 
 func TestAddressChanges(t *testing.T) {

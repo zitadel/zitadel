@@ -3,11 +3,11 @@ package debug_events
 import (
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/server"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/query"
-	debug_events "github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/server"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	debug_events "github.com/zitadel/zitadel/v2/pkg/grpc/resources/debug_events/v3alpha"
 )
 
 type Server struct {

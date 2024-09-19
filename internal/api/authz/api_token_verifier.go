@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 // TODO: Define interfaces where they are accepted

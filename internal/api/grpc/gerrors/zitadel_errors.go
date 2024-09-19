@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
-	"github.com/zitadel/zitadel/pkg/grpc/message"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/message"
 )
 
 func ZITADELToGRPCError(err error) error {

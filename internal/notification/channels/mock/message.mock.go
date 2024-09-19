@@ -12,7 +12,7 @@ package mock
 import (
 	reflect "reflect"
 
-	eventstore "github.com/zitadel/zitadel/internal/eventstore"
+	eventstore "github.com/zitadel/zitadel/v2/internal/eventstore"
 	gomock "go.uber.org/mock/gomock"
 )
 

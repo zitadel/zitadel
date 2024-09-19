@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/zitadel/zitadel/cmd"
+	"github.com/zitadel/zitadel/v2/cmd"
 )
 
 func main() {

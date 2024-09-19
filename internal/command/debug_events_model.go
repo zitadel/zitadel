@@ -1,9 +1,9 @@
 package command
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	debug "github.com/zitadel/zitadel/internal/repository/debug_events"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	debug "github.com/zitadel/zitadel/v2/internal/repository/debug_events"
 )
 
 type DebugEventsWriteModel struct {

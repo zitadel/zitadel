@@ -12,7 +12,7 @@ package mock
 import (
 	reflect "reflect"
 
-	channels "github.com/zitadel/zitadel/internal/notification/channels"
+	channels "github.com/zitadel/zitadel/v2/internal/notification/channels"
 	gomock "go.uber.org/mock/gomock"
 )
 

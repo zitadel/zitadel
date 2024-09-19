@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/pkg/grpc/user"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/user"
 )
 
 func TestAppendMFAU2FAddedEvent(t *testing.T) {

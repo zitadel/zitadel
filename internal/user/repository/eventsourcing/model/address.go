@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/logging"
 
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type Address struct {

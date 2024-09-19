@@ -3,7 +3,7 @@ package object
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/actions"
+	"github.com/zitadel/zitadel/v2/internal/actions"
 )
 
 // HTTPRequestField accepts the http.Request by value, so it's not mutated

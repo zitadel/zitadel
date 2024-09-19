@@ -9,11 +9,11 @@ import (
 	"github.com/spf13/viper"
 	"sigs.k8s.io/yaml"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	cryptoDB "github.com/zitadel/zitadel/v2/internal/crypto/database"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/database/dialect"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 const (

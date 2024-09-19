@@ -3,9 +3,9 @@ package system
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	objectpb "github.com/zitadel/zitadel/pkg/grpc/object"
-	"github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	objectpb "github.com/zitadel/zitadel/v2/pkg/grpc/object"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 func (s *Server) SetLimits(ctx context.Context, req *system.SetLimitsRequest) (*system.SetLimitsResponse, error) {

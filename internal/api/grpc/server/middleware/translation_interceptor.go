@@ -6,10 +6,10 @@ import (
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/i18n"
-	_ "github.com/zitadel/zitadel/internal/statik"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/i18n"
+	_ "github.com/zitadel/zitadel/v2/internal/statik"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 func TranslationHandler() func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {

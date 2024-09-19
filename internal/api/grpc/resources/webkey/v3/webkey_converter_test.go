@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/v2/pkg/grpc/resources/object/v3alpha"
+	webkey "github.com/zitadel/zitadel/v2/pkg/grpc/resources/webkey/v3alpha"
 )
 
 func Test_createWebKeyRequestToConfig(t *testing.T) {

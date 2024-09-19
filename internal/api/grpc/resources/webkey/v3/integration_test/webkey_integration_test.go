@@ -15,11 +15,11 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/v2/pkg/grpc/resources/object/v3alpha"
+	webkey "github.com/zitadel/zitadel/v2/pkg/grpc/resources/webkey/v3alpha"
 )
 
 var (

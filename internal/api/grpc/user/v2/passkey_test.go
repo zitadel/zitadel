@@ -11,11 +11,11 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/user/v2"
 )
 
 func Test_passkeyAuthenticatorToDomain(t *testing.T) {

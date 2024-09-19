@@ -5,10 +5,10 @@ import (
 
 	"github.com/dop251/goja"
 
-	"github.com/zitadel/zitadel/internal/actions"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/actions"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 func UserFromExternalUser(c *actions.FieldConfig, user *domain.ExternalUser) goja.Value {

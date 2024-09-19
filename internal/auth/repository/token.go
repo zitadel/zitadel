@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	usr_model "github.com/zitadel/zitadel/v2/internal/user/model"
 )
 
 type TokenRepository interface {

@@ -6,8 +6,8 @@ import (
 
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
-	"github.com/zitadel/zitadel/internal/idp"
-	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/v2/internal/idp"
+	"github.com/zitadel/zitadel/v2/internal/idp/providers/oidc"
 )
 
 // Session extends the [oidc.Session] with the formValues returned from the callback.

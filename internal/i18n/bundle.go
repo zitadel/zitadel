@@ -14,7 +14,7 @@ import (
 	"golang.org/x/text/language"
 	"sigs.k8s.io/yaml"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 const i18nPath = "/i18n"

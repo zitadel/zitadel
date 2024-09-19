@@ -1,6 +1,6 @@
 package mirror
 
-import "github.com/zitadel/zitadel/internal/v2/system"
+import "github.com/zitadel/zitadel/v2/internal/v2/system"
 
 const (
 	Creator         = "MIRROR"

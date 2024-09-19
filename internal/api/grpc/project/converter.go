@@ -1,11 +1,11 @@
 package project
 
 import (
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	proj_pb "github.com/zitadel/zitadel/v2/pkg/grpc/project"
 )
 
 func ProjectViewsToPb(projects []*query.Project) []*proj_pb.Project {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 func Test_extractBearerToken(t *testing.T) {

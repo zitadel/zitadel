@@ -1,8 +1,8 @@
 package email
 
 import (
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/webhook"
 )
 
 type Config struct {

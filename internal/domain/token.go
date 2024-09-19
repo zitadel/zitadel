@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
 )
 
 func AddAudScopeToAudience(ctx context.Context, audience, scopes []string) []string {

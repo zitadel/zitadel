@@ -1,6 +1,6 @@
 package migration
 
-import "github.com/zitadel/zitadel/internal/eventstore"
+import "github.com/zitadel/zitadel/v2/internal/eventstore"
 
 var _ eventstore.QueryReducer = (*StepStates)(nil)
 

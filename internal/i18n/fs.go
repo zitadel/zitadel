@@ -7,9 +7,9 @@ import (
 	"github.com/zitadel/logging"
 
 	// ensure fs is setup
-	_ "github.com/zitadel/zitadel/internal/api/ui/login/statik"
-	_ "github.com/zitadel/zitadel/internal/notification/statik"
-	_ "github.com/zitadel/zitadel/internal/statik"
+	_ "github.com/zitadel/zitadel/v2/internal/api/ui/login/statik"
+	_ "github.com/zitadel/zitadel/v2/internal/notification/statik"
+	_ "github.com/zitadel/zitadel/v2/internal/statik"
 )
 
 var zitadelFS, loginFS, notificationFS http.FileSystem

@@ -14,7 +14,7 @@ import (
 	io "io"
 	reflect "reflect"
 
-	static "github.com/zitadel/zitadel/internal/static"
+	static "github.com/zitadel/zitadel/v2/internal/static"
 	gomock "go.uber.org/mock/gomock"
 )
 

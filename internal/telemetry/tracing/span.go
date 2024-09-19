@@ -4,7 +4,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/gerrors"
 )
 
 type Span struct {

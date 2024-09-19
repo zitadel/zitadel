@@ -7,8 +7,8 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
-	"github.com/zitadel/zitadel/internal/static"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/static"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type Config struct {

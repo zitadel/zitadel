@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/notification/channels/email"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/email"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 // GetSMTPConfig reads the iam SMTP provider config

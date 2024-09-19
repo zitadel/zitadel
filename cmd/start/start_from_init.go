@@ -5,10 +5,10 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/cmd/initialise"
-	"github.com/zitadel/zitadel/cmd/key"
-	"github.com/zitadel/zitadel/cmd/setup"
-	"github.com/zitadel/zitadel/cmd/tls"
+	"github.com/zitadel/zitadel/v2/cmd/initialise"
+	"github.com/zitadel/zitadel/v2/cmd/key"
+	"github.com/zitadel/zitadel/v2/cmd/setup"
+	"github.com/zitadel/zitadel/v2/cmd/tls"
 )
 
 func NewStartFromInit(server chan<- *Server) *cobra.Command {

@@ -5,13 +5,13 @@ import (
 
 	"github.com/muhlemmer/gu"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	"github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	resource_object "github.com/zitadel/zitadel/v2/internal/api/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/resources/user/v3alpha"
 )
 
 func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (_ *user.CreateUserResponse, err error) {

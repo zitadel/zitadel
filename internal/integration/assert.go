@@ -10,7 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
+	resources_object "github.com/zitadel/zitadel/v2/pkg/grpc/resources/object/v3alpha"
 )
 
 // Details is the interface that covers both v1 and v2 proto generated object details.

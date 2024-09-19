@@ -5,7 +5,7 @@ import (
 	"net/smtp"
 	"slices"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 // golang net/smtp SMTP AUTH LOGIN or PLAIN Auth Handler

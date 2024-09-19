@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/zitadel/zitadel/internal/activity"
-	"github.com/zitadel/zitadel/internal/api/info"
+	"github.com/zitadel/zitadel/v2/internal/activity"
+	"github.com/zitadel/zitadel/v2/internal/api/info"
 )
 
 func UnaryActivityClientInterceptor() grpc.UnaryClientInterceptor {

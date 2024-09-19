@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 func projectWriteModelToProject(writeModel *ProjectWriteModel) *domain.Project {

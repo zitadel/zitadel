@@ -5,11 +5,11 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/projection"
-	"github.com/zitadel/zitadel/internal/v2/readmodel"
-	"github.com/zitadel/zitadel/internal/v2/system"
-	mirror_event "github.com/zitadel/zitadel/internal/v2/system/mirror"
+	"github.com/zitadel/zitadel/v2/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/v2/projection"
+	"github.com/zitadel/zitadel/v2/internal/v2/readmodel"
+	"github.com/zitadel/zitadel/v2/internal/v2/system"
+	mirror_event "github.com/zitadel/zitadel/v2/internal/v2/system/mirror"
 )
 
 func queryLastSuccessfulMigration(ctx context.Context, destinationES *eventstore.EventStore, source string) (*readmodel.LastSuccessfulMirror, error) {

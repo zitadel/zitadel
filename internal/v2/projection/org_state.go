@@ -1,8 +1,8 @@
 package projection
 
 import (
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/org"
+	"github.com/zitadel/zitadel/v2/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/v2/org"
 )
 
 type OrgState struct {

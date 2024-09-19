@@ -3,11 +3,11 @@ package webkey
 import (
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/server"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/query"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/server"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	webkey "github.com/zitadel/zitadel/v2/pkg/grpc/resources/webkey/v3alpha"
 )
 
 type Server struct {

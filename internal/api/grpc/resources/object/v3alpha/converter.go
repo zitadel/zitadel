@@ -5,12 +5,12 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/v2/pkg/grpc/resources/object/v3alpha"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails, ownerType object.OwnerType, ownerId string) *resource_object.Details {

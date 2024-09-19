@@ -3,11 +3,11 @@ package debug_events
 import (
 	"fmt"
 
-	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/query"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	debug_events "github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha"
+	resource_object "github.com/zitadel/zitadel/v2/internal/api/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	debug_events "github.com/zitadel/zitadel/v2/pkg/grpc/resources/debug_events/v3alpha"
 )
 
 func debugEventsFromRequest(req *debug_events.CreateDebugEventsRequest) *command.DebugEvents {

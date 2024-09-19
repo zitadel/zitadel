@@ -1,11 +1,11 @@
 package feature
 
 import (
-	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/feature"
-	"github.com/zitadel/zitadel/internal/query"
-	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	object "github.com/zitadel/zitadel/v2/internal/api/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/feature"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	feature_pb "github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2beta"
 )
 
 func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.SystemFeatures {

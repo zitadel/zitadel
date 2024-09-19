@@ -3,11 +3,11 @@ package debug_events
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	debug_events "github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	resource_object "github.com/zitadel/zitadel/v2/internal/api/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	debug_events "github.com/zitadel/zitadel/v2/pkg/grpc/resources/debug_events/v3alpha"
 )
 
 func (s *Server) CreateDebugEvents(ctx context.Context, req *debug_events.CreateDebugEventsRequest) (_ *debug_events.CreateDebugEventsResponse, err error) {

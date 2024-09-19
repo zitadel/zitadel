@@ -5,13 +5,13 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	domain_schema "github.com/zitadel/zitadel/v2/internal/domain/schema"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/user/schemauser"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type CreateSchemaUser struct {

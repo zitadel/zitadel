@@ -5,13 +5,13 @@ import (
 
 	"github.com/muhlemmer/gu"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
-	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
+	settings_pb "github.com/zitadel/zitadel/v2/pkg/grpc/settings"
 )
 
 func listSMSConfigsToModel(req *admin_pb.ListSMSProvidersRequest) (*query.SMSConfigsSearchQueries, error) {

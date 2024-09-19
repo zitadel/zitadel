@@ -4,7 +4,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 const (

@@ -6,13 +6,13 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	resource_object "github.com/zitadel/zitadel/v2/internal/api/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	action "github.com/zitadel/zitadel/v2/pkg/grpc/resources/action/v3alpha"
 )
 
 const (

@@ -8,9 +8,9 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	exec "github.com/zitadel/zitadel/internal/repository/execution"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	exec "github.com/zitadel/zitadel/v2/internal/repository/execution"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 var (

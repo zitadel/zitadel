@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 // resourceOwnerModel can be used to retrieve the resourceOwner of an aggregate

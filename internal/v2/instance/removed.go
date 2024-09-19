@@ -1,8 +1,8 @@
 package instance
 
 import (
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 const RemovedType = eventTypePrefix + "removed"

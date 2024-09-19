@@ -14,13 +14,13 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	db "github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/v2/database"
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	db "github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/database/dialect"
+	"github.com/zitadel/zitadel/v2/internal/id"
+	"github.com/zitadel/zitadel/v2/internal/v2/database"
+	"github.com/zitadel/zitadel/v2/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/v2/eventstore/postgres"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 var shouldIgnorePrevious bool

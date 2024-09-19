@@ -10,12 +10,12 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/actions"
-	"github.com/zitadel/zitadel/internal/actions/object"
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/idp"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/actions"
+	"github.com/zitadel/zitadel/v2/internal/actions/object"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/idp"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 func (l *Login) runPostExternalAuthenticationActions(

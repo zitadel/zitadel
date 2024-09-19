@@ -12,12 +12,12 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	zitadel_http "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/i18n"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	object_v3 "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
 )
 
 const (

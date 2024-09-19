@@ -6,8 +6,8 @@ import (
 
 	"github.com/dop251/goja"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/v2/internal/logstore"
+	"github.com/zitadel/zitadel/v2/internal/logstore/record"
 )
 
 func TestSetFields(t *testing.T) {

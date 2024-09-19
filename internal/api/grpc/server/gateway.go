@@ -19,10 +19,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
-	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	client_middleware "github.com/zitadel/zitadel/v2/internal/api/grpc/client/middleware"
+	http_utils "github.com/zitadel/zitadel/v2/internal/api/http"
+	http_mw "github.com/zitadel/zitadel/v2/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/metrics"
 )
 
 const (

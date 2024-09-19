@@ -3,11 +3,11 @@ package system
 import (
 	"context"
 
-	object_pb "github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
-	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
+	object_pb "github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
+	system_pb "github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 func (s *Server) SetInstanceFeature(ctx context.Context, req *system_pb.SetInstanceFeatureRequest) (*system_pb.SetInstanceFeatureResponse, error) {

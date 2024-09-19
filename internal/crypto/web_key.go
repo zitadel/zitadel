@@ -11,7 +11,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/muhlemmer/gu"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type KeyUsage int32

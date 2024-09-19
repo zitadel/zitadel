@@ -1,6 +1,6 @@
 package execution
 
-import "github.com/zitadel/zitadel/internal/eventstore"
+import "github.com/zitadel/zitadel/v2/internal/eventstore"
 
 func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SetEventType, eventstore.GenericEventMapper[SetEvent])

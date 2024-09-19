@@ -1,12 +1,12 @@
 package management
 
 import (
-	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/query"
-	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	idp_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/idp"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	policy_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/policy"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	mgmt_pb "github.com/zitadel/zitadel/v2/pkg/grpc/management"
 )
 
 func AddLoginPolicyToCommand(p *mgmt_pb.AddCustomLoginPolicyRequest) *command.AddLoginPolicy {

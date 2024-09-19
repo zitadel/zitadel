@@ -8,8 +8,8 @@ import (
 
 	"github.com/superseriousbusiness/exifremove/pkg/exifremove"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/static"
 )
 
 type AssetUpload struct {

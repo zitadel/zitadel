@@ -1,8 +1,8 @@
 package management
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
-	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	mgmt "github.com/zitadel/zitadel/v2/pkg/grpc/management"
 )
 
 func AddLockoutPolicyToDomain(p *mgmt.AddCustomLockoutPolicyRequest) *domain.LockoutPolicy {

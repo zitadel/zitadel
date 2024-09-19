@@ -1,9 +1,9 @@
 package view
 
 import (
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/iam/repository/view"
-	"github.com/zitadel/zitadel/internal/iam/repository/view/model"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/iam/repository/view"
+	"github.com/zitadel/zitadel/v2/internal/iam/repository/view/model"
 )
 
 const (

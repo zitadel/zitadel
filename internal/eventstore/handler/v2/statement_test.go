@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 type wantExecuter struct {

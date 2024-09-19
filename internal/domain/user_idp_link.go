@@ -1,6 +1,6 @@
 package domain
 
-import es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+import es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
 
 type UserIDPLink struct {
 	es_models.ObjectRoot

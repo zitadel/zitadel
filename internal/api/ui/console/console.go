@@ -17,11 +17,11 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/cmd/build"
-	"github.com/zitadel/zitadel/internal/api/authz"
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/http/middleware"
-	console_path "github.com/zitadel/zitadel/internal/api/ui/console/path"
+	"github.com/zitadel/zitadel/v2/cmd/build"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/api/http/middleware"
+	console_path "github.com/zitadel/zitadel/v2/internal/api/ui/console/path"
 )
 
 type Config struct {

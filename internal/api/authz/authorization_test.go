@@ -3,7 +3,7 @@ package authz
 import (
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type TestRequest struct {

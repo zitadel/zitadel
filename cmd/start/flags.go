@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/cmd/key"
-	"github.com/zitadel/zitadel/cmd/tls"
+	"github.com/zitadel/zitadel/v2/cmd/key"
+	"github.com/zitadel/zitadel/v2/cmd/tls"
 )
 
 var (

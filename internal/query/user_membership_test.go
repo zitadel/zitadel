@@ -11,7 +11,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/database"
 )
 
 var (

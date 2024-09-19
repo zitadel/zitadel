@@ -5,13 +5,13 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/query"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	object "github.com/zitadel/zitadel/v2/internal/api/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/i18n"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	object_pb "github.com/zitadel/zitadel/v2/pkg/grpc/object/v2beta"
+	settings "github.com/zitadel/zitadel/v2/pkg/grpc/settings/v2beta"
 )
 
 func (s *Server) GetLoginSettings(ctx context.Context, req *settings.GetLoginSettingsRequest) (*settings.GetLoginSettingsResponse, error) {

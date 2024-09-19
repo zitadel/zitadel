@@ -13,8 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
-	domain "github.com/zitadel/zitadel/internal/domain"
-	query "github.com/zitadel/zitadel/internal/query"
+	domain "github.com/zitadel/zitadel/v2/internal/domain"
+	query "github.com/zitadel/zitadel/v2/internal/query"
 	gomock "go.uber.org/mock/gomock"
 	language "golang.org/x/text/language"
 )

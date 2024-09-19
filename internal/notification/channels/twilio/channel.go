@@ -4,9 +4,9 @@ import (
 	"github.com/kevinburke/twilio-go"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/notification/channels"
-	"github.com/zitadel/zitadel/internal/notification/messages"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels"
+	"github.com/zitadel/zitadel/v2/internal/notification/messages"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 func InitChannel(config Config) channels.NotificationChannel {

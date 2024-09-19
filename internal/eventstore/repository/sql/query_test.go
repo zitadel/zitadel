@@ -13,12 +13,12 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/cockroach"
-	db_mock "github.com/zitadel/zitadel/internal/database/mock"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/database/cockroach"
+	db_mock "github.com/zitadel/zitadel/v2/internal/database/mock"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 func Test_getCondition(t *testing.T) {

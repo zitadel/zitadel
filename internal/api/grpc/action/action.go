@@ -3,11 +3,11 @@ package action
 import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
-	message_pb "github.com/zitadel/zitadel/pkg/grpc/message"
+	object_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	action_pb "github.com/zitadel/zitadel/v2/pkg/grpc/action"
+	message_pb "github.com/zitadel/zitadel/v2/pkg/grpc/message"
 )
 
 // for backward compatability: old enum identifiers are mapped as well

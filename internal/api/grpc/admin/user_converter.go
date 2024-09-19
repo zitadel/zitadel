@@ -4,10 +4,10 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	admin_grpc "github.com/zitadel/zitadel/pkg/grpc/admin"
+	user_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	admin_grpc "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
 )
 
 func setUpOrgHumanToCommand(human *admin_grpc.SetUpOrgRequest_Human) *command.AddHuman {

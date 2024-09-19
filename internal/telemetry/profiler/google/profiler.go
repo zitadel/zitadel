@@ -3,7 +3,7 @@ package google
 import (
 	"cloud.google.com/go/profiler"
 
-	"github.com/zitadel/zitadel/cmd/build"
+	"github.com/zitadel/zitadel/v2/cmd/build"
 )
 
 type Config struct {

@@ -7,9 +7,9 @@ import (
 
 	"github.com/benbjohnson/clock"
 
-	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/v2/internal/logstore"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/repository/quota"
 )
 
 var _ logstore.UsageStorer[*Record] = (*InmemLogStorage)(nil)

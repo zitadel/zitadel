@@ -1,10 +1,10 @@
 package user
 
 import (
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
-	user_model "github.com/zitadel/zitadel/internal/user/model"
-	"github.com/zitadel/zitadel/pkg/grpc/user"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	user_model "github.com/zitadel/zitadel/v2/internal/user/model"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/user"
 )
 
 func UserSessionsToPb(sessions []*user_model.UserSessionView, avatarPrefix string) []*user.Session {

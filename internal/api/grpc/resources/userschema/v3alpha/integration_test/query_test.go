@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
-	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
-	schema "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/resources/object/v3alpha"
+	schema "github.com/zitadel/zitadel/v2/pkg/grpc/resources/userschema/v3alpha"
 )
 
 func TestServer_ListUserSchemas(t *testing.T) {

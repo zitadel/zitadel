@@ -3,8 +3,8 @@ package domain
 import (
 	"regexp"
 
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 var colorRegex = regexp.MustCompile("^$|^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")

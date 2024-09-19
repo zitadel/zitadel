@@ -4,16 +4,16 @@ import (
 	"context"
 	"time"
 
-	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	query2 "github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	user_repo "github.com/zitadel/zitadel/internal/repository/user"
-	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	auth_view "github.com/zitadel/zitadel/v2/internal/auth/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/handler/v2"
+	query2 "github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/repository/instance"
+	"github.com/zitadel/zitadel/v2/internal/repository/org"
+	user_repo "github.com/zitadel/zitadel/v2/internal/repository/user"
+	view_model "github.com/zitadel/zitadel/v2/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 const (

@@ -6,10 +6,10 @@ import (
 	"slices"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/id"
+	"github.com/zitadel/zitadel/v2/internal/repository/quota"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type quotaWriteModel struct {

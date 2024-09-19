@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/feature/v2"
+	action "github.com/zitadel/zitadel/v2/pkg/grpc/resources/action/v3alpha"
 )
 
 var (

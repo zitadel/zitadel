@@ -4,15 +4,15 @@ import (
 	"context"
 	"html"
 
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/notification/channels/email"
-	"github.com/zitadel/zitadel/internal/notification/channels/sms"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/notification/senders"
-	"github.com/zitadel/zitadel/internal/notification/templates"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/i18n"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/email"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/sms"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/v2/internal/notification/senders"
+	"github.com/zitadel/zitadel/v2/internal/notification/templates"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 type Notify func(

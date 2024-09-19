@@ -17,12 +17,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
-	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v3alpha"
+	action "github.com/zitadel/zitadel/v2/pkg/grpc/resources/action/v3alpha"
+	resource_object "github.com/zitadel/zitadel/v2/pkg/grpc/resources/object/v3alpha"
 )
 
 func TestServer_ExecutionTarget(t *testing.T) {

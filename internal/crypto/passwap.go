@@ -16,7 +16,7 @@ import (
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/verifier"
 
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/v2/internal/zerrors"
 )
 
 type Hasher struct {
