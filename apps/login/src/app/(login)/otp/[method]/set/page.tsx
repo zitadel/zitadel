@@ -65,28 +65,21 @@ export default async function Page({
   const paramsToContinue = new URLSearchParams({});
   let urlToContinue = "/accounts";
 
-  if (authRequestId && sessionId) {
-    if (sessionId) {
-      paramsToContinue.append("sessionId", sessionId);
-    }
-    if (authRequestId) {
-      paramsToContinue.append("authRequestId", authRequestId);
-    }
-    if (organization) {
-      paramsToContinue.append("organization", organization);
-    }
+  if (sessionId) {
+    paramsToContinue.append("sessionId", sessionId);
+  }
+  if (authRequestId) {
+    paramsToContinue.append("authRequestId", authRequestId);
+  }
+  if (organization) {
+    paramsToContinue.append("organization", organization);
+  }
+
+  if (checkAfter) {
+    urlToContinue = `/otp/${method}?` + paramsToContinue;
+  } else if (authRequestId && sessionId) {
     urlToContinue = `/login?` + paramsToContinue;
   } else if (loginName) {
-    if (loginName) {
-      paramsToContinue.append("loginName", loginName);
-    }
-    if (authRequestId) {
-      paramsToContinue.append("authRequestId", authRequestId);
-    }
-    if (organization) {
-      paramsToContinue.append("organization", organization);
-    }
-
     urlToContinue = `/signedin?` + paramsToContinue;
   }
 
@@ -148,13 +141,8 @@ export default async function Page({
             <div className="mt-8 flex w-full flex-row items-center">
               <BackButton />
               <span className="flex-grow"></span>
-              <Link
-                href={
-                  checkAfter
-                    ? `/otp/${method}?` + new URLSearchParams()
-                    : urlToContinue
-                }
-              >
+
+              <Link href={urlToContinue}>
                 <Button
                   type="submit"
                   className="self-end"
