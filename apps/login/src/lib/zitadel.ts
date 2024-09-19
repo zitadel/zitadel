@@ -48,24 +48,27 @@ export const orgService = createOrganizationServiceClient(transport);
 export const settingsService = createSettingsServiceClient(transport);
 
 export async function getBrandingSettings(organization?: string) {
-  // return await settingsService
-  //   .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-  //   .then((resp) => resp.settings);
   return unstable_cache(
     async () => {
       return await settingsService
         .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
         .then((resp) => resp.settings);
     },
-    ["branding", organization ?? "default"],
-    { revalidate: 3600, tags: ["branding"] },
+    ["brandingSettings", organization ?? "default"],
+    { revalidate: 3600, tags: ["brandingSettings"] },
   )();
 }
 
 export async function getLoginSettings(orgId?: string) {
-  return settingsService
-    .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => resp.settings);
+  return unstable_cache(
+    async () => {
+      return await settingsService
+        .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
+        .then((resp) => resp.settings);
+    },
+    ["loginSettings", orgId ?? "default"],
+    { revalidate: 3600, tags: ["loginSettings"] },
+  )();
 }
 
 export async function addOTPEmail(userId: string) {
@@ -92,17 +95,29 @@ export async function getGeneralSettings() {
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
-  return settingsService
-    .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => {
-      return resp.settings;
-    });
+  return unstable_cache(
+    async () => {
+      return await settingsService
+        .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
+        .then((resp) => {
+          return resp.settings;
+        });
+    },
+    ["legalAndSupportSettings", organization ?? "default"],
+    { revalidate: 3600, tags: ["legalAndSupportSettings"] },
+  )();
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
-  return settingsService
-    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-    .then((resp) => resp.settings);
+  return unstable_cache(
+    async () => {
+      return await settingsService
+        .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
+        .then((resp) => resp.settings);
+    },
+    ["complexitySettings", organization ?? "default"],
+    { revalidate: 3600, tags: ["complexitySettings"] },
+  )();
 }
 
 export async function createSessionFromChecks(

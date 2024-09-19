@@ -32,7 +32,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
     users.details.totalResult !== BigInt(1) ||
     !users.result[0].userId
   ) {
-    return { error: "Could not find user" };
+    return { error: "Could not send Password Reset Link" };
   }
   const userId = users.result[0].userId;
 
