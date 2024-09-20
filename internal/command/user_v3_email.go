@@ -6,8 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -31,24 +29,22 @@ func (s *ChangeSchemaUserEmail) Valid() (err error) {
 	return nil
 }
 
-func existingSchemaUserEmail(ctx context.Context, c *Commands, resourceOwner, userID string) (*UserV3WriteModel, error) {
-	writeModel, err := c.getSchemaUserEmailWriteModelByID(ctx, resourceOwner, userID)
-	if err != nil {
-		return nil, err
-	}
-	return writeModel, nil
-}
-
 func (c *Commands) ChangeSchemaUserEmail(ctx context.Context, user *ChangeSchemaUserEmail, alg crypto.EncryptionAlgorithm) (_ *domain.ObjectDetails, err error) {
 	if err := user.Valid(); err != nil {
 		return nil, err
 	}
 
-	writeModel, err := existingSchemaUserEmail(ctx, c, user.ResourceOwner, user.ID)
+	writeModel, err := c.getSchemaUserEmailWriteModelByID(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return nil, err
 	}
-	events, plainCode, err := c.updateSchemaUserEmail(ctx, writeModel, nil, user.Email, alg)
+
+	events, plainCode, err := writeModel.NewEmailUpdated(ctx,
+		user.Email,
+		func(ctx context.Context) (*EncryptedCode, error) {
+			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +58,7 @@ func (c *Commands) VerifySchemaUserEmail(ctx context.Context, resourceOwner, id,
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-y3n4Sdu8j5", "Errors.IDMissing")
 	}
-	writeModel, err := existingSchemaUserEmail(ctx, c, resourceOwner, id)
+	writeModel, err := c.getSchemaUserEmailWriteModelByID(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +87,7 @@ func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSc
 	if user.ID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-KvPc5o9GeJ", "Errors.IDMissing")
 	}
-	writeModel, err := existingSchemaUserEmail(ctx, c, user.ResourceOwner, user.ID)
+	writeModel, err := c.getSchemaUserEmailWriteModelByID(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -110,61 +106,4 @@ func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSc
 		user.PlainCode = plainCode
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
-}
-
-type EmailUpdate interface {
-	EmailCodeGenerate
-	GetAddress() domain.EmailAddress
-	IsVerified() bool
-}
-
-func (c *Commands) updateSchemaUserEmail(ctx context.Context, writeModel *UserV3WriteModel, events []eventstore.Command, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	if events == nil {
-		events = []eventstore.Command{}
-	}
-
-	updateEvents, plainCode, err := writeModel.NewEmailUpdatedEvents(ctx,
-		email,
-		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
-		},
-	)
-	if err != nil {
-		return nil, "", err
-	}
-	return append(events, updateEvents...), plainCode, nil
-}
-
-type EmailVerify interface {
-	GetCode() string
-}
-
-func (c *Commands) verifySchemaUserEmail(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, email EmailVerify, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	if err := crypto.VerifyCode(existing.EmailCode.CreationDate, existing.EmailCode.Expiry, existing.EmailCode.Code, email.GetCode(), alg); err != nil {
-		return events, plainCode, err
-	}
-	return append(events, schemauser.NewEmailVerifiedEvent(ctx, UserV3AggregateFromWriteModel(&existing.WriteModel))), "", nil
-}
-
-type EmailCodeGenerate interface {
-	IsReturnCode() bool
-	GetURLTemplate() string
-}
-
-func (c *Commands) generateSchemaUserEmailCode(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, email EmailCodeGenerate, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	cryptoCode, err := c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
-	if err != nil {
-		return nil, "", err
-	}
-	if email.IsReturnCode() {
-		plainCode = cryptoCode.Plain
-	}
-	events = append(events, schemauser.NewEmailCodeAddedEvent(ctx,
-		UserV3AggregateFromWriteModel(&existing.WriteModel),
-		cryptoCode.Crypted,
-		cryptoCode.Expiry,
-		email.GetURLTemplate(),
-		email.IsReturnCode(),
-	))
-	return events, plainCode, nil
 }

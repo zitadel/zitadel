@@ -240,7 +240,7 @@ func (wm *UserV3WriteModel) NewCreated(
 	}
 
 	if phone != nil {
-		phoneEvents, plainCodePhone, err := wm.NewPhoneCreatedEvents(ctx,
+		phoneEvents, plainCodePhone, err := wm.NewPhoneCreated(ctx,
 			phone,
 			code,
 		)
@@ -329,7 +329,7 @@ func (wm *UserV3WriteModel) NewUpdated(
 		events = append(events, userEvents...)
 	}
 	if email != nil {
-		emailEvents, plainCodeEmail, err := wm.NewEmailUpdatedEvents(ctx,
+		emailEvents, plainCodeEmail, err := wm.NewEmailUpdated(ctx,
 			email,
 			code,
 		)
@@ -343,7 +343,7 @@ func (wm *UserV3WriteModel) NewUpdated(
 	}
 
 	if phone != nil {
-		phoneEvents, plainCodePhone, err := wm.NewPhoneCreatedEvents(ctx,
+		phoneEvents, plainCodePhone, err := wm.NewPhoneCreated(ctx,
 			phone,
 			code,
 		)
@@ -469,7 +469,7 @@ func (wm *UserV3WriteModel) NewEmailCreatedEvents(
 	return events, plainCode, nil
 }
 
-func (wm *UserV3WriteModel) NewEmailUpdatedEvents(
+func (wm *UserV3WriteModel) NewEmailUpdated(
 	ctx context.Context,
 	email *Email,
 	code func(context.Context) (*EncryptedCode, error),
@@ -558,7 +558,7 @@ func (wm *UserV3WriteModel) newEmailCodeAddedEvent(
 	), plainCode, nil
 }
 
-func (wm *UserV3WriteModel) NewPhoneCreatedEvents(
+func (wm *UserV3WriteModel) NewPhoneCreated(
 	ctx context.Context,
 	phone *Phone,
 	code func(context.Context) (*EncryptedCode, error),
@@ -590,7 +590,7 @@ func (wm *UserV3WriteModel) NewPhoneCreatedEvents(
 	return events, plainCode, nil
 }
 
-func (wm *UserV3WriteModel) NewPhoneUpdatedEvents(
+func (wm *UserV3WriteModel) NewPhoneUpdated(
 	ctx context.Context,
 	phone *Phone,
 	code func(context.Context) (*EncryptedCode, error),
@@ -601,29 +601,7 @@ func (wm *UserV3WriteModel) NewPhoneUpdatedEvents(
 	if !wm.Exists() {
 		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-z2u8u7jylQ", "Errors.User.NotFound")
 	}
-	return wm.NewPhoneCreatedEvents(ctx, phone, code)
-}
-
-func (wm *UserV3WriteModel) NewPhoneVerify(
-	ctx context.Context,
-	verify func(creationDate time.Time, expiry time.Duration, cryptoCode *crypto.CryptoValue) error,
-) ([]eventstore.Command, error) {
-	if !wm.PhoneWM {
-		return nil, nil
-	}
-	if !wm.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Tmmf8mhTOI", "Errors.User.NotFound")
-	}
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
-		return nil, err
-	}
-	if wm.PhoneCode == nil {
-		return nil, nil
-	}
-	if err := verify(wm.PhoneCode.CreationDate, wm.PhoneCode.Expiry, wm.PhoneCode.Code); err != nil {
-		return nil, err
-	}
-	return []eventstore.Command{wm.newPhoneVerifiedEvent(ctx)}, nil
+	return wm.NewPhoneCreated(ctx, phone, code)
 }
 
 func (wm *UserV3WriteModel) newPhoneVerifiedEvent(
@@ -632,29 +610,6 @@ func (wm *UserV3WriteModel) newPhoneVerifiedEvent(
 	return schemauser.NewPhoneVerifiedEvent(ctx, UserV3AggregateFromWriteModel(&wm.WriteModel))
 }
 
-func (wm *UserV3WriteModel) NewResendPhoneCode(
-	ctx context.Context,
-	code func(context.Context) (*EncryptedCode, error),
-	isReturnCode bool,
-) (_ []eventstore.Command, plainCode string, err error) {
-	if !wm.PhoneWM {
-		return nil, "", nil
-	}
-	if !wm.Exists() {
-		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-6jaTsYTDIL", "Errors.User.NotFound")
-	}
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
-		return nil, "", err
-	}
-	if wm.EmailCode == nil {
-		return nil, "", zerrors.ThrowPreconditionFailed(err, "COMMAND-dVF7ByBgQm", "Errors.User.Code.Empty")
-	}
-	event, plainCode, err := wm.newPhoneCodeAddedEvent(ctx, code, isReturnCode)
-	if err != nil {
-		return nil, "", err
-	}
-	return []eventstore.Command{event}, plainCode, nil
-}
 func (wm *UserV3WriteModel) newPhoneCodeAddedEvent(
 	ctx context.Context,
 	code func(context.Context) (*EncryptedCode, error),

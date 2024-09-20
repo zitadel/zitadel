@@ -42,7 +42,7 @@ func setEmailToEmail(setEmail *user.SetEmail) *command.Email {
 	return &command.Email{
 		Address:     domain.EmailAddress(setEmail.Address),
 		ReturnCode:  setEmail.GetReturnCode() != nil,
-		Verified:    setEmail.GetIsVerified() == true,
+		Verified:    setEmail.GetIsVerified(),
 		URLTemplate: setEmail.GetSendCode().GetUrlTemplate(),
 	}
 }
