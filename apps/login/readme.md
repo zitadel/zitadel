@@ -165,7 +165,7 @@ After updating the session, the user is **always** signed in. :warning: required
 
 ### /mfa/set
 
-This page loads login Settings and the authentication methods for a user and shows setup options.
+This page loads login settings and the authentication methods for a user and shows setup options.
 
 <img src="./screenshots/mfaset.png" alt="/mfa/set" width="400px" />
 
