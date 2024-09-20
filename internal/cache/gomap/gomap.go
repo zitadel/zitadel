@@ -46,18 +46,19 @@ func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, 
 
 func (c *mapCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, ok bool) {
 	i, ok := c.indexMap[index]
-	if ok {
-		entry, err := i.Get(key)
-		if err == nil {
-			c.logger.DebugContext(ctx, "map cache get", "index", index, "key", key)
-			return entry.value, true
-		}
-		if errors.Is(err, cache.ErrCacheMiss) {
-			c.logger.InfoContext(ctx, "map cache get", "err", err, "index", index, "key", key)
-			return value, false
-		}
+	if !ok {
+		c.logger.ErrorContext(ctx, "map cache get", "err", cache.NewIndexUnknownErr(index), "index", index, "key", key)
+		return value, false
 	}
-	c.logger.ErrorContext(ctx, "map cache get", "err", cache.NewIndexUnknownErr(index), "index", index, "key", key)
+	entry, err := i.Get(key)
+	if err == nil {
+		c.logger.DebugContext(ctx, "map cache get", "index", index, "key", key)
+		return entry.value, true
+	}
+	if errors.Is(err, cache.ErrCacheMiss) {
+		c.logger.InfoContext(ctx, "map cache get", "err", err, "index", index, "key", key)
+		return value, false
+	}
 	return value, false
 }
 

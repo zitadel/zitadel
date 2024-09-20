@@ -21,12 +21,12 @@ type PrunerCache[I, K comparable, V Entry[I, K]] interface {
 
 type AutoPruneConfig struct {
 	// Interval at which the cache is automatically pruned.
-	// 0 disables automatic pruning.
+	// 0 or lower disables automatic pruning.
 	Interval time.Duration
 
 	// Timeout for an automatic prune.
 	// It is recommended to keep the value shorter than AutoPruneInterval
-	// 0 disables timeouts.
+	// 0 or lower disables automatic pruning.
 	Timeout time.Duration
 }
 
