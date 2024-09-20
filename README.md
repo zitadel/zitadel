@@ -50,6 +50,8 @@ the features will be extended.
 This list should show the current implementation state, and also what is missing.
 You can already use the current state, and extend it with your needs.
 
+#### Features list
+
 - [x] Local User Registration (with Password)
 - [x] User Registration and Login with external Provider
   - [x] Google
