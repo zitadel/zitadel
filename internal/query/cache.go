@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/cache/gomap"
 	"github.com/zitadel/zitadel/internal/cache/noop"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 type Caches struct {
@@ -74,9 +75,21 @@ type invalidator[I comparable] interface {
 	Invalidate(ctx context.Context, index I, key ...string) error
 }
 
-func cacheInvalidationFunc[I comparable](cache invalidator[I], index I) func(context.Context, ...string) {
-	return func(ctx context.Context, aggregateIDs ...string) {
-		err := cache.Invalidate(ctx, index, aggregateIDs...)
+func cacheInvalidationFunc[I comparable](cache invalidator[I], index I, getID func(*eventstore.Aggregate) string) func(context.Context, []*eventstore.Aggregate) {
+	return func(ctx context.Context, aggregates []*eventstore.Aggregate) {
+		ids := make([]string, len(aggregates))
+		for i, aggregate := range aggregates {
+			ids[i] = getID(aggregate)
+		}
+		err := cache.Invalidate(ctx, index, ids...)
 		logging.OnError(err).Warn("cache invalidation failed")
 	}
+}
+
+func getAggregateID(aggregate *eventstore.Aggregate) string {
+	return aggregate.ID
+}
+
+func getResourceOwner(aggregate *eventstore.Aggregate) string {
+	return aggregate.ResourceOwner
 }

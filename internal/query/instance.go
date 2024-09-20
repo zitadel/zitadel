@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -579,16 +580,19 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 }
 
 func (c *Caches) registerInstanceInvalidation() {
-	invalidate := cacheInvalidationFunc(c.instance, instanceIndexByID)
+	invalidate := cacheInvalidationFunc(c.instance, instanceIndexByID, getAggregateID)
 	projection.InstanceProjection.RegisterCacheInvalidation(invalidate)
 	projection.InstanceDomainProjection.RegisterCacheInvalidation(invalidate)
 	projection.InstanceFeatureProjection.RegisterCacheInvalidation(invalidate)
 	projection.InstanceTrustedDomainProjection.RegisterCacheInvalidation(invalidate)
-	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
 	projection.SecurityPolicyProjection.RegisterCacheInvalidation(invalidate)
 
+	// limits uses own aggregate ID, invalidate using resource owner.
+	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
+	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
+
 	// System feature update should invalidate all instances, so Truncate the cache.
-	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ ...string) {
+	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {
 		err := c.instance.Truncate(ctx)
 		logging.OnError(err).Warn("cache truncate failed")
 	})

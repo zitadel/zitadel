@@ -62,7 +62,7 @@ type Handler struct {
 	triggeredInstancesSync sync.Map
 
 	triggerWithoutEvents Reduce
-	cacheInvalidations   []func(ctx context.Context, aggregateIDs ...string)
+	cacheInvalidations   []func(ctx context.Context, aggregates []*eventstore.Aggregate)
 }
 
 var _ migration.Migration = (*Handler)(nil)
@@ -421,7 +421,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 
 // RegisterCacheInvalidation registers a function to be called when a cache needs to be invalidated.
 // In order to avoid race conditions, this method must be called before [Handler.Start] is called.
-func (h *Handler) RegisterCacheInvalidation(invalidate func(ctx context.Context, aggregateIDs ...string)) {
+func (h *Handler) RegisterCacheInvalidation(invalidate func(ctx context.Context, aggregates []*eventstore.Aggregate)) {
 	h.cacheInvalidations = append(h.cacheInvalidations, invalidate)
 }
 
@@ -519,7 +519,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 			err = commitErr
 		}
 		if err == nil && currentState.aggregateID != "" && len(statements) > 0 {
-			h.invalidateCaches(ctx, aggregateIDsFromStatements(statements)...)
+			h.invalidateCaches(ctx, aggregatesFromStatements(statements))
 		}
 	}()
 
@@ -536,8 +536,8 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 
 	currentState.position = statements[lastProcessedIndex].Position
 	currentState.offset = statements[lastProcessedIndex].offset
-	currentState.aggregateID = statements[lastProcessedIndex].AggregateID
-	currentState.aggregateType = statements[lastProcessedIndex].AggregateType
+	currentState.aggregateID = statements[lastProcessedIndex].Aggregate.ID
+	currentState.aggregateType = statements[lastProcessedIndex].Aggregate.Type
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
 	err = h.setState(tx, currentState)
@@ -570,8 +570,8 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
-		currentState.aggregateID = statements[len(statements)-1].AggregateID
-		currentState.aggregateType = statements[len(statements)-1].AggregateType
+		currentState.aggregateID = statements[len(statements)-1].Aggregate.ID
+		currentState.aggregateType = statements[len(statements)-1].Aggregate.Type
 		currentState.sequence = statements[len(statements)-1].Sequence
 		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
 
@@ -591,8 +591,8 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
 	for i, statement := range statements {
 		if statement.Position.Equal(currentState.position) &&
-			statement.AggregateID == currentState.aggregateID &&
-			statement.AggregateType == currentState.aggregateType &&
+			statement.Aggregate.ID == currentState.aggregateID &&
+			statement.Aggregate.Type == currentState.aggregateType &&
 			statement.Sequence == currentState.sequence {
 			return i
 		}
@@ -681,7 +681,7 @@ func (h *Handler) ProjectionName() string {
 	return h.projection.Name()
 }
 
-func (h *Handler) invalidateCaches(ctx context.Context, aggregateIDs ...string) {
+func (h *Handler) invalidateCaches(ctx context.Context, aggregates []*eventstore.Aggregate) {
 	if len(h.cacheInvalidations) == 0 {
 		return
 	}
@@ -690,22 +690,24 @@ func (h *Handler) invalidateCaches(ctx context.Context, aggregateIDs ...string) 
 	wg.Add(len(h.cacheInvalidations))
 
 	for _, invalidate := range h.cacheInvalidations {
-		go func(invalidate func(context.Context, ...string)) {
+		go func(invalidate func(context.Context, []*eventstore.Aggregate)) {
 			defer wg.Done()
-			invalidate(ctx, aggregateIDs...)
+			invalidate(ctx, aggregates)
 		}(invalidate)
 	}
 	wg.Wait()
 }
 
-// aggregateIDsFromStatements returns the unique aggregate IDs from statements.
-// Duplicate aggregate IDs are omitted.
-func aggregateIDsFromStatements(statements []*Statement) []string {
-	ids := make([]string, 0, len(statements))
+// aggregatesFromStatements returns the unique aggregates from statements.
+// Duplicate aggregates are omitted.
+func aggregatesFromStatements(statements []*Statement) []*eventstore.Aggregate {
+	aggregates := make([]*eventstore.Aggregate, 0, len(statements))
 	for _, statement := range statements {
-		if !slices.Contains(ids, statement.AggregateID) {
-			ids = append(ids, statement.AggregateID)
+		if !slices.ContainsFunc(aggregates, func(aggregate *eventstore.Aggregate) bool {
+			return *statement.Aggregate == *aggregate
+		}) {
+			aggregates = append(aggregates, statement.Aggregate)
 		}
 	}
-	return ids
+	return aggregates
 }
