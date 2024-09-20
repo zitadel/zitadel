@@ -36,8 +36,10 @@ import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
-const CACHE_REVALIDATION_INTERVAL_IN_SECONDS =
-  Number(process.env.CACHE_REVALIDATION_INTERVAL_IN_SECONDS) ?? 3600;
+const CACHE_REVALIDATION_INTERVAL_IN_SECONDS = process.env
+  .CACHE_REVALIDATION_INTERVAL_IN_SECONDS
+  ? Number(process.env.CACHE_REVALIDATION_INTERVAL_IN_SECONDS)
+  : 3600;
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
