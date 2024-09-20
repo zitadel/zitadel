@@ -24,17 +24,17 @@
     }
   },
   "devDependencies": {
-    "@changesets/cli": "^2.22.0",
+    "@changesets/cli": "^2.27.8",
     "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "8.57.0",
+    "eslint": "8.57.1",
     "eslint-config-zitadel": "workspace:*",
     "@zitadel/prettier-config": "workspace:*",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^4.0.0",
-    "tsup": "^8.2.4",
-    "turbo": "2.0.12",
-    "typescript": "^5.4.5",
+    "tsup": "^8.3.0",
+    "turbo": "2.1.2",
+    "typescript": "^5.6.2",
     "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "^2.0.5"
+    "vitest": "^2.1.1"
   }
 }
