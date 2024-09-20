@@ -35,7 +35,9 @@ import {
 import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
-const SESSION_LIFETIME_S = 3600;
+const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
+const CACHE_REVALIDATION_INTERVAL_IN_SECONDS =
+  Number(process.env.CACHE_REVALIDATION_INTERVAL_IN_SECONDS) ?? 3600;
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
@@ -65,7 +67,10 @@ export async function getBrandingSettings(organization?: string) {
         );
     },
     ["brandingSettings", organization ?? "default"],
-    { revalidate: 3600, tags: ["brandingSettings"] },
+    {
+      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
+      tags: ["brandingSettings"],
+    },
   )().then((resp) =>
     resp ? fromJson(BrandingSettingsSchema, resp) : undefined,
   );
@@ -83,7 +88,10 @@ export async function getLoginSettings(orgId?: string) {
         );
     },
     ["loginSettings", orgId ?? "default"],
-    { revalidate: 3600, tags: ["loginSettings"] },
+    {
+      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
+      tags: ["loginSettings"],
+    },
   )().then((resp) => (resp ? fromJson(LoginSettingsSchema, resp) : undefined));
 }
 
@@ -122,7 +130,10 @@ export async function getLegalAndSupportSettings(organization?: string) {
         );
     },
     ["legalAndSupportSettings", organization ?? "default"],
-    { revalidate: 3600, tags: ["legalAndSupportSettings"] },
+    {
+      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
+      tags: ["legalAndSupportSettings"],
+    },
   )().then((resp) =>
     resp ? fromJson(LegalAndSupportSettingsSchema, resp) : undefined,
   );
@@ -140,7 +151,10 @@ export async function getPasswordComplexitySettings(organization?: string) {
         );
     },
     ["complexitySettings", organization ?? "default"],
-    { revalidate: 3600, tags: ["complexitySettings"] },
+    {
+      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
+      tags: ["complexitySettings"],
+    },
   )().then((resp) =>
     resp ? fromJson(PasswordComplexitySettingsSchema, resp) : undefined,
   );
