@@ -102,7 +102,7 @@ Requests to the APIs made:
 - `getSession()`
 - `updateSession()`
 
-**MFA AVAILABLE:** After the password has been submitted, additional authentication Methods are loaded.
+**MFA AVAILABLE:** After the password has been submitted, additional authentication methods are loaded.
 If the user has set up an additional **single** second factor, it is redirected to add the next factor. Depending on the available method he is redirected to `/otp/time-based`,`/otp/sms?`, `/otp/email?` or `/u2f?`. If the user has multiple second factors, he is redirected to `/mfa` to select his preferred method to continue.
 
 **NO MFA, FORCE MFA:** If no MFA method is available, and the settings force MFA, the user is sent to `/mfa/set` which prompts to setup a second factor.
