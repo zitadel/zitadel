@@ -75,6 +75,9 @@ func NewUsernameCreatedEvent(
 			aggregate,
 			UsernameCreatedType,
 		),
+		UserID:        userID,
+		IsOrgSpecific: isOrgSpecific,
+		Username:      username,
 	}
 }
 
