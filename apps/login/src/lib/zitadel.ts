@@ -17,10 +17,16 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { create } from "@zitadel/client";
+import { create, fromJson, toJson } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { BrandingSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
+import { LegalAndSupportSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import {
+  IdentityProviderType,
+  LoginSettingsSchema,
+} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   SearchQuery,
@@ -29,7 +35,9 @@ import {
 import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
-const SESSION_LIFETIME_S = 3600;
+const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
+const CACHE_REVALIDATION_INTERVAL_IN_SECONDS =
+  Number(process.env.CACHE_REVALIDATION_INTERVAL_IN_SECONDS) ?? 3600;
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
@@ -52,17 +60,39 @@ export async function getBrandingSettings(organization?: string) {
     async () => {
       return await settingsService
         .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-        .then((resp) => resp.settings);
+        .then((resp) =>
+          resp.settings
+            ? toJson(BrandingSettingsSchema, resp.settings)
+            : undefined,
+        );
     },
-    ["branding"],
-    { revalidate: 3600, tags: ["branding"] },
-  )();
+    ["brandingSettings", organization ?? "default"],
+    {
+      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
+      tags: ["brandingSettings"],
+    },
+  )().then((resp) =>
+    resp ? fromJson(BrandingSettingsSchema, resp) : undefined,
+  );
 }
 
 export async function getLoginSettings(orgId?: string) {
-  return settingsService
-    .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => resp.settings);
+  return unstable_cache(
+    async () => {
+      return await settingsService
+        .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
+        .then((resp) =>
+          resp.settings
+            ? toJson(LoginSettingsSchema, resp.settings)
+            : undefined,
+        );
+    },
+    ["loginSettings", orgId ?? "default"],
+    {
+      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
+      tags: ["loginSettings"],
+    },
+  )().then((resp) => (resp ? fromJson(LoginSettingsSchema, resp) : undefined));
 }
 
 export async function addOTPEmail(userId: string) {
@@ -74,39 +104,11 @@ export async function addOTPEmail(userId: string) {
   );
 }
 
-export async function addOTPSMS(userId: string, token?: string) {
-  // TODO: Follow up here, I do not understand the branching
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
-
+export async function addOTPSMS(userId: string) {
   return userService.addOTPSMS({ userId }, {});
 }
 
-export async function registerTOTP(userId: string, token?: string) {
-  // TODO: Follow up here, I do not understand the branching
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+export async function registerTOTP(userId: string) {
   return userService.registerTOTP({ userId }, {});
 }
 
@@ -117,17 +119,45 @@ export async function getGeneralSettings() {
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
-  return settingsService
-    .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => {
-      return resp.settings;
-    });
+  return unstable_cache(
+    async () => {
+      return await settingsService
+        .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
+        .then((resp) =>
+          resp.settings
+            ? toJson(LegalAndSupportSettingsSchema, resp.settings)
+            : undefined,
+        );
+    },
+    ["legalAndSupportSettings", organization ?? "default"],
+    {
+      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
+      tags: ["legalAndSupportSettings"],
+    },
+  )().then((resp) =>
+    resp ? fromJson(LegalAndSupportSettingsSchema, resp) : undefined,
+  );
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
-  return settingsService
-    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-    .then((resp) => resp.settings);
+  return unstable_cache(
+    async () => {
+      return await settingsService
+        .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
+        .then((resp) =>
+          resp.settings
+            ? toJson(PasswordComplexitySettingsSchema, resp.settings)
+            : undefined,
+        );
+    },
+    ["complexitySettings", organization ?? "default"],
+    {
+      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
+      tags: ["complexitySettings"],
+    },
+  )().then((resp) =>
+    resp ? fromJson(PasswordComplexitySettingsSchema, resp) : undefined,
+  );
 }
 
 export async function createSessionFromChecks(
@@ -442,7 +472,6 @@ export function createUser(
   info: IDPInformation,
 ) {
   const userData = PROVIDER_MAPPING[provider](info);
-  console.log("ud", userData);
   return userService.addHumanUser(userData, {});
 }
 
@@ -451,7 +480,7 @@ export function createUser(
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function passwordReset(userId: string): Promise<any> {
+export async function passwordReset(userId: string) {
   return userService.passwordReset(
     {
       userId,
@@ -466,24 +495,18 @@ export async function passwordReset(userId: string): Promise<any> {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
+
+// TODO check for token requirements!
 export async function createPasskeyRegistrationLink(
   userId: string,
-  token?: string,
+  // token: string,
 ) {
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+  // const transport = createServerTransport(token, {
+  //   baseUrl: process.env.ZITADEL_API_URL!,
+  //   httpVersion: "2",
+  // });
 
+  // const service = createUserServiceClient(transport);
   return userService.createPasskeyRegistrationLink({
     userId,
     medium: {
@@ -499,7 +522,19 @@ export async function createPasskeyRegistrationLink(
  * @param domain the domain on which the factor is registered
  * @returns the newly set email
  */
-export async function registerU2F(userId: string, domain: string) {
+
+// TODO check for token requirements!
+export async function registerU2F(
+  userId: string,
+  domain: string,
+  // token: string,
+) {
+  // const transport = createServerTransport(token, {
+  //   baseUrl: process.env.ZITADEL_API_URL!,
+  //   httpVersion: "2",
+  // });
+
+  // const service = createUserServiceClient(transport);
   return userService.registerU2F({
     userId,
     domain,
@@ -550,7 +585,6 @@ export async function registerPasskey(
     userId,
     code,
     domain,
-    // authenticator:
   });
 }
 

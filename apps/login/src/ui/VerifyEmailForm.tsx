@@ -60,9 +60,8 @@ export default function VerifyEmailForm({
     setLoading(true);
     const response = await resendVerifyEmail({
       userId,
-    }).catch((error: Error) => {
-      setLoading(false);
-      setError(error.message);
+    }).catch(() => {
+      setError("Could not resend email");
     });
 
     setLoading(false);
@@ -74,9 +73,8 @@ export default function VerifyEmailForm({
     const verifyResponse = await verifyUserByEmail({
       code: value.code,
       userId,
-    }).catch((error: Error) => {
-      setLoading(false);
-      setError(error.message ?? "Could not verify email");
+    }).catch(() => {
+      setError("Could not verify email");
     });
 
     setLoading(false);

@@ -15,6 +15,10 @@ export default async function Page({
   const { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
+  if (!organization) {
+    // TODO: get default organization
+  }
+
   const setPassword = !!(firstname && lastname && email);
 
   const legal = await getLegalAndSupportSettings(organization);

@@ -55,8 +55,8 @@ export default function ChangePasswordForm({
       sessionId: sessionId,
       userId: userId,
       password: values.password,
-    }).catch((error: Error) => {
-      setError(error.message ?? "Could not change password");
+    }).catch(() => {
+      setError("Could not change password");
     });
 
     setLoading(false);

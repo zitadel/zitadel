@@ -158,6 +158,14 @@ export default function LoginOTP({
           params.append("organization", organization);
         }
 
+        if (authRequestId) {
+          params.append("authRequest", authRequestId);
+        }
+
+        if (sessionId) {
+          params.append("sessionId", sessionId);
+        }
+
         return router.push(`/login?` + params);
       } else {
         const params = new URLSearchParams();

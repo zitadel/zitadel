@@ -111,7 +111,7 @@ describe("login", () => {
         cy.get('button[type="submit"]').click();
         cy.location("pathname", { timeout: 10_000 }).should(
           "eq",
-          "/passkey/add",
+          "/passkey/set",
         );
       });
     });
@@ -156,12 +156,9 @@ describe("login", () => {
         },
       });
     });
-    it("should redirect a user with passwordless authentication to /passkey/login", () => {
+    it("should redirect a user with passwordless authentication to /passkey", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      cy.location("pathname", { timeout: 10_000 }).should(
-        "eq",
-        "/passkey/login",
-      );
+      cy.location("pathname", { timeout: 10_000 }).should("eq", "/passkey");
     });
   });
 });

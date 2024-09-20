@@ -1,6 +1,6 @@
 "use client";
 
-import { registerUser } from "@/lib/server/register";
+import { registerUser, RegisterUserResponse } from "@/lib/server/register";
 import {
   lowerCaseValidator,
   numberValidator,
@@ -65,9 +65,13 @@ export default function SetPasswordForm({
       organization: organization,
       authRequestId: authRequestId,
       password: values.password,
-    }).catch((error: Error) => {
-      setError(error.message ?? "Could not register user");
+    }).catch(() => {
+      setError("Could not register user");
     });
+
+    if (response && "error" in response) {
+      setError(response.error);
+    }
 
     setLoading(false);
 
@@ -76,22 +80,36 @@ export default function SetPasswordForm({
       return;
     }
 
-    const params = new URLSearchParams({ userId: response.userId });
+    const userResponse = response as RegisterUserResponse;
 
-    if (response.factors?.user?.loginName) {
-      params.append("loginName", response.factors.user.loginName);
-    }
-    if (authRequestId) {
-      params.append("authRequestId", authRequestId);
+    const params = new URLSearchParams({ userId: userResponse.userId });
+
+    if (userResponse.factors?.user?.loginName) {
+      params.append("loginName", userResponse.factors.user.loginName);
     }
     if (organization) {
       params.append("organization", organization);
     }
-    if (response && response.sessionId) {
-      params.append("sessionId", response.sessionId);
+    if (userResponse && userResponse.sessionId) {
+      params.append("sessionId", userResponse.sessionId);
     }
 
-    return router.push(`/verify?` + params);
+    // skip verification for now as it is an app based flow
+    // return router.push(`/verify?` + params);
+
+    // check for mfa force to continue with mfa setup
+
+    if (authRequestId && userResponse.sessionId) {
+      if (authRequestId) {
+        params.append("authRequest", authRequestId);
+      }
+      return router.push(`/login?` + params);
+    } else {
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+      return router.push(`/signedin?` + params);
+    }
   }
 
   const { errors } = formState;

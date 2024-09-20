@@ -49,7 +49,12 @@ export async function registerPasskeyLink(
     throw new Error("Could not get session");
   }
   // TODO: add org context
-  const registerLink = await createPasskeyRegistrationLink(userId);
+
+  // use session token to add the passkey
+  const registerLink = await createPasskeyRegistrationLink(
+    userId,
+    // sessionCookie.token,
+  );
 
   if (!registerLink.code) {
     throw new Error("Missing code in response");

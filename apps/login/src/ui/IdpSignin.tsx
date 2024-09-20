@@ -34,7 +34,6 @@ export default function IdpSignin({
         idpIntentToken,
       },
       authRequestId,
-      // organization: props.organization,
     })
       .then((session) => {
         if (authRequestId && session && session.id) {

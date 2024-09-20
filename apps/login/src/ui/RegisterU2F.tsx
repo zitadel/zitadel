@@ -2,6 +2,7 @@
 
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Alert from "./Alert";
@@ -9,18 +10,20 @@ import BackButton from "./BackButton";
 import { Button, ButtonVariants } from "./Button";
 import { Spinner } from "./Spinner";
 
-type Inputs = {};
-
 type Props = {
+  loginName?: string;
   sessionId: string;
   authRequestId?: string;
   organization?: string;
+  checkAfter: boolean;
 };
 
 export default function RegisterU2F({
+  loginName,
   sessionId,
   organization,
   authRequestId,
+  checkAfter,
 }: Props) {
   const [error, setError] = useState<string>("");
 
@@ -34,16 +37,20 @@ export default function RegisterU2F({
     publicKeyCredential: any,
     sessionId: string,
   ) {
+    setError("");
     setLoading(true);
     const response = await verifyU2F({
       u2fId,
       passkeyName,
       publicKeyCredential,
       sessionId,
-    }).catch((error: Error) => {
-      setLoading(false);
-      setError(error.message);
+    }).catch(() => {
+      setError("An error on verifying passkey occurred");
     });
+
+    if (response && "error" in response && response?.error) {
+      setError(response?.error);
+    }
 
     setLoading(false);
 
@@ -55,20 +62,26 @@ export default function RegisterU2F({
     setLoading(true);
     const response = await addU2F({
       sessionId,
-    }).catch((error) => {
-      setLoading(false);
-      setError(error.message);
+    }).catch(() => {
+      setError("An error on registering passkey");
     });
 
-    if (!response) {
-      setLoading(false);
+    setLoading(false);
+
+    if (response && "error" in response && response?.error) {
+      setError(response?.error);
+    }
+
+    if (!response || !("u2fId" in response)) {
       setError("An error on registering passkey");
       return;
     }
 
-    const u2fId = response?.u2fId;
+    const u2fResponse = response as unknown as RegisterU2FResponse;
+
+    const u2fId = u2fResponse.u2fId;
     const options: CredentialCreationOptions =
-      (response?.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
+      (u2fResponse?.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
       {};
 
     if (options.publicKey) {
@@ -128,22 +141,38 @@ export default function RegisterU2F({
         return;
       }
 
-      const params = new URLSearchParams();
+      const paramsToContinue = new URLSearchParams({});
+      let urlToContinue = "/accounts";
 
+      if (sessionId) {
+        paramsToContinue.append("sessionId", sessionId);
+      }
+
+      if (loginName) {
+        paramsToContinue.append("loginName", loginName);
+      }
       if (organization) {
-        params.set("organization", organization);
+        paramsToContinue.append("organization", organization);
       }
 
-      if (authRequestId) {
-        params.set("authRequestId", authRequestId);
-        params.set("sessionId", sessionId);
-        // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
-        // params.set("loginName", resp.loginName);
-
-        router.push("/u2f?" + params);
-      } else {
-        router.push("/accounts?" + params);
+      if (checkAfter) {
+        if (authRequestId) {
+          paramsToContinue.append("authRequestId", authRequestId);
+        }
+        urlToContinue = `/u2f?` + paramsToContinue;
+      } else if (authRequestId && sessionId) {
+        if (authRequestId) {
+          paramsToContinue.append("authRequest", authRequestId);
+        }
+        urlToContinue = `/login?` + paramsToContinue;
+      } else if (loginName) {
+        if (authRequestId) {
+          paramsToContinue.append("authRequestId", authRequestId);
+        }
+        urlToContinue = `/signedin?` + paramsToContinue;
       }
+
+      router.push(urlToContinue);
     }
 
     setLoading(false);

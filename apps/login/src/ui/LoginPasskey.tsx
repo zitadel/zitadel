@@ -50,19 +50,20 @@ export default function LoginPasskey({
           const pK =
             response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions
               ?.publicKey;
-          if (pK) {
-            submitLoginAndContinue(pK)
-              .then(() => {
-                setLoading(false);
-              })
-              .catch((error) => {
-                setError(error);
-                setLoading(false);
-              });
-          } else {
+
+          if (!pK) {
             setError("Could not request passkey challenge");
             setLoading(false);
           }
+
+          return submitLoginAndContinue(pK)
+            .then(() => {
+              setLoading(false);
+            })
+            .catch((error) => {
+              setError(error);
+              setLoading(false);
+            });
         })
         .catch((error) => {
           setError(error);
@@ -89,8 +90,8 @@ export default function LoginPasskey({
         },
       }),
       authRequestId,
-    }).catch((error: Error) => {
-      setError(error.message);
+    }).catch(() => {
+      setError("Could not request passkey challenge");
     });
     setLoading(false);
 
@@ -107,8 +108,8 @@ export default function LoginPasskey({
         webAuthN: { credentialAssertionData: data },
       } as Checks,
       authRequestId,
-    }).catch((error: Error) => {
-      setError(error.message);
+    }).catch(() => {
+      setError("Could not verify passkey");
     });
 
     setLoading(false);
@@ -135,64 +136,62 @@ export default function LoginPasskey({
         publicKey,
       })
       .then((assertedCredential: any) => {
-        if (assertedCredential) {
-          const authData = new Uint8Array(
-            assertedCredential.response.authenticatorData,
-          );
-          const clientDataJSON = new Uint8Array(
-            assertedCredential.response.clientDataJSON,
-          );
-          const rawId = new Uint8Array(assertedCredential.rawId);
-          const sig = new Uint8Array(assertedCredential.response.signature);
-          const userHandle = new Uint8Array(
-            assertedCredential.response.userHandle,
-          );
-          const data = {
-            id: assertedCredential.id,
-            rawId: coerceToBase64Url(rawId, "rawId"),
-            type: assertedCredential.type,
-            response: {
-              authenticatorData: coerceToBase64Url(authData, "authData"),
-              clientDataJSON: coerceToBase64Url(
-                clientDataJSON,
-                "clientDataJSON",
-              ),
-              signature: coerceToBase64Url(sig, "sig"),
-              userHandle: coerceToBase64Url(userHandle, "userHandle"),
-            },
-          };
-          return submitLogin(data).then((resp) => {
-            if (authRequestId && resp && resp.sessionId) {
-              return router.push(
-                `/login?` +
-                  new URLSearchParams({
-                    sessionId: resp.sessionId,
-                    authRequest: authRequestId,
-                  }),
-              );
-            } else {
-              const params = new URLSearchParams({});
-
-              if (authRequestId) {
-                params.set("authRequestId", authRequestId);
-              }
-              if (resp?.factors?.user?.loginName) {
-                params.set("loginName", resp.factors.user.loginName);
-              }
-
-              return router.push(`/signedin?` + params);
-            }
-          });
-        } else {
+        if (!assertedCredential) {
           setLoading(false);
           setError("An error on retrieving passkey");
-          return null;
+          return;
         }
+
+        const authData = new Uint8Array(
+          assertedCredential.response.authenticatorData,
+        );
+        const clientDataJSON = new Uint8Array(
+          assertedCredential.response.clientDataJSON,
+        );
+        const rawId = new Uint8Array(assertedCredential.rawId);
+        const sig = new Uint8Array(assertedCredential.response.signature);
+        const userHandle = new Uint8Array(
+          assertedCredential.response.userHandle,
+        );
+        const data = {
+          id: assertedCredential.id,
+          rawId: coerceToBase64Url(rawId, "rawId"),
+          type: assertedCredential.type,
+          response: {
+            authenticatorData: coerceToBase64Url(authData, "authData"),
+            clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
+            signature: coerceToBase64Url(sig, "sig"),
+            userHandle: coerceToBase64Url(userHandle, "userHandle"),
+          },
+        };
+
+        return submitLogin(data).then((resp) => {
+          if (authRequestId && resp && resp.sessionId) {
+            return router.push(
+              `/login?` +
+                new URLSearchParams({
+                  sessionId: resp.sessionId,
+                  authRequest: authRequestId,
+                }),
+            );
+          } else {
+            const params = new URLSearchParams({});
+
+            if (authRequestId) {
+              params.set("authRequestId", authRequestId);
+            }
+            if (resp?.factors?.user?.loginName) {
+              params.set("loginName", resp.factors.user.loginName);
+            }
+
+            return router.push(`/signedin?` + params);
+          }
+        });
       })
       .catch((error) => {
+        // we log this error to the console, as it is not a critical error
         console.error(error);
         setLoading(false);
-        //   setError(error);
         return null;
       });
   }
@@ -245,7 +244,27 @@ export default function LoginPasskey({
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading}
-          onClick={() => updateSessionForChallenge()}
+          onClick={async () => {
+            const response = await updateSessionForChallenge();
+
+            const pK =
+              response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions
+                ?.publicKey;
+
+            if (!pK) {
+              setError("Could not request passkey challenge");
+              setLoading(false);
+            }
+
+            return submitLoginAndContinue(pK)
+              .then(() => {
+                setLoading(false);
+              })
+              .catch((error) => {
+                setError(error);
+                setLoading(false);
+              });
+          }}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

@@ -13,6 +13,7 @@ import TOTPRegister from "@/ui/TOTPRegister";
 import UserAvatar from "@/ui/UserAvatar";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function Page({
   searchParams,
@@ -31,8 +32,7 @@ export default async function Page({
     organization,
   });
 
-  let totpResponse: RegisterTOTPResponse | undefined,
-    totpError: Error | undefined;
+  let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
       await registerTOTP(session.factors.user.id)
@@ -41,15 +41,19 @@ export default async function Page({
             totpResponse = resp;
           }
         })
-        .catch((error) => {
-          totpError = error;
+        .catch((err) => {
+          error = err;
         });
     } else if (method === "sms") {
       // does not work
-      await addOTPSMS(session.factors.user.id);
+      await addOTPSMS(session.factors.user.id).catch((error) => {
+        error = new Error("Could not add OTP via SMS");
+      });
     } else if (method === "email") {
       // works
-      await addOTPEmail(session.factors.user.id);
+      await addOTPEmail(session.factors.user.id).catch((error) => {
+        error = new Error("Could not add OTP via Email");
+      });
     } else {
       throw new Error("Invalid method");
     }
@@ -60,28 +64,34 @@ export default async function Page({
   const paramsToContinue = new URLSearchParams({});
   let urlToContinue = "/accounts";
 
-  if (authRequestId && sessionId) {
-    if (sessionId) {
-      paramsToContinue.append("sessionId", sessionId);
-    }
+  if (sessionId) {
+    paramsToContinue.append("sessionId", sessionId);
+  }
+  if (loginName) {
+    paramsToContinue.append("loginName", loginName);
+  }
+  if (organization) {
+    paramsToContinue.append("organization", organization);
+  }
+
+  if (checkAfter) {
     if (authRequestId) {
       paramsToContinue.append("authRequestId", authRequestId);
     }
-    if (organization) {
-      paramsToContinue.append("organization", organization);
+    urlToContinue = `/otp/${method}?` + paramsToContinue;
+    // immediately check the OTP on the next page if sms or email was set up
+    if (["email", "sms"].includes(method)) {
+      return redirect(urlToContinue);
+    }
+  } else if (authRequestId && sessionId) {
+    if (authRequestId) {
+      paramsToContinue.append("authRequest", authRequestId);
     }
     urlToContinue = `/login?` + paramsToContinue;
   } else if (loginName) {
-    if (loginName) {
-      paramsToContinue.append("loginName", loginName);
-    }
     if (authRequestId) {
       paramsToContinue.append("authRequestId", authRequestId);
     }
-    if (organization) {
-      paramsToContinue.append("organization", organization);
-    }
-
     urlToContinue = `/signedin?` + paramsToContinue;
   }
 
@@ -98,9 +108,9 @@ export default async function Page({
           </div>
         )}
 
-        {totpError && (
+        {error && (
           <div className="py-4">
-            <Alert>{totpError?.message}</Alert>
+            <Alert>{error?.message}</Alert>
           </div>
         )}
 
@@ -119,8 +129,6 @@ export default async function Page({
               Scan the QR Code or navigate to the URL manually.
             </p>
             <div>
-              {/* {auth && <div>{auth.to}</div>} */}
-
               <TOTPRegister
                 uri={totpResponse.uri as string}
                 secret={totpResponse.secret as string}
@@ -145,13 +153,8 @@ export default async function Page({
             <div className="mt-8 flex w-full flex-row items-center">
               <BackButton />
               <span className="flex-grow"></span>
-              <Link
-                href={
-                  checkAfter
-                    ? `/otp/${method}?` + new URLSearchParams()
-                    : urlToContinue
-                }
-              >
+
+              <Link href={urlToContinue}>
                 <Button
                   type="submit"
                   className="self-end"

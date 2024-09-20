@@ -1,6 +1,9 @@
 "use client";
 
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import {
+  LoginSettings,
+  SecondFactorType,
+} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { EMAIL, SMS, TOTP, U2F } from "./AuthMethods";
 
@@ -47,28 +50,37 @@ export default function ChooseSecondFactorToSetup({
 
   return (
     <div className="grid grid-cols-1 gap-5 w-full pt-4">
-      {loginSettings.secondFactors.map((factor, i) => {
-        return factor === 1
-          ? TOTP(
+      {loginSettings.secondFactors.map((factor) => {
+        switch (factor) {
+          case SecondFactorType.OTP:
+            return TOTP(
               userMethods.includes(AuthenticationMethodType.TOTP),
               "/otp/time-based/set?" + params,
-            )
-          : factor === 2
-            ? U2F(
-                userMethods.includes(AuthenticationMethodType.U2F),
-                "/u2f/set?" + params,
+            );
+          case SecondFactorType.U2F:
+            return U2F(
+              userMethods.includes(AuthenticationMethodType.U2F),
+              "/u2f/set?" + params,
+            );
+          case SecondFactorType.OTP_EMAIL:
+            return (
+              emailVerified &&
+              EMAIL(
+                userMethods.includes(AuthenticationMethodType.OTP_EMAIL),
+                "/otp/email/set?" + params,
               )
-            : factor === 3 && emailVerified
-              ? EMAIL(
-                  userMethods.includes(AuthenticationMethodType.OTP_EMAIL),
-                  "/otp/email/set?" + params,
-                )
-              : factor === 4 && phoneVerified
-                ? SMS(
-                    userMethods.includes(AuthenticationMethodType.OTP_SMS),
-                    "/otp/sms/set?" + params,
-                  )
-                : null;
+            );
+          case SecondFactorType.OTP_SMS:
+            return (
+              phoneVerified &&
+              SMS(
+                userMethods.includes(AuthenticationMethodType.OTP_SMS),
+                "/otp/sms/set?" + params,
+              )
+            );
+          default:
+            return null;
+        }
       })}
     </div>
   );

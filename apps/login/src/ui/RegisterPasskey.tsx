@@ -47,9 +47,8 @@ export default function RegisterPasskey({
       passkeyName,
       publicKeyCredential,
       sessionId,
-    }).catch((error: Error) => {
-      setError(error.message);
-      setLoading(false);
+    }).catch(() => {
+      setError("Could not verify Passkey");
     });
 
     setLoading(false);
@@ -60,9 +59,8 @@ export default function RegisterPasskey({
     setLoading(true);
     const resp = await registerPasskeyLink({
       sessionId,
-    }).catch((error: Error) => {
-      setError(error.message ?? "Could not register passkey");
-      setLoading(false);
+    }).catch(() => {
+      setError("Could not register passkey");
     });
     setLoading(false);
 
@@ -139,6 +137,10 @@ export default function RegisterPasskey({
       return;
     }
 
+    continueAndLogin();
+  }
+
+  function continueAndLogin() {
     const params = new URLSearchParams();
 
     if (organization) {
@@ -147,14 +149,11 @@ export default function RegisterPasskey({
 
     if (authRequestId) {
       params.set("authRequestId", authRequestId);
-      params.set("sessionId", sessionId);
-      // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
-      // params.set("loginName", resp.loginName);
-
-      router.push("/passkey/login?" + params);
-    } else {
-      router.push("/accounts?" + params);
     }
+
+    params.set("sessionId", sessionId);
+
+    router.push("/passkey?" + params);
   }
 
   return (
@@ -171,32 +170,7 @@ export default function RegisterPasskey({
             type="button"
             variant={ButtonVariants.Secondary}
             onClick={() => {
-              if (authRequestId) {
-                const params = new URLSearchParams({
-                  authRequest: authRequestId,
-                });
-
-                if (sessionId) {
-                  params.set("sessionId", sessionId);
-                }
-
-                if (organization) {
-                  params.set("organization", organization);
-                }
-
-                router.push("/login?" + params);
-              } else {
-                const params = new URLSearchParams();
-
-                if (sessionId) {
-                  params.append("sessionId", sessionId);
-                }
-                if (organization) {
-                  params.append("organization", organization);
-                }
-
-                router.push("/signedin?" + params);
-              }
+              continueAndLogin();
             }}
           >
             skip

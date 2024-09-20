@@ -10,7 +10,7 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, organization, authRequestId } = searchParams;
+  const { loginName, organization, authRequestId, checkAfter } = searchParams;
 
   const sessionFactors = await loadMostRecentSession({
     loginName,
@@ -49,9 +49,11 @@ export default async function Page({
 
         {sessionFactors?.id && (
           <RegisterU2F
+            loginName={loginName}
             sessionId={sessionFactors.id}
             organization={organization}
             authRequestId={authRequestId}
+            checkAfter={checkAfter === "true"}
           />
         )}
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
-import { resetPassword } from "@/lib/server/password";
-import { updateSession } from "@/lib/server/session";
+import { resetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
@@ -51,17 +50,20 @@ export default function PasswordForm({
     setError("");
     setLoading(true);
 
-    const response = await updateSession({
+    const response = await sendPassword({
       loginName,
       organization,
       checks: create(ChecksSchema, {
         password: { password: values.password },
       }),
       authRequestId,
-    }).catch((error: Error) => {
-      setError(error.message ?? "Could not verify password");
-      setLoading(false);
+    }).catch(() => {
+      setError("Could not verify password");
     });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+    }
 
     setLoading(false);
 
@@ -76,16 +78,17 @@ export default function PasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
-    }).catch((error: Error) => {
-      setLoading(false);
-      setError(error.message ?? "Could not reset password");
+    }).catch(() => {
+      setError("Could not reset password");
     });
 
-    setLoading(false);
-
-    if (response) {
+    if (response && "error" in response) {
+      setError(response.error);
+    } else {
       setInfo("Password was reset. Please check your email.");
     }
+
+    setLoading(false);
 
     return response;
   }
@@ -97,7 +100,7 @@ export default function PasswordForm({
     setInfo("");
     // if user has mfa -> /otp/[method] or /u2f
     // if mfa is forced and user has no mfa -> /mfa/set
-    // if no passwordless -> /passkey/add
+    // if no passwordless -> /passkey/set
 
     // exclude password and passwordless
     if (
@@ -105,7 +108,6 @@ export default function PasswordForm({
       !submitted.authMethods ||
       !submitted.factors?.user?.loginName
     ) {
-      setError("Could not verify password");
       return;
     }
 
@@ -115,9 +117,9 @@ export default function PasswordForm({
         m !== AuthenticationMethodType.PASSKEY,
     );
 
-    if (availableSecondFactors.length == 1) {
+    if (availableSecondFactors?.length == 1) {
       const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
+        loginName: submitted.factors?.user.loginName,
       });
 
       if (authRequestId) {
@@ -139,7 +141,7 @@ export default function PasswordForm({
       } else if (factor === AuthenticationMethodType.U2F) {
         return router.push(`/u2f?` + params);
       }
-    } else if (availableSecondFactors.length >= 1) {
+    } else if (availableSecondFactors?.length >= 1) {
       const params = new URLSearchParams({
         loginName: submitted.factors.user.loginName,
       });
@@ -153,29 +155,10 @@ export default function PasswordForm({
       }
 
       return router.push(`/mfa?` + params);
-    } else if (
-      submitted.factors &&
-      !submitted.factors.webAuthN && // if session was not verified with a passkey
-      promptPasswordless && // if explicitly prompted due policy
-      !isAlternative // escaped if password was used as an alternative method
-    ) {
-      const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
-        promptPasswordless: "true",
-      });
-
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      return router.push(`/passkey/add?` + params);
     } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
       const params = new URLSearchParams({
         loginName: submitted.factors.user.loginName,
+        force: "true", // this defines if the mfa is forced in the settings
         checkAfter: "true", // this defines if the check is directly made after the setup
       });
 
@@ -189,6 +172,26 @@ export default function PasswordForm({
 
       // TODO: provide a way to setup passkeys on mfa page?
       return router.push(`/mfa/set?` + params);
+    } else if (
+      submitted.factors &&
+      !submitted.factors.webAuthN && // if session was not verified with a passkey
+      promptPasswordless && // if explicitly prompted due policy
+      !isAlternative // escaped if password was used as an alternative method
+    ) {
+      const params = new URLSearchParams({
+        loginName: submitted.factors.user.loginName,
+        prompt: "true",
+      });
+
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      return router.push(`/passkey/set?` + params);
     } else if (authRequestId && submitted.sessionId) {
       const params = new URLSearchParams({
         sessionId: submitted.sessionId,
@@ -230,14 +233,16 @@ export default function PasswordForm({
           {...register("password", { required: "This field is required" })}
           label="Password"
         />
-        <button
-          className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
-          onClick={() => resetPasswordAndContinue()}
-          type="button"
-          disabled={loading}
-        >
-          Reset Password
-        </button>
+        {!loginSettings?.hidePasswordReset && (
+          <button
+            className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+            onClick={() => resetPasswordAndContinue()}
+            type="button"
+            disabled={loading}
+          >
+            Reset Password
+          </button>
+        )}
 
         {loginName && (
           <input
