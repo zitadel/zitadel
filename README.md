@@ -13,6 +13,8 @@ You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
 Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
 a [GitHub issue](https://github.com/zitadel/typescript/issues).
 
+<img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
+
 ## Developing Your Own ZITADEL Login UI
 
 We think the easiest path of getting up and running, is the following:
