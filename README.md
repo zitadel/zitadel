@@ -91,7 +91,11 @@ You can already use the current state, and extend it with your needs.
     - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
   - [ ] AuthRequest UI locales
 
-  > Back navigation or retrys are not displayed. The flows for reauthentication after registering Passkeys, OTP or U2F methods are not displayed either as these will be omitted in future UX.
+  #### Flow diagram
+
+  This diagram shows the available pages and flows.
+
+  > Note that back navigation or retries are not displayed.
 
 ```mermaid
     flowchart TD

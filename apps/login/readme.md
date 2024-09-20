@@ -4,7 +4,9 @@ This is going to be our next UI for the hosted login. It's based on Next.js 13 a
 
 ## Flow Diagram
 
-> Back navigation or retrys are not displayed. The flows for reauthentication after registering Passkeys, OTP or U2F methods are not displayed either as these will be omitted in future UX.
+This diagram shows the available pages and flows.
+
+> Note that back navigation or retries are not displayed.
 
 ```mermaid
     flowchart TD
