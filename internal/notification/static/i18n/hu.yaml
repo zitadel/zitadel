@@ -35,8 +35,6 @@ VerifyEmailOTP:
   ButtonText: Azonosítás
 VerifySMSOTP:
   Text: Egyszerhasználatos jelszavad a(z) {{ .Domain }} oldalhoz: {{.OTP}}. Eddig lesz érvényes: {{.Expiry}}.
-    
-    @{{.Domain}} #{{.OTP}}
 DomainClaimed:
   Title: A domaint már igényelték
   PreHeader: E-mail / felhasználónév megváltoztatása
