@@ -310,7 +310,7 @@ LogoutDone:
   LoginButtonText: Bejelentkezés
 LinkingUserPrompt:
   Title: Meglévő felhasználó megtalálva
-  Description: Szeretnéd összekapcsolni a meglévő fiókodat:
+  Description: Szeretnéd összekapcsolni a meglévő fiókodat
   LinkButtonText: Összekapcsolás
   OtherButtonText: Egyéb lehetőségek
 LinkingUsersDone:
