@@ -1,4 +1,4 @@
-# ZITADEL TypeScript with Turborepo and Changesets
+# ZITADEL TypeScript with Turborepo
 
 This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL
 Login UI.
