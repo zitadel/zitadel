@@ -117,7 +117,8 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUserEmail{
-					ID: "user1",
+					ID:    "user1",
+					Email: &Email{Address: "noemail@example.com"},
 				},
 			},
 			res{
@@ -327,7 +328,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
 			}
-			err := c.ChangeSchemaUserEmail(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ChangeSchemaUserEmail(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -335,7 +336,7 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, tt.args.user.Details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 
 			if tt.res.returnCode != "" {
@@ -377,7 +378,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-0oj2PquNGA", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-y3n4Sdu8j5", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -394,7 +395,7 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-nJ0TQFuRmP", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-qbGyMPvjvj", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -706,7 +707,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-0oj2PquNGA", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-KvPc5o9GeJ", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -725,7 +726,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-nJ0TQFuRmP", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-EajeF6ypOV", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -1031,7 +1032,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
 			}
-			err := c.ResendSchemaUserEmailCode(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ResendSchemaUserEmailCode(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1040,7 +1041,7 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.returnCode, tt.args.user.PlainCode)
-				assertObjectDetails(t, tt.res.details, tt.args.user.Details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}

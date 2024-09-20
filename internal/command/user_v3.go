@@ -15,8 +15,6 @@ import (
 )
 
 type CreateSchemaUser struct {
-	Details *domain.ObjectDetails
-
 	SchemaID       string
 	schemaRevision uint64
 
@@ -99,44 +97,36 @@ func (c *Commands) getSchemaRoleForWrite(ctx context.Context, resourceOwner, use
 	return domain_schema.RoleOwner, nil
 }
 
-func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser, alg crypto.EncryptionAlgorithm) (err error) {
+func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
 	if err := user.Valid(ctx, c); err != nil {
-		return err
+		return nil, err
 	}
 
 	writeModel, err := c.getSchemaUserExists(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
-		return err
-	}
-	if writeModel.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.AlreadyExists")
+		return nil, err
 	}
 
-	userAgg := UserV3AggregateFromWriteModel(&writeModel.WriteModel)
-	events := []eventstore.Command{
-		schemauser.NewCreatedEvent(ctx,
-			userAgg,
-			user.SchemaID, user.schemaRevision, user.Data,
-		),
+	events, codeEmail, codePhone, err := writeModel.NewCreated(ctx,
+		user.SchemaID,
+		user.schemaRevision,
+		user.Data,
+		user.Email,
+		user.Phone,
+		func(ctx context.Context) (*EncryptedCode, error) {
+			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
-	if user.Email != nil {
-		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, writeModel, events, user.Email, alg)
-		if err != nil {
-			return err
-		}
+	if codeEmail != "" {
+		user.ReturnCodeEmail = codeEmail
 	}
-	if user.Phone != nil {
-		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, writeModel, events, userAgg, user.Phone, alg)
-		if err != nil {
-			return err
-		}
+	if codePhone != "" {
+		user.ReturnCodePhone = codePhone
 	}
-
-	if err := c.pushAppendAndReduce(ctx, writeModel, events...); err != nil {
-		return err
-	}
-	user.Details = writeModelToObjectDetails(&writeModel.WriteModel)
-	return nil
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 func (c *Commands) DeleteSchemaUser(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
@@ -147,29 +137,22 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, resourceOwner, id strin
 	if err != nil {
 		return nil, err
 	}
-	if !writeModel.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound")
-	}
-	if err := c.checkPermissionDeleteUser(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+
+	events, err := writeModel.NewDeletedEvents(ctx)
+	if err != nil {
 		return nil, err
 	}
-	if err := c.pushAppendAndReduce(ctx, writeModel,
-		schemauser.NewDeletedEvent(ctx, UserV3AggregateFromWriteModel(&writeModel.WriteModel)),
-	); err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 type ChangeSchemaUser struct {
-	Details *domain.ObjectDetails
-
-	SchemaID         *string
 	schemaWriteModel *UserSchemaWriteModel
 
 	ResourceOwner string
 	ID            string
-	Data          json.RawMessage
+
+	SchemaUser *SchemaUser
 
 	Email           *Email
 	ReturnCodeEmail string
@@ -177,12 +160,17 @@ type ChangeSchemaUser struct {
 	ReturnCodePhone string
 }
 
+type SchemaUser struct {
+	SchemaID string
+	Data     json.RawMessage
+}
+
 func (s *ChangeSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 	if s.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-gEJR1QOGHb", "Errors.IDMissing")
 	}
-	if s.SchemaID != nil {
-		s.schemaWriteModel, err = c.getSchemaWriteModelByID(ctx, "", *s.SchemaID)
+	if s.SchemaUser != nil && s.SchemaUser.SchemaID != "" {
+		s.schemaWriteModel, err = c.getSchemaWriteModelByID(ctx, "", s.SchemaUser.SchemaID)
 		if err != nil {
 			return err
 		}
@@ -206,92 +194,40 @@ func (s *ChangeSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 	return nil
 }
 
-func (s *ChangeSchemaUser) ValidData(ctx context.Context, c *Commands, existingUser *UserV3WriteModel) (err error) {
-	// get role for permission check in schema through extension
-	role, err := c.getSchemaRoleForWrite(ctx, existingUser.ResourceOwner, existingUser.AggregateID)
-	if err != nil {
-		return err
-	}
-
-	if s.schemaWriteModel == nil {
-		s.schemaWriteModel, err = c.getSchemaWriteModelByID(ctx, "", existingUser.SchemaID)
-		if err != nil {
-			return err
-		}
-	}
-
-	schema, err := domain_schema.NewSchema(role, bytes.NewReader(s.schemaWriteModel.Schema))
-	if err != nil {
-		return err
-	}
-
-	// if data not changed but a new schema or revision should be used
-	data := s.Data
-	if s.Data == nil {
-		data = existingUser.Data
-	}
-
-	var v interface{}
-	if err := json.Unmarshal(data, &v); err != nil {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-7o3ZGxtXUz", "Errors.User.Invalid")
-	}
-
-	if err := schema.Validate(v); err != nil {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SlKXqLSeL6", "Errors.UserSchema.Data.Invalid")
-	}
-	return nil
-}
-
-func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser, alg crypto.EncryptionAlgorithm) (err error) {
+func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
 	if err := user.Valid(ctx, c); err != nil {
-		return err
+		return nil, err
 	}
 
 	writeModel, err := c.getSchemaUserWriteModelByID(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !writeModel.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.NotFound")
 	}
 
-	userAgg := UserV3AggregateFromWriteModel(&writeModel.WriteModel)
-	events := make([]eventstore.Command, 0)
-	if user.Data != nil || user.SchemaID != nil {
-		if err := user.ValidData(ctx, c, writeModel); err != nil {
-			return err
-		}
-		updateEvent := writeModel.NewUpdatedEvent(ctx,
-			userAgg,
-			user.schemaWriteModel.AggregateID,
-			user.schemaWriteModel.SchemaRevision,
-			user.Data,
-		)
-		if updateEvent != nil {
-			events = append(events, updateEvent)
-		}
+	events, codeEmail, codePhone, err := writeModel.NewUpdated(ctx,
+		user.schemaWriteModel,
+		c.getSchemaWriteModelByID,
+		user.SchemaUser,
+		user.Email,
+		user.Phone,
+		func(ctx context.Context) (*EncryptedCode, error) {
+			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
-	if user.Email != nil {
-		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, writeModel, events, user.Email, alg)
-		if err != nil {
-			return err
-		}
+
+	if codeEmail != "" {
+		user.ReturnCodeEmail = codeEmail
 	}
-	if user.Phone != nil {
-		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, writeModel, events, userAgg, user.Phone, alg)
-		if err != nil {
-			return err
-		}
+	if codePhone != "" {
+		user.ReturnCodePhone = codePhone
 	}
-	if len(events) == 0 {
-		user.Details = writeModelToObjectDetails(&writeModel.WriteModel)
-		return nil
-	}
-	if err := c.pushAppendAndReduce(ctx, writeModel, events...); err != nil {
-		return err
-	}
-	user.Details = writeModelToObjectDetails(&writeModel.WriteModel)
-	return nil
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 func (c *Commands) checkPermissionUpdateUserState(ctx context.Context, resourceOwner, userID string) error {
@@ -386,11 +322,12 @@ func (c *Commands) ActivateSchemaUser(ctx context.Context, resourceOwner, id str
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) updateSchemaUserPhone(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, agg *eventstore.Aggregate, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
+func (c *Commands) updateSchemaUserPhone(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
 	if existing.Phone == string(phone.Number) {
 		return events, plainCode, nil
 	}
 
+	agg := UserV3AggregateFromWriteModel(existing.GetWriteModel())
 	events = append(events, schemauser.NewPhoneUpdatedEvent(ctx,
 		agg,
 		phone.Number,
@@ -415,7 +352,7 @@ func (c *Commands) updateSchemaUserPhone(ctx context.Context, existing *UserV3Wr
 }
 
 func (c *Commands) getSchemaUserExists(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
-	writeModel := NewExistsUserV3WriteModel(resourceOwner, id)
+	writeModel := NewExistsUserV3WriteModel(resourceOwner, id, c.checkPermission)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
@@ -423,7 +360,7 @@ func (c *Commands) getSchemaUserExists(ctx context.Context, resourceOwner, id st
 }
 
 func (c *Commands) getSchemaUserWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
-	writeModel := NewUserV3WriteModel(resourceOwner, id)
+	writeModel := NewUserV3WriteModel(resourceOwner, id, c.checkPermission)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
@@ -431,7 +368,7 @@ func (c *Commands) getSchemaUserWriteModelByID(ctx context.Context, resourceOwne
 }
 
 func (c *Commands) getSchemaUserEmailWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
-	writeModel := NewUserV3EmailWriteModel(resourceOwner, id)
+	writeModel := NewUserV3EmailWriteModel(resourceOwner, id, c.checkPermission)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}

@@ -17,11 +17,12 @@ func (s *Server) SetContactEmail(ctx context.Context, req *user.SetContactEmailR
 		return nil, err
 	}
 	schemauser := setContactEmailRequestToChangeSchemaUserEmail(req)
-	if err := s.command.ChangeSchemaUserEmail(ctx, schemauser, s.userCodeAlg); err != nil {
+	details, err := s.command.ChangeSchemaUserEmail(ctx, schemauser, s.userCodeAlg)
+	if err != nil {
 		return nil, err
 	}
 	return &user.SetContactEmailResponse{
-		Details:          resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
+		Details:          resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
 		VerificationCode: gu.Ptr(schemauser.ReturnCode),
 	}, nil
 }
@@ -64,11 +65,12 @@ func (s *Server) ResendContactEmailCode(ctx context.Context, req *user.ResendCon
 		return nil, err
 	}
 	schemauser := resendContactEmailCodeRequestToResendSchemaUserEmailCode(req)
-	if err = s.command.ResendSchemaUserEmailCode(ctx, schemauser, s.userCodeAlg); err != nil {
+	details, err := s.command.ResendSchemaUserEmailCode(ctx, schemauser, s.userCodeAlg)
+	if err != nil {
 		return nil, err
 	}
 	return &user.ResendContactEmailCodeResponse{
-		Details:          resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
+		Details:          resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
 		VerificationCode: gu.Ptr(schemauser.PlainCode),
 	}, nil
 }

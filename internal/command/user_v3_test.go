@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -876,7 +875,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
 			}
-			err := c.CreateSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.CreateSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -884,7 +883,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, tt.args.user.Details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 
 			if tt.res.returnCodePhone != "" {
@@ -1995,8 +1994,10 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("type"),
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "type",
+					},
 				},
 			},
 			res{
@@ -2067,9 +2068,11 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
 					ID: "user1",
-					Data: json.RawMessage(`{
+					SchemaUser: &SchemaUser{
+						Data: json.RawMessage(`{
 						"name": "user"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2134,9 +2137,11 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
 					ID: "user1",
-					Data: json.RawMessage(`{
+					SchemaUser: &SchemaUser{
+						Data: json.RawMessage(`{
 						"name": "user2"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2196,8 +2201,10 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id2"),
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id2",
+					},
 				},
 			},
 			res{
@@ -2262,11 +2269,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id2"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id2",
+						Data: json.RawMessage(`{
 						"name": "user2"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2350,9 +2359,11 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
 					ID: "user1",
-					Data: json.RawMessage(`{
+					SchemaUser: &SchemaUser{
+						Data: json.RawMessage(`{
 						"name2": "user2"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2418,11 +2429,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id2"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id2",
+						Data: json.RawMessage(`{
 						"name2": "user2"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2476,11 +2489,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id1"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id1",
+						Data: json.RawMessage(`{
 						"name": "user"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2533,11 +2548,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("type"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "type",
+						Data: json.RawMessage(`{
 						"name": "user"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2588,11 +2605,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("type"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "type",
+						Data: json.RawMessage(`{
 						"name": 1
 					}`),
+					},
 				},
 			},
 			res{
@@ -2657,12 +2676,14 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id1"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id1",
+						Data: json.RawMessage(`{
 						"name": "user1",
 						"additional": "property"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2714,11 +2735,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("type"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "type",
+						Data: json.RawMessage(`{
 						"invalid": "user"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2832,8 +2855,10 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id1"),
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id1",
+					},
 					Email: &Email{
 						Address:     "test@example.com",
 						ReturnCode:  true,
@@ -3102,7 +3127,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
 			}
-			err := c.ChangeSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ChangeSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -3110,7 +3135,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, tt.args.user.Details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 
 			if tt.res.returnCodePhone != "" {

@@ -199,6 +199,27 @@ func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer
 	return AppendAndReduce(object, events...)
 }
 
+type WriteModel interface {
+	AppendEvents(...eventstore.Event)
+	// TODO: Why is it allowed to return an error here?
+	Reduce() error
+	GetWriteModel() *eventstore.WriteModel
+}
+
+func (c *Commands) pushAppendAndReduceDetails(ctx context.Context, object WriteModel, cmds ...eventstore.Command) (*domain.ObjectDetails, error) {
+	if len(cmds) == 0 {
+		return writeModelToObjectDetails(object.GetWriteModel()), nil
+	}
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	if err := AppendAndReduce(object, events...); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(object.GetWriteModel()), nil
+}
+
 func AppendAndReduce(object AppendReducer, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
 	return object.Reduce()

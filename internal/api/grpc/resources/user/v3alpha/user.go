@@ -22,12 +22,12 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-
-	if err := s.command.CreateSchemaUser(ctx, schemauser, s.userCodeAlg); err != nil {
+	details, err := s.command.CreateSchemaUser(ctx, schemauser, s.userCodeAlg)
+	if err != nil {
 		return nil, err
 	}
 	return &user.CreateUserResponse{
-		Details:   resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
+		Details:   resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
 		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
 		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
 	}, nil
@@ -91,17 +91,36 @@ func (s *Server) PatchUser(ctx context.Context, req *user.PatchUserRequest) (_ *
 		return nil, err
 	}
 
-	if err := s.command.ChangeSchemaUser(ctx, schemauser, s.userCodeAlg); err != nil {
+	details, err := s.command.ChangeSchemaUser(ctx, schemauser, s.userCodeAlg)
+	if err != nil {
 		return nil, err
 	}
 	return &user.PatchUserResponse{
-		Details:   resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
+		Details:   resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
 		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
 		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
 	}, nil
 }
 
 func patchUserRequestToChangeSchemaUser(req *user.PatchUserRequest) (_ *command.ChangeSchemaUser, err error) {
+	schemaUser, err := setSchemaUserToSchemaUser(req)
+	if err != nil {
+		return nil, err
+	}
+	email, phone := setContactToContact(req.GetUser().GetContact())
+	return &command.ChangeSchemaUser{
+		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
+		ID:            req.GetId(),
+		SchemaUser:    schemaUser,
+		Email:         email,
+		Phone:         phone,
+	}, nil
+}
+
+func setSchemaUserToSchemaUser(req *user.PatchUserRequest) (_ *command.SchemaUser, err error) {
+	if req.GetUser() == nil {
+		return nil, nil
+	}
 	var data []byte
 	if req.GetUser().Data != nil {
 		data, err = req.GetUser().GetData().MarshalJSON()
@@ -110,14 +129,9 @@ func patchUserRequestToChangeSchemaUser(req *user.PatchUserRequest) (_ *command.
 		}
 	}
 
-	email, phone := setContactToContact(req.GetUser().GetContact())
-	return &command.ChangeSchemaUser{
-		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
-		ID:            req.GetId(),
-		SchemaID:      req.GetUser().SchemaId,
-		Data:          data,
-		Email:         email,
-		Phone:         phone,
+	return &command.SchemaUser{
+		SchemaID: req.GetUser().GetSchemaId(),
+		Data:     data,
 	}, nil
 }
 

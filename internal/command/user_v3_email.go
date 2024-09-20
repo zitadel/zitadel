@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -11,8 +12,6 @@ import (
 )
 
 type ChangeSchemaUserEmail struct {
-	Details *domain.ObjectDetails
-
 	ResourceOwner string
 	ID            string
 
@@ -21,6 +20,9 @@ type ChangeSchemaUserEmail struct {
 }
 
 func (s *ChangeSchemaUserEmail) Valid() (err error) {
+	if s.ID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-0oj2PquNGA", "Errors.IDMissing")
+	}
 	if s.Email != nil && s.Email.Address != "" {
 		if err := s.Email.Validate(); err != nil {
 			return err
@@ -29,73 +31,54 @@ func (s *ChangeSchemaUserEmail) Valid() (err error) {
 	return nil
 }
 
-func existingSchemaUserEmailWithPermission(ctx context.Context, c *Commands, resourceOwner, userID string) (*UserV3WriteModel, error) {
-	if userID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0oj2PquNGA", "Errors.IDMissing")
-	}
+func existingSchemaUserEmail(ctx context.Context, c *Commands, resourceOwner, userID string) (*UserV3WriteModel, error) {
 	writeModel, err := c.getSchemaUserEmailWriteModelByID(ctx, resourceOwner, userID)
 	if err != nil {
-		return nil, err
-	}
-	if !writeModel.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-nJ0TQFuRmP", "Errors.User.NotFound")
-	}
-	if err := c.checkPermissionUpdateUser(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
 		return nil, err
 	}
 	return writeModel, nil
 }
 
-func (c *Commands) ChangeSchemaUserEmail(ctx context.Context, user *ChangeSchemaUserEmail, alg crypto.EncryptionAlgorithm) (err error) {
+func (c *Commands) ChangeSchemaUserEmail(ctx context.Context, user *ChangeSchemaUserEmail, alg crypto.EncryptionAlgorithm) (_ *domain.ObjectDetails, err error) {
 	if err := user.Valid(); err != nil {
-		return err
+		return nil, err
 	}
 
-	writeModel, err := existingSchemaUserEmailWithPermission(ctx, c, user.ResourceOwner, user.ID)
+	writeModel, err := existingSchemaUserEmail(ctx, c, user.ResourceOwner, user.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	// when there is no change in the address, we don't want to change anything on the verification state
-	if user.Email == nil || string(user.Email.Address) == writeModel.Email {
-		user.Details = writeModelToObjectDetails(&writeModel.WriteModel)
-		return nil
-	}
-
-	events := make([]eventstore.Command, 0)
-	events, user.ReturnCode, err = c.updateSchemaUserEmail(ctx, writeModel, events, user.Email, alg)
+	events, plainCode, err := c.updateSchemaUserEmail(ctx, writeModel, nil, user.Email, alg)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if err := c.pushAppendAndReduce(ctx, writeModel, events...); err != nil {
-		return err
+	if plainCode != "" {
+		user.ReturnCode = plainCode
 	}
-	user.Details = writeModelToObjectDetails(&writeModel.WriteModel)
-	return nil
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 func (c *Commands) VerifySchemaUserEmail(ctx context.Context, resourceOwner, id, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	writeModel, err := existingSchemaUserEmailWithPermission(ctx, c, resourceOwner, id)
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-y3n4Sdu8j5", "Errors.IDMissing")
+	}
+	writeModel, err := existingSchemaUserEmail(ctx, c, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if writeModel.EmailCode == nil {
-		return writeModelToObjectDetails(&writeModel.WriteModel), nil
-	}
-	if err := crypto.VerifyCode(writeModel.EmailCode.CreationDate, writeModel.EmailCode.Expiry, writeModel.EmailCode.Code, code, alg); err != nil {
+	events, err := writeModel.NewEmailVerify(ctx,
+		func(creationDate time.Time, expiry time.Duration, cryptoCode *crypto.CryptoValue) error {
+			return crypto.VerifyCode(creationDate, expiry, cryptoCode, code, alg)
+		},
+	)
+	if err != nil {
 		return nil, err
 	}
-	if err := c.pushAppendAndReduce(ctx, writeModel,
-		schemauser.NewEmailVerifiedEvent(ctx, UserV3AggregateFromWriteModel(&writeModel.WriteModel)),
-	); err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 type ResendSchemaUserEmailCode struct {
-	Details *domain.ObjectDetails
-
 	ResourceOwner string
 	ID            string
 
@@ -104,31 +87,29 @@ type ResendSchemaUserEmailCode struct {
 	PlainCode   string
 }
 
-func (r *ResendSchemaUserEmailCode) IsReturnCode() bool {
-	return r.ReturnCode
-}
-func (r *ResendSchemaUserEmailCode) GetURLTemplate() string {
-	return r.URLTemplate
-}
+func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSchemaUserEmailCode, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+	if user.ID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-KvPc5o9GeJ", "Errors.IDMissing")
+	}
+	writeModel, err := existingSchemaUserEmail(ctx, c, user.ResourceOwner, user.ID)
+	if err != nil {
+		return nil, err
+	}
 
-func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSchemaUserEmailCode, alg crypto.EncryptionAlgorithm) error {
-	writeModel, err := existingSchemaUserEmailWithPermission(ctx, c, user.ResourceOwner, user.ID)
+	events, plainCode, err := writeModel.NewResendEmailCode(ctx,
+		func(ctx context.Context) (*EncryptedCode, error) {
+			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+		},
+		user.URLTemplate,
+		user.ReturnCode,
+	)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if writeModel.EmailCode == nil {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-QRkNTBwF8q", "Errors.User.Code.Empty")
+	if plainCode != "" {
+		user.PlainCode = plainCode
 	}
-	events := make([]eventstore.Command, 0)
-	events, user.PlainCode, err = c.generateSchemaUserEmailCode(ctx, writeModel, events, user, alg)
-	if err != nil {
-		return err
-	}
-	if err := c.pushAppendAndReduce(ctx, writeModel, events...); err != nil {
-		return err
-	}
-	user.Details = writeModelToObjectDetails(&writeModel.WriteModel)
-	return nil
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 type EmailUpdate interface {
@@ -137,18 +118,21 @@ type EmailUpdate interface {
 	IsVerified() bool
 }
 
-func (c *Commands) updateSchemaUserEmail(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, email EmailUpdate, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	if existing.Email == string(email.GetAddress()) {
-		return events, plainCode, nil
+func (c *Commands) updateSchemaUserEmail(ctx context.Context, writeModel *UserV3WriteModel, events []eventstore.Command, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
+	if events == nil {
+		events = []eventstore.Command{}
 	}
-	events = append(events, schemauser.NewEmailUpdatedEvent(ctx,
-		UserV3AggregateFromWriteModel(&existing.WriteModel),
-		email.GetAddress(),
-	))
-	if email.IsVerified() {
-		return append(events, schemauser.NewEmailVerifiedEvent(ctx, UserV3AggregateFromWriteModel(&existing.WriteModel))), "", nil
+
+	updateEvents, plainCode, err := writeModel.NewEmailUpdatedEvents(ctx,
+		email,
+		func(ctx context.Context) (*EncryptedCode, error) {
+			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+		},
+	)
+	if err != nil {
+		return nil, "", err
 	}
-	return c.generateSchemaUserEmailCode(ctx, existing, events, email, alg)
+	return append(events, updateEvents...), plainCode, nil
 }
 
 type EmailVerify interface {
