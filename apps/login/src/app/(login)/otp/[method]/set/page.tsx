@@ -47,13 +47,11 @@ export default async function Page({
     } else if (method === "sms") {
       // does not work
       await addOTPSMS(session.factors.user.id).catch((error) => {
-        console.error(error);
         error = new Error("Could not add OTP via SMS");
       });
     } else if (method === "email") {
       // works
       await addOTPEmail(session.factors.user.id).catch((error) => {
-        console.error(error);
         error = new Error("Could not add OTP via Email");
       });
     } else {

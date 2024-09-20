@@ -189,9 +189,9 @@ export default function LoginPasskey({
         });
       })
       .catch((error) => {
+        // we log this error to the console, as it is not a critical error
         console.error(error);
         setLoading(false);
-        //   setError(error);
         return null;
       });
   }
