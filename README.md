@@ -3,6 +3,8 @@
 This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL
 Login UI.
 
+<img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
+
 **⚠️ This repo and packages are in alpha state and subject to change ⚠️**
 
 The scope of functionality of this repo and packages is under active development.
@@ -12,8 +14,6 @@ The `@zitadel/client` and `@zitadel/node` packages are using [@connectrpc/connec
 You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
 Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
 a [GitHub issue](https://github.com/zitadel/typescript/issues).
-
-<img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
 
 ## Developing Your Own ZITADEL Login UI
 
@@ -73,6 +73,7 @@ You can already use the current state, and extend it with your needs.
 - [x] Domain Discovery
 - [x] Branding
 - OIDC Standard
+
   - [x] Authorization Code Flow with PKCE
   - [x] AuthRequest `hintUserId`
   - [x] AuthRequest `loginHint`
@@ -89,6 +90,47 @@ You can already use the current state, and extend it with your needs.
     - [x] `urn:zitadel:iam:org:id:{orgid}`
     - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
   - [ ] AuthRequest UI locales
+
+  > Back navigation or retrys are not displayed. The flows for reauthentication after registering Passkeys, OTP or U2F methods are not displayed either as these will be omitted in future UX.
+
+```mermaid
+    flowchart TD
+    A[Start] --> register
+    A[Start] --> accounts
+    A[Start] --> loginname
+    loginname -- signInWithIDP --> idp-success
+    loginname -- signInWithIDP --> idp-failure
+    idp-success --> B[signedin]
+    loginname --> password
+    loginname -- hasPasskey --> passkey
+    loginname -- allowRegister --> register
+    passkey-add --passwordAllowed --> password
+    passkey -- hasPassword --> password
+    passkey --> B[signedin]
+    password -- hasMFA --> mfa
+    password -- allowPasskeys --> passkey-add
+    mfa --> otp
+    otp --> B[signedin]
+    mfa--> u2f
+    u2f -->B[signedin]
+    register --> passkey-add
+    register --> password-set
+    password-set --> B[signedin]
+    passkey-add --> B[signedin]
+    password --> B[signedin]
+    password-- forceMFA -->mfaset
+    mfaset --> u2fset
+    mfaset --> otpset
+    u2fset --> B[signedin]
+    otpset --> B[signedin]
+    accounts--> loginname
+    password -- not verified yet -->verify
+    register-- withpassword -->verify
+    passkey-- notVerified --> verify
+    verify --> B[signedin]
+```
+
+You can find a more detailed documentation of the different pages [here](./apps/login/readme.md).
 
 ## Tooling
 
