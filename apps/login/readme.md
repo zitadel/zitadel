@@ -79,7 +79,7 @@ If no single IDP is set, we check for `loginSettings.allowUsernamePassword` and 
 
 If no previous condition is met we throw an error stating the user was not found.
 
-**EXCEPTIONS:** If the outcome after this order produces a no authentication methods found, or user not found, we check whether `loginSettings?.ignoreUnknownUsernames` is set to `true` as in this case we redirect to the /password page regardless (to not leak information about a registered user).
+**EXCEPTIONS:** If the outcome after this order produces a no authentication methods found, or user not found, we check whether `loginSettings?.ignoreUnknownUsernames` is set to `true` as in this case we redirect to the /password page regardless (to prevent username guessing).
 
 > NOTE: This page at this stage beeing ignores local sessions and executes a reauthentication. This is a feature which is not implemented yet.
 
