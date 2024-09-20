@@ -53,8 +53,8 @@ export function SignInWithIDP({
         `${host}/idp/${provider}/success?` + new URLSearchParams(params),
       failureUrl:
         `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
-    }).catch((error: Error) => {
-      setError(error.message ?? "Could not start IDP flow");
+    }).catch(() => {
+      setError("Could not start IDP flow");
     });
 
     setLoading(false);

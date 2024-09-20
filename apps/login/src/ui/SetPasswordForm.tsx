@@ -65,8 +65,7 @@ export default function SetPasswordForm({
       organization: organization,
       authRequestId: authRequestId,
       password: values.password,
-    }).catch((error: Error) => {
-      console.error(error);
+    }).catch(() => {
       setError("Could not register user");
     });
 

@@ -50,16 +50,15 @@ export default function UsernameForm({
       loginName: values.loginName,
       organization,
       authRequestId,
-    }).catch((error: Error) => {
-      console.error(error);
+    }).catch(() => {
       setError("An internal error occurred");
     });
+
+    setLoading(false);
 
     if (res?.error) {
       setError(res.error);
     }
-
-    setLoading(false);
 
     return res;
   }

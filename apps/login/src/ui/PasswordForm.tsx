@@ -57,9 +57,8 @@ export default function PasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
-    }).catch((error: Error) => {
-      setError(error.message ?? "Could not verify password");
-      setLoading(false);
+    }).catch(() => {
+      setError("Could not verify password");
     });
 
     if (response && "error" in response && response.error) {
@@ -79,9 +78,7 @@ export default function PasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
-    }).catch((error: Error) => {
-      console.error(error);
-      setLoading(false);
+    }).catch(() => {
       setError("Could not reset password");
     });
 

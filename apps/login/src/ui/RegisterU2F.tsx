@@ -44,9 +44,7 @@ export default function RegisterU2F({
       passkeyName,
       publicKeyCredential,
       sessionId,
-    }).catch((error: Error) => {
-      console.error(error);
-      setLoading(false);
+    }).catch(() => {
       setError("An error on verifying passkey occurred");
     });
 
@@ -64,18 +62,17 @@ export default function RegisterU2F({
     setLoading(true);
     const response = await addU2F({
       sessionId,
-    }).catch((error: Error) => {
-      console.error(error);
-      setLoading(false);
+    }).catch(() => {
       setError("An error on registering passkey");
     });
+
+    setLoading(false);
 
     if (response && "error" in response && response?.error) {
       setError(response?.error);
     }
 
     if (!response || !("u2fId" in response)) {
-      setLoading(false);
       setError("An error on registering passkey");
       return;
     }

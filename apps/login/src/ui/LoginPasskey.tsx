@@ -90,8 +90,8 @@ export default function LoginPasskey({
         },
       }),
       authRequestId,
-    }).catch((error: Error) => {
-      setError(error.message);
+    }).catch(() => {
+      setError("Could not request passkey challenge");
     });
     setLoading(false);
 
@@ -108,8 +108,8 @@ export default function LoginPasskey({
         webAuthN: { credentialAssertionData: data },
       } as Checks,
       authRequestId,
-    }).catch((error: Error) => {
-      setError(error.message);
+    }).catch(() => {
+      setError("Could not verify passkey");
     });
 
     setLoading(false);
