@@ -63,7 +63,6 @@ export default function RegisterFormWithoutPassword({
       lastName: values.lastname,
       organization: organization,
     }).catch((error) => {
-      console.error(error);
       setError("Could not register user");
       setLoading(false);
     });
