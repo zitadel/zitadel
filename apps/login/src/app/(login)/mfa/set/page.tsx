@@ -123,7 +123,7 @@ export default async function Page({
 
         {!valid && (
           <Alert>
-            You have to have a valid session in order to set a second factor!
+            You need to have a valid session in order to set a second factor!
             {/* TODO: show reauth button */}
           </Alert>
         )}
