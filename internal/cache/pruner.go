@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/zitadel/logging"
 )
 
@@ -31,20 +32,24 @@ type AutoPruneConfig struct {
 }
 
 func (c AutoPruneConfig) StartAutoPrune(background context.Context, pruner Pruner) (close func()) {
+	return c.startAutoPrune(background, pruner, clockwork.NewRealClock())
+}
+
+func (c *AutoPruneConfig) startAutoPrune(background context.Context, pruner Pruner, clock clockwork.Clock) (close func()) {
 	if c.Interval <= 0 {
 		return func() {}
 	}
 	background, cancel := context.WithCancel(background)
-	go c.pruneTimer(background, pruner)
+	// randomize the first interval
+	timer := clock.NewTimer(time.Duration(rand.Int63n(int64(c.Interval))))
+	go c.pruneTimer(background, pruner, timer)
 	return cancel
 }
 
-func (c *AutoPruneConfig) pruneTimer(background context.Context, pruner Pruner) {
-	// randomize the first interval
-	timer := time.NewTimer(time.Duration(rand.Int63n(int64(c.Interval))))
+func (c *AutoPruneConfig) pruneTimer(background context.Context, pruner Pruner, timer clockwork.Timer) {
 	defer func() {
 		if !timer.Stop() {
-			<-timer.C
+			<-timer.Chan()
 		}
 	}()
 
@@ -52,7 +57,7 @@ func (c *AutoPruneConfig) pruneTimer(background context.Context, pruner Pruner) 
 		select {
 		case <-background.Done():
 			return
-		case <-timer.C:
+		case <-timer.Chan():
 			timer.Reset(c.Interval)
 			err := c.doPrune(background, pruner)
 			logging.OnError(err).WithField("name", "").Error("cache auto prune")

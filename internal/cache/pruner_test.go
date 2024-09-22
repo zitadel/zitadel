@@ -2,32 +2,42 @@ package cache
 
 import (
 	"context"
-	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/stretchr/testify/assert"
 )
 
 type testPruner struct {
-	called atomic.Int64
+	called chan struct{}
 }
 
 func (p *testPruner) Prune(context.Context) error {
-	p.called.Add(1)
+	p.called <- struct{}{}
 	return nil
 }
 
-func TestAutoPruneConfig_StartAutoPrune(t *testing.T) {
+func TestAutoPruneConfig_startAutoPrune(t *testing.T) {
 	c := AutoPruneConfig{
-		Interval: 300 * time.Millisecond,
+		Interval: time.Second,
 		Timeout:  time.Millisecond,
 	}
-	var pruner testPruner
-	close := c.StartAutoPrune(context.Background(), &pruner)
-	defer close()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
 
-	// 3 runs take 900 milliseconds.
-	time.Sleep(time.Second)
-	assert.Equal(t, int64(3), pruner.called.Load())
+	pruner := testPruner{
+		called: make(chan struct{}),
+	}
+	clock := clockwork.NewFakeClock()
+	close := c.startAutoPrune(ctx, &pruner, clock)
+	defer close()
+	clock.Advance(time.Second)
+
+	select {
+	case _, ok := <-pruner.called:
+		assert.True(t, ok)
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	}
 }
