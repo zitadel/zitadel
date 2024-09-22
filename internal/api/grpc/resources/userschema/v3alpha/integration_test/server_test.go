@@ -19,51 +19,44 @@ import (
 )
 
 var (
-	IAMOwnerCTX, SystemCTX context.Context
-	Instance               *integration.Instance
-	Client                 schema.ZITADELUserSchemasClient
+	CTX context.Context
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 		defer cancel()
-
-		Instance = integration.NewInstance(ctx)
-
-		IAMOwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		SystemCTX = integration.WithSystemAuthorization(ctx)
-		Client = Instance.Client.UserSchemaV3
-
+		CTX = ctx
 		return m.Run()
 	}())
 }
 
-func ensureFeatureEnabled(t *testing.T, iamOwnerCTX context.Context) {
-	f, err := Instance.Client.FeatureV2.GetInstanceFeatures(iamOwnerCTX, &feature.GetInstanceFeaturesRequest{
+func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
+	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{
 		Inheritance: true,
 	})
 	require.NoError(t, err)
 	if f.UserSchema.GetEnabled() {
 		return
 	}
-	_, err = Instance.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
+	_, err = instance.Client.FeatureV2.SetInstanceFeatures(ctx, &feature.SetInstanceFeaturesRequest{
 		UserSchema: gu.Ptr(true),
 	})
 	require.NoError(t, err)
 	retryDuration := time.Minute
-	if ctxDeadline, ok := iamOwnerCTX.Deadline(); ok {
+	if ctxDeadline, ok := ctx.Deadline(); ok {
 		retryDuration = time.Until(ctxDeadline)
 	}
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			f, err := Instance.Client.FeatureV2.GetInstanceFeatures(iamOwnerCTX, &feature.GetInstanceFeaturesRequest{
+			f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
 			require.NoError(ttt, err)
 			assert.True(ttt, f.GetUserSchema().GetEnabled())
 
-			_, err = Instance.Client.UserSchemaV3.SearchUserSchemas(iamOwnerCTX, &schema.SearchUserSchemasRequest{
+			_, err = instance.Client.UserSchemaV3.SearchUserSchemas(ctx, &schema.SearchUserSchemasRequest{
 				Query: &object.SearchQuery{
 					Limit: 1,
 				},

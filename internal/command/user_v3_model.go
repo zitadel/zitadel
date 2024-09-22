@@ -29,7 +29,8 @@ type UserV3WriteModel struct {
 
 	Data json.RawMessage
 
-	State domain.UserState
+	Locked bool
+	State  domain.UserState
 }
 
 func NewExistsUserV3WriteModel(resourceOwner, userID string) *UserV3WriteModel {
@@ -61,8 +62,9 @@ func (wm *UserV3WriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *schemauser.CreatedEvent:
 			wm.SchemaID = e.SchemaID
-			wm.SchemaRevision = 1
+			wm.SchemaRevision = e.SchemaRevision
 			wm.Data = e.Data
+			wm.Locked = false
 
 			wm.State = domain.UserStateActive
 		case *schemauser.UpdatedEvent:
@@ -79,6 +81,8 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.State = domain.UserStateDeleted
 		case *schemauser.EmailUpdatedEvent:
 			wm.Email = string(e.EmailAddress)
+			wm.IsEmailVerified = false
+			wm.EmailVerifiedFailedCount = 0
 		case *schemauser.EmailCodeAddedEvent:
 			wm.IsEmailVerified = false
 			wm.EmailVerifiedFailedCount = 0
@@ -87,8 +91,10 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.EmailVerifiedFailedCount = 0
 		case *schemauser.EmailVerificationFailedEvent:
 			wm.EmailVerifiedFailedCount += 1
-		case *schemauser.PhoneChangedEvent:
+		case *schemauser.PhoneUpdatedEvent:
 			wm.Phone = string(e.PhoneNumber)
+			wm.IsPhoneVerified = false
+			wm.PhoneVerifiedFailedCount = 0
 		case *schemauser.PhoneCodeAddedEvent:
 			wm.IsPhoneVerified = false
 			wm.PhoneVerifiedFailedCount = 0
@@ -97,28 +103,39 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.IsPhoneVerified = true
 		case *schemauser.PhoneVerificationFailedEvent:
 			wm.PhoneVerifiedFailedCount += 1
+		case *schemauser.LockedEvent:
+			wm.Locked = true
+		case *schemauser.UnlockedEvent:
+			wm.Locked = false
+		case *schemauser.DeactivatedEvent:
+			wm.State = domain.UserStateInactive
+		case *schemauser.ActivatedEvent:
+			wm.State = domain.UserStateActive
 		}
 	}
 	return wm.WriteModel.Reduce()
 }
 
 func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
-		AggregateTypes(schemauser.AggregateType).
-		AggregateIDs(wm.AggregateID).
-		EventTypes(
-			schemauser.CreatedType,
-			schemauser.DeletedType,
-		)
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+	if wm.ResourceOwner != "" {
+		builder = builder.ResourceOwner(wm.ResourceOwner)
+	}
+	eventtypes := []eventstore.EventType{
+		schemauser.CreatedType,
+		schemauser.DeletedType,
+		schemauser.ActivatedType,
+		schemauser.DeactivatedType,
+		schemauser.LockedType,
+		schemauser.UnlockedType,
+	}
 	if wm.DataWM {
-		query = query.EventTypes(
+		eventtypes = append(eventtypes,
 			schemauser.UpdatedType,
 		)
 	}
 	if wm.EmailWM {
-		query = query.EventTypes(
+		eventtypes = append(eventtypes,
 			schemauser.EmailUpdatedType,
 			schemauser.EmailVerifiedType,
 			schemauser.EmailCodeAddedType,
@@ -126,31 +143,34 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 		)
 	}
 	if wm.PhoneWM {
-		query = query.EventTypes(
+		eventtypes = append(eventtypes,
 			schemauser.PhoneUpdatedType,
 			schemauser.PhoneVerifiedType,
 			schemauser.PhoneCodeAddedType,
 			schemauser.PhoneVerificationFailedType,
 		)
 	}
-	return query.Builder()
+	return builder.AddQuery().
+		AggregateTypes(schemauser.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(eventtypes...).Builder()
 }
 
 func (wm *UserV3WriteModel) NewUpdatedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,
-	schemaID *string,
-	schemaRevision *uint64,
+	schemaID string,
+	schemaRevision uint64,
 	data json.RawMessage,
 ) *schemauser.UpdatedEvent {
 	changes := make([]schemauser.Changes, 0)
-	if schemaID != nil && wm.SchemaID != *schemaID {
-		changes = append(changes, schemauser.ChangeSchemaID(wm.SchemaID, *schemaID))
+	if wm.SchemaID != schemaID {
+		changes = append(changes, schemauser.ChangeSchemaID(schemaID))
 	}
-	if schemaRevision != nil && wm.SchemaRevision != *schemaRevision {
-		changes = append(changes, schemauser.ChangeSchemaRevision(wm.SchemaRevision, *schemaRevision))
+	if wm.SchemaRevision != schemaRevision {
+		changes = append(changes, schemauser.ChangeSchemaRevision(schemaRevision))
 	}
-	if !bytes.Equal(wm.Data, data) {
+	if data != nil && !bytes.Equal(wm.Data, data) {
 		changes = append(changes, schemauser.ChangeData(data))
 	}
 	if len(changes) == 0 {
