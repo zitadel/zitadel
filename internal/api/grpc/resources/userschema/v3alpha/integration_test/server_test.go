@@ -14,6 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	schema "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
 )
 
@@ -60,9 +61,14 @@ func ensureFeatureEnabled(t *testing.T, iamOwnerCTX context.Context) {
 				Inheritance: true,
 			})
 			require.NoError(ttt, err)
-			if f.UserSchema.GetEnabled() {
-				return
-			}
+			assert.True(ttt, f.GetUserSchema().GetEnabled())
+
+			_, err = Instance.Client.UserSchemaV3.SearchUserSchemas(iamOwnerCTX, &schema.SearchUserSchemasRequest{
+				Query: &object.SearchQuery{
+					Limit: 1,
+				},
+			})
+			assert.NoError(ttt, err)
 		},
 		retryDuration,
 		time.Second,
