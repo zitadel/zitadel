@@ -52,7 +52,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-0oj2PquNGA", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-DkQ9aurv5u", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -90,7 +90,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-z2u8u7jylQ", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-b33QAVgel6", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -375,7 +375,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-y3n4Sdu8j5", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-R4LKY44Ke3", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -392,7 +392,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-qbGyMPvjvj", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-bx2OLtgGNS", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -700,7 +700,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-KvPc5o9GeJ", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-zmxIFR2nMo", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -719,7 +719,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-EajeF6ypOV", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-z8Bu9vuL9s", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -751,7 +751,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-QRkNTBwF8q", "Errors.User.Code.Empty"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-fEsHdqECzb", "Errors.User.Code.Empty"))
 				},
 			},
 		},
@@ -810,7 +810,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-QRkNTBwF8q", "Errors.User.Code.Empty"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-fEsHdqECzb", "Errors.User.Code.Empty"))
 				},
 			},
 		},

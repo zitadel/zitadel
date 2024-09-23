@@ -19,7 +19,7 @@ type ChangeSchemaUserPhone struct {
 
 func (s *ChangeSchemaUserPhone) Valid() (err error) {
 	if s.ID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-0oj2PquNGA", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-DkQ9aurv5u", "Errors.IDMissing")
 	}
 	if s.Phone != nil && s.Phone.Number != "" {
 		if s.Phone.Number, err = s.Phone.Number.Normalize(); err != nil {
@@ -56,7 +56,7 @@ func (c *Commands) ChangeSchemaUserPhone(ctx context.Context, user *ChangeSchema
 
 func (c *Commands) VerifySchemaUserPhone(ctx context.Context, resourceOwner, id, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
 	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-y3n4Sdu8j5", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-R4LKY44Ke3", "Errors.IDMissing")
 	}
 	writeModel, err := c.getSchemaUserPhoneWriteModelByID(ctx, resourceOwner, id)
 	if err != nil {
@@ -84,7 +84,7 @@ type ResendSchemaUserPhoneCode struct {
 
 func (c *Commands) ResendSchemaUserPhoneCode(ctx context.Context, user *ResendSchemaUserPhoneCode, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
 	if user.ID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-KvPc5o9GeJ", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-zmxIFR2nMo", "Errors.IDMissing")
 	}
 	writeModel, err := c.getSchemaUserPhoneWriteModelByID(ctx, user.ResourceOwner, user.ID)
 	if err != nil {

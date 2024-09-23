@@ -610,7 +610,7 @@ func (wm *UserV3WriteModel) NewPhoneUpdated(
 		return nil, "", nil
 	}
 	if !wm.Exists() {
-		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-z2u8u7jylQ", "Errors.User.NotFound")
+		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-b33QAVgel6", "Errors.User.NotFound")
 	}
 	return wm.NewPhoneCreated(ctx, phone, code)
 }
@@ -623,7 +623,7 @@ func (wm *UserV3WriteModel) NewPhoneVerify(
 		return nil, nil
 	}
 	if !wm.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-qbGyMPvjvj", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bx2OLtgGNS", "Errors.User.NotFound")
 	}
 	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, err
@@ -652,13 +652,13 @@ func (wm *UserV3WriteModel) NewResendPhoneCode(
 		return nil, "", nil
 	}
 	if !wm.Exists() {
-		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-EajeF6ypOV", "Errors.User.NotFound")
+		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-z8Bu9vuL9s", "Errors.User.NotFound")
 	}
 	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return nil, "", err
 	}
 	if wm.PhoneCode == nil {
-		return nil, "", zerrors.ThrowPreconditionFailed(err, "COMMAND-QRkNTBwF8q", "Errors.User.Code.Empty")
+		return nil, "", zerrors.ThrowPreconditionFailed(err, "COMMAND-fEsHdqECzb", "Errors.User.Code.Empty")
 	}
 	event, plainCode, err := wm.newPhoneCodeAddedEvent(ctx, code, isReturnCode)
 	if err != nil {
