@@ -335,3 +335,13 @@ func (c *Commands) getSMSConfig(ctx context.Context, instanceID, id string) (_ *
 	}
 	return writeModel, nil
 }
+
+// getActiveSMSConfig returns the last activated SMS configuration
+func (c *Commands) getActiveSMSConfig(ctx context.Context, instanceID string) (_ *IAMSMSConfigWriteModel, err error) {
+	writeModel := NewIAMSMSLastActivatedConfigWriteModel(instanceID)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return c.getSMSConfig(ctx, instanceID, writeModel.activeID)
+}

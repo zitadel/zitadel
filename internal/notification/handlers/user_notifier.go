@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -285,15 +286,16 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if err != nil {
 			return err
 		}
+		generatorInfo := new(senders.CodeGeneratorInfo)
 		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
 		if e.NotificationType == domain.NotificationTypeSms {
-			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e)
+			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo)
 		}
 		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
-		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
 	}), nil
 }
 
@@ -345,7 +347,7 @@ func (u *userNotifier) reduceOTPSMS(
 	expiry time.Duration,
 	userID,
 	resourceOwner string,
-	sentCommand func(ctx context.Context, userID string, resourceOwner string) (err error),
+	sentCommand func(ctx context.Context, userID, resourceOwner string, generatorInfo *senders.CodeGeneratorInfo) (err error),
 	eventTypes ...eventstore.EventType,
 ) (*handler.Statement, error) {
 	ctx := HandlerContext(event.Aggregate())
@@ -377,12 +379,13 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event)
+	generatorInfo := new(senders.CodeGeneratorInfo)
+	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event, generatorInfo)
 	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
 	if err != nil {
 		return nil, err
 	}
-	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner)
+	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner, generatorInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -713,12 +716,13 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if err != nil {
 			return err
 		}
-		err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e).
+		generatorInfo := new(senders.CodeGeneratorInfo)
+		err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo).
 			SendPhoneVerificationCode(ctx, code)
 		if err != nil {
 			return err
 		}
-		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
 	}), nil
 }
 

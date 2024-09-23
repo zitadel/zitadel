@@ -19,6 +19,8 @@ type HumanPasswordWriteModel struct {
 	CodeCreationDate         time.Time
 	CodeExpiry               time.Duration
 	PasswordCheckFailedCount uint64
+	GeneratorID              string
+	VerificationID           string
 
 	UserState domain.UserState
 }
@@ -56,6 +58,10 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
 			wm.CodeExpiry = e.Expiry
+			wm.GeneratorID = e.GeneratorID
+		case *user.HumanPasswordCodeSentEvent:
+			wm.GeneratorID = e.GeneratorInfo.GetID()
+			wm.VerificationID = e.GeneratorInfo.GetVerificationID()
 		case *user.HumanEmailVerifiedEvent:
 			if wm.UserState == domain.UserStateInitial {
 				wm.UserState = domain.UserStateActive

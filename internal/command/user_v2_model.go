@@ -42,13 +42,15 @@ type UserV2WriteModel struct {
 	InitCodeExpiry       time.Duration
 	InitCheckFailedCount uint64
 
-	PasswordWriteModel       bool
-	PasswordEncodedHash      string
-	PasswordChangeRequired   bool
-	PasswordCode             *crypto.CryptoValue
-	PasswordCodeCreationDate time.Time
-	PasswordCodeExpiry       time.Duration
-	PasswordCheckFailedCount uint64
+	PasswordWriteModel         bool
+	PasswordEncodedHash        string
+	PasswordChangeRequired     bool
+	PasswordCode               *crypto.CryptoValue
+	PasswordCodeCreationDate   time.Time
+	PasswordCodeExpiry         time.Duration
+	PasswordCheckFailedCount   uint64
+	PasswordCodeGeneratorID    string
+	PasswordCodeVerificationID string
 
 	EmailWriteModel       bool
 	Email                 domain.EmailAddress
@@ -270,7 +272,9 @@ func (wm *UserV2WriteModel) Reduce() error {
 			wm.PasswordChangeRequired = e.ChangeRequired
 			wm.EmptyPasswordCode()
 		case *user.HumanPasswordCodeAddedEvent:
-			wm.SetPasswordCode(e.Code, e.Expiry, e.CreationDate())
+			wm.SetPasswordCode(e)
+		case *user.HumanPasswordCodeSentEvent:
+			wm.SetPasswordCodeSent(e)
 		case *user.UserIDPLinkAddedEvent:
 			wm.AddIDPLink(e.IDPConfigID, e.DisplayName, e.ExternalUserID)
 		case *user.UserIDPLinkRemovedEvent:
@@ -337,10 +341,16 @@ func (wm *UserV2WriteModel) EmptyPasswordCode() {
 	wm.PasswordCodeExpiry = 0
 	wm.PasswordCodeCreationDate = time.Time{}
 }
-func (wm *UserV2WriteModel) SetPasswordCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
-	wm.PasswordCode = code
-	wm.PasswordCodeExpiry = expiry
-	wm.PasswordCodeCreationDate = creationDate
+func (wm *UserV2WriteModel) SetPasswordCode(e *user.HumanPasswordCodeAddedEvent) {
+	wm.PasswordCode = e.Code
+	wm.PasswordCodeExpiry = e.Expiry
+	wm.PasswordCodeCreationDate = e.CreationDate()
+	wm.PasswordCodeGeneratorID = e.GeneratorID
+}
+
+func (wm *UserV2WriteModel) SetPasswordCodeSent(e *user.HumanPasswordCodeSentEvent) {
+	wm.PasswordCodeGeneratorID = e.GeneratorInfo.GetID()
+	wm.PasswordCodeVerificationID = e.GeneratorInfo.GetVerificationID()
 }
 
 func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {

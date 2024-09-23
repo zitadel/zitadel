@@ -21,6 +21,27 @@ type EncryptedCode struct {
 	Expiry  time.Duration
 }
 
+func (e *EncryptedCode) CryptedCode() *crypto.CryptoValue {
+	if e == nil {
+		return nil
+	}
+	return e.Crypted
+}
+
+func (e *EncryptedCode) PlainCode() string {
+	if e == nil {
+		return ""
+	}
+	return e.Plain
+}
+
+func (e *EncryptedCode) CodeExpiry() time.Duration {
+	if e == nil {
+		return 0
+	}
+	return e.Expiry
+}
+
 func newEncryptedCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
 	return newEncryptedCodeWithDefaultConfig(ctx, filter, typ, alg, emptyConfig)
 }

@@ -425,21 +425,21 @@ func (c *Commands) updateSchemaUserPhone(ctx context.Context, existing *UserV3Wr
 		phone.Number,
 	))
 	if phone.Verified {
-		events = append(events, schemauser.NewPhoneVerifiedEvent(ctx, agg))
-	} else {
-		cryptoCode, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
-		if err != nil {
-			return nil, "", err
-		}
-		if phone.ReturnCode {
-			plainCode = cryptoCode.Plain
-		}
-		events = append(events, schemauser.NewPhoneCodeAddedEvent(ctx, agg,
-			cryptoCode.Crypted,
-			cryptoCode.Expiry,
-			phone.ReturnCode,
-		))
+		return append(events, schemauser.NewPhoneVerifiedEvent(ctx, agg)), "", nil
 	}
+	cryptoCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
+	if err != nil {
+		return nil, "", err
+	}
+	if phone.ReturnCode {
+		plainCode = cryptoCode.Plain
+	}
+	events = append(events, schemauser.NewPhoneCodeAddedEvent(ctx, agg,
+		cryptoCode.CryptedCode(),
+		cryptoCode.CodeExpiry(),
+		phone.ReturnCode,
+		generatorID,
+	))
 	return events, plainCode, nil
 }
 
