@@ -133,7 +133,7 @@ func TestServer_SetContactPhone(t *testing.T) {
 				schemaID := schemaResp.GetDetails().GetId()
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaID, []byte(data))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				return nil
 			},
 			req: &user.SetContactPhoneRequest{
@@ -324,7 +324,7 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 			dep: func(req *user.VerifyContactPhoneRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -343,7 +343,7 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 			dep: func(req *user.VerifyContactPhoneRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -379,7 +379,7 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 			dep: func(req *user.VerifyContactPhoneRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -400,7 +400,7 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 				schemaID := schemaResp.GetDetails().GetId()
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaID, []byte(data))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				return nil
 			},
 			req: &user.VerifyContactPhoneRequest{
@@ -419,7 +419,7 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 			dep: func(req *user.VerifyContactPhoneRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -440,7 +440,7 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 			dep: func(req *user.VerifyContactPhoneRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -516,7 +516,7 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 			dep: func(req *user.ResendContactPhoneCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				return nil
 			},
 			req: &user.ResendContactPhoneCodeRequest{
@@ -534,7 +534,7 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 			dep: func(req *user.ResendContactPhoneCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				return nil
 			},
 			req: &user.ResendContactPhoneCodeRequest{
@@ -568,7 +568,7 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 			dep: func(req *user.ResendContactPhoneCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				return nil
 			},
 			req: &user.ResendContactPhoneCodeRequest{
@@ -605,7 +605,7 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 			dep: func(req *user.ResendContactPhoneCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				return nil
 			},
 			req: &user.ResendContactPhoneCodeRequest{},
@@ -625,7 +625,7 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 			dep: func(req *user.ResendContactPhoneCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				return nil
 			},
 			req: &user.ResendContactPhoneCodeRequest{
@@ -653,7 +653,7 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 			dep: func(req *user.ResendContactPhoneCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserPhone(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Phone())
 				return nil
 			},
 			req: &user.ResendContactPhoneCodeRequest{

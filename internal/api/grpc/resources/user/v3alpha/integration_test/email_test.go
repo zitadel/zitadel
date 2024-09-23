@@ -61,7 +61,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 					},
 				},
 				Email: &user.SetEmail{
-					Address: "user@example.com",
+					Address: gofakeit.Email(),
 				},
 			},
 			wantErr: true,
@@ -81,7 +81,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 					},
 				},
 				Email: &user.SetEmail{
-					Address: "user@example.com",
+					Address: gofakeit.Email(),
 				},
 			},
 			wantErr: true,
@@ -100,7 +100,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 				},
 				Id: "notexisting",
 				Email: &user.SetEmail{
-					Address: "user@example.com",
+					Address: gofakeit.Email(),
 				},
 			},
 			wantErr: true,
@@ -120,7 +120,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 					},
 				},
 				Email: &user.SetEmail{
-					Address: "user@example.com",
+					Address: gofakeit.Email(),
 				},
 			},
 			wantErr: true,
@@ -133,7 +133,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 				schemaID := schemaResp.GetDetails().GetId()
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaID, []byte(data))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				return nil
 			},
 			req: &user.SetContactEmailRequest{
@@ -143,7 +143,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 					},
 				},
 				Email: &user.SetEmail{
-					Address: "user@example.com",
+					Address: gofakeit.Email(),
 				},
 			},
 			res: res{
@@ -166,7 +166,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 			},
 			req: &user.SetContactEmailRequest{
 				Email: &user.SetEmail{
-					Address: "user@example.com",
+					Address: gofakeit.Email(),
 				},
 			},
 			res: res{
@@ -194,7 +194,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 					},
 				},
 				Email: &user.SetEmail{
-					Address:      "user@example.com",
+					Address:      gofakeit.Email(),
 					Verification: &user.SetEmail_ReturnCode{},
 				},
 			},
@@ -224,7 +224,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 					},
 				},
 				Email: &user.SetEmail{
-					Address:      "user@example.com",
+					Address:      gofakeit.Email(),
 					Verification: &user.SetEmail_IsVerified{IsVerified: true},
 				},
 			},
@@ -253,7 +253,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 					},
 				},
 				Email: &user.SetEmail{
-					Address:      "user@example.com",
+					Address:      gofakeit.Email(),
 					Verification: &user.SetEmail_SendCode{},
 				},
 			},
@@ -324,7 +324,7 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 			dep: func(req *user.VerifyContactEmailRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -343,7 +343,7 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 			dep: func(req *user.VerifyContactEmailRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -379,7 +379,7 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 			dep: func(req *user.VerifyContactEmailRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -400,7 +400,7 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 				schemaID := schemaResp.GetDetails().GetId()
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaID, []byte(data))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				return nil
 			},
 			req: &user.VerifyContactEmailRequest{
@@ -419,7 +419,7 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 			dep: func(req *user.VerifyContactEmailRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -440,7 +440,7 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 			dep: func(req *user.VerifyContactEmailRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				verifyResp := instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				req.VerificationCode = verifyResp.GetVerificationCode()
 				return nil
 			},
@@ -516,7 +516,7 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 			dep: func(req *user.ResendContactEmailCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				return nil
 			},
 			req: &user.ResendContactEmailCodeRequest{
@@ -534,7 +534,7 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 			dep: func(req *user.ResendContactEmailCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				return nil
 			},
 			req: &user.ResendContactEmailCodeRequest{
@@ -568,7 +568,7 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 			dep: func(req *user.ResendContactEmailCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				return nil
 			},
 			req: &user.ResendContactEmailCodeRequest{
@@ -605,7 +605,7 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 			dep: func(req *user.ResendContactEmailCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				return nil
 			},
 			req: &user.ResendContactEmailCodeRequest{},
@@ -625,7 +625,7 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 			dep: func(req *user.ResendContactEmailCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				return nil
 			},
 			req: &user.ResendContactEmailCodeRequest{
@@ -653,7 +653,7 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 			dep: func(req *user.ResendContactEmailCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, "user@example.com")
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
 				return nil
 			},
 			req: &user.ResendContactEmailCodeRequest{
