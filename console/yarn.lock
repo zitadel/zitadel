@@ -26,12 +26,12 @@
     "@angular-devkit/core" "16.2.14"
     rxjs "7.8.1"
 
-"@angular-devkit/architect@0.1602.15":
-  version "0.1602.15"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.1602.15.tgz#b70f2456677f6859d4dac4ad80c6b13d00108797"
-  integrity sha512-+yPlUG5c8l7Z/A6dyeV7NQjj4WDWnWWQt+8eW/KInwVwoYiM32ntTJ0M4uU/aDdHuwKQnMLly28AcSWPWKYf2Q==
+"@angular-devkit/architect@0.1602.16":
+  version "0.1602.16"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.1602.16.tgz#7ffcaa5840037682d8205054c2c3bb84a053aeb7"
+  integrity sha512-aWEeGU4UlbrSKpcAZsldVNxNXAWEeu9hM2BPk77GftbRC8PBMWpgYyrJWTz2ryn8aSmGKT3T8OyBH4gZA/667w==
   dependencies:
-    "@angular-devkit/core" "16.2.15"
+    "@angular-devkit/core" "16.2.16"
     rxjs "7.8.1"
 
 "@angular-devkit/build-angular@^16.2.2":
@@ -126,10 +126,10 @@
     rxjs "7.8.1"
     source-map "0.7.4"
 
-"@angular-devkit/core@16.2.15":
-  version "16.2.15"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-16.2.15.tgz#44ef98cda82ef82435a2a41507f8c24720d372df"
-  integrity sha512-68BgPWpcjNKz++uvLFG8IZaOH3ti2BWQVqaE3yTIYaMoNt0y0A0X2MUVd7EGbAGUk2JdloWJv5LTPVZMzCuK4w==
+"@angular-devkit/core@16.2.16":
+  version "16.2.16"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-16.2.16.tgz#078c48790c7b2b87eb5f78c6b724c4d28cbe26a1"
+  integrity sha512-5xHs9JFmp78sydrOAg0UGErxfMVv5c2f3RXoikS7eBOOXTWEi5pmnOkOvSJ3loQFGVs3Y7i+u02G3VrF5ZxOrA==
   dependencies:
     ajv "8.12.0"
     ajv-formats "2.1.1"
@@ -138,12 +138,12 @@
     rxjs "7.8.1"
     source-map "0.7.4"
 
-"@angular-devkit/schematics@16.2.15":
-  version "16.2.15"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-16.2.15.tgz#cedcb48fdd240db0a779674cf52455a78a4098bb"
-  integrity sha512-C/j2EwapdBMf1HWDuH89bA9B2e511iEYImkyZ+vCSXRwGiWUaZCrhl18bvztpErTrdOLM3mCwNXWEAMXI4zUXA==
+"@angular-devkit/schematics@16.2.16":
+  version "16.2.16"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/schematics/-/schematics-16.2.16.tgz#7f8dbf16fe440f0a9d2b5b25d0dbe16b73356216"
+  integrity sha512-pF6fdtJh6yLmgA7Gs45JIdxPl2MsTAhYcZIMrX1a6ID64dfwtF0MP8fDE6vrWInV1zXbzzf7l7PeKuqVtTSzKg==
   dependencies:
-    "@angular-devkit/core" "16.2.15"
+    "@angular-devkit/core" "16.2.16"
     jsonc-parser "3.2.0"
     magic-string "0.30.1"
     ora "5.4.1"
@@ -262,15 +262,15 @@
   optionalDependencies:
     parse5 "^7.1.2"
 
-"@angular/cli@^16.2.15":
-  version "16.2.15"
-  resolved "https://registry.yarnpkg.com/@angular/cli/-/cli-16.2.15.tgz#951d84ef9a7113242b10fe89be1adfa3a94dd6aa"
-  integrity sha512-nNUmt0ZRj2xHH8tGXSJUiusP5rmakAz0f6cc6T4p03OyeShOKdvs9+/F4hzzsM79/ylZofBlFfwYVCBTbOtMqw==
+"@angular/cli@^16.2.16":
+  version "16.2.16"
+  resolved "https://registry.yarnpkg.com/@angular/cli/-/cli-16.2.16.tgz#8886e63c75bbce91c5a550eeaf3b283eaef89533"
+  integrity sha512-aqfNYZ45ndrf36i+7AhQ9R8BCm025j7TtYaUmvvjT4LwiUg6f6KtlZPB/ivBlXmd1g9oXqW4advL0AIi8A/Ozg==
   dependencies:
-    "@angular-devkit/architect" "0.1602.15"
-    "@angular-devkit/core" "16.2.15"
-    "@angular-devkit/schematics" "16.2.15"
-    "@schematics/angular" "16.2.15"
+    "@angular-devkit/architect" "0.1602.16"
+    "@angular-devkit/core" "16.2.16"
+    "@angular-devkit/schematics" "16.2.16"
+    "@schematics/angular" "16.2.16"
     "@yarnpkg/lockfile" "1.1.0"
     ansi-colors "4.1.3"
     ini "4.1.1"
@@ -2904,13 +2904,13 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
 
-"@schematics/angular@16.2.15":
-  version "16.2.15"
-  resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-16.2.15.tgz#f3b810842959808f0d65ce816f4f0c1a7463c176"
-  integrity sha512-T7wEGYxidpLAkis+hO5nsVfnWsy6sXf1T9GS8uztC8IYYsnqB9jTVfjVyfhASugZasdmx7+jWv3oCGy6Z5ZehA==
+"@schematics/angular@16.2.16":
+  version "16.2.16"
+  resolved "https://registry.yarnpkg.com/@schematics/angular/-/angular-16.2.16.tgz#3f077f398fc7ff88654fd477790af8270585c3af"
+  integrity sha512-V4cE4R5MbusKaNW9DWsisiSRUoQzbAaBIeJh42yCkg5H/lUdf18hUB7DG6Pl7yH6/tjzzz4SqIVD7N64uCDC2A==
   dependencies:
-    "@angular-devkit/core" "16.2.15"
-    "@angular-devkit/schematics" "16.2.15"
+    "@angular-devkit/core" "16.2.16"
+    "@angular-devkit/schematics" "16.2.16"
     jsonc-parser "3.2.0"
 
 "@sigstore/bundle@^1.1.0":
