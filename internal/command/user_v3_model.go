@@ -91,6 +91,17 @@ func NewUserV3EmailWriteModel(resourceOwner, userID string, checkPermission doma
 	}
 }
 
+func NewUserV3PhoneWriteModel(resourceOwner, userID string, checkPermission domain.PermissionCheck) *UserV3WriteModel {
+	return &UserV3WriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		PhoneWM:         true,
+		checkPermission: checkPermission,
+	}
+}
+
 func (wm *UserV3WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
@@ -604,10 +615,56 @@ func (wm *UserV3WriteModel) NewPhoneUpdated(
 	return wm.NewPhoneCreated(ctx, phone, code)
 }
 
+func (wm *UserV3WriteModel) NewPhoneVerify(
+	ctx context.Context,
+	verify func(creationDate time.Time, expiry time.Duration, cryptoCode *crypto.CryptoValue) error,
+) ([]eventstore.Command, error) {
+	if !wm.PhoneWM {
+		return nil, nil
+	}
+	if !wm.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-qbGyMPvjvj", "Errors.User.NotFound")
+	}
+	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+		return nil, err
+	}
+	if wm.PhoneCode == nil {
+		return nil, nil
+	}
+	if err := verify(wm.PhoneCode.CreationDate, wm.PhoneCode.Expiry, wm.PhoneCode.Code); err != nil {
+		return nil, err
+	}
+	return []eventstore.Command{wm.newPhoneVerifiedEvent(ctx)}, nil
+}
+
 func (wm *UserV3WriteModel) newPhoneVerifiedEvent(
 	ctx context.Context,
 ) *schemauser.PhoneVerifiedEvent {
 	return schemauser.NewPhoneVerifiedEvent(ctx, UserV3AggregateFromWriteModel(&wm.WriteModel))
+}
+
+func (wm *UserV3WriteModel) NewResendPhoneCode(
+	ctx context.Context,
+	code func(context.Context) (*EncryptedCode, error),
+	isReturnCode bool,
+) (_ []eventstore.Command, plainCode string, err error) {
+	if !wm.PhoneWM {
+		return nil, "", nil
+	}
+	if !wm.Exists() {
+		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-EajeF6ypOV", "Errors.User.NotFound")
+	}
+	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+		return nil, "", err
+	}
+	if wm.PhoneCode == nil {
+		return nil, "", zerrors.ThrowPreconditionFailed(err, "COMMAND-QRkNTBwF8q", "Errors.User.Code.Empty")
+	}
+	event, plainCode, err := wm.newPhoneCodeAddedEvent(ctx, code, isReturnCode)
+	if err != nil {
+		return nil, "", err
+	}
+	return []eventstore.Command{event}, plainCode, nil
 }
 
 func (wm *UserV3WriteModel) newPhoneCodeAddedEvent(

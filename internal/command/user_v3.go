@@ -374,3 +374,11 @@ func (c *Commands) getSchemaUserEmailWriteModelByID(ctx context.Context, resourc
 	}
 	return writeModel, nil
 }
+
+func (c *Commands) getSchemaUserPhoneWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
+	writeModel := NewUserV3PhoneWriteModel(resourceOwner, id, c.checkPermission)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}

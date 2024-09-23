@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
@@ -140,22 +139,6 @@ func setContactToContact(contact *user.SetContact) (*command.Email, *command.Pho
 		return nil, nil
 	}
 	return setEmailToEmail(contact.GetEmail()), setPhoneToPhone(contact.GetPhone())
-}
-
-func setPhoneToPhone(setPhone *user.SetPhone) *command.Phone {
-	if setPhone == nil {
-		return nil
-	}
-	phone := &command.Phone{
-		Number: domain.PhoneNumber(setPhone.Number),
-	}
-	if setPhone.GetIsVerified() {
-		phone.Verified = true
-	}
-	if setPhone.GetReturnCode() != nil {
-		phone.ReturnCode = true
-	}
-	return phone
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {
