@@ -338,10 +338,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/language-service@^18.2.4":
-  version "18.2.4"
-  resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-18.2.4.tgz#c449a75bc405bf519fc90f7a9269a98e2a1f7758"
-  integrity sha512-Keg6n8u8xHLhRDTmx4hUqh1AtVFUt8hDxPMYSUu64czjOT5Dnh8XsgKagu563NEjxbDaCzttPuO+y3DlcaDZoQ==
+"@angular/language-service@^18.2.5":
+  version "18.2.5"
+  resolved "https://registry.yarnpkg.com/@angular/language-service/-/language-service-18.2.5.tgz#ae6ff97100c527aa64d94d1cda2524cfa8d26425"
+  integrity sha512-JE6ck4UWXayiG8ptJJtkrKCjy+5Ftktgsoj4QGdQzMhbpia7Wge5XDj28o+bwEFndRnP6ihRtud63IvOz9aKFQ==
 
 "@angular/material-moment-adapter@^16.2.4":
   version "16.2.14"
