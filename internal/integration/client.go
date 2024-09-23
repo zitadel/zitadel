@@ -776,6 +776,28 @@ func (i *Instance) CreateSchemaUser(ctx context.Context, orgID string, schemaID 
 	return user
 }
 
+func (i *Instance) AddAuthenticatorUsername(ctx context.Context, orgID string, userID string, username string, isOrgSpecific bool) *user_v3alpha.AddUsernameResponse {
+	user, err := i.Client.UserV3Alpha.AddUsername(ctx, &user_v3alpha.AddUsernameRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		Username: &user_v3alpha.SetUsername{
+			Username:               username,
+			IsOrganizationSpecific: isOrgSpecific,
+		},
+	})
+	logging.OnError(err).Fatal("create username")
+	return user
+}
+
+func (i *Instance) RemoveAuthenticatorUsername(ctx context.Context, orgID string, id string) *user_v3alpha.RemoveUsernameResponse {
+	user, err := i.Client.UserV3Alpha.RemoveUsername(ctx, &user_v3alpha.RemoveUsernameRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           id,
+	})
+	logging.OnError(err).Fatal("remove username")
+	return user
+}
+
 func (i *Instance) CreateInviteCode(ctx context.Context, userID string) *user_v2.CreateInviteCodeResponse {
 	user, err := i.Client.UserV2.CreateInviteCode(ctx, &user_v2.CreateInviteCodeRequest{
 		UserId:       userID,

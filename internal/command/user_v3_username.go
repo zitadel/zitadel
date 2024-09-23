@@ -9,8 +9,6 @@ import (
 )
 
 type AddUsername struct {
-	Details *domain.ObjectDetails
-
 	ResourceOwner string
 	UserID        string
 
@@ -18,14 +16,14 @@ type AddUsername struct {
 	IsOrgSpecific bool
 }
 
-func (c *Commands) AddUsername(ctx context.Context, username *AddUsername) (err error) {
+func (c *Commands) AddUsername(ctx context.Context, username *AddUsername) (*domain.ObjectDetails, error) {
 	existing, err := existingSchemaUserWithPermission(ctx, c, username.ResourceOwner, username.UserID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	id, err := c.idGenerator.Next()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	events, err := c.eventstore.Push(ctx,
 		authenticator.NewUsernameCreatedEvent(ctx,
@@ -36,19 +34,15 @@ func (c *Commands) AddUsername(ctx context.Context, username *AddUsername) (err 
 		),
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	username.Details = pushedEventsToObjectDetails(events)
-	return nil
+	return pushedEventsToObjectDetails(events), nil
 }
 
 func (c *Commands) DeleteUsername(ctx context.Context, resourceOwner, id string) (_ *domain.ObjectDetails, err error) {
-	existing, err := c.getSchemaUsernameExists(ctx, resourceOwner, id)
+	existing, err := c.getSchemaUsernameExistsWithPermission(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
-	}
-	if existing.Username == "" {
-		return nil, zerrors.ThrowNotFound(nil, "TODO", "TODO")
 	}
 	events, err := c.eventstore.Push(ctx,
 		authenticator.NewUsernameDeletedEvent(ctx,
@@ -63,9 +57,19 @@ func (c *Commands) DeleteUsername(ctx context.Context, resourceOwner, id string)
 	return pushedEventsToObjectDetails(events), nil
 }
 
-func (c *Commands) getSchemaUsernameExists(ctx context.Context, resourceOwner, id string) (*UsernameV3WriteModel, error) {
+func (c *Commands) getSchemaUsernameExistsWithPermission(ctx context.Context, resourceOwner, id string) (*UsernameV3WriteModel, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-PoSU5BOZCi", "Errors.IDMissing")
+	}
 	writeModel := NewUsernameV3WriteModel(resourceOwner, id)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	if writeModel.Username == "" {
+		return nil, zerrors.ThrowNotFound(nil, "TODO", "TODO")
+	}
+
+	if err := c.checkPermissionUpdateUser(ctx, writeModel.ResourceOwner, writeModel.UserID); err != nil {
 		return nil, err
 	}
 	return writeModel, nil
@@ -83,15 +87,18 @@ func existingSchemaUserWithPermission(ctx context.Context, c *Commands, resource
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "Errors.User.NotFound")
 	}
 
-	_, err = c.getSchemaWriteModelByID(ctx, "", existingUser.SchemaID)
-	if err != nil {
-		return nil, err
-	}
-	if !existingUser.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "Errors.User.NotFound")
-	}
 	if err := c.checkPermissionUpdateUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
 		return nil, err
 	}
+
+	existingSchema, err := c.getSchemaWriteModelByID(ctx, "", existingUser.SchemaID)
+	if err != nil {
+		return nil, err
+	}
+	if !existingSchema.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "TODO")
+	}
+
+	//TODO possible authenticators check
 	return existingUser, nil
 }

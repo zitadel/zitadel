@@ -8,6 +8,7 @@ import (
 
 type UsernameV3WriteModel struct {
 	eventstore.WriteModel
+	UserID        string
 	Username      string
 	IsOrgSpecific bool
 }
@@ -25,9 +26,11 @@ func (wm *UsernameV3WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *authenticator.UsernameCreatedEvent:
+			wm.UserID = e.UserID
 			wm.Username = e.Username
 			wm.IsOrgSpecific = e.IsOrgSpecific
 		case *authenticator.UsernameDeletedEvent:
+			wm.UserID = ""
 			wm.Username = ""
 			wm.IsOrgSpecific = false
 		}
