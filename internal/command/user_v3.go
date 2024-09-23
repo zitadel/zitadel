@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -304,7 +303,7 @@ func (c *Commands) ActivateSchemaUser(ctx context.Context, resourceOwner, id str
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-17XupGvxBJ", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserExists(ctx, "", id)
+	writeModel, err := c.getSchemaUserExists(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
@@ -320,35 +319,6 @@ func (c *Commands) ActivateSchemaUser(ctx context.Context, resourceOwner, id str
 		return nil, err
 	}
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
-}
-
-func (c *Commands) updateSchemaUserPhone(ctx context.Context, existing *UserV3WriteModel, events []eventstore.Command, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	if existing.Phone == string(phone.Number) {
-		return events, plainCode, nil
-	}
-
-	agg := UserV3AggregateFromWriteModel(existing.GetWriteModel())
-	events = append(events, schemauser.NewPhoneUpdatedEvent(ctx,
-		agg,
-		phone.Number,
-	))
-	if phone.Verified {
-		events = append(events, schemauser.NewPhoneVerifiedEvent(ctx, agg))
-	} else {
-		cryptoCode, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
-		if err != nil {
-			return nil, "", err
-		}
-		if phone.ReturnCode {
-			plainCode = cryptoCode.Plain
-		}
-		events = append(events, schemauser.NewPhoneCodeAddedEvent(ctx, agg,
-			cryptoCode.Crypted,
-			cryptoCode.Expiry,
-			phone.ReturnCode,
-		))
-	}
-	return events, plainCode, nil
 }
 
 func (c *Commands) getSchemaUserExists(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
