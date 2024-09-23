@@ -6117,10 +6117,10 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-i18n-iso-countries@^7.7.0:
-  version "7.11.3"
-  resolved "https://registry.yarnpkg.com/i18n-iso-countries/-/i18n-iso-countries-7.11.3.tgz#46cf3e067fbf8bc8dcf291ad33fdeb2852a74913"
-  integrity sha512-yxQVzNvxEaspSqNnCbqLvwTZNXXkGydWcSxytJYZYb0KH5pn13fdywuX0vFxmOg57Z8ff416AuKDx6Oqnx+j9w==
+i18n-iso-countries@^7.12.0:
+  version "7.12.0"
+  resolved "https://registry.yarnpkg.com/i18n-iso-countries/-/i18n-iso-countries-7.12.0.tgz#e189d85a505ee025f0f48b5ccc35fa66c436e99c"
+  integrity sha512-NDFf5j/raA5JrcPT/NcHP3RUMH7TkdkxQKAKdvDlgb+MS296WJzzqvV0Y5uwavSm7A6oYvBeSV0AxoHdDiHIiw==
   dependencies:
     diacritics "1.3.0"
 
