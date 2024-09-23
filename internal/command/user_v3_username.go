@@ -75,6 +75,34 @@ func (c *Commands) getSchemaUsernameExistsWithPermission(ctx context.Context, re
 	return writeModel, nil
 }
 
+func existingSchemaUser(ctx context.Context, c *Commands, resourceOwner, userID string) (*UserV3WriteModel, error) {
+	if userID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aS3Vz5t6BS", "Errors.IDMissing")
+	}
+	existingUser, err := c.getSchemaUserExists(ctx, resourceOwner, userID)
+	if err != nil {
+		return nil, err
+	}
+	if !existingUser.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "Errors.User.NotFound")
+	}
+
+	if err := c.checkPermissionUpdateUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
+		return nil, err
+	}
+
+	existingSchema, err := c.getSchemaWriteModelByID(ctx, "", existingUser.SchemaID)
+	if err != nil {
+		return nil, err
+	}
+	if !existingSchema.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "TODO")
+	}
+
+	//TODO possible authenticators check
+	return existingUser, nil
+}
+
 func existingSchemaUserWithPermission(ctx context.Context, c *Commands, resourceOwner, userID string) (*UserV3WriteModel, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aS3Vz5t6BS", "Errors.IDMissing")

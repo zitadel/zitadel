@@ -2,84 +2,58 @@ package command
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
-	"github.com/zitadel/zitadel/internal/repository/user/schema"
-	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func filterSchemaUserExisting() expect {
+func filterSchemaUserPasswordExisting() expect {
 	return expectFilter(
 		eventFromEventPusher(
-			schemauser.NewCreatedEvent(
+			authenticator.NewPasswordCreatedEvent(
 				context.Background(),
-				&schemauser.NewAggregate("user1", "org1").Aggregate,
-				"id1",
+				&authenticator.NewAggregate("user1", "org1").Aggregate,
+				"user1",
+				"encoded",
+				false,
+			),
+		),
+	)
+}
+
+func filterPasswordComplexityPolicyExisting() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+				&org.NewAggregate("org1").Aggregate,
 				1,
-				json.RawMessage(`{
-						"name": "user1"
-					}`),
+				false,
+				false,
+				false,
+				false,
 			),
 		),
 	)
 }
 
-func filterSchemaExisting() expect {
-	return expectFilter(
-		eventFromEventPusher(
-			schema.NewCreatedEvent(
-				context.Background(),
-				&schema.NewAggregate("id1", "instanceID").Aggregate,
-				"type",
-				json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-				[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-			),
-		),
-	)
-}
-
-func filterUsernameExisting(isOrgSpecifc bool) expect {
-	return expectFilter(
-		eventFromEventPusher(
-			authenticator.NewUsernameCreatedEvent(
-				context.Background(),
-				&authenticator.NewAggregate("username1", "org1").Aggregate,
-				"id1",
-				isOrgSpecifc,
-				"username",
-			),
-		),
-	)
-}
-
-func TestCommands_AddUsername(t *testing.T) {
+func TestCommands_SetSchemaUserPassword(t *testing.T) {
 	type fields struct {
-		eventstore      func(t *testing.T) *eventstore.Eventstore
-		idGenerator     id.Generator
-		checkPermission domain.PermissionCheck
+		eventstore         func(t *testing.T) *eventstore.Eventstore
+		userPasswordHasher *crypto.Hasher
+		checkPermission    domain.PermissionCheck
 	}
 	type args struct {
 		ctx  context.Context
-		user *AddUsername
+		user *SetSchemaUserPassword
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -99,7 +73,7 @@ func TestCommands_AddUsername(t *testing.T) {
 			},
 			args{
 				ctx:  authz.NewMockContext("instanceID", "", ""),
-				user: &AddUsername{},
+				user: &SetSchemaUserPassword{},
 			},
 			res{
 				err: func(err error) bool {
@@ -108,22 +82,42 @@ func TestCommands_AddUsername(t *testing.T) {
 			},
 		},
 		{
+			"no password, error",
+			fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &SetSchemaUserPassword{
+					UserID: "user1",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3klek4sbns", "Errors.User.Password.Empty"))
+				},
+			},
+		},
+		{
 			"user not existing, error",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &AddUsername{
-					UserID: "notexisting",
+				user: &SetSchemaUserPassword{
+					UserID:   "notexisting",
+					Password: "password",
 				},
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
 				},
 			},
 		},
@@ -131,14 +125,15 @@ func TestCommands_AddUsername(t *testing.T) {
 			"no permission, error",
 			fields{
 				eventstore: expectEventstore(
-					filterSchemaUserExisting(),
+					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &AddUsername{
-					UserID: "user1",
+				user: &SetSchemaUserPassword{
+					UserID:   "user1",
+					Password: "password",
 				},
 			},
 			res{
@@ -148,51 +143,31 @@ func TestCommands_AddUsername(t *testing.T) {
 			},
 		},
 		{
-			"userschema not existing, error",
+			"password added, ok",
 			fields{
 				eventstore: expectEventstore(
-					filterSchemaUserExisting(),
 					expectFilter(),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &AddUsername{
-					UserID: "user1",
-				},
-			},
-			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "TODO"))
-				},
-			},
-		},
-		{
-			"username added, ok",
-			fields{
-				eventstore: expectEventstore(
 					filterSchemaUserExisting(),
-					filterSchemaExisting(),
+					filterPasswordComplexityPolicyExisting(),
 					expectPush(
-						authenticator.NewUsernameCreatedEvent(
+						authenticator.NewPasswordCreatedEvent(
 							context.Background(),
-							&authenticator.NewAggregate("username1", "org1").Aggregate,
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
 							"user1",
+							"$plain$x$password",
 							false,
-							"username",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				idGenerator:     mock.ExpectID(t, "username1"),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &AddUsername{
-					UserID:        "user1",
-					Username:      "username",
-					IsOrgSpecific: false,
+				user: &SetSchemaUserPassword{
+					UserID:         "user1",
+					Password:       "password",
+					ChangeRequired: false,
 				},
 			},
 			res{
@@ -202,30 +177,63 @@ func TestCommands_AddUsername(t *testing.T) {
 			},
 		},
 		{
-			"username added, isOrgSpecific, ok",
+			"password set, ok",
 			fields{
 				eventstore: expectEventstore(
-					filterSchemaUserExisting(),
-					filterSchemaExisting(),
+					filterSchemaUserPasswordExisting(),
+					filterPasswordComplexityPolicyExisting(),
 					expectPush(
-						authenticator.NewUsernameCreatedEvent(
+						authenticator.NewPasswordCreatedEvent(
 							context.Background(),
-							&authenticator.NewAggregate("username1", "org1").Aggregate,
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
 							"user1",
-							true,
-							"username",
+							"$plain$x$password",
+							false,
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				idGenerator:     mock.ExpectID(t, "username1"),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &AddUsername{
-					UserID:        "user1",
-					Username:      "username",
-					IsOrgSpecific: true,
+				user: &SetSchemaUserPassword{
+					UserID:         "user1",
+					Password:       "password",
+					ChangeRequired: false,
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"password set, changeRequired, ok",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserPasswordExisting(),
+					filterPasswordComplexityPolicyExisting(),
+					expectPush(
+						authenticator.NewPasswordCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"$plain$x$password",
+							true,
+						),
+					),
+				),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &SetSchemaUserPassword{
+					UserID:         "user1",
+					Password:       "password",
+					ChangeRequired: true,
 				},
 			},
 			res{
@@ -238,11 +246,11 @@ func TestCommands_AddUsername(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				idGenerator:     tt.fields.idGenerator,
-				checkPermission: tt.fields.checkPermission,
+				eventstore:         tt.fields.eventstore(t),
+				checkPermission:    tt.fields.checkPermission,
+				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			details, err := c.AddUsername(tt.args.ctx, tt.args.user)
+			details, err := c.SetSchemaUserPassword(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -256,7 +264,7 @@ func TestCommands_AddUsername(t *testing.T) {
 	}
 }
 
-func TestCommands_DeleteUsername(t *testing.T) {
+func TestCommands_DeleteSchemaUserPassword(t *testing.T) {
 	type fields struct {
 		eventstore      func(t *testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
@@ -293,7 +301,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			},
 		},
 		{
-			"username not existing, error",
+			"password not existing, error",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(),
@@ -311,25 +319,23 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			},
 		},
 		{
-			"username already removed, error",
+			"password already removed, error",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							authenticator.NewUsernameCreatedEvent(
+							authenticator.NewPasswordCreatedEvent(
 								context.Background(),
-								&authenticator.NewAggregate("username1", "org1").Aggregate,
+								&authenticator.NewAggregate("user1", "org1").Aggregate,
 								"id1",
-								true,
-								"username",
+								"hash",
+								false,
 							),
 						),
 						eventFromEventPusher(
-							authenticator.NewUsernameDeletedEvent(
+							authenticator.NewPasswordDeletedEvent(
 								context.Background(),
-								&authenticator.NewAggregate("username1", "org1").Aggregate,
-								true,
-								"username",
+								&authenticator.NewAggregate("user1", "org1").Aggregate,
 							),
 						),
 					),
@@ -338,7 +344,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "notexisting",
+				id:  "user1",
 			},
 			res{
 				err: func(err error) bool {
@@ -350,13 +356,13 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			"no permission, error",
 			fields{
 				eventstore: expectEventstore(
-					filterUsernameExisting(false),
+					filterSchemaUserPasswordExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "username1",
+				id:  "user1",
 			},
 			res{
 				err: func(err error) bool {
@@ -365,16 +371,14 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			},
 		},
 		{
-			"username removed, ok",
+			"password removed, ok",
 			fields{
 				eventstore: expectEventstore(
-					filterUsernameExisting(false),
+					filterSchemaUserPasswordExisting(),
 					expectPush(
-						authenticator.NewUsernameDeletedEvent(
+						authenticator.NewPasswordDeletedEvent(
 							context.Background(),
-							&authenticator.NewAggregate("username1", "org1").Aggregate,
-							false,
-							"username",
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
 						),
 					),
 				),
@@ -382,33 +386,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "username1",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			"username removed, isOrgSpecific, ok",
-			fields{
-				eventstore: expectEventstore(
-					filterUsernameExisting(true),
-					expectPush(
-						authenticator.NewUsernameDeletedEvent(
-							context.Background(),
-							&authenticator.NewAggregate("username1", "org1").Aggregate,
-							true,
-							"username",
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "username1",
+				id:  "user1",
 			},
 			res{
 				details: &domain.ObjectDetails{
@@ -423,7 +401,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			details, err := c.DeleteUsername(tt.args.ctx, tt.args.resourceOwner, tt.args.id)
+			details, err := c.DeleteSchemaUserPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
