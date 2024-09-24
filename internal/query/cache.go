@@ -29,7 +29,7 @@ func startCaches(background context.Context, conf *cache.CachesConfig) (_ *Cache
 	if err != nil {
 		return nil, err
 	}
-	caches.instance, err = startCache[instanceIndex, string, *authzInstance](background, instanceIndexValues(), conf.Instance, caches.connectors)
+	caches.instance, err = startCache[instanceIndex, string, *authzInstance](background, instanceIndexValues(), "authz_instance", conf.Instance, caches.connectors)
 	if err != nil {
 		return nil, err
 	}
@@ -52,13 +52,13 @@ func startCacheConnectors(_ context.Context, conf *cache.CachesConfig) (*cacheCo
 	return connectors, nil
 }
 
-func startCache[I, K comparable, V cache.Entry[I, K]](background context.Context, indices []I, conf *cache.CacheConfig, connectors *cacheConnectors) (cache.Cache[I, K, V], error) {
+func startCache[I, K comparable, V cache.Entry[I, K]](background context.Context, indices []I, name string, conf *cache.CacheConfig, connectors *cacheConnectors) (cache.Cache[I, K, V], error) {
 	if conf == nil || conf.Connector == "" {
 		return noop.NewCache[I, K, V](), nil
 	}
 	if strings.EqualFold(conf.Connector, "memory") && connectors.memory != nil {
 		c := gomap.NewCache[I, K, V](background, indices, *conf)
-		connectors.memory.StartAutoPrune(background, c)
+		connectors.memory.StartAutoPrune(background, c, name)
 		return c, nil
 	}
 
