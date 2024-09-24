@@ -114,9 +114,9 @@ func addSMSConfigHTTPToConfig(ctx context.Context, req *admin_pb.AddSMSProviderH
 
 func updateSMSConfigHTTPToConfig(ctx context.Context, req *admin_pb.UpdateSMSProviderHTTPRequest) *command.ChangeSMSHTTP {
 	return &command.ChangeSMSHTTP{
-		ResourceOwner:    authz.GetInstance(ctx).InstanceID(),
-		ID:               req.Id,
-		Description:      gu.Ptr(req.Description),
-		Endpoint:         gu.Ptr(req.Endpoint),
+		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+		ID:            req.Id,
+		Description:   gu.Ptr(req.Description),
+		Endpoint:      gu.Ptr(req.Endpoint),
 	}
 }
