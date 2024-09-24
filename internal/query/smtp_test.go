@@ -14,27 +14,36 @@ import (
 )
 
 var (
-	prepareSMTPConfigStmt = `SELECT projections.smtp_configs2.creation_date,` +
-		` projections.smtp_configs2.change_date,` +
-		` projections.smtp_configs2.resource_owner,` +
-		` projections.smtp_configs2.sequence,` +
-		` projections.smtp_configs2.tls,` +
-		` projections.smtp_configs2.sender_address,` +
-		` projections.smtp_configs2.sender_name,` +
-		` projections.smtp_configs2.reply_to_address,` +
-		` projections.smtp_configs2.host,` +
-		` projections.smtp_configs2.username,` +
-		` projections.smtp_configs2.password,` +
-		` projections.smtp_configs2.id,` +
-		` projections.smtp_configs2.state,` +
-		` projections.smtp_configs2.description` +
-		` FROM projections.smtp_configs2` +
+	prepareSMTPConfigStmt = `SELECT projections.smtp_configs4.creation_date,` +
+		` projections.smtp_configs4.change_date,` +
+		` projections.smtp_configs4.resource_owner,` +
+		` projections.smtp_configs4.sequence,` +
+		` projections.smtp_configs4.id,` +
+		` projections.smtp_configs4.state,` +
+		` projections.smtp_configs4.description,` +
+		` projections.smtp_configs4_smtp.id,` +
+		` projections.smtp_configs4_smtp.tls,` +
+		` projections.smtp_configs4_smtp.sender_address,` +
+		` projections.smtp_configs4_smtp.sender_name,` +
+		` projections.smtp_configs4_smtp.reply_to_address,` +
+		` projections.smtp_configs4_smtp.host,` +
+		` projections.smtp_configs4_smtp.username,` +
+		` projections.smtp_configs4_smtp.password,` +
+		` projections.smtp_configs4_http.id,` +
+		` projections.smtp_configs4_http.endpoint` +
+		` FROM projections.smtp_configs4` +
+		` LEFT JOIN projections.smtp_configs4_smtp ON projections.smtp_configs4.id = projections.smtp_configs4_smtp.id AND projections.smtp_configs4.instance_id = projections.smtp_configs4_smtp.instance_id` +
+		` LEFT JOIN projections.smtp_configs4_http ON projections.smtp_configs4.id = projections.smtp_configs4_http.id AND projections.smtp_configs4.instance_id = projections.smtp_configs4_http.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareSMTPConfigCols = []string{
 		"creation_date",
 		"change_date",
 		"resource_owner",
 		"sequence",
+		"id",
+		"state",
+		"description",
+		"id",
 		"tls",
 		"sender_address",
 		"sender_name",
@@ -43,8 +52,7 @@ var (
 		"smtp_user",
 		"smtp_password",
 		"id",
-		"state",
-		"description",
+		"endpoint",
 	}
 )
 
@@ -89,6 +97,10 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						testNow,
 						"ro",
 						uint64(20211108),
+						"2232323",
+						domain.SMTPConfigStateActive,
+						"test",
+						"2232323",
 						true,
 						"sender",
 						"name",
@@ -96,27 +108,69 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						"host",
 						"user",
 						&crypto.CryptoValue{},
-						"2232323",
-						domain.SMTPConfigStateActive,
-						"test",
+						nil,
+						nil,
 					},
 				),
 			},
 			object: &SMTPConfig{
-				CreationDate:   testNow,
-				ChangeDate:     testNow,
-				ResourceOwner:  "ro",
-				Sequence:       20211108,
-				TLS:            true,
-				SenderAddress:  "sender",
-				SenderName:     "name",
-				ReplyToAddress: "reply-to",
-				Host:           "host",
-				User:           "user",
-				Password:       &crypto.CryptoValue{},
-				ID:             "2232323",
-				State:          domain.SMTPConfigStateActive,
-				Description:    "test",
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "ro",
+				Sequence:      20211108,
+				SMTPConfig: &SMTP{
+					TLS:            true,
+					SenderAddress:  "sender",
+					SenderName:     "name",
+					ReplyToAddress: "reply-to",
+					Host:           "host",
+					User:           "user",
+					Password:       &crypto.CryptoValue{},
+				},
+				ID:          "2232323",
+				State:       domain.SMTPConfigStateActive,
+				Description: "test",
+			},
+		},
+		{
+			name:    "prepareSMTPConfigQuery found, http",
+			prepare: prepareSMTPConfigQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(prepareSMTPConfigStmt),
+					prepareSMTPConfigCols,
+					[]driver.Value{
+						testNow,
+						testNow,
+						"ro",
+						uint64(20211108),
+						"2232323",
+						domain.SMTPConfigStateActive,
+						"test",
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						nil,
+						"2232323",
+						"endpoint",
+					},
+				),
+			},
+			object: &SMTPConfig{
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "ro",
+				Sequence:      20211108,
+				HTTPConfig: &HTTP{
+					Endpoint: "endpoint",
+				},
+				ID:          "2232323",
+				State:       domain.SMTPConfigStateActive,
+				Description: "test",
 			},
 		},
 		{
@@ -131,6 +185,10 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						testNow,
 						"ro",
 						uint64(20211109),
+						"44442323",
+						domain.SMTPConfigStateInactive,
+						"test2",
+						"44442323",
 						true,
 						"sender2",
 						"name2",
@@ -138,27 +196,28 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						"host2",
 						"user2",
 						&crypto.CryptoValue{},
-						"44442323",
-						domain.SMTPConfigStateInactive,
-						"test2",
+						nil,
+						nil,
 					},
 				),
 			},
 			object: &SMTPConfig{
-				CreationDate:   testNow,
-				ChangeDate:     testNow,
-				ResourceOwner:  "ro",
-				Sequence:       20211109,
-				TLS:            true,
-				SenderAddress:  "sender2",
-				SenderName:     "name2",
-				ReplyToAddress: "reply-to2",
-				Host:           "host2",
-				User:           "user2",
-				Password:       &crypto.CryptoValue{},
-				ID:             "44442323",
-				State:          domain.SMTPConfigStateInactive,
-				Description:    "test2",
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "ro",
+				Sequence:      20211109,
+				SMTPConfig: &SMTP{
+					TLS:            true,
+					SenderAddress:  "sender2",
+					SenderName:     "name2",
+					ReplyToAddress: "reply-to2",
+					Host:           "host2",
+					User:           "user2",
+					Password:       &crypto.CryptoValue{},
+				},
+				ID:          "44442323",
+				State:       domain.SMTPConfigStateInactive,
+				Description: "test2",
 			},
 		},
 		{
@@ -173,6 +232,10 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						testNow,
 						"ro",
 						uint64(20211109),
+						"23234444",
+						domain.SMTPConfigStateInactive,
+						"test3",
+						"23234444",
 						true,
 						"sender3",
 						"name3",
@@ -180,27 +243,28 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						"host3",
 						"user3",
 						&crypto.CryptoValue{},
-						"23234444",
-						domain.SMTPConfigStateInactive,
-						"test3",
+						nil,
+						nil,
 					},
 				),
 			},
 			object: &SMTPConfig{
-				CreationDate:   testNow,
-				ChangeDate:     testNow,
-				ResourceOwner:  "ro",
-				Sequence:       20211109,
-				TLS:            true,
-				SenderAddress:  "sender3",
-				SenderName:     "name3",
-				ReplyToAddress: "reply-to3",
-				Host:           "host3",
-				User:           "user3",
-				Password:       &crypto.CryptoValue{},
-				ID:             "23234444",
-				State:          domain.SMTPConfigStateInactive,
-				Description:    "test3",
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "ro",
+				Sequence:      20211109,
+				SMTPConfig: &SMTP{
+					TLS:            true,
+					SenderAddress:  "sender3",
+					SenderName:     "name3",
+					ReplyToAddress: "reply-to3",
+					Host:           "host3",
+					User:           "user3",
+					Password:       &crypto.CryptoValue{},
+				},
+				ID:          "23234444",
+				State:       domain.SMTPConfigStateInactive,
+				Description: "test3",
 			},
 		},
 		{

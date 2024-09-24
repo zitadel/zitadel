@@ -197,7 +197,8 @@
           "VE": "När en användare ändrar sin e-postadress, kommer de att få ett mail med en länk för att verifiera den nya adressen.",
           "VP": "När en användare ändrar sitt telefonnummer, kommer de att få ett SMS med en kod för att verifiera det nya numret.",
           "VEO": "När en användare lägger till en engångslösenord via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
-          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer."
+          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
+          "IU": "När en inbjudningskod för användare skapas, får de ett e-mail med en länk för att ställa in sin autentiseringsmetod."
         }
       },
       "LOGIN_TEXTS": {
@@ -1671,7 +1672,8 @@
         "PR": "Återställ Lösenord",
         "DC": "Domänkrav",
         "PL": "lösenordsfri",
-        "PC": "Lösenordsändring"
+        "PC": "Lösenordsändring",
+        "IU": "Bjud in användare"
       },
       "CHIPS": {
         "firstname": "Förnamn",
@@ -1691,7 +1693,8 @@
         "tempUsername": "Tillfälligt användarnamn",
         "otp": "Engångslösenord",
         "verifyUrl": "Verifiera Engångslösenord URL",
-        "expiry": "Utgångsdatum"
+        "expiry": "Utgångsdatum",
+        "applicationName": "Applikationsnamn"
       },
       "TOAST": {
         "UPDATED": "Anpassade Texter sparade."

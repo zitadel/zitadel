@@ -197,7 +197,8 @@
           "VE": "Cuando un usuario cambia su dirección de correo electrónico, recibirá un correo electrónico con un enlace para verificar la nueva dirección.",
           "VP": "Cuando un usuario cambia su número de teléfono, recibirá un SMS con un código para verificar el nuevo número.",
           "VEO": "Cuando un usuario agrega una Contraseña de Un Solo Uso mediante correo electrónico, necesita activarla ingresando un código enviado a su dirección de correo electrónico.",
-          "VSO": "Cuando un usuario agrega una Contraseña de Un Solo Uso mediante SMS, necesita activarla ingresando un código enviado a su número de teléfono."
+          "VSO": "Cuando un usuario agrega una Contraseña de Un Solo Uso mediante SMS, necesita activarla ingresando un código enviado a su número de teléfono.",
+          "IU": "Cuando se crea un código de invitación de usuario, recibirán un correo electrónico con un enlace para configurar su método de autenticación."
         }
       },
       "LOGIN_TEXTS": {
@@ -1668,7 +1669,8 @@
         "PR": "Restablecimiento de contraseña",
         "DC": "Reclamar un dominio",
         "PL": "Acceso sin contraseña",
-        "PC": "Cambio de contraseña"
+        "PC": "Cambio de contraseña",
+        "IU": "Invitar usuario"
       },
       "CHIPS": {
         "firstname": "Nombre",
@@ -1688,7 +1690,8 @@
         "tempUsername": "Nombre de usuario temporal",
         "otp": "Contraseña de un solo uso",
         "verifyUrl": "URL para verificar la contraseña de un solo uso",
-        "expiry": "Expiración"
+        "expiry": "Expiración",
+        "applicationName": "Nombre de la aplicación"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados guardados."

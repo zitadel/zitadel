@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: 'Halo {{.DisplayName}},'
   Text: 'Kata sandi pengguna Anda telah berubah. '
   ButtonText: Login
+InviteUser:
+  Title: Undangan ke {{.ApplicationName}}
+  PreHeader: Undangan ke {{.ApplicationName}}
+  Subject: Undangan ke {{.ApplicationName}}
+  Greeting: 'Halo {{.DisplayName}},'
+  Text: Pengguna Anda telah diundang ke {{.ApplicationName}}. Silakan klik tombol di bawah ini untuk menyelesaikan proses undangan. Jika Anda tidak meminta email ini, harap abaikan.
+  ButtonText: Terima undangan

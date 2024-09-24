@@ -250,16 +250,26 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				require.NoError(t, err)
 				defer close()
 			}
-
-			got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
+			retryDuration := 5 * time.Second
+			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
+				retryDuration = time.Until(ctxDeadline)
 			}
-			require.NoError(t, err)
 
-			integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
-			assert.Equal(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
+				if tt.wantErr {
+					assert.Error(ttt, err, "Error: "+err.Error())
+				} else {
+					assert.NoError(ttt, err)
+				}
+				if err != nil {
+					return
+				}
+
+				integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
+				assert.Equal(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
+
 			if tt.clean != nil {
 				tt.clean(tt.ctx)
 			}

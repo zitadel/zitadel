@@ -106,6 +106,7 @@ type idpUserLinksProvider interface {
 type userEventProvider interface {
 	UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
 	PasswordCodeExists(ctx context.Context, userID string) (exists bool, err error)
+	InviteCodeExists(ctx context.Context, userID string) (exists bool, err error)
 }
 
 type userCommandProvider interface {
@@ -1060,8 +1061,12 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if err != nil {
 		return nil, err
 	}
-	if (!isInternalLogin || len(idps.Links) > 0) && len(request.LinkingUsers) == 0 {
-		step := repo.idpChecked(request, idps.Links, userSession)
+	noLocalAuth := request.LoginPolicy != nil && !request.LoginPolicy.AllowUsernamePassword
+	if (!isInternalLogin || len(idps.Links) > 0 || noLocalAuth) && len(request.LinkingUsers) == 0 {
+		step, err := repo.idpChecked(request, idps.Links, userSession)
+		if err != nil {
+			return nil, err
+		}
 		if step != nil {
 			return append(steps, step), nil
 		}
@@ -1087,7 +1092,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 	if !user.IsEmailVerified {
 		steps = append(steps, &domain.VerifyEMailStep{
-			InitPassword: !user.PasswordSet,
+			InitPassword: !user.PasswordSet && len(idps.Links) == 0,
 		})
 	}
 	if user.UsernameChangeRequired {
@@ -1250,8 +1255,18 @@ func (repo *AuthRequestRepo) firstFactorChecked(ctx context.Context, request *do
 
 	if user.PasswordInitRequired {
 		if !user.IsEmailVerified {
+			// If the user was created through the user resource API,
+			// they can either have an invite code...
+			exists, err := repo.UserEventProvider.InviteCodeExists(ctx, user.ID)
+			logging.WithFields("userID", user.ID).OnError(err).Error("unable to check if invite code exists")
+			if err == nil && exists {
+				return &domain.VerifyInviteStep{}
+			}
+			// or were created with an explicit email verification mail
 			return &domain.VerifyEMailStep{InitPassword: true}
 		}
+		// If they were created with a verified mail, they might have never received mail to set their password,
+		// e.g. when created through a user resource API. In this case we'll just create and send one now.
 		exists, err := repo.UserEventProvider.PasswordCodeExists(ctx, user.ID)
 		logging.WithFields("userID", user.ID).OnError(err).Error("unable to check if password code exists")
 		if err == nil && !exists {
@@ -1272,20 +1287,29 @@ func (repo *AuthRequestRepo) firstFactorChecked(ctx context.Context, request *do
 	return &domain.PasswordStep{}
 }
 
-func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []*query.IDPUserLink, userSession *user_model.UserSessionView) domain.NextStep {
+func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []*query.IDPUserLink, userSession *user_model.UserSessionView) (domain.NextStep, error) {
 	if checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
 		request.IDPLoginChecked = true
 		request.AuthTime = userSession.ExternalLoginVerification
-		return nil
+		return nil, nil
 	}
-	selectedIDPConfigID := request.SelectedIDPConfigID
-	if selectedIDPConfigID == "" {
-		selectedIDPConfigID = userSession.SelectedIDPConfigID
+	// use the explicitly set IdP first
+	if request.SelectedIDPConfigID != "" {
+		return &domain.ExternalLoginStep{SelectedIDPConfigID: request.SelectedIDPConfigID}, nil
 	}
-	if selectedIDPConfigID == "" && len(idps) > 0 {
-		selectedIDPConfigID = idps[0].IDPID
+	// reuse the previously used IdP from the session
+	if userSession.SelectedIDPConfigID != "" {
+		return &domain.ExternalLoginStep{SelectedIDPConfigID: userSession.SelectedIDPConfigID}, nil
 	}
-	return &domain.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}
+	// then use an existing linked IdP of the user
+	if len(idps) > 0 {
+		return &domain.ExternalLoginStep{SelectedIDPConfigID: idps[0].IDPID}, nil
+	}
+	// if the user did not link one, then just use one of the configured IdPs of the org
+	if len(request.AllowedExternalIDPs) > 0 {
+		return &domain.ExternalLoginStep{SelectedIDPConfigID: request.AllowedExternalIDPs[0].IDPConfigID}, nil
+	}
+	return nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Org.IdpNotExisting")
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView, isInternalAuthentication bool) (domain.NextStep, bool, error) {

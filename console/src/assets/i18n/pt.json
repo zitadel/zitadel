@@ -197,7 +197,8 @@
           "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
           "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
           "VEO": "Quando um usuário adiciona um método de Senha Única via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
-          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone."
+          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone.",
+          "IU": "Quando um código de convite de usuário é criado, eles receberão um e-mail com um link para configurar seu método de autenticação."
         }
       },
       "LOGIN_TEXTS": {
@@ -1668,7 +1669,8 @@
         "PR": "Redefinição de Senha",
         "DC": "Reivindicação de Domínio",
         "PL": "Sem senha",
-        "PC": "Alteração de Senha"
+        "PC": "Alteração de Senha",
+        "IU": "Convidar usuário"
       },
       "CHIPS": {
         "firstname": "Nome próprio",
@@ -1688,7 +1690,8 @@
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
         "verifyUrl": "URL para verificar a senha de uso único",
-        "expiry": "Data de expiração"
+        "expiry": "Data de expiração",
+        "applicationName": "Nome do aplicativo"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."
