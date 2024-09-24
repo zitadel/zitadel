@@ -19,9 +19,9 @@ type JWTCreatedEvent struct {
 
 	UserID string `json:"userID"`
 
-	ExpirationDate time.Time `json:"expirationDate,omitempty"`
-	PublicKey      []byte    `json:"publicKey,omitempty"`
-	TriggerOrigin  string    `json:"triggerOrigin,omitempty"`
+	ExpirationDate    time.Time `json:"expirationDate,omitempty"`
+	PublicKey         []byte    `json:"publicKey,omitempty"`
+	TriggeredAtOrigin string    `json:"triggerOrigin,omitempty"`
 }
 
 func (e *JWTCreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -34,6 +34,10 @@ func (e *JWTCreatedEvent) Payload() interface{} {
 
 func (e *JWTCreatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *JWTCreatedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewJWTCreatedEvent(
@@ -49,10 +53,10 @@ func NewJWTCreatedEvent(
 			aggregate,
 			JWTCreatedType,
 		),
-		UserID:         userID,
-		ExpirationDate: expirationDate,
-		PublicKey:      publicKey,
-		TriggerOrigin:  http.DomainContext(ctx).Origin(),
+		UserID:            userID,
+		ExpirationDate:    expirationDate,
+		PublicKey:         publicKey,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 

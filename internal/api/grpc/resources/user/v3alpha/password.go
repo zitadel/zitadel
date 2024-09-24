@@ -31,3 +31,31 @@ func setPasswordRequestToSetSchemaUserPassword(req *user.SetPasswordRequest) *co
 		ChangeRequired:      req.GetNewPassword().GetChangeRequired(),
 	}
 }
+
+/*
+func (s *Server) RemovePassword(ctx context.Context, req *user.RemovePasswordRequest) (_ *user.RemovePasswordResponse, err error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
+	details, err := s.command.DeleteSchemaUserPassword(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &user.RemovePasswordResponse{
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
+	}, nil
+}
+
+func (s *Server) RemovePassword(ctx context.Context, req *user.RemovePasswordRequest) (_ *user.RemovePasswordResponse, err error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
+	details, err := s.command.DeleteSchemaUserPassword(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &user.RemovePasswordResponse{
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
+	}, nil
+}
+*/

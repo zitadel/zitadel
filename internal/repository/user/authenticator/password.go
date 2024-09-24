@@ -2,24 +2,29 @@ package authenticator
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
-	passwordPrefix      = eventPrefix + "password."
-	PasswordCreatedType = passwordPrefix + "created"
-	PasswordDeletedType = passwordPrefix + "deleted"
+	passwordPrefix        = eventPrefix + "password."
+	PasswordCreatedType   = passwordPrefix + "created"
+	PasswordDeletedType   = passwordPrefix + "deleted"
+	PasswordCodeAddedType = passwordPrefix + "code.added"
 )
 
 type PasswordCreatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	UserID         string `json:"userID"`
-	EncodedHash    string `json:"encodedHash,omitempty"`
-	ChangeRequired bool   `json:"changeRequired,omitempty"`
-	TriggerOrigin  string `json:"triggerOrigin,omitempty"`
+	UserID string `json:"userID"`
+
+	EncodedHash       string `json:"encodedHash,omitempty"`
+	ChangeRequired    bool   `json:"changeRequired,omitempty"`
+	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
 }
 
 func (e *PasswordCreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -32,6 +37,10 @@ func (e *PasswordCreatedEvent) Payload() interface{} {
 
 func (e *PasswordCreatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *PasswordCreatedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func NewPasswordCreatedEvent(
@@ -47,10 +56,10 @@ func NewPasswordCreatedEvent(
 			aggregate,
 			PasswordCreatedType,
 		),
-		UserID:         userID,
-		EncodedHash:    encodeHash,
-		ChangeRequired: changeRequired,
-		TriggerOrigin:  http.DomainContext(ctx).Origin(),
+		UserID:            userID,
+		EncodedHash:       encodeHash,
+		ChangeRequired:    changeRequired,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -81,4 +90,55 @@ func NewPasswordDeletedEvent(
 			PasswordDeletedType,
 		),
 	}
+}
+
+type PasswordCodeAddedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	Code              *crypto.CryptoValue     `json:"code,omitempty"`
+	Expiry            time.Duration           `json:"expiry,omitempty"`
+	NotificationType  domain.NotificationType `json:"notificationType,omitempty"`
+	URLTemplate       string                  `json:"url_template,omitempty"`
+	CodeReturned      bool                    `json:"code_returned,omitempty"`
+	TriggeredAtOrigin string                  `json:"triggerOrigin,omitempty"`
+}
+
+func (e *PasswordCodeAddedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *PasswordCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *PasswordCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
+func NewPasswordCodeAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	notificationType domain.NotificationType,
+	urlTemplate string,
+	codeReturned bool,
+) *PasswordCodeAddedEvent {
+	return &PasswordCodeAddedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasswordCodeAddedType,
+		),
+		Code:              code,
+		Expiry:            expiry,
+		NotificationType:  notificationType,
+		URLTemplate:       urlTemplate,
+		CodeReturned:      codeReturned,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
+	}
+}
+
+func (e *PasswordCodeAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }

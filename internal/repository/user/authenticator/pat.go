@@ -19,9 +19,9 @@ type PATCreatedEvent struct {
 
 	UserID string `json:"userID"`
 
-	ExpirationDate time.Time `json:"expirationDate,omitempty"`
-	Scopes         []string  `json:"scopes"`
-	TriggerOrigin  string    `json:"triggerOrigin,omitempty"`
+	ExpirationDate    time.Time `json:"expirationDate,omitempty"`
+	Scopes            []string  `json:"scopes"`
+	TriggeredAtOrigin string    `json:"triggerOrigin,omitempty"`
 }
 
 func (e *PATCreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -49,10 +49,10 @@ func NewPATCreatedEvent(
 			aggregate,
 			PATCreatedType,
 		),
-		UserID:         userID,
-		ExpirationDate: expirationDate,
-		Scopes:         scopes,
-		TriggerOrigin:  http.DomainContext(ctx).Origin(),
+		UserID:            userID,
+		ExpirationDate:    expirationDate,
+		Scopes:            scopes,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 

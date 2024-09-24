@@ -23,7 +23,7 @@ func filterSchemaUserPasswordExisting() expect {
 				context.Background(),
 				&authenticator.NewAggregate("user1", "org1").Aggregate,
 				"user1",
-				"encoded",
+				"$plain$x$password",
 				false,
 			),
 		),
@@ -234,6 +234,73 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 					UserID:         "user1",
 					Password:       "password",
 					ChangeRequired: true,
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"password set, current password, ok",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserPasswordExisting(),
+					filterPasswordComplexityPolicyExisting(),
+					expectPush(
+						authenticator.NewPasswordCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"$plain$x$password2",
+							false,
+						),
+					),
+				),
+				checkPermission:    newMockPermissionCheckNotAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &SetSchemaUserPassword{
+					UserID:          "user1",
+					Password:        "password2",
+					CurrentPassword: "password",
+					ChangeRequired:  false,
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"password set, code, ok",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserPasswordExisting(),
+					filterPasswordComplexityPolicyExisting(),
+					expectPush(
+						authenticator.NewPasswordCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"$plain$x$password2",
+							false,
+						),
+					),
+				),
+				checkPermission:    newMockPermissionCheckNotAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &SetSchemaUserPassword{
+					UserID:         "user1",
+					Password:       "password2",
+					ChangeRequired: false,
 				},
 			},
 			res{

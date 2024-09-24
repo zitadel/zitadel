@@ -570,7 +570,7 @@ service ZITADELUsers {
 
   // Set a password
   //
-  // Add, update or reset a user's password with either a verification code or the current password.
+  // Add or update a user's password with either a verification code, the current password or enough permissions.
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/password"
@@ -613,6 +613,30 @@ service ZITADELUsers {
         key: "200"
         value: {
           description: "Password reset successfully requested";
+        }
+      };
+    };
+  }
+
+  // Remove a password
+  //
+  // Remove a user's password.
+  rpc RemovePassword (RemovePasswordRequest) returns (RemovePasswordResponse) {
+    option (google.api.http) = {
+      delete: "/resources/v3alpha/users/{id}/password"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Password successfully removed";
         }
       };
     };
@@ -1585,6 +1609,30 @@ message RequestPasswordResetResponse {
       example: "\"SKJd342k\"";
     }
   ];
+}
+
+message RemovePasswordRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  // Optionally expect the user to be in this organization.
+  optional zitadel.object.v3alpha.Organization organization = 2;
+  // unique identifier of the user.
+  string id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemovePasswordResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message StartWebAuthNRegistrationRequest {

@@ -1,7 +1,11 @@
 package command
 
 import (
+	"time"
+
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 )
@@ -12,6 +16,10 @@ type PasswordV3WriteModel struct {
 
 	EncodedHash    string
 	ChangeRequired bool
+
+	Code             *crypto.CryptoValue
+	CodeCreationDate time.Time
+	CodeExpiry       time.Duration
 }
 
 func NewPasswordV3WriteModel(resourceOwner, id string) *PasswordV3WriteModel {
@@ -31,10 +39,16 @@ func (wm *PasswordV3WriteModel) Reduce() error {
 			wm.UserID = e.UserID
 			wm.EncodedHash = e.EncodedHash
 			wm.ChangeRequired = e.ChangeRequired
+			wm.Code = nil
 		case *authenticator.PasswordDeletedEvent:
 			wm.UserID = ""
 			wm.EncodedHash = ""
 			wm.ChangeRequired = false
+			wm.Code = nil
+		case *user.HumanPasswordCodeAddedEvent:
+			wm.Code = e.Code
+			wm.CodeCreationDate = e.CreationDate()
+			wm.CodeExpiry = e.Expiry
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -49,5 +63,6 @@ func (wm *PasswordV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			authenticator.PasswordCreatedType,
 			authenticator.PasswordDeletedType,
+			authenticator.PasswordCodeAddedType,
 		).Builder()
 }
