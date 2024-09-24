@@ -1108,7 +1108,6 @@ func TestCommandSide_PhoneVerificationCodeSent(t *testing.T) {
 		ctx           context.Context
 		userID        string
 		resourceOwner string
-		providerID    string
 		generatorInfo *senders.CodeGeneratorInfo
 	}
 	type res struct {

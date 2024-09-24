@@ -552,7 +552,7 @@ func (c *Commands) sendHumanOTP(
 	if !existingOTP.OTPAdded() {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady")
 	}
-	code, generatorID, err := generateCode(ctx, c.eventstore.Filter, secretGeneratorType, c.userEncryption, defaultSecretGenerator)
+	code, generatorID, err := generateCode(ctx, c.eventstore.Filter, secretGeneratorType, c.userEncryption, defaultSecretGenerator) //nolint:staticcheck
 	if err != nil {
 		return err
 	}

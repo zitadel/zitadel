@@ -238,7 +238,7 @@ func (c *UserPhoneEvents) SetVerified(ctx context.Context) {
 // AddGeneratedCode generates a new encrypted code and sets it to the phone number.
 // When returnCode a plain text of the code will be returned from Push.
 func (c *UserPhoneEvents) AddGeneratedCode(ctx context.Context, returnCode bool) error {
-	code, generatorID, err := c.generateCode(ctx, c.eventstore.Filter)
+	code, generatorID, err := c.generateCode(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return err
 	}

@@ -43,7 +43,7 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, re
 	if phone.IsPhoneVerified {
 		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 	} else {
-		phoneCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode)
+		phoneCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 		if err != nil {
 			return nil, err
 		}
@@ -140,10 +140,7 @@ func (c *Commands) activeSMSProvider(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if config.State != domain.SMSConfigStateActive {
-		return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-SBH3s", "Errors.SMSConfig.NotFound")
-	}
-	if config.Twilio != nil && config.Twilio.VerifyServiceSID != "" {
+	if config.State == domain.SMSConfigStateActive && config.Twilio != nil && config.Twilio.VerifyServiceSID != "" {
 		return config.ID, nil
 	}
 	return "", err
@@ -168,7 +165,7 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 	if existingPhone.IsPhoneVerified {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")
 	}
-	phoneCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode)
+	phoneCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}

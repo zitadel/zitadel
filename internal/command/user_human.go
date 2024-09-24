@@ -563,7 +563,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
-		phoneCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode)
+		phoneCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 		if err != nil {
 			return nil, nil, err
 		}

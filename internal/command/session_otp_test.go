@@ -18,10 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-//func expectFilterActiveSMSConfig() []expect {
-//
-//}
-
 func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 	type fields struct {
 		userID          string

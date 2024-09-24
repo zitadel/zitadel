@@ -269,7 +269,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 	var passwordCode *EncryptedCode
 	var generatorID string
 	if notifyType == domain.NotificationTypeSms {
-		passwordCode, generatorID, err = c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption, c.defaultSecretGenerators.PasswordVerificationCode)
+		passwordCode, generatorID, err = c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption, c.defaultSecretGenerators.PasswordVerificationCode) //nolint:staticcheck
 	} else {
 		passwordCode, err = c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
 	}
