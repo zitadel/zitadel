@@ -194,7 +194,7 @@ func (c *Commands) getSchemaUserPasswordWithVerification(ctx context.Context, us
 	}
 	// ...or old password
 	if user.CurrentPassword != "" {
-		verification = c.checkCurrentPassword(user.Password, user.EncodedPasswordHash, user.CurrentPassword, writeModel.EncodedHash)
+		verification = c.checkSchemaUserCurrentPassword(user.Password, user.EncodedPasswordHash, user.CurrentPassword, writeModel.EncodedHash)
 	}
 
 	if verification != nil {
@@ -242,9 +242,9 @@ func (c *Commands) checkSchemaUserCurrentPassword(
 ) setPasswordVerification {
 	// in case the new password is already encoded, we only need to verify the current
 	if newEncodedPassword != "" {
-		return func(ctx context.Context) (_ string, err error) {
+		return func(ctx context.Context) (string, error) {
 			_, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.Verify")
-			_, err = c.userPasswordHasher.Verify(currentEncodePassword, currentPassword)
+			_, err := c.userPasswordHasher.Verify(currentEncodePassword, currentPassword)
 			spanPasswap.EndWithError(err)
 			return "", convertPasswapErr(err)
 		}
