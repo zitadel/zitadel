@@ -520,7 +520,7 @@ func (c *Commands) HumanCheckOTPEmail(ctx context.Context, userID, code, resourc
 		writeModel,
 		c.eventstore.FilterToQueryReducer,
 		c.userEncryption,
-		nil, //TODO:?
+		nil, // email currently always uses local code checks
 		succeededEvent,
 		failedEvent,
 	)

@@ -115,11 +115,11 @@ func (c *Commands) phoneCodeVerifierFromConfig(ctx context.Context, id string) (
 		return nil, err
 	}
 	if config.State != domain.SMSConfigStateActive {
-		return nil, err // TODO: !
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-M0odsf", "Errors.SMSConfig.NotFound")
 	}
 	if config.Twilio != nil {
 		if config.Twilio.VerifyServiceSID == "" {
-			return nil, err // TODO: !
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sgb4h", "Errors.SMSConfig.NotExternalVerification")
 		}
 		token, err := crypto.DecryptString(config.Twilio.Token, c.smsEncryption)
 		if err != nil {
@@ -132,7 +132,7 @@ func (c *Commands) phoneCodeVerifierFromConfig(ctx context.Context, id string) (
 			VerifyServiceSID: config.Twilio.VerifyServiceSID,
 		}, nil
 	}
-	return nil, err
+	return nil, nil
 }
 
 func (c *Commands) activeSMSProvider(ctx context.Context) (string, error) {
@@ -141,10 +141,10 @@ func (c *Commands) activeSMSProvider(ctx context.Context) (string, error) {
 		return "", err
 	}
 	if config.State != domain.SMSConfigStateActive {
-		return "", err // TODO: !
+		return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-SBH3s", "Errors.SMSConfig.NotFound")
 	}
 	if config.Twilio != nil && config.Twilio.VerifyServiceSID != "" {
-		return config.ID, err
+		return config.ID, nil
 	}
 	return "", err
 }

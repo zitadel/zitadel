@@ -758,7 +758,7 @@ func verifyCode(
 		return crypto.VerifyCode(codeCreationDate, codeExpiry, encryptedCode, code, codeAlg)
 	}
 	if getCodeVerifier == nil {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-M0g95", "Errors.User.Code.NotConfigured") //TODO: !
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-M0g95", "Errors.User.Code.NotConfigured")
 	}
 	verifier, err := getCodeVerifier(ctx, codeProviderID)
 	if err != nil {
