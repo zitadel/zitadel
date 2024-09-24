@@ -726,9 +726,8 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo).
-			SendPhoneVerificationCode(ctx, code)
-		if err != nil {
+		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo).
+			SendPhoneVerificationCode(ctx, code); err != nil {
 			return err
 		}
 		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
