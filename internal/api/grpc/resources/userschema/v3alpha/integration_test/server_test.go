@@ -51,7 +51,7 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 			f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
-			require.NoError(ttt, err)
+			assert.NoError(ttt, err)
 			if f.UserSchema.GetEnabled() {
 				return
 			}
