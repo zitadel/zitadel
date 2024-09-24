@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/shopspring/decimal"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 )
@@ -314,7 +312,7 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 		ResourceOwner: sql.NullString{String: "ro", Valid: true},
 		Typ:           "test.created",
 		Version:       "v1",
-		Pos:           decimal.NewFromInt(42),
+		Pos:           42,
 	}
 
 	for _, opt := range opts {

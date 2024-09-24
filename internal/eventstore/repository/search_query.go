@@ -55,8 +55,6 @@ const (
 	//OperationNotIn checks if a stored value does not match one of the passed value list
 	OperationNotIn
 
-	OperationGreaterEqual
-
 	operationCount
 )
 
@@ -234,10 +232,10 @@ func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuer
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if builder.GetPositionAfter().IsZero() {
+	if builder.GetPositionAfter() == 0 {
 		return nil
 	}
-	query.Position = NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreaterEqual)
+	query.Position = NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreater)
 	return query.Position
 }
 
