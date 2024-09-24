@@ -32,11 +32,11 @@ func addUsernameRequestToAddUsername(req *user.AddUsernameRequest) *command.AddU
 	}
 }
 
-func (s *Server) DeleteUsername(ctx context.Context, req *user.RemoveUsernameRequest) (_ *user.RemoveUsernameResponse, err error) {
+func (s *Server) RemoveUsername(ctx context.Context, req *user.RemoveUsernameRequest) (_ *user.RemoveUsernameResponse, err error) {
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeleteUsername(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
+	details, err := s.command.DeleteUsername(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId(), req.GetUsernameId())
 	if err != nil {
 		return nil, err
 	}

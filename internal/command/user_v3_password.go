@@ -59,6 +59,7 @@ func (c *Commands) SetSchemaUserPassword(ctx context.Context, user *SetSchemaUse
 		return nil, err
 	}
 	resourceOwner := existing.ResourceOwner
+	// when no password was set yet
 	if existing.EncodedHash == "" {
 		existingUser, err := c.getSchemaUserExists(ctx, user.ResourceOwner, user.UserID)
 		if err != nil {
@@ -79,7 +80,7 @@ func (c *Commands) SetSchemaUserPassword(ctx context.Context, user *SetSchemaUse
 	}
 
 	encodedPassword := schemaUser.EncodedPasswordHash
-	if user.Password != "" {
+	if encodedPassword == "" && user.Password != "" {
 		encodedPassword, err = c.userPasswordHasher.Hash(user.Password)
 		if err = convertPasswapErr(err); err != nil {
 			return nil, err

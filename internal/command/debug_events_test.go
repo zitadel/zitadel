@@ -210,6 +210,7 @@ func TestCommands_CreateDebugEvents(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
+				ID:            "dgb1",
 			},
 		},
 		{
@@ -243,6 +244,7 @@ func TestCommands_CreateDebugEvents(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
+				ID:            "dgb1",
 			},
 		},
 		{
@@ -275,6 +277,7 @@ func TestCommands_CreateDebugEvents(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
+				ID:            "dgb1",
 			},
 		},
 		{
@@ -324,6 +327,7 @@ func TestCommands_CreateDebugEvents(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
+				ID:            "dgb1",
 			},
 		},
 	}

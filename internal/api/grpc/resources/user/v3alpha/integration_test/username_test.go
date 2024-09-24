@@ -8,7 +8,6 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
@@ -369,10 +368,10 @@ func TestServer_AddUsername(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.AddUsername(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 		})
 	}
@@ -412,8 +411,9 @@ func TestServer_DeleteUsername(t *testing.T) {
 			ctx:  context.Background(),
 			dep: func(req *user.RemoveUsernameRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
 				usernameResp := instance.AddAuthenticatorUsername(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), userResp.GetDetails().GetId(), gofakeit.Username(), false)
-				req.Id = usernameResp.GetUsernameId()
+				req.UsernameId = usernameResp.GetUsernameId()
 				return nil
 			},
 			req: &user.RemoveUsernameRequest{
@@ -430,8 +430,9 @@ func TestServer_DeleteUsername(t *testing.T) {
 			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
 			dep: func(req *user.RemoveUsernameRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
 				usernameResp := instance.AddAuthenticatorUsername(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), userResp.GetDetails().GetId(), gofakeit.Username(), false)
-				req.Id = usernameResp.GetUsernameId()
+				req.UsernameId = usernameResp.GetUsernameId()
 				return nil
 			},
 			req: &user.RemoveUsernameRequest{
@@ -452,6 +453,20 @@ func TestServer_DeleteUsername(t *testing.T) {
 						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
+				UsernameId: "notempty",
+			},
+			wantErr: true,
+		},
+		{
+			name: "username delete, userid empty",
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			req: &user.RemoveUsernameRequest{
+				Organization: &object.Organization{
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
+					},
+				},
+				Id: "notempty",
 			},
 			wantErr: true,
 		},
@@ -464,7 +479,25 @@ func TestServer_DeleteUsername(t *testing.T) {
 						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
-				Id: "notexisting",
+				UsernameId: "notempty",
+				Id:         "notexisting",
+			},
+			wantErr: true,
+		},
+		{
+			name: "username remove, no username",
+			ctx:  isolatedIAMOwnerCTX,
+			dep: func(req *user.RemoveUsernameRequest) error {
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
+				return nil
+			},
+			req: &user.RemoveUsernameRequest{
+				Organization: &object.Organization{
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
+					},
+				},
 			},
 			wantErr: true,
 		},
@@ -473,8 +506,9 @@ func TestServer_DeleteUsername(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(req *user.RemoveUsernameRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
 				usernameResp := instance.AddAuthenticatorUsername(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), userResp.GetDetails().GetId(), gofakeit.Username(), false)
-				req.Id = usernameResp.GetUsernameId()
+				req.UsernameId = usernameResp.GetUsernameId()
 				return nil
 			},
 			req: &user.RemoveUsernameRequest{
@@ -501,8 +535,8 @@ func TestServer_DeleteUsername(t *testing.T) {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
 				resp := instance.AddAuthenticatorUsername(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Username(), false)
-				req.Id = resp.GetUsernameId()
-				instance.RemoveAuthenticatorUsername(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), resp.GetUsernameId())
+				req.UsernameId = resp.GetUsernameId()
+				instance.RemoveAuthenticatorUsername(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, req.UsernameId)
 				return nil
 			},
 			req: &user.RemoveUsernameRequest{
@@ -519,8 +553,9 @@ func TestServer_DeleteUsername(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(req *user.RemoveUsernameRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
 				usernameResp := instance.AddAuthenticatorUsername(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), userResp.GetDetails().GetId(), gofakeit.Username(), true)
-				req.Id = usernameResp.GetUsernameId()
+				req.UsernameId = usernameResp.GetUsernameId()
 				return nil
 			},
 			req: &user.RemoveUsernameRequest{
@@ -549,11 +584,13 @@ func TestServer_DeleteUsername(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.RemoveUsername(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
+
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
+
 		})
 	}
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -212,16 +213,16 @@ func TestServer_CreateUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := instance.Client.UserV3Alpha.CreateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCodeEmail {
-				require.NotNil(t, got.EmailCode)
+				assert.NotNil(t, got.EmailCode)
 			}
 			if tt.res.returnCodePhone {
-				require.NotNil(t, got.PhoneCode)
+				assert.NotNil(t, got.PhoneCode)
 			}
 		})
 	}
@@ -628,16 +629,16 @@ func TestServer_PatchUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.PatchUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCodeEmail {
-				require.NotNil(t, got.EmailCode)
+				assert.NotNil(t, got.EmailCode)
 			}
 			if tt.res.returnCodePhone {
-				require.NotNil(t, got.PhoneCode)
+				assert.NotNil(t, got.PhoneCode)
 			}
 		})
 	}
@@ -843,10 +844,10 @@ func TestServer_DeleteUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.DeleteUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
@@ -1054,10 +1055,10 @@ func TestServer_LockUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.LockUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
@@ -1237,10 +1238,10 @@ func TestServer_UnlockUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.UnlockUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
@@ -1439,10 +1440,10 @@ func TestServer_DeactivateUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.DeactivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
@@ -1622,10 +1623,10 @@ func TestServer_ActivateUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.ActivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}

@@ -5,9 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
-	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 )
 
 type PasswordV3WriteModel struct {
@@ -45,7 +43,7 @@ func (wm *PasswordV3WriteModel) Reduce() error {
 			wm.EncodedHash = ""
 			wm.ChangeRequired = false
 			wm.Code = nil
-		case *user.HumanPasswordCodeAddedEvent:
+		case *authenticator.PasswordCodeAddedEvent:
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
 			wm.CodeExpiry = e.Expiry
@@ -58,7 +56,7 @@ func (wm *PasswordV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(schemauser.AggregateType).
+		AggregateTypes(authenticator.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			authenticator.PasswordCreatedType,

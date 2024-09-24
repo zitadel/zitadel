@@ -3,8 +3,11 @@ package user
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 )
@@ -29,10 +32,11 @@ func setPasswordRequestToSetSchemaUserPassword(req *user.SetPasswordRequest) *co
 		Password:            req.GetNewPassword().GetPassword(),
 		EncodedPasswordHash: req.GetNewPassword().GetHash(),
 		ChangeRequired:      req.GetNewPassword().GetChangeRequired(),
+		VerificationCode:    req.GetNewPassword().GetVerificationCode(),
+		CurrentPassword:     req.GetNewPassword().GetCurrentPassword(),
 	}
 }
 
-/*
 func (s *Server) RemovePassword(ctx context.Context, req *user.RemovePasswordRequest) (_ *user.RemovePasswordResponse, err error) {
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
@@ -46,16 +50,34 @@ func (s *Server) RemovePassword(ctx context.Context, req *user.RemovePasswordReq
 	}, nil
 }
 
-func (s *Server) RemovePassword(ctx context.Context, req *user.RemovePasswordRequest) (_ *user.RemovePasswordResponse, err error) {
+func (s *Server) RequestPasswordReset(ctx context.Context, req *user.RequestPasswordResetRequest) (_ *user.RequestPasswordResetResponse, err error) {
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeleteSchemaUserPassword(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId())
+	schemauser := requestPasswordResetRequestToRequestSchemaUserPasswordReset(req)
+	details, err := s.command.RequestSchemaUserPasswordReset(ctx, schemauser)
 	if err != nil {
 		return nil, err
 	}
-	return &user.RemovePasswordResponse{
-		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
+	return &user.RequestPasswordResetResponse{
+		Details:          resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
+		VerificationCode: gu.Ptr(schemauser.PlainCode),
 	}, nil
 }
-*/
+
+func requestPasswordResetRequestToRequestSchemaUserPasswordReset(req *user.RequestPasswordResetRequest) *command.RequestSchemaUserPasswordReset {
+	var notificationType domain.NotificationType
+	if req.GetSendEmail() != nil {
+		notificationType = domain.NotificationTypeEmail
+	}
+	if req.GetSendSms() != nil {
+		notificationType = domain.NotificationTypeSms
+	}
+	return &command.RequestSchemaUserPasswordReset{
+		ResourceOwner:    organizationToUpdateResourceOwner(req.Organization),
+		UserID:           req.GetId(),
+		URLTemplate:      req.GetSendEmail().GetUrlTemplate(),
+		ReturnCode:       req.GetReturnCode() != nil,
+		NotificationType: notificationType,
+	}
+}

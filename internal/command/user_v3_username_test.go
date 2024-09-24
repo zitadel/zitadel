@@ -63,7 +63,7 @@ func filterUsernameExisting(isOrgSpecifc bool) expect {
 			authenticator.NewUsernameCreatedEvent(
 				context.Background(),
 				&authenticator.NewAggregate("username1", "org1").Aggregate,
-				"id1",
+				"user1",
 				isOrgSpecifc,
 				"username",
 			),
@@ -264,6 +264,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		resourceOwner string
+		userID        string
 		id            string
 	}
 	type res struct {
@@ -277,7 +278,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 		res    res
 	}{
 		{
-			"no ID, error",
+			"no userID, error",
 			fields{
 				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -285,6 +286,23 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				id:  "",
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-J6ybG5WZiy", "Errors.IDMissing"))
+				},
+			},
+		},
+		{
+			"no ID, error",
+			fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:    authz.NewMockContext("instanceID", "", ""),
+				userID: "user1",
+				id:     "",
 			},
 			res{
 				err: func(err error) bool {
@@ -301,8 +319,9 @@ func TestCommands_DeleteUsername(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "notexisting",
+				ctx:    authz.NewMockContext("instanceID", "", ""),
+				userID: "user1",
+				id:     "notexisting",
 			},
 			res{
 				err: func(err error) bool {
@@ -319,7 +338,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 							authenticator.NewUsernameCreatedEvent(
 								context.Background(),
 								&authenticator.NewAggregate("username1", "org1").Aggregate,
-								"id1",
+								"user1",
 								true,
 								"username",
 							),
@@ -337,8 +356,9 @@ func TestCommands_DeleteUsername(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "notexisting",
+				ctx:    authz.NewMockContext("instanceID", "", ""),
+				userID: "user1",
+				id:     "notexisting",
 			},
 			res{
 				err: func(err error) bool {
@@ -355,8 +375,9 @@ func TestCommands_DeleteUsername(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "username1",
+				ctx:    authz.NewMockContext("instanceID", "", ""),
+				userID: "user1",
+				id:     "username1",
 			},
 			res{
 				err: func(err error) bool {
@@ -381,8 +402,9 @@ func TestCommands_DeleteUsername(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "username1",
+				ctx:    authz.NewMockContext("instanceID", "", ""),
+				userID: "user1",
+				id:     "username1",
 			},
 			res{
 				details: &domain.ObjectDetails{
@@ -407,8 +429,9 @@ func TestCommands_DeleteUsername(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
-				id:  "username1",
+				ctx:    authz.NewMockContext("instanceID", "", ""),
+				userID: "user1",
+				id:     "username1",
 			},
 			res{
 				details: &domain.ObjectDetails{
@@ -423,7 +446,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
-			details, err := c.DeleteUsername(tt.args.ctx, tt.args.resourceOwner, tt.args.id)
+			details, err := c.DeleteUsername(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

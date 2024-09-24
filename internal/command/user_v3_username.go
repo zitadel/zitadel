@@ -39,8 +39,8 @@ func (c *Commands) AddUsername(ctx context.Context, username *AddUsername) (*dom
 	return pushedEventsToObjectDetails(events), nil
 }
 
-func (c *Commands) DeleteUsername(ctx context.Context, resourceOwner, id string) (_ *domain.ObjectDetails, err error) {
-	existing, err := c.getSchemaUsernameExistsWithPermission(ctx, resourceOwner, id)
+func (c *Commands) DeleteUsername(ctx context.Context, resourceOwner, userID, id string) (_ *domain.ObjectDetails, err error) {
+	existing, err := c.getSchemaUsernameExistsWithPermission(ctx, resourceOwner, userID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -57,11 +57,14 @@ func (c *Commands) DeleteUsername(ctx context.Context, resourceOwner, id string)
 	return pushedEventsToObjectDetails(events), nil
 }
 
-func (c *Commands) getSchemaUsernameExistsWithPermission(ctx context.Context, resourceOwner, id string) (*UsernameV3WriteModel, error) {
+func (c *Commands) getSchemaUsernameExistsWithPermission(ctx context.Context, resourceOwner, userID, id string) (*UsernameV3WriteModel, error) {
+	if userID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-J6ybG5WZiy", "Errors.IDMissing")
+	}
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-PoSU5BOZCi", "Errors.IDMissing")
 	}
-	writeModel := NewUsernameV3WriteModel(resourceOwner, id)
+	writeModel := NewUsernameV3WriteModel(resourceOwner, userID, id)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}

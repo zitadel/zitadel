@@ -789,8 +789,40 @@ func (i *Instance) AddAuthenticatorUsername(ctx context.Context, orgID string, u
 	return user
 }
 
-func (i *Instance) RemoveAuthenticatorUsername(ctx context.Context, orgID string, id string) *user_v3alpha.RemoveUsernameResponse {
+func (i *Instance) RemoveAuthenticatorUsername(ctx context.Context, orgID string, userid, id string) *user_v3alpha.RemoveUsernameResponse {
 	user, err := i.Client.UserV3Alpha.RemoveUsername(ctx, &user_v3alpha.RemoveUsernameRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userid,
+		UsernameId:   id,
+	})
+	logging.OnError(err).Fatal("remove username")
+	return user
+}
+
+func (i *Instance) SetAuthenticatorPassword(ctx context.Context, orgID string, userID string, password string) *user_v3alpha.SetPasswordResponse {
+	user, err := i.Client.UserV3Alpha.SetPassword(ctx, &user_v3alpha.SetPasswordRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		NewPassword: &user_v3alpha.SetPassword{
+			Type: &user_v3alpha.SetPassword_Password{Password: password},
+		},
+	})
+	logging.OnError(err).Fatal("create password")
+	return user
+}
+
+func (i *Instance) RequestAuthenticatorPasswordReset(ctx context.Context, orgID string, userID string) *user_v3alpha.RequestPasswordResetResponse {
+	user, err := i.Client.UserV3Alpha.RequestPasswordReset(ctx, &user_v3alpha.RequestPasswordResetRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		Medium:       &user_v3alpha.RequestPasswordResetRequest_ReturnCode{},
+	})
+	logging.OnError(err).Fatal("reset password")
+	return user
+}
+
+func (i *Instance) RemoveAuthenticatorPassword(ctx context.Context, orgID string, id string) *user_v3alpha.RemovePasswordResponse {
+	user, err := i.Client.UserV3Alpha.RemovePassword(ctx, &user_v3alpha.RemovePasswordRequest{
 		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
 		Id:           id,
 	})
