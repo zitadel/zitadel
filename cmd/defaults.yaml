@@ -2,6 +2,16 @@ Log:
   Level: info # ZITADEL_LOG_LEVEL
   Formatter:
     Format: text # ZITADEL_LOG_FORMATTER_FORMAT
+# For sending structured logs not only to stdout but also to external services, use the Hooks section.
+# Currently, only the type GCPLoggingOtelExporter is supported.
+# Hooks:
+#   # GCPLoggingOtelExporter sends ZITADEL activity logs to Google Cloud Logging
+#   # From Google Cloud Logging, the logs are queryable by their fields, which are mapped to log labels.
+#   # Make sure the ZITADEL runtime has Google Application Default Credentials with the role "roles/logging.logWriter" set up.
+#   - GCPLoggingOtelExporter:
+#       Project: "my-zitadel-project"
+#       Attributes:
+#         Environment: "Production"
 
 # Exposes metrics on /debug/metrics
 Metrics:

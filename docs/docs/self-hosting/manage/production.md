@@ -56,18 +56,29 @@ Logs are a stream of time-ordered events collected from all running processes.
 
 [ZITADEL is configurable](#default-zitadel-logging-config) to write the following events to the standard output:
 
-- Runtime Logs: Define the log level and record format in the `Log` configuration section.
+- Standard Runtime Logs: Define the log level and record format in the `Log` configuration section.
+- Activity Logs: These info level logs have a common set of fields and are written to stdout on interesting user interaction, like authentications or API calls. By configuring the `Hooks` section, you can send these logs in a structured format to external services like Google Cloud Logging. This enables you to easily query the logs by these fields.
 - Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary by setting `LogStore.Access.Stdout.Enabled` to true.
 - Actions Execution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this by setting `LogStore.Execution.Stdout.Enabled` to true.
 
-### Default ZITADEL Logging Config
+### Example ZITADEL Logging Config
 
 ```yaml
 Log:
   Level: info # ZITADEL_LOG_LEVEL
   Formatter:
     Format: text # ZITADEL_LOG_FORMATTER_FORMAT
-    
+# For sending structured logs not only to stdout but also to external services, use the Hooks section.
+# Currently, only the type GCPLoggingOtelExporter is supported.
+  Hooks:
+    # GCPLoggingOtelExporter sends ZITADEL activity logs to Google Cloud Logging
+    # From Google Cloud Logging, the logs are queryable by their fields, which are mapped to log labels.
+    # Make sure the ZITADEL runtime has Google Application Default Credentials with the role "roles/logging.logWriter" set up.
+    - GCPLoggingOtelExporter:
+        Project: "my-zitadel-project"
+        Attributes:
+          Environment: "Production"
+
 LogStore:
   Access:
     Stdout:
