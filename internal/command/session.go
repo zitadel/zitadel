@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
-	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -19,7 +17,9 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 )
 
 type SessionCommand func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error)

@@ -2,7 +2,6 @@ package logs
 
 import (
 	"fmt"
-	"github.com/zitadel/zitadel/pkg/streams"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -12,6 +11,8 @@ import (
 	"github.com/zitadel/logging/otel"
 	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/otel/log"
+
+	"github.com/zitadel/zitadel/pkg/streams"
 )
 
 type Hook string
@@ -82,9 +83,7 @@ func (c *Config) SetLogger() (err error) {
 
 func decodeRawConfig(rawConfig map[string]interface{}, typedConfig any) (err error) {
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		MatchName: func(mapKey, fieldName string) bool {
-			return strings.ToLower(mapKey) == strings.ToLower(fieldName)
-		},
+		MatchName:        strings.EqualFold,
 		WeaklyTypedInput: true,
 		Result:           typedConfig,
 	})

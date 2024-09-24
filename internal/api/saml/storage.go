@@ -3,8 +3,6 @@ package saml
 import (
 	"context"
 	"encoding/json"
-	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
-	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 	"time"
 
 	"github.com/dop251/goja"
@@ -25,8 +23,10 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 )
 
 var _ provider.EntityStorage = &Storage{}

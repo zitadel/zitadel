@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
-	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 	"strings"
 	"time"
 
@@ -20,8 +18,10 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 )
 
 const (

@@ -2,18 +2,19 @@ package activity
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/pkg/streams"
 	"google.golang.org/grpc/codes"
-	"strconv"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/logs/record"
+	"github.com/zitadel/zitadel/pkg/streams"
 	"github.com/zitadel/zitadel/pkg/streams/activity"
 )
 

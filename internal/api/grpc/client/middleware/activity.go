@@ -2,12 +2,12 @@ package middleware
 
 import (
 	"context"
-	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/internal/telemetry/logs/record/activity"
+	activity_schemas "github.com/zitadel/zitadel/pkg/streams/activity"
 )
 
 func UnaryActivityClientInterceptor() grpc.UnaryClientInterceptor {

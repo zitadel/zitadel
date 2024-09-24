@@ -2,6 +2,7 @@ package record
 
 import (
 	"github.com/sirupsen/logrus"
+
 	"github.com/zitadel/zitadel/pkg/streams"
 )
 
