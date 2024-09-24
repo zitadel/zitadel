@@ -59,6 +59,7 @@ func (c *mapCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, o
 		c.logger.InfoContext(ctx, "map cache get", "err", err, "index", index, "key", key)
 		return value, false
 	}
+	c.logger.ErrorContext(ctx, "map cache get", "err", cache.NewIndexUnknownErr(index), "index", index, "key", key)
 	return value, false
 }
 
