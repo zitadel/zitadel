@@ -61,20 +61,6 @@ func (c *Config) SetLogger() (err error) {
 				}),
 				otel.WithLevels([]logrus.Level{logrus.InfoLevel}),
 				otel.WithAttributes(addedAttributes.ToAttributes()),
-				otel.WithMapBody(func(entry *logrus.Entry) (body string) {
-					entryCopy := *entry
-					lg := logrus.New()
-					lg.Formatter = &logrus.TextFormatter{
-						DisableColors:    true,
-						DisableQuote:     true,
-						DisableTimestamp: true,
-						PadLevelText:     true,
-						QuoteEmptyFields: true,
-					}
-					entryCopy.Logger = lg
-					body, err = entryCopy.String()
-					return strings.TrimSpace(body)
-				}),
 			)
 			if err != nil {
 				return err
