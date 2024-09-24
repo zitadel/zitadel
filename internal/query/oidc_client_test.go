@@ -29,7 +29,7 @@ var (
 	testdataOidcClientNoSettings string
 )
 
-func TestQueries_GetOIDCClientByID(t *testing.T) {
+func TestQueries_ActiveOIDCClientByID(t *testing.T) {
 	expQuery := regexp.QuoteMeta(oidcClientQuery)
 	cols := []string{"client"}
 	pubkey := `-----BEGIN RSA PUBLIC KEY-----
@@ -232,7 +232,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
-				got, err := q.GetOIDCClientByID(ctx, "clientID", true)
+				got, err := q.ActiveOIDCClientByID(ctx, "clientID", true)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
 			})

@@ -144,7 +144,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 		return nil, DeviceAuthStateError(deviceAuthModel.State)
 	}
 
-	cmd, err := c.newOIDCSessionAddEvents(ctx, deviceAuthModel.UserOrgID)
+	cmd, err := c.newOIDCSessionAddEvents(ctx, deviceAuthModel.UserID, deviceAuthModel.UserOrgID)
 	if err != nil {
 		return nil, err
 	}

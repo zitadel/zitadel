@@ -187,7 +187,7 @@ module.exports = {
       selector: "div#",
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python", "protobuf"],
+      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python", "protobuf", "json", "bash"],
     },
     colorMode: {
       defaultMode: "dark",
