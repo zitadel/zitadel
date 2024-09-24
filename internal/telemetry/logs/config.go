@@ -27,6 +27,7 @@ type Config struct {
 
 type GCPExporterConfig struct {
 	Attributes map[string]string
+	Project    string
 }
 
 func (g *GCPExporterConfig) ToAttributes() (attributes []log.KeyValue) {
@@ -47,6 +48,7 @@ func (c *Config) SetLogger() (err error) {
 				return err
 			}
 			hook, err = otel.NewGCPLoggingExporterHook(
+				addedAttributes.Project,
 				otel.WithExporterConfig(func(cfg *googlecloudexporter.Config) {
 					cfg.LogConfig.DefaultLogName = "zitadel"
 					cfg.LogConfig.ServiceResourceLabels = false

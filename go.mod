@@ -2,8 +2,6 @@ module github.com/zitadel/zitadel
 
 go 1.22.2
 
-replace github.com/zitadel/logging => github.com/zitadel/logging v0.6.1-0.20240912223143-5e0ad4a3c07a
-
 require (
 	cloud.google.com/go/profiler v0.4.1
 	cloud.google.com/go/storage v1.43.0
@@ -66,7 +64,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
-	github.com/zitadel/logging v0.6.0
+	github.com/zitadel/logging v0.6.1-0.20240924115256-812efc0563b7
 	github.com/zitadel/oidc/v3 v3.28.1
 	github.com/zitadel/passwap v0.6.0
 	github.com/zitadel/saml v0.2.0
