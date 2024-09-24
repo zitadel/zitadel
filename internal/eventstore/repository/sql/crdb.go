@@ -11,7 +11,6 @@ import (
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -266,11 +265,11 @@ func (crdb *CRDB) FilterToReducer(ctx context.Context, searchQuery *eventstore.S
 	return err
 }
 
-// LatestPosition returns the latest position found by the search query
-func (db *CRDB) LatestPosition(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (decimal.Decimal, error) {
-	var position decimal.Decimal
+// LatestSequence returns the latest sequence found by the search query
+func (db *CRDB) LatestSequence(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (float64, error) {
+	var position sql.NullFloat64
 	err := query(ctx, db, searchQuery, &position, false)
-	return position, err
+	return position.Float64, err
 }
 
 // InstanceIDs returns the instance ids found by the search query
@@ -337,7 +336,7 @@ func (db *CRDB) eventQuery(useV1 bool) string {
 		" FROM eventstore.events2"
 }
 
-func (db *CRDB) maxPositionQuery(useV1 bool) string {
+func (db *CRDB) maxSequenceQuery(useV1 bool) string {
 	if useV1 {
 		return `SELECT event_sequence FROM eventstore.events`
 	}
@@ -415,8 +414,6 @@ func (db *CRDB) operation(operation repository.Operation) string {
 		return "="
 	case repository.OperationGreater:
 		return ">"
-	case repository.OperationGreaterEqual:
-		return ">="
 	case repository.OperationLess:
 		return "<"
 	case repository.OperationJSONContains:

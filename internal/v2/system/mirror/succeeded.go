@@ -1,8 +1,6 @@
 package mirror
 
 import (
-	"github.com/shopspring/decimal"
-
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -11,7 +9,7 @@ type succeededPayload struct {
 	// Source is the name of the database data are mirrored from
 	Source string `json:"source"`
 	// Position until data will be mirrored
-	Position decimal.Decimal `json:"position"`
+	Position float64 `json:"position"`
 }
 
 const SucceededType = eventTypePrefix + "succeeded"
@@ -40,7 +38,7 @@ func SucceededEventFromStorage(event *eventstore.StorageEvent) (e *SucceededEven
 	}, nil
 }
 
-func NewSucceededCommand(source string, position decimal.Decimal) *eventstore.Command {
+func NewSucceededCommand(source string, position float64) *eventstore.Command {
 	return &eventstore.Command{
 		Action: eventstore.Action[any]{
 			Creator:  Creator,
