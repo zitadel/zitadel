@@ -1021,6 +1021,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 					),
@@ -1089,6 +1090,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -1155,6 +1157,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -1229,6 +1232,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(

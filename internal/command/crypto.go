@@ -13,6 +13,8 @@ type encrypedCodeFunc func(ctx context.Context, filter preparation.FilterToQuery
 
 type encryptedCodeWithDefaultFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, error)
 
+type encryptedCodeGeneratorWithDefaultFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error)
+
 var emptyConfig = &crypto.GeneratorConfig{}
 
 type EncryptedCode struct {

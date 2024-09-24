@@ -34,7 +34,7 @@ func (c *Commands) createOTPSMSChallenge(returnCode bool, dst *string) SessionCo
 		if !writeModel.OTPAdded() {
 			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady")
 		}
-		code, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeOTPSMS, cmd.otpAlg, c.defaultSecretGenerators.OTPSMS)
+		code, generatorID, err := cmd.createPhoneCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPSMS, cmd.otpAlg, c.defaultSecretGenerators.OTPSMS)
 		if err != nil {
 			return nil, err
 		}

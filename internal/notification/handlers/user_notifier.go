@@ -259,9 +259,12 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if alreadyHandled {
 			return nil
 		}
-		code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
-		if err != nil {
-			return err
+		var code string
+		if e.Code != nil {
+			code, err = crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+			if err != nil {
+				return err
+			}
 		}
 		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 		if err != nil {
@@ -358,9 +361,12 @@ func (u *userNotifier) reduceOTPSMS(
 	if alreadyHandled {
 		return handler.NewNoOpStatement(event), nil
 	}
-	plainCode, err := crypto.DecryptString(code, u.queries.UserDataCrypto)
-	if err != nil {
-		return nil, err
+	var plainCode string
+	if code != nil {
+		plainCode, err = crypto.DecryptString(code, u.queries.UserDataCrypto)
+		if err != nil {
+			return nil, err
+		}
 	}
 	colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, resourceOwner, false)
 	if err != nil {
@@ -694,9 +700,12 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if alreadyHandled {
 			return nil
 		}
-		code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
-		if err != nil {
-			return err
+		var code string
+		if e.Code != nil {
+			code, err = crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+			if err != nil {
+				return err
+			}
 		}
 		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 		if err != nil {
@@ -782,7 +791,7 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 }
 
 func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, event eventstore.Event, expiry time.Duration, data map[string]interface{}, eventTypes ...eventstore.EventType) (bool, error) {
-	if event.CreatedAt().Add(expiry).Before(time.Now().UTC()) {
+	if expiry > 0 && event.CreatedAt().Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
 	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)

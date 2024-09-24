@@ -5,20 +5,20 @@ type CodeGenerator interface {
 }
 
 type CodeGeneratorInfo struct {
-	ID             *string `json:"id,omitempty"`
-	VerificationID *string `json:"verificationId,omitempty"`
+	ID             string `json:"id,omitempty"`
+	VerificationID string `json:"verificationId,omitempty"`
 }
 
 func (c *CodeGeneratorInfo) GetID() string {
-	if c == nil || c.ID == nil {
+	if c == nil {
 		return ""
 	}
-	return *c.ID
+	return c.ID
 }
 
 func (c *CodeGeneratorInfo) GetVerificationID() string {
-	if c == nil || c.VerificationID == nil {
+	if c == nil {
 		return ""
 	}
-	return *c.VerificationID
+	return c.VerificationID
 }

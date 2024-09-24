@@ -239,7 +239,7 @@ func (wm *IAMSMSLastActivatedConfigWriteModel) Reduce() error {
 			wm.activeID = e.ID
 		}
 	}
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 func (wm *IAMSMSLastActivatedConfigWriteModel) Query() *eventstore.SearchQueryBuilder {

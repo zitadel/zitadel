@@ -176,7 +176,7 @@ func (e *HumanPasswordCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 }
 
 func (e *HumanPasswordCodeSentEvent) Payload() interface{} {
-	return nil
+	return e
 }
 
 func (e *HumanPasswordCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {

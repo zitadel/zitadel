@@ -18,18 +18,31 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddUserHuman(t *testing.T) {
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore         func(t *testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
-		userPasswordHasher *crypto.Hasher
-		newCode            encrypedCodeFunc
-		checkPermission    domain.PermissionCheck
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		idGenerator                 id.Generator
+		userPasswordHasher          *crypto.Hasher
+		newCode                     encrypedCodeFunc
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		checkPermission             domain.PermissionCheck
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx             context.Context
@@ -1027,6 +1040,36 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "+41711234567", language.English),
 						user.NewHumanEmailVerifiedEvent(
@@ -1042,13 +1085,15 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("phonecode"),
 							},
 							time.Hour*1,
+							"",
 						),
 					),
 				),
-				checkPermission:    newMockPermissionCheckAllowed(),
-				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher: mockPasswordHasher("x"),
-				newCode:            mockEncryptedCode("phonecode", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher:          mockPasswordHasher("x"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phonecode", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1171,6 +1216,36 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "+41711234567", language.English),
 						user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -1186,13 +1261,15 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							},
 							1*time.Hour,
 							true,
+							"",
 						),
 					),
 				),
-				checkPermission:    newMockPermissionCheckAllowed(),
-				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher: mockPasswordHasher("x"),
-				newCode:            mockEncryptedCode("phoneCode", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher:          mockPasswordHasher("x"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1547,11 +1624,13 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore(t),
-				userPasswordHasher: tt.fields.userPasswordHasher,
-				idGenerator:        tt.fields.idGenerator,
-				newEncryptedCode:   tt.fields.newCode,
-				checkPermission:    tt.fields.checkPermission,
+				eventstore:                  tt.fields.eventstore(t),
+				userPasswordHasher:          tt.fields.userPasswordHasher,
+				idGenerator:                 tt.fields.idGenerator,
+				newEncryptedCode:            tt.fields.newCode,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				checkPermission:             tt.fields.checkPermission,
 				multifactors: domain.MultifactorConfigs{
 					OTP: domain.OTPConfig{
 						Issuer:    "zitadel.com",
@@ -1578,11 +1657,23 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 }
 
 func TestCommandSide_ChangeUserHuman(t *testing.T) {
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore         func(t *testing.T) *eventstore.Eventstore
-		userPasswordHasher *crypto.Hasher
-		newCode            encrypedCodeFunc
-		checkPermission    domain.PermissionCheck
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		userPasswordHasher          *crypto.Hasher
+		newCode                     encrypedCodeFunc
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		checkPermission             domain.PermissionCheck
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx     context.Context
@@ -2107,6 +2198,36 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						user.NewHumanPhoneChangedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -2122,11 +2243,13 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							},
 							time.Hour,
 							false,
+							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneCode", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2255,6 +2378,36 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						user.NewHumanPhoneChangedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -2270,11 +2423,13 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							},
 							time.Hour,
 							true,
+							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneCode", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -2929,11 +3084,13 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore(t),
-				userPasswordHasher: tt.fields.userPasswordHasher,
-				newEncryptedCode:   tt.fields.newCode,
-				checkPermission:    tt.fields.checkPermission,
-				userEncryption:     tt.args.codeAlg,
+				eventstore:                  tt.fields.eventstore(t),
+				userPasswordHasher:          tt.fields.userPasswordHasher,
+				newEncryptedCode:            tt.fields.newCode,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				checkPermission:             tt.fields.checkPermission,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				userEncryption:              tt.args.codeAlg,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)
 			if tt.res.err == nil {

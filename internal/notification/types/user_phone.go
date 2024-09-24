@@ -49,15 +49,14 @@ func generateSms(
 			RecipientPhoneNumber: recipient,
 			Content:              data.Text,
 			TriggeringEvent:      triggeringEvent,
-			VerificationID:       generatorInfo.VerificationID,
 		}
 		err = smsChannels.HandleMessage(message)
 		if err != nil {
 			return err
 		}
 		if config.TwilioConfig.VerifyServiceSID != "" {
-			generatorInfo.ID = &config.ProviderConfig.ID
-			generatorInfo.VerificationID = message.VerificationID
+			generatorInfo.ID = config.ProviderConfig.ID
+			generatorInfo.VerificationID = *message.VerificationID
 		}
 		return nil
 	}

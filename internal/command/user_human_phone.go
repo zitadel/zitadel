@@ -77,7 +77,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 	if !existingCode.UserState.Exists() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Rsj8c", "Errors.User.NotFound")
 	}
-	if !existingCode.State.Exists() || existingCode.Code == nil {
+	if !existingCode.State.Exists() || (existingCode.Code == nil && existingCode.GeneratorID == "") {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Rsj8c", "Errors.User.Code.NotFound")
 	}
 
@@ -109,7 +109,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 	return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-sM0cs", "Errors.User.Code.Invalid")
 }
 
-func (c *Commands) phoneCodeVerifier(ctx context.Context, id string) (senders.CodeGenerator, error) {
+func (c *Commands) phoneCodeVerifierFromConfig(ctx context.Context, id string) (senders.CodeGenerator, error) {
 	config, err := c.getSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), id)
 	if err != nil {
 		return nil, err

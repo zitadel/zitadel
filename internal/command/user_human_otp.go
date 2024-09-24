@@ -605,7 +605,7 @@ func checkOTP(
 	if !existingOTP.OTPAdded() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady")
 	}
-	if existingOTP.Code() == nil {
+	if existingOTP.Code() == nil && existingOTP.GeneratorID() == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound")
 	}
 	userAgg := &user.NewAggregate(userID, existingOTP.ResourceOwner()).Aggregate
