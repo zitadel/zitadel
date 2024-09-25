@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 
@@ -83,7 +84,7 @@ type Statement struct {
 	AggregateType eventstore.AggregateType
 	AggregateID   string
 	Sequence      uint64
-	Position      float64
+	Position      decimal.Decimal
 	CreationDate  time.Time
 	InstanceID    string
 

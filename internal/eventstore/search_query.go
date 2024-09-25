@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -23,7 +25,7 @@ type SearchQueryBuilder struct {
 	queries               []*SearchQuery
 	tx                    *sql.Tx
 	allowTimeTravel       bool
-	positionAfter         float64
+	positionGreaterEqual  decimal.Decimal
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
@@ -74,8 +76,8 @@ func (b *SearchQueryBuilder) GetAllowTimeTravel() bool {
 	return b.allowTimeTravel
 }
 
-func (b SearchQueryBuilder) GetPositionAfter() float64 {
-	return b.positionAfter
+func (b SearchQueryBuilder) GetPositionAfter() decimal.Decimal {
+	return b.positionGreaterEqual
 }
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
@@ -267,8 +269,8 @@ func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
 }
 
 // PositionAfter filters for events which happened after the specified time
-func (builder *SearchQueryBuilder) PositionAfter(position float64) *SearchQueryBuilder {
-	builder.positionAfter = position
+func (builder *SearchQueryBuilder) PositionGreaterEqual(position decimal.Decimal) *SearchQueryBuilder {
+	builder.positionGreaterEqual = position
 	return builder
 }
 

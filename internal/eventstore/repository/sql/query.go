@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -189,7 +190,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			return zerrors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
 		}
 		event := new(repository.Event)
-		position := new(sql.NullFloat64)
+		position := new(decimal.NullDecimal)
 
 		if useV1 {
 			err = scanner(
@@ -226,7 +227,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			logging.New().WithError(err).Warn("unable to scan row")
 			return zerrors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 		}
-		event.Pos = position.Float64
+		event.Pos = position.Decimal
 		return reduce(event)
 	}
 }

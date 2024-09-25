@@ -121,6 +121,7 @@ func CreateGatewayWithPrefix(
 			client_middleware.DefaultTracingClient(),
 			client_middleware.UnaryActivityClientInterceptor(),
 		),
+		// grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -148,6 +149,7 @@ func CreateGateway(
 				client_middleware.DefaultTracingClient(),
 				client_middleware.UnaryActivityClientInterceptor(),
 			),
+			// grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 		})
 	if err != nil {
 		return nil, err

@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -44,7 +46,7 @@ type Event interface {
 	// CreatedAt is the time the event was created at
 	CreatedAt() time.Time
 	// Position is the global position of the event
-	Position() float64
+	Position() decimal.Decimal
 
 	// Unmarshal parses the payload and stores the result
 	// in the value pointed to by ptr. If ptr is nil or not a pointer,

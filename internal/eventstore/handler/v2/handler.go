@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"math"
 	"math/rand"
 	"slices"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -269,52 +269,18 @@ func randomizeStart(min, maxSeconds float64) time.Duration {
 }
 
 func (h *Handler) subscribe(ctx context.Context) {
-	queue := make(chan eventstore.Event, 100)
-	subscription := eventstore.SubscribeEventTypes(queue, h.eventTypes)
+	trigger := func(ctx context.Context, position decimal.Decimal) error {
+		h.log().Debug("triggered by subscription")
+		_, err := h.Trigger(ctx, WithMaxPosition(position))
+		return err
+	}
+	subscription := eventstore.SubscribeEventTypes(trigger, h.eventTypes)
 	for {
 		select {
 		case <-ctx.Done():
 			subscription.Unsubscribe()
 			h.log().Debug("shutdown")
 			return
-		case event := <-queue:
-			events := checkAdditionalEvents(queue, event)
-			solvedInstances := make([]string, 0, len(events))
-			queueCtx := call.WithTimestamp(ctx)
-			for _, e := range events {
-				if instanceSolved(solvedInstances, e.Aggregate().InstanceID) {
-					continue
-				}
-				queueCtx = authz.WithInstanceID(queueCtx, e.Aggregate().InstanceID)
-				_, err := h.Trigger(queueCtx)
-				h.log().OnError(err).Debug("trigger of queued event failed")
-				if err == nil {
-					solvedInstances = append(solvedInstances, e.Aggregate().InstanceID)
-				}
-			}
-		}
-	}
-}
-
-func instanceSolved(solvedInstances []string, instanceID string) bool {
-	for _, solvedInstance := range solvedInstances {
-		if solvedInstance == instanceID {
-			return true
-		}
-	}
-	return false
-}
-
-func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Event) []eventstore.Event {
-	events := make([]eventstore.Event, 1)
-	events[0] = event
-	for {
-		wait := time.NewTimer(1 * time.Millisecond)
-		select {
-		case event := <-eventQueue:
-			events = append(events, event)
-		case <-wait.C:
-			return events
 		}
 	}
 }
@@ -379,7 +345,7 @@ func (h *Handler) existingInstances(ctx context.Context) ([]string, error) {
 
 type triggerConfig struct {
 	awaitRunning bool
-	maxPosition  float64
+	maxPosition  decimal.Decimal
 }
 
 type TriggerOpt func(conf *triggerConfig)
@@ -390,7 +356,7 @@ func WithAwaitRunning() TriggerOpt {
 	}
 }
 
-func WithMaxPosition(position float64) TriggerOpt {
+func WithMaxPosition(position decimal.Decimal) TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.maxPosition = position
 	}
@@ -466,6 +432,10 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
+	if h.ProjectionName() == "projections.instance_domains" {
+		h.log().Debug("gugus")
+	}
+
 	txCtx := ctx
 	if h.txDuration > 0 {
 		var cancel, cancelTx func()
@@ -500,7 +470,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
+	if !config.maxPosition.Equal(decimal.Decimal{}) && currentState.position.GreaterThanOrEqual(config.maxPosition) {
 		return false, nil
 	}
 
@@ -609,14 +579,14 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 		return nil
 	}
 
-	_, err = tx.Exec("SAVEPOINT exec")
+	_, err = tx.ExecContext(ctx, "SAVEPOINT exec")
 	if err != nil {
 		h.log().WithError(err).Debug("create savepoint failed")
 		return err
 	}
 	var shouldContinue bool
 	defer func() {
-		_, errSave := tx.Exec("RELEASE SAVEPOINT exec")
+		_, errSave := tx.ExecContext(ctx, "RELEASE SAVEPOINT exec")
 		if err == nil {
 			err = errSave
 		}
@@ -644,9 +614,9 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		OrderAsc().
 		InstanceID(currentState.instanceID)
 
-	if currentState.position > 0 {
+	if currentState.position.GreaterThan(decimal.Decimal{}) {
 		// decrease position by 10 because builder.PositionAfter filters for position > and we need position >=
-		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 10))
+		builder = builder.PositionGreaterEqual(currentState.position)
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
 		}
