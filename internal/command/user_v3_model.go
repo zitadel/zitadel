@@ -215,7 +215,7 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(eventtypes...).Builder()
 }
 
-func (wm *UserV3WriteModel) NewCreated(
+func (wm *UserV3WriteModel) NewCreate(
 	ctx context.Context,
 	schemaWM *UserSchemaWriteModel,
 	data json.RawMessage,
@@ -223,11 +223,11 @@ func (wm *UserV3WriteModel) NewCreated(
 	phone *Phone,
 	code func(context.Context) (*EncryptedCode, error),
 ) (_ []eventstore.Command, codeEmail string, codePhone string, err error) {
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", "", err
 	}
-	if wm.Exists() {
-		return nil, "", "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.AlreadyExists")
+	if err := wm.NotExists(); err != nil {
+		return nil, "", "", err
 	}
 	schemaID, schemaRevision, err := wm.validateData(ctx, data, schemaWM)
 	if err != nil {
@@ -315,11 +315,11 @@ func (wm *UserV3WriteModel) NewUpdate(
 	phone *Phone,
 	code func(context.Context) (*EncryptedCode, error),
 ) (_ []eventstore.Command, codeEmail string, codePhone string, err error) {
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", "", err
 	}
-	if !wm.Exists() {
-		return nil, "", "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.NotFound")
+	if err := wm.Exists(); err != nil {
+		return nil, "", "", err
 	}
 	events := make([]eventstore.Command, 0)
 	if user != nil {
@@ -390,14 +390,13 @@ func (wm *UserV3WriteModel) newUpdatedEvents(
 func (wm *UserV3WriteModel) NewDelete(
 	ctx context.Context,
 ) (_ []eventstore.Command, err error) {
-	if !wm.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound")
+	if err := wm.Exists(); err != nil {
+		return nil, err
 	}
-	if err := wm.checkPermissionDelete(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionDelete(ctx); err != nil {
 		return nil, err
 	}
 	return []eventstore.Command{schemauser.NewDeletedEvent(ctx, UserV3AggregateFromWriteModel(&wm.WriteModel))}, nil
-
 }
 
 func UserV3AggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
@@ -410,37 +409,43 @@ func UserV3AggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggreg
 	}
 }
 
-func (wm *UserV3WriteModel) Exists() bool {
-	return wm.State != domain.UserStateDeleted && wm.State != domain.UserStateUnspecified
+func (wm *UserV3WriteModel) NotExists() error {
+	if err := wm.Exists(); err != nil {
+		return nil
+	}
+	return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.AlreadyExists")
 }
 
-func (wm *UserV3WriteModel) checkPermissionWrite(
-	ctx context.Context,
-	resourceOwner string,
-	userID string,
-) error {
+func (wm *UserV3WriteModel) Exists() error {
+	if wm.State != domain.UserStateDeleted && wm.State != domain.UserStateUnspecified {
+		return nil
+	}
+	return zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound")
+}
+
+func (wm *UserV3WriteModel) checkPermissionWrite(ctx context.Context) error {
 	if wm.writePermissionCheck {
 		return nil
 	}
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
+	if wm.AggregateID == authz.GetCtxData(ctx).UserID {
 		return nil
 	}
-	if err := wm.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
+	if err := wm.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID); err != nil {
 		return err
 	}
 	wm.writePermissionCheck = true
 	return nil
 }
 
-func (wm *UserV3WriteModel) checkPermissionDelete(
-	ctx context.Context,
-	resourceOwner string,
-	userID string,
-) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
+func (wm *UserV3WriteModel) checkPermissionDelete(ctx context.Context) error {
+	if wm.AggregateID == authz.GetCtxData(ctx).UserID {
 		return nil
 	}
-	return wm.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, userID)
+	return wm.checkPermission(ctx, domain.PermissionUserDelete, wm.ResourceOwner, wm.AggregateID)
+}
+
+func (wm *UserV3WriteModel) checkPermissionStateChange(ctx context.Context) error {
+	return wm.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID)
 }
 
 func (wm *UserV3WriteModel) NewEmailCreate(
@@ -448,7 +453,7 @@ func (wm *UserV3WriteModel) NewEmailCreate(
 	email *Email,
 	code func(context.Context) (*EncryptedCode, error),
 ) (_ []eventstore.Command, plainCode string, err error) {
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", err
 	}
 	if email == nil || wm.Email == string(email.Address) {
@@ -483,8 +488,8 @@ func (wm *UserV3WriteModel) NewEmailUpdate(
 	if !wm.EmailWM {
 		return nil, "", nil
 	}
-	if !wm.Exists() {
-		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-nJ0TQFuRmP", "Errors.User.NotFound")
+	if err := wm.Exists(); err != nil {
+		return nil, "", err
 	}
 	return wm.NewEmailCreate(ctx, email, code)
 }
@@ -496,10 +501,10 @@ func (wm *UserV3WriteModel) NewEmailVerify(
 	if !wm.EmailWM {
 		return nil, nil
 	}
-	if !wm.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-qbGyMPvjvj", "Errors.User.NotFound")
+	if err := wm.Exists(); err != nil {
+		return nil, err
 	}
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, err
 	}
 	if wm.EmailCode == nil {
@@ -526,10 +531,10 @@ func (wm *UserV3WriteModel) NewResendEmailCode(
 	if !wm.EmailWM {
 		return nil, "", nil
 	}
-	if !wm.Exists() {
-		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-EajeF6ypOV", "Errors.User.NotFound")
+	if err := wm.Exists(); err != nil {
+		return nil, "", err
 	}
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", err
 	}
 	if wm.EmailCode == nil {
@@ -569,7 +574,7 @@ func (wm *UserV3WriteModel) NewPhoneCreate(
 	phone *Phone,
 	code func(context.Context) (*EncryptedCode, error),
 ) (_ []eventstore.Command, plainCode string, err error) {
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", err
 	}
 	if phone == nil || wm.Phone == string(phone.Number) {
@@ -604,8 +609,8 @@ func (wm *UserV3WriteModel) NewPhoneUpdate(
 	if !wm.PhoneWM {
 		return nil, "", nil
 	}
-	if !wm.Exists() {
-		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-b33QAVgel6", "Errors.User.NotFound")
+	if err := wm.Exists(); err != nil {
+		return nil, "", err
 	}
 	return wm.NewPhoneCreate(ctx, phone, code)
 }
@@ -617,10 +622,10 @@ func (wm *UserV3WriteModel) NewPhoneVerify(
 	if !wm.PhoneWM {
 		return nil, nil
 	}
-	if !wm.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bx2OLtgGNS", "Errors.User.NotFound")
+	if err := wm.Exists(); err != nil {
+		return nil, err
 	}
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, err
 	}
 	if wm.PhoneCode == nil {
@@ -646,10 +651,10 @@ func (wm *UserV3WriteModel) NewResendPhoneCode(
 	if !wm.PhoneWM {
 		return nil, "", nil
 	}
-	if !wm.Exists() {
-		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-z8Bu9vuL9s", "Errors.User.NotFound")
+	if err := wm.Exists(); err != nil {
+		return nil, "", err
 	}
-	if err := wm.checkPermissionWrite(ctx, wm.ResourceOwner, wm.AggregateID); err != nil {
+	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", err
 	}
 	if wm.PhoneCode == nil {
@@ -680,4 +685,60 @@ func (wm *UserV3WriteModel) newPhoneCodeAddedEvent(
 		cryptoCode.Expiry,
 		isReturnCode,
 	), plainCode, nil
+}
+
+func (wm *UserV3WriteModel) NewLock(ctx context.Context) (_ []eventstore.Command, err error) {
+	if err := wm.Exists(); err != nil {
+		return nil, err
+	}
+	// can only be locked when not already locked
+	if wm.Locked {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-G4LOrnjY7q", "Errors.User.NotFound")
+	}
+	if err := wm.checkPermissionStateChange(ctx); err != nil {
+		return nil, err
+	}
+	return []eventstore.Command{schemauser.NewLockedEvent(ctx, UserV3AggregateFromWriteModel(&wm.WriteModel))}, nil
+}
+
+func (wm *UserV3WriteModel) NewUnlock(ctx context.Context) (_ []eventstore.Command, err error) {
+	if err := wm.Exists(); err != nil {
+		return nil, err
+	}
+	// can only be unlocked when locked
+	if !wm.Locked {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound")
+	}
+	if err := wm.checkPermissionStateChange(ctx); err != nil {
+		return nil, err
+	}
+	return []eventstore.Command{schemauser.NewUnlockedEvent(ctx, UserV3AggregateFromWriteModel(&wm.WriteModel))}, nil
+}
+
+func (wm *UserV3WriteModel) NewDeactivate(ctx context.Context) (_ []eventstore.Command, err error) {
+	if err := wm.Exists(); err != nil {
+		return nil, err
+	}
+	// can only be deactivated when active
+	if wm.State != domain.UserStateActive {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Ob6lR5iFTe", "Errors.User.NotFound")
+	}
+	if err := wm.checkPermissionStateChange(ctx); err != nil {
+		return nil, err
+	}
+	return []eventstore.Command{schemauser.NewDeactivatedEvent(ctx, UserV3AggregateFromWriteModel(&wm.WriteModel))}, nil
+}
+
+func (wm *UserV3WriteModel) NewActivate(ctx context.Context) (_ []eventstore.Command, err error) {
+	if err := wm.Exists(); err != nil {
+		return nil, err
+	}
+	// can only be activated when inactive
+	if wm.State != domain.UserStateInactive {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotFound")
+	}
+	if err := wm.checkPermissionStateChange(ctx); err != nil {
+		return nil, err
+	}
+	return []eventstore.Command{schemauser.NewActivatedEvent(ctx, UserV3AggregateFromWriteModel(&wm.WriteModel))}, nil
 }

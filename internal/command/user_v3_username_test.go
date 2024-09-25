@@ -123,7 +123,7 @@ func TestCommands_AddUsername(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -132,8 +132,11 @@ func TestCommands_AddUsername(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
+				idGenerator:     mock.ExpectID(t, "username1"),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -164,7 +167,7 @@ func TestCommands_AddUsername(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-6T2xrOHxTx", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists"))
 				},
 			},
 		},
@@ -174,6 +177,7 @@ func TestCommands_AddUsername(t *testing.T) {
 				eventstore: expectEventstore(
 					filterSchemaUserExisting(),
 					filterSchemaExisting(),
+					expectFilter(),
 					expectPush(
 						authenticator.NewUsernameCreatedEvent(
 							context.Background(),
@@ -207,6 +211,7 @@ func TestCommands_AddUsername(t *testing.T) {
 				eventstore: expectEventstore(
 					filterSchemaUserExisting(),
 					filterSchemaExisting(),
+					expectFilter(),
 					expectPush(
 						authenticator.NewUsernameCreatedEvent(
 							context.Background(),

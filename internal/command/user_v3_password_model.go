@@ -1,11 +1,14 @@
 package command
 
 import (
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type PasswordV3WriteModel struct {
@@ -18,15 +21,22 @@ type PasswordV3WriteModel struct {
 	Code             *crypto.CryptoValue
 	CodeCreationDate time.Time
 	CodeExpiry       time.Duration
+
+	checkPermission domain.PermissionCheck
 }
 
-func NewPasswordV3WriteModel(resourceOwner, id string) *PasswordV3WriteModel {
+func (wm *PasswordV3WriteModel) GetWriteModel() *eventstore.WriteModel {
+	return &wm.WriteModel
+}
+
+func NewPasswordV3WriteModel(resourceOwner, id string, checkPermission domain.PermissionCheck) *PasswordV3WriteModel {
 	return &PasswordV3WriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   id,
 			ResourceOwner: resourceOwner,
 		},
-		UserID: id,
+		UserID:          id,
+		checkPermission: checkPermission,
 	}
 }
 
@@ -63,4 +73,61 @@ func (wm *PasswordV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 			authenticator.PasswordDeletedType,
 			authenticator.PasswordCodeAddedType,
 		).Builder()
+}
+
+func (wm *PasswordV3WriteModel) NewCreate(
+	ctx context.Context,
+	encodeHash string,
+	changeRequired bool,
+) ([]eventstore.Command, error) {
+	return []eventstore.Command{
+		authenticator.NewPasswordCreatedEvent(ctx,
+			AuthenticatorAggregateFromWriteModel(wm.GetWriteModel()),
+			wm.UserID,
+			encodeHash,
+			changeRequired,
+		),
+	}, nil
+}
+
+func (wm *PasswordV3WriteModel) NewAddCode(
+	ctx context.Context,
+	notificationType domain.NotificationType,
+	urlTemplate string,
+	codeReturned bool,
+	code func(context.Context) (*EncryptedCode, error),
+) (_ []eventstore.Command, plainCode string, err error) {
+	crypt, err := code(ctx)
+	if err != nil {
+		return nil, "", err
+	}
+
+	events := []eventstore.Command{
+		authenticator.NewPasswordCodeAddedEvent(ctx,
+			AuthenticatorAggregateFromWriteModel(wm.GetWriteModel()),
+			crypt.Crypted,
+			crypt.Expiry,
+			notificationType,
+			urlTemplate,
+			codeReturned,
+		),
+	}
+	if codeReturned {
+		plainCode = crypt.Plain
+	}
+	return events, plainCode, nil
+}
+
+func (wm *PasswordV3WriteModel) NewDelete(ctx context.Context) ([]eventstore.Command, error) {
+	if err := wm.Exists(); err != nil {
+		return nil, err
+	}
+	return []eventstore.Command{authenticator.NewPasswordDeletedEvent(ctx, AuthenticatorAggregateFromWriteModel(wm.GetWriteModel()))}, nil
+}
+
+func (wm *PasswordV3WriteModel) Exists() error {
+	if wm.EncodedHash == "" {
+		return zerrors.ThrowNotFound(nil, "COMMAND-Joi3utDPIh", "Errors.User.Password.NotFound")
+	}
+	return nil
 }

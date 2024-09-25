@@ -90,7 +90,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-b33QAVgel6", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -394,7 +394,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-bx2OLtgGNS", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -722,7 +722,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-z8Bu9vuL9s", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound"))
 				},
 			},
 		},

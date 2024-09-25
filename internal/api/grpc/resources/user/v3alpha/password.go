@@ -3,8 +3,6 @@ package user
 import (
 	"context"
 
-	"github.com/muhlemmer/gu"
-
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -61,7 +59,7 @@ func (s *Server) RequestPasswordReset(ctx context.Context, req *user.RequestPass
 	}
 	return &user.RequestPasswordResetResponse{
 		Details:          resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
-		VerificationCode: gu.Ptr(schemauser.PlainCode),
+		VerificationCode: schemauser.PlainCode,
 	}, nil
 }
 

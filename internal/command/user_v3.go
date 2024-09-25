@@ -66,7 +66,7 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser)
 		return nil, err
 	}
 
-	events, codeEmail, codePhone, err := writeModel.NewCreated(ctx,
+	events, codeEmail, codePhone, err := writeModel.NewCreate(ctx,
 		schemaWriteModel,
 		user.Data,
 		user.Email,
@@ -151,10 +151,8 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser)
 	if err != nil {
 		return nil, err
 	}
-	if !writeModel.Exists() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.NotFound")
-	}
 
+	// use already used schemaID, if no new schemaID is defined
 	schemaID := writeModel.SchemaID
 	if user.SchemaUser != nil && user.SchemaUser.SchemaID != "" {
 		schemaID = user.SchemaUser.SchemaID
@@ -205,7 +203,7 @@ func existingSchema(ctx context.Context, c *Commands, resourceOwner, id string) 
 		return nil, err
 	}
 	if !writeModel.Exists() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists")
 	}
 	return writeModel, nil
 }

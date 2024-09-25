@@ -121,7 +121,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-TODO", "Errors.User.Password.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -130,6 +130,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(),
+					filterSchemaUserExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -609,7 +610,7 @@ func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-TODO", "Errors.User.Password.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-Joi3utDPIh", "Errors.User.Password.NotFound"))
 				},
 			},
 		},
@@ -768,7 +769,8 @@ func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
 				assertObjectDetails(t, tt.res.details, details)
 			}
 			if tt.res.plainCode != "" {
-				assert.Equal(t, tt.res.plainCode, tt.args.user.PlainCode)
+				assert.NotNil(t, tt.args.user.PlainCode)
+				assert.Equal(t, tt.res.plainCode, *tt.args.user.PlainCode)
 			}
 		})
 	}
@@ -824,7 +826,7 @@ func TestCommands_DeleteSchemaUserPassword(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-Joi3utDPIh", "Errors.User.Password.NotFound"))
 				},
 			},
 		},
@@ -858,7 +860,7 @@ func TestCommands_DeleteSchemaUserPassword(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-Joi3utDPIh", "Errors.User.Password.NotFound"))
 				},
 			},
 		},

@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -46,6 +45,7 @@ func (c *Commands) SetSchemaUserPassword(ctx context.Context, user *SetSchemaUse
 	}
 
 	schemaUser := &schemaUserPassword{
+		Create:              true,
 		ResourceOwner:       user.ResourceOwner,
 		UserID:              user.UserID,
 		VerificationCode:    user.VerificationCode,
@@ -54,27 +54,15 @@ func (c *Commands) SetSchemaUserPassword(ctx context.Context, user *SetSchemaUse
 		EncodedPasswordHash: user.EncodedPasswordHash,
 	}
 
-	existing, err := c.getSchemaUserPasswordWithVerification(ctx, schemaUser)
+	writeModel, err := c.getSchemaUserPasswordWithVerification(ctx, schemaUser)
 	if err != nil {
 		return nil, err
-	}
-	resourceOwner := existing.ResourceOwner
-	// when no password was set yet
-	if existing.EncodedHash == "" {
-		existingUser, err := c.getSchemaUserWMForState(ctx, user.ResourceOwner, user.UserID)
-		if err != nil {
-			return nil, err
-		}
-		if !existingUser.Exists() {
-			return nil, zerrors.ThrowNotFound(nil, "COMMAND-TODO", "Errors.User.Password.NotFound")
-		}
-		resourceOwner = existingUser.ResourceOwner
 	}
 
 	// If password is provided, let's check if is compliant with the policy.
 	// If only a encodedPassword is passed, we can skip this.
 	if user.Password != "" {
-		if err = c.checkPasswordComplexity(ctx, user.Password, resourceOwner); err != nil {
+		if err = c.checkPasswordComplexity(ctx, user.Password, writeModel.ResourceOwner); err != nil {
 			return nil, err
 		}
 	}
@@ -87,18 +75,14 @@ func (c *Commands) SetSchemaUserPassword(ctx context.Context, user *SetSchemaUse
 		}
 	}
 
-	events, err := c.eventstore.Push(ctx,
-		authenticator.NewPasswordCreatedEvent(ctx,
-			&authenticator.NewAggregate(user.UserID, resourceOwner).Aggregate,
-			existing.UserID,
-			encodedPassword,
-			user.ChangeRequired,
-		),
+	events, err := writeModel.NewCreate(ctx,
+		encodedPassword,
+		user.ChangeRequired,
 	)
 	if err != nil {
 		return nil, err
 	}
-	return pushedEventsToObjectDetails(events), nil
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 type RequestSchemaUserPasswordReset struct {
@@ -107,64 +91,48 @@ type RequestSchemaUserPasswordReset struct {
 
 	URLTemplate      string
 	NotificationType domain.NotificationType
-	PlainCode        string
+	PlainCode        *string
 	ReturnCode       bool
 }
 
 func (c *Commands) RequestSchemaUserPasswordReset(ctx context.Context, user *RequestSchemaUserPasswordReset) (_ *domain.ObjectDetails, err error) {
-	existing, err := c.getSchemaUserPasswordExists(ctx, user.ResourceOwner, user.UserID)
-	if err != nil {
-		return nil, err
-	}
-	if existing.EncodedHash == "" {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-TODO", "Errors.User.Password.NotFound")
-	}
-
-	code, err := c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
+	writeModel, err := existsSchemaUserPasswordWithPermission(ctx, c, user.ResourceOwner, user.UserID)
 	if err != nil {
 		return nil, err
 	}
 
-	events, err := c.eventstore.Push(ctx,
-		authenticator.NewPasswordCodeAddedEvent(ctx,
-			&authenticator.NewAggregate(existing.UserID, existing.ResourceOwner).Aggregate,
-			code.Crypted,
-			code.Expiry,
-			user.NotificationType,
-			user.URLTemplate,
-			user.ReturnCode,
-		),
+	events, plainCode, err := writeModel.NewAddCode(ctx,
+		user.NotificationType,
+		user.URLTemplate,
+		user.ReturnCode,
+		func(ctx context.Context) (*EncryptedCode, error) {
+			return c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
+		},
 	)
 	if err != nil {
 		return nil, err
 	}
-	if user.ReturnCode {
-		user.PlainCode = code.Plain
+	if plainCode != "" {
+		user.PlainCode = &plainCode
 	}
-	return pushedEventsToObjectDetails(events), nil
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 func (c *Commands) DeleteSchemaUserPassword(ctx context.Context, resourceOwner, id string) (_ *domain.ObjectDetails, err error) {
-	existing, err := c.getSchemaUserPasswordExists(ctx, resourceOwner, id)
+	writeModel, err := existsSchemaUserPasswordWithPermission(ctx, c, resourceOwner, id)
 	if err != nil {
 		return nil, err
-	}
-	if existing.EncodedHash == "" {
-		return nil, zerrors.ThrowNotFound(nil, "TODO", "TODO")
 	}
 
-	events, err := c.eventstore.Push(ctx,
-		authenticator.NewPasswordDeletedEvent(ctx,
-			&authenticator.NewAggregate(id, existing.ResourceOwner).Aggregate,
-		),
-	)
+	events, err := writeModel.NewDelete(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return pushedEventsToObjectDetails(events), nil
+	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
 type schemaUserPassword struct {
+	Create              bool
 	ResourceOwner       string
 	UserID              string
 	VerificationCode    string
@@ -173,17 +141,36 @@ type schemaUserPassword struct {
 	EncodedPasswordHash string
 }
 
-func (c *Commands) getSchemaUserPasswordExists(ctx context.Context, resourceOwner, id string) (*PasswordV3WriteModel, error) {
-	return c.getSchemaUserPasswordWithVerification(ctx, &schemaUserPassword{ResourceOwner: resourceOwner, UserID: id})
+func (c *Commands) getSchemaUserPasswordWM(ctx context.Context, resourceOwner, id string) (*PasswordV3WriteModel, error) {
+	writeModel := NewPasswordV3WriteModel(resourceOwner, id, c.checkPermission)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
+
+func existsSchemaUserPasswordWithPermission(ctx context.Context, c *Commands, resourceOwner, id string) (*PasswordV3WriteModel, error) {
+	writeModel, err := c.getSchemaUserPasswordWithVerification(ctx, &schemaUserPassword{ResourceOwner: resourceOwner, UserID: id})
+	if err != nil {
+		return nil, err
+	}
+	return writeModel, writeModel.Exists()
 }
 
 func (c *Commands) getSchemaUserPasswordWithVerification(ctx context.Context, user *schemaUserPassword) (*PasswordV3WriteModel, error) {
 	if user.UserID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-PoSU5BOZCi", "Errors.IDMissing")
 	}
-	writeModel := NewPasswordV3WriteModel(user.ResourceOwner, user.UserID)
-	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+	writeModel, err := c.getSchemaUserPasswordWM(ctx, user.ResourceOwner, user.UserID)
+	if err != nil {
 		return nil, err
+	}
+	if err := writeModel.Exists(); user.Create && err != nil {
+		schemauser, err := existingSchemaUser(ctx, c, user.ResourceOwner, user.UserID)
+		if err != nil {
+			return nil, err
+		}
+		writeModel.ResourceOwner = schemauser.ResourceOwner
 	}
 
 	// if no verification is set, the user must have the permission to change the password
