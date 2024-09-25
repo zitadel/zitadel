@@ -330,6 +330,9 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	if err != nil {
 		return err
 	}
+	if user.State != domain.UserStateActive {
+		return zerrors.ThrowUnauthenticated(nil, "OIDC-S3tha", "Errors.Users.NotActive")
+	}
 	var allRoles bool
 	roles := make([]string, 0)
 	for _, scope := range scopes {
@@ -799,19 +802,24 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if projectID != "" {
 		roleAudience = append(roleAudience, projectID)
 	}
-	queries := make([]query.SearchQuery, 0, 2)
 	projectQuery, err := query.NewUserGrantProjectIDsSearchQuery(roleAudience)
 	if err != nil {
 		return nil, nil, err
 	}
-	queries = append(queries, projectQuery)
 	userIDQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
 		return nil, nil, err
 	}
-	queries = append(queries, userIDQuery)
+	activeQuery, err := query.NewUserGrantStateQuery(domain.UserGrantStateActive)
+	if err != nil {
+		return nil, nil, err
+	}
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: queries,
+		Queries: []query.SearchQuery{
+			projectQuery,
+			userIDQuery,
+			activeQuery,
+		},
 	}, true)
 	if err != nil {
 		return nil, nil, err
