@@ -21,7 +21,7 @@
         "prettier": "^3.3.3",
         "prettier-plugin-organize-imports": "^3.2.4",
         "typescript": "5.4.5",
-        "webpack": "5.89.0",
+        "webpack": "5.94.0",
         "webpack-cli": "5.1.4",
         "webpack-glob-entries": "^1.0.1"
     },
