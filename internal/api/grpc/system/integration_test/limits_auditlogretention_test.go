@@ -31,11 +31,11 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	farPast := timestamppb.New(beforeTime.Add(-10 * time.Hour).UTC())
 	zeroCounts := &eventCounts{}
 	seededCount := requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
-		counts.assertAll(t, c, "seeded events are > 0", assert.Greater, zeroCounts)
+		counts.assertAll(c, "seeded events are > 0", assert.Greater, zeroCounts)
 	}, "wait for seeded event assertions to pass")
 	produceEvents(iamOwnerCtx, t, isoInstance.Client, userID, appID, projectID, projectGrantID)
 	addedCount := requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
-		counts.assertAll(t, c, "added events are > seeded events", assert.Greater, seededCount)
+		counts.assertAll(c, "added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for added event assertions to pass")
 	_, err := integration.SystemClient().SetLimits(CTX, &system.SetLimitsRequest{
 		InstanceId:        isoInstance.ID(),
@@ -44,8 +44,8 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	require.NoError(t, err)
 	var limitedCounts *eventCounts
 	requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
-		counts.assertAll(t, c, "limited events < added events", assert.Less, addedCount)
-		counts.assertAll(t, c, "limited events > 0", assert.Greater, zeroCounts)
+		counts.assertAll(c, "limited events < added events", assert.Less, addedCount)
+		counts.assertAll(c, "limited events > 0", assert.Greater, zeroCounts)
 		limitedCounts = counts
 	}, "wait for limited event assertions to pass")
 	listedEvents, err := isoInstance.Client.Admin.ListEvents(iamOwnerCtx, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_From{
@@ -63,7 +63,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	})
 	require.NoError(t, err)
 	requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
-		counts.assertAll(t, c, "with reset limit, added events are > seeded events", assert.Greater, seededCount)
+		counts.assertAll(c, "with reset limit, added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for reset event assertions to pass")
 }
 
@@ -77,7 +77,7 @@ func requireEventually(
 ) (counts *eventCounts) {
 	countTimeout := 30 * time.Second
 	assertTimeout := countTimeout + time.Second
-	countCtx, cancel := context.WithTimeout(ctx, countTimeout)
+	countCtx, cancel := context.WithTimeout(ctx, time.Minute)
 	defer cancel()
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
 		counts = countEvents(countCtx, c, cc, userID, projectID, appID, projectGrantID)
@@ -168,63 +168,77 @@ type eventCounts struct {
 	all, myUser, aUser, grant, project, app, org int
 }
 
-func (e *eventCounts) assertAll(t *testing.T, c assert.TestingT, name string, compare assert.ComparisonAssertionFunc, than *eventCounts) {
-	t.Run(name, func(t *testing.T) {
-		compare(c, e.all, than.all, "ListEvents")
-		compare(c, e.myUser, than.myUser, "ListMyUserChanges")
-		compare(c, e.aUser, than.aUser, "ListUserChanges")
-		compare(c, e.grant, than.grant, "ListProjectGrantChanges")
-		compare(c, e.project, than.project, "ListProjectChanges")
-		compare(c, e.app, than.app, "ListAppChanges")
-		compare(c, e.org, than.org, "ListOrgChanges")
-	})
+func (e *eventCounts) assertAll(c assert.TestingT, name string, compare assert.ComparisonAssertionFunc, than *eventCounts) {
+	compare(c, e.all, than.all, name+"ListEvents")
+	compare(c, e.myUser, than.myUser, name+"ListMyUserChanges")
+	compare(c, e.aUser, than.aUser, name+"ListUserChanges")
+	compare(c, e.grant, than.grant, name+"ListProjectGrantChanges")
+	compare(c, e.project, than.project, name+"ListProjectChanges")
+	compare(c, e.app, than.app, name+"ListAppChanges")
+	compare(c, e.org, than.org, name+"ListOrgChanges")
 }
 
 func countEvents(ctx context.Context, t assert.TestingT, cc *integration.Client, userID, projectID, appID, grantID string) *eventCounts {
 	counts := new(eventCounts)
 	var wg sync.WaitGroup
 	wg.Add(7)
+
+	var mutex sync.Mutex
+	assertResultLocked := func(err error, f func(counts *eventCounts)) {
+		mutex.Lock()
+		assert.NoError(t, err)
+		f(counts)
+		mutex.Unlock()
+	}
+
 	go func() {
 		defer wg.Done()
 		result, err := cc.Admin.ListEvents(ctx, &admin.ListEventsRequest{})
-		assert.NoError(t, err)
-		counts.all = len(result.GetEvents())
+		assertResultLocked(err, func(counts *eventCounts) {
+			counts.all = len(result.GetEvents())
+		})
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Auth.ListMyUserChanges(ctx, &auth.ListMyUserChangesRequest{})
-		assert.NoError(t, err)
-		counts.myUser = len(result.GetResult())
+		assertResultLocked(err, func(counts *eventCounts) {
+			counts.myUser = len(result.GetResult())
+		})
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListUserChanges(ctx, &management.ListUserChangesRequest{UserId: userID})
-		assert.NoError(t, err)
-		counts.aUser = len(result.GetResult())
+		assertResultLocked(err, func(counts *eventCounts) {
+			counts.aUser = len(result.GetResult())
+		})
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListAppChanges(ctx, &management.ListAppChangesRequest{ProjectId: projectID, AppId: appID})
-		assert.NoError(t, err)
-		counts.app = len(result.GetResult())
+		assertResultLocked(err, func(counts *eventCounts) {
+			counts.app = len(result.GetResult())
+		})
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListOrgChanges(ctx, &management.ListOrgChangesRequest{})
-		assert.NoError(t, err)
-		counts.org = len(result.GetResult())
+		assertResultLocked(err, func(counts *eventCounts) {
+			counts.org = len(result.GetResult())
+		})
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListProjectChanges(ctx, &management.ListProjectChangesRequest{ProjectId: projectID})
-		assert.NoError(t, err)
-		counts.project = len(result.GetResult())
+		assertResultLocked(err, func(counts *eventCounts) {
+			counts.project = len(result.GetResult())
+		})
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListProjectGrantChanges(ctx, &management.ListProjectGrantChangesRequest{ProjectId: projectID, GrantId: grantID})
-		assert.NoError(t, err)
-		counts.grant = len(result.GetResult())
+		assertResultLocked(err, func(counts *eventCounts) {
+			counts.grant = len(result.GetResult())
+		})
 	}()
 	wg.Wait()
 	return counts

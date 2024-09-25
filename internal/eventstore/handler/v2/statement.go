@@ -80,12 +80,10 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 }
 
 type Statement struct {
-	AggregateType eventstore.AggregateType
-	AggregateID   string
-	Sequence      uint64
-	Position      float64
-	CreationDate  time.Time
-	InstanceID    string
+	Aggregate    *eventstore.Aggregate
+	Sequence     uint64
+	Position     float64
+	CreationDate time.Time
 
 	offset uint32
 
@@ -108,13 +106,11 @@ var (
 
 func NewStatement(event eventstore.Event, e Exec) *Statement {
 	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		Position:      event.Position(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreatedAt(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       e,
+		Aggregate:    event.Aggregate(),
+		Sequence:     event.Sequence(),
+		Position:     event.Position(),
+		CreationDate: event.CreatedAt(),
+		Execute:      e,
 	}
 }
 
