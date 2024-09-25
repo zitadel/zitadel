@@ -830,6 +830,32 @@ func (i *Instance) RemoveAuthenticatorPassword(ctx context.Context, orgID string
 	return user
 }
 
+func (i *Instance) UpdateSchemaUserEmail(ctx context.Context, orgID string, userID string, email string) *user_v3alpha.SetContactEmailResponse {
+	user, err := i.Client.UserV3Alpha.SetContactEmail(ctx, &user_v3alpha.SetContactEmailRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		Email: &user_v3alpha.SetEmail{
+			Address:      email,
+			Verification: &user_v3alpha.SetEmail_ReturnCode{},
+		},
+	})
+	logging.OnError(err).Fatal("create user")
+	return user
+}
+
+func (i *Instance) UpdateSchemaUserPhone(ctx context.Context, orgID string, userID string, phone string) *user_v3alpha.SetContactPhoneResponse {
+	user, err := i.Client.UserV3Alpha.SetContactPhone(ctx, &user_v3alpha.SetContactPhoneRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		Phone: &user_v3alpha.SetPhone{
+			Number:       phone,
+			Verification: &user_v3alpha.SetPhone_ReturnCode{},
+		},
+	})
+	logging.OnError(err).Fatal("create user")
+	return user
+}
+
 func (i *Instance) CreateInviteCode(ctx context.Context, userID string) *user_v2.CreateInviteCodeResponse {
 	user, err := i.Client.UserV2.CreateInviteCode(ctx, &user_v2.CreateInviteCodeRequest{
 		UserId:       userID,

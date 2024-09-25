@@ -636,9 +636,13 @@ func TestServer_PatchUser(t *testing.T) {
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCodeEmail {
 				assert.NotNil(t, got.EmailCode)
+			} else {
+				assert.Nil(t, got.EmailCode)
 			}
 			if tt.res.returnCodePhone {
 				assert.NotNil(t, got.PhoneCode)
+			} else {
+				assert.Nil(t, got.PhoneCode)
 			}
 		})
 	}
