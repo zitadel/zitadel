@@ -14,6 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	schema "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
 )
 
 var (
@@ -51,7 +52,7 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 			f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
-			require.NoError(ttt, err)
+			assert.NoError(ttt, err)
 			if f.UserSchema.GetEnabled() {
 				return
 			}
@@ -59,4 +60,13 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 		retryDuration,
 		time.Second,
 		"timed out waiting for ensuring instance feature")
+
+	require.EventuallyWithT(t,
+		func(ttt *assert.CollectT) {
+			_, err := instance.Client.UserSchemaV3.SearchUserSchemas(ctx, &schema.SearchUserSchemasRequest{})
+			assert.NoError(ttt, err)
+		},
+		retryDuration,
+		time.Second,
+		"timed out waiting for ensuring instance feature call")
 }

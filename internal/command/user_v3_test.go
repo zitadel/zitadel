@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
@@ -875,8 +874,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:      tt.fields.idGenerator,
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
+				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			err := c.CreateSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.CreateSchemaUser(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -884,14 +884,16 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, tt.args.user.Details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 
 			if tt.res.returnCodePhone != "" {
-				assert.Equal(t, tt.res.returnCodePhone, tt.args.user.ReturnCodePhone)
+				assert.NotNil(t, tt.args.user.ReturnCodePhone)
+				assert.Equal(t, tt.res.returnCodePhone, *tt.args.user.ReturnCodePhone)
 			}
 			if tt.res.returnCodeEmail != "" {
-				assert.Equal(t, tt.res.returnCodeEmail, tt.args.user.ReturnCodeEmail)
+				assert.NotNil(t, tt.args.user.ReturnCodeEmail)
+				assert.Equal(t, tt.res.returnCodeEmail, *tt.args.user.ReturnCodeEmail)
 			}
 		})
 	}
@@ -1988,6 +1990,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"schema not existing, error",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -1995,8 +2010,10 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("type"),
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "type",
+					},
 				},
 			},
 			res{
@@ -2060,6 +2077,25 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -2067,9 +2103,11 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
 					ID: "user1",
-					Data: json.RawMessage(`{
+					SchemaUser: &SchemaUser{
+						Data: json.RawMessage(`{
 						"name": "user"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2134,9 +2172,11 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
 					ID: "user1",
-					Data: json.RawMessage(`{
+					SchemaUser: &SchemaUser{
+						Data: json.RawMessage(`{
 						"name": "user2"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2149,6 +2189,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"user updated, changed schema",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -2165,19 +2218,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2196,8 +2236,10 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id2"),
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id2",
+					},
 				},
 			},
 			res{
@@ -2210,6 +2252,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"user updated, new schema",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -2226,19 +2281,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2262,11 +2304,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id2"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id2",
+						Data: json.RawMessage(`{
 						"name": "user2"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2350,9 +2394,11 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
 					ID: "user1",
-					Data: json.RawMessage(`{
+					SchemaUser: &SchemaUser{
+						Data: json.RawMessage(`{
 						"name2": "user2"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2365,6 +2411,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"user updated, new schema and revision",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								2,
+								json.RawMessage(`{
+						"name1": "user1"
+					}`),
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -2381,19 +2440,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								2,
-								json.RawMessage(`{
-						"name1": "user1"
-					}`),
 							),
 						),
 					),
@@ -2418,11 +2464,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id2"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id2",
+						Data: json.RawMessage(`{
 						"name2": "user2"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2435,6 +2483,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"user update, no field permission as admin",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -2457,30 +2518,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id1"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id1",
+						Data: json.RawMessage(`{
 						"name": "user"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2494,6 +2544,18 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					), expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
@@ -2515,29 +2577,18 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
 				),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("type"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "type",
+						Data: json.RawMessage(`{
 						"name": "user"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2552,6 +2603,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2569,30 +2633,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("type"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "type",
+						Data: json.RawMessage(`{
 						"name": 1
 					}`),
+					},
 				},
 			},
 			res{
@@ -2607,6 +2660,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2621,19 +2687,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2657,12 +2710,14 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id1"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id1",
+						Data: json.RawMessage(`{
 						"name": "user1",
 						"additional": "property"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2675,6 +2730,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"user update, invalid data attribute name",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -2695,30 +2763,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("type"),
-					Data: json.RawMessage(`{
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "type",
+						Data: json.RawMessage(`{
 						"invalid": "user"
 					}`),
+					},
 				},
 			},
 			res{
@@ -2777,6 +2834,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2791,19 +2861,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2832,8 +2889,10 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &ChangeSchemaUser{
-					ID:       "user1",
-					SchemaID: gu.Ptr("id1"),
+					ID: "user1",
+					SchemaUser: &SchemaUser{
+						SchemaID: "id1",
+					},
 					Email: &Email{
 						Address:     "test@example.com",
 						ReturnCode:  true,
@@ -3101,8 +3160,9 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore:       tt.fields.eventstore(t),
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
+				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			err := c.ChangeSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ChangeSchemaUser(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -3110,14 +3170,16 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.details, tt.args.user.Details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 
 			if tt.res.returnCodePhone != "" {
-				assert.Equal(t, tt.res.returnCodePhone, tt.args.user.ReturnCodePhone)
+				assert.NotNil(t, tt.args.user.ReturnCodePhone)
+				assert.Equal(t, tt.res.returnCodePhone, *tt.args.user.ReturnCodePhone)
 			}
 			if tt.res.returnCodeEmail != "" {
-				assert.Equal(t, tt.res.returnCodeEmail, tt.args.user.ReturnCodeEmail)
+				assert.NotNil(t, tt.args.user.ReturnCodeEmail)
+				assert.Equal(t, tt.res.returnCodeEmail, *tt.args.user.ReturnCodeEmail)
 			}
 		})
 	}
