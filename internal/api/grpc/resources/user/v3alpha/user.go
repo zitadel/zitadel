@@ -3,12 +3,9 @@ package user
 import (
 	"context"
 
-	"github.com/muhlemmer/gu"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
@@ -22,14 +19,14 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-
-	if err := s.command.CreateSchemaUser(ctx, schemauser, s.userCodeAlg); err != nil {
+	details, err := s.command.CreateSchemaUser(ctx, schemauser)
+	if err != nil {
 		return nil, err
 	}
 	return &user.CreateUserResponse{
-		Details:   resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
-		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
-		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
+		Details:   resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
+		EmailCode: schemauser.ReturnCodeEmail,
+		PhoneCode: schemauser.ReturnCodePhone,
 	}, nil
 }
 
@@ -44,6 +41,8 @@ func createUserRequestToCreateSchemaUser(ctx context.Context, req *user.CreateUs
 		SchemaID:      req.GetUser().GetSchemaId(),
 		ID:            req.GetUser().GetUserId(),
 		Data:          data,
+		Email:         setEmailToEmail(req.GetUser().GetContact().GetEmail()),
+		Phone:         setPhoneToPhone(req.GetUser().GetContact().GetPhone()),
 	}, nil
 }
 
@@ -91,17 +90,36 @@ func (s *Server) PatchUser(ctx context.Context, req *user.PatchUserRequest) (_ *
 		return nil, err
 	}
 
-	if err := s.command.ChangeSchemaUser(ctx, schemauser, s.userCodeAlg); err != nil {
+	details, err := s.command.ChangeSchemaUser(ctx, schemauser)
+	if err != nil {
 		return nil, err
 	}
 	return &user.PatchUserResponse{
-		Details:   resource_object.DomainToDetailsPb(schemauser.Details, object.OwnerType_OWNER_TYPE_ORG, schemauser.Details.ResourceOwner),
-		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
-		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
+		Details:   resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
+		EmailCode: schemauser.ReturnCodeEmail,
+		PhoneCode: schemauser.ReturnCodePhone,
 	}, nil
 }
 
 func patchUserRequestToChangeSchemaUser(req *user.PatchUserRequest) (_ *command.ChangeSchemaUser, err error) {
+	schemaUser, err := setSchemaUserToSchemaUser(req)
+	if err != nil {
+		return nil, err
+	}
+	email, phone := setContactToContact(req.GetUser().GetContact())
+	return &command.ChangeSchemaUser{
+		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
+		ID:            req.GetId(),
+		SchemaUser:    schemaUser,
+		Email:         email,
+		Phone:         phone,
+	}, nil
+}
+
+func setSchemaUserToSchemaUser(req *user.PatchUserRequest) (_ *command.SchemaUser, err error) {
+	if req.GetUser() == nil {
+		return nil, nil
+	}
 	var data []byte
 	if req.GetUser().Data != nil {
 		data, err = req.GetUser().GetData().MarshalJSON()
@@ -110,43 +128,17 @@ func patchUserRequestToChangeSchemaUser(req *user.PatchUserRequest) (_ *command.
 		}
 	}
 
-	var email *command.Email
-	var phone *command.Phone
-	if req.GetUser().GetContact() != nil {
-		if req.GetUser().GetContact().GetEmail() != nil {
-			email = &command.Email{
-				Address: domain.EmailAddress(req.GetUser().GetContact().Email.Address),
-			}
-			if req.GetUser().GetContact().Email.GetIsVerified() {
-				email.Verified = true
-			}
-			if req.GetUser().GetContact().Email.GetReturnCode() != nil {
-				email.ReturnCode = true
-			}
-			if req.GetUser().GetContact().Email.GetSendCode() != nil {
-				email.URLTemplate = req.GetUser().GetContact().Email.GetSendCode().GetUrlTemplate()
-			}
-		}
-		if req.GetUser().GetContact().Phone != nil {
-			phone = &command.Phone{
-				Number: domain.PhoneNumber(req.GetUser().GetContact().Phone.Number),
-			}
-			if req.GetUser().GetContact().Phone.GetIsVerified() {
-				phone.Verified = true
-			}
-			if req.GetUser().GetContact().Phone.GetReturnCode() != nil {
-				phone.ReturnCode = true
-			}
-		}
-	}
-	return &command.ChangeSchemaUser{
-		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
-		ID:            req.GetId(),
-		SchemaID:      req.GetUser().SchemaId,
-		Data:          data,
-		Email:         email,
-		Phone:         phone,
+	return &command.SchemaUser{
+		SchemaID: req.GetUser().GetSchemaId(),
+		Data:     data,
 	}, nil
+}
+
+func setContactToContact(contact *user.SetContact) (*command.Email, *command.Phone) {
+	if contact == nil {
+		return nil, nil
+	}
+	return setEmailToEmail(contact.GetEmail()), setPhoneToPhone(contact.GetPhone())
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {
