@@ -143,6 +143,10 @@ func NewUserGrantRoleQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantRoles, value, TextListContains)
 }
 
+func NewUserGrantStateQuery(value domain.UserGrantState) (SearchQuery, error) {
+	return NewNumberQuery(UserGrantState, value, NumberEquals)
+}
+
 func NewUserGrantWithGrantedQuery(owner string) (SearchQuery, error) {
 	orgQuery, err := NewUserGrantResourceOwnerSearchQuery(owner)
 	if err != nil {
@@ -277,7 +281,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, zerrors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")
 	}
 
-	latestState, err := q.latestState(ctx, userGrantTable)
+	latestSequence, err := q.latestState(ctx, userGrantTable)
 	if err != nil {
 		return nil, err
 	}
@@ -290,7 +294,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 		return nil, err
 	}
 
-	grants.State = latestState
+	grants.State = latestSequence
 	return grants, nil
 }
 

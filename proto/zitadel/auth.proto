@@ -1565,6 +1565,11 @@ message UserGrant {
             description: "type of the user (human / machine)"
         }
     ];
+    zitadel.user.v1.UserGrantState state = 13 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the user grant";
+        }
+    ];
 }
 
 message ListMyProjectOrgsRequest {
