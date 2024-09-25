@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -110,36 +109,36 @@ func Test_prepareColumns(t *testing.T) {
 		{
 			name: "max column",
 			args: args{
-				columns: eventstore.ColumnsMaxPosition,
-				dest:    new(decimal.Decimal),
+				columns: eventstore.ColumnsMaxSequence,
+				dest:    new(sql.NullFloat64),
 				useV1:   true,
 			},
 			res: res{
 				query:    `SELECT event_sequence FROM eventstore.events`,
-				expected: decimal.NewFromInt(42),
+				expected: sql.NullFloat64{Float64: 43, Valid: true},
 			},
 			fields: fields{
-				dbRow: []interface{}{decimal.NewNullDecimal(decimal.NewFromInt(42))},
+				dbRow: []interface{}{sql.NullFloat64{Float64: 43, Valid: true}},
 			},
 		},
 		{
 			name: "max column v2",
 			args: args{
-				columns: eventstore.ColumnsMaxPosition,
-				dest:    new(decimal.Decimal),
+				columns: eventstore.ColumnsMaxSequence,
+				dest:    new(sql.NullFloat64),
 			},
 			res: res{
 				query:    `SELECT "position" FROM eventstore.events2`,
-				expected: decimal.NewFromInt(42),
+				expected: sql.NullFloat64{Float64: 43, Valid: true},
 			},
 			fields: fields{
-				dbRow: []interface{}{decimal.NewNullDecimal(decimal.NewFromInt(42))},
+				dbRow: []interface{}{sql.NullFloat64{Float64: 43, Valid: true}},
 			},
 		},
 		{
 			name: "max sequence wrong dest type",
 			args: args{
-				columns: eventstore.ColumnsMaxPosition,
+				columns: eventstore.ColumnsMaxSequence,
 				dest:    new(uint64),
 			},
 			res: res{
@@ -179,11 +178,11 @@ func Test_prepareColumns(t *testing.T) {
 			res: res{
 				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2`,
 				expected: []eventstore.Event{
-					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: decimal.NewFromInt(42), Data: nil, Version: "v1"},
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 42, Data: nil, Version: "v1"},
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NewNullDecimal(decimal.NewFromInt(42)), sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
+				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), sql.NullFloat64{Float64: 42, Valid: true}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
 			},
 		},
 		{
@@ -198,11 +197,11 @@ func Test_prepareColumns(t *testing.T) {
 			res: res{
 				query: `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2`,
 				expected: []eventstore.Event{
-					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: decimal.Decimal{}, Data: nil, Version: "v1"},
+					&repository.Event{AggregateID: "hodor", AggregateType: "user", Seq: 5, Pos: 0, Data: nil, Version: "v1"},
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), decimal.NullDecimal{}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
+				dbRow: []interface{}{time.Time{}, eventstore.EventType(""), uint64(5), sql.NullFloat64{Float64: 0, Valid: false}, sql.RawBytes(nil), "", sql.NullString{}, "", eventstore.AggregateType("user"), "hodor", uint8(1)},
 			},
 		},
 		{
