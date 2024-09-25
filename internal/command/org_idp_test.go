@@ -21,7 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
+func TestCommandSide_AddOrgGenericOAuthProvider(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator

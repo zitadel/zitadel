@@ -172,11 +172,11 @@
       <a class="custom-link" *ngIf="pP.customLink" href="{{ pP.customLink }}" mat-stroked-button target="_blank">
         {{ pP.customLinkText }}
       </a>
-    </ng-container>
 
-    <a class="doc-link" *ngIf="docsLink" href="{{ docsLink }}" mat-stroked-button target="_blank">
-      {{ 'MENU.DOCUMENTATION' | translate }}
-    </a>
+      <a class="doc-link" *ngIf="pP.docsLink" href="{{ pP.docsLink }}" mat-stroked-button target="_blank">
+        {{ 'MENU.DOCUMENTATION' | translate }}
+      </a>
+    </ng-container>
 
     <div class="system-rel" *ngIf="!isOnMe">
       <a

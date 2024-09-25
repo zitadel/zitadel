@@ -7,7 +7,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.settings.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/settings";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings";
 
 message SecretGenerator {
   SecretGeneratorType generator_type = 1;
@@ -95,19 +95,76 @@ message SMTPConfig {
   string id = 10;
 }
 
+message EmailProvider {
+  zitadel.v1.ObjectDetails details = 1;
+  string id = 2;
+  EmailProviderState state = 3;
+  string description = 6;
+
+  oneof config {
+    EmailProviderSMTP smtp = 4;
+    EmailProviderHTTP http = 5;
+  }
+}
+
+enum EmailProviderState {
+  EMAIL_PROVIDER_STATE_UNSPECIFIED = 0;
+  EMAIL_PROVIDER_ACTIVE = 1;
+  EMAIL_PROVIDER_INACTIVE = 2;
+}
+
+message EmailProviderSMTP {
+  string sender_address = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"noreply@m.zitadel.cloud\"";
+    }
+  ];
+  string sender_name = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ZITADEL\"";
+    }
+  ];
+  bool tls = 3;
+  string host = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"smtp.postmarkapp.com:587\"";
+    }
+  ];
+  string user = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+    }
+  ];
+  string reply_to_address = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"replyto@m.zitadel.cloud\"";
+    }
+  ];
+}
+
+message EmailProviderHTTP {
+  string endpoint = 1;
+}
+
 message SMSProvider {
   zitadel.v1.ObjectDetails details = 1;
   string id = 2;
   SMSProviderConfigState state = 3;
+  string description = 6;
 
   oneof config {
     TwilioConfig twilio = 4;
+    HTTPConfig http = 5;
   }
 }
 
 message TwilioConfig {
   string sid = 1;
   string sender_number = 2;
+}
+
+message HTTPConfig {
+  string endpoint = 1;
 }
 
 enum SMSProviderConfigState {
@@ -117,8 +174,8 @@ enum SMSProviderConfigState {
 }
 
 message DebugNotificationProvider {
-    zitadel.v1.ObjectDetails details = 1;
-    bool compact = 2;
+  zitadel.v1.ObjectDetails details = 1;
+  bool compact = 2;
 }
 
 message OIDCSettings {

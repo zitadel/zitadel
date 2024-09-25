@@ -143,32 +143,32 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     }
 
     security_definitions: {
-		security: {
-			key: "BasicAuth";
-			value: {
-				type: TYPE_BASIC;
-			}
-		}
-		security: {
-			key: "OAuth2";
-			value: {
-				type: TYPE_OAUTH2;
-				flow: FLOW_ACCESS_CODE;
-				authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-				token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
-        scopes: {
-					scope: {
-						key: "openid";
-						value: "openid";
-					}
-          scope: {
-            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
-            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
-          }
-				}
-			}
-		}
-	}
+        security: {
+            key: "BasicAuth";
+            value: {
+                type: TYPE_BASIC;
+            }
+        }
+        security: {
+            key: "OAuth2";
+            value: {
+                type: TYPE_OAUTH2;
+                flow: FLOW_ACCESS_CODE;
+                authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+                token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+                scopes: {
+                    scope: {
+                        key: "openid";
+                        value: "openid";
+                    }
+                    scope: {
+                        key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+                        value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+                    }
+                }
+            }
+        }
+    }
     security: {
         security_requirement: {
             key: "OAuth2";
@@ -342,6 +342,7 @@ service AdminService {
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -421,6 +422,11 @@ service AdminService {
         };
     }
 
+    // Deprecated: Get active SMTP Configuration
+    //
+    // Returns the active SMTP configuration from the system. This is used to send E-Mails to the users.
+    //
+    // Deprecated: please move to the new endpoint GetEmailProvider.
     rpc GetSMTPConfig(GetSMTPConfigRequest) returns (GetSMTPConfigResponse) {
         option (google.api.http) = {
             get: "/smtp";
@@ -431,12 +437,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
-            summary: "Get active SMTP Configuration";
-            description: "Returns the active SMTP configuration from the system. This is used to send E-Mails to the users."
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Get SMTP provider configuration by its id
+    //
+    // Get a specific SMTP provider configuration by its ID.
+    //
+    // Deprecated: please move to the new endpoint GetEmailProviderById.
     rpc GetSMTPConfigById(GetSMTPConfigByIdRequest) returns (GetSMTPConfigByIdResponse) {
         option (google.api.http) = {
             get: "/smtp/{id}";
@@ -447,12 +457,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
-            summary: "Get SMTP provider configuration by its id";
-            description: "Get a specific SMTP provider configuration by its ID.";
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Add SMTP Configuration
+    //
+    // Add a new SMTP configuration if nothing is set yet.
+    //
+    // Deprecated: please move to the new endpoint AddEmailProviderSMTP.
     rpc AddSMTPConfig(AddSMTPConfigRequest) returns (AddSMTPConfigResponse) {
         option (google.api.http) = {
             post: "/smtp";
@@ -464,12 +478,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
-            summary: "Add SMTP Configuration";
-            description: "Add a new SMTP configuration if nothing is set yet."
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Update SMTP Configuration
+    //
+    // Update the SMTP configuration, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP.
+    //
+    // Deprecated: please move to the new endpoint UpdateEmailProviderSMTP.
     rpc UpdateSMTPConfig(UpdateSMTPConfigRequest) returns (UpdateSMTPConfigResponse) {
         option (google.api.http) = {
             put: "/smtp/{id}";
@@ -481,12 +499,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
-            summary: "Update SMTP Configuration";
-            description: "Update the SMTP configuration, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Update SMTP Password
+    //
+    // Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP.
+    //
+    // Deprecated: please move to the new endpoint UpdateEmailProviderSMTPPassword.
     rpc UpdateSMTPConfigPassword(UpdateSMTPConfigPasswordRequest) returns (UpdateSMTPConfigPasswordResponse) {
         option (google.api.http) = {
             put: "/smtp/{id}/password";
@@ -498,12 +520,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
-            summary: "Update SMTP Password";
-            description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Activate SMTP Provider
+    //
+    // Activate an SMTP provider.
+    //
+    // Deprecated: please move to the new endpoint ActivateEmailProvider.
     rpc ActivateSMTPConfig(ActivateSMTPConfigRequest) returns (ActivateSMTPConfigResponse) {
         option (google.api.http) = {
             post: "/smtp/{id}/_activate";
@@ -515,12 +541,18 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Provider";
+            tags: "SMTP Configs";
             summary: "Activate SMTP Provider";
             description: "Activate an SMTP provider."
+            deprecated: true;
         };
     }
 
+    // Deprecated: Deactivate SMTP Provider
+    //
+    // Deactivate an SMTP provider. After deactivating the provider, the users will not be able to receive SMTP notifications from that provider anymore.
+    //
+    // Deprecated: please move to the new endpoint DeactivateEmailProvider.
     rpc DeactivateSMTPConfig(DeactivateSMTPConfigRequest) returns (DeactivateSMTPConfigResponse) {
         option (google.api.http) = {
             post: "/smtp/{id}/_deactivate";
@@ -532,12 +564,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Provider";
-            summary: "Deactivate SMTP Provider";
-            description: "Deactivate an SMTP provider. After deactivating the provider, the users will not be able to receive SMTP notifications from that provider anymore."
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Remove SMTP Configuration
+    //
+    // Remove the SMTP configuration, be aware that the users will not get an E-Mail if no SMTP is set.
+    //
+    // Deprecated: please move to the new endpoint RemoveEmailProvider.
     rpc RemoveSMTPConfig(RemoveSMTPConfigRequest) returns (RemoveSMTPConfigResponse) {
         option (google.api.http) = {
             delete: "/smtp/{id}";
@@ -548,12 +584,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
-            summary: "Remove SMTP Configuration";
-            description: "Remove the SMTP configuration, be aware that the users will not get an E-Mail if no SMTP is set."
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Test SMTP Provider
+    //
+    // Test an SMTP provider identified by its ID. After testing the provider, the users will receive information about the test results.
+    //
+    // Deprecated: please move to the new endpoint TestEmailProviderSMTPById.
     rpc TestSMTPConfigById(TestSMTPConfigByIdRequest) returns (TestSMTPConfigByIdResponse) {
         option (google.api.http) = {
             post: "/smtp/{id}/_test";
@@ -565,12 +605,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Provider";
-            summary: "Test SMTP Provider ";
-            description: "Test an SMTP provider identified by its ID. After testing the provider, the users will receive information about the test results."
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: Test SMTP Provider
+    //
+    // Test an SMTP provider. After testing the provider, the users will receive information about the test results.
+    //
+    // Deprecated: please move to the new endpoint TestEmailProviderSMTP.
     rpc TestSMTPConfig(TestSMTPConfigRequest) returns (TestSMTPConfigResponse) {
         option (google.api.http) = {
             post: "/smtp/_test";
@@ -582,12 +626,16 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Provider";
-            summary: "Test SMTP Provider";
-            description: "Test an SMTP provider. After testing the provider, the users will receive information about the test results."
+            tags: "SMTP Configs";
+            deprecated: true;
         };
     }
 
+    // Deprecated: List SMTP Configs
+    //
+    // Returns a list of SMTP configurations.
+    //
+    // Deprecated: please move to the new endpoint ListEmailProviders.
     rpc ListSMTPConfigs(ListSMTPConfigsRequest) returns (ListSMTPConfigsResponse) {
         option (google.api.http) = {
             post: "/smtp/_search"
@@ -600,8 +648,225 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "SMTP Configs";
-            summary: "List SMTP Configs";
-            description: "Returns a list of SMTP configurations."
+            deprecated: true;
+        };
+    }
+
+    rpc ListEmailProviders(ListEmailProvidersRequest) returns (ListEmailProvidersResponse) {
+        option (google.api.http) = {
+            post: "/email/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "List Email providers";
+            description: "Returns a list of Email providers."
+        };
+    }
+
+    rpc GetEmailProvider(GetEmailProviderRequest) returns (GetEmailProviderResponse) {
+        option (google.api.http) = {
+            get: "/email";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Get active Email provider";
+            description: "Returns the active Email provider from the system. This is used to send E-Mails to the users."
+        };
+    }
+
+    rpc GetEmailProviderById(GetEmailProviderByIdRequest) returns (GetEmailProviderByIdResponse) {
+        option (google.api.http) = {
+            get: "/email/{id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Get Email provider by its id";
+            description: "Get a specific Email provider by its ID.";
+        };
+    }
+
+    rpc AddEmailProviderSMTP(AddEmailProviderSMTPRequest) returns (AddEmailProviderSMTPResponse) {
+        option (google.api.http) = {
+            post: "/email/smtp";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Add SMTP Email provider";
+            description: "Add a new SMTP Email provider if nothing is set yet."
+        };
+    }
+
+    rpc UpdateEmailProviderSMTP(UpdateEmailProviderSMTPRequest) returns (UpdateEmailProviderSMTPResponse) {
+        option (google.api.http) = {
+            put: "/email/smtp/{id}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Update SMTP Email provider";
+            description: "Update the SMTP Email provider, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
+        };
+    }
+
+    rpc AddEmailProviderHTTP(AddEmailProviderHTTPRequest) returns (AddEmailProviderHTTPResponse) {
+        option (google.api.http) = {
+            post: "/email/http";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Add HTTP Email provider";
+            description: "Add a new HTTP Email provider if nothing is set yet."
+        };
+    }
+
+    rpc UpdateEmailProviderHTTP(UpdateEmailProviderHTTPRequest) returns (UpdateEmailProviderHTTPResponse) {
+        option (google.api.http) = {
+            put: "/email/http/{id}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Update HTTP Email provider";
+            description: "Update the HTTP Email provider, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured HTTP."
+        };
+    }
+
+    rpc UpdateEmailProviderSMTPPassword(UpdateEmailProviderSMTPPasswordRequest) returns (UpdateEmailProviderSMTPPasswordResponse) {
+        option (google.api.http) = {
+            put: "/email/smtp/{id}/password";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Update SMTP Password";
+            description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
+        };
+    }
+
+    rpc ActivateEmailProvider(ActivateEmailProviderRequest) returns (ActivateEmailProviderResponse) {
+        option (google.api.http) = {
+            post: "/email/{id}/_activate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Activate Email Provider";
+            description: "Activate an Email provider."
+        };
+    }
+
+    rpc DeactivateEmailProvider(DeactivateEmailProviderRequest) returns (DeactivateEmailProviderResponse) {
+        option (google.api.http) = {
+            post: "/email/{id}/_deactivate";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Deactivate Email Provider";
+            description: "Deactivate an Email provider. After deactivating the provider, the users will not be able to receive Email notifications from that provider anymore."
+        };
+    }
+
+    rpc RemoveEmailProvider(RemoveEmailProviderRequest) returns (RemoveEmailProviderResponse) {
+        option (google.api.http) = {
+            delete: "/email/{id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Remove Email provider";
+            description: "Remove the Email provider, be aware that the users will not get an E-Mail if no provider is set."
+        };
+    }
+
+    rpc TestEmailProviderSMTPById(TestEmailProviderSMTPByIdRequest) returns (TestEmailProviderSMTPByIdResponse) {
+        option (google.api.http) = {
+            post: "/email/smtp/{id}/_test";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Test SMTP Email Provider";
+            description: "Test an SMTP Email provider identified by its ID. After testing the provider, the users will receive information about the test results."
+        };
+    }
+
+    rpc TestEmailProviderSMTP(TestEmailProviderSMTPRequest) returns (TestEmailProviderSMTPResponse) {
+        option (google.api.http) = {
+            post: "/email/smtp/_test";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Email Provider";
+            summary: "Test SMTP Email Provider";
+            description: "Test an SMTP Email provider. After testing the provider, the users will receive information about the test results."
         };
     }
 
@@ -686,6 +951,40 @@ service AdminService {
             tags: "SMS Provider";
             summary: "Update Twilio SMS Provider Token";
             description: "Change the token of the SMS provider of the type Twilio."
+        };
+    }
+
+    rpc AddSMSProviderHTTP(AddSMSProviderHTTPRequest) returns (AddSMSProviderHTTPResponse) {
+        option (google.api.http) = {
+            post: "/sms/http";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Add HTTP SMS Provider";
+            description: "Configure a new SMS provider of the type HTTP. A provider has to be activated to be able to send notifications."
+        };
+    }
+
+    rpc UpdateSMSProviderHTTP(UpdateSMSProviderHTTPRequest) returns (UpdateSMSProviderHTTPResponse) {
+        option (google.api.http) = {
+            put: "/sms/http/{id}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMS Provider";
+            summary: "Update HTTP SMS Provider";
+            description: "Change the configuration of an SMS provider of the type HTTP. A provider has to be activated to be able to send notifications."
         };
     }
 
@@ -3553,6 +3852,71 @@ service AdminService {
         };
     }
 
+    rpc GetDefaultInviteUserMessageText(GetDefaultInviteUserMessageTextRequest) returns (GetDefaultInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/invite_user/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Invite User Message Text";
+            description: "Get the default text of the invite user message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an invite code email is requested."
+        };
+    }
+
+    rpc GetCustomInviteUserMessageText(GetCustomInviteUserMessageTextRequest) returns (GetCustomInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/invite_user/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Invite User Message Text";
+            description: "Get the custom text of the invite user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an invite code email is requested."
+        };
+    }
+
+    rpc SetDefaultInviteUserMessageText(SetDefaultInviteUserMessageTextRequest) returns (SetDefaultInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/invite_user/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Default Invite User Message Text";
+            description: "Set the custom text of the invite user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an invite code email is requested. The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}} {{.ApplicationName}}"
+        };
+    }
+
+    rpc ResetCustomInviteUserMessageTextToDefault(ResetCustomInviteUserMessageTextToDefaultRequest) returns (ResetCustomInviteUserMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/invite_user/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Invite User Message Text to Default";
+            description: "Removes the custom text of the invite user message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
+        };
+    }
+
     rpc GetDefaultLoginTexts(GetDefaultLoginTextsRequest) returns (GetDefaultLoginTextsResponse) {
         option (google.api.http) = {
             get: "/text/default/login/{language}";
@@ -4461,6 +4825,320 @@ message TestSMTPConfigRequest {
 // This is an empty response
 message TestSMTPConfigResponse {}
 
+//This is an empty request
+message GetEmailProviderRequest {}
+
+message GetEmailProviderResponse {
+    zitadel.settings.v1.EmailProvider config = 1;
+}
+
+message GetEmailProviderByIdRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message GetEmailProviderByIdResponse {
+    zitadel.settings.v1.EmailProvider config = 1;
+}
+
+message ListEmailProvidersRequest {
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListEmailProvidersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.settings.v1.EmailProvider result = 2;
+}
+
+message AddEmailProviderSMTPRequest {
+    string sender_address = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string sender_name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool tls = 3;
+    string host = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 500},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"smtp.postmarkapp.com:587\"";
+            description: "Make sure to include the port.";
+            min_length: 1;
+            max_length: 500;
+        }
+    ];
+    string user = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+        }
+    ];
+    string password = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-password\"";
+        }
+    ];
+    string reply_to_address = 7 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"replyto@m.zitadel.cloud\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    string description = 8 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+}
+
+message AddEmailProviderSMTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateEmailProviderSMTPRequest {
+    string sender_address = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string sender_name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool tls = 3;
+    string host = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 500},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"smtp.postmarkapp.com:587\"";
+            description: "Make sure to include the port.";
+            min_length: 1;
+            max_length: 500;
+        }
+    ];
+    string user = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+        }
+    ];
+    string reply_to_address = 6 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"replyto@m.zitadel.cloud\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    string password = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-password\"";
+        }
+    ];
+    string description = 8 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    string id = 9 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message UpdateEmailProviderSMTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateEmailProviderSMTPPasswordRequest {
+    string password = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-updated-password\"";
+        }
+    ];
+    string id = 2 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message UpdateEmailProviderSMTPPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+
+message AddEmailProviderHTTPRequest {
+    string endpoint = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 2048},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://relay.example.com/provider\"";
+            min_length: 1;
+            max_length: 2048;
+        }
+    ];
+    string description = 2 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+}
+
+message AddEmailProviderHTTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateEmailProviderHTTPRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    string endpoint = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 2048},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://relay.example.com/provider\"";
+            min_length: 1;
+            max_length: 2048;
+        }
+    ];
+    string description = 3 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+}
+
+message UpdateEmailProviderHTTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ActivateEmailProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ActivateEmailProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeactivateEmailProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateEmailProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveEmailProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message RemoveEmailProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message TestEmailProviderSMTPByIdRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    string receiver_address = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+// This is an empty response
+message TestEmailProviderSMTPByIdResponse {}
+
+message TestEmailProviderSMTPRequest {
+    string sender_address = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string sender_name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool tls = 3;
+    string host = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 500},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"smtp.postmarkapp.com:587\"";
+            description: "Make sure to include the port.";
+            min_length: 1;
+            max_length: 500;
+        }
+    ];
+    string user = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+        }
+    ];
+    string password = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-password\"";
+        }
+    ];
+    string receiver_address = 7 [
+        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string id = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Zitadel SMTP provider id in case you are not sending the password and want to reuse the stored password";
+            example: "\"267191369515139464\"";
+        }
+    ];
+}
+
+// This is an empty response
+message TestEmailProviderSMTPResponse {}
+
 message ListSMSProvidersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
@@ -4506,6 +5184,14 @@ message AddSMSProviderTwilioRequest {
             max_length: 200;
         }
     ];
+    string description = 4 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
 }
 
 message AddSMSProviderTwilioResponse {
@@ -4533,6 +5219,14 @@ message UpdateSMSProviderTwilioRequest {
             max_length: 200;
         }
     ];
+    string description = 4 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
 }
 
 message UpdateSMSProviderTwilioResponse {
@@ -4545,6 +5239,56 @@ message UpdateSMSProviderTwilioTokenRequest {
 }
 
 message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddSMSProviderHTTPRequest {
+    string endpoint = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 2048},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://relay.example.com/provider\"";
+            min_length: 1;
+            max_length: 2048;
+        }
+    ];
+    string description = 2 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+}
+
+message AddSMSProviderHTTPResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSMSProviderHTTPRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string endpoint = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 2048},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"http://relay.example.com/provider\"";
+            min_length: 1;
+            max_length: 2048;
+        }
+    ];
+    string description = 3 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+}
+
+message UpdateSMSProviderHTTPResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -7688,6 +8432,89 @@ message ResetCustomPasswordChangeMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message GetDefaultInviteUserMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultInviteUserMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetCustomInviteUserMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomInviteUserMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetDefaultInviteUserMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string title = 2 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string pre_header = 3 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string subject = 4 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string greeting = 5 [
+        (validate.rules).string = {max_bytes: 4000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Hello {{.DisplayName}},\""
+            max_length: 1000;
+        }
+    ];
+    string text = 6 [
+        (validate.rules).string = {max_bytes: 40000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Your user has been invited to {{.ApplicationName}}. Please click the button below to finish the invite process. If you didn't ask for this mail, please ignore it.\""
+            max_length: 10000;
+        }
+    ];
+    string button_text = 7 [
+        (validate.rules).string = {max_bytes: 4000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Accept invite\""
+            max_length: 1000;
+        }
+    ];
+    string footer_text = 8 [(validate.rules).string = {max_len: 8000}];
+}
+
+message SetDefaultInviteUserMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomInviteUserMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomInviteUserMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 
 message GetDefaultPasswordlessRegistrationMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -8138,6 +8965,7 @@ message DataOrg {
 
     repeated zitadel.management.v1.SetCustomVerifySMSOTPMessageTextRequest verify_sms_otp_messages = 37;
     repeated zitadel.management.v1.SetCustomVerifyEmailOTPMessageTextRequest verify_email_otp_messages = 38;
+    repeated zitadel.management.v1.SetCustomInviteUserMessageTextRequest invite_user_messages = 39;
 }
 
 message ImportDataResponse{

@@ -75,3 +75,18 @@ func SearchQueryPbToQuery(defaults systemdefaults.SystemDefaults, query *resourc
 	}
 	return offset, limit, asc, nil
 }
+
+func ResourceOwnerFromOrganization(organization *object.Organization) string {
+	if organization == nil {
+		return ""
+	}
+
+	if organization.GetOrgId() != "" {
+		return organization.GetOrgId()
+	}
+	if organization.GetOrgDomain() != "" {
+		// TODO get org from domain
+		return ""
+	}
+	return ""
+}

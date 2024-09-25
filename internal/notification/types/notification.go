@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/internal/notification/channels/email"
+	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
@@ -23,8 +23,8 @@ type Notify func(
 ) error
 
 type ChannelChains interface {
-	Email(context.Context) (*senders.Chain, *smtp.Config, error)
-	SMS(context.Context) (*senders.Chain, *twilio.Config, error)
+	Email(context.Context) (*senders.Chain, *email.Config, error)
+	SMS(context.Context) (*senders.Chain, *sms.Config, error)
 	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
 }
 
@@ -54,8 +54,9 @@ func SendEmail(
 			ctx,
 			channels,
 			user,
-			data.Subject,
 			template,
+			data,
+			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
 		)
@@ -79,7 +80,7 @@ func sanitizeArgsForHTML(args map[string]any) {
 	}
 }
 
-func SendSMSTwilio(
+func SendSMS(
 	ctx context.Context,
 	channels ChannelChains,
 	translator *i18n.Translator,
@@ -99,7 +100,8 @@ func SendSMSTwilio(
 			ctx,
 			channels,
 			user,
-			data.Text,
+			data,
+			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
 		)
