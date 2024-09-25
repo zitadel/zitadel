@@ -20,7 +20,7 @@ In this guide, we will walk through the different protocols, features and concep
 OpenID Connect (OIDC) offers a modern and lightweight authentication protocol built on top of OAuth 2.0, providing flexible authentication flows and easy integration with web and mobile applications.
 ZITADEL offers a certified compliant implementation of the OpenID Connect Standard, ensuring compliance with proven security best practices.
 
-Authenticating users through the OpenID Connect protocol typically requires an application to redirect the user with an [Auth Request](/docs/apis/openidoauth/authrequest) to the identity provider that contains information such as the requesting application, [scopes](/docs/apis/openidoauth/scopes), and redirect url.
+Authenticating users through the OpenID Connect protocol typically requires an application to redirect the user with an [Auth Request](/docs/oidc-playground) to the identity provider that contains information such as the requesting application, [scopes](/docs/apis/openidoauth/scopes), and redirect url.
 The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/docs/concepts/features/custom-domain.md)
 The user will authenticate using their credentials.
 After successful authentication, the user will be redirected back to the original application.

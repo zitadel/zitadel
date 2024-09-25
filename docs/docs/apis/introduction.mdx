@@ -36,7 +36,7 @@ Accessing the ZITADEL APIs through a service user might require additional steps
 - Standard and reserved [scopes reference](/docs/apis/openidoauth/scopes)
 - Standard, custom, and reserved [claims reference](/docs/apis/openidoauth/claims)
 
-The [OIDC Playground](/docs/apis/openidoauth/authrequest) is for testing OpenID authentication requests and their parameters.
+The [OIDC Playground](/oidc-playground) is for testing OpenID authentication requests and their parameters.
 
 ### SAML 2.0
 
@@ -70,7 +70,7 @@ ZITADEL APIs were organized by UseCase/Context, such as Auth API for authenticat
 This led to confusion about which API to use, particularly for requests that could be useful across multiple APIs but with different filters.
 For instance, SearchUsers on an Instance Level or on an Organization Level.
 
-To address this issue, ZITADEL is migrating to a [resource-based API](#zitadel-apis-resource-based). 
+To address this issue, ZITADEL is migrating to a [resource-based API](#zitadel-apis-resource-based).
 :::
 
 <ApiCard title="Authentication" type="AUTH">
@@ -224,7 +224,6 @@ Definition:
 </Column>
 </ApiCard>
 
-
 ## API definitions
 
 Each service's proto definition is located in the source control on GitHub.
@@ -270,8 +269,8 @@ As you can see the `GetMyUser` function is also available as a REST service unde
 
 In the table below you can see the URI of those calls.
 
-| Service | URI                                                 |
-| :------ | :-------------------------------------------------- |
+| Service | URI                                                   |
+| :------ | :---------------------------------------------------- |
 | REST    | $ZITADEL_DOMAIN/auth/v1/users/me                      |
 | GRPC    | $ZITADEL_DOMAIN/zitadel.auth.v1.AuthService/GetMyUser |
 
@@ -281,7 +280,7 @@ ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or yo
 
 The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `{your_domain}/ui/console/`.
 
-Are you self-hosting and having troubles with *Instance not found* errors? [Check out this page](/docs/self-hosting/manage/custom-domain).
+Are you self-hosting and having troubles with _Instance not found_ errors? [Check out this page](/docs/self-hosting/manage/custom-domain).
 
 ## API path prefixes
 
