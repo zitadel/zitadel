@@ -163,14 +163,10 @@ type SchemaUser struct {
 	Data     json.RawMessage
 }
 
-func (s *ChangeSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
+func (s *ChangeSchemaUser) Valid() (err error) {
 	if s.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-gEJR1QOGHb", "Errors.IDMissing")
 	}
-	if s.SchemaUser != nil && s.SchemaUser.SchemaID != "" {
-
-	}
-
 	if s.Email != nil && s.Email.Address != "" {
 		if err := s.Email.Validate(); err != nil {
 			return err
@@ -187,7 +183,7 @@ func (s *ChangeSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 }
 
 func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser) (*domain.ObjectDetails, error) {
-	if err := user.Valid(ctx, c); err != nil {
+	if err := user.Valid(); err != nil {
 		return nil, err
 	}
 
