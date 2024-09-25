@@ -14,7 +14,7 @@ type ChangeSchemaUserPhone struct {
 	ID            string
 
 	Phone      *Phone
-	ReturnCode string
+	ReturnCode *string
 }
 
 func (s *ChangeSchemaUserPhone) Valid() (err error) {
@@ -29,7 +29,7 @@ func (s *ChangeSchemaUserPhone) Valid() (err error) {
 	return nil
 }
 
-func (c *Commands) ChangeSchemaUserPhone(ctx context.Context, user *ChangeSchemaUserPhone, alg crypto.EncryptionAlgorithm) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) ChangeSchemaUserPhone(ctx context.Context, user *ChangeSchemaUserPhone) (_ *domain.ObjectDetails, err error) {
 	if err := user.Valid(); err != nil {
 		return nil, err
 	}
@@ -39,22 +39,22 @@ func (c *Commands) ChangeSchemaUserPhone(ctx context.Context, user *ChangeSchema
 		return nil, err
 	}
 
-	events, plainCode, err := writeModel.NewPhoneUpdated(ctx,
+	events, plainCode, err := writeModel.NewPhoneUpdate(ctx,
 		user.Phone,
 		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newPhoneCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+			return c.newPhoneCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
 	if plainCode != "" {
-		user.ReturnCode = plainCode
+		user.ReturnCode = &plainCode
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
-func (c *Commands) VerifySchemaUserPhone(ctx context.Context, resourceOwner, id, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+func (c *Commands) VerifySchemaUserPhone(ctx context.Context, resourceOwner, id, code string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-R4LKY44Ke3", "Errors.IDMissing")
 	}
@@ -65,7 +65,7 @@ func (c *Commands) VerifySchemaUserPhone(ctx context.Context, resourceOwner, id,
 
 	events, err := writeModel.NewPhoneVerify(ctx,
 		func(creationDate time.Time, expiry time.Duration, cryptoCode *crypto.CryptoValue) error {
-			return crypto.VerifyCode(creationDate, expiry, cryptoCode, code, alg)
+			return crypto.VerifyCode(creationDate, expiry, cryptoCode, code, c.userEncryption)
 		},
 	)
 	if err != nil {
@@ -79,10 +79,10 @@ type ResendSchemaUserPhoneCode struct {
 	ID            string
 
 	ReturnCode bool
-	PlainCode  string
+	PlainCode  *string
 }
 
-func (c *Commands) ResendSchemaUserPhoneCode(ctx context.Context, user *ResendSchemaUserPhoneCode, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+func (c *Commands) ResendSchemaUserPhoneCode(ctx context.Context, user *ResendSchemaUserPhoneCode) (*domain.ObjectDetails, error) {
 	if user.ID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-zmxIFR2nMo", "Errors.IDMissing")
 	}
@@ -93,7 +93,7 @@ func (c *Commands) ResendSchemaUserPhoneCode(ctx context.Context, user *ResendSc
 
 	events, plainCode, err := writeModel.NewResendPhoneCode(ctx,
 		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newPhoneCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+			return c.newPhoneCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
 		},
 		user.ReturnCode,
 	)
@@ -101,7 +101,7 @@ func (c *Commands) ResendSchemaUserPhoneCode(ctx context.Context, user *ResendSc
 		return nil, err
 	}
 	if plainCode != "" {
-		user.PlainCode = plainCode
+		user.PlainCode = &plainCode
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }

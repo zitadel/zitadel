@@ -324,8 +324,9 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 				eventstore:       tt.fields.eventstore(t),
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
+				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			details, err := c.ChangeSchemaUserPhone(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ChangeSchemaUserPhone(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -337,7 +338,8 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			}
 
 			if tt.res.returnCode != "" {
-				assert.Equal(t, tt.res.returnCode, tt.args.user.ReturnCode)
+				assert.NotNil(t, tt.args.user.ReturnCode)
+				assert.Equal(t, tt.res.returnCode, *tt.args.user.ReturnCode)
 			}
 		})
 	}
@@ -651,8 +653,9 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
+				userEncryption:  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			details, err := c.VerifySchemaUserPhone(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.code, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.VerifySchemaUserPhone(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.code)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1016,8 +1019,9 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				eventstore:       tt.fields.eventstore(t),
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
+				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			details, err := c.ResendSchemaUserPhoneCode(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ResendSchemaUserPhoneCode(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1025,8 +1029,11 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.returnCode, tt.args.user.PlainCode)
 				assertObjectDetails(t, tt.res.details, details)
+				if tt.res.returnCode != "" {
+					assert.NotNil(t, tt.args.user.PlainCode)
+					assert.Equal(t, tt.res.returnCode, *tt.args.user.PlainCode)
+				}
 			}
 		})
 	}

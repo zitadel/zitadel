@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -126,14 +128,15 @@ func TestServer_SetContactEmail(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "email patch, no change",
+			name: "email patch, empty",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(req *user.SetContactEmailRequest) error {
 				data := "{\"name\": \"user\"}"
 				schemaID := schemaResp.GetDetails().GetId()
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaID, []byte(data))
 				req.Id = userResp.GetDetails().GetId()
-				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, gofakeit.Email())
+				email := gofakeit.Email()
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, email)
 				return nil
 			},
 			req: &user.SetContactEmailRequest{
@@ -142,9 +145,30 @@ func TestServer_SetContactEmail(t *testing.T) {
 						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
-				Email: &user.SetEmail{
-					Address: gofakeit.Email(),
+				Email: &user.SetEmail{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "email patch, no change",
+			ctx:  isolatedIAMOwnerCTX,
+			dep: func(req *user.SetContactEmailRequest) error {
+				data := "{\"name\": \"user\"}"
+				schemaID := schemaResp.GetDetails().GetId()
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaID, []byte(data))
+				req.Id = userResp.GetDetails().GetId()
+				email := gofakeit.Email()
+				instance.UpdateSchemaUserEmail(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, email)
+				req.Email.Address = email
+				return nil
+			},
+			req: &user.SetContactEmailRequest{
+				Organization: &object.Organization{
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
+					},
 				},
+				Email: &user.SetEmail{},
 			},
 			res: res{
 				want: &resource_object.Details{
@@ -210,6 +234,27 @@ func TestServer_SetContactEmail(t *testing.T) {
 			},
 		},
 		{
+			name: "email patch, return, invalid template",
+			ctx:  isolatedIAMOwnerCTX,
+			dep: func(req *user.SetContactEmailRequest) error {
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
+				return nil
+			},
+			req: &user.SetContactEmailRequest{
+				Organization: &object.Organization{
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
+					},
+				},
+				Email: &user.SetEmail{
+					Address:      gofakeit.Email(),
+					Verification: &user.SetEmail_SendCode{SendCode: &user.SendEmailVerificationCode{UrlTemplate: gu.Ptr("{{")}},
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "email patch, verified, ok",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(req *user.SetContactEmailRequest) error {
@@ -226,6 +271,35 @@ func TestServer_SetContactEmail(t *testing.T) {
 				Email: &user.SetEmail{
 					Address:      gofakeit.Email(),
 					Verification: &user.SetEmail_IsVerified{IsVerified: true},
+				},
+			},
+			res: res{
+				want: &resource_object.Details{
+					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_ORG,
+						Id:   orgResp.GetOrganizationId(),
+					},
+				},
+			},
+		},
+		{
+			name: "email patch, template, ok",
+			ctx:  isolatedIAMOwnerCTX,
+			dep: func(req *user.SetContactEmailRequest) error {
+				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				req.Id = userResp.GetDetails().GetId()
+				return nil
+			},
+			req: &user.SetContactEmailRequest{
+				Organization: &object.Organization{
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
+					},
+				},
+				Email: &user.SetEmail{
+					Address:      gofakeit.Email(),
+					Verification: &user.SetEmail_SendCode{SendCode: &user.SendEmailVerificationCode{UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}")}},
 				},
 			},
 			res: res{
@@ -276,13 +350,15 @@ func TestServer_SetContactEmail(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.SetContactEmail(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCode {
-				require.NotNil(t, got.VerificationCode)
+				assert.NotNil(t, got.VerificationCode)
+			} else {
+				assert.Nil(t, got.VerificationCode)
 			}
 		})
 	}
@@ -307,8 +383,7 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 	orgResp := instance.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	type res struct {
-		want            *resource_object.Details
-		returnCodeEmail bool
+		want *resource_object.Details
 	}
 	tests := []struct {
 		name    string
@@ -459,7 +534,6 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 						Id:   orgResp.GetOrganizationId(),
 					},
 				},
-				returnCodeEmail: true,
 			},
 		},
 	}
@@ -471,10 +545,10 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.VerifyContactEmail(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 		})
 	}
@@ -683,13 +757,15 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.ResendContactEmailCode(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCode {
-				require.NotNil(t, got.VerificationCode)
+				assert.NotNil(t, got.VerificationCode)
+			} else {
+				assert.Nil(t, got.VerificationCode)
 			}
 		})
 	}

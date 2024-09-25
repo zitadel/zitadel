@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"io"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -14,7 +15,7 @@ type ChangeSchemaUserEmail struct {
 	ID            string
 
 	Email      *Email
-	ReturnCode string
+	ReturnCode *string
 }
 
 func (s *ChangeSchemaUserEmail) Valid() (err error) {
@@ -26,10 +27,15 @@ func (s *ChangeSchemaUserEmail) Valid() (err error) {
 			return err
 		}
 	}
+	if s.Email != nil && s.Email.URLTemplate != "" {
+		if err := domain.RenderConfirmURLTemplate(io.Discard, s.Email.URLTemplate, s.ID, "code", "orgID"); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func (c *Commands) ChangeSchemaUserEmail(ctx context.Context, user *ChangeSchemaUserEmail, alg crypto.EncryptionAlgorithm) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) ChangeSchemaUserEmail(ctx context.Context, user *ChangeSchemaUserEmail) (_ *domain.ObjectDetails, err error) {
 	if err := user.Valid(); err != nil {
 		return nil, err
 	}
@@ -39,22 +45,22 @@ func (c *Commands) ChangeSchemaUserEmail(ctx context.Context, user *ChangeSchema
 		return nil, err
 	}
 
-	events, plainCode, err := writeModel.NewEmailUpdated(ctx,
+	events, plainCode, err := writeModel.NewEmailUpdate(ctx,
 		user.Email,
 		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+			return c.newEmailCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
 	if plainCode != "" {
-		user.ReturnCode = plainCode
+		user.ReturnCode = &plainCode
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
-func (c *Commands) VerifySchemaUserEmail(ctx context.Context, resourceOwner, id, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+func (c *Commands) VerifySchemaUserEmail(ctx context.Context, resourceOwner, id, code string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-y3n4Sdu8j5", "Errors.IDMissing")
 	}
@@ -65,7 +71,7 @@ func (c *Commands) VerifySchemaUserEmail(ctx context.Context, resourceOwner, id,
 
 	events, err := writeModel.NewEmailVerify(ctx,
 		func(creationDate time.Time, expiry time.Duration, cryptoCode *crypto.CryptoValue) error {
-			return crypto.VerifyCode(creationDate, expiry, cryptoCode, code, alg)
+			return crypto.VerifyCode(creationDate, expiry, cryptoCode, code, c.userEncryption)
 		},
 	)
 	if err != nil {
@@ -80,10 +86,10 @@ type ResendSchemaUserEmailCode struct {
 
 	URLTemplate string
 	ReturnCode  bool
-	PlainCode   string
+	PlainCode   *string
 }
 
-func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSchemaUserEmailCode, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSchemaUserEmailCode) (*domain.ObjectDetails, error) {
 	if user.ID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-KvPc5o9GeJ", "Errors.IDMissing")
 	}
@@ -94,7 +100,7 @@ func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSc
 
 	events, plainCode, err := writeModel.NewResendEmailCode(ctx,
 		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+			return c.newEmailCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
 		},
 		user.URLTemplate,
 		user.ReturnCode,
@@ -103,7 +109,7 @@ func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSc
 		return nil, err
 	}
 	if plainCode != "" {
-		user.PlainCode = plainCode
+		user.PlainCode = &plainCode
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }

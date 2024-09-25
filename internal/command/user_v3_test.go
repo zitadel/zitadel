@@ -874,8 +874,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:      tt.fields.idGenerator,
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
+				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			details, err := c.CreateSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.CreateSchemaUser(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -887,10 +888,12 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			}
 
 			if tt.res.returnCodePhone != "" {
-				assert.Equal(t, tt.res.returnCodePhone, tt.args.user.ReturnCodePhone)
+				assert.NotNil(t, tt.args.user.ReturnCodePhone)
+				assert.Equal(t, tt.res.returnCodePhone, *tt.args.user.ReturnCodePhone)
 			}
 			if tt.res.returnCodeEmail != "" {
-				assert.Equal(t, tt.res.returnCodeEmail, tt.args.user.ReturnCodeEmail)
+				assert.NotNil(t, tt.args.user.ReturnCodeEmail)
+				assert.Equal(t, tt.res.returnCodeEmail, *tt.args.user.ReturnCodeEmail)
 			}
 		})
 	}
@@ -1987,6 +1990,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"schema not existing, error",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -2058,6 +2074,25 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								json.RawMessage(`{
 						"name": "user1"
 					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 							),
 						),
 					),
@@ -2156,6 +2191,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id2", "instanceID").Aggregate,
@@ -2170,19 +2218,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2219,6 +2254,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id2", "instanceID").Aggregate,
@@ -2233,19 +2281,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2378,6 +2413,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								2,
+								json.RawMessage(`{
+						"name1": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id2", "instanceID").Aggregate,
@@ -2392,19 +2440,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								2,
-								json.RawMessage(`{
-						"name1": "user1"
-					}`),
 							),
 						),
 					),
@@ -2450,6 +2485,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2467,19 +2515,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2510,6 +2545,18 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					), expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2527,19 +2574,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2569,6 +2603,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2583,19 +2630,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2626,6 +2660,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2640,19 +2687,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2698,6 +2732,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2713,19 +2760,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
        							"additionalProperties": false
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -2800,6 +2834,19 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
+							schemauser.NewCreatedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"id1",
+								1,
+								json.RawMessage(`{
+						"name": "user1"
+					}`),
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							schema.NewCreatedEvent(
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
@@ -2814,19 +2861,6 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 								}
 							}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
 							),
 						),
 					),
@@ -3126,8 +3160,9 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 				eventstore:       tt.fields.eventstore(t),
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
+				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			details, err := c.ChangeSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ChangeSchemaUser(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -3139,10 +3174,12 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			}
 
 			if tt.res.returnCodePhone != "" {
-				assert.Equal(t, tt.res.returnCodePhone, tt.args.user.ReturnCodePhone)
+				assert.NotNil(t, tt.args.user.ReturnCodePhone)
+				assert.Equal(t, tt.res.returnCodePhone, *tt.args.user.ReturnCodePhone)
 			}
 			if tt.res.returnCodeEmail != "" {
-				assert.Equal(t, tt.res.returnCodeEmail, tt.args.user.ReturnCodeEmail)
+				assert.NotNil(t, tt.args.user.ReturnCodeEmail)
+				assert.Equal(t, tt.res.returnCodeEmail, *tt.args.user.ReturnCodeEmail)
 			}
 		})
 	}

@@ -74,7 +74,27 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"))
 				},
 			},
-		}, {
+		},
+		{
+			"no valid template, error",
+			fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ChangeSchemaUserEmail{
+					ID:    "user1",
+					Email: &Email{Address: "noemail", URLTemplate: "{{"},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"))
+				},
+			},
+		},
+		{
 			"email update, user not found",
 			fields{
 				eventstore: expectEventstore(
@@ -327,8 +347,9 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 				eventstore:       tt.fields.eventstore(t),
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
+				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			details, err := c.ChangeSchemaUserEmail(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ChangeSchemaUserEmail(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -337,10 +358,10 @@ func TestCommands_ChangeSchemaUserEmail(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.details, details)
-			}
-
-			if tt.res.returnCode != "" {
-				assert.Equal(t, tt.res.returnCode, tt.args.user.ReturnCode)
+				if tt.res.returnCode != "" {
+					assert.NotNil(t, tt.args.user.ReturnCode)
+					assert.Equal(t, tt.res.returnCode, *tt.args.user.ReturnCode)
+				}
 			}
 		})
 	}
@@ -658,13 +679,15 @@ func TestCommands_VerifySchemaUserEmail(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
+				userEncryption:  crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			details, err := c.VerifySchemaUserEmail(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.code, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.VerifySchemaUserEmail(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.code)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+				return
 			}
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.details, details)
@@ -1031,17 +1054,22 @@ func TestCommands_ResendSchemaUserEmailCode(t *testing.T) {
 				eventstore:       tt.fields.eventstore(t),
 				checkPermission:  tt.fields.checkPermission,
 				newEncryptedCode: tt.fields.newCode,
+				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
-			details, err := c.ResendSchemaUserEmailCode(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			details, err := c.ResendSchemaUserEmailCode(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+				return
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.returnCode, tt.args.user.PlainCode)
 				assertObjectDetails(t, tt.res.details, details)
+				if tt.res.returnCode != "" {
+					assert.NotNil(t, tt.args.user.PlainCode)
+					assert.Equal(t, tt.res.returnCode, *tt.args.user.PlainCode)
+				}
 			}
 		})
 	}

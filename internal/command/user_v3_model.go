@@ -237,7 +237,7 @@ func (wm *UserV3WriteModel) NewCreated(
 		),
 	}
 	if email != nil {
-		emailEvents, plainCodeEmail, err := wm.NewEmailCreatedEvents(ctx,
+		emailEvents, plainCodeEmail, err := wm.NewEmailCreate(ctx,
 			email,
 			code,
 		)
@@ -251,7 +251,7 @@ func (wm *UserV3WriteModel) NewCreated(
 	}
 
 	if phone != nil {
-		phoneEvents, plainCodePhone, err := wm.NewPhoneCreated(ctx,
+		phoneEvents, plainCodePhone, err := wm.NewPhoneCreate(ctx,
 			phone,
 			code,
 		)
@@ -277,18 +277,11 @@ func (wm *UserV3WriteModel) getSchemaRoleForWrite(ctx context.Context, resourceO
 	return domain_schema.RoleOwner, nil
 }
 
-func (wm *UserV3WriteModel) validateData(ctx context.Context, schemaWM *UserSchemaWriteModel, data []byte, schemaWMGet func(ctx context.Context, resourceOwner, id string) (*UserSchemaWriteModel, error)) (string, uint64, error) {
+func (wm *UserV3WriteModel) validateData(ctx context.Context, data []byte, schemaWM *UserSchemaWriteModel) (string, uint64, error) {
 	// get role for permission check in schema through extension
 	role, err := wm.getSchemaRoleForWrite(ctx, wm.ResourceOwner, wm.AggregateID)
 	if err != nil {
 		return "", 0, err
-	}
-
-	if schemaWM == nil {
-		schemaWM, err = schemaWMGet(ctx, "", wm.SchemaID)
-		if err != nil {
-			return "", 0, err
-		}
 	}
 
 	schema, err := domain_schema.NewSchema(role, bytes.NewReader(schemaWM.Schema))
@@ -311,10 +304,9 @@ func (wm *UserV3WriteModel) validateData(ctx context.Context, schemaWM *UserSche
 	return schemaWM.AggregateID, schemaWM.SchemaRevision, nil
 }
 
-func (wm *UserV3WriteModel) NewUpdated(
+func (wm *UserV3WriteModel) NewUpdate(
 	ctx context.Context,
 	schemaWM *UserSchemaWriteModel,
-	schemaWMGet func(ctx context.Context, resourceOwner, id string) (*UserSchemaWriteModel, error),
 	user *SchemaUser,
 	email *Email,
 	phone *Phone,
@@ -328,7 +320,7 @@ func (wm *UserV3WriteModel) NewUpdated(
 	}
 	events := make([]eventstore.Command, 0)
 	if user != nil {
-		schemaID, schemaRevision, err := wm.validateData(ctx, schemaWM, user.Data, schemaWMGet)
+		schemaID, schemaRevision, err := wm.validateData(ctx, user.Data, schemaWM)
 		if err != nil {
 			return nil, "", "", err
 		}
@@ -340,7 +332,7 @@ func (wm *UserV3WriteModel) NewUpdated(
 		events = append(events, userEvents...)
 	}
 	if email != nil {
-		emailEvents, plainCodeEmail, err := wm.NewEmailUpdated(ctx,
+		emailEvents, plainCodeEmail, err := wm.NewEmailUpdate(ctx,
 			email,
 			code,
 		)
@@ -354,7 +346,7 @@ func (wm *UserV3WriteModel) NewUpdated(
 	}
 
 	if phone != nil {
-		phoneEvents, plainCodePhone, err := wm.NewPhoneCreated(ctx,
+		phoneEvents, plainCodePhone, err := wm.NewPhoneCreate(ctx,
 			phone,
 			code,
 		)
@@ -392,7 +384,7 @@ func (wm *UserV3WriteModel) newUpdatedEvents(
 	return []eventstore.Command{schemauser.NewUpdatedEvent(ctx, UserV3AggregateFromWriteModel(&wm.WriteModel), changes)}
 }
 
-func (wm *UserV3WriteModel) NewDeletedEvents(
+func (wm *UserV3WriteModel) NewDelete(
 	ctx context.Context,
 ) (_ []eventstore.Command, err error) {
 	if !wm.Exists() {
@@ -448,7 +440,7 @@ func (wm *UserV3WriteModel) checkPermissionDelete(
 	return wm.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, userID)
 }
 
-func (wm *UserV3WriteModel) NewEmailCreatedEvents(
+func (wm *UserV3WriteModel) NewEmailCreate(
 	ctx context.Context,
 	email *Email,
 	code func(context.Context) (*EncryptedCode, error),
@@ -480,7 +472,7 @@ func (wm *UserV3WriteModel) NewEmailCreatedEvents(
 	return events, plainCode, nil
 }
 
-func (wm *UserV3WriteModel) NewEmailUpdated(
+func (wm *UserV3WriteModel) NewEmailUpdate(
 	ctx context.Context,
 	email *Email,
 	code func(context.Context) (*EncryptedCode, error),
@@ -491,7 +483,7 @@ func (wm *UserV3WriteModel) NewEmailUpdated(
 	if !wm.Exists() {
 		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-nJ0TQFuRmP", "Errors.User.NotFound")
 	}
-	return wm.NewEmailCreatedEvents(ctx, email, code)
+	return wm.NewEmailCreate(ctx, email, code)
 }
 
 func (wm *UserV3WriteModel) NewEmailVerify(
@@ -569,7 +561,7 @@ func (wm *UserV3WriteModel) newEmailCodeAddedEvent(
 	), plainCode, nil
 }
 
-func (wm *UserV3WriteModel) NewPhoneCreated(
+func (wm *UserV3WriteModel) NewPhoneCreate(
 	ctx context.Context,
 	phone *Phone,
 	code func(context.Context) (*EncryptedCode, error),
@@ -601,7 +593,7 @@ func (wm *UserV3WriteModel) NewPhoneCreated(
 	return events, plainCode, nil
 }
 
-func (wm *UserV3WriteModel) NewPhoneUpdated(
+func (wm *UserV3WriteModel) NewPhoneUpdate(
 	ctx context.Context,
 	phone *Phone,
 	code func(context.Context) (*EncryptedCode, error),
@@ -612,7 +604,7 @@ func (wm *UserV3WriteModel) NewPhoneUpdated(
 	if !wm.Exists() {
 		return nil, "", zerrors.ThrowNotFound(nil, "COMMAND-b33QAVgel6", "Errors.User.NotFound")
 	}
-	return wm.NewPhoneCreated(ctx, phone, code)
+	return wm.NewPhoneCreate(ctx, phone, code)
 }
 
 func (wm *UserV3WriteModel) NewPhoneVerify(

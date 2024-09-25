@@ -3,8 +3,6 @@ package user
 import (
 	"context"
 
-	"github.com/muhlemmer/gu"
-
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -17,13 +15,13 @@ func (s *Server) SetContactEmail(ctx context.Context, req *user.SetContactEmailR
 		return nil, err
 	}
 	schemauser := setContactEmailRequestToChangeSchemaUserEmail(req)
-	details, err := s.command.ChangeSchemaUserEmail(ctx, schemauser, s.userCodeAlg)
+	details, err := s.command.ChangeSchemaUserEmail(ctx, schemauser)
 	if err != nil {
 		return nil, err
 	}
 	return &user.SetContactEmailResponse{
 		Details:          resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
-		VerificationCode: gu.Ptr(schemauser.ReturnCode),
+		VerificationCode: schemauser.ReturnCode,
 	}, nil
 }
 
@@ -51,7 +49,7 @@ func (s *Server) VerifyContactEmail(ctx context.Context, req *user.VerifyContact
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.VerifySchemaUserEmail(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId(), req.GetVerificationCode(), s.userCodeAlg)
+	details, err := s.command.VerifySchemaUserEmail(ctx, organizationToUpdateResourceOwner(req.Organization), req.GetId(), req.GetVerificationCode())
 	if err != nil {
 		return nil, err
 	}
@@ -65,13 +63,13 @@ func (s *Server) ResendContactEmailCode(ctx context.Context, req *user.ResendCon
 		return nil, err
 	}
 	schemauser := resendContactEmailCodeRequestToResendSchemaUserEmailCode(req)
-	details, err := s.command.ResendSchemaUserEmailCode(ctx, schemauser, s.userCodeAlg)
+	details, err := s.command.ResendSchemaUserEmailCode(ctx, schemauser)
 	if err != nil {
 		return nil, err
 	}
 	return &user.ResendContactEmailCodeResponse{
 		Details:          resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
-		VerificationCode: gu.Ptr(schemauser.PlainCode),
+		VerificationCode: schemauser.PlainCode,
 	}, nil
 }
 

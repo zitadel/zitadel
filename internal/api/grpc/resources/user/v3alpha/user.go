@@ -3,8 +3,6 @@ package user
 import (
 	"context"
 
-	"github.com/muhlemmer/gu"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
@@ -21,14 +19,14 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.CreateSchemaUser(ctx, schemauser, s.userCodeAlg)
+	details, err := s.command.CreateSchemaUser(ctx, schemauser)
 	if err != nil {
 		return nil, err
 	}
 	return &user.CreateUserResponse{
 		Details:   resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
-		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
-		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
+		EmailCode: schemauser.ReturnCodeEmail,
+		PhoneCode: schemauser.ReturnCodePhone,
 	}, nil
 }
 
@@ -43,6 +41,8 @@ func createUserRequestToCreateSchemaUser(ctx context.Context, req *user.CreateUs
 		SchemaID:      req.GetUser().GetSchemaId(),
 		ID:            req.GetUser().GetUserId(),
 		Data:          data,
+		Email:         setEmailToEmail(req.GetUser().GetContact().GetEmail()),
+		Phone:         setPhoneToPhone(req.GetUser().GetContact().GetPhone()),
 	}, nil
 }
 
@@ -90,14 +90,14 @@ func (s *Server) PatchUser(ctx context.Context, req *user.PatchUserRequest) (_ *
 		return nil, err
 	}
 
-	details, err := s.command.ChangeSchemaUser(ctx, schemauser, s.userCodeAlg)
+	details, err := s.command.ChangeSchemaUser(ctx, schemauser)
 	if err != nil {
 		return nil, err
 	}
 	return &user.PatchUserResponse{
 		Details:   resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
-		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
-		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
+		EmailCode: schemauser.ReturnCodeEmail,
+		PhoneCode: schemauser.ReturnCodePhone,
 	}, nil
 }
 

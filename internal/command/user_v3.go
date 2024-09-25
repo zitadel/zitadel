@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
@@ -22,9 +21,9 @@ type CreateSchemaUser struct {
 	Data          json.RawMessage
 
 	Email           *Email
-	ReturnCodeEmail string
+	ReturnCodeEmail *string
 	Phone           *Phone
-	ReturnCodePhone string
+	ReturnCodePhone *string
 }
 
 func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
@@ -96,7 +95,7 @@ func (c *Commands) getSchemaRoleForWrite(ctx context.Context, resourceOwner, use
 	return domain_schema.RoleOwner, nil
 }
 
-func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser) (*domain.ObjectDetails, error) {
 	if err := user.Valid(ctx, c); err != nil {
 		return nil, err
 	}
@@ -113,17 +112,17 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser,
 		user.Email,
 		user.Phone,
 		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+			return c.newEmailCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
 	if codeEmail != "" {
-		user.ReturnCodeEmail = codeEmail
+		user.ReturnCodeEmail = &codeEmail
 	}
 	if codePhone != "" {
-		user.ReturnCodePhone = codePhone
+		user.ReturnCodePhone = &codePhone
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
@@ -137,7 +136,7 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, resourceOwner, id strin
 		return nil, err
 	}
 
-	events, err := writeModel.NewDeletedEvents(ctx)
+	events, err := writeModel.NewDelete(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -154,9 +153,9 @@ type ChangeSchemaUser struct {
 	SchemaUser *SchemaUser
 
 	Email           *Email
-	ReturnCodeEmail string
+	ReturnCodeEmail *string
 	Phone           *Phone
-	ReturnCodePhone string
+	ReturnCodePhone *string
 }
 
 type SchemaUser struct {
@@ -169,13 +168,7 @@ func (s *ChangeSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-gEJR1QOGHb", "Errors.IDMissing")
 	}
 	if s.SchemaUser != nil && s.SchemaUser.SchemaID != "" {
-		s.schemaWriteModel, err = c.getSchemaWriteModelByID(ctx, "", s.SchemaUser.SchemaID)
-		if err != nil {
-			return err
-		}
-		if !s.schemaWriteModel.Exists() {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists")
-		}
+
 	}
 
 	if s.Email != nil && s.Email.Address != "" {
@@ -193,7 +186,7 @@ func (s *ChangeSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 	return nil
 }
 
-func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser) (*domain.ObjectDetails, error) {
 	if err := user.Valid(ctx, c); err != nil {
 		return nil, err
 	}
@@ -206,14 +199,30 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser,
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.NotFound")
 	}
 
-	events, codeEmail, codePhone, err := writeModel.NewUpdated(ctx,
-		user.schemaWriteModel,
-		c.getSchemaWriteModelByID,
+	schemaID := writeModel.SchemaID
+	if user.SchemaUser != nil && user.SchemaUser.SchemaID != "" {
+		schemaID = user.SchemaUser.SchemaID
+	}
+
+	var schemaWM *UserSchemaWriteModel
+	if user.SchemaUser != nil {
+		schemaWriteModel, err := c.getSchemaWriteModelByID(ctx, "", schemaID)
+		if err != nil {
+			return nil, err
+		}
+		if !schemaWriteModel.Exists() {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists")
+		}
+		schemaWM = schemaWriteModel
+	}
+
+	events, codeEmail, codePhone, err := writeModel.NewUpdate(ctx,
+		schemaWM,
 		user.SchemaUser,
 		user.Email,
 		user.Phone,
 		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+			return c.newEmailCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
 		},
 	)
 	if err != nil {
@@ -221,10 +230,10 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser,
 	}
 
 	if codeEmail != "" {
-		user.ReturnCodeEmail = codeEmail
+		user.ReturnCodeEmail = &codeEmail
 	}
 	if codePhone != "" {
-		user.ReturnCodePhone = codePhone
+		user.ReturnCodePhone = &codePhone
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
