@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -44,16 +42,6 @@ func (s *CreateSchemaUser) Valid() (err error) {
 	}
 
 	return nil
-}
-
-func (c *Commands) getSchemaRoleForWrite(ctx context.Context, resourceOwner, userID string) (domain_schema.Role, error) {
-	if userID == authz.GetCtxData(ctx).UserID {
-		return domain_schema.RoleSelf, nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
-		return domain_schema.RoleUnspecified, err
-	}
-	return domain_schema.RoleOwner, nil
 }
 
 func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser) (_ *domain.ObjectDetails, err error) {
