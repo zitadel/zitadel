@@ -34,7 +34,7 @@ func (c *Commands) ChangeSchemaUserPhone(ctx context.Context, user *ChangeSchema
 		return nil, err
 	}
 
-	writeModel, err := c.getSchemaUserPhoneWriteModelByID(ctx, user.ResourceOwner, user.ID)
+	writeModel, err := c.getSchemaUserWMForPhone(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *Commands) VerifySchemaUserPhone(ctx context.Context, resourceOwner, id,
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-R4LKY44Ke3", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserPhoneWriteModelByID(ctx, resourceOwner, id)
+	writeModel, err := c.getSchemaUserWMForPhone(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (c *Commands) ResendSchemaUserPhoneCode(ctx context.Context, user *ResendSc
 	if user.ID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-zmxIFR2nMo", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserPhoneWriteModelByID(ctx, user.ResourceOwner, user.ID)
+	writeModel, err := c.getSchemaUserWMForPhone(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -104,4 +104,12 @@ func (c *Commands) ResendSchemaUserPhoneCode(ctx context.Context, user *ResendSc
 		user.PlainCode = &plainCode
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
+}
+
+func (c *Commands) getSchemaUserWMForPhone(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
+	writeModel := NewUserV3PhoneWriteModel(resourceOwner, id, c.checkPermission)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
 }

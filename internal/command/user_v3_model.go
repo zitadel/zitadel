@@ -217,8 +217,7 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *UserV3WriteModel) NewCreated(
 	ctx context.Context,
-	schemaID string,
-	schemaRevision uint64,
+	schemaWM *UserSchemaWriteModel,
 	data json.RawMessage,
 	email *Email,
 	phone *Phone,
@@ -230,9 +229,13 @@ func (wm *UserV3WriteModel) NewCreated(
 	if wm.Exists() {
 		return nil, "", "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.AlreadyExists")
 	}
+	schemaID, schemaRevision, err := wm.validateData(ctx, data, schemaWM)
+	if err != nil {
+		return nil, "", "", err
+	}
 	events := []eventstore.Command{
 		schemauser.NewCreatedEvent(ctx,
-			UserV3AggregateFromWriteModel(&wm.WriteModel),
+			UserV3AggregateFromWriteModel(wm.GetWriteModel()),
 			schemaID, schemaRevision, data,
 		),
 	}

@@ -82,7 +82,7 @@ func existingSchemaUserWithPermission(ctx context.Context, c *Commands, resource
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aS3Vz5t6BS", "Errors.IDMissing")
 	}
-	existingUser, err := c.getSchemaUserExists(ctx, resourceOwner, userID)
+	existingUser, err := c.getSchemaUserWMForState(ctx, resourceOwner, userID)
 	if err != nil {
 		return nil, err
 	}

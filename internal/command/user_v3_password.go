@@ -61,7 +61,7 @@ func (c *Commands) SetSchemaUserPassword(ctx context.Context, user *SetSchemaUse
 	resourceOwner := existing.ResourceOwner
 	// when no password was set yet
 	if existing.EncodedHash == "" {
-		existingUser, err := c.getSchemaUserExists(ctx, user.ResourceOwner, user.UserID)
+		existingUser, err := c.getSchemaUserWMForState(ctx, user.ResourceOwner, user.UserID)
 		if err != nil {
 			return nil, err
 		}
