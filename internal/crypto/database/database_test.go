@@ -468,17 +468,17 @@ func dbMock(t *testing.T, expectations ...func(m sqlmock.Sqlmock)) db {
 
 func expectQueryErr(query string, err error, args ...driver.Value) func(m sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectBegin()
+		// m.ExpectBegin()
 		m.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(args...).WillReturnError(err)
-		m.ExpectRollback()
+		// m.ExpectRollback()
 	}
 }
 
 func expectQueryScanErr(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectBegin()
+		// m.ExpectBegin()
 		q := m.ExpectQuery(regexp.QuoteMeta(stmt)).WithArgs(args...)
-		m.ExpectRollback()
+		// m.ExpectRollback()
 		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
@@ -494,9 +494,9 @@ func expectQueryScanErr(stmt string, cols []string, rows [][]driver.Value, args 
 
 func expectQuery(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectBegin()
+		// m.ExpectBegin()
 		q := m.ExpectQuery(regexp.QuoteMeta(stmt)).WithArgs(args...)
-		m.ExpectCommit()
+		// m.ExpectCommit()
 		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {

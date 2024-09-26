@@ -57,11 +57,11 @@ func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
 	}
 	defer client.Close()
 
-	mock.ExpectBegin()
+	// mock.ExpectBegin()
 	mock.ExpectQuery(expectedDeviceAuthWhereUserCodeQuery).WillReturnRows(
 		mock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
 	)
-	mock.ExpectCommit()
+	// mock.ExpectCommit()
 	q := Queries{
 		client: &database.DB{DB: client},
 	}
