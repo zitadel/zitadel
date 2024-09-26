@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	pgxdecimal "github.com/jackc/pgx-shopspring-decimal"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/mitchellh/mapstructure"
@@ -83,10 +81,6 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
 	if err != nil {
 		return nil, err
-	}
-	config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
-		pgxdecimal.Register(conn.TypeMap())
-		return nil
 	}
 
 	if connConfig.MaxOpenConns != 0 {

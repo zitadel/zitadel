@@ -93,6 +93,7 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			}
 		case *instance.SMSConfigTwilioActivatedEvent:
 			if wm.ID != e.ID {
+				wm.State = domain.SMSConfigStateInactive
 				continue
 			}
 			wm.State = domain.SMSConfigStateActive
@@ -110,6 +111,7 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			wm.State = domain.SMSConfigStateRemoved
 		case *instance.SMSConfigActivatedEvent:
 			if wm.ID != e.ID {
+				wm.State = domain.SMSConfigStateInactive
 				continue
 			}
 			wm.State = domain.SMSConfigStateActive

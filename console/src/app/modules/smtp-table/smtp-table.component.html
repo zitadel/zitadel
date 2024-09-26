@@ -24,7 +24,7 @@
         <th class="availability" mat-header-cell *matHeaderCellDef>
           <span>{{ 'SMTP.LIST.ACTIVATED' | translate }}</span>
         </th>
-        <td class="pointer availability" mat-cell *matCellDef="let config">
+        <td class="availability" [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
           <i
             matTooltip="{{ 'SMTP.LIST.ACTIVATED' | translate }}"
             *ngIf="isActive(config.state)"
@@ -36,7 +36,7 @@
 
       <ng-container matColumnDef="description">
         <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.DESCRIPTION' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let config">
+        <td [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
           <span>{{ config?.description }}</span>
         </td>
       </ng-container>
@@ -45,22 +45,22 @@
         <th class="availability" mat-header-cell *matHeaderCellDef>
           <span>TLS</span>
         </th>
-        <td class="pointer availability" mat-cell *matCellDef="let config">
+        <td class="availability" [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
           <i *ngIf="config.tls" class="las la-lock"></i>
-          <i *ngIf="!config.tls" class="las la-unlock"></i>
+          <i *ngIf="config.senderAddress && !config.tls" class="las la-unlock"></i>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="host">
         <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let config">
+        <td [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
           <span>{{ config?.host }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="senderAddress">
         <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let config">
+        <td [ngClass]="{ pointer: config.senderAddress }" mat-cell *matCellDef="let config">
           <span>{{ config?.senderAddress }}</span>
         </td>
       </ng-container>
@@ -95,7 +95,7 @@
 
             <button
               actions
-              [disabled]="(['iam.write'] | hasRole | async) === false"
+              [disabled]="(['iam.write'] | hasRole | async) === false || !config?.senderAddress"
               mat-icon-button
               color="primary"
               matTooltip="{{ 'SMTP.LIST.TEST' | translate }}"
