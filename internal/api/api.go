@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"net/http"
 	"sort"
 	"strings"
@@ -37,6 +38,7 @@ type API struct {
 	healthServer      *health.Server
 	accessInterceptor *http_mw.AccessInterceptor
 	queries           *query.Queries
+	acceptingTraffic  bool
 }
 
 func (a *API) ListGrpcServices() []string {
@@ -218,21 +220,29 @@ func (a *API) routeGRPCWeb() {
 		Name("grpc-web")
 }
 
-func (a *API) healthHandler() http.Handler {
-	checks := []ValidationFunction{
-		func(ctx context.Context) error {
-			if err := a.health.Health(ctx); err != nil {
-				return zerrors.ThrowInternal(err, "API-F24h2", "DB CONNECTION ERROR")
-			}
-			return nil
-		},
+func (a *API) IsReady(ctx context.Context) error {
+	return errors.Join(validate(ctx, a.readinessChecks())...)
+}
+
+func (a *API) checkDBPing(ctx context.Context) error {
+	if err := a.health.Health(ctx); err != nil {
+		return zerrors.ThrowInternal(err, "API-F24h2", "DB CONNECTION ERROR")
 	}
+	return nil
+}
+
+func (a *API) readinessChecks() []ValidationFunction {
+	return []ValidationFunction{
+		a.checkDBPing,
+	}
+}
+
+func (a *API) healthHandler() http.Handler {
 	handler := http.NewServeMux()
 	handler.HandleFunc("/healthz", handleHealth)
-	handler.HandleFunc("/ready", handleReadiness(checks))
-	handler.HandleFunc("/validate", handleValidate(checks))
+	handler.HandleFunc("/ready", handleReadiness(a.readinessChecks()))
+	handler.HandleFunc("/validate", handleValidate(a.readinessChecks()))
 	handler.Handle("/metrics", metricsExporter())
-
 	return handler
 }
 

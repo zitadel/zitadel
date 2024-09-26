@@ -26,8 +26,8 @@ func New() *cobra.Command {
 	adminCMD.AddCommand(
 		initialise.New(),
 		setup.New(),
-		start.New(nil),
-		start.NewStartFromInit(nil),
+		start.New(),
+		start.NewStartFromInit(),
 		key.New(),
 	)
 

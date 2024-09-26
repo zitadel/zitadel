@@ -3,10 +3,10 @@ package initialise
 import (
 	"context"
 	"embed"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/socket"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -72,9 +72,13 @@ func InitAll(ctx context.Context, config *Config) {
 }
 
 func initialise(config database.Config, steps ...func(*database.DB) error) error {
+	closeSocket, err := socket.ListenAndIgnore()
+	logging.OnError(err).Fatal("unable to listen on socket")
+	defer closeSocket()
+
 	logging.Info("initialization started")
 
-	err := ReadStmts(config.Type())
+	err = ReadStmts(config.Type())
 	if err != nil {
 		return err
 	}

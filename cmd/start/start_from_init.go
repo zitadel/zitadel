@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/tls"
 )
 
-func NewStartFromInit(server chan<- *Server) *cobra.Command {
+func NewStartFromInit() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start-from-init",
 		Short: "cold starts zitadel",
@@ -23,7 +23,11 @@ Last ZITADEL starts.
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
+			startup, closeSocket, err := listenSocket(cmd.Context())
+			logging.OnError(err).Fatal("unable to listen on socket")
+			defer closeSocket()
+
+			err = tls.ModeFromFlag(cmd)
 			logging.OnError(err).Fatal("invalid tlsMode")
 
 			masterKey, err := key.MasterKey(cmd)
@@ -40,7 +44,7 @@ Requirements:
 
 			startConfig := MustNewConfig(viper.GetViper())
 
-			err = startZitadel(cmd.Context(), startConfig, masterKey, server)
+			err = startZitadel(cmd.Context(), startConfig, masterKey, startup)
 			logging.OnError(err).Fatal("unable to start zitadel")
 		},
 	}

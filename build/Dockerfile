@@ -11,14 +11,17 @@ RUN useradd -s "" --home / zitadel && \
     chown zitadel /app/zitadel && \
     chmod +x /app/zitadel && \
     chown zitadel /app/entrypoint.sh && \
-    chmod +x /app/entrypoint.sh
+    chmod +x /app/entrypoint.sh && \
+    mkdir /emptytmp
 
 WORKDIR /app
 ENV PATH="/app:${PATH}"
 
-HEALTHCHECK CMD /app/zitadel ready
-
 USER zitadel
+
+HEALTHCHECK --interval=5s --timeout=120s --retries=6 \
+    CMD ["/app/zitadel", "ready"]
+
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 FROM --platform=$TARGETPLATFORM scratch as final
@@ -26,9 +29,13 @@ ARG TARGETPLATFORM
 
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
-COPY --from=artifact /app/zitadel /app/zitadel
-
-HEALTHCHECK CMD /app/zitadel ready
+COPY --from=artifact --chown=zitadel:zitadel /app/zitadel /app/zitadel
+COPY --from=artifact --chown=zitadel:zitadel /emptytmp /tmp
 
 USER zitadel
+
+# /app/zitadel ready is a healthcheck endpoint that immediately
+HEALTHCHECK --interval=5s --timeout=600s --retries=3 \
+    CMD ["/app/zitadel", "ready"]
+
 ENTRYPOINT ["/app/zitadel"]

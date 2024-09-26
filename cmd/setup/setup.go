@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	_ "embed"
+	"github.com/zitadel/zitadel/internal/socket"
 	"net/http"
 
 	"github.com/spf13/cobra"
@@ -53,7 +54,11 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
-			err := tls.ModeFromFlag(cmd)
+			closeSocket, err := socket.ListenAndIgnore()
+			logging.OnError(err).Fatal("unable to listen on socket")
+			defer closeSocket()
+
+			err = tls.ModeFromFlag(cmd)
 			logging.OnError(err).Fatal("invalid tlsMode")
 
 			err = BindInitProjections(cmd)

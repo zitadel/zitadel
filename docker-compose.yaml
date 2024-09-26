@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  zitadel:
+    restart: 'always'
+    networks:
+      - 'zitadel'
+    image: zitadel:local
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
+    environment:
+      - 'ZITADEL_DATABASE_POSTGRES_HOST=db'
+      - 'ZITADEL_DATABASE_POSTGRES_PORT=5432'
+      - 'ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel'
+      - 'ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel'
+      - 'ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel'
+      - 'ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable'
+      - 'ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=postgres'
+      - 'ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres'
+      - 'ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable'
+      - 'ZITADEL_EXTERNALSECURE=false'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    ports:
+      - '8080:8080'
+
+  db:
+    restart: 'always'
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=zitadel
+    networks:
+      - 'zitadel'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres"]
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+
+networks:
+  zitadel:

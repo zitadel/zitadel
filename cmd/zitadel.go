@@ -28,7 +28,7 @@ var (
 	defaultConfig []byte
 )
 
-func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server) *cobra.Command {
+func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "zitadel",
 		Short: "The ZITADEL CLI lets you interact with ZITADEL",
@@ -53,9 +53,9 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		admin.New(), //is now deprecated, remove later on
 		initialise.New(),
 		setup.New(),
-		start.New(server),
-		start.NewStartFromInit(server),
-		start.NewStartFromSetup(server),
+		start.New(),
+		start.NewStartFromInit(),
+		start.NewStartFromSetup(),
 		mirror.New(&configFiles),
 		key.New(),
 		ready.New(),

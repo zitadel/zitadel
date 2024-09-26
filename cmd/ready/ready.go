@@ -2,14 +2,15 @@ package ready
 
 import (
 	"crypto/tls"
+	"fmt"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/socket"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
 )
 
 func New() *cobra.Command {
@@ -27,6 +28,33 @@ func New() *cobra.Command {
 }
 
 func ready(config *Config) bool {
+	explicitErr := tryToCheckExplicitly(config)
+	if explicitErr == nil {
+		logging.Info("ready check passed")
+		return true
+	}
+	socketErr := expectTrueFromSocket(socket.ReadinessQuery)
+	if socketErr == nil {
+		logging.Info("ready check passed")
+		return true
+	}
+	logging.Warnf("ready check failed: %v", explicitErr)
+	logging.Warnf("ready check failed: %v", socketErr)
+	return false
+}
+
+func expectTrueFromSocket(query socket.SocketRequest) error {
+	resp, err := query.Request()
+	if err != nil {
+		return fmt.Errorf("socket request error: %w", err)
+	}
+	if resp != socket.True {
+		return fmt.Errorf("zitadel process did not respond true to a readiness query")
+	}
+	return nil
+}
+
+func tryToCheckExplicitly(config *Config) error {
 	scheme := "https"
 	if !config.TLS.Enabled {
 		scheme = "http"
@@ -35,13 +63,11 @@ func ready(config *Config) bool {
 	httpClient := http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
 	res, err := httpClient.Get(scheme + "://" + net.JoinHostPort("localhost", strconv.Itoa(int(config.Port))) + "/debug/ready")
 	if err != nil {
-		logging.WithError(err).Warn("ready check failed")
-		return false
+		return fmt.Errorf("url error: %w", err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		logging.WithFields("status", res.StatusCode).Warn("ready check failed")
-		return false
+		return fmt.Errorf("unexpected status code: %d", res.StatusCode)
 	}
-	return true
+	return nil
 }
