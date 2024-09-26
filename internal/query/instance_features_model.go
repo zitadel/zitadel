@@ -69,6 +69,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceWebKeyEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
+			feature_v2.InstanceDisableUserTokenEvent,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -92,6 +93,7 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.TokenExchange = m.system.TokenExchange
 	m.instance.Actions = m.system.Actions
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
+	m.instance.DisableUserTokenEvent = m.system.DisableUserTokenEvent
 	return true
 }
 
@@ -121,6 +123,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.WebKey.set(level, event.Value)
 	case feature.KeyDebugOIDCParentError:
 		features.DebugOIDCParentError.set(level, event.Value)
+	case feature.KeyDisableUserTokenEvent:
+		features.DisableUserTokenEvent.set(level, event.Value)
 	}
 	return nil
 }

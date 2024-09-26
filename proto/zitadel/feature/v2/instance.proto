@@ -72,6 +72,13 @@ message SetInstanceFeaturesRequest{
       description: "Return parent errors to OIDC clients for debugging purposes. Parent errors may contain sensitive data or unwanted details about the system status of zitadel. Only enable if really needed.";
     }
   ];
+
+  optional bool disable_user_token_event = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -155,6 +162,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Return parent errors to OIDC clients for debugging purposes. Parent errors may contain sensitive data or unwanted details about the system status of zitadel. Only enable if really needed.";
+    }
+  ];
+
+  FeatureFlag disable_user_token_event = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
     }
   ];
 }

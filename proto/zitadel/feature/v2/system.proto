@@ -61,6 +61,13 @@ message SetSystemFeaturesRequest{
       description: "Improves performance of specified execution paths.";
     }
   ];
+
+  optional bool disable_user_token_event = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
+    }
+  ];
 }
 
 message SetSystemFeaturesResponse {
@@ -123,6 +130,13 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";
+    }
+  ];
+
+  FeatureFlag disable_user_token_event = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
     }
   ];
 }
