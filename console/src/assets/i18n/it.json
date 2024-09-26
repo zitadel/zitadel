@@ -1420,6 +1420,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
+        "VERIFYSERVICESID": "SID del servizio di verifica",
+        "VERIFYSERVICESID_DESCRIPTION": "Impostando un SID del servizio di verifica, è possibile utilizzare il servizio Twilio Verify invece del servizio messaggi per la verifica dei numeri di telefono e degli SMS OTP.",
         "ADDED": "Twilio aggiunto con successo.",
         "UPDATED": "Twilio aggiornato correttamente.",
         "REMOVED": "Twilio rimosso con successo.",
