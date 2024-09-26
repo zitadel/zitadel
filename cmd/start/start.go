@@ -184,6 +184,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
+		config.Caches,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,
@@ -454,7 +455,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, user_v3_alpha.CreateServer(commands, keys.User)); err != nil {
+	if err := apis.RegisterService(ctx, user_v3_alpha.CreateServer(commands)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, webkey.CreateServer(commands, queries)); err != nil {

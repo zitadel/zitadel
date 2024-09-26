@@ -6,6 +6,23 @@ ExternalSecure: false
 TLS:
   Enabled: false
 
+Caches:
+  Connectors:
+    Memory:
+      Enabled: true
+      AutoPrune:
+        Interval: 30s
+        TimeOut: 1s
+  Instance:
+    Connector: "memory"
+    MaxAge: 1m
+    LastUsage: 30s
+    Log:
+      Level: info
+      AddSource: true
+      Formatter:
+        Format: text
+
 Quotas:
   Access:
     Enabled: true
@@ -33,7 +50,6 @@ LogStore:
 Projections:
   HandleActiveInstances: 30m
   RequeueEvery: 5s
-  TransactionDuration: 1m
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
