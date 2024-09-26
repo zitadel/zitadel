@@ -18,6 +18,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		TokenExchange:                   req.OidcTokenExchange,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
+		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 	}
 }
 
@@ -32,6 +33,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		Actions:                             featureSourceToFlagPb(&f.Actions),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
+		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 	}
 }
 
@@ -47,6 +49,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		WebKey:                          req.WebKey,
 		DebugOIDCParentError:            req.DebugOidcParentError,
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
+		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 	}
 }
 
@@ -63,6 +66,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		WebKey:                              featureSourceToFlagPb(&f.WebKey),
 		DebugOidcParentError:                featureSourceToFlagPb(&f.DebugOIDCParentError),
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
+		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 	}
 }
 
