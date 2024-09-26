@@ -1974,7 +1974,6 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 	columns := []handler.Column{
 		handler.NewCol(SAMLIDCol, idpEvent.ID),
 		handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
-		handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
 		handler.NewCol(SAMLKeyCol, idpEvent.Key),
 		handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
 		handler.NewCol(SAMLBindingCol, idpEvent.Binding),
@@ -1983,6 +1982,9 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 	}
 	if idpEvent.NameIDFormat != nil {
 		columns = append(columns, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
+	}
+	if idpEvent.Metadata != nil {
+		columns = append(columns, handler.NewCol(SAMLMetadataCol, idpEvent.Metadata))
 	}
 
 	return handler.NewMultiStatement(
