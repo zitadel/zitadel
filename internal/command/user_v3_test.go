@@ -871,6 +871,109 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 		},
 		{
+			"user created, phone to verify (external)",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"verifyServiceSid",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectPush(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"+41791234567",
+						),
+						schemauser.NewPhoneCodeAddedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							nil,
+							0,
+							false,
+							"id",
+						),
+					),
+				),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+					Phone: &Phone{
+						Number: "+41791234567",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "id1",
+				},
+			},
+		},
+		{
 			"user created, full verified",
 			fields{
 				eventstore: expectEventstore(
@@ -3238,6 +3341,84 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 							time.Hour*1,
 							false,
 							"",
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ChangeSchemaUser{
+					ID: "user1",
+					Phone: &Phone{
+						Number: "+41791234567",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"user updated, phone to verify (external)",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"verifyServiceSid",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectPush(
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
+							&schemauser.NewAggregate("user1", "org1").Aggregate,
+							"+41791234567",
+						),
+						schemauser.NewPhoneCodeAddedEvent(context.Background(),
+							&schemauser.NewAggregate("user1", "org1").Aggregate,
+							nil,
+							0,
+							false,
+							"id",
 						),
 					),
 				),

@@ -777,7 +777,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			expectContent := "We received a password reset request. Please use the button below to reset your password. (Code ) If you didn't ask for this mail, please ignore it."
 			w.messageSMS = &messages.SMS{
 				SenderPhoneNumber:    "senderNumber",
-				RecipientPhoneNumber: lastPhone, /// TODO: !!!!
+				RecipientPhoneNumber: lastPhone,
 				Content:              expectContent,
 			}
 			expectTemplateQueries(queries, givenTemplate)

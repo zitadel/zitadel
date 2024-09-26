@@ -1124,6 +1124,111 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "add human (with phone), ok (external)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"verifiyServiceSid",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectPush(
+						newAddHumanEvent("$plain$x$password", false, true, "+41711234567", language.English),
+						user.NewHumanEmailVerifiedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+						),
+						user.NewHumanPhoneCodeAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							nil,
+							0,
+							"id",
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher:          mockPasswordHasher("x"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phonecode", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Password:  "password",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
+					},
+					Phone: Phone{
+						Number: "+41711234567",
+					},
+					PreferredLanguage: language.English,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
 			name: "add human (with verified phone), ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -2268,7 +2373,83 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					ResourceOwner: "org1",
 				},
 			},
-		}, {
+		},
+		{
+			name: "change human phone, ok (external)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"verifyServiceSid",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPhoneChangedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"+41791234567",
+						),
+						user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							nil,
+							0,
+							false,
+							"id",
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Phone: &Phone{
+						Number: "+41791234567",
+					},
+				},
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
 			name: "change human phone verified, not allowed",
 			fields: fields{
 				eventstore: expectEventstore(

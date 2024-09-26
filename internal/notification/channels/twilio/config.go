@@ -24,8 +24,17 @@ func (t *Config) VerifyCode(verificationID, code string) error {
 	checkParams.SetVerificationSid(verificationID)
 	checkParams.SetCode(code)
 	resp, err := client.VerifyV2.CreateVerificationCheck(t.VerifyServiceSID, checkParams)
-	if err != nil || resp.Status == nil || *resp.Status != "approved" {
-		return zerrors.ThrowInvalidArgument(err, "TWILI-JK3ta", "Errors.Code.Invalid")
+	if err != nil || resp.Status == nil {
+		return zerrors.ThrowInvalidArgument(err, "TWILI-JK3ta", "Errors.User.Code.NotFound")
 	}
-	return nil
+	switch *resp.Status {
+	case "approved":
+		return nil
+	case "expired":
+		return zerrors.ThrowInvalidArgument(nil, "TWILI-SF3ba", "Errors.User.Code.Expired")
+	case "max_attempts_reached":
+		return zerrors.ThrowInvalidArgument(nil, "TWILI-Ok39a", "Errors.User.Code.NotFound")
+	default:
+		return zerrors.ThrowInvalidArgument(nil, "TWILI-Skwe4", "Errors.User.Code.Invalid")
+	}
 }

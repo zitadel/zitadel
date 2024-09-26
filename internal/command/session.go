@@ -12,7 +12,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -38,7 +37,7 @@ type SessionCommands struct {
 	totpAlg         crypto.EncryptionAlgorithm
 	otpAlg          crypto.EncryptionAlgorithm
 	createCode      encryptedCodeWithDefaultFunc
-	createPhoneCode func(ctx context.Context, filter preparation.FilterToQueryReducer, secretGeneratorType domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error)
+	createPhoneCode encryptedCodeGeneratorWithDefaultFunc
 	createToken     func(sessionID string) (id string, token string, err error)
 	getCodeVerifier func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	now             func() time.Time

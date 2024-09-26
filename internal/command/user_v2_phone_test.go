@@ -1215,6 +1215,96 @@ func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
 			},
 		},
 		{
+			name: "resend (external)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil,
+								0,
+								true,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"verifyServiceSid",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							nil,
+							0,
+							false,
+							"id",
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("a", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
+			},
+			args: args{
+				userID:     "user1",
+				returnCode: false,
+			},
+			want: &domain.Phone{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				PhoneNumber:     "+41791234567",
+				IsPhoneVerified: false,
+			},
+		},
+		{
 			name: "return code",
 			fields: fields{
 				eventstore: expectEventstore(

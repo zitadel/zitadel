@@ -23,5 +23,5 @@ func (notify Notify) SendPasswordCode(ctx context.Context, user *query.NotifyUse
 	}
 	args := make(map[string]interface{})
 	args["Code"] = code
-	return notify(url, args, domain.PasswordResetMessageType, true) // TODO: !!!
+	return notify(url, args, domain.PasswordResetMessageType, true)
 }
