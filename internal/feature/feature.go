@@ -15,6 +15,9 @@ const (
 	KeyActions
 	KeyImprovedPerformance
 	KeyWebKey
+	KeyDebugOIDCParentError           // not used in this release yet, but would break in the future otherwise
+	KeyOIDCSingleV1SessionTermination // not used in this release yet, but would break in the future otherwise
+	KeyDisableUserTokenEvent
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -39,6 +42,7 @@ type Features struct {
 	Actions                         bool                      `json:"actions,omitempty"`
 	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
 	WebKey                          bool                      `json:"web_key,omitempty"`
+	DisableUserTokenEvent           bool                      `json:"disable_user_token_event,omitempty"`
 }
 
 type ImprovedPerformanceType int32

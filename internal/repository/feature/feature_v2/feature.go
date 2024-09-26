@@ -19,6 +19,7 @@ var (
 	SystemTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTokenExchange)
 	SystemActionsEventType                         = setEventTypeFromFeature(feature.LevelSystem, feature.KeyActions)
 	SystemImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyImprovedPerformance)
+	SystemDisableUserTokenEvent                    = setEventTypeFromFeature(feature.LevelSystem, feature.KeyDisableUserTokenEvent)
 
 	InstanceResetEventType                           = resetEventTypeFromFeature(feature.LevelInstance)
 	InstanceLoginDefaultOrgEventType                 = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
@@ -29,6 +30,7 @@ var (
 	InstanceActionsEventType                         = setEventTypeFromFeature(feature.LevelInstance, feature.KeyActions)
 	InstanceImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyImprovedPerformance)
 	InstanceWebKeyEventType                          = setEventTypeFromFeature(feature.LevelInstance, feature.KeyWebKey)
+	InstanceDisableUserTokenEvent                    = setEventTypeFromFeature(feature.LevelInstance, feature.KeyDisableUserTokenEvent)
 )
 
 const (

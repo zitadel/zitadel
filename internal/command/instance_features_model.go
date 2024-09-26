@@ -68,6 +68,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceActionsEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceWebKeyEventType,
+			feature_v2.InstanceDisableUserTokenEvent,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -104,6 +105,9 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyWebKey:
 		v := value.(bool)
 		features.WebKey = &v
+	case feature.KeyDisableUserTokenEvent:
+		v := value.(bool)
+		features.DisableUserTokenEvent = &v
 	}
 }
 
@@ -118,5 +122,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Actions, f.Actions, feature_v2.InstanceActionsEventType)
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.InstanceImprovedPerformanceEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.WebKey, f.WebKey, feature_v2.InstanceWebKeyEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DisableUserTokenEvent, f.DisableUserTokenEvent, feature_v2.InstanceDisableUserTokenEvent)
 	return cmds
 }

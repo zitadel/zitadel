@@ -65,6 +65,13 @@ message SetInstanceFeaturesRequest{
       description: "Enable the webkey/v3alpha API. The first time this feature is enabled, web keys are generated and activated.";
     }
   ];
+
+  optional bool disable_user_token_event = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -141,6 +148,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enable the webkey/v3alpha API. The first time this feature is enabled, web keys are generated and activated.";
+    }
+  ];
+
+  FeatureFlag disable_user_token_event = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
     }
   ];
 }

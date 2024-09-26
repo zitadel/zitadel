@@ -17,6 +17,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		Actions:                         req.Actions,
 		TokenExchange:                   req.OidcTokenExchange,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
+		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 	}
 }
 
@@ -30,6 +31,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		Actions:                             featureSourceToFlagPb(&f.Actions),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
+		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 	}
 }
 
@@ -43,6 +45,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		Actions:                         req.Actions,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 		WebKey:                          req.WebKey,
+		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 	}
 }
 
@@ -57,6 +60,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		Actions:                             featureSourceToFlagPb(&f.Actions),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		WebKey:                              featureSourceToFlagPb(&f.WebKey),
+		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 	}
 }
 
