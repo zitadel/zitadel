@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/profile"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/oauth2"
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -98,13 +99,19 @@ func TestServer_JWTProfile(t *testing.T) {
 			tokenSource, err := profile.NewJWTProfileTokenSourceFromKeyFileData(CTX, Instance.OIDCIssuer(), tt.keyData, tt.scope)
 			require.NoError(t, err)
 
-			tokens, err := tokenSource.TokenCtx(CTX)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			require.NotNil(t, tokens)
+			var tokens *oauth2.Token
+			require.EventuallyWithT(
+				t, func(collect *assert.CollectT) {
+					tokens, err = tokenSource.TokenCtx(CTX)
+					if tt.wantErr {
+						assert.Error(collect, err)
+						return
+					}
+					assert.NoError(collect, err)
+					assert.NotNil(collect, tokens)
+				},
+				time.Minute, time.Second,
+			)
 
 			provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), "", "", redirectURI, tt.scope)
 			require.NoError(t, err)

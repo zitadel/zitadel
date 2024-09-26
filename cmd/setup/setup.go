@@ -311,6 +311,7 @@ func initProjections(
 		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
+		config.Caches,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,
