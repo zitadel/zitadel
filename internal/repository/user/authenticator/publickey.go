@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	jwtPrefix      = eventPrefix + "jwt."
-	JWTCreatedType = jwtPrefix + "created"
-	JWTDeletedType = jwtPrefix + "deleted"
+	publicKeyPrefix      = eventPrefix + "pk."
+	PublicKeyCreatedType = publicKeyPrefix + "created"
+	PublicKeyDeletedType = publicKeyPrefix + "deleted"
 )
 
-type JWTCreatedEvent struct {
+type PublicKeyCreatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	UserID string `json:"userID"`
@@ -24,34 +24,34 @@ type JWTCreatedEvent struct {
 	TriggeredAtOrigin string    `json:"triggerOrigin,omitempty"`
 }
 
-func (e *JWTCreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+func (e *PublicKeyCreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *JWTCreatedEvent) Payload() interface{} {
+func (e *PublicKeyCreatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *JWTCreatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *PublicKeyCreatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func (e *JWTCreatedEvent) TriggerOrigin() string {
+func (e *PublicKeyCreatedEvent) TriggerOrigin() string {
 	return e.TriggeredAtOrigin
 }
 
-func NewJWTCreatedEvent(
+func NewPublicKeyCreatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userID string,
 	expirationDate time.Time,
 	publicKey []byte,
-) *JWTCreatedEvent {
-	return &JWTCreatedEvent{
+) *PublicKeyCreatedEvent {
+	return &PublicKeyCreatedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			JWTCreatedType,
+			PublicKeyCreatedType,
 		),
 		UserID:            userID,
 		ExpirationDate:    expirationDate,
@@ -60,31 +60,31 @@ func NewJWTCreatedEvent(
 	}
 }
 
-type JWTDeletedEvent struct {
+type PublicKeyDeletedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 }
 
-func (e *JWTDeletedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+func (e *PublicKeyDeletedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
-func (e *JWTDeletedEvent) Payload() interface{} {
+func (e *PublicKeyDeletedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *JWTDeletedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *PublicKeyDeletedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewJWTDeletedEvent(
+func NewPublicKeyDeletedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-) *JWTDeletedEvent {
-	return &JWTDeletedEvent{
+) *PublicKeyDeletedEvent {
+	return &PublicKeyDeletedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			JWTDeletedType,
+			PublicKeyDeletedType,
 		),
 	}
 }

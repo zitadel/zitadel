@@ -8,8 +8,8 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, PasswordCreatedType, eventstore.GenericEventMapper[PasswordCreatedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, PasswordCodeAddedType, eventstore.GenericEventMapper[PasswordCodeAddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, PasswordDeletedType, eventstore.GenericEventMapper[PasswordDeletedEvent])
-	eventstore.RegisterFilterEventMapper(AggregateType, JWTCreatedType, eventstore.GenericEventMapper[JWTCreatedEvent])
-	eventstore.RegisterFilterEventMapper(AggregateType, JWTDeletedType, eventstore.GenericEventMapper[JWTDeletedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, PublicKeyCreatedType, eventstore.GenericEventMapper[PublicKeyCreatedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, PublicKeyDeletedType, eventstore.GenericEventMapper[PublicKeyDeletedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, PATCreatedType, eventstore.GenericEventMapper[PATCreatedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, PATDeletedType, eventstore.GenericEventMapper[PATDeletedEvent])
 }
