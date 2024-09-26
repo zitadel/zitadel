@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"fmt"
 	"io"
 	"time"
 
@@ -32,9 +33,9 @@ func eventstoreCmd() *cobra.Command {
 		Long: `mirrors the eventstore of an instance from one database to another
 ZITADEL needs to be initialized and set up with the --for-mirror flag
 Migrate only copies events2 and unique constraints`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			config := mustNewMigrationConfig(viper.GetViper())
-			copyEventstore(cmd.Context(), config)
+			return copyEventstore(cmd.Context(), config)
 		},
 	}
 
@@ -44,17 +45,26 @@ Migrate only copies events2 and unique constraints`,
 	return cmd
 }
 
-func copyEventstore(ctx context.Context, config *Migration) {
+func copyEventstore(ctx context.Context, config *Migration) error {
 	sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect to source database")
+	if err != nil {
+		return fmt.Errorf("unable to connect to source database: %w", err)
+	}
 	defer sourceClient.Close()
 
 	destClient, err := db.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect to destination database")
+	if err != nil {
+		return fmt.Errorf("unable to connect to destination database: %w", err)
+	}
 	defer destClient.Close()
 
-	copyEvents(ctx, sourceClient, destClient, config.EventBulkSize)
-	copyUniqueConstraints(ctx, sourceClient, destClient)
+	if err = copyEvents(ctx, sourceClient, destClient, config.EventBulkSize); err != nil {
+		return fmt.Errorf("unable to copy events: %w", err)
+	}
+	if err = copyUniqueConstraints(ctx, sourceClient, destClient); err != nil {
+		return fmt.Errorf("unable to copy unique constraints: %w", err)
+	}
+	return nil
 }
 
 func positionQuery(db *db.DB) string {
@@ -69,19 +79,21 @@ func positionQuery(db *db.DB) string {
 	}
 }
 
-func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
+func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) error {
 	start := time.Now()
 	reader, writer := io.Pipe()
-
 	migrationID, err := id.SonyFlakeGenerator().Next()
-	logging.OnError(err).Fatal("unable to generate migration id")
-
+	if err != nil {
+		return fmt.Errorf("unable to generate migration id: %w", err)
+	}
 	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire source connection")
-
+	if err != nil {
+		return fmt.Errorf("unable to acquire source connection: %w", err)
+	}
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
-
+	if err != nil {
+		return fmt.Errorf("unable to acquire dest connection: %w", err)
+	}
 	sourceES := eventstore.NewEventstoreFromOne(postgres.New(source, &postgres.Config{
 		MaxRetries: 3,
 	}))
@@ -90,11 +102,14 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	}))
 
 	previousMigration, err := queryLastSuccessfulMigration(ctx, destinationES, source.DatabaseName())
-	logging.OnError(err).Fatal("unable to query latest successful migration")
-
+	if err != nil {
+		return fmt.Errorf("unable to query latest successful migration: %w", err)
+	}
 	maxPosition, err := writeMigrationStart(ctx, sourceES, migrationID, dest.DatabaseName())
-	logging.OnError(err).Fatal("unable to write migration started event")
+	if err != nil {
+		return fmt.Errorf("unable to write migration start: %w", err)
 
+	}
 	logging.WithFields("from", previousMigration.Position, "to", maxPosition).Info("start event migration")
 
 	nextPos := make(chan bool, 1)
@@ -102,7 +117,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	errs := make(chan error, 3)
 
 	go func() {
-		err := sourceConn.Raw(func(driverConn interface{}) error {
+		goErr := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			nextPos <- true
 			var i uint32
@@ -139,7 +154,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 		})
 		writer.Close()
 		close(nextPos)
-		errs <- err
+		errs <- goErr
 	}()
 
 	// generate next position for
@@ -147,41 +162,41 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 		defer close(pos)
 		for range nextPos {
 			var position float64
-			err := dest.QueryRowContext(
+			goErr := dest.QueryRowContext(
 				ctx,
 				func(row *sql.Row) error {
 					return row.Scan(&position)
 				},
 				positionQuery(dest),
 			)
-			if err != nil {
+			if goErr != nil {
 				errs <- zerrors.ThrowUnknown(err, "MIGRA-kMyPH", "unable to query next position")
 				return
 			}
 			pos <- position
 		}
 	}()
-
 	var eventCount int64
 	errs <- destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
-		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM STDIN")
+		tag, cbErr := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM STDIN")
 		eventCount = tag.RowsAffected()
-		if err != nil {
-			return zerrors.ThrowUnknown(err, "MIGRA-DTHi7", "unable to copy events into destination")
+		if cbErr != nil {
+			return zerrors.ThrowUnknown(cbErr, "MIGRA-DTHi7", "unable to copy events into destination")
 		}
 
 		return nil
 	})
-
 	close(errs)
-	writeCopyEventsDone(ctx, destinationES, migrationID, source.DatabaseName(), maxPosition, errs)
-
+	if err = writeCopyEventsDone(ctx, destinationES, migrationID, source.DatabaseName(), maxPosition, errs); err != nil {
+		return fmt.Errorf("unable to write migration done: %w", err)
+	}
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
+	return nil
 }
 
-func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position decimal.Decimal, errs <-chan error) {
+func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position decimal.Decimal, errs <-chan error) error {
 	joinedErrs := make([]error, 0, len(errs))
 	for err := range errs {
 		joinedErrs = append(joinedErrs, err)
@@ -190,25 +205,31 @@ func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, sou
 
 	if err != nil {
 		logging.WithError(err).Error("unable to mirror events")
-		err := writeMigrationFailed(ctx, es, id, source, err)
-		logging.OnError(err).Fatal("unable to write failed event")
-		return
+		err = writeMigrationFailed(ctx, es, id, source, err)
+		if err != nil {
+			return fmt.Errorf("unable to write failed event: %w", err)
+		}
+		return nil
 	}
 
-	err = writeMigrationSucceeded(ctx, es, id, source, position)
-	logging.OnError(err).Fatal("unable to write failed event")
+	if err = writeMigrationSucceeded(ctx, es, id, source, position); err != nil {
+		return fmt.Errorf("unable to write succeeded event: %w", err)
+	}
+	return nil
 }
 
-func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
+func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) error {
 	start := time.Now()
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
 
 	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire source connection")
+	if err != nil {
+		return fmt.Errorf("unable to acquire source connection: %w", err)
+	}
 
 	go func() {
-		err := sourceConn.Raw(func(driverConn interface{}) error {
+		errs <- sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			var stmt database.Statement
 			stmt.WriteString("COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints ")
@@ -219,11 +240,12 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 			writer.Close()
 			return err
 		})
-		errs <- err
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
+	if err != nil {
+		return fmt.Errorf("unable to acquire dest connection: %w", err)
+	}
 
 	var eventCount int64
 	err = destConn.Raw(func(driverConn interface{}) error {
@@ -234,18 +256,22 @@ func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 			stmt.WriteString("DELETE FROM eventstore.unique_constraints ")
 			stmt.WriteString(instanceClause())
 
-			_, err := conn.Exec(ctx, stmt.String())
-			if err != nil {
-				return err
+			_, cbErr := conn.Exec(ctx, stmt.String())
+			if cbErr != nil {
+				return cbErr
 			}
 		}
 
-		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.unique_constraints FROM stdin")
+		tag, cbErr := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.unique_constraints FROM stdin")
 		eventCount = tag.RowsAffected()
-
-		return err
+		return cbErr
 	})
-	logging.OnError(err).Fatal("unable to copy unique constraints to destination")
-	logging.OnError(<-errs).Fatal("unable to copy unique constraints from source")
+	if err != nil {
+		return fmt.Errorf("unable to copy unique constraints to destination: %w", err)
+	}
+	if err = <-errs; err != nil {
+		return fmt.Errorf("unable to copy unique constraints from source: %w", err)
+	}
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("unique constraints migrated")
+	return nil
 }

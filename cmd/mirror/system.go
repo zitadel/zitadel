@@ -3,6 +3,7 @@ package mirror
 import (
 	"context"
 	_ "embed"
+	"fmt"
 	"io"
 	"time"
 
@@ -22,9 +23,9 @@ func systemCmd() *cobra.Command {
 		Long: `mirrors the system tables of ZITADEL from one database to another
 ZITADEL needs to be initialized
 Only keys and assets are mirrored`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			config := mustNewMigrationConfig(viper.GetViper())
-			copySystem(cmd.Context(), config)
+			return copySystem(cmd.Context(), config)
 		},
 	}
 
@@ -33,24 +34,35 @@ Only keys and assets are mirrored`,
 	return cmd
 }
 
-func copySystem(ctx context.Context, config *Migration) {
+func copySystem(ctx context.Context, config *Migration) error {
 	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
-	logging.OnError(err).Fatal("unable to connect to source database")
+	if err != nil {
+		return fmt.Errorf("unable to connect to source database: %w", err)
+	}
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect to destination database")
+	if err != nil {
+		return fmt.Errorf("unable to connect to destination database: %w", err)
+	}
 	defer destClient.Close()
 
-	copyAssets(ctx, sourceClient, destClient)
-	copyEncryptionKeys(ctx, sourceClient, destClient)
+	if err = copyAssets(ctx, sourceClient, destClient); err != nil {
+		return fmt.Errorf("unable to copy assets: %w", err)
+	}
+	if err = copyEncryptionKeys(ctx, sourceClient, destClient); err != nil {
+		return fmt.Errorf("unable to copy encryption keys: %w", err)
+	}
+	return nil
 }
 
-func copyAssets(ctx context.Context, source, dest *database.DB) {
+func copyAssets(ctx context.Context, source, dest *database.DB) error {
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire source connection")
+	if err != nil {
+		return fmt.Errorf("unable to acquire source connection: %w", err)
+	}
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
@@ -68,7 +80,9 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
+	if err != nil {
+		return fmt.Errorf("unable to acquire dest connection: %w", err)
+	}
 	defer destConn.Close()
 
 	var eventCount int64
@@ -87,16 +101,23 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 
 		return err
 	})
-	logging.OnError(err).Fatal("unable to copy assets to destination")
-	logging.OnError(<-errs).Fatal("unable to copy assets from source")
+	if err != nil {
+		return fmt.Errorf("unable to copy assets to destination: %w", err)
+	}
+	if err = <-errs; err != nil {
+		return fmt.Errorf("unable to copy assets from source: %w", err)
+	}
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("assets migrated")
+	return nil
 }
 
-func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
+func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) error {
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire source connection")
+	if err != nil {
+		return fmt.Errorf("unable to acquire source connection: %w", err)
+	}
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
@@ -114,7 +135,9 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
+	if err != nil {
+		return fmt.Errorf("unable to acquire dest connection: %w", err)
+	}
 	defer destConn.Close()
 
 	var eventCount int64
@@ -133,7 +156,12 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 
 		return err
 	})
-	logging.OnError(err).Fatal("unable to copy encryption keys to destination")
-	logging.OnError(<-errs).Fatal("unable to copy encryption keys from source")
+	if err != nil {
+		return fmt.Errorf("unable to copy encryption keys to destination: %w", err)
+	}
+	if err = <-errs; err != nil {
+		return fmt.Errorf("unable to copy encryption keys from source: %w", err)
+	}
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("encryption keys migrated")
+	return nil
 }

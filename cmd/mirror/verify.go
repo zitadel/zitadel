@@ -33,17 +33,31 @@ var schemas = []string{
 	"system",
 }
 
-func verifyMigration(ctx context.Context, config *Migration) {
+func verifyMigration(ctx context.Context, config *Migration) error {
 	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
-	logging.OnError(err).Fatal("unable to connect to source database")
+	if err != nil {
+		return fmt.Errorf("unable to connect to source database: %w", err)
+	}
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect to destination database")
+	if err != nil {
+		return fmt.Errorf("unable to connect to destination database: %w", err)
+	}
 	defer destClient.Close()
 
 	for _, schema := range schemas {
-		for _, table := range append(getTables(ctx, destClient, schema), getViews(ctx, destClient, schema)...) {
+		var tables []string
+		tables, err = getTables(ctx, destClient, schema)
+		if err != nil {
+			return fmt.Errorf("unable to get tables: %w", err)
+		}
+		var views []string
+		views, err = getViews(ctx, destClient, schema)
+		if err != nil {
+			return fmt.Errorf("unable to get views: %w", err)
+		}
+		for _, table := range append(tables, views...) {
 			sourceCount := countEntries(ctx, sourceClient, table)
 			destCount := countEntries(ctx, destClient, table)
 
@@ -55,10 +69,11 @@ func verifyMigration(ctx context.Context, config *Migration) {
 			entry.WithField("diff", destCount-sourceCount).Info("unequal count")
 		}
 	}
+	return nil
 }
 
-func getTables(ctx context.Context, dest *database.DB, schema string) (tables []string) {
-	err := dest.QueryContext(
+func getTables(ctx context.Context, dest *database.DB, schema string) (tables []string, err error) {
+	err = dest.QueryContext(
 		ctx,
 		func(r *sql.Rows) error {
 			for r.Next() {
@@ -73,12 +88,14 @@ func getTables(ctx context.Context, dest *database.DB, schema string) (tables []
 		"SELECT CONCAT(schemaname, '.', tablename) FROM pg_tables WHERE schemaname = $1",
 		schema,
 	)
-	logging.WithFields("schema", schema).OnError(err).Fatal("unable to query tables")
-	return tables
+	if err != nil {
+		return nil, fmt.Errorf("unable to query tables: %w", err)
+	}
+	return tables, nil
 }
 
-func getViews(ctx context.Context, dest *database.DB, schema string) (tables []string) {
-	err := dest.QueryContext(
+func getViews(ctx context.Context, dest *database.DB, schema string) (tables []string, err error) {
+	err = dest.QueryContext(
 		ctx,
 		func(r *sql.Rows) error {
 			for r.Next() {
@@ -93,8 +110,10 @@ func getViews(ctx context.Context, dest *database.DB, schema string) (tables []s
 		"SELECT CONCAT(schemaname, '.', viewname) FROM pg_views WHERE schemaname = $1",
 		schema,
 	)
-	logging.WithFields("schema", schema).OnError(err).Fatal("unable to query views")
-	return tables
+	if err != nil {
+		return nil, fmt.Errorf("unable to query views in schema %s: %w", schema, err)
+	}
+	return tables, nil
 }
 
 func countEntries(ctx context.Context, client *database.DB, table string) (count int) {

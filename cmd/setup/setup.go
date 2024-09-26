@@ -4,7 +4,7 @@ import (
 	"context"
 	"embed"
 	_ "embed"
-	"github.com/zitadel/zitadel/internal/socket"
+	"github.com/zitadel/zitadel/internal/unixsocket"
 	"net/http"
 
 	"github.com/spf13/cobra"
@@ -54,7 +54,7 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
-			closeSocket, err := socket.ListenAndIgnore()
+			closeSocket, err := unixsocket.ListenAndIgnore()
 			logging.OnError(err).Fatal("unable to listen on socket")
 			defer closeSocket()
 

@@ -3,6 +3,7 @@ package mirror
 import (
 	"context"
 	_ "embed"
+	"fmt"
 	"io"
 	"time"
 
@@ -33,23 +34,29 @@ Only auth requests are mirrored`,
 	return cmd
 }
 
-func copyAuth(ctx context.Context, config *Migration) {
+func copyAuth(ctx context.Context, config *Migration) error {
 	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
-	logging.OnError(err).Fatal("unable to connect to source database")
+	if err != nil {
+		return fmt.Errorf("unable to connect to source database: %w", err)
+	}
 	defer sourceClient.Close()
 
 	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect to destination database")
+	if err != nil {
+		return fmt.Errorf("unable to connect to destination database: %w", err)
+	}
 	defer destClient.Close()
 
-	copyAuthRequests(ctx, sourceClient, destClient)
+	return copyAuthRequests(ctx, sourceClient, destClient)
 }
 
-func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
+func copyAuthRequests(ctx context.Context, source, dest *database.DB) error {
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire connection")
+	if err != nil {
+		return fmt.Errorf("unable to acquire connection: %w", err)
+	}
 	defer sourceConn.Close()
 
 	r, w := io.Pipe()
@@ -66,7 +73,9 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire connection")
+	if err != nil {
+		return fmt.Errorf("unable to acquire connection: %w", err)
+	}
 	defer destConn.Close()
 
 	var affected int64
@@ -85,7 +94,12 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 
 		return err
 	})
-	logging.OnError(err).Fatal("unable to copy auth requests to destination")
-	logging.OnError(<-errs).Fatal("unable to copy auth requests from source")
+	if err != nil {
+		return fmt.Errorf("unable to copy auth requests to destination: %w", err)
+	}
+	if err = <-errs; err != nil {
+		return fmt.Errorf("unable to copy auth requests from source: %w", err)
+	}
 	logging.WithFields("took", time.Since(start), "count", affected).Info("auth requests migrated")
+	return nil
 }

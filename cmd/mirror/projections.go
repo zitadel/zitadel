@@ -3,6 +3,7 @@ package mirror
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -50,13 +51,13 @@ func projectionsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "projections",
 		Short: "calls the projections synchronously",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			config := mustNewProjectionsConfig(viper.GetViper())
-
 			masterKey, err := key.MasterKey(cmd)
-			logging.OnError(err).Fatal("unable to read master key")
-
-			projections(cmd.Context(), config, masterKey)
+			if err != nil {
+				return fmt.Errorf("unable to read master key: %w", err)
+			}
+			return projections(cmd.Context(), config, masterKey)
 		},
 	}
 
@@ -100,24 +101,30 @@ func projections(
 	ctx context.Context,
 	config *ProjectionsConfig,
 	masterKey string,
-) {
+) error {
 	start := time.Now()
-
 	client, err := database.Connect(config.Destination, false, dialect.DBPurposeQuery)
-	logging.OnError(err).Fatal("unable to connect to database")
-
+	if err != nil {
+		return fmt.Errorf("unable to connect to database: %w", err)
+	}
 	keyStorage, err := crypto_db.NewKeyStorage(client, masterKey)
-	logging.OnError(err).Fatal("cannot start key storage")
-
+	if err != nil {
+		return fmt.Errorf("unable to start key storage: %w", err)
+	}
 	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
-	logging.OnError(err).Fatal("unable to read encryption keys")
-
+	if err != nil {
+		return fmt.Errorf("unable to read encryption keys: %w", err)
+	}
 	staticStorage, err := config.AssetStorage.NewStorage(client.DB)
-	logging.OnError(err).Fatal("unable create static storage")
+	if err != nil {
+		return fmt.Errorf("unable create static storage: %w", err)
+	}
 
 	config.Eventstore.Querier = old_es.NewCRDB(client)
 	esPusherDBClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect eventstore push client")
+	if err != nil {
+		return fmt.Errorf("unable to connect eventstore push client: %w", err)
+	}
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	es := eventstore.NewEventstore(config.Eventstore)
 	esV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(client, &es_v4_pg.Config{
@@ -149,11 +156,14 @@ func projections(
 		config.SystemAPIUsers,
 		false,
 	)
-	logging.OnError(err).Fatal("unable to start queries")
+	if err != nil {
+		return fmt.Errorf("unable to start queries: %w", err)
+	}
 
 	authZRepo, err := authz.Start(queries, es, client, keys.OIDC, config.ExternalSecure)
-	logging.OnError(err).Fatal("unable to start authz repo")
-
+	if err != nil {
+		return fmt.Errorf("unable to start authz repo: %w", err)
+	}
 	webAuthNConfig := &webauthn.Config{
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
@@ -185,13 +195,14 @@ func projections(
 		config.OIDC.DefaultRefreshTokenIdleExpiration,
 		config.DefaultInstance.SecretGenerators,
 	)
-	logging.OnError(err).Fatal("unable to start commands")
-
+	if err != nil {
+		return fmt.Errorf("unable to start commands: %w", err)
+	}
 	err = projection.Create(ctx, client, es, config.Projections, keys.OIDC, keys.SAML, config.SystemAPIUsers)
-	logging.OnError(err).Fatal("unable to start projections")
-
+	if err != nil {
+		return fmt.Errorf("unable to create projections: %w", err)
+	}
 	i18n.MustLoadSupportedLanguagesFromDir()
-
 	notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
@@ -214,13 +225,17 @@ func projections(
 	config.Auth.Spooler.Client = client
 	config.Auth.Spooler.Eventstore = es
 	authView, err := auth_view.StartView(config.Auth.Spooler.Client, keys.OIDC, queries, config.Auth.Spooler.Eventstore)
-	logging.OnError(err).Fatal("unable to start auth view")
+	if err != nil {
+		return fmt.Errorf("unable to start auth view: %w", err)
+	}
 	auth_handler.Register(ctx, config.Auth.Spooler, authView, queries)
 
 	config.Admin.Spooler.Client = client
 	config.Admin.Spooler.Eventstore = es
 	adminView, err := admin_view.StartView(config.Admin.Spooler.Client)
-	logging.OnError(err).Fatal("unable to start admin view")
+	if err != nil {
+		return fmt.Errorf("unable to start admin view: %w", err)
+	}
 
 	admin_handler.Register(ctx, config.Admin.Spooler, adminView, staticStorage)
 
@@ -248,6 +263,7 @@ func projections(
 	close(failedInstances)
 
 	logging.WithFields("took", time.Since(start)).Info("projections executed")
+	return nil
 }
 
 func execProjections(ctx context.Context, instances <-chan string, failedInstances chan<- string, wg *sync.WaitGroup) {

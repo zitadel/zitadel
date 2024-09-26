@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/socket"
+	"github.com/zitadel/zitadel/internal/unixsocket"
 	"math"
 	"net/http"
 	"os"
@@ -621,16 +621,16 @@ func checkExisting(values []string) func(string) bool {
 }
 
 func listenSocket(ctx context.Context) (chan<- *Server, func() error, error) {
-	return socket.Listen(func(server *Server, request socket.SocketRequest) (socket.SocketResponse, error) {
+	return unixsocket.Listen(func(server *Server, request unixsocket.SocketRequest) (unixsocket.SocketResponse, error) {
 		switch request {
-		case socket.ReadinessQuery:
+		case unixsocket.ReadinessQuery:
 			if readyErr := server.Queries.Health(ctx); readyErr != nil {
 				logging.Warnf("readiness check failed: %v", readyErr)
-				return socket.False, nil
+				return unixsocket.False, nil
 			}
-			return socket.True, nil
+			return unixsocket.True, nil
 		default:
-			return socket.UnknownRequest, fmt.Errorf("unknown request: %d", request)
+			return unixsocket.UnknownRequest, fmt.Errorf("unknown request: %d", request)
 		}
 	})
 }

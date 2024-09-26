@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/socket"
+	"github.com/zitadel/zitadel/internal/unixsocket"
 	"net"
 	"net/http"
 	"os"
@@ -33,7 +33,7 @@ func ready(config *Config) bool {
 		logging.Info("ready check passed")
 		return true
 	}
-	socketErr := expectTrueFromSocket(socket.ReadinessQuery)
+	socketErr := expectTrueFromSocket(unixsocket.ReadinessQuery)
 	if socketErr == nil {
 		logging.Info("ready check passed")
 		return true
@@ -43,12 +43,12 @@ func ready(config *Config) bool {
 	return false
 }
 
-func expectTrueFromSocket(query socket.SocketRequest) error {
+func expectTrueFromSocket(query unixsocket.SocketRequest) error {
 	resp, err := query.Request()
 	if err != nil {
 		return fmt.Errorf("socket request error: %w", err)
 	}
-	if resp != socket.True {
+	if resp != unixsocket.True {
 		return fmt.Errorf("zitadel process did not respond true to a readiness query")
 	}
 	return nil

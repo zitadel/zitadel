@@ -6,10 +6,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/socket"
-
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
+	"github.com/zitadel/zitadel/internal/unixsocket"
 )
 
 var (
@@ -72,7 +71,7 @@ func InitAll(ctx context.Context, config *Config) {
 }
 
 func initialise(config database.Config, steps ...func(*database.DB) error) error {
-	closeSocket, err := socket.ListenAndIgnore()
+	closeSocket, err := unixsocket.ListenAndIgnore()
 	logging.OnError(err).Fatal("unable to listen on socket")
 	defer closeSocket()
 
