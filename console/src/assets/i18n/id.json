@@ -1294,6 +1294,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Nomor Pengirim",
+        "VERIFYSERVICESID": "ID Layanan Verifikasi",
+        "VERIFYSERVICESID_DESCRIPTION": "Menetapkan ID Layanan Verifikasi memungkinkan penggunaan Layanan Verifikasi Twilio alih-alih Layanan Pesan untuk verifikasi nomor telepon dan SMS OTP.",
         "ADDED": "Twilio menambahkan dengan sukses.",
         "UPDATED": "Twilio berhasil diperbarui.",
         "REMOVED": "Twilio dihapus",
