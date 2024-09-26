@@ -68,6 +68,13 @@ message SetSystemFeaturesRequest{
       description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
     }
   ];
+
+  optional bool disable_user_token_event = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
+    }
+  ];
 }
 
 message SetSystemFeaturesResponse {
@@ -137,6 +144,13 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
+    }
+  ];
+
+  FeatureFlag disable_user_token_event = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
     }
   ];
 }
