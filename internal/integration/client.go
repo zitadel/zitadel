@@ -830,6 +830,30 @@ func (i *Instance) RemoveAuthenticatorPassword(ctx context.Context, orgID string
 	return user
 }
 
+func (i *Instance) AddAuthenticatorPublicKey(ctx context.Context, orgID string, userID string, pk []byte) *user_v3alpha.AddPublicKeyResponse {
+	user, err := i.Client.UserV3Alpha.AddPublicKey(ctx, &user_v3alpha.AddPublicKeyRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		PublicKey: &user_v3alpha.SetPublicKey{
+			Type: &user_v3alpha.SetPublicKey_PublicKey{PublicKey: &user_v3alpha.ProvidedPublicKey{
+				PublicKey: pk,
+			}},
+		},
+	})
+	logging.OnError(err).Fatal("create pk")
+	return user
+}
+
+func (i *Instance) RemoveAuthenticatorPublicKey(ctx context.Context, orgID string, userid, id string) *user_v3alpha.RemovePublicKeyResponse {
+	user, err := i.Client.UserV3Alpha.RemovePublicKey(ctx, &user_v3alpha.RemovePublicKeyRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userid,
+		PublicKeyId:  id,
+	})
+	logging.OnError(err).Fatal("remove pk")
+	return user
+}
+
 func (i *Instance) UpdateSchemaUserEmail(ctx context.Context, orgID string, userID string, email string) *user_v3alpha.SetContactEmailResponse {
 	user, err := i.Client.UserV3Alpha.SetContactEmail(ctx, &user_v3alpha.SetContactEmailRequest{
 		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},

@@ -207,3 +207,14 @@ func existingSchema(ctx context.Context, c *Commands, resourceOwner, id string) 
 	}
 	return writeModel, nil
 }
+
+func existingSchemaWithAuthenticator(ctx context.Context, c *Commands, resourceOwner, id string, authenticator domain.AuthenticatorType) (*UserSchemaWriteModel, error) {
+	writeModel, err := c.getSchemaWriteModelByID(ctx, resourceOwner, id)
+	if err != nil {
+		return nil, err
+	}
+	if !writeModel.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists")
+	}
+	return writeModel, nil
+}

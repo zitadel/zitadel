@@ -38,7 +38,6 @@ func (c *Commands) AddUsername(ctx context.Context, username *AddUsername) (*dom
 	if err != nil {
 		return nil, err
 	}
-
 	events, err := writeModel.NewCreate(ctx, username.IsOrgSpecific, username.Username)
 	if err != nil {
 		return nil, err
@@ -46,7 +45,7 @@ func (c *Commands) AddUsername(ctx context.Context, username *AddUsername) (*dom
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }
 
-func (c *Commands) DeleteUsername(ctx context.Context, resourceOwner, userID, id string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) DeleteUsername(ctx context.Context, resourceOwner, userID, id string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-J6ybG5WZiy", "Errors.IDMissing")
 	}
@@ -58,7 +57,6 @@ func (c *Commands) DeleteUsername(ctx context.Context, resourceOwner, userID, id
 	if err != nil {
 		return nil, err
 	}
-
 	events, err := writeModel.NewDelete(ctx)
 	if err != nil {
 		return nil, err
