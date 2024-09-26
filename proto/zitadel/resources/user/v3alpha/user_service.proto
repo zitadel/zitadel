@@ -1392,7 +1392,7 @@ message SetContactPhoneRequest {
 message SetContactPhoneResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
   // The phone verification code will be set if a contact phone was set with a return_code verification option.
-  optional string email_code = 3 [
+  optional string verification_code = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"SKJd342k\"";
     }

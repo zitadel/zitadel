@@ -14,10 +14,11 @@ type AddTwilioConfig struct {
 	ResourceOwner string
 	ID            string
 
-	Description  string
-	SID          string
-	Token        string
-	SenderNumber string
+	Description      string
+	SID              string
+	Token            string
+	SenderNumber     string
+	VerifyServiceSID string
 }
 
 func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *AddTwilioConfig) (err error) {
@@ -52,6 +53,7 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *AddTwilioConf
 			config.SID,
 			config.SenderNumber,
 			token,
+			config.VerifyServiceSID,
 		),
 	)
 	if err != nil {
@@ -66,10 +68,11 @@ type ChangeTwilioConfig struct {
 	ResourceOwner string
 	ID            string
 
-	Description  *string
-	SID          *string
-	Token        *string
-	SenderNumber *string
+	Description      *string
+	SID              *string
+	Token            *string
+	SenderNumber     *string
+	VerifyServiceSID *string
 }
 
 func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, config *ChangeTwilioConfig) (err error) {
@@ -92,7 +95,9 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, config *ChangeTwil
 		config.ID,
 		config.Description,
 		config.SID,
-		config.SenderNumber)
+		config.SenderNumber,
+		config.VerifyServiceSID,
+	)
 	if err != nil {
 		return err
 	}
@@ -329,4 +334,14 @@ func (c *Commands) getSMSConfig(ctx context.Context, instanceID, id string) (_ *
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+// getActiveSMSConfig returns the last activated SMS configuration
+func (c *Commands) getActiveSMSConfig(ctx context.Context, instanceID string) (_ *IAMSMSConfigWriteModel, err error) {
+	writeModel := NewIAMSMSLastActivatedConfigWriteModel(instanceID)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return c.getSMSConfig(ctx, instanceID, writeModel.activeID)
 }
