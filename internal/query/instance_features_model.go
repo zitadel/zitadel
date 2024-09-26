@@ -67,6 +67,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceActionsEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
+			feature_v2.InstanceDisableUserTokenEvent,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -90,6 +91,7 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.TokenExchange = m.system.TokenExchange
 	m.instance.Actions = m.system.Actions
 	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
+	m.instance.DisableUserTokenEvent = m.system.DisableUserTokenEvent
 	return true
 }
 
@@ -115,6 +117,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
+	case feature.KeyDisableUserTokenEvent:
+		features.DisableUserTokenEvent.set(level, event.Value)
 	}
 	return nil
 }

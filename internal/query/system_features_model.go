@@ -57,6 +57,7 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemActionsEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
+			feature_v2.SystemDisableUserTokenEvent,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -88,6 +89,8 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
+	case feature.KeyDisableUserTokenEvent:
+		features.DisableUserTokenEvent.set(level, event.Value)
 	}
 	return nil
 }
