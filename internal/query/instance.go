@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -206,22 +208,35 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 
 	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
-	instance, scan := scanAuthzInstance()
-	// in case public domain is the same as the instance domain, we do not need to check it
-	// and can empty it for the check
-	if instanceDomain == publicDomain {
-		publicDomain = ""
+
+	instance, ok := q.caches.instance.Get(ctx, instanceIndexByHost, instanceDomain)
+	if ok {
+		return instance, instance.checkDomain(instanceDomain, publicDomain)
 	}
-	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain, publicDomain)
-	return instance, err
+	instance, scan := scanAuthzInstance()
+	if err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain); err != nil {
+		return nil, err
+	}
+	q.caches.instance.Set(ctx, instance)
+
+	return instance, instance.checkDomain(instanceDomain, publicDomain)
 }
 
 func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	instance, ok := q.caches.instance.Get(ctx, instanceIndexByID, id)
+	if ok {
+		return instance, nil
+	}
+
 	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
 	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
+	if err == nil {
+		q.caches.instance.Set(ctx, instance)
+	}
 	return instance, err
 }
 
@@ -431,6 +446,8 @@ type authzInstance struct {
 	block               *bool
 	auditLogRetention   *time.Duration
 	features            feature.Features
+	externalDomains     database.TextArray[string]
+	trustedDomains      database.TextArray[string]
 }
 
 type csp struct {
@@ -485,6 +502,31 @@ func (i *authzInstance) Features() feature.Features {
 	return i.features
 }
 
+var errPublicDomain = "public domain %q not trusted"
+
+func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
+	// in case public domain is empty, or the same as the instance domain, we do not need to check it
+	if publicDomain == "" || instanceDomain == publicDomain {
+		return nil
+	}
+	if !slices.Contains(i.trustedDomains, publicDomain) {
+		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.IAM.NotFound")
+	}
+	return nil
+}
+
+// Keys implements [cache.Entry]
+func (i *authzInstance) Keys(index instanceIndex) []string {
+	switch index {
+	case instanceIndexByID:
+		return []string{i.id}
+	case instanceIndexByHost:
+		return i.externalDomains
+	default:
+		return nil
+	}
+}
+
 func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 	instance := &authzInstance{}
 	return instance, func(row *sql.Row) error {
@@ -509,6 +551,8 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			&auditLogRetention,
 			&block,
 			&features,
+			&instance.externalDomains,
+			&instance.trustedDomains,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
 			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
@@ -534,3 +578,30 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		return nil
 	}
 }
+
+func (c *Caches) registerInstanceInvalidation() {
+	invalidate := cacheInvalidationFunc(c.instance, instanceIndexByID, getAggregateID)
+	projection.InstanceProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceDomainProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceFeatureProjection.RegisterCacheInvalidation(invalidate)
+	projection.InstanceTrustedDomainProjection.RegisterCacheInvalidation(invalidate)
+	projection.SecurityPolicyProjection.RegisterCacheInvalidation(invalidate)
+
+	// limits uses own aggregate ID, invalidate using resource owner.
+	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
+	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
+
+	// System feature update should invalidate all instances, so Truncate the cache.
+	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {
+		err := c.instance.Truncate(ctx)
+		logging.OnError(err).Warn("cache truncate failed")
+	})
+}
+
+type instanceIndex int16
+
+//go:generate enumer -type instanceIndex
+const (
+	instanceIndexByID instanceIndex = iota
+	instanceIndexByHost
+)

@@ -9,9 +9,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -335,8 +337,8 @@ func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceOwner st
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
 	}
-	codeAddedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo) eventstore.Command {
-		return user.NewHumanOTPSMSCodeAddedEvent(ctx, aggregate, code, expiry, info)
+	codeAddedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo, generatorID string) eventstore.Command {
+		return user.NewHumanOTPSMSCodeAddedEvent(ctx, aggregate, code, expiry, info, generatorID)
 	}
 	return c.sendHumanOTP(
 		ctx,
@@ -347,15 +349,16 @@ func (c *Commands) HumanSendOTPSMS(ctx context.Context, userID, resourceOwner st
 		domain.SecretGeneratorTypeOTPSMS,
 		c.defaultSecretGenerators.OTPSMS,
 		codeAddedEvent,
+		c.newPhoneCode,
 	)
 }
 
-func (c *Commands) HumanOTPSMSCodeSent(ctx context.Context, userID, resourceOwner string) (err error) {
+func (c *Commands) HumanOTPSMSCodeSent(ctx context.Context, userID, resourceOwner string, generatorInfo *senders.CodeGeneratorInfo) (err error) {
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
 	}
 	codeSentEvent := func(ctx context.Context, aggregate *eventstore.Aggregate) eventstore.Command {
-		return user.NewHumanOTPSMSCodeSentEvent(ctx, aggregate)
+		return user.NewHumanOTPSMSCodeSentEvent(ctx, aggregate, generatorInfo)
 	}
 	return c.humanOTPSent(ctx, userID, resourceOwner, smsWriteModel, codeSentEvent)
 }
@@ -379,6 +382,7 @@ func (c *Commands) HumanCheckOTPSMS(ctx context.Context, userID, code, resourceO
 		writeModel,
 		c.eventstore.FilterToQueryReducer,
 		c.userEncryption,
+		c.phoneCodeVerifier,
 		succeededEvent,
 		failedEvent,
 	)
@@ -467,8 +471,12 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner 
 	smsWriteModel := func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error) {
 		return c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	}
-	codeAddedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo) eventstore.Command {
+	codeAddedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo, _ string) eventstore.Command {
 		return user.NewHumanOTPEmailCodeAddedEvent(ctx, aggregate, code, expiry, info)
+	}
+	generateCode := func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error) {
+		code, err := c.newEncryptedCodeWithDefault(ctx, filter, typ, alg, defaultConfig)
+		return code, "", err
 	}
 	return c.sendHumanOTP(
 		ctx,
@@ -479,6 +487,7 @@ func (c *Commands) HumanSendOTPEmail(ctx context.Context, userID, resourceOwner 
 		domain.SecretGeneratorTypeOTPEmail,
 		c.defaultSecretGenerators.OTPEmail,
 		codeAddedEvent,
+		generateCode,
 	)
 }
 
@@ -511,6 +520,7 @@ func (c *Commands) HumanCheckOTPEmail(ctx context.Context, userID, code, resourc
 		writeModel,
 		c.eventstore.FilterToQueryReducer,
 		c.userEncryption,
+		nil, // email currently always uses local code checks
 		succeededEvent,
 		failedEvent,
 	)
@@ -529,7 +539,8 @@ func (c *Commands) sendHumanOTP(
 	writeModelByID func(ctx context.Context, userID string, resourceOwner string) (OTPWriteModel, error),
 	secretGeneratorType domain.SecretGeneratorType,
 	defaultSecretGenerator *crypto.GeneratorConfig,
-	codeAddedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo) eventstore.Command,
+	codeAddedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo, generatorID string) eventstore.Command,
+	generateCode func(ctx context.Context, filter preparation.FilterToQueryReducer, secretGeneratorType domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error),
 ) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing")
@@ -541,17 +552,12 @@ func (c *Commands) sendHumanOTP(
 	if !existingOTP.OTPAdded() {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady")
 	}
-	config, err := cryptoGeneratorConfigWithDefault(ctx, c.eventstore.Filter, secretGeneratorType, defaultSecretGenerator) //nolint:staticcheck
-	if err != nil {
-		return err
-	}
-	gen := crypto.NewEncryptionGenerator(*config, c.userEncryption)
-	value, _, err := crypto.NewCode(gen)
+	code, generatorID, err := generateCode(ctx, c.eventstore.Filter, secretGeneratorType, c.userEncryption, defaultSecretGenerator) //nolint:staticcheck
 	if err != nil {
 		return err
 	}
 	userAgg := &user.NewAggregate(userID, resourceOwner).Aggregate
-	_, err = c.eventstore.Push(ctx, codeAddedEvent(ctx, userAgg, value, gen.Expiry(), authRequestDomainToAuthRequestInfo(authRequest)))
+	_, err = c.eventstore.Push(ctx, codeAddedEvent(ctx, userAgg, code.CryptedCode(), code.CodeExpiry(), authRequestDomainToAuthRequestInfo(authRequest), generatorID))
 	return err
 }
 
@@ -583,6 +589,7 @@ func checkOTP(
 	writeModelByID func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error),
 	queryReducer func(ctx context.Context, r eventstore.QueryReducer) error,
 	alg crypto.EncryptionAlgorithm,
+	getCodeVerifier func(ctx context.Context, id string) (senders.CodeGenerator, error),
 	checkSucceededEvent, checkFailedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command,
 ) ([]eventstore.Command, error) {
 	if userID == "" {
@@ -598,12 +605,21 @@ func checkOTP(
 	if !existingOTP.OTPAdded() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady")
 	}
-	if existingOTP.Code() == nil {
+	if existingOTP.Code() == nil && existingOTP.GeneratorID() == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound")
 	}
 	userAgg := &user.NewAggregate(userID, existingOTP.ResourceOwner()).Aggregate
-	verifyErr := crypto.VerifyCode(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, alg)
-
+	verifyErr := verifyCode(
+		ctx,
+		existingOTP.CodeCreationDate(),
+		existingOTP.CodeExpiry(),
+		existingOTP.Code(),
+		existingOTP.GeneratorID(),
+		existingOTP.ProviderVerificationID(),
+		code,
+		alg,
+		getCodeVerifier,
+	)
 	// recheck for additional events (failed OTP checks or locks)
 	recheckErr := queryReducer(ctx, existingOTP)
 	if recheckErr != nil {
