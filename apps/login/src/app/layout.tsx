@@ -1,10 +1,12 @@
 import "@/styles/globals.scss";
-import { AddressBar } from "@/ui/AddressBar";
-import { GlobalNav } from "@/ui/GlobalNav";
-import Theme from "@/ui/Theme";
-import ThemeProvider from "@/ui/ThemeProvider";
+
+import { AddressBar } from "@/components/address-bar";
+import { GlobalNav } from "@/components/global-nav";
+import { Theme } from "@/components/theme";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { Lato } from "next/font/google";
+import { ReactNode } from "react";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
@@ -16,7 +18,7 @@ export const revalidate = 60; // revalidate every minute
 export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   // later only shown with dev mode enabled
   const showNav = process.env.DEBUG === "true";

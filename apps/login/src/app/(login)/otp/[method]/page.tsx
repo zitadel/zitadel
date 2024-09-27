@@ -1,9 +1,9 @@
+import { Alert } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { LoginOTP } from "@/components/login-otp";
+import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import LoginOTP from "@/ui/LoginOTP";
-import UserAvatar from "@/ui/UserAvatar";
 
 export default async function Page({
   searchParams,

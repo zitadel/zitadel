@@ -1,3 +1,9 @@
+import { Alert } from "@/components/alert";
+import { BackButton } from "@/components/back-button";
+import { Button, ButtonVariants } from "@/components/button";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { TotpRegister } from "@/components/totp-register";
+import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,
@@ -5,12 +11,6 @@ import {
   getBrandingSettings,
   registerTOTP,
 } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import BackButton from "@/ui/BackButton";
-import { Button, ButtonVariants } from "@/ui/Button";
-import DynamicTheme from "@/ui/DynamicTheme";
-import TOTPRegister from "@/ui/TOTPRegister";
-import UserAvatar from "@/ui/UserAvatar";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -129,7 +129,7 @@ export default async function Page({
               Scan the QR Code or navigate to the URL manually.
             </p>
             <div>
-              <TOTPRegister
+              <TotpRegister
                 uri={totpResponse.uri as string}
                 secret={totpResponse.secret as string}
                 loginName={loginName}
@@ -137,7 +137,7 @@ export default async function Page({
                 authRequestId={authRequestId}
                 organization={organization}
                 checkAfter={checkAfter === "true"}
-              ></TOTPRegister>
+              ></TotpRegister>
             </div>{" "}
           </>
         ) : (

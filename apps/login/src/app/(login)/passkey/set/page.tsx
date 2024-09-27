@@ -1,9 +1,9 @@
+import { Alert, AlertType } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { RegisterPasskey } from "@/components/register-passkey";
+import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings } from "@/lib/zitadel";
-import Alert, { AlertType } from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import RegisterPasskey from "@/ui/RegisterPasskey";
-import UserAvatar from "@/ui/UserAvatar";
 
 export default async function Page({
   searchParams,

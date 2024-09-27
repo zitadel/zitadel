@@ -1,6 +1,6 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { getBrandingSettings, settingsService } from "@/lib/zitadel";
-import DynamicTheme from "@/ui/DynamicTheme";
-import { SignInWithIDP } from "@/ui/SignInWithIDP";
 import { makeReqCtx } from "@zitadel/client/v2";
 
 function getIdentityProviders(orgId?: string) {
@@ -36,12 +36,12 @@ export default async function Page({
         </p>
 
         {identityProviders && (
-          <SignInWithIDP
+          <SignInWithIdp
             host={host}
             identityProviders={identityProviders}
             authRequestId={authRequestId}
             organization={organization}
-          ></SignInWithIDP>
+          ></SignInWithIdp>
         )}
       </div>
     </DynamicTheme>

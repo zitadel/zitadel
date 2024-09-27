@@ -1,7 +1,7 @@
+import { Alert } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { VerifyEmailForm } from "@/components/verify-email-form";
 import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import VerifyEmailForm from "@/ui/VerifyEmailForm";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 export default async function Page({ searchParams }: { searchParams: any }) {

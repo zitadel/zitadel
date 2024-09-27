@@ -1,7 +1,7 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { SessionsList } from "@/components/sessions-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getBrandingSettings, listSessions } from "@/lib/zitadel";
-import DynamicTheme from "@/ui/DynamicTheme";
-import SessionsList from "@/ui/SessionsList";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 

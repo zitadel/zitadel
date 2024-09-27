@@ -1,11 +1,11 @@
 "use client";
 
-import { Boundary } from "@/ui/Boundary";
-import { Button } from "@/ui/Button";
-import React from "react";
+import { Boundary } from "@/components/boundary";
+import { Button } from "@/components/button";
+import { useEffect } from "react";
 
 export default function Error({ error, reset }: any) {
-  React.useEffect(() => {
+  useEffect(() => {
     console.log("logging error:", error);
   }, [error]);
 

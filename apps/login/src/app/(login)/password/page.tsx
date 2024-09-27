@@ -1,9 +1,9 @@
+import { Alert } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { PasswordForm } from "@/components/password-form";
+import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import PasswordForm from "@/ui/PasswordForm";
-import UserAvatar from "@/ui/UserAvatar";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 export default async function Page({

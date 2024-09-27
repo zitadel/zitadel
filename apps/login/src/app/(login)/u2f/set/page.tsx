@@ -1,9 +1,9 @@
+import { Alert } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { RegisterU2f } from "@/components/register-u2f";
+import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import RegisterU2F from "@/ui/RegisterU2F";
-import UserAvatar from "@/ui/UserAvatar";
 
 export default async function Page({
   searchParams,
@@ -48,7 +48,7 @@ export default async function Page({
         )}
 
         {sessionFactors?.id && (
-          <RegisterU2F
+          <RegisterU2f
             loginName={loginName}
             sessionId={sessionFactors.id}
             organization={organization}
