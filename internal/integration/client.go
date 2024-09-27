@@ -854,6 +854,26 @@ func (i *Instance) RemoveAuthenticatorPublicKey(ctx context.Context, orgID strin
 	return user
 }
 
+func (i *Instance) AddAuthenticatorPersonalAccessToken(ctx context.Context, orgID string, userID string) *user_v3alpha.AddPersonalAccessTokenResponse {
+	user, err := i.Client.UserV3Alpha.AddPersonalAccessToken(ctx, &user_v3alpha.AddPersonalAccessTokenRequest{
+		Organization:        &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:                  userID,
+		PersonalAccessToken: &user_v3alpha.SetPersonalAccessToken{},
+	})
+	logging.OnError(err).Fatal("create pat")
+	return user
+}
+
+func (i *Instance) RemoveAuthenticatorPersonalAccessToken(ctx context.Context, orgID string, userid, id string) *user_v3alpha.RemovePersonalAccessTokenResponse {
+	user, err := i.Client.UserV3Alpha.RemovePersonalAccessToken(ctx, &user_v3alpha.RemovePersonalAccessTokenRequest{
+		Organization:          &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:                    userid,
+		PersonalAccessTokenId: id,
+	})
+	logging.OnError(err).Fatal("remove pat")
+	return user
+}
+
 func (i *Instance) UpdateSchemaUserEmail(ctx context.Context, orgID string, userID string, email string) *user_v3alpha.SetContactEmailResponse {
 	user, err := i.Client.UserV3Alpha.SetContactEmail(ctx, &user_v3alpha.SetContactEmailRequest{
 		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},

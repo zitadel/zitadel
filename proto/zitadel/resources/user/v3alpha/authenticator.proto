@@ -29,6 +29,8 @@ message Authenticators {
   repeated PublicKey public_keys = 7;
   // A list of the user's linked identity providers (IDPs).
   repeated IdentityProvider identity_providers = 8;
+  // A list of the user's personal access tokens.
+  repeated PersonalAccessToken personal_access_tokens = 9;
 }
 
 message Username {
@@ -236,10 +238,27 @@ message IdentityProvider {
   ];
 }
 
+message PersonalAccessToken {
+  // ID is the read-only unique identifier of the personal access token.
+  string personal_access_token_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+  zitadel.resources.object.v3alpha.Details details = 2;
+  // After the expiration date, the key will no longer be usable for authentication.
+  google.protobuf.Timestamp expiration_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"3019-04-01T08:45:00.000000Z\"";
+    }
+  ];
+}
+
 message SetAuthenticators {
   repeated SetUsername usernames = 1;
   SetPassword password = 2;
-  SetPublicKey public_key = 3;
+  repeated SetPublicKey public_key = 3;
+  repeated SetPersonalAccessToken personal_access_token = 4;
 }
 
 message SetUsername {
@@ -347,6 +366,14 @@ message ProvidedPublicKey {
   ];
 }
 
+message SetPersonalAccessToken {
+  // After the expiration date, the key will no longer be usable for authentication.
+  optional google.protobuf.Timestamp expiration_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"3019-04-01T08:45:00.000000Z\"";
+    }
+  ];
+}
 
 message SendPasswordResetEmail {
   // Optionally set a url_template, which will be used in the password reset mail

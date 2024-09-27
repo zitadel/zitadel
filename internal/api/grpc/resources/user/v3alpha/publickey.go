@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"time"
 
 	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
@@ -26,10 +27,15 @@ func (s *Server) AddPublicKey(ctx context.Context, req *user.AddPublicKeyRequest
 }
 
 func addPublicKeyRequestToAddPublicKey(req *user.AddPublicKeyRequest) *command.AddPublicKey {
+	expDate := time.Time{}
+	if req.GetPublicKey().GetExpirationDate() != nil {
+		expDate = req.GetPublicKey().GetExpirationDate().AsTime()
+	}
 	return &command.AddPublicKey{
-		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
-		UserID:        req.GetId(),
-		PublicKey:     req.GetPublicKey().GetPublicKey().GetPublicKey(),
+		ResourceOwner:  organizationToUpdateResourceOwner(req.Organization),
+		UserID:         req.GetId(),
+		PublicKey:      req.GetPublicKey().GetPublicKey().GetPublicKey(),
+		ExpirationDate: expDate,
 	}
 }
 
