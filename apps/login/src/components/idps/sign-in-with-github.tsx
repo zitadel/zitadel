@@ -1,27 +1,21 @@
 "use client";
 
-import { ReactNode, forwardRef } from "react";
-import { IdpButtonClasses, SignInWithIdentityProviderProps } from "./classes";
+import { forwardRef } from "react";
+import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 export const SignInWithGithub = forwardRef<
   HTMLButtonElement,
   SignInWithIdentityProviderProps
->(
-  ({ children, className = "", name = "", ...props }, ref): ReactNode => (
-    <button
-      type="button"
-      ref={ref}
-      className={`${IdpButtonClasses} ${className}`}
-      {...props}
-    >
-      <div className="h-8 w-8 mx-2 flex items-center justify-center">
+>(function SignInWithGithub(props, ref) {
+  const { children, name, ...restProps } = props;
+  return (
+    <BaseButton {...restProps} ref={ref}>
+      <div className="mx-2 my-2 flex items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="1024"
-          height="1024"
           fill="none"
           viewBox="0 0 1024 1024"
-          className="hidden dark:block"
+          className="h-8 w-8 hidden dark:block"
         >
           <path
             fill="#fafafa"
@@ -32,11 +26,9 @@ export const SignInWithGithub = forwardRef<
         </svg>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="1024"
-          height="1024"
           fill="none"
           viewBox="0 0 1024 1024"
-          className="block dark:hidden"
+          className="h-8 w-8 block dark:hidden"
         >
           <path
             fill="#1B1F23"
@@ -51,8 +43,6 @@ export const SignInWithGithub = forwardRef<
       ) : (
         <span className="ml-4">{name ? name : "Sign in with GitHub"}</span>
       )}
-    </button>
-  ),
-);
-
-SignInWithGithub.displayName = "SignInWithGithub";
+    </BaseButton>
+  );
+});

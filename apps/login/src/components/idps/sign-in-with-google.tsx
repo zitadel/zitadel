@@ -1,19 +1,15 @@
 "use client";
 
-import { ReactNode, forwardRef } from "react";
-import { IdpButtonClasses, SignInWithIdentityProviderProps } from "./classes";
+import { forwardRef } from "react";
+import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 export const SignInWithGoogle = forwardRef<
   HTMLButtonElement,
   SignInWithIdentityProviderProps
->(
-  ({ children, className = "", name = "", ...props }, ref): ReactNode => (
-    <button
-      type="button"
-      ref={ref}
-      className={`${IdpButtonClasses} ${className}`}
-      {...props}
-    >
+>(function SignInWithGoogle(props, ref) {
+  const { children, name, ...restProps } = props;
+  return (
+    <BaseButton {...restProps} ref={ref}>
       <div className="h-12 w-12 flex items-center justify-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -57,8 +53,6 @@ export const SignInWithGoogle = forwardRef<
       ) : (
         <span className="ml-4">{name ? name : "Sign in with Google"}</span>
       )}
-    </button>
-  ),
-);
-
-SignInWithGoogle.displayName = "SignInWithGoogle";
+    </BaseButton>
+  );
+});

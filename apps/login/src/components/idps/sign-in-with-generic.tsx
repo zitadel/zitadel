@@ -1,25 +1,21 @@
 "use client";
 
-import { ReactNode, forwardRef } from "react";
-import { IdpButtonClasses, SignInWithIdentityProviderProps } from "./classes";
+import { forwardRef } from "react";
+import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 export const SignInWithGeneric = forwardRef<
   HTMLButtonElement,
   SignInWithIdentityProviderProps
->(
-  (
-    { children, className = "h-[50px] pl-20", name = "", ...props },
-    ref,
-  ): ReactNode => (
-    <button
-      type="button"
-      ref={ref}
-      className={`${IdpButtonClasses} ${className}`}
-      {...props}
-    >
-      {children ? children : <span className="">{name}</span>}
-    </button>
-  ),
-);
-
-SignInWithGeneric.displayName = "SignInWithGeneric";
+>(function SignInWithGeneric(props, ref) {
+  const {
+    children,
+    name = "",
+    className = "h-[50px] pl-20",
+    ...restProps
+  } = props;
+  return (
+    <BaseButton {...restProps} ref={ref} className={className}>
+      {children ? children : <span>{name}</span>}
+    </BaseButton>
+  );
+});

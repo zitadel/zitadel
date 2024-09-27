@@ -1,19 +1,15 @@
 "use client";
 
-import { ReactNode, forwardRef } from "react";
-import { IdpButtonClasses, SignInWithIdentityProviderProps } from "./classes";
+import { forwardRef } from "react";
+import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
 export const SignInWithApple = forwardRef<
   HTMLButtonElement,
   SignInWithIdentityProviderProps
->(
-  ({ children, className = "", name = "", ...props }, ref): ReactNode => (
-    <button
-      type="button"
-      ref={ref}
-      className={`${IdpButtonClasses} ${className}`}
-      {...props}
-    >
+>(function SignInWithApple(props, ref) {
+  const { children, name, ...restProps } = props;
+  return (
+    <BaseButton {...restProps} ref={ref}>
       <div className="h-12 w-12 flex items-center justify-center">
         <div className="h-6 w-6">
           <svg viewBox="0 0 170 170" fill="currentColor">
@@ -27,8 +23,6 @@ export const SignInWithApple = forwardRef<
       ) : (
         <span className="ml-4">{name ? name : "Sign in with Apple"}</span>
       )}
-    </button>
-  ),
-);
-
-SignInWithApple.displayName = "SignInWithApple";
+    </BaseButton>
+  );
+});
