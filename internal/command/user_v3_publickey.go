@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -12,35 +13,47 @@ type AddPublicKey struct {
 	ResourceOwner string
 	UserID        string
 
+	PublicKey *PublicKey
+}
+
+func (wm *AddPublicKey) GetPrivateKey() []byte {
+	if wm.PublicKey == nil {
+		return nil
+	}
+	return wm.PublicKey.PrivateKey
+}
+
+type PublicKey struct {
 	ExpirationDate time.Time
 	PublicKey      []byte
 	PrivateKey     []byte
 }
 
-func (wm *AddPublicKey) GetExpirationDate() time.Time {
+func (wm *PublicKey) GetExpirationDate() time.Time {
 	return wm.ExpirationDate
 }
 
-func (wm *AddPublicKey) SetExpirationDate(date time.Time) {
+func (wm *PublicKey) SetExpirationDate(date time.Time) {
 	wm.ExpirationDate = date
 }
 
-func (wm *AddPublicKey) SetPublicKey(data []byte) {
+func (wm *PublicKey) SetPublicKey(data []byte) {
 	wm.PublicKey = data
 }
 
-func (wm *AddPublicKey) SetPrivateKey(data []byte) {
+func (wm *PublicKey) SetPrivateKey(data []byte) {
 	wm.PrivateKey = data
 }
 
-func (c *Commands) AddPublicKey(ctx context.Context, pk *AddPublicKey) (*domain.ObjectDetails, error) {
-	if pk.UserID == "" {
+func (c *Commands) AddPublicKey(ctx context.Context, add *AddPublicKey) (*domain.ObjectDetails, error) {
+	if add.UserID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-14sGR7lTaj", "Errors.IDMissing")
 	}
-	schemauser, err := existingSchemaUser(ctx, c, pk.ResourceOwner, pk.UserID)
+	schemauser, err := existingSchemaUser(ctx, c, add.ResourceOwner, add.UserID)
 	if err != nil {
 		return nil, err
 	}
+	add.ResourceOwner = schemauser.ResourceOwner
 
 	_, err = existingSchema(ctx, c, "", schemauser.SchemaID)
 	if err != nil {
@@ -48,26 +61,35 @@ func (c *Commands) AddPublicKey(ctx context.Context, pk *AddPublicKey) (*domain.
 	}
 	// TODO check for possible authenticators
 
-	id, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	writeModel, err := c.getSchemaPublicKeyWM(ctx, schemauser.ResourceOwner, schemauser.AggregateID, id)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(pk.PublicKey) == 0 {
-		if err := domain.SetNewAuthNKeyPair(pk, c.machineKeySize); err != nil {
-			return nil, err
-		}
-	}
-
-	events, err := writeModel.NewCreate(ctx, pk.ExpirationDate, pk.PublicKey)
+	writeModel, events, err := c.addPublicKey(ctx, add.ResourceOwner, add.UserID, add.PublicKey)
 	if err != nil {
 		return nil, err
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
+}
+
+func (c *Commands) addPublicKey(ctx context.Context, resourceOwner, userID string, add *PublicKey) (*PublicKeyV3WriteModel, []eventstore.Command, error) {
+	if add == nil {
+		return nil, nil, nil
+	}
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+	writeModel, err := c.getSchemaPublicKeyWM(ctx, resourceOwner, userID, id)
+	if err != nil {
+		return nil, nil, err
+	}
+	if len(add.PublicKey) == 0 {
+		if err := domain.SetNewAuthNKeyPair(add, c.machineKeySize); err != nil {
+			return nil, nil, err
+		}
+	}
+	events, err := writeModel.NewCreate(ctx, add.ExpirationDate, add.PublicKey)
+	if err != nil {
+		return nil, nil, err
+	}
+	return writeModel, events, nil
 }
 
 func (c *Commands) DeletePublicKey(ctx context.Context, resourceOwner, userID, id string) (*domain.ObjectDetails, error) {

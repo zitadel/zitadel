@@ -19,6 +19,11 @@ type CreateSchemaUser struct {
 	ReturnCodeEmail *string
 	Phone           *Phone
 	ReturnCodePhone *string
+
+	Usernames  []*Username
+	Password   *SchemaUserPassword
+	PublicKeys []*PublicKey
+	PATs       []*PAT
 }
 
 func (s *CreateSchemaUser) Valid() (err error) {
@@ -83,6 +88,34 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser)
 	}
 	if codePhone != "" {
 		user.ReturnCodePhone = &codePhone
+	}
+	for i := range user.Usernames {
+		_, usernameEvents, err := c.addUsername(ctx, writeModel.ResourceOwner, writeModel.AggregateID, user.Usernames[i])
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, usernameEvents...)
+	}
+	if user.Password != nil {
+		_, pwEvents, err := c.setSchemaUserPassword(ctx, writeModel.ResourceOwner, writeModel.AggregateID, nil, user.Password)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, pwEvents...)
+	}
+	for i := range user.PublicKeys {
+		_, pkEvents, err := c.addPublicKey(ctx, writeModel.ResourceOwner, writeModel.AggregateID, user.PublicKeys[i])
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, pkEvents...)
+	}
+	for i := range user.PATs {
+		_, patEvents, err := c.addPAT(ctx, writeModel.ResourceOwner, writeModel.AggregateID, user.PATs[i])
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, patEvents...)
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
 }

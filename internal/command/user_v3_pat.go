@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -18,27 +19,24 @@ type AddPAT struct {
 	ResourceOwner string
 	UserID        string
 
+	PAT *PAT
+}
+
+type PAT struct {
 	ExpirationDate time.Time
-	Scope          []string
+	Scopes         []string
 	Token          string
 }
 
-func (wm *AddPAT) GetExpirationDate() time.Time {
-	return wm.ExpirationDate
-}
-
-func (wm *AddPAT) SetExpirationDate(date time.Time) {
-	wm.ExpirationDate = date
-}
-
-func (c *Commands) AddPAT(ctx context.Context, pat *AddPAT) (*domain.ObjectDetails, error) {
-	if pat.UserID == "" {
+func (c *Commands) AddPAT(ctx context.Context, add *AddPAT) (*domain.ObjectDetails, error) {
+	if add.UserID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-14sGR7lTaj", "Errors.IDMissing")
 	}
-	schemauser, err := existingSchemaUser(ctx, c, pat.ResourceOwner, pat.UserID)
+	schemauser, err := existingSchemaUser(ctx, c, add.ResourceOwner, add.UserID)
 	if err != nil {
 		return nil, err
 	}
+	add.ResourceOwner = schemauser.ResourceOwner
 
 	_, err = existingSchema(ctx, c, "", schemauser.SchemaID)
 	if err != nil {
@@ -46,24 +44,34 @@ func (c *Commands) AddPAT(ctx context.Context, pat *AddPAT) (*domain.ObjectDetai
 	}
 	// TODO check for possible authenticators
 
-	id, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, err
-	}
-	writeModel, err := c.getSchemaPATWM(ctx, schemauser.ResourceOwner, schemauser.AggregateID, id)
-	if err != nil {
-		return nil, err
-	}
-
-	events, err := writeModel.NewCreate(ctx, pat.ExpirationDate, pat.Scope)
-	if err != nil {
-		return nil, err
-	}
-	pat.Token, err = createSchemaUserPAT(c.keyAlgorithm, writeModel.AggregateID, pat.UserID)
+	writeModel, events, err := c.addPAT(ctx, add.ResourceOwner, add.UserID, add.PAT)
 	if err != nil {
 		return nil, err
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
+}
+
+func (c *Commands) addPAT(ctx context.Context, resourceOwner, userID string, add *PAT) (*PATV3WriteModel, []eventstore.Command, error) {
+	if add == nil {
+		return nil, nil, nil
+	}
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+	writeModel, err := c.getSchemaPATWM(ctx, resourceOwner, userID, id)
+	if err != nil {
+		return nil, nil, err
+	}
+	events, err := writeModel.NewCreate(ctx, add.ExpirationDate, add.Scopes)
+	if err != nil {
+		return nil, nil, err
+	}
+	add.Token, err = createSchemaUserPAT(c.keyAlgorithm, writeModel.AggregateID, writeModel.UserID)
+	if err != nil {
+		return nil, nil, err
+	}
+	return writeModel, events, nil
 }
 
 func (c *Commands) DeletePAT(ctx context.Context, resourceOwner, userID, id string) (*domain.ObjectDetails, error) {

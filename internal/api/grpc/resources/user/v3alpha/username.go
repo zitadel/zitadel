@@ -24,11 +24,23 @@ func (s *Server) AddUsername(ctx context.Context, req *user.AddUsernameRequest) 
 }
 
 func addUsernameRequestToAddUsername(req *user.AddUsernameRequest) *command.AddUsername {
+	if req == nil {
+		return nil
+	}
 	return &command.AddUsername{
 		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
 		UserID:        req.GetId(),
-		Username:      req.GetUsername().GetUsername(),
-		IsOrgSpecific: req.GetUsername().GetIsOrganizationSpecific(),
+		Username:      setUsernameToAddUsername(req.GetUsername()),
+	}
+}
+
+func setUsernameToAddUsername(req *user.SetUsername) *command.Username {
+	if req == nil {
+		return nil
+	}
+	return &command.Username{
+		Username:      req.GetUsername(),
+		IsOrgSpecific: req.GetIsOrganizationSpecific(),
 	}
 }
 

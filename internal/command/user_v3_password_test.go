@@ -94,7 +94,8 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID: "user1",
+					UserID:   "user1",
+					Password: &SchemaUserPassword{},
 				},
 			},
 			res{
@@ -108,7 +109,6 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(),
-					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
@@ -116,7 +116,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
 					UserID:   "notexisting",
-					Password: "password",
+					Password: &SchemaUserPassword{Password: "password"},
 				},
 			},
 			res{
@@ -129,8 +129,9 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"no permission, error",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(),
 					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -138,7 +139,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
 					UserID:   "user1",
-					Password: "password",
+					Password: &SchemaUserPassword{Password: "password"},
 				},
 			},
 			res{
@@ -151,8 +152,9 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password added, ok",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(),
 					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					expectFilter(),
 					filterPasswordComplexityPolicyExisting(),
 					expectPush(
 						authenticator.NewPasswordCreatedEvent(
@@ -170,9 +172,11 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:         "user1",
-					Password:       "password",
-					ChangeRequired: false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password",
+						ChangeRequired: false,
+					},
 				},
 			},
 			res{
@@ -185,7 +189,9 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, complexity failed",
 			fields{
 				eventstore: expectEventstore(
-					filterSchemaUserPasswordExisting(),
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					expectFilter(),
 					filterPasswordComplexityPolicyExisting(),
 					expectPush(
 						authenticator.NewPasswordCreatedEvent(
@@ -203,9 +209,11 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:         "user1",
-					Password:       "password",
-					ChangeRequired: false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password",
+						ChangeRequired: false,
+					},
 				},
 			},
 			res{
@@ -218,7 +226,9 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, ok",
 			fields{
 				eventstore: expectEventstore(
-					filterSchemaUserPasswordExisting(),
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					expectFilter(),
 					filterPasswordComplexityPolicyExisting(),
 					expectPush(
 						authenticator.NewPasswordCreatedEvent(
@@ -236,9 +246,11 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:         "user1",
-					Password:       "password",
-					ChangeRequired: false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password",
+						ChangeRequired: false,
+					},
 				},
 			},
 			res{
@@ -251,7 +263,9 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, changeRequired, ok",
 			fields{
 				eventstore: expectEventstore(
-					filterSchemaUserPasswordExisting(),
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					expectFilter(),
 					filterPasswordComplexityPolicyExisting(),
 					expectPush(
 						authenticator.NewPasswordCreatedEvent(
@@ -269,9 +283,11 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:         "user1",
-					Password:       "password",
-					ChangeRequired: true,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password",
+						ChangeRequired: true,
+					},
 				},
 			},
 			res{
@@ -284,7 +300,9 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, encoded, ok",
 			fields{
 				eventstore: expectEventstore(
-					filterSchemaUserPasswordExisting(),
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					expectFilter(),
 					filterPasswordComplexityPolicyExisting(),
 					expectPush(
 						authenticator.NewPasswordCreatedEvent(
@@ -302,10 +320,12 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:              "user1",
-					Password:            "passwordnotused",
-					EncodedPasswordHash: "$plain$x$password2",
-					ChangeRequired:      false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:            "passwordnotused",
+						EncodedPasswordHash: "$plain$x$password2",
+						ChangeRequired:      false,
+					},
 				},
 			},
 			res{
@@ -318,6 +338,8 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, current password, ok",
 			fields{
 				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 					filterSchemaUserPasswordExisting(),
 					filterPasswordComplexityPolicyExisting(),
 					expectPush(
@@ -335,10 +357,14 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:          "user1",
-					Password:        "password2",
-					CurrentPassword: "password",
-					ChangeRequired:  false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						CurrentPassword: "password",
+					},
 				},
 			},
 			res{
@@ -351,6 +377,8 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, current password, ok",
 			fields{
 				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 					filterSchemaUserPasswordExisting(),
 					filterPasswordComplexityPolicyExisting(),
 					expectPush(
@@ -368,10 +396,14 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:          "user1",
-					Password:        "password2",
-					CurrentPassword: "password",
-					ChangeRequired:  false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						CurrentPassword: "password",
+					},
 				},
 			},
 			res{
@@ -383,6 +415,8 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, current password, failed",
 			fields{
 				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 					filterSchemaUserPasswordExisting(),
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
@@ -390,10 +424,14 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:          "user1",
-					Password:        "password2",
-					CurrentPassword: "notreally",
-					ChangeRequired:  false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						CurrentPassword: "notreally",
+					},
 				},
 			},
 			res{
@@ -406,6 +444,8 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, code, ok",
 			fields{
 				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 					expectFilter(
 						eventFromEventPusher(
 							authenticator.NewPasswordCreatedEvent(
@@ -449,10 +489,14 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:           "user1",
-					Password:         "password2",
-					VerificationCode: "code",
-					ChangeRequired:   false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						Code: "code",
+					},
 				},
 			},
 			res{
@@ -465,6 +509,8 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, code, failed",
 			fields{
 				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 					expectFilter(
 						eventFromEventPusher(
 							authenticator.NewPasswordCreatedEvent(
@@ -498,10 +544,14 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:           "user1",
-					Password:         "password2",
-					VerificationCode: "notreally",
-					ChangeRequired:   false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						Code: "notreally",
+					},
 				},
 			},
 			res{
@@ -514,6 +564,8 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			"password set, code, no code",
 			fields{
 				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 					filterSchemaUserPasswordExisting(),
 				),
 				userPasswordHasher: mockPasswordHasher("x"),
@@ -522,10 +574,14 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &SetSchemaUserPassword{
-					UserID:           "user1",
-					Password:         "password2",
-					VerificationCode: "notreally",
-					ChangeRequired:   false,
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						Code: "notreally",
+					},
 				},
 			},
 			res{
@@ -618,7 +674,7 @@ func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
 			"no permission, error",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(),
+					filterSchemaUserPasswordExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},

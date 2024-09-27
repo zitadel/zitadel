@@ -22,19 +22,31 @@ func (s *Server) AddPublicKey(ctx context.Context, req *user.AddPublicKeyRequest
 	return &user.AddPublicKeyResponse{
 		Details:     resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
 		PublicKeyId: details.ID,
-		PrivateKey:  pk.PrivateKey,
+		PrivateKey:  pk.GetPrivateKey(),
 	}, nil
 }
 
 func addPublicKeyRequestToAddPublicKey(req *user.AddPublicKeyRequest) *command.AddPublicKey {
-	expDate := time.Time{}
-	if req.GetPublicKey().GetExpirationDate() != nil {
-		expDate = req.GetPublicKey().GetExpirationDate().AsTime()
+	if req == nil {
+		return nil
 	}
 	return &command.AddPublicKey{
-		ResourceOwner:  organizationToUpdateResourceOwner(req.Organization),
-		UserID:         req.GetId(),
-		PublicKey:      req.GetPublicKey().GetPublicKey().GetPublicKey(),
+		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
+		UserID:        req.GetId(),
+		PublicKey:     setPublicKeyToAddPublicKey(req.GetPublicKey()),
+	}
+}
+
+func setPublicKeyToAddPublicKey(req *user.SetPublicKey) *command.PublicKey {
+	if req == nil {
+		return nil
+	}
+	expDate := time.Time{}
+	if req.GetExpirationDate() != nil {
+		expDate = req.GetExpirationDate().AsTime()
+	}
+	return &command.PublicKey{
+		PublicKey:      req.GetPublicKey().GetPublicKey(),
 		ExpirationDate: expDate,
 	}
 }

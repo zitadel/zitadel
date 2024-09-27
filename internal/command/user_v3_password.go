@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -14,19 +15,22 @@ type SetSchemaUserPassword struct {
 	ResourceOwner string
 	UserID        string
 
+	Verification *SchemaUserPasswordVerification
+	Password     *SchemaUserPassword
+}
+
+type SchemaUserPasswordVerification struct {
+	CurrentPassword string
+	Code            string
+}
+
+type SchemaUserPassword struct {
 	Password            string
 	EncodedPasswordHash string
 	ChangeRequired      bool
-
-	CurrentPassword  string
-	VerificationCode string
 }
 
-func (p *SetSchemaUserPassword) Validate(hasher *crypto.Hasher) (err error) {
-	if p.UserID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-aS3Vz5t6BS", "Errors.IDMissing")
-	}
-
+func (p *SchemaUserPassword) Validate(hasher *crypto.Hasher) (err error) {
 	if p.EncodedPasswordHash != "" {
 		if !hasher.EncodingSupported(p.EncodedPasswordHash) {
 			return zerrors.ThrowInvalidArgument(nil, "COMMAND-oz74onzvqr", "Errors.User.Password.NotSupported")
@@ -35,54 +39,73 @@ func (p *SetSchemaUserPassword) Validate(hasher *crypto.Hasher) (err error) {
 	if p.Password == "" && p.EncodedPasswordHash == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-3klek4sbns", "Errors.User.Password.Empty")
 	}
-
 	return nil
 }
 
-func (c *Commands) SetSchemaUserPassword(ctx context.Context, user *SetSchemaUserPassword) (*domain.ObjectDetails, error) {
-	if err := user.Validate(c.userPasswordHasher); err != nil {
+func (c *Commands) SetSchemaUserPassword(ctx context.Context, set *SetSchemaUserPassword) (*domain.ObjectDetails, error) {
+	if set.UserID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aS3Vz5t6BS", "Errors.IDMissing")
+	}
+	if err := set.Password.Validate(c.userPasswordHasher); err != nil {
 		return nil, err
 	}
-
-	schemaUser := &schemaUserPassword{
-		Create:              true,
-		ResourceOwner:       user.ResourceOwner,
-		UserID:              user.UserID,
-		VerificationCode:    user.VerificationCode,
-		CurrentPassword:     user.CurrentPassword,
-		Password:            user.Password,
-		EncodedPasswordHash: user.EncodedPasswordHash,
-	}
-
-	writeModel, err := c.getSchemaUserPasswordWithVerification(ctx, schemaUser)
+	schemauser, err := existingSchemaUser(ctx, c, set.ResourceOwner, set.UserID)
 	if err != nil {
 		return nil, err
 	}
+	set.ResourceOwner = schemauser.ResourceOwner
 
-	// If password is provided, let's check if is compliant with the policy.
-	// If only a encodedPassword is passed, we can skip this.
-	if user.Password != "" {
-		if err = c.checkPasswordComplexity(ctx, user.Password, writeModel.ResourceOwner); err != nil {
-			return nil, err
-		}
+	_, err = existingSchema(ctx, c, "", schemauser.SchemaID)
+	if err != nil {
+		return nil, err
 	}
+	// TODO check for possible authenticators
 
-	encodedPassword := schemaUser.EncodedPasswordHash
-	if encodedPassword == "" && user.Password != "" {
-		encodedPassword, err = c.userPasswordHasher.Hash(user.Password)
-		if err = convertPasswapErr(err); err != nil {
-			return nil, err
-		}
-	}
-
-	events, err := writeModel.NewCreate(ctx,
-		encodedPassword,
-		user.ChangeRequired,
-	)
+	writeModel, events, err := c.setSchemaUserPassword(ctx, set.ResourceOwner, set.UserID, set.Verification, set.Password)
 	if err != nil {
 		return nil, err
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
+}
+
+func (c *Commands) setSchemaUserPassword(ctx context.Context, resourceOwner, userID string, verification *SchemaUserPasswordVerification, set *SchemaUserPassword) (*PasswordV3WriteModel, []eventstore.Command, error) {
+	if set == nil {
+		return nil, nil, nil
+	}
+	schemaUser := &schemaUserPassword{
+		Set:           true,
+		ResourceOwner: resourceOwner,
+		UserID:        userID,
+		Verification:  verification,
+		NewPassword:   set,
+	}
+	writeModel, err := c.getSchemaUserPasswordWithVerification(ctx, schemaUser)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// If password is provided, let's check if is compliant with the policy.
+	// If only a encodedPassword is passed, we can skip this.
+	if set.Password != "" {
+		if err = c.checkPasswordComplexity(ctx, set.Password, writeModel.ResourceOwner); err != nil {
+			return nil, nil, err
+		}
+	}
+	encodedPassword := schemaUser.NewPassword.EncodedPasswordHash
+	if encodedPassword == "" && set.Password != "" {
+		encodedPassword, err = c.userPasswordHasher.Hash(set.Password)
+		if err = convertPasswapErr(err); err != nil {
+			return nil, nil, err
+		}
+	}
+	events, err := writeModel.NewCreate(ctx,
+		encodedPassword,
+		set.ChangeRequired,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	return writeModel, events, nil
 }
 
 type RequestSchemaUserPasswordReset struct {
@@ -132,13 +155,11 @@ func (c *Commands) DeleteSchemaUserPassword(ctx context.Context, resourceOwner, 
 }
 
 type schemaUserPassword struct {
-	Create              bool
-	ResourceOwner       string
-	UserID              string
-	VerificationCode    string
-	CurrentPassword     string
-	Password            string
-	EncodedPasswordHash string
+	Set           bool
+	ResourceOwner string
+	UserID        string
+	Verification  *SchemaUserPasswordVerification
+	NewPassword   *SchemaUserPassword
 }
 
 func (c *Commands) getSchemaUserPasswordWM(ctx context.Context, resourceOwner, id string) (*PasswordV3WriteModel, error) {
@@ -165,23 +186,21 @@ func (c *Commands) getSchemaUserPasswordWithVerification(ctx context.Context, us
 	if err != nil {
 		return nil, err
 	}
-	if err := writeModel.Exists(); user.Create && err != nil {
-		schemauser, err := existingSchemaUser(ctx, c, user.ResourceOwner, user.UserID)
-		if err != nil {
-			return nil, err
-		}
-		writeModel.ResourceOwner = schemauser.ResourceOwner
+	if err := writeModel.Exists(); !user.Set && err != nil {
+		return nil, err
 	}
 
 	// if no verification is set, the user must have the permission to change the password
 	verification := c.setSchemaUserPasswordWithPermission(writeModel.UserID, writeModel.ResourceOwner)
-	// otherwise check the password code...
-	if user.VerificationCode != "" {
-		verification = c.setSchemaUserPasswordWithVerifyCode(writeModel.CodeCreationDate, writeModel.CodeExpiry, writeModel.Code, user.VerificationCode)
-	}
-	// ...or old password
-	if user.CurrentPassword != "" {
-		verification = c.checkSchemaUserCurrentPassword(user.Password, user.EncodedPasswordHash, user.CurrentPassword, writeModel.EncodedHash)
+	if user.Verification != nil {
+		// otherwise check the password code...
+		if user.Verification.Code != "" {
+			verification = c.setSchemaUserPasswordWithVerifyCode(writeModel.CodeCreationDate, writeModel.CodeExpiry, writeModel.Code, user.Verification.Code)
+		}
+		// ...or old password
+		if user.Verification.CurrentPassword != "" {
+			verification = c.checkSchemaUserCurrentPassword(user.NewPassword.Password, user.NewPassword.EncodedPasswordHash, user.Verification.CurrentPassword, writeModel.EncodedHash)
+		}
 	}
 
 	if verification != nil {
@@ -191,7 +210,7 @@ func (c *Commands) getSchemaUserPasswordWithVerification(ctx context.Context, us
 		}
 		// use the new hash from the verification in case there is one (e.g. existing pw check)
 		if newEncodedPassword != "" {
-			user.EncodedPasswordHash = newEncodedPassword
+			user.NewPassword.EncodedPasswordHash = newEncodedPassword
 		}
 	}
 	return writeModel, nil

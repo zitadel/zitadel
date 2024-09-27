@@ -25,21 +25,32 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *user.AddPerson
 	return &user.AddPersonalAccessTokenResponse{
 		Details:               resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
 		PersonalAccessTokenId: details.ID,
-		PersonalAccessToken:   pat.Token,
+		PersonalAccessToken:   pat.PAT.Token,
 	}, nil
 }
 
 func addPersonalAccessTokenRequestToAddPAT(req *user.AddPersonalAccessTokenRequest) *command.AddPAT {
-	expDate := time.Time{}
-	if req.GetPersonalAccessToken().GetExpirationDate() != nil {
-		expDate = req.GetPersonalAccessToken().GetExpirationDate().AsTime()
+	if req == nil {
+		return nil
 	}
-
 	return &command.AddPAT{
-		ResourceOwner:  organizationToUpdateResourceOwner(req.Organization),
-		UserID:         req.GetId(),
+		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
+		UserID:        req.GetId(),
+		PAT:           setPersonalAccessTokenToAddPAT(req.GetPersonalAccessToken()),
+	}
+}
+
+func setPersonalAccessTokenToAddPAT(set *user.SetPersonalAccessToken) *command.PAT {
+	if set == nil {
+		return nil
+	}
+	expDate := time.Time{}
+	if set.GetExpirationDate() != nil {
+		expDate = set.GetExpirationDate().AsTime()
+	}
+	return &command.PAT{
 		ExpirationDate: expDate,
-		Scope:          []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
+		Scopes:         []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner},
 	}
 }
 

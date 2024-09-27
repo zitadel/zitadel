@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -23,10 +24,12 @@ import (
 
 func TestCommands_CreateSchemaUser(t *testing.T) {
 	type fields struct {
-		eventstore      func(t *testing.T) *eventstore.Eventstore
-		idGenerator     id.Generator
-		checkPermission domain.PermissionCheck
-		newCode         encrypedCodeFunc
+		eventstore         func(t *testing.T) *eventstore.Eventstore
+		idGenerator        id.Generator
+		checkPermission    domain.PermissionCheck
+		newCode            encrypedCodeFunc
+		userPasswordHasher *crypto.Hasher
+		tokenAlg           crypto.EncryptionAlgorithm
 	}
 	type args struct {
 		ctx  context.Context
@@ -698,15 +701,100 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				},
 			},
 		},
+		{
+			"user created, full authenticators",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					filterSchemaExisting(),
+					expectFilter(),
+					expectFilter(),
+					filterPasswordComplexityPolicyExisting(),
+					expectFilter(),
+					expectFilter(),
+					expectPush(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+						authenticator.NewUsernameCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("username1", "org1").Aggregate,
+							"id1",
+							true,
+							"username1",
+						),
+						authenticator.NewPasswordCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("id1", "org1").Aggregate,
+							"id1",
+							"$plain$x$password",
+							false,
+						),
+						authenticator.NewPublicKeyCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("pk1", "org1").Aggregate,
+							"id1",
+							time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+							[]byte("something"),
+						),
+						authenticator.NewPATCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("pat1", "org1").Aggregate,
+							"id1",
+							time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+							[]string{"first", "second", "third"},
+						),
+					),
+				),
+				idGenerator:        mock.NewIDGeneratorExpectIDs(t, "id1", "username1", "pk1", "pat1"),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+				tokenAlg:           crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner: "org1",
+					SchemaID:      "type",
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+					Usernames: []*Username{
+						{Username: "username1", IsOrgSpecific: true},
+					},
+					Password: &SchemaUserPassword{Password: "password"},
+					PublicKeys: []*PublicKey{
+						{PublicKey: []byte("something"), ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC)},
+					},
+					PATs: []*PAT{
+						{Scopes: []string{"first", "second", "third"}, ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC)},
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "id1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:       tt.fields.eventstore(t),
-				idGenerator:      tt.fields.idGenerator,
-				checkPermission:  tt.fields.checkPermission,
-				newEncryptedCode: tt.fields.newCode,
-				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore:         tt.fields.eventstore(t),
+				idGenerator:        tt.fields.idGenerator,
+				checkPermission:    tt.fields.checkPermission,
+				newEncryptedCode:   tt.fields.newCode,
+				userEncryption:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				userPasswordHasher: tt.fields.userPasswordHasher,
+				keyAlgorithm:       tt.fields.tokenAlg,
 			}
 			details, err := c.CreateSchemaUser(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {

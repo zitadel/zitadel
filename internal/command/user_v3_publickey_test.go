@@ -101,8 +101,10 @@ func TestCommands_AddPublicKey(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPublicKey{
-					UserID:    "user1",
-					PublicKey: []byte("something"),
+					UserID: "user1",
+					PublicKey: &PublicKey{
+						PublicKey: []byte("something"),
+					},
 				},
 			},
 			res{
@@ -155,8 +157,10 @@ func TestCommands_AddPublicKey(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPublicKey{
-					UserID:    "user1",
-					PublicKey: []byte("something"),
+					UserID: "user1",
+					PublicKey: &PublicKey{
+						PublicKey: []byte("something"),
+					},
 				},
 			},
 			res{
@@ -188,9 +192,11 @@ func TestCommands_AddPublicKey(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPublicKey{
-					UserID:         "user1",
-					PublicKey:      []byte("something"),
-					ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+					UserID: "user1",
+					PublicKey: &PublicKey{
+						PublicKey:      []byte("something"),
+						ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+					},
 				},
 			},
 			res{

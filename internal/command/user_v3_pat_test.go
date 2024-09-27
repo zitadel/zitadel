@@ -62,8 +62,10 @@ func TestCommands_AddPAT(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:  authz.NewMockContext("instanceID", "", ""),
-				user: &AddPAT{},
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &AddPAT{
+					PAT: &PAT{},
+				},
 			},
 			res{
 				err: func(err error) bool {
@@ -83,6 +85,7 @@ func TestCommands_AddPAT(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPAT{
 					UserID: "notexisting",
+					PAT:    &PAT{},
 				},
 			},
 			res{
@@ -106,6 +109,7 @@ func TestCommands_AddPAT(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPAT{
 					UserID: "user1",
+					PAT:    &PAT{},
 				},
 			},
 			res{
@@ -127,6 +131,7 @@ func TestCommands_AddPAT(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPAT{
 					UserID: "user1",
+					PAT:    &PAT{},
 				},
 			},
 			res{
@@ -160,7 +165,9 @@ func TestCommands_AddPAT(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPAT{
 					UserID: "user1",
-					Scope:  []string{"first", "second", "third"},
+					PAT: &PAT{
+						Scopes: []string{"first", "second", "third"},
+					},
 				},
 			},
 			res{
@@ -194,9 +201,11 @@ func TestCommands_AddPAT(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPAT{
-					UserID:         "user1",
-					ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
-					Scope:          []string{"first", "second", "third"},
+					UserID: "user1",
+					PAT: &PAT{
+						ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+						Scopes:         []string{"first", "second", "third"},
+					},
 				},
 			},
 			res{
@@ -224,7 +233,7 @@ func TestCommands_AddPAT(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.details, details)
-				assert.Equal(t, tt.res.token, tt.args.user.Token)
+				assert.Equal(t, tt.res.token, tt.args.user.PAT.Token)
 			}
 		})
 	}

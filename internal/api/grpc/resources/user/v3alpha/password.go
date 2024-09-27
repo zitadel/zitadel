@@ -24,14 +24,38 @@ func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) 
 }
 
 func setPasswordRequestToSetSchemaUserPassword(req *user.SetPasswordRequest) *command.SetSchemaUserPassword {
+	pw, verification := setPasswordToSetSchemaUserPassword(req.GetNewPassword())
 	return &command.SetSchemaUserPassword{
-		ResourceOwner:       organizationToUpdateResourceOwner(req.Organization),
-		UserID:              req.GetId(),
-		Password:            req.GetNewPassword().GetPassword(),
-		EncodedPasswordHash: req.GetNewPassword().GetHash(),
-		ChangeRequired:      req.GetNewPassword().GetChangeRequired(),
-		VerificationCode:    req.GetNewPassword().GetVerificationCode(),
-		CurrentPassword:     req.GetNewPassword().GetCurrentPassword(),
+		ResourceOwner: organizationToUpdateResourceOwner(req.Organization),
+		UserID:        req.GetId(),
+		Password:      pw,
+		Verification:  verification,
+	}
+}
+
+func setPasswordToSetSchemaUserPassword(req *user.SetPassword) (*command.SchemaUserPassword, *command.SchemaUserPasswordVerification) {
+	return setPasswordToSchemaUserPassword(req.GetPassword(), req.GetHash(), req.GetChangeRequired()),
+		setPasswordToSchemaUserPasswordVerification(req.GetCurrentPassword(), req.GetVerificationCode())
+}
+
+func setPasswordToSchemaUserPassword(pw string, hash string, changeRequired bool) *command.SchemaUserPassword {
+	if pw == "" && hash == "" {
+		return nil
+	}
+	return &command.SchemaUserPassword{
+		Password:            pw,
+		EncodedPasswordHash: hash,
+		ChangeRequired:      changeRequired,
+	}
+}
+
+func setPasswordToSchemaUserPasswordVerification(pw string, code string) *command.SchemaUserPasswordVerification {
+	if pw == "" && code == "" {
+		return nil
+	}
+	return &command.SchemaUserPasswordVerification{
+		CurrentPassword: pw,
+		Code:            code,
 	}
 }
 

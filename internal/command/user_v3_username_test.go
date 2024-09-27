@@ -142,6 +142,9 @@ func TestCommands_AddUsername(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddUsername{
 					UserID: "user1",
+					Username: &Username{
+						Username: "user1",
+					},
 				},
 			},
 			res{
@@ -163,6 +166,9 @@ func TestCommands_AddUsername(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddUsername{
 					UserID: "user1",
+					Username: &Username{
+						Username: "user1",
+					},
 				},
 			},
 			res{
@@ -194,9 +200,11 @@ func TestCommands_AddUsername(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddUsername{
-					UserID:        "user1",
-					Username:      "username",
-					IsOrgSpecific: false,
+					UserID: "user1",
+					Username: &Username{
+						Username:      "username",
+						IsOrgSpecific: false,
+					},
 				},
 			},
 			res{
@@ -228,9 +236,11 @@ func TestCommands_AddUsername(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddUsername{
-					UserID:        "user1",
-					Username:      "username",
-					IsOrgSpecific: true,
+					UserID: "user1",
+					Username: &Username{
+						Username:      "username",
+						IsOrgSpecific: true,
+					},
 				},
 			},
 			res{
