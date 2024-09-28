@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -27,6 +28,7 @@ func generateSms(
 	args map[string]interface{},
 	lastPhone bool,
 	triggeringEvent eventstore.Event,
+	generatorInfo *senders.CodeGeneratorInfo,
 ) error {
 	smsChannels, config, err := channels.SMS(ctx)
 	logging.OnError(err).Error("could not create sms channel")
@@ -48,7 +50,15 @@ func generateSms(
 			Content:              data.Text,
 			TriggeringEvent:      triggeringEvent,
 		}
-		return smsChannels.HandleMessage(message)
+		err = smsChannels.HandleMessage(message)
+		if err != nil {
+			return err
+		}
+		if config.TwilioConfig.VerifyServiceSID != "" {
+			generatorInfo.ID = config.ProviderConfig.ID
+			generatorInfo.VerificationID = *message.VerificationID
+		}
+		return nil
 	}
 	if config.WebhookConfig != nil {
 		caseArgs := make(map[string]interface{}, len(args))
