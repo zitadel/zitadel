@@ -23,5 +23,5 @@ func (mig *IDPTemplate6SAMLNameIDFormat) Execute(ctx context.Context, _ eventsto
 }
 
 func (mig *IDPTemplate6SAMLNameIDFormat) String() string {
-	return "26_idp_templates6_add_saml_name_id_format"
+	return "27_idp_templates6_add_saml_name_id_format"
 }
