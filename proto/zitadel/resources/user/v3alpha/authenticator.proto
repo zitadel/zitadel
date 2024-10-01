@@ -345,17 +345,18 @@ message SetPublicKey {
   ];
 
   oneof type {
+    option (validate.required) = true;
     // Let ZITADEL generate the key and return the private key.
-    GeneratedKey generated_key = 2;
-    // Let ZITADEL send the link to the user via SMS.
+    GenerateKey generate_key = 2;
+    // Let ZITADEL use the public key directly, from generated key outside of ZITADEL.
     ProvidedPublicKey public_key = 3;
   }
 }
 
-message GeneratedKey {}
+message GenerateKey {}
 message ProvidedPublicKey {
-  // Public key provided to persist.
-  bytes public_key = 2 [
+  // Public key provided to persist. Supported formats are defined in RFC2459 with the RSA, DSA, ECDSA, ED25519 and ECDH packages, provided by the X509 Golang package.
+  optional bytes public_key = 2 [
     (validate.rules).bytes = {min_len: 1, max_len: 4048},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

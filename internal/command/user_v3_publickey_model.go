@@ -15,7 +15,6 @@ type PublicKeyV3WriteModel struct {
 	eventstore.WriteModel
 	UserID         string
 	ExpirationDate time.Time
-	PrivateKey     []byte
 	PublicKey      []byte
 
 	checkPermission domain.PermissionCheck
@@ -114,7 +113,7 @@ func (wm *PublicKeyV3WriteModel) NewDelete(ctx context.Context) ([]eventstore.Co
 
 func (wm *PublicKeyV3WriteModel) Exists() error {
 	if len(wm.PublicKey) == 0 {
-		return zerrors.ThrowNotFound(nil, "TODO", "TODO")
+		return zerrors.ThrowNotFound(nil, "COMMAND-CqNteIqtCt", "Errors.User.NotFound")
 	}
 	return nil
 }
@@ -123,5 +122,5 @@ func (wm *PublicKeyV3WriteModel) NotExists() error {
 	if err := wm.Exists(); err != nil {
 		return nil
 	}
-	return zerrors.ThrowAlreadyExists(nil, "TODO", "TODO")
+	return zerrors.ThrowAlreadyExists(nil, "COMMAND-QkVpJv0DqA", "Errors.User.AlreadyExists")
 }

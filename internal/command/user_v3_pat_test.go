@@ -26,7 +26,7 @@ func filterPATExisting() expect {
 				context.Background(),
 				&authenticator.NewAggregate("pk1", "org1").Aggregate,
 				"user1",
-				time.Time{},
+				time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
 				[]string{"first", "second", "third"},
 			),
 		),
@@ -141,6 +141,27 @@ func TestCommands_AddPAT(t *testing.T) {
 			},
 		},
 		{
+			"pat added, expirationDate before now",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &AddPAT{
+					UserID: "user1",
+					PAT: &PAT{
+						Scopes:         []string{"first", "second", "third"},
+						ExpirationDate: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.UTC),
+					},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "DOMAIN-dv3t5", "Errors.AuthNKey.ExpireBeforeNow"))
+				},
+			},
+		},
+		{
 			"pat added, ok",
 			fields{
 				eventstore: expectEventstore(
@@ -152,7 +173,7 @@ func TestCommands_AddPAT(t *testing.T) {
 							context.Background(),
 							&authenticator.NewAggregate("pk1", "org1").Aggregate,
 							"user1",
-							time.Time{},
+							time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
 							[]string{"first", "second", "third"},
 						),
 					),
@@ -189,7 +210,7 @@ func TestCommands_AddPAT(t *testing.T) {
 							context.Background(),
 							&authenticator.NewAggregate("pk1", "org1").Aggregate,
 							"user1",
-							time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+							time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
 							[]string{"first", "second", "third"},
 						),
 					),
@@ -203,7 +224,7 @@ func TestCommands_AddPAT(t *testing.T) {
 				user: &AddPAT{
 					UserID: "user1",
 					PAT: &PAT{
-						ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+						ExpirationDate: time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
 						Scopes:         []string{"first", "second", "third"},
 					},
 				},
@@ -308,7 +329,7 @@ func TestCommands_DeletePAT(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-ur4kxtxIhW", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -322,7 +343,7 @@ func TestCommands_DeletePAT(t *testing.T) {
 								context.Background(),
 								&authenticator.NewAggregate("pk1", "org1").Aggregate,
 								"user1",
-								time.Time{},
+								time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
 								[]string{"first", "second", "third"},
 							),
 						),
@@ -343,7 +364,7 @@ func TestCommands_DeletePAT(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-ur4kxtxIhW", "Errors.User.NotFound"))
 				},
 			},
 		},

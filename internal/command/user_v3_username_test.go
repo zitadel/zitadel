@@ -340,7 +340,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-uEii8L6Awp", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -377,7 +377,7 @@ func TestCommands_DeleteUsername(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-uEii8L6Awp", "Errors.User.NotFound"))
 				},
 			},
 		},

@@ -37,16 +37,16 @@ func addPublicKeyRequestToAddPublicKey(req *user.AddPublicKeyRequest) *command.A
 	}
 }
 
-func setPublicKeyToAddPublicKey(req *user.SetPublicKey) *command.PublicKey {
-	if req == nil {
+func setPublicKeyToAddPublicKey(set *user.SetPublicKey) *command.PublicKey {
+	if set == nil {
 		return nil
 	}
 	expDate := time.Time{}
-	if req.GetExpirationDate() != nil {
-		expDate = req.GetExpirationDate().AsTime()
+	if set.GetExpirationDate() != nil {
+		expDate = set.GetExpirationDate().AsTime()
 	}
 	return &command.PublicKey{
-		PublicKey:      req.GetPublicKey().GetPublicKey(),
+		PublicKey:      set.GetPublicKey().GetPublicKey(),
 		ExpirationDate: expDate,
 	}
 }

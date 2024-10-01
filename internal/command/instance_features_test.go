@@ -64,7 +64,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
-				ID:            "instance1",
 			},
 		},
 		{
@@ -94,7 +93,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
-				ID:            "instance1",
 			},
 		},
 		{
@@ -113,7 +111,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
-				ID:            "instance1",
 			},
 		},
 		{
@@ -132,7 +129,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
-				ID:            "instance1",
 			},
 		},
 		{
@@ -151,7 +147,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
-				ID:            "instance1",
 			},
 		},
 		{
@@ -170,7 +165,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
-				ID:            "instance1",
 			},
 		},
 		{
@@ -230,7 +224,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
-				ID:            "instance1",
 			},
 		},
 		{
@@ -282,7 +275,6 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
-				ID:            "instance1",
 			},
 		},
 	}

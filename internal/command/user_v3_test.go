@@ -770,10 +770,16 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 					},
 					Password: &SchemaUserPassword{Password: "password"},
 					PublicKeys: []*PublicKey{
-						{PublicKey: []byte("something"), ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC)},
+						{
+							PublicKey:      []byte("something"),
+							ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+						},
 					},
 					PATs: []*PAT{
-						{Scopes: []string{"first", "second", "third"}, ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC)},
+						{
+							Scopes:         []string{"first", "second", "third"},
+							ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+						},
 					},
 				},
 			},

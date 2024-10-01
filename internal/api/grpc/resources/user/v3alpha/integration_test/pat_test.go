@@ -5,6 +5,7 @@ package user_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
@@ -192,7 +193,9 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
-				PersonalAccessToken: &user.SetPersonalAccessToken{},
+				PersonalAccessToken: &user.SetPersonalAccessToken{
+					ExpirationDate: timestamppb.New(time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC)),
+				},
 			},
 			res: res{
 				want: &resource_object.Details{
@@ -205,7 +208,7 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 			},
 		},
 		{
-			name: "pat add, generated, ok",
+			name: "pat add, expirationdate invalid",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(req *user.AddPersonalAccessTokenRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
@@ -218,17 +221,11 @@ func TestServer_AddPersonalAccessToken(t *testing.T) {
 						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
-				PersonalAccessToken: &user.SetPersonalAccessToken{},
-			},
-			res: res{
-				want: &resource_object.Details{
-					Changed: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_ORG,
-						Id:   orgResp.GetOrganizationId(),
-					},
+				PersonalAccessToken: &user.SetPersonalAccessToken{
+					ExpirationDate: timestamppb.New(time.Date(2020, time.December, 31, 23, 59, 59, 0, time.UTC)),
 				},
 			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

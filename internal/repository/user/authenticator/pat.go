@@ -20,7 +20,7 @@ type PATCreatedEvent struct {
 	UserID string `json:"userID"`
 
 	ExpirationDate    time.Time `json:"expirationDate,omitempty"`
-	Scopes            []string  `json:"scopes"`
+	Scopes            []string  `json:"scopes,omitempty"`
 	TriggeredAtOrigin string    `json:"triggerOrigin,omitempty"`
 }
 

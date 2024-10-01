@@ -28,10 +28,22 @@ type PAT struct {
 	Token          string
 }
 
+func (wm *PAT) GetExpirationDate() time.Time {
+	return wm.ExpirationDate
+}
+
+func (wm *PAT) SetExpirationDate(date time.Time) {
+	wm.ExpirationDate = date
+}
+
 func (c *Commands) AddPAT(ctx context.Context, add *AddPAT) (*domain.ObjectDetails, error) {
 	if add.UserID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-14sGR7lTaj", "Errors.IDMissing")
 	}
+	if err := domain.EnsureValidExpirationDate(add.PAT); err != nil {
+		return nil, err
+	}
+
 	schemauser, err := existingSchemaUser(ctx, c, add.ResourceOwner, add.UserID)
 	if err != nil {
 		return nil, err

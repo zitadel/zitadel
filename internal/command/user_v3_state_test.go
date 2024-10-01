@@ -337,7 +337,7 @@ func TestCommandSide_UnlockSchemaUser(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotLocked"))
 				},
 			},
 		},
@@ -758,7 +758,7 @@ func TestCommandSide_ReactivateSchemaUser(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotInactive"))
 				},
 			},
 		},

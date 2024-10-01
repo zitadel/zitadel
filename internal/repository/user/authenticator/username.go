@@ -4,50 +4,29 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
 	usernamePrefix      = eventPrefix + "username."
 	UsernameCreatedType = usernamePrefix + "created"
 	UsernameDeletedType = usernamePrefix + "deleted"
-
-	uniqueUsernameType = "username"
 )
 
 func NewAddUsernameUniqueConstraint(resourceOwner string, isOrgSpecific bool, username string) *eventstore.UniqueConstraint {
-	if isOrgSpecific {
-		return eventstore.NewAddEventUniqueConstraint(
-			uniqueUsernameType,
-			resourceOwner+":"+username,
-			"TODO")
-	}
-
-	return eventstore.NewAddEventUniqueConstraint(
-		uniqueUsernameType,
-		username,
-		"TODO")
+	return user.NewAddUsernameUniqueConstraint(username, resourceOwner, isOrgSpecific)
 }
 
 func NewRemoveUsernameUniqueConstraint(resourceOwner string, isOrgSpecific bool, username string) *eventstore.UniqueConstraint {
-	if isOrgSpecific {
-		return eventstore.NewRemoveUniqueConstraint(
-			uniqueUsernameType,
-			resourceOwner+":"+username,
-		)
-	}
-
-	return eventstore.NewRemoveUniqueConstraint(
-		uniqueUsernameType,
-		username,
-	)
+	return user.NewRemoveUsernameUniqueConstraint(username, resourceOwner, isOrgSpecific)
 }
 
 type UsernameCreatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	UserID        string `json:"userID"`
-	IsOrgSpecific bool   `json:"isOrgSpecific"`
-	Username      string `json:"username"`
+	IsOrgSpecific bool   `json:"isOrgSpecific,omitempty"`
+	Username      string `json:"username,omitempty"`
 }
 
 func (e *UsernameCreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {

@@ -61,7 +61,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
-				ID:            "SYSTEM",
 			},
 		},
 		{
@@ -80,7 +79,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
-				ID:            "SYSTEM",
 			},
 		},
 		{
@@ -99,7 +97,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
-				ID:            "SYSTEM",
 			},
 		},
 		{
@@ -118,7 +115,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
-				ID:            "SYSTEM",
 			},
 		},
 		{
@@ -137,7 +133,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
-				ID:            "SYSTEM",
 			},
 		},
 		{
@@ -197,7 +192,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
-				ID:            "SYSTEM",
 			},
 		},
 		{
@@ -259,7 +253,6 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
-				ID:            "SYSTEM",
 			},
 		},
 	}

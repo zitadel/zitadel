@@ -24,12 +24,14 @@ func filterPublicKeyExisting() expect {
 				context.Background(),
 				&authenticator.NewAggregate("pk1", "org1").Aggregate,
 				"user1",
-				time.Time{},
+				time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
 				[]byte("something"),
 			),
 		),
 	)
 }
+
+var publicKeyExample = []byte("-----BEGIN PUBLIC KEY-----\nMIICITANBgkqhkiG9w0BAQEFAAOCAg4AMIICCQKCAgB5tWxwCGRloCqvpgI2ZXPl\nxQ+WZbQPuHTqAxwbXbsKOJoAAq16iHmzriLKpqVDxRUXqTH3cY0P0A1IZbCBB2gG\nyq3Lk08sR5ute+MEQ+QibX2qpk+mccRr+eP6B1otcyBWxRhZ/YtWphDpZ4GCb4oN\nAzTIebU0ztlu1OOnDDSEEhwScu2LhG40bx4hVU8XNgIqEjxiR61J89vfZpCmn0Rl\nsqYvmX9sqtqPokdsKl3LPItRyDAJMG0uhwwGKsHffDNeLDZN1OCZE/ZS7USarJQH\nbtGeqFQKsCL33xsKbNL+QjnAhqHW09bMdwofJvlwYLfL0rGJQr5aVCaERAfKAOE6\npy0nVkEJsRLxvdx/ZbTtZdCBk/LiznkE1xp9J02obQ+kWHtdUYxM1OSJqPRGQpbS\nZTxurdBQ43gRjO07iWNV9CB0i6QN2GtDBmHVb48i6aPdA++uJqnPYzy46FWA3KMA\nSlxiZ1RDcGH+fN9uklC2cwAurctAxed3Me2RYGdxl813udeV4Ef3qaiV2dix/pKA\nvN1KIfPTpTdULCDBLjtaAYflJ2WYXHeWMJMMC4oJc3bcKpA4mWjZibZ3pSGX/STQ\nXwHUtKsGlrVBSeqjjILVpH+2G0rusrqkGOlPKN+qOIsnwJf9x47v+xEw1slqdDWm\n+x3gc+8m9oowCcq20OeNTQIDAQAB\n-----END PUBLIC KEY-----")
 
 func TestCommands_AddPublicKey(t *testing.T) {
 	type fields struct {
@@ -79,11 +81,38 @@ func TestCommands_AddPublicKey(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPublicKey{
 					UserID: "notexisting",
+					PublicKey: &PublicKey{
+						PublicKey: publicKeyExample,
+					},
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound"))
+				},
+			},
+		},
+		{
+			"userschema not existing, error",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &AddPublicKey{
+					UserID: "user1",
+					PublicKey: &PublicKey{
+						PublicKey: publicKeyExample,
+					},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists"))
 				},
 			},
 		},
@@ -103,7 +132,7 @@ func TestCommands_AddPublicKey(t *testing.T) {
 				user: &AddPublicKey{
 					UserID: "user1",
 					PublicKey: &PublicKey{
-						PublicKey: []byte("something"),
+						PublicKey: publicKeyExample,
 					},
 				},
 			},
@@ -114,23 +143,43 @@ func TestCommands_AddPublicKey(t *testing.T) {
 			},
 		},
 		{
-			"userschema not existing, error",
+			"publickey added, no public key format",
 			fields{
-				eventstore: expectEventstore(
-					filterSchemaUserExisting(),
-					expectFilter(),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &AddPublicKey{
 					UserID: "user1",
+					PublicKey: &PublicKey{
+						PublicKey: []byte("something"),
+					},
 				},
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-WdWlhUSVqK", "Errors.User.Machine.Key.Invalid"))
+				},
+			},
+		},
+		{
+			"publickey added, expirationDate before now",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &AddPublicKey{
+					UserID: "user1",
+					PublicKey: &PublicKey{
+						PublicKey:      publicKeyExample,
+						ExpirationDate: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.UTC),
+					},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "DOMAIN-dv3t5", "Errors.AuthNKey.ExpireBeforeNow"))
 				},
 			},
 		},
@@ -146,8 +195,8 @@ func TestCommands_AddPublicKey(t *testing.T) {
 							context.Background(),
 							&authenticator.NewAggregate("pk1", "org1").Aggregate,
 							"user1",
-							time.Time{},
-							[]byte("something"),
+							time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
+							publicKeyExample,
 						),
 					),
 				),
@@ -159,7 +208,7 @@ func TestCommands_AddPublicKey(t *testing.T) {
 				user: &AddPublicKey{
 					UserID: "user1",
 					PublicKey: &PublicKey{
-						PublicKey: []byte("something"),
+						PublicKey: publicKeyExample,
 					},
 				},
 			},
@@ -181,8 +230,8 @@ func TestCommands_AddPublicKey(t *testing.T) {
 							context.Background(),
 							&authenticator.NewAggregate("pk1", "org1").Aggregate,
 							"user1",
-							time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
-							[]byte("something"),
+							time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
+							publicKeyExample,
 						),
 					),
 				),
@@ -194,8 +243,8 @@ func TestCommands_AddPublicKey(t *testing.T) {
 				user: &AddPublicKey{
 					UserID: "user1",
 					PublicKey: &PublicKey{
-						PublicKey:      []byte("something"),
-						ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+						PublicKey:      publicKeyExample,
+						ExpirationDate: time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
 					},
 				},
 			},
@@ -296,7 +345,7 @@ func TestCommands_DeletePublicKey(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-CqNteIqtCt", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -310,7 +359,7 @@ func TestCommands_DeletePublicKey(t *testing.T) {
 								context.Background(),
 								&authenticator.NewAggregate("pk1", "org1").Aggregate,
 								"user1",
-								time.Time{},
+								time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
 								[]byte("something"),
 							),
 						),
@@ -331,7 +380,7 @@ func TestCommands_DeletePublicKey(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-CqNteIqtCt", "Errors.User.NotFound"))
 				},
 			},
 		},

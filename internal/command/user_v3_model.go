@@ -707,7 +707,7 @@ func (wm *UserV3WriteModel) NewUnlock(ctx context.Context) (_ []eventstore.Comma
 	}
 	// can only be unlocked when locked
 	if !wm.Locked {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotLocked")
 	}
 	if err := wm.checkPermissionStateChange(ctx); err != nil {
 		return nil, err
@@ -735,7 +735,7 @@ func (wm *UserV3WriteModel) NewActivate(ctx context.Context) (_ []eventstore.Com
 	}
 	// can only be activated when inactive
 	if wm.State != domain.UserStateInactive {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotInactive")
 	}
 	if err := wm.checkPermissionStateChange(ctx); err != nil {
 		return nil, err

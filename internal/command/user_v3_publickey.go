@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -16,11 +17,32 @@ type AddPublicKey struct {
 	PublicKey *PublicKey
 }
 
+func (wm *AddPublicKey) GetPublicKey() []byte {
+	if wm.PublicKey == nil {
+		return nil
+	}
+	return wm.PublicKey.PublicKey
+}
+
 func (wm *AddPublicKey) GetPrivateKey() []byte {
 	if wm.PublicKey == nil {
 		return nil
 	}
 	return wm.PublicKey.PrivateKey
+}
+
+func (wm *AddPublicKey) GetExpirationDate() time.Time {
+	if wm.PublicKey == nil {
+		return time.Time{}
+	}
+	return wm.PublicKey.GetExpirationDate()
+}
+
+func (wm *AddPublicKey) SetExpirationDate(date time.Time) {
+	if wm.PublicKey == nil {
+		wm.PublicKey = &PublicKey{}
+	}
+	wm.PublicKey.SetExpirationDate(date)
 }
 
 type PublicKey struct {
@@ -49,6 +71,15 @@ func (c *Commands) AddPublicKey(ctx context.Context, add *AddPublicKey) (*domain
 	if add.UserID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-14sGR7lTaj", "Errors.IDMissing")
 	}
+	if publicKey := add.GetPublicKey(); publicKey != nil {
+		if _, err := crypto.BytesToPublicKey(publicKey); err != nil {
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-WdWlhUSVqK", "Errors.User.Machine.Key.Invalid")
+		}
+	}
+	if err := domain.EnsureValidExpirationDate(add.PublicKey); err != nil {
+		return nil, err
+	}
+
 	schemauser, err := existingSchemaUser(ctx, c, add.ResourceOwner, add.UserID)
 	if err != nil {
 		return nil, err

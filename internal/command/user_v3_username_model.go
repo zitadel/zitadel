@@ -114,7 +114,7 @@ func (wm *UsernameV3WriteModel) NewDelete(ctx context.Context) ([]eventstore.Com
 
 func (wm *UsernameV3WriteModel) Exists() error {
 	if wm.Username == "" {
-		return zerrors.ThrowNotFound(nil, "TODO", "TODO")
+		return zerrors.ThrowNotFound(nil, "COMMAND-uEii8L6Awp", "Errors.User.NotFound")
 	}
 	return nil
 }
@@ -123,7 +123,7 @@ func (wm *UsernameV3WriteModel) NotExists() error {
 	if err := wm.Exists(); err != nil {
 		return nil
 	}
-	return zerrors.ThrowAlreadyExists(nil, "TODO", "TODO")
+	return zerrors.ThrowAlreadyExists(nil, "COMMAND-rK7ZTzEEGU", "Errors.User.AlreadyExists")
 }
 
 func AuthenticatorAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {

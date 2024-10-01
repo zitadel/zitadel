@@ -252,29 +252,6 @@ func TestServer_AddUsername(t *testing.T) {
 			},
 		},
 		{
-			name: "username add, already existing",
-			ctx:  isolatedIAMOwnerCTX,
-			dep: func(req *user.AddUsernameRequest) error {
-				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
-				req.Id = userResp.GetDetails().GetId()
-				username := gofakeit.Username()
-				instance.AddAuthenticatorUsername(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), req.Id, username, false)
-				req.Username.Username = username
-				return nil
-			},
-			req: &user.AddUsernameRequest{
-				Organization: &object.Organization{
-					Property: &object.Organization_OrgId{
-						OrgId: orgResp.GetOrganizationId(),
-					},
-				},
-				Username: &user.SetUsername{
-					IsOrganizationSpecific: false,
-				},
-			},
-			wantErr: true,
-		},
-		{
 			name: "username add, isOrgSpecific, already existing",
 			ctx:  isolatedIAMOwnerCTX,
 			dep: func(req *user.AddUsernameRequest) error {

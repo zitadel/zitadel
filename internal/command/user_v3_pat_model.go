@@ -113,7 +113,7 @@ func (wm *PATV3WriteModel) NewDelete(ctx context.Context) ([]eventstore.Command,
 
 func (wm *PATV3WriteModel) Exists() error {
 	if len(wm.Scopes) == 0 {
-		return zerrors.ThrowNotFound(nil, "TODO", "TODO")
+		return zerrors.ThrowNotFound(nil, "COMMAND-ur4kxtxIhW", "Errors.User.NotFound")
 	}
 	return nil
 }
@@ -122,5 +122,5 @@ func (wm *PATV3WriteModel) NotExists() error {
 	if err := wm.Exists(); err != nil {
 		return nil
 	}
-	return zerrors.ThrowAlreadyExists(nil, "TODO", "TODO")
+	return zerrors.ThrowAlreadyExists(nil, "COMMAND-iBM2bOhvYH", "Errors.User.AlreadyExists")
 }
