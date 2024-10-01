@@ -661,7 +661,7 @@ service ZITADELUsers {
       responses: {
         key: "200"
         value: {
-          description: "Username successfully added";
+          description: "Public key successfully added";
         }
       };
     };
