@@ -5,6 +5,8 @@ import (
 	_ "embed"
 	"errors"
 	"log/slog"
+	"strings"
+	"text/template"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -14,6 +16,9 @@ import (
 )
 
 var (
+	//go:embed create_partition.sql.tmpl
+	createPartitionQuery string
+	createPartitionTmpl  = template.Must(template.New("create_partition").Parse(createPartitionQuery))
 	//go:embed set.sql
 	setQuery string
 	//go:embed get.sql
@@ -42,14 +47,27 @@ type pgCache[I ~int, K ~string, V cache.Entry[I, K]] struct {
 }
 
 // NewCache returns a cache that stores and retrieves objects using PostgreSQL unlogged tables.
-func NewCache[I ~int, K ~string, V cache.Entry[I, K]](name string, config cache.CacheConfig, indices []I, pool PGXPool) cache.PrunerCache[I, K, V] {
-	return &pgCache[I, K, V]{
+func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, name string, config cache.CacheConfig, indices []I, pool PGXPool) (cache.PrunerCache[I, K, V], error) {
+	c := &pgCache[I, K, V]{
 		name:    name,
 		config:  &config,
 		indices: indices,
 		pool:    pool,
 		logger:  config.Log.Slog().With("cache_name", name),
 	}
+	if err := c.createPartition(ctx); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+func (c *pgCache[I, K, V]) createPartition(ctx context.Context) error {
+	var query strings.Builder
+	if err := createPartitionTmpl.Execute(&query, c.name); err != nil {
+		return err
+	}
+	_, err := c.pool.Exec(ctx, query.String())
+	return err
 }
 
 func (c *pgCache[I, K, V]) Set(ctx context.Context, entry V) {

@@ -43,6 +43,53 @@ func (o *testObject) Keys(index testIndex) []string {
 	}
 }
 
+func TestNewCache(t *testing.T) {
+	tests := []struct {
+		name    string
+		expect  func(pgxmock.PgxCommonIface)
+		wantErr error
+	}{
+		{
+			name: "error",
+			expect: func(pci pgxmock.PgxCommonIface) {
+				pci.ExpectExec(regexp.QuoteMeta(expectedCreatePartitionQuery)).
+					WillReturnError(pgx.ErrTxClosed)
+			},
+			wantErr: pgx.ErrTxClosed,
+		},
+		{
+			name: "success",
+			expect: func(pci pgxmock.PgxCommonIface) {
+				pci.ExpectExec(regexp.QuoteMeta(expectedCreatePartitionQuery)).
+					WillReturnResult(pgxmock.NewResult("CREATE TABLE", 0))
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			conf := cache.CacheConfig{
+				Log: &logging.Config{
+					Level:     "debug",
+					AddSource: true,
+				},
+			}
+			pool, err := pgxmock.NewPool()
+			require.NoError(t, err)
+			tt.expect(pool)
+
+			c, err := NewCache[testIndex, string, *testObject](context.Background(), cacheName, conf, testIndices, pool)
+			require.ErrorIs(t, err, tt.wantErr)
+			if tt.wantErr == nil {
+				assert.NotNil(t, c)
+			}
+
+			err = pool.ExpectationsWereMet()
+			assert.NoError(t, err)
+		})
+	}
+
+}
+
 func Test_pgCache_Set(t *testing.T) {
 	queryExpect := regexp.QuoteMeta(setQuery)
 	type args struct {
@@ -104,18 +151,12 @@ func Test_pgCache_Set(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pool, err := pgxmock.NewPool()
-			require.NoError(t, err)
-			tt.expect(pool)
+			c, pool := prepareCache(t, cache.CacheConfig{})
 			defer pool.Close()
+			tt.expect(pool)
 
-			c := NewCache[testIndex, string, *testObject]("test", cache.CacheConfig{
-				Log: &logging.Config{
-					Level:     "debug",
-					AddSource: true,
-				},
-			}, testIndices, pool).(*pgCache[testIndex, string, *testObject])
-			err = c.set(context.Background(), tt.args.entry)
+			err := c.(*pgCache[testIndex, string, *testObject]).
+				set(context.Background(), tt.args.entry)
 			require.ErrorIs(t, err, tt.wantErr)
 
 			err = pool.ExpectationsWereMet()
@@ -197,23 +238,16 @@ func Test_pgCache_Get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pool, err := pgxmock.NewPool()
-			require.NoError(t, err)
-			tt.expect(pool)
+			c, pool := prepareCache(t, tt.config)
 			defer pool.Close()
+			tt.expect(pool)
 
-			conf := tt.config
-			conf.Log = &logging.Config{
-				Level:     "debug",
-				AddSource: true,
-			}
-			c := NewCache[testIndex, string, *testObject]("test", conf, testIndices, pool)
 			got, ok := c.Get(context.Background(), tt.args.index, tt.args.key)
 			if tt.want != nil {
 				require.True(t, ok)
 			}
 			assert.Equal(t, tt.want, got)
-			err = pool.ExpectationsWereMet()
+			err := pool.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
 	}
@@ -268,18 +302,11 @@ func Test_pgCache_Invalidate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pool, err := pgxmock.NewPool()
-			require.NoError(t, err)
-			tt.expect(pool)
+			c, pool := prepareCache(t, tt.config)
 			defer pool.Close()
+			tt.expect(pool)
 
-			conf := tt.config
-			conf.Log = &logging.Config{
-				Level:     "debug",
-				AddSource: true,
-			}
-			c := NewCache[testIndex, string, *testObject]("test", conf, testIndices, pool)
-			err = c.Invalidate(context.Background(), tt.args.index, tt.args.keys...)
+			err := c.Invalidate(context.Background(), tt.args.index, tt.args.keys...)
 			assert.ErrorIs(t, err, tt.wantErr)
 
 			err = pool.ExpectationsWereMet()
@@ -337,18 +364,11 @@ func Test_pgCache_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pool, err := pgxmock.NewPool()
-			require.NoError(t, err)
-			tt.expect(pool)
+			c, pool := prepareCache(t, tt.config)
 			defer pool.Close()
+			tt.expect(pool)
 
-			conf := tt.config
-			conf.Log = &logging.Config{
-				Level:     "debug",
-				AddSource: true,
-			}
-			c := NewCache[testIndex, string, *testObject]("test", conf, testIndices, pool)
-			err = c.Delete(context.Background(), tt.args.index, tt.args.keys...)
+			err := c.Delete(context.Background(), tt.args.index, tt.args.keys...)
 			assert.ErrorIs(t, err, tt.wantErr)
 
 			err = pool.ExpectationsWereMet()
@@ -393,18 +413,11 @@ func Test_pgCache_Prune(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pool, err := pgxmock.NewPool()
-			require.NoError(t, err)
-			tt.expect(pool)
+			c, pool := prepareCache(t, tt.config)
 			defer pool.Close()
+			tt.expect(pool)
 
-			conf := tt.config
-			conf.Log = &logging.Config{
-				Level:     "debug",
-				AddSource: true,
-			}
-			c := NewCache[testIndex, string, *testObject]("test", conf, testIndices, pool)
-			err = c.Prune(context.Background())
+			err := c.Prune(context.Background())
 			assert.ErrorIs(t, err, tt.wantErr)
 
 			err = pool.ExpectationsWereMet()
@@ -449,22 +462,43 @@ func Test_pgCache_Truncate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pool, err := pgxmock.NewPool()
-			require.NoError(t, err)
-			tt.expect(pool)
+			c, pool := prepareCache(t, tt.config)
 			defer pool.Close()
+			tt.expect(pool)
 
-			conf := tt.config
-			conf.Log = &logging.Config{
-				Level:     "debug",
-				AddSource: true,
-			}
-			c := NewCache[testIndex, string, *testObject]("test", conf, testIndices, pool)
-			err = c.Truncate(context.Background())
+			err := c.Truncate(context.Background())
 			assert.ErrorIs(t, err, tt.wantErr)
 
 			err = pool.ExpectationsWereMet()
 			assert.NoError(t, err)
 		})
 	}
+}
+
+const (
+	cacheName                    = "test"
+	expectedCreatePartitionQuery = `create unlogged table if not exists cache.objects_test
+partition of cache.objects
+for values in ('test');
+
+create unlogged table if not exists cache.string_keys_test
+partition of cache.string_keys
+for values in ('test');
+`
+)
+
+func prepareCache(t *testing.T, conf cache.CacheConfig) (cache.PrunerCache[testIndex, string, *testObject], pgxmock.PgxPoolIface) {
+	conf.Log = &logging.Config{
+		Level:     "debug",
+		AddSource: true,
+	}
+	pool, err := pgxmock.NewPool()
+	require.NoError(t, err)
+
+	pool.ExpectExec(regexp.QuoteMeta(expectedCreatePartitionQuery)).
+		WillReturnResult(pgxmock.NewResult("CREATE TABLE", 0))
+
+	c, err := NewCache[testIndex, string, *testObject](context.Background(), cacheName, conf, testIndices, pool)
+	require.NoError(t, err)
+	return c, pool
 }
