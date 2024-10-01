@@ -262,7 +262,7 @@ message SetAuthenticators {
 }
 
 message SetUsername {
-  // Set the user's username. This will be used for identification during authentication.
+  // Add a user's username. This will be used for identification during authentication.
   string username = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
