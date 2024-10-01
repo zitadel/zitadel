@@ -57,6 +57,7 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) *domain.OIDCApp {
 		ClockSkew:                req.ClockSkew.AsDuration(),
 		AdditionalOrigins:        req.AdditionalOrigins,
 		SkipNativeAppSuccessPage: req.SkipNativeAppSuccessPage,
+		BackChannelLogoutURI:     req.GetBackChannelLogoutUri(),
 	}
 }
 
@@ -108,6 +109,7 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 		ClockSkew:                app.ClockSkew.AsDuration(),
 		AdditionalOrigins:        app.AdditionalOrigins,
 		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
+		BackChannelLogoutURI:     app.BackChannelLogoutUri,
 	}
 }
 

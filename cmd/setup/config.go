@@ -123,6 +123,7 @@ type Steps struct {
 	s34AddCacheSchema                       *AddCacheSchema
 	s35AddPositionToIndexEsWm               *AddPositionToIndexEsWm
 	s36FillV2Milestones                     *FillV2Milestones
+	s34Apps7OIDConfigsBackChannelLogoutURI  *Apps7OIDConfigsBackChannelLogoutURI
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
