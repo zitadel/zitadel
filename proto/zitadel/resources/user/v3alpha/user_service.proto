@@ -1828,7 +1828,7 @@ message AddPersonalAccessTokenRequest {
       example: "\"69629026806489455\"";
     }
   ];
-  // Set the user's new personal access token.
+  // Add a user's new personal access token.
   SetPersonalAccessToken personal_access_token = 4;
 }
 
