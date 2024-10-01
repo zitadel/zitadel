@@ -644,7 +644,7 @@ service ZITADELUsers {
 
   // Add a public key
   //
-  // Add a new public key to a user. The public key will be used to identify the user on authentication.
+  // Add a new public key to a user. The public key will be used to verify the user's identity on authentication.
   rpc AddPublicKey (AddPublicKeyRequest) returns (AddPublicKeyResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/public_key"
