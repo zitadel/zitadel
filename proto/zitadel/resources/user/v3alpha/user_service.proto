@@ -710,7 +710,7 @@ service ZITADELUsers {
       responses: {
         key: "200"
         value: {
-          description: "Username successfully added";
+          description: "Personal Access Token successfully added";
         }
       };
     };
