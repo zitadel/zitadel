@@ -367,7 +367,7 @@ message ProvidedPublicKey {
 }
 
 message SetPersonalAccessToken {
-  // After the expiration date, the key will no longer be usable for authentication.
+  // After the expiration date, the personal access token will no longer be usable for authorization.
   optional google.protobuf.Timestamp expiration_date = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"3019-04-01T08:45:00.000000Z\"";
