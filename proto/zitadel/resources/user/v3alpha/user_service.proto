@@ -685,7 +685,7 @@ service ZITADELUsers {
       responses: {
         key: "200"
         value: {
-          description: "Username successfully removed";
+          description: "Public key successfully removed";
         }
       };
     };
