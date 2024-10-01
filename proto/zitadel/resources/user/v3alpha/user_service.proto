@@ -1761,7 +1761,7 @@ message AddPublicKeyRequest {
       example: "\"69629026806489455\"";
     }
   ];
-  // Set the user's new public key.
+  // Add a user's new public key.
   SetPublicKey public_key = 4;
 }
 
