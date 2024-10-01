@@ -109,7 +109,7 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			},
 		},
 		{
-			name:         "openid, profile, email",
+			name:         "openid, profile, email, zitadel",
 			clientID:     clientID,
 			clientSecret: clientSecret,
 			scope:        []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, domain.ProjectScopeZITADEL},
