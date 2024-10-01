@@ -29,6 +29,7 @@ type SystemFeatures struct {
 	ImprovedPerformance             FeatureSource[[]feature.ImprovedPerformanceType]
 	OIDCSingleV1SessionTermination  FeatureSource[bool]
 	DisableUserTokenEvent           FeatureSource[bool]
+	EnableBackChannelLogout         FeatureSource[bool]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

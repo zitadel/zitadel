@@ -18,6 +18,7 @@ const (
 	KeyDebugOIDCParentError
 	KeyOIDCSingleV1SessionTermination
 	KeyDisableUserTokenEvent
+	KeyEnableBackChannelLogout
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -45,6 +46,7 @@ type Features struct {
 	DebugOIDCParentError            bool                      `json:"debug_oidc_parent_error,omitempty"`
 	OIDCSingleV1SessionTermination  bool                      `json:"terminate_single_v1_session,omitempty"`
 	DisableUserTokenEvent           bool                      `json:"disable_user_token_event,omitempty"`
+	EnableBackChannelLogout         bool                      `json:"enable_back_channel_logout,omitempty"`
 }
 
 type ImprovedPerformanceType int32
