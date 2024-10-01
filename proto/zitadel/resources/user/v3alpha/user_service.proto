@@ -570,7 +570,7 @@ service ZITADELUsers {
 
   // Set a password
   //
-  // Add or update a user's password with either a verification code, the current password or enough permissions.
+  // Add or update a user's password with either a verification code, the current password or sufficient permissions.
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/password"
