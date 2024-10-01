@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	publicKeyPrefix      = eventPrefix + "pk."
+	publicKeyPrefix      = eventPrefix + "public_key."
 	PublicKeyCreatedType = publicKeyPrefix + "created"
 	PublicKeyDeletedType = publicKeyPrefix + "deleted"
 )
