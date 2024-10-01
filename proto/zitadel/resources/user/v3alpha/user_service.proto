@@ -718,7 +718,7 @@ service ZITADELUsers {
 
   // Remove a personal access token
   //
-  // Remove an existing personal access token of a user, so it cannot be used for authentication anymore.
+  // Remove an existing personal access token of a user, so it cannot be used to for authorization anymore.
   rpc RemovePersonalAccessToken (RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
     option (google.api.http) = {
       delete: "/resources/v3alpha/users/{id}/personal_access_token/{personal_access_token_id}"
