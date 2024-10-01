@@ -693,7 +693,7 @@ service ZITADELUsers {
 
   // Add a personal access token
   //
-  // Add a new personal access token to a user. The personal access token will be used to identify the user on authentication.
+  // Add a new personal access token to a user. The personal access token can be used to access granted resources including the ZITADEL API.
   rpc AddPersonalAccessToken (AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/personal_access_token"
