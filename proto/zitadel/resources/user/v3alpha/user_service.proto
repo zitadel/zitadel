@@ -620,7 +620,7 @@ service ZITADELUsers {
 
   // Remove a password
   //
-  // Remove a user's password.
+  // Remove a user's password. The user will not be able to login with a password anymore and is required to use another authentication method such as an identity provider.
   rpc RemovePassword (RemovePasswordRequest) returns (RemovePasswordResponse) {
     option (google.api.http) = {
       delete: "/resources/v3alpha/users/{id}/password"
