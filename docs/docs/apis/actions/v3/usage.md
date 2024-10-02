@@ -2,7 +2,7 @@
 title: Using Actions
 ---
 
-This page describes the options you have when defining ZITADEL Actions V2.
+This page describes the options you have when defining ZITADEL Actions V3.
 
 ## Endpoints
 
