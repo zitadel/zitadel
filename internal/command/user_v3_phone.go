@@ -41,8 +41,8 @@ func (c *Commands) ChangeSchemaUserPhone(ctx context.Context, user *ChangeSchema
 
 	events, plainCode, err := writeModel.NewPhoneUpdate(ctx,
 		user.Phone,
-		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newPhoneCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
+		func(ctx context.Context) (*EncryptedCode, string, error) {
+			return c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 		},
 	)
 	if err != nil {
@@ -92,8 +92,8 @@ func (c *Commands) ResendSchemaUserPhoneCode(ctx context.Context, user *ResendSc
 	}
 
 	events, plainCode, err := writeModel.NewResendPhoneCode(ctx,
-		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newPhoneCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
+		func(ctx context.Context) (*EncryptedCode, string, error) {
+			return c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 		},
 		user.ReturnCode,
 	)

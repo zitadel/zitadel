@@ -79,6 +79,9 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser)
 		func(ctx context.Context) (*EncryptedCode, error) {
 			return c.newEmailCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
 		},
+		func(ctx context.Context) (*EncryptedCode, string, error) {
+			return c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
+		},
 	)
 	if err != nil {
 		return nil, err
@@ -207,6 +210,9 @@ func (c *Commands) ChangeSchemaUser(ctx context.Context, user *ChangeSchemaUser)
 		user.Phone,
 		func(ctx context.Context) (*EncryptedCode, error) {
 			return c.newEmailCode(ctx, c.eventstore.Filter, c.userEncryption) //nolint:staticcheck
+		},
+		func(ctx context.Context) (*EncryptedCode, string, error) {
+			return c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 		},
 	)
 	if err != nil {

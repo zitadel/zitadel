@@ -21,6 +21,8 @@ type PasswordV3WriteModel struct {
 	Code             *crypto.CryptoValue
 	CodeCreationDate time.Time
 	CodeExpiry       time.Duration
+	GeneratorID      string
+	VerificationID   string
 
 	checkPermission domain.PermissionCheck
 }
@@ -57,6 +59,10 @@ func (wm *PasswordV3WriteModel) Reduce() error {
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
 			wm.CodeExpiry = e.Expiry
+			wm.GeneratorID = e.GeneratorID
+		case *authenticator.PasswordCodeSentEvent:
+			wm.GeneratorID = e.GeneratorInfo.GetID()
+			wm.VerificationID = e.GeneratorInfo.GetVerificationID()
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -95,9 +101,9 @@ func (wm *PasswordV3WriteModel) NewAddCode(
 	notificationType domain.NotificationType,
 	urlTemplate string,
 	codeReturned bool,
-	code func(context.Context) (*EncryptedCode, error),
+	code func(context.Context, domain.NotificationType) (*EncryptedCode, string, error),
 ) (_ []eventstore.Command, plainCode string, err error) {
-	crypt, err := code(ctx)
+	crypt, generatorID, err := code(ctx, notificationType)
 	if err != nil {
 		return nil, "", err
 	}
@@ -105,11 +111,12 @@ func (wm *PasswordV3WriteModel) NewAddCode(
 	events := []eventstore.Command{
 		authenticator.NewPasswordCodeAddedEvent(ctx,
 			AuthenticatorAggregateFromWriteModel(wm.GetWriteModel()),
-			crypt.Crypted,
-			crypt.Expiry,
+			crypt.CryptedCode(),
+			crypt.CodeExpiry(),
 			notificationType,
 			urlTemplate,
 			codeReturned,
+			generatorID,
 		),
 	}
 	if codeReturned {

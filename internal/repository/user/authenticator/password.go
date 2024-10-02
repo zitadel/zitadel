@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 )
 
 const (
@@ -15,6 +16,7 @@ const (
 	PasswordCreatedType   = passwordPrefix + "created"
 	PasswordDeletedType   = passwordPrefix + "deleted"
 	PasswordCodeAddedType = passwordPrefix + "code.added"
+	PasswordCodeSentType  = passwordPrefix + "code.sent"
 )
 
 type PasswordCreatedEvent struct {
@@ -101,6 +103,7 @@ type PasswordCodeAddedEvent struct {
 	URLTemplate       string                  `json:"url_template,omitempty"`
 	CodeReturned      bool                    `json:"code_returned,omitempty"`
 	TriggeredAtOrigin string                  `json:"triggerOrigin,omitempty"`
+	GeneratorID       string                  `json:"generatorId,omitempty"`
 }
 
 func (e *PasswordCodeAddedEvent) Payload() interface{} {
@@ -123,6 +126,7 @@ func NewPasswordCodeAddedEvent(
 	notificationType domain.NotificationType,
 	urlTemplate string,
 	codeReturned bool,
+	generatorID string,
 ) *PasswordCodeAddedEvent {
 	return &PasswordCodeAddedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -136,9 +140,39 @@ func NewPasswordCodeAddedEvent(
 		URLTemplate:       urlTemplate,
 		CodeReturned:      codeReturned,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
+		GeneratorID:       generatorID,
 	}
 }
 
 func (e *PasswordCodeAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
+}
+
+type PasswordCodeSentEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
+}
+
+func (e *PasswordCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
+
+func (e *PasswordCodeSentEvent) Payload() interface{} {
+	return e
+}
+
+func (e *PasswordCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, generatorInfo *senders.CodeGeneratorInfo) *PasswordCodeSentEvent {
+	return &PasswordCodeSentEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			PasswordCodeSentType,
+		),
+		GeneratorInfo: generatorInfo,
+	}
 }

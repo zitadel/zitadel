@@ -28,6 +28,7 @@ var (
 		` projections.sms_configs3_twilio.sid,` +
 		` projections.sms_configs3_twilio.token,` +
 		` projections.sms_configs3_twilio.sender_number,` +
+		` projections.sms_configs3_twilio.verify_service_sid,` +
 
 		// http config
 		` projections.sms_configs3_http.sms_id,` +
@@ -50,6 +51,7 @@ var (
 		` projections.sms_configs3_twilio.sid,` +
 		` projections.sms_configs3_twilio.token,` +
 		` projections.sms_configs3_twilio.sender_number,` +
+		` projections.sms_configs3_twilio.verify_service_sid,` +
 
 		// http config
 		` projections.sms_configs3_http.sms_id,` +
@@ -74,6 +76,7 @@ var (
 		"sid",
 		"token",
 		"sender-number",
+		"verify_sid",
 		// http config
 		"sms_id",
 		"endpoint",
@@ -126,6 +129,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							"sid",
 							&crypto.CryptoValue{},
 							"sender-number",
+							"",
 							// http config
 							nil,
 							nil,
@@ -148,9 +152,10 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 						Sequence:      20211109,
 						Description:   "description",
 						TwilioConfig: &Twilio{
-							SID:          "sid",
-							Token:        &crypto.CryptoValue{},
-							SenderNumber: "sender-number",
+							SID:              "sid",
+							Token:            &crypto.CryptoValue{},
+							SenderNumber:     "sender-number",
+							VerifyServiceSID: "",
 						},
 					},
 				},
@@ -174,6 +179,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							uint64(20211109),
 							"description",
 							// twilio config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -228,6 +234,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							"sid",
 							&crypto.CryptoValue{},
 							"sender-number",
+							"verify-service-sid",
 							// http config
 							nil,
 							nil,
@@ -246,6 +253,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							"sid2",
 							&crypto.CryptoValue{},
 							"sender-number2",
+							"verify-service-sid2",
 							// http config
 							nil,
 							nil,
@@ -260,6 +268,7 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 							uint64(20211109),
 							"description",
 							// twilio config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -286,9 +295,10 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 						Sequence:      20211109,
 						Description:   "description",
 						TwilioConfig: &Twilio{
-							SID:          "sid",
-							Token:        &crypto.CryptoValue{},
-							SenderNumber: "sender-number",
+							SID:              "sid",
+							Token:            &crypto.CryptoValue{},
+							SenderNumber:     "sender-number",
+							VerifyServiceSID: "verify-service-sid",
 						},
 					},
 					{
@@ -301,9 +311,10 @@ func Test_SMSConfigsPrepare(t *testing.T) {
 						Sequence:      20211109,
 						Description:   "description",
 						TwilioConfig: &Twilio{
-							SID:          "sid2",
-							Token:        &crypto.CryptoValue{},
-							SenderNumber: "sender-number2",
+							SID:              "sid2",
+							Token:            &crypto.CryptoValue{},
+							SenderNumber:     "sender-number2",
+							VerifyServiceSID: "verify-service-sid2",
 						},
 					},
 					{
@@ -397,6 +408,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						"sid",
 						&crypto.CryptoValue{},
 						"sender-number",
+						"verify-service-sid",
 						// http config
 						nil,
 						nil,
@@ -413,9 +425,10 @@ func Test_SMSConfigPrepare(t *testing.T) {
 				Sequence:      20211109,
 				Description:   "description",
 				TwilioConfig: &Twilio{
-					SID:          "sid",
-					SenderNumber: "sender-number",
-					Token:        &crypto.CryptoValue{},
+					SID:              "sid",
+					SenderNumber:     "sender-number",
+					Token:            &crypto.CryptoValue{},
+					VerifyServiceSID: "verify-service-sid",
 				},
 			},
 		},
@@ -436,6 +449,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						uint64(20211109),
 						"description",
 						// twilio config
+						nil,
 						nil,
 						nil,
 						nil,

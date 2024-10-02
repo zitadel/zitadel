@@ -161,6 +161,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s30FillFieldsForOrgDomainVerified = &FillFieldsForOrgDomainVerified{eventstore: eventstoreClient}
 	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: esPusherDBClient}
 	steps.s32AddAuthSessionID = &AddAuthSessionID{dbClient: esPusherDBClient}
+	steps.s33SMSConfigs3TwilioAddVerifyServiceSid = &SMSConfigs3TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -218,6 +219,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s25User11AddLowerFieldsToVerifiedEmail,
 		steps.s27IDPTemplate6SAMLNameIDFormat,
 		steps.s32AddAuthSessionID,
+		steps.s33SMSConfigs3TwilioAddVerifyServiceSid,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -309,6 +311,7 @@ func initProjections(
 		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
+		config.Caches,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,

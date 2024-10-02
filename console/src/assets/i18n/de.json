@@ -1420,6 +1420,8 @@
         "SID": "SID",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
+        "VERIFYSERVICESID": "Verification Service Sid",
+        "VERIFYSERVICESID_DESCRIPTION": "Das Setzen einer Verification Service Sid ermöglicht die Verwendung des Twilio Verify-Dienstes anstelle des Nachrichtendienstes zur Überprüfung von Telefonnummern und OTP-SMS.",
         "ADDED": "Twilio erfolgreich hinzugefügt.",
         "UPDATED": "Twilio wurde erfolgreich aktualisiert.",
         "REMOVED": "Twilio entfernt",

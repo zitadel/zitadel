@@ -128,8 +128,15 @@ func (c *Commands) RequestSchemaUserPasswordReset(ctx context.Context, user *Req
 		user.NotificationType,
 		user.URLTemplate,
 		user.ReturnCode,
-		func(ctx context.Context) (*EncryptedCode, error) {
-			return c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
+		func(ctx context.Context, notifyType domain.NotificationType) (*EncryptedCode, string, error) {
+			var passwordCode *EncryptedCode
+			var generatorID string
+			if notifyType == domain.NotificationTypeSms {
+				passwordCode, generatorID, err = c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption, c.defaultSecretGenerators.PasswordVerificationCode) //nolint:staticcheck
+			} else {
+				passwordCode, err = c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
+			}
+			return passwordCode, generatorID, err
 		},
 	)
 	if err != nil {
@@ -195,7 +202,7 @@ func (c *Commands) getSchemaUserPasswordWithVerification(ctx context.Context, us
 	if user.Verification != nil {
 		// otherwise check the password code...
 		if user.Verification.Code != "" {
-			verification = c.setSchemaUserPasswordWithVerifyCode(writeModel.CodeCreationDate, writeModel.CodeExpiry, writeModel.Code, user.Verification.Code)
+			verification = c.setSchemaUserPasswordWithVerifyCode(writeModel.CodeCreationDate, writeModel.CodeExpiry, writeModel.Code, writeModel.GeneratorID, writeModel.VerificationID, user.Verification.Code)
 		}
 		// ...or old password
 		if user.Verification.CurrentPassword != "" {
@@ -225,20 +232,34 @@ func (c *Commands) setSchemaUserPasswordWithPermission(orgID, userID string) set
 
 // setSchemaUserPasswordWithVerifyCode returns a password code check as [setPasswordVerification] implementation
 func (c *Commands) setSchemaUserPasswordWithVerifyCode(
-	passwordCodeCreationDate time.Time,
-	passwordCodeExpiry time.Duration,
-	passwordCode *crypto.CryptoValue,
+	codeCreationDate time.Time,
+	codeExpiry time.Duration,
+	encryptedCode *crypto.CryptoValue,
+	codeProviderID string,
+	codeVerificationID string,
 	code string,
 ) setPasswordVerification {
-	return func(ctx context.Context) (_ string, err error) {
-		if passwordCode == nil {
-			return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-TODO", "Errors.User.Code.NotFound")
+	if codeProviderID == "" {
+		return func(ctx context.Context) (newEncodedPassword string, err error) {
+			if encryptedCode == nil {
+				return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-05Pe3gq4FQ", "Errors.User.Code.NotFound")
+			}
+			_, spanCrypto := tracing.NewNamedSpan(ctx, "crypto.VerifyCode")
+			defer func() {
+				spanCrypto.EndWithError(err)
+			}()
+			return "", crypto.VerifyCode(codeCreationDate, codeExpiry, encryptedCode, code, c.userEncryption)
 		}
-		_, spanCrypto := tracing.NewNamedSpan(ctx, "crypto.VerifyCode")
-		defer func() {
-			spanCrypto.EndWithError(err)
-		}()
-		return "", crypto.VerifyCode(passwordCodeCreationDate, passwordCodeExpiry, passwordCode, code, c.userEncryption)
+	}
+	return func(ctx context.Context) (newEncodedPassword string, err error) {
+		if c.phoneCodeVerifier == nil {
+			return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-S8kTrxy0aH", "Errors.User.Code.NotConfigured")
+		}
+		verifier, err := c.phoneCodeVerifier(ctx, codeProviderID)
+		if err != nil {
+			return "", err
+		}
+		return "", verifier.VerifyCode(codeVerificationID, code)
 	}
 }
 

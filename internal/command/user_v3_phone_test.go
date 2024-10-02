@@ -14,16 +14,138 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+func filterSMSProviderActivated() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			instance.NewSMSConfigActivatedEvent(
+				context.Background(),
+				&instance.NewAggregate("instanceID").Aggregate,
+				"id",
+			),
+		),
+	)
+}
+
+func filterSMSProviderExternalExisting() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			instance.NewSMSConfigTwilioAddedEvent(
+				context.Background(),
+				&instance.NewAggregate("instanceID").Aggregate,
+				"id",
+				"",
+				"sid",
+				"senderNumber",
+				&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+				"verifyServiceSid",
+			),
+		),
+		eventFromEventPusher(
+			instance.NewSMSConfigActivatedEvent(
+				context.Background(),
+				&instance.NewAggregate("instanceID").Aggregate,
+				"id",
+			),
+		),
+	)
+}
+
+func filterSMSProviderInternalExisting() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			instance.NewSMSConfigTwilioAddedEvent(
+				context.Background(),
+				&instance.NewAggregate("instanceID").Aggregate,
+				"id",
+				"",
+				"sid",
+				"senderNumber",
+				&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+				"",
+			),
+		),
+		eventFromEventPusher(
+			instance.NewSMSConfigActivatedEvent(
+				context.Background(),
+				&instance.NewAggregate("instanceID").Aggregate,
+				"id",
+			),
+		),
+	)
+}
+
+func filterSchemaUserPhoneExisting() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			schemauser.NewCreatedEvent(
+				context.Background(),
+				&schemauser.NewAggregate("user1", "org1").Aggregate,
+				"id1",
+				1,
+				json.RawMessage(`{
+						"name": "user1"
+					}`),
+			),
+		),
+		eventFromEventPusher(
+			schemauser.NewPhoneUpdatedEvent(
+				context.Background(),
+				&schema.NewAggregate("id1", "instanceID").Aggregate,
+				"+41791234567",
+			),
+		),
+	)
+}
+
+func filterSchemaUserPhoneCodeExisting() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			schemauser.NewCreatedEvent(
+				context.Background(),
+				&schemauser.NewAggregate("user1", "org1").Aggregate,
+				"id1",
+				1,
+				json.RawMessage(`{
+						"name": "user1"
+					}`),
+			),
+		),
+		eventFromEventPusher(
+			schemauser.NewPhoneUpdatedEvent(
+				context.Background(),
+				&schemauser.NewAggregate("user1", "org1").Aggregate,
+				"+41791234567",
+			),
+		),
+		eventFromEventPusher(
+			schemauser.NewPhoneCodeAddedEvent(
+				context.Background(),
+				&schemauser.NewAggregate("user1", "org1").Aggregate,
+				&crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("phoneverify"),
+				},
+				time.Hour*1,
+				false,
+				"",
+			),
+		),
+	)
+}
+
 func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 	type fields struct {
-		eventstore      func(t *testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
-		newCode         encrypedCodeFunc
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		checkPermission             domain.PermissionCheck
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 	}
 	type args struct {
 		ctx  context.Context
@@ -98,19 +220,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			"phone update, no permission",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -131,26 +241,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			"phone update, phone not changed",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewPhoneUpdatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"+41791234567",
-							),
-						),
-					),
+					filterSchemaUserPhoneExisting(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
@@ -174,19 +265,9 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			"phone update, phone return",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -202,11 +283,12 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 							},
 							time.Hour*1,
 							true,
+							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneverify", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -229,16 +311,9 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			"user updated, phone to verify",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						schemauser.NewCreatedEvent(
-							context.Background(),
-							&schemauser.NewAggregate("user1", "org1").Aggregate,
-							"type",
-							1,
-							json.RawMessage(`{
-						"name": "user"
-					}`),
-						)),
+					filterSchemaUserExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -253,11 +328,50 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 								Crypted:    []byte("phoneverify"),
 							}, time.Hour*1,
 							false,
+							"",
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ChangeSchemaUserPhone{
+					ID: "user1",
+					Phone: &Phone{
+						Number: "+41791234567",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"user updated, phone to verify (external)",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderExternalExisting(),
+					expectPush(
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
+							&schemauser.NewAggregate("user1", "org1").Aggregate,
+							"+41791234567",
+						),
+						schemauser.NewPhoneCodeAddedEvent(context.Background(),
+							&schemauser.NewAggregate("user1", "org1").Aggregate,
+							nil,
+							0,
+							false,
+							"id",
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneverify", time.Hour),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -278,17 +392,7 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 			"user updated, verified",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						schemauser.NewCreatedEvent(
-							context.Background(),
-							&schemauser.NewAggregate("user1", "org1").Aggregate,
-							"type",
-							1,
-							json.RawMessage(`{
-						"name": "user"
-					}`),
-						),
-					),
+					filterSchemaUserExisting(),
 					expectPush(
 						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -321,10 +425,20 @@ func TestCommands_ChangeSchemaUserPhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:       tt.fields.eventstore(t),
-				checkPermission:  tt.fields.checkPermission,
-				newEncryptedCode: tt.fields.newCode,
-				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore:                  tt.fields.eventstore(t),
+				checkPermission:             tt.fields.checkPermission,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				userEncryption:              crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				defaultSecretGenerators: &SecretGenerators{
+					PhoneVerificationCode: &crypto.GeneratorConfig{
+						Length:              8,
+						Expiry:              time.Hour,
+						IncludeLowerLetters: true,
+						IncludeUpperLetters: true,
+						IncludeDigits:       true,
+						IncludeSymbols:      true,
+					},
+				},
 			}
 			details, err := c.ChangeSchemaUserPhone(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
@@ -402,19 +516,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 			"phone verify, no code",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
@@ -463,6 +565,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -520,6 +623,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 					),
@@ -571,6 +675,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 					),
@@ -622,6 +727,7 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 					),
@@ -671,9 +777,9 @@ func TestCommands_VerifySchemaUserPhone(t *testing.T) {
 
 func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 	type fields struct {
-		eventstore      func(t *testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
-		newCode         encrypedCodeFunc
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		checkPermission             domain.PermissionCheck
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 	}
 	type args struct {
 		ctx  context.Context
@@ -793,6 +899,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -821,40 +928,7 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 			"phone code resend, no permission",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewPhoneUpdatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"+41791234567",
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewPhoneCodeAddedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("phoneverify"),
-								},
-								time.Hour*1,
-								false,
-							),
-						),
-					),
+					filterSchemaUserPhoneCodeExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -874,40 +948,9 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 			"phone code resend, ok",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewPhoneUpdatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"+41791234567",
-							),
-						),
-						eventFromEventPusherWithCreationDateNow(
-							schemauser.NewPhoneCodeAddedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("phoneverify"),
-								},
-								time.Hour*1,
-								false,
-							),
-						),
-					),
+					filterSchemaUserPhoneCodeExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						eventFromEventPusher(
 							schemauser.NewPhoneCodeAddedEvent(
@@ -921,12 +964,47 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
+							),
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify2", time.Hour),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ResendSchemaUserPhoneCode{
+					ID: "user1",
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"phone code resend, ok (external)",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserPhoneCodeExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderExternalExisting(),
+					expectPush(
+						eventFromEventPusher(
+							schemauser.NewPhoneCodeAddedEvent(
+								context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								nil,
+								0,
+								false,
+								"id",
 							),
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneverify2", time.Hour),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -944,40 +1022,9 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 			"phone code resend, return, ok",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewPhoneUpdatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"+41791234567",
-							),
-						),
-						eventFromEventPusherWithCreationDateNow(
-							schemauser.NewPhoneCodeAddedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("phoneverify"),
-								},
-								time.Hour*1,
-								false,
-							),
-						),
-					),
+					filterSchemaUserPhoneCodeExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						eventFromEventPusher(
 							schemauser.NewPhoneCodeAddedEvent(
@@ -991,12 +1038,13 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 								},
 								time.Hour*1,
 								true,
+								"",
 							),
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneverify2", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify2", time.Hour),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -1016,10 +1064,20 @@ func TestCommands_ResendSchemaUserPhoneCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:       tt.fields.eventstore(t),
-				checkPermission:  tt.fields.checkPermission,
-				newEncryptedCode: tt.fields.newCode,
-				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore:                  tt.fields.eventstore(t),
+				checkPermission:             tt.fields.checkPermission,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				userEncryption:              crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				defaultSecretGenerators: &SecretGenerators{
+					PhoneVerificationCode: &crypto.GeneratorConfig{
+						Length:              8,
+						Expiry:              time.Hour,
+						IncludeLowerLetters: true,
+						IncludeUpperLetters: true,
+						IncludeDigits:       true,
+						IncludeSymbols:      true,
+					},
+				},
 			}
 			details, err := c.ResendSchemaUserPhoneCode(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {

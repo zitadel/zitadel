@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
@@ -23,13 +24,25 @@ import (
 )
 
 func TestCommands_CreateSchemaUser(t *testing.T) {
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore         func(t *testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
-		checkPermission    domain.PermissionCheck
-		newCode            encrypedCodeFunc
-		userPasswordHasher *crypto.Hasher
-		tokenAlg           crypto.EncryptionAlgorithm
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		idGenerator                 id.Generator
+		checkPermission             domain.PermissionCheck
+		userPasswordHasher          *crypto.Hasher
+		tokenAlg                    crypto.EncryptionAlgorithm
+		newCode                     encrypedCodeFunc
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx  context.Context
@@ -537,6 +550,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 					filterSchemaExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -561,12 +576,14 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 							},
 							time.Hour*1,
 							true,
+							"",
 						),
 					),
 				),
-				idGenerator:     mock.ExpectID(t, "id1"),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneverify", time.Hour),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -596,6 +613,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 					filterSchemaExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -620,12 +639,70 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 							},
 							time.Hour*1,
 							false,
+							"",
 						),
 					),
 				),
-				idGenerator:     mock.ExpectID(t, "id1"),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneverify", time.Hour),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner: "org1",
+					SchemaID:      "type",
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+					Phone: &Phone{
+						Number: "+41791234567",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "id1",
+				},
+			},
+		},
+		{
+			"user created, phone to verify (external)",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					filterSchemaExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderExternalExisting(),
+					expectPush(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"+41791234567",
+						),
+						schemauser.NewPhoneCodeAddedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							nil,
+							0,
+							false,
+							"id",
+						),
+					),
+				),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -794,11 +871,12 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:         tt.fields.eventstore(t),
-				idGenerator:        tt.fields.idGenerator,
-				checkPermission:    tt.fields.checkPermission,
-				newEncryptedCode:   tt.fields.newCode,
-				userEncryption:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore:                  tt.fields.eventstore(t),
+				idGenerator:                 tt.fields.idGenerator,
+				checkPermission:             tt.fields.checkPermission,
+				newEncryptedCode:            tt.fields.newCode,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators, userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.tokenAlg,
 			}
@@ -919,18 +997,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 			name: "remove user, ok",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
 					expectPush(
 						schemauser.NewDeletedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -953,18 +1020,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 			name: "remove user, no permission",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -1033,10 +1089,22 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 }
 
 func TestCommands_ChangeSchemaUser(t *testing.T) {
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore      func(t *testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
-		newCode         encrypedCodeFunc
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		checkPermission             domain.PermissionCheck
+		newCode                     encrypedCodeFunc
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx  context.Context
@@ -1074,19 +1142,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"schema not existing, error",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -1148,38 +1204,8 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"user update, no permission",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -2100,6 +2126,36 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 					}`),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -2115,11 +2171,13 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 							},
 							time.Hour*1,
 							true,
+							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneverify", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -2153,6 +2211,36 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 					}`),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						schemauser.NewPhoneUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -2168,11 +2256,91 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 							},
 							time.Hour*1,
 							false,
+							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("phoneverify", time.Hour),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &ChangeSchemaUser{
+					ID: "user1",
+					Phone: &Phone{
+						Number: "+41791234567",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"user updated, phone to verify (external)",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"verifyServiceSid",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectPush(
+						schemauser.NewPhoneUpdatedEvent(context.Background(),
+							&schemauser.NewAggregate("user1", "org1").Aggregate,
+							"+41791234567",
+						),
+						schemauser.NewPhoneCodeAddedEvent(context.Background(),
+							&schemauser.NewAggregate("user1", "org1").Aggregate,
+							nil,
+							0,
+							false,
+							"id",
+						),
+					),
+				),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneverify", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -2241,10 +2409,12 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:       tt.fields.eventstore(t),
-				checkPermission:  tt.fields.checkPermission,
-				newEncryptedCode: tt.fields.newCode,
-				userEncryption:   crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore:                  tt.fields.eventstore(t),
+				checkPermission:             tt.fields.checkPermission,
+				newEncryptedCode:            tt.fields.newCode,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				userEncryption:              crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			}
 			details, err := c.ChangeSchemaUser(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {

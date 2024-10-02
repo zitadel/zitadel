@@ -49,6 +49,27 @@ func mockEncryptedCodeWithDefault(code string, exp time.Duration) encryptedCodeW
 	}
 }
 
+func mockEncryptedCodeGeneratorWithDefault(code string, exp time.Duration) encryptedCodeGeneratorWithDefaultFunc {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, _ *crypto.GeneratorConfig) (*EncryptedCode, string, error) {
+		return &EncryptedCode{
+			Crypted: &crypto.CryptoValue{
+				CryptoType: crypto.TypeEncryption,
+				Algorithm:  "enc",
+				KeyID:      "id",
+				Crypted:    []byte(code),
+			},
+			Plain:  code,
+			Expiry: exp,
+		}, "", nil
+	}
+}
+
+func mockEncryptedCodeGeneratorWithDefaultExternal(id string) encryptedCodeGeneratorWithDefaultFunc {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, _ *crypto.GeneratorConfig) (*EncryptedCode, string, error) {
+		return nil, id, nil
+	}
+}
+
 func mockHashedSecret(secret string) hashedSecretFunc {
 	return func(_ context.Context, _ preparation.FilterToQueryReducer) (encodedHash string, plain string, err error) {
 		return secret, secret, nil

@@ -20,9 +20,10 @@ type IAMSMSConfigWriteModel struct {
 }
 
 type TwilioConfig struct {
-	SID          string
-	Token        *crypto.CryptoValue
-	SenderNumber string
+	SID              string
+	Token            *crypto.CryptoValue
+	SenderNumber     string
+	VerifyServiceSID string
 }
 
 type HTTPConfig struct {
@@ -48,9 +49,10 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 				continue
 			}
 			wm.Twilio = &TwilioConfig{
-				SID:          e.SID,
-				Token:        e.Token,
-				SenderNumber: e.SenderNumber,
+				SID:              e.SID,
+				Token:            e.Token,
+				SenderNumber:     e.SenderNumber,
+				VerifyServiceSID: e.VerifyServiceSID,
 			}
 			wm.Description = e.Description
 			wm.State = domain.SMSConfigStateInactive
@@ -66,6 +68,9 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			}
 			if e.SenderNumber != nil {
 				wm.Twilio.SenderNumber = *e.SenderNumber
+			}
+			if e.VerifyServiceSID != nil {
+				wm.Twilio.VerifyServiceSID = *e.VerifyServiceSID
 			}
 		case *instance.SMSConfigTwilioTokenChangedEvent:
 			if wm.ID != e.ID {
@@ -131,6 +136,7 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 	}
 	return wm.WriteModel.Reduce()
 }
+
 func (wm *IAMSMSConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
@@ -152,7 +158,7 @@ func (wm *IAMSMSConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string, description, sid, senderNumber *string) (*instance.SMSConfigTwilioChangedEvent, bool, error) {
+func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string, description, sid, senderNumber, verifyServiceSID *string) (*instance.SMSConfigTwilioChangedEvent, bool, error) {
 	changes := make([]instance.SMSConfigTwilioChanges, 0)
 	var err error
 
@@ -168,6 +174,9 @@ func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, agg
 	}
 	if senderNumber != nil && wm.Twilio.SenderNumber != *senderNumber {
 		changes = append(changes, instance.ChangeSMSConfigTwilioSenderNumber(*senderNumber))
+	}
+	if verifyServiceSID != nil && wm.Twilio.VerifyServiceSID != *verifyServiceSID {
+		changes = append(changes, instance.ChangeSMSConfigTwilioVerifyServiceSID(*verifyServiceSID))
 	}
 
 	if len(changes) == 0 {
@@ -203,4 +212,47 @@ func (wm *IAMSMSConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggre
 		return nil, false, err
 	}
 	return changeEvent, true, nil
+}
+
+type IAMSMSLastActivatedConfigWriteModel struct {
+	eventstore.WriteModel
+
+	activeID string
+}
+
+func NewIAMSMSLastActivatedConfigWriteModel(instanceID string) *IAMSMSLastActivatedConfigWriteModel {
+	return &IAMSMSLastActivatedConfigWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
+			InstanceID:    instanceID,
+		},
+	}
+}
+
+func (wm *IAMSMSLastActivatedConfigWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *instance.SMSConfigActivatedEvent:
+			wm.activeID = e.ID
+		case *instance.SMSConfigTwilioActivatedEvent:
+			wm.activeID = e.ID
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *IAMSMSLastActivatedConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		OrderDesc().
+		Limit(1).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(
+			instance.SMSConfigActivatedEventType,
+			instance.SMSConfigTwilioActivatedEventType,
+		).
+		Builder()
 }

@@ -48,6 +48,91 @@ func filterPasswordComplexityPolicyExisting() expect {
 	)
 }
 
+func filterSchemaUserPasswordCodeExisting() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			authenticator.NewPasswordCreatedEvent(
+				context.Background(),
+				&authenticator.NewAggregate("user1", "org1").Aggregate,
+				"user1",
+				"$plain$x$password",
+				false,
+			),
+		),
+		eventFromEventPusherWithCreationDateNow(
+			authenticator.NewPasswordCodeAddedEvent(context.Background(),
+				&authenticator.NewAggregate("user1", "org1").Aggregate,
+				&crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				time.Hour*1,
+				domain.NotificationTypeEmail,
+				"",
+				false,
+				"",
+			),
+		),
+	)
+}
+
+func filterSchemaUserPasswordCodeReturnExisting() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			authenticator.NewPasswordCreatedEvent(
+				context.Background(),
+				&authenticator.NewAggregate("user1", "org1").Aggregate,
+				"user1",
+				"$plain$x$password",
+				false,
+			),
+		),
+		eventFromEventPusherWithCreationDateNow(
+			authenticator.NewPasswordCodeAddedEvent(context.Background(),
+				&authenticator.NewAggregate("user1", "org1").Aggregate,
+				&crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "enc",
+					KeyID:      "id",
+					Crypted:    []byte("code"),
+				},
+				time.Hour*1,
+				domain.NotificationTypeEmail,
+				"",
+				true,
+				"",
+			),
+		),
+	)
+}
+
+func filterSchemaUserPasswordCodeExternalExisting() expect {
+	return expectFilter(
+		eventFromEventPusher(
+			authenticator.NewPasswordCreatedEvent(
+				context.Background(),
+				&authenticator.NewAggregate("user1", "org1").Aggregate,
+				"user1",
+				"$plain$x$password",
+				false,
+			),
+		),
+		eventFromEventPusherWithCreationDateNow(
+			authenticator.NewPasswordCodeAddedEvent(context.Background(),
+				&authenticator.NewAggregate("user1", "org1").Aggregate,
+				nil,
+				0,
+				domain.NotificationTypeSms,
+				"",
+				false,
+				"id1",
+			),
+		),
+	)
+}
+
 func TestCommands_SetSchemaUserPassword(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
@@ -446,6 +531,46 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 				eventstore: expectEventstore(
 					filterSchemaUserExisting(),
 					filterSchemaExisting(),
+					filterSchemaUserPasswordCodeExisting(),
+					filterPasswordComplexityPolicyExisting(),
+					expectPush(
+						authenticator.NewPasswordCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"$plain$x$password2",
+							false,
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &SetSchemaUserPassword{
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						Code: "code",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"password set, code external, ok",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 					expectFilter(
 						eventFromEventPusher(
 							authenticator.NewPasswordCreatedEvent(
@@ -469,6 +594,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 								domain.NotificationTypeEmail,
 								"",
 								false,
+								"",
 							),
 						),
 					),
@@ -534,6 +660,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 								domain.NotificationTypeEmail,
 								"",
 								false,
+								"",
 							),
 						),
 					),
@@ -586,7 +713,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-TODO", "Errors.User.Code.NotFound"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-05Pe3gq4FQ", "Errors.User.Code.NotFound"))
 				},
 			},
 		},
@@ -614,10 +741,22 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 }
 
 func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore      func(t *testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
-		newCode         encrypedCodeFunc
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		checkPermission             domain.PermissionCheck
+		newCode                     encrypedCodeFunc
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx  context.Context
@@ -709,6 +848,7 @@ func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
 							domain.NotificationTypeEmail,
 							"https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
 							false,
+							"",
 						),
 					),
 				),
@@ -734,6 +874,8 @@ func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					filterSchemaUserPasswordExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						authenticator.NewPasswordCodeAddedEvent(
 							context.Background(),
@@ -748,11 +890,49 @@ func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
 							domain.NotificationTypeSms,
 							"",
 							false,
+							"",
 						),
 					),
 				),
-				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockEncryptedCode("code", 10*time.Minute),
+				checkPermission:             newMockPermissionCheckAllowed(),
+				defaultSecretGenerators:     defaultGenerators,
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("code", 10*time.Minute),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &RequestSchemaUserPasswordReset{
+					UserID:           "user1",
+					NotificationType: domain.NotificationTypeSms,
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"password reset, sms (external), ok",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserPasswordExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderExternalExisting(),
+					expectPush(
+						authenticator.NewPasswordCodeAddedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
+							nil,
+							0,
+							domain.NotificationTypeSms,
+							"",
+							false,
+							"id",
+						),
+					),
+				),
+				checkPermission:         newMockPermissionCheckAllowed(),
+				defaultSecretGenerators: defaultGenerators,
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -786,6 +966,7 @@ func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
 							domain.NotificationTypeEmail,
 							"",
 							true,
+							"",
 						),
 					),
 				),
@@ -810,9 +991,11 @@ func TestCommands_RequestSchemaUserPasswordReset(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:       tt.fields.eventstore(t),
-				checkPermission:  tt.fields.checkPermission,
-				newEncryptedCode: tt.fields.newCode,
+				eventstore:                  tt.fields.eventstore(t),
+				checkPermission:             tt.fields.checkPermission,
+				newEncryptedCode:            tt.fields.newCode,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     defaultGenerators,
 			}
 			details, err := c.RequestSchemaUserPasswordReset(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {

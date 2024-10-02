@@ -221,7 +221,8 @@ func (wm *UserV3WriteModel) NewCreate(
 	data json.RawMessage,
 	email *Email,
 	phone *Phone,
-	code func(context.Context) (*EncryptedCode, error),
+	emailCode func(context.Context) (*EncryptedCode, error),
+	phoneCode func(context.Context) (*EncryptedCode, string, error),
 ) (_ []eventstore.Command, codeEmail string, codePhone string, err error) {
 	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", "", err
@@ -242,7 +243,7 @@ func (wm *UserV3WriteModel) NewCreate(
 	if email != nil {
 		emailEvents, plainCodeEmail, err := wm.NewEmailCreate(ctx,
 			email,
-			code,
+			emailCode,
 		)
 		if err != nil {
 			return nil, "", "", err
@@ -256,7 +257,7 @@ func (wm *UserV3WriteModel) NewCreate(
 	if phone != nil {
 		phoneEvents, plainCodePhone, err := wm.NewPhoneCreate(ctx,
 			phone,
-			code,
+			phoneCode,
 		)
 		if err != nil {
 			return nil, "", "", err
@@ -313,7 +314,8 @@ func (wm *UserV3WriteModel) NewUpdate(
 	user *SchemaUser,
 	email *Email,
 	phone *Phone,
-	code func(context.Context) (*EncryptedCode, error),
+	emailCode func(context.Context) (*EncryptedCode, error),
+	phoneCode func(context.Context) (*EncryptedCode, string, error),
 ) (_ []eventstore.Command, codeEmail string, codePhone string, err error) {
 	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", "", err
@@ -337,7 +339,7 @@ func (wm *UserV3WriteModel) NewUpdate(
 	if email != nil {
 		emailEvents, plainCodeEmail, err := wm.NewEmailUpdate(ctx,
 			email,
-			code,
+			emailCode,
 		)
 		if err != nil {
 			return nil, "", "", err
@@ -351,7 +353,7 @@ func (wm *UserV3WriteModel) NewUpdate(
 	if phone != nil {
 		phoneEvents, plainCodePhone, err := wm.NewPhoneCreate(ctx,
 			phone,
-			code,
+			phoneCode,
 		)
 		if err != nil {
 			return nil, "", "", err
@@ -572,7 +574,7 @@ func (wm *UserV3WriteModel) newEmailCodeAddedEvent(
 func (wm *UserV3WriteModel) NewPhoneCreate(
 	ctx context.Context,
 	phone *Phone,
-	code func(context.Context) (*EncryptedCode, error),
+	code func(context.Context) (*EncryptedCode, string, error),
 ) (_ []eventstore.Command, plainCode string, err error) {
 	if err := wm.checkPermissionWrite(ctx); err != nil {
 		return nil, "", err
@@ -604,7 +606,7 @@ func (wm *UserV3WriteModel) NewPhoneCreate(
 func (wm *UserV3WriteModel) NewPhoneUpdate(
 	ctx context.Context,
 	phone *Phone,
-	code func(context.Context) (*EncryptedCode, error),
+	code func(context.Context) (*EncryptedCode, string, error),
 ) (_ []eventstore.Command, plainCode string, err error) {
 	if !wm.PhoneWM {
 		return nil, "", nil
@@ -645,7 +647,7 @@ func (wm *UserV3WriteModel) newPhoneVerifiedEvent(
 
 func (wm *UserV3WriteModel) NewResendPhoneCode(
 	ctx context.Context,
-	code func(context.Context) (*EncryptedCode, error),
+	code func(context.Context) (*EncryptedCode, string, error),
 	isReturnCode bool,
 ) (_ []eventstore.Command, plainCode string, err error) {
 	if !wm.PhoneWM {
@@ -669,10 +671,10 @@ func (wm *UserV3WriteModel) NewResendPhoneCode(
 
 func (wm *UserV3WriteModel) newPhoneCodeAddedEvent(
 	ctx context.Context,
-	code func(context.Context) (*EncryptedCode, error),
+	code func(context.Context) (*EncryptedCode, string, error),
 	isReturnCode bool,
 ) (_ *schemauser.PhoneCodeAddedEvent, plainCode string, err error) {
-	cryptoCode, err := code(ctx)
+	cryptoCode, generatorID, err := code(ctx)
 	if err != nil {
 		return nil, "", err
 	}
@@ -681,9 +683,10 @@ func (wm *UserV3WriteModel) newPhoneCodeAddedEvent(
 	}
 	return schemauser.NewPhoneCodeAddedEvent(ctx,
 		UserV3AggregateFromWriteModel(&wm.WriteModel),
-		cryptoCode.Crypted,
-		cryptoCode.Expiry,
+		cryptoCode.CryptedCode(),
+		cryptoCode.CodeExpiry(),
 		isReturnCode,
+		generatorID,
 	), plainCode, nil
 }
 
