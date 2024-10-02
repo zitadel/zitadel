@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/database/postgres"
 )
 
 // Cache stores objects with a value of type `V`.
@@ -75,8 +76,8 @@ type Entry[I, K comparable] interface {
 
 type CachesConfig struct {
 	Connectors struct {
-		Memory MemoryConnectorConfig
-		// SQL database.Config
+		Memory   MemoryConnectorConfig
+		Postgres PostgresConnectorConfig
 		// Redis redis.Config?
 	}
 	Instance *CacheConfig
@@ -103,4 +104,10 @@ type CacheConfig struct {
 type MemoryConnectorConfig struct {
 	Enabled   bool
 	AutoPrune AutoPruneConfig
+}
+
+type PostgresConnectorConfig struct {
+	Enabled    bool
+	AutoPrune  AutoPruneConfig
+	Connection postgres.Config
 }

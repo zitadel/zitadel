@@ -13,4 +13,7 @@ select $1, keys.index_id, keys.index_key, id as object_id
 from object, jsonb_to_recordset($2) keys (
 	index_id bigint,
 	index_key text
-);
+)
+on conflict (cache_name, index_id, index_key) do
+	update set object_id = EXCLUDED.object_id
+;

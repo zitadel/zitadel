@@ -37,6 +37,7 @@ const (
 	DBPurposeQuery DBPurpose = iota
 	DBPurposeEventPusher
 	DBPurposeProjectionSpooler
+	DBPurposeCache
 )
 
 func (p DBPurpose) AppName() string {

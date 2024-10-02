@@ -72,21 +72,14 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 	return connector, nil
 }
 
-func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, error) {
-	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *Config) ConnectPGX(useAdmin bool, connConfig *dialect.ConnectionConfig, purpose dialect.DBPurpose) (*pgxpool.Pool, error) {
 	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
 	if err != nil {
 		return nil, err
 	}
-
-	if connConfig.MaxOpenConns != 0 {
+	if connConfig != nil && connConfig.MaxOpenConns != 0 {
 		config.MaxConns = int32(connConfig.MaxOpenConns)
 	}
-
 	config.MaxConnLifetime = c.MaxConnLifetime
 	config.MaxConnIdleTime = c.MaxConnIdleTime
 
@@ -99,6 +92,18 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 	}
 
 	if err := pool.Ping(context.Background()); err != nil {
+		return nil, err
+	}
+	return pool, nil
+}
+
+func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, error) {
+	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
+	if err != nil {
+		return nil, err
+	}
+	pool, err := c.ConnectPGX(useAdmin, connConfig, purpose)
+	if err != nil {
 		return nil, err
 	}
 

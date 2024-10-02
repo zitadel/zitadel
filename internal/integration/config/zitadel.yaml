@@ -8,15 +8,27 @@ TLS:
 
 Caches:
   Connectors:
-    Memory:
+    Postgres:
       Enabled: true
       AutoPrune:
         Interval: 30s
-        TimeOut: 1s
+        TimeOut: 1s 
+      Connection:
+        Host: localhost
+        Port: 5432
+        Database: zitadel
+        MaxOpenConns: 10
+        MaxIdleConns: 5
+        MaxConnLifetime: 1h
+        MaxConnIdleTime: 5m
+        User:
+          Username: zitadel
+          SSL:
+            Mode: disable
   Instance:
-    Connector: "memory"
-    MaxAge: 1m
-    LastUsage: 30s
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUsage: 30m
     Log:
       Level: info
       AddSource: true

@@ -177,7 +177,21 @@ func Test_pgCache_Get(t *testing.T) {
 		args   args
 		expect func(pgxmock.PgxCommonIface)
 		want   *testObject
+		wantOk bool
 	}{
+		{
+			name: "invalid index",
+			config: cache.CacheConfig{
+				MaxAge:     time.Minute,
+				LastUseAge: time.Second,
+			},
+			args: args{
+				index: 99,
+				key:   "id1",
+			},
+			expect: func(pci pgxmock.PgxCommonIface) {},
+			wantOk: false,
+		},
 		{
 			name: "no rows",
 			config: cache.CacheConfig{
@@ -193,6 +207,7 @@ func Test_pgCache_Get(t *testing.T) {
 					WithArgs("test", testIndexID, "id1", time.Duration(0), time.Duration(0)).
 					WillReturnRows(pgxmock.NewRows([]string{"payload"}))
 			},
+			wantOk: false,
 		},
 		{
 			name: "error",
@@ -209,6 +224,7 @@ func Test_pgCache_Get(t *testing.T) {
 					WithArgs("test", testIndexID, "id1", time.Duration(0), time.Duration(0)).
 					WillReturnError(pgx.ErrTxClosed)
 			},
+			wantOk: false,
 		},
 		{
 			name: "ok",
@@ -234,6 +250,7 @@ func Test_pgCache_Get(t *testing.T) {
 				ID:   "id1",
 				Name: []string{"foo", "bar"},
 			},
+			wantOk: true,
 		},
 	}
 	for _, tt := range tests {
@@ -243,9 +260,7 @@ func Test_pgCache_Get(t *testing.T) {
 			tt.expect(pool)
 
 			got, ok := c.Get(context.Background(), tt.args.index, tt.args.key)
-			if tt.want != nil {
-				require.True(t, ok)
-			}
+			assert.Equal(t, tt.wantOk, ok)
 			assert.Equal(t, tt.want, got)
 			err := pool.ExpectationsWereMet()
 			assert.NoError(t, err)
