@@ -14,6 +14,16 @@ with domain as (
 	cross join projections.system_features s
 	full outer join instance_features i using (instance_id, key)
 	group by instance_id
+), external_domains as (
+	select ed.instance_id, array_agg(ed.domain) as domains
+	from domain d
+	join projections.instance_domains ed on d.instance_id = ed.instance_id
+	group by ed.instance_id
+), trusted_domains as (
+	select td.instance_id, array_agg(td.domain) as domains
+	from domain d
+	join projections.instance_trusted_domains td on d.instance_id = td.instance_id
+	group by td.instance_id
 )
 select
     i.id,
@@ -27,11 +37,13 @@ select
 	s.enable_impersonation,
     l.audit_log_retention,
     l.block,
-	f.features
+	f.features,
+	ed.domains as external_domains,
+	td.domains as trusted_domains
 from domain d
 join projections.instances i on i.id = d.instance_id
-left join projections.instance_trusted_domains td on i.id = td.instance_id
 left join projections.security_policies2 s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id
-where case when $2 = '' then true else td.domain = $2 end;
+left join external_domains ed on i.id = ed.instance_id
+left join trusted_domains td on i.id = td.instance_id;

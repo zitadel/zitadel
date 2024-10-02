@@ -1420,6 +1420,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Číslo odesílatele",
+        "VERIFYSERVICESID": "ID služby ověření",
+        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a SMS OTP.",
         "ADDED": "Twilio bylo úspěšně přidáno.",
         "UPDATED": "Twilio bylo úspěšně aktualizováno.",
         "REMOVED": "Twilio bylo odebráno",

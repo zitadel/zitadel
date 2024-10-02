@@ -2,8 +2,6 @@ package eventstore
 
 import (
 	"context"
-
-	"github.com/shopspring/decimal"
 )
 
 func NewEventstore(querier Querier, pusher Pusher) *EventStore {
@@ -32,12 +30,12 @@ type healthier interface {
 }
 
 type GlobalPosition struct {
-	Position        decimal.Decimal
+	Position        float64
 	InPositionOrder uint32
 }
 
 func (gp GlobalPosition) IsLess(other GlobalPosition) bool {
-	return gp.Position.LessThan(other.Position) || (gp.Position.Equal(other.Position) && gp.InPositionOrder < other.InPositionOrder)
+	return gp.Position < other.Position || (gp.Position == other.Position && gp.InPositionOrder < other.InPositionOrder)
 }
 
 type Reducer interface {

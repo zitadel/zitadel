@@ -119,6 +119,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
+		DisableUserTokenEvent: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
 	}
 	got := systemFeaturesToPb(arg)
 	assert.Equal(t, want, got)
@@ -242,6 +246,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		OidcSingleV1SessionTermination: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		DisableUserTokenEvent: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
 	}
 	got := instanceFeaturesToPb(arg)

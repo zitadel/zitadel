@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -64,6 +65,7 @@ type Commands struct {
 	defaultAccessTokenLifetime      time.Duration
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
+	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -179,6 +181,7 @@ func StartCommands(
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
+	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	return repo, nil
 }
 
@@ -189,11 +192,28 @@ type AppendReducer interface {
 }
 
 func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
+	if len(cmds) == 0 {
+		return nil
+	}
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return err
 	}
 	return AppendAndReduce(object, events...)
+}
+
+type AppendReducerDetails interface {
+	AppendEvents(...eventstore.Event)
+	// TODO: Why is it allowed to return an error here?
+	Reduce() error
+	GetWriteModel() *eventstore.WriteModel
+}
+
+func (c *Commands) pushAppendAndReduceDetails(ctx context.Context, object AppendReducerDetails, cmds ...eventstore.Command) (*domain.ObjectDetails, error) {
+	if err := c.pushAppendAndReduce(ctx, object, cmds...); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(object.GetWriteModel()), nil
 }
 
 func AppendAndReduce(object AppendReducer, events ...eventstore.Event) error {

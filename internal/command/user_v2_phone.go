@@ -6,9 +6,11 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -88,7 +90,7 @@ func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, pho
 	if err = cmd.Change(ctx, domain.PhoneNumber(phone)); err != nil {
 		return nil, err
 	}
-	if err = cmd.AddGeneratedCode(ctx, gen, returnCode); err != nil {
+	if err = cmd.AddGeneratedCode(ctx, returnCode); err != nil {
 		return nil, err
 	}
 	return cmd.Push(ctx)
@@ -107,10 +109,10 @@ func (c *Commands) resendUserPhoneCodeWithGenerator(ctx context.Context, userID 
 			return nil, err
 		}
 	}
-	if cmd.model.Code == nil {
+	if cmd.model.Code == nil && cmd.model.GeneratorID == "" {
 		return nil, zerrors.ThrowPreconditionFailed(err, "PHONE-5xrra88eq8", "Errors.User.Code.Empty")
 	}
-	if err = cmd.AddGeneratedCode(ctx, gen, returnCode); err != nil {
+	if err = cmd.AddGeneratedCode(ctx, returnCode); err != nil {
 		return nil, err
 	}
 	return cmd.Push(ctx)
@@ -166,10 +168,12 @@ func (c *Commands) removeUserPhone(ctx context.Context, userID string) (*domain.
 // UserPhoneEvents allows step-by-step additions of events,
 // operating on the Human Phone Model.
 type UserPhoneEvents struct {
-	eventstore *eventstore.Eventstore
-	aggregate  *eventstore.Aggregate
-	events     []eventstore.Command
-	model      *HumanPhoneWriteModel
+	eventstore      *eventstore.Eventstore
+	aggregate       *eventstore.Aggregate
+	events          []eventstore.Command
+	model           *HumanPhoneWriteModel
+	generateCode    func(ctx context.Context, filter preparation.FilterToQueryReducer) (*EncryptedCode, string, error)
+	getCodeVerifier func(ctx context.Context, id string) (senders.CodeGenerator, error)
 
 	plainCode *string
 }
@@ -196,6 +200,10 @@ func (c *Commands) NewUserPhoneEvents(ctx context.Context, userID string) (*User
 		eventstore: c.eventstore,
 		aggregate:  UserAggregateFromWriteModel(&model.WriteModel),
 		model:      model,
+		generateCode: func(ctx context.Context, filter preparation.FilterToQueryReducer) (*EncryptedCode, string, error) {
+			return c.newPhoneCode(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode)
+		},
+		getCodeVerifier: c.phoneCodeVerifier,
 	}, nil
 }
 
@@ -229,15 +237,14 @@ func (c *UserPhoneEvents) SetVerified(ctx context.Context) {
 
 // AddGeneratedCode generates a new encrypted code and sets it to the phone number.
 // When returnCode a plain text of the code will be returned from Push.
-func (c *UserPhoneEvents) AddGeneratedCode(ctx context.Context, gen crypto.Generator, returnCode bool) error {
-	value, plain, err := crypto.NewCode(gen)
+func (c *UserPhoneEvents) AddGeneratedCode(ctx context.Context, returnCode bool) error {
+	code, generatorID, err := c.generateCode(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return err
 	}
-
-	c.events = append(c.events, user.NewHumanPhoneCodeAddedEventV2(ctx, c.aggregate, value, gen.Expiry(), returnCode))
+	c.events = append(c.events, user.NewHumanPhoneCodeAddedEventV2(ctx, c.aggregate, code.CryptedCode(), code.CodeExpiry(), returnCode, generatorID))
 	if returnCode {
-		c.plainCode = &plain
+		c.plainCode = &code.Plain
 	}
 	return nil
 }
@@ -247,7 +254,17 @@ func (c *UserPhoneEvents) VerifyCode(ctx context.Context, code string, gen crypt
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 
-	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen.Alg())
+	err := verifyCode(
+		ctx,
+		c.model.CodeCreationDate,
+		c.model.CodeExpiry,
+		c.model.Code,
+		c.model.GeneratorID,
+		c.model.VerificationID,
+		code,
+		gen.Alg(),
+		c.getCodeVerifier,
+	)
 	if err == nil {
 		c.events = append(c.events, user.NewHumanPhoneVerifiedEvent(ctx, c.aggregate))
 		return nil
