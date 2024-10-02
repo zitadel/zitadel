@@ -103,6 +103,47 @@ func TestServer_AddHumanUser(t *testing.T) {
 			},
 		},
 		{
+			name: "default verification (org domain ctx)",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgDomain{
+							OrgDomain: Instance.DefaultOrg.PrimaryDomain,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
 			name: "return email verification code",
 			args: args{
 				CTX,
