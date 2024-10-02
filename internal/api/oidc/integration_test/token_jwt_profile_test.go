@@ -3,6 +3,7 @@
 package oidc_test
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func TestServer_JWTProfile(t *testing.T) {
@@ -48,6 +51,16 @@ func TestServer_JWTProfile(t *testing.T) {
 			name:    "openid, profile, email",
 			keyData: keyData,
 			scope:   []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			wantClaims: claims{
+				name:     name,
+				username: name,
+				updated:  user.GetDetails().GetChangeDate().AsTime(),
+			},
+		},
+		{
+			name:    "openid, profile, email, zitadel",
+			keyData: keyData,
+			scope:   []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, domain.ProjectScopeZITADEL},
 			wantClaims: claims{
 				name:     name,
 				username: name,
@@ -129,6 +142,13 @@ func TestServer_JWTProfile(t *testing.T) {
 			assert.Empty(t, userinfo.UserInfoEmail)
 			assert.Empty(t, userinfo.UserInfoPhone)
 			assert.Empty(t, userinfo.Address)
+
+			_, err = Instance.Client.Auth.GetMyUser(integration.WithAuthorizationToken(CTX, tokens.AccessToken), &auth.GetMyUserRequest{})
+			if slices.Contains(tt.scope, domain.ProjectScopeZITADEL) {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
 		})
 	}
 }
