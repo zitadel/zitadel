@@ -25,7 +25,7 @@ type execution struct {
 type anyArg struct{}
 
 func (e *testExecuter) Exec(stmt string, args ...interface{}) (sql.Result, error) {
-	if stmt == "SAVEPOINT stmt_exec" || stmt == "RELEASE SAVEPOINT stmt_exec" {
+	if stmt == "SAVEPOINT exec_stmt" {
 		return nil, nil
 	}
 

@@ -9,6 +9,7 @@ const (
 	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
 	ProjectIDScopeZITADEL = "zitadel"
 	AudSuffix             = ":aud"
+	ProjectScopeZITADEL   = ProjectIDScope + ProjectIDScopeZITADEL + AudSuffix
 	SelectIDPScope        = "urn:zitadel:iam:org:idp:id:"
 )
 
