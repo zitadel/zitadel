@@ -3,8 +3,12 @@ package command
 import (
 	"context"
 	"encoding/json"
+	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -247,13 +251,34 @@ func existingSchema(ctx context.Context, c *Commands, resourceOwner, id string) 
 	return writeModel, nil
 }
 
-func existingSchemaWithAuthenticator(ctx context.Context, c *Commands, resourceOwner, id string, authenticator domain.AuthenticatorType) (*UserSchemaWriteModel, error) {
-	writeModel, err := c.getSchemaWriteModelByID(ctx, resourceOwner, id)
+func schemaUserVerifyCode(
+	ctx context.Context,
+	codeCreationDate time.Time,
+	codeExpiry time.Duration,
+	encryptedCode *crypto.CryptoValue,
+	codeProviderID string,
+	codeVerificationID string,
+	code string,
+	codeAlg crypto.EncryptionAlgorithm,
+	getCodeVerifier func(ctx context.Context, id string) (_ senders.CodeGenerator, err error),
+) (err error) {
+	if codeProviderID == "" {
+		if encryptedCode == nil {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-05Pe3gq4FQ", "Errors.User.Code.NotFound")
+		}
+		_, spanCrypto := tracing.NewNamedSpan(ctx, "crypto.VerifyCode")
+		defer func() {
+			spanCrypto.EndWithError(err)
+		}()
+		return crypto.VerifyCode(codeCreationDate, codeExpiry, encryptedCode, code, codeAlg)
+	}
+	if getCodeVerifier == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-S8kTrxy0aH", "Errors.User.Code.NotConfigured")
+	}
+	verifier, err := getCodeVerifier(ctx, codeProviderID)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if !writeModel.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists")
-	}
-	return writeModel, nil
+
+	return verifier.VerifyCode(codeVerificationID, code)
 }

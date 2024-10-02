@@ -239,27 +239,8 @@ func (c *Commands) setSchemaUserPasswordWithVerifyCode(
 	codeVerificationID string,
 	code string,
 ) setPasswordVerification {
-	if codeProviderID == "" {
-		return func(ctx context.Context) (newEncodedPassword string, err error) {
-			if encryptedCode == nil {
-				return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-05Pe3gq4FQ", "Errors.User.Code.NotFound")
-			}
-			_, spanCrypto := tracing.NewNamedSpan(ctx, "crypto.VerifyCode")
-			defer func() {
-				spanCrypto.EndWithError(err)
-			}()
-			return "", crypto.VerifyCode(codeCreationDate, codeExpiry, encryptedCode, code, c.userEncryption)
-		}
-	}
-	return func(ctx context.Context) (newEncodedPassword string, err error) {
-		if c.phoneCodeVerifier == nil {
-			return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-S8kTrxy0aH", "Errors.User.Code.NotConfigured")
-		}
-		verifier, err := c.phoneCodeVerifier(ctx, codeProviderID)
-		if err != nil {
-			return "", err
-		}
-		return "", verifier.VerifyCode(codeVerificationID, code)
+	return func(ctx context.Context) (_ string, err error) {
+		return "", schemaUserVerifyCode(ctx, codeCreationDate, codeExpiry, encryptedCode, codeProviderID, codeVerificationID, code, c.userEncryption, c.phoneCodeVerifier)
 	}
 }
 

@@ -64,8 +64,8 @@ func (c *Commands) VerifySchemaUserPhone(ctx context.Context, resourceOwner, id,
 	}
 
 	events, err := writeModel.NewPhoneVerify(ctx,
-		func(creationDate time.Time, expiry time.Duration, cryptoCode *crypto.CryptoValue) error {
-			return crypto.VerifyCode(creationDate, expiry, cryptoCode, code, c.userEncryption)
+		func(ctx context.Context, creationDate time.Time, expiry time.Duration, cryptoCode *crypto.CryptoValue, generatorID string, verificationID string) error {
+			return schemaUserVerifyCode(ctx, creationDate, expiry, cryptoCode, generatorID, verificationID, code, c.userEncryption, c.phoneCodeVerifier)
 		},
 	)
 	if err != nil {

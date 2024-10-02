@@ -34,6 +34,8 @@ type UserV3WriteModel struct {
 	IsPhoneVerified          bool
 	PhoneVerifiedFailedCount int
 	PhoneCode                *VerifyCode
+	PhoneCodeGeneratorID     string
+	PhoneCodeVerificationID  string
 
 	Data json.RawMessage
 
@@ -156,12 +158,16 @@ func (wm *UserV3WriteModel) Reduce() error {
 				CreationDate: e.CreationDate(),
 				Expiry:       e.Expiry,
 			}
+			wm.PhoneCodeGeneratorID = e.GeneratorID
 		case *schemauser.PhoneVerifiedEvent:
 			wm.PhoneVerifiedFailedCount = 0
 			wm.IsPhoneVerified = true
 			wm.PhoneCode = nil
 		case *schemauser.PhoneVerificationFailedEvent:
 			wm.PhoneVerifiedFailedCount += 1
+		case *schemauser.PhoneCodeSentEvent:
+			wm.PhoneCodeGeneratorID = e.GeneratorInfo.GetID()
+			wm.PhoneCodeVerificationID = e.GeneratorInfo.GetVerificationID()
 		case *schemauser.LockedEvent:
 			wm.Locked = true
 		case *schemauser.UnlockedEvent:
@@ -207,6 +213,7 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 			schemauser.PhoneVerifiedType,
 			schemauser.PhoneCodeAddedType,
 			schemauser.PhoneVerificationFailedType,
+			schemauser.PhoneCodeSentType,
 		)
 	}
 	return builder.AddQuery().
@@ -619,7 +626,7 @@ func (wm *UserV3WriteModel) NewPhoneUpdate(
 
 func (wm *UserV3WriteModel) NewPhoneVerify(
 	ctx context.Context,
-	verify func(creationDate time.Time, expiry time.Duration, cryptoCode *crypto.CryptoValue) error,
+	verify func(context.Context, time.Time, time.Duration, *crypto.CryptoValue, string, string) error,
 ) ([]eventstore.Command, error) {
 	if !wm.PhoneWM {
 		return nil, nil
@@ -633,7 +640,7 @@ func (wm *UserV3WriteModel) NewPhoneVerify(
 	if wm.PhoneCode == nil {
 		return nil, nil
 	}
-	if err := verify(wm.PhoneCode.CreationDate, wm.PhoneCode.Expiry, wm.PhoneCode.Code); err != nil {
+	if err := verify(ctx, wm.PhoneCode.CreationDate, wm.PhoneCode.Expiry, wm.PhoneCode.Code, wm.PhoneCodeGeneratorID, wm.PhoneCodeVerificationID); err != nil {
 		return nil, err
 	}
 	return []eventstore.Command{wm.newPhoneVerifiedEvent(ctx)}, nil

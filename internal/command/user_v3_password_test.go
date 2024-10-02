@@ -14,6 +14,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/notification/senders/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -130,6 +132,15 @@ func filterSchemaUserPasswordCodeExternalExisting() expect {
 				"id1",
 			),
 		),
+		eventFromEventPusherWithCreationDateNow(
+			authenticator.NewPasswordCodeSentEvent(context.Background(),
+				&authenticator.NewAggregate("user1", "org1").Aggregate,
+				&senders.CodeGeneratorInfo{
+					ID:             "id",
+					VerificationID: "verificationID",
+				},
+			),
+		),
 	)
 }
 
@@ -139,6 +150,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 		userPasswordHasher *crypto.Hasher
 		checkPermission    domain.PermissionCheck
 		codeAlg            crypto.EncryptionAlgorithm
+		phoneCodeVerifier  func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	}
 	type args struct {
 		ctx  context.Context
@@ -566,38 +578,87 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 			},
 		},
 		{
+			"password set, code external, not configured",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					filterSchemaUserPasswordCodeExternalExisting(),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &SetSchemaUserPassword{
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						Code: "code",
+					},
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-S8kTrxy0aH", "Errors.User.Code.NotConfigured"))
+				},
+			},
+		},
+		{
 			"password set, code external, ok",
 			fields{
 				eventstore: expectEventstore(
 					filterSchemaUserExisting(),
 					filterSchemaExisting(),
-					expectFilter(
-						eventFromEventPusher(
-							authenticator.NewPasswordCreatedEvent(
-								context.Background(),
-								&authenticator.NewAggregate("user1", "org1").Aggregate,
-								"user1",
-								"$plain$x$password",
-								false,
-							),
-						),
-						eventFromEventPusherWithCreationDateNow(
-							authenticator.NewPasswordCodeAddedEvent(context.Background(),
-								&authenticator.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("code"),
-								},
-								time.Hour*1,
-								domain.NotificationTypeEmail,
-								"",
-								false,
-								"",
-							),
+					filterSchemaUserPasswordCodeExternalExisting(),
+					filterPasswordComplexityPolicyExisting(),
+					expectPush(
+						authenticator.NewPasswordCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"$plain$x$password2",
+							false,
 						),
 					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				phoneCodeVerifier: func(ctx context.Context, id string) (senders.CodeGenerator, error) {
+					sender := mock.NewMockCodeGenerator(gomock.NewController(t))
+					sender.EXPECT().VerifyCode("verificationID", "code").Return(nil)
+					return sender, nil
+				},
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &SetSchemaUserPassword{
+					UserID: "user1",
+					Password: &SchemaUserPassword{
+						Password:       "password2",
+						ChangeRequired: false,
+					},
+					Verification: &SchemaUserPasswordVerification{
+						Code: "code",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"password set, code return, ok",
+			fields{
+				eventstore: expectEventstore(
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
+					filterSchemaUserPasswordCodeReturnExisting(),
 					filterPasswordComplexityPolicyExisting(),
 					expectPush(
 						authenticator.NewPasswordCreatedEvent(
@@ -725,6 +786,7 @@ func TestCommands_SetSchemaUserPassword(t *testing.T) {
 				checkPermission:    tt.fields.checkPermission,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.codeAlg,
+				phoneCodeVerifier:  tt.fields.phoneCodeVerifier,
 			}
 			details, err := c.SetSchemaUserPassword(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
