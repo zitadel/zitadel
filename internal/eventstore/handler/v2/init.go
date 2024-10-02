@@ -265,7 +265,7 @@ func NewViewCheck(selectStmt string, secondaryTables ...*SuffixedTable) *handler
 
 func execNextIfExists(config execConfig, q query, opts []execOption, executeNext bool) func(handler.Executer, string) (bool, error) {
 	return func(handler handler.Executer, name string) (shouldExecuteNext bool, err error) {
-		_, err = handler.Exec("SAVEPOINT stmt_exec")
+		_, err = handler.Exec("SAVEPOINT exec_stmt")
 		if err != nil {
 			return false, zerrors.ThrowInternal(err, "V2-U1wlz", "create savepoint failed")
 		}
@@ -275,7 +275,7 @@ func execNextIfExists(config execConfig, q query, opts []execOption, executeNext
 			}
 
 			if isErrAlreadyExists(err) {
-				_, err = handler.Exec("ROLLBACK TO SAVEPOINT stmt_exec")
+				_, err = handler.Exec("ROLLBACK TO SAVEPOINT exec_stmt")
 				shouldExecuteNext = executeNext
 				return
 			}
