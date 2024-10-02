@@ -134,7 +134,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		orgID = resourceOwner
 	}
 	// System API calls don't have a resource owner
-	if orgID != "" {
+	if orgID != "" || orgDomain != "" {
 		orgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 		if err != nil {
 			return CtxData{}, zerrors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
