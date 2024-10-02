@@ -42,7 +42,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 	}
 
 	orgs := make([]*admin_pb.DataOrg, len(queriedOrgs.Orgs))
-	processedOrgs := make([]string, len(queriedOrgs.Orgs))
+	processedOrgs := make([]string, 0, len(queriedOrgs.Orgs))
 	processedProjects := make([]string, 0)
 	processedGrants := make([]string, 0)
 	processedUsers := make([]string, 0)
