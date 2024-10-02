@@ -1,5 +1,5 @@
 ---
-title: Actions v2 example execution locally
+title: Test Actions Locally
 ---
 
 In this guide, you will create a ZITADEL execution and target. After a user is created through the API, the target is called.

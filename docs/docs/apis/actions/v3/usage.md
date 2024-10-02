@@ -1,5 +1,5 @@
 ---
-title: Actions V2
+title: Using Actions
 ---
 
 This page describes the options you have when defining ZITADEL Actions V2.
