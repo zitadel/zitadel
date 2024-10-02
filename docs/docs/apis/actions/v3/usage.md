@@ -51,7 +51,7 @@ There are different types of Targets:
 
 `InterruptOnError` means that the Execution gets interrupted if any of the calls return with a status code >= 400, and the next Target will not be called anymore.
 
-The API documentation to create a target can be found [here](/apis/resources/action_service_v3/action-service-create-target)
+The API documentation to create a target can be found [here](/apis/resources/action_service_v3/zitadel-actions-create-target)
 
 ## Execution
 
@@ -65,7 +65,7 @@ The condition can be defined for 4 types of processes:
 - `Functions`, handling specific functionality in the logic of ZITADEL
 - `Events`, after a specific event happened and was stored in ZITADEL
 
-The API documentation to set an Execution can be found [here](/apis/resources/action_service_v3/action-service-set-execution)
+The API documentation to set an Execution can be found [here](/apis/resources/action_service_v3/zitadel-actions-set-execution)
 
 ### Condition Best Match
 
@@ -147,19 +147,19 @@ For Request and Response there are 3 levels the condition can be defined:
 - `All`, handling any request or response under the ZITADEL API
 
 The available conditions can be found under:
-- [All available Methods](/apis/resources/action_service_v3/action-service-list-execution-methods), for example `/zitadel.user.v2.UserService/AddHumanUser`
-- [All available Services](/apis/resources/action_service_v3/action-service-list-execution-services), for example `zitadel.user.v2.UserService`
+- [All available Methods](/apis/resources/action_service_v3/zitadel-actions-list-execution-methods), for example `/zitadel.user.v2.UserService/AddHumanUser`
+- [All available Services](/apis/resources/action_service_v3/zitadel-actions-list-execution-services), for example `zitadel.user.v2.UserService`
 
 ### Condition for Functions
 
 Replace the current Actions with the following flows:
 
-- [Internal Authentication](../actions/internal-authentication)
-- [External Authentication](../actions/external-authentication)
-- [Complement Token](../actions/complement-token)
-- [Customize SAML Response](../actions/customize-samlresponse)
+- [Internal Authentication](/apis/actions/internal-authentication)
+- [External Authentication](/apis/actions/external-authentication)
+- [Complement Token](/apis/actions/complement-token)
+- [Customize SAML Response](/apis/actions/customize-samlresponse)
 
-The available conditions can be found under [all available Functions](/apis/resources/action_service_v3/action-service-list-execution-functions).
+The available conditions can be found under [all available Functions](/apis/resources/action_service_v3/zitadel-actions-list-execution-functions).
 
 ### Condition for Events
 
