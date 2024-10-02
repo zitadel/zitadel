@@ -677,18 +677,6 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 			opt(&config)
 		}
 
-		_, err = ex.Exec("SAVEPOINT stmt_exec")
-		if err != nil {
-			return zerrors.ThrowInternal(err, "CRDB-YdOXD", "create savepoint failed")
-		}
-		defer func() {
-			if err != nil {
-				_, rollbackErr := ex.Exec("ROLLBACK TO SAVEPOINT stmt_exec")
-				logging.OnError(rollbackErr).Debug("rollback failed")
-				return
-			}
-			_, err = ex.Exec("RELEASE SAVEPOINT stmt_exec")
-		}()
 		_, err = ex.Exec(q(config), config.args...)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
