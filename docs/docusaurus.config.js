@@ -289,7 +289,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           session_v2: {
@@ -297,7 +297,7 @@ module.exports = {
             outputDir: "docs/apis/resources/session_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           oidc_v2: {
@@ -305,7 +305,7 @@ module.exports = {
             outputDir: "docs/apis/resources/oidc_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           settings_v2: {
@@ -313,7 +313,7 @@ module.exports = {
             outputDir: "docs/apis/resources/settings_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           user_schema_v3: {

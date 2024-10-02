@@ -530,10 +530,11 @@ module.exports = {
     },
   ],
   apis: [
+
     "apis/introduction",
     {
       type: "category",
-      label: "Core Resources",
+      label: "Resources",
       collapsed: false,
       link: {
         type: "doc",
@@ -542,11 +543,742 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "V1 (Generally Available)",
-          collapsed: false,
+          label: "Actions",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/actions"
+            },
+            {
+              type: "category",
+              label: "v3 (alpha)",
+              link: {
+                type: "generated-index",
+                title: "Actions Service API (alpha)",
+                slug: "/apis/resources/action_service_v3",
+                description:
+                    "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
+                    "\n" +
+                    "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
+              },
+              items: require("./docs/apis/resources/action_service_v3/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Applications",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/applications"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Authentication Methods",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/authentication-methods"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Branding",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/branding"
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Branding",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-branding-settings"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Domain Settings",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/domain-settings"
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Domain Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-domain-settings"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Events",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/admin/events"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Failed Events",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/admin/failed-events"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Feature Restrictions",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/admin/feature-restrictions"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Features",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              link: {
+                type: "generated-index",
+                title: "Feature Service API",
+                slug: "/apis/resources/feature_service_v2",
+                description:
+                    'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n'
+              },
+              items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Identity Providers",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default IDPs",
+                  href: "/apis/resources/admin/identity-providers"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization IDPs",
+                  href: "/apis/resources/mgmt/identity-providers"
+                },
+              ]
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              link: {
+                type: "generated-index",
+                title: "Identity Provider Service API",
+                slug: "/apis/resources/idp_service_v2",
+                description:
+                    'This API is intended to manage identity providers (IdPs) for ZITADEL.\n'
+              },
+              items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Import/Export",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/admin/import-export"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Instances",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "System API - Manage Instances",
+                  href: "/apis/resources/system/system-service"
+                },
+                {
+                  type: "link",
+                  label: "Admin API - My Instance",
+                  href: "/apis/resources/admin/instance"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Lockout Settings",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Lockout Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-lockout-settings"
+                }
+              ],
+            }
+          ]
+        },
+        {
+          type: "category",
+          label: "Login Settings",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Login Settings",
+                  href: "/apis/resources/admin/login-settings"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Login Settings",
+                  href: "/apis/resources/mgmt/login-settings"
+                }
+              ],
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Login Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-login-settings"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Login Texts",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Login Texts",
+                  href: "/apis/resources/admin/login-texts"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Login Texts",
+                  href: "/apis/resources/mgmt/login-texts"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Managers",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Instance Managers",
+                  href: "/apis/resources/admin/members"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Managers",
+                  href: "/apis/resources/mgmt/members"
+                }
+              ],},
+          ],
+        },
+        {
+          type: "category",
+          label: "Message Texts",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Message Texts",
+                  href: "/apis/resources/admin/message-texts"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Message Texts",
+                  href: "/apis/resources/mgmt/message-texts"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Notification Settings",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Notification Settings",
+                  href: "/apis/resources/admin/notification-settings"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Notification Settings",
+                  href: "/apis/resources/mgmt/notification-settings"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "OIDC Sessions",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              link: {
+                type: "generated-index",
+                title: "OIDC Service API",
+                slug: "/apis/resources/oidc_service_v2",
+                description:
+                    "Get OIDC Auth Request details and create callback URLs.\n"
+              },
+              items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Organizations",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - All Organizations",
+                  href: "/apis/resources/admin/organizations"
+                },
+                {
+                  type: "link",
+                  label: "Management API - My Organization",
+                  href: "/apis/resources/mgmt/organizations"
+                }
+              ],
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              link: {
+                type: "generated-index",
+                title: "Organization Service API",
+                slug: "/apis/resources/org_service/v2",
+                description:
+                    'This API is intended to manage organizations for ZITADEL. \n'
+              },
+              items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Organization Metadata",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/organization-metadata"
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Password Settings",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Password Settings",
+                  href: "/apis/resources/admin/password-settings"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Password Settings",
+                  href: "/apis/resources/mgmt/password-settings"
+                }
+              ],
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Password Complexity Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-password-complexity-settings"
+                },
+                {
+                  type: "link",
+                  label: "Get Password Expiry Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-password-expiry-settings"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Privacy Settings",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Privacy Settings",
+                  href: "/apis/resources/admin/privacy-settings"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Privacy Settings",
+                  href: "/apis/resources/mgmt/privacy-settings"
+                }
+              ],
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Legal & Support Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-legal-and-support-settings"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Projects",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/projects"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Project Grants",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/project-grants"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Project Roles",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/project-roles"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Secret Generators",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/admin/secrets"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Security Settings",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Security Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-security-settings"
+                },
+                {
+                  type: "link",
+                  label: "Set Security Settings",
+                  href: "/apis/resources/settings_service_v2/apis/resources/settings_service_v2/settings-service-set-security-settings"
+                }
+              ],
+            }
+          ]
+        },
+        {
+          type: "category",
+          label: "Sessions",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              link: {
+                type: "generated-index",
+                title: "Session Service API",
+                slug: "/apis/resources/session_service_v2",
+                description:
+                    "This API is intended to manage sessions in a ZITADEL instance.\n"
+              },
+              items: require("./docs/apis/resources/session_service_v2/sidebar.ts"),
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Settings",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              link: {
+                type: "generated-index",
+                title: "Settings Service API",
+                slug: "/apis/resources/settings_service_v2",
+                description:
+                    "This API is intended to manage settings in a ZITADEL instance.\n"
+              },
+              items: require("./docs/apis/resources/settings_service_v2/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "SMS Provider",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/admin/sms-provider"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "SMTP",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/admin/smtp"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Users",
+          items: [
+            {
+              type: "category",
+              label: "v1.0 (deprecated)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Auth API - Profile Management",
+                  href: "/apis/resources/auth"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Users",
+                  href: "/apis/resources/mgmt/users"
+                },
+              ]
+            },
+            {
+              type: "category",
+              label: "v2.0 (stable)",
+              link: {
+                type: "generated-index",
+                title: "User Service API v2",
+                slug: "/apis/resources/user_service_v2",
+                description:
+                    "This API is intended to manage users in a ZITADEL instance.\n"
+              },
+              items: require("./docs/apis/resources/user_service_v2/sidebar.ts"),
+
+            },
+            {
+              type: "category",
+              label: "v3.0 (alpha)",
+              link: {
+                type: "generated-index",
+                title: "User Service API v3",
+                slug: "/apis/resources/user_service_v3",
+                description:
+                    "This API is intended to manage users in a ZITADEL instance.\n"
+              },
+              items: require("./docs/apis/resources/user_service_v3/sidebar.ts"),
+
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "User Grants",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/user-grants"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "User Metadata",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/user-grants"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "User Schemas",
+          items: [
+            {
+              type: "category",
+              label: "v3 (alpha)",
+              link: {
+                type: "generated-index",
+                title: "User Schema Service API (alpha)",
+                slug: "/apis/resources/user_schema_service",
+                description:
+                    "This API is intended to manage data schemas for users in a ZITADEL instance.\n" +
+                    "\n" +
+                    "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
+              },
+              items: require("./docs/apis/resources/user_schema_service_v3/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Web Keys",
+          items: [
+            {
+              type: "category",
+              label: "v3 (alpha)",
+              link: {
+                type: "generated-index",
+                title: "Web Key Service API (alpha)",
+                slug: "/apis/resources/webkey_service_v3",
+                description:
+                    "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
+                    "\n" +
+                    "This project is in preview state. It can AND will continue breaking until a stable version is released.",
+              },
+              items: require("./docs/apis/resources/webkey_service_v3/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Service Based API (v1)",
+          collapsed: true,
           link: {
             type: "generated-index",
-            title: "APIs V1 (GA)",
+            title: "APIs V1",
             slug: "/apis/services/",
             description:
               "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
@@ -554,19 +1286,19 @@ module.exports = {
           items: [
             {
               type: "category",
-              label: "Authenticated User",
+              label: "Auth API",
               link: {
                 type: "generated-index",
                 title: "Auth API",
                 slug: "/apis/resources/auth",
                 description:
-                  "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+                    "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
               },
               items: require("./docs/apis/resources/auth/sidebar.ts"),
             },
             {
               type: "category",
-              label: "Organization Objects",
+              label: "Management API",
               link: {
                 type: "generated-index",
                 title: "Management API",
@@ -578,7 +1310,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Instance Objects",
+              label: "Admin API",
               link: {
                 type: "generated-index",
                 title: "Admin API",
@@ -590,7 +1322,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Instance Lifecycle",
+              label: "System API",
               link: {
                 type: "generated-index",
                 title: "System API",
@@ -601,168 +1333,6 @@ module.exports = {
                   "Checkout the guide how to access the ZITADEL System API.",
               },
               items: require("./docs/apis/resources/system/sidebar.ts"),
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "V2 (Generally Available)",
-          collapsed: false,
-          link: {
-            type: "doc",
-            id: "apis/v2",
-          },
-          items: [
-            {
-              type: "category",
-              label: "User Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "User Service API",
-                slug: "/apis/resources/user_service_v2",
-                description:
-                  "This API is intended to manage users in a ZITADEL instance.\n"
-              },
-              items: require("./docs/apis/resources/user_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Session Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Session Service API",
-                slug: "/apis/resources/session_service_v2",
-                description:
-                  "This API is intended to manage sessions in a ZITADEL instance.\n"
-              },
-              items: require("./docs/apis/resources/session_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "OIDC Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "OIDC Service API",
-                slug: "/apis/resources/oidc_service_v2",
-                description:
-                  "Get OIDC Auth Request details and create callback URLs.\n"
-              },
-              items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Settings Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Settings Service API",
-                slug: "/apis/resources/settings_service_v2",
-                description:
-                  "This API is intended to manage settings in a ZITADEL instance.\n"
-              },
-              items: require("./docs/apis/resources/settings_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Feature Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Feature Service API",
-                slug: "/apis/resources/feature_service_v2",
-                description:
-                  'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n'
-              },
-              items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Organization Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Organization Service API",
-                slug: "/apis/resources/org_service/v2",
-                description:
-                  'This API is intended to manage organizations for ZITADEL. \n'
-              },
-              items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Identity Provider Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Identity Provider Service API",
-                slug: "/apis/resources/idp_service_v2",
-                description:
-                  'This API is intended to manage identity providers (IdPs) for ZITADEL.\n'
-              },
-              items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "V3 (Preview)",
-          collapsed: false,
-          link: {
-            type: "doc",
-            id: "apis/v3",
-          },
-          items: [
-            {
-              type: "category",
-              label: "User Schema Lifecycle (Preview)",
-              link: {
-                type: "generated-index",
-                title: "User Schema Service API (Preview)",
-                slug: "/apis/resources/user_schema_service",
-                description:
-                  "This API is intended to manage data schemas for users in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
-              },
-              items: require("./docs/apis/resources/user_schema_service_v3/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "User Lifecycle (Preview)",
-              link: {
-                type: "generated-index",
-                title: "User Service API (Preview)",
-                slug: "/apis/resources/user_service_v3",
-                description:
-                  "This API is intended to manage users with your own data schema in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
-              },
-              items: require("./docs/apis/resources/user_service_v3/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Action Lifecycle (Preview)",
-              link: {
-                type: "generated-index",
-                title: "Action Service API (Preview)",
-                slug: "/apis/resources/action_service_v3",
-                description:
-                  "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
-              },
-              items: require("./docs/apis/resources/action_service_v3/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Web key Lifecycle (Preview)",
-              link: {
-                type: "generated-index",
-                title: "Web Key Service API (Preview)",
-                slug: "/apis/resources/webkey_service_v3",
-                description:
-                  "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
-                  "\n" +
-                  "This project is in preview state. It can AND will continue breaking until a stable version is released.",
-              },
-              items: require("./docs/apis/resources/webkey_service_v3/sidebar.ts"),
             },
           ],
         },

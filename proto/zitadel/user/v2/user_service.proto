@@ -108,6 +108,10 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
+// The UserService is intended to manage users in a ZITADEL instance..
+//
+// Depending on the context information and permission of a requesting user, users can be searched and managed over an instance or an organization.
+// However, a user always belongs to an organization.
 service UserService {
 
   // Create a new human user

@@ -84,7 +84,7 @@ open discussion.
 
 **In the meantime**:
 
-KUDOS, if you already [have a look at our proposal](https://zitadel.com/docs/apis/v3) before the start of the event. Share any inputs in the chat of the [office hours channel](https://zitadel.com/office-hours) on our Discord server.
+KUDOS, if you already [have a look at our proposal](https://zitadel.com//docs/apis/introduction#api-v3) before the start of the event. Share any inputs in the chat of the [office hours channel](https://zitadel.com/office-hours) on our Discord server.
 
 We look forward to seeing you there!
 
