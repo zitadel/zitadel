@@ -25,5 +25,5 @@ create unlogged table if not exists cache.string_keys(
 )
 partition by list (cache_name);
 
-create index if not exists object_id_idx
+create index if not exists string_keys_object_id_idx
     on cache.string_keys (cache_name, object_id); -- for delete cascade
