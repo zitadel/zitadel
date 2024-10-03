@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	UserAuthMethodTable = "projections.user_auth_methods4"
+	UserAuthMethodTable = "projections.user_auth_methods5"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
@@ -26,7 +26,7 @@ const (
 	UserAuthMethodInstanceIDCol    = "instance_id"
 	UserAuthMethodStateCol         = "state"
 	UserAuthMethodNameCol          = "name"
-	UserAuthMethodOwnerRemovedCol  = "owner_removed"
+	UserAuthMethodDomainCol        = "domain"
 )
 
 type userAuthMethodProjection struct{}
@@ -52,11 +52,10 @@ func (*userAuthMethodProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserAuthMethodResourceOwnerCol, handler.ColumnTypeText),
 			handler.NewColumn(UserAuthMethodInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(UserAuthMethodNameCol, handler.ColumnTypeText),
-			handler.NewColumn(UserAuthMethodOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(UserAuthMethodDomainCol, handler.ColumnTypeText),
 		},
 			handler.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserAuthMethodResourceOwnerCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{UserAuthMethodOwnerRemovedCol})),
 		),
 	)
 }
@@ -151,14 +150,17 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 
 func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) (*handler.Statement, error) {
 	tokenID := ""
+	rpID := ""
 	var methodType domain.UserAuthMethodType
 	switch e := event.(type) {
 	case *user.HumanPasswordlessAddedEvent:
 		methodType = domain.UserAuthMethodTypePasswordless
 		tokenID = e.WebAuthNTokenID
+		rpID = e.RPID
 	case *user.HumanU2FAddedEvent:
 		methodType = domain.UserAuthMethodTypeU2F
 		tokenID = e.WebAuthNTokenID
+		rpID = e.RPID
 	case *user.HumanOTPAddedEvent:
 		methodType = domain.UserAuthMethodTypeTOTP
 	default:
@@ -184,6 +186,7 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateNotReady),
 			handler.NewCol(UserAuthMethodTypeCol, methodType),
 			handler.NewCol(UserAuthMethodNameCol, ""),
+			handler.NewCol(UserAuthMethodDomainCol, rpID),
 		},
 	), nil
 }

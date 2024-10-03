@@ -2436,6 +2436,40 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 			},
 		},
 		{
+			name: "with auth (passkey) with domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithPasskey,
+					Domain: gu.Ptr(Instance.Domain),
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with wrong domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithPasskey,
+					Domain: gu.Ptr("notexistent"),
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{},
+			},
+		},
+		{
 			name: "multiple auth",
 			args: args{
 				CTX,
@@ -2449,6 +2483,43 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				},
 				AuthMethodTypes: []user.AuthenticationMethodType{
 					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+		{
+			name: "multiple auth with domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userMultipleAuth,
+					Domain: gu.Ptr(Instance.Domain),
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+		{
+			name: "multiple auth with wrong domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userMultipleAuth,
+					Domain: gu.Ptr("notexistent"),
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
 					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
 				},
 			},
