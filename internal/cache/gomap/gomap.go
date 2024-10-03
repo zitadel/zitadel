@@ -114,10 +114,6 @@ func (c *mapCache[I, K, V]) Truncate(ctx context.Context) error {
 	return nil
 }
 
-func (c *mapCache[I, K, V]) Close(ctx context.Context) error {
-	return ctx.Err()
-}
-
 type index[K comparable, V any] struct {
 	mutex   sync.RWMutex
 	config  *cache.CacheConfig

@@ -154,8 +154,6 @@ func (c *pgCache[I, K, V]) Truncate(ctx context.Context) (err error) {
 	return err
 }
 
-func (c *pgCache[I, K, V]) Close(context.Context) (err error) { return }
-
 type indexKey[I, K comparable] struct {
 	IndexID  I `json:"index_id"`
 	IndexKey K `json:"index_key"`

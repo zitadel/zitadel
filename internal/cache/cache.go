@@ -56,9 +56,6 @@ type Cache[I, K comparable, V Entry[I, K]] interface {
 
 	// Truncate deletes all cached objects.
 	Truncate(ctx context.Context) error
-
-	// Close the cache. Subsequent calls to the cache are not allowed.
-	Close(ctx context.Context) error
 }
 
 // Entry contains a value of type `V` to be cached.
