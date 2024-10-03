@@ -2,7 +2,18 @@
 title: Using Actions
 ---
 
-This page describes the options you have when defining ZITADEL Actions V3.
+The Action API provides a flexible mechanism for customizing and extending the functionality of ZITADEL. By allowing you to define targets and executions, you can implement custom workflows triggered on an API requests and responses, events or specific functions.
+
+**How it works:**
+- Create Target
+- Set Execution with condition and target
+- Custom Code will be triggered and executed
+
+**Use Cases:**
+- User Management: Automate provisioning user data to external systems when users are crreated, updated or deleted.
+- Security: Implement IP blocking or rate limiting based on API usage patterns.
+- Extend Workflows: Automatically setup resources in your application, when a new organization in ZITADEL is created. 
+- Token extension: Add custom claims to the tokens.
 
 ## Endpoints
 
