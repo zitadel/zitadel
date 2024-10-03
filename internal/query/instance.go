@@ -436,7 +436,7 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 
 type authzInstance struct {
 	ID              string                     `json:"id,omitempty"`
-	IamProjectID    string                     `json:"iam_project_id,omitempty"`
+	IAMProjectID    string                     `json:"iam_project_id,omitempty"`
 	ConsoleID       string                     `json:"console_id,omitempty"`
 	ConsoleAppID    string                     `json:"console_app_id,omitempty"`
 	DefaultLang     language.Tag               `json:"default_lang,omitempty"`
