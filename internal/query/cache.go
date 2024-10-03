@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/cache/gomap"
 	"github.com/zitadel/zitadel/internal/cache/noop"
 	"github.com/zitadel/zitadel/internal/cache/pg"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -21,14 +20,14 @@ type Caches struct {
 	instance   cache.Cache[instanceIndex, string, *authzInstance]
 }
 
-func startCaches(background context.Context, conf *cache.CachesConfig) (_ *Caches, err error) {
+func startCaches(background context.Context, conf *cache.CachesConfig, pool *pgxpool.Pool) (_ *Caches, err error) {
 	caches := &Caches{
 		instance: noop.NewCache[instanceIndex, string, *authzInstance](),
 	}
 	if conf == nil {
 		return caches, nil
 	}
-	caches.connectors, err = startCacheConnectors(background, conf)
+	caches.connectors, err = startCacheConnectors(background, conf, pool)
 	if err != nil {
 		return nil, err
 	}
@@ -51,16 +50,12 @@ type pgxPoolCacheConnector struct {
 	pool *pgxpool.Pool
 }
 
-func startCacheConnectors(_ context.Context, conf *cache.CachesConfig) (_ *cacheConnectors, err error) {
+func startCacheConnectors(_ context.Context, conf *cache.CachesConfig, pool *pgxpool.Pool) (_ *cacheConnectors, err error) {
 	connectors := new(cacheConnectors)
 	if conf.Connectors.Memory.Enabled {
 		connectors.memory = &conf.Connectors.Memory.AutoPrune
 	}
 	if conf.Connectors.Postgres.Enabled {
-		pool, err := conf.Connectors.Postgres.Connection.ConnectPGX(false, nil, dialect.DBPurposeCache)
-		if err != nil {
-			return nil, err
-		}
 		connectors.postgres = &pgxPoolCacheConnector{
 			AutoPruneConfig: &conf.Connectors.Postgres.AutoPrune,
 			pool:            pool,

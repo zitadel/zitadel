@@ -13,18 +13,6 @@ Caches:
       AutoPrune:
         Interval: 30s
         TimeOut: 1s 
-      Connection:
-        Host: localhost
-        Port: 5432
-        Database: zitadel
-        MaxOpenConns: 10
-        MaxIdleConns: 5
-        MaxConnLifetime: 1h
-        MaxConnIdleTime: 5m
-        User:
-          Username: zitadel
-          SSL:
-            Mode: disable
   Instance:
     Connector: "postgres"
     MaxAge: 1h
