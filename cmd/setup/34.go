@@ -4,6 +4,8 @@ import (
 	"context"
 	_ "embed"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -18,8 +20,12 @@ type AddCacheSchema struct {
 }
 
 func (mig *AddCacheSchema) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addCacheSchema)
-	return err
+	if mig.dbClient.Type() == "postgres" {
+		_, err := mig.dbClient.ExecContext(ctx, addCacheSchema)
+		return err
+	}
+	logging.WithFields("name", mig.String(), "dialect", mig.dbClient.Type()).Info("unlogged tables not supported")
+	return nil
 }
 
 func (mig *AddCacheSchema) String() string {
