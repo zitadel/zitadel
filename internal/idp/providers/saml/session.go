@@ -9,6 +9,7 @@ import (
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -67,6 +68,9 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 
 	s.Assertion, err = s.ServiceProvider.ServiceProvider.ParseResponse(s.Request, []string{s.RequestID})
 	if err != nil {
+		if invalidRespErr, ok := err.(*saml.InvalidResponseError); ok {
+			logging.OnError(invalidRespErr.PrivateErr).Info("invalid SAML response details")
+		}
 		return nil, zerrors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
 	}
 
