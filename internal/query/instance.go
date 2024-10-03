@@ -602,6 +602,7 @@ type instanceIndex int
 
 //go:generate enumer -type instanceIndex -linecomment
 const (
+	// Empty line comment ensures empty string for unspecified value
 	instanceIndexUnspecified instanceIndex = iota //
 	instanceIndexByID
 	instanceIndexByHost
