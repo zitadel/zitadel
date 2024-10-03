@@ -26,6 +26,8 @@ type orgAttr struct {
 }
 
 func TestServer_ListOrganizations(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx context.Context
 		req *org.ListOrganizationsRequest
