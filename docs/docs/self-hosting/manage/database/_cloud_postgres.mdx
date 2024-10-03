@@ -1,0 +1,23 @@
+## ZITADEL with cloud Postgres
+
+If you want to use a cloud-based PostgreSQL-compatible database such as [Azure Database for PostgreSQL](https://azure.microsoft.com/en-us/products/postgresql/), you must make sure that the host is configured properly and the SSL connection is set to 'required'.
+An example Docker configuration detail for an Azure DB instance:
+```yaml
+ environment:
+      ...
+      # database configuration
+      - ZITADEL_DATABASE_POSTGRES_HOST=your-postgres-instance.postgres.database.azure.com
+      - ZITADEL_DATABASE_POSTGRES_PORT=5432
+      - ZITADEL_DATABASE_POSTGRES_DATABASE=postgres
+      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=your-username
+      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=secret-password
+      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=require
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=pgadmin
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=secret-password
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=require
+```
+The IP address of your Zitadel server has to be enabled in the firewall settings of the cloud database provider (if applicable).
+
+
+With the setup done, follow the [phases guide](/docs/self-hosting/manage/updating_scaling#separating-init-and-setup-from-the-runtime)
+to run the init and then setup phase to get all necessary tables and data set up.
