@@ -460,7 +460,7 @@ func (i *authzInstance) InstanceID() string {
 }
 
 func (i *authzInstance) ProjectID() string {
-	return i.IamProjectID
+	return i.IAMProjectID
 }
 
 func (i *authzInstance) ConsoleClientID() string {
@@ -541,7 +541,7 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		err := row.Scan(
 			&instance.ID,
 			&instance.DefaultOrgID,
-			&instance.IamProjectID,
+			&instance.IAMProjectID,
 			&instance.ConsoleID,
 			&instance.ConsoleAppID,
 			&lang,
