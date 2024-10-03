@@ -3,6 +3,7 @@ package mirror
 import (
 	"bytes"
 	_ "embed"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -16,13 +17,16 @@ var (
 	instanceIDs   []string
 	isSystem      bool
 	shouldReplace bool
+	isSrcFile     bool
+	isDestFile    bool
+	filePath      string
 )
 
 func New(configFiles *[]string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mirror",
-		Short: "mirrors all data of ZITADEL from one database to another",
-		Long: `mirrors all data of ZITADEL from one database to another
+		Short: "mirrors all data of ZITADEL between databases, or between a database and files",
+		Long: `mirrors all data of ZITADEL between databases, or between a database and files
 ZITADEL needs to be initialized and set up with --for-mirror
 
 The command does mirror all data needed and recomputes the projections.
@@ -42,6 +46,30 @@ Order of execution:
 				viper.SetConfigFile(file)
 				err := viper.MergeInConfig()
 				logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
+			}
+
+			if isSrcFile = viper.IsSet("Source.file.path"); isSrcFile {
+				filePath = viper.GetString("Source.file.path") + "/"
+			}
+			if isDestFile = viper.IsSet("Destination.file.path"); isDestFile {
+				filePath = viper.GetString("Destination.file.path") + "/"
+			}
+
+			if isSrcFile || isDestFile {
+				if isSrcFile && isDestFile {
+					logging.Fatal("both source and destination cannot be files")
+				}
+
+				if !(shouldIgnorePrevious && shouldReplace) {
+					logging.Fatal("both --ignore-previous and --replace flags must be set for mirroring files")
+				}
+
+				if stat, err := os.Stat(filePath); err != nil || !stat.IsDir() {
+					if os.IsNotExist(err) {
+						logging.Fatal("file path does not exist")
+					}
+					logging.Fatal("file path leads to a file not a directory")
+				}
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
@@ -89,6 +117,9 @@ func mirrorFlags(cmd *cobra.Command) {
 
 func instanceClause() string {
 	if isSystem {
+		if isSrcFile || isDestFile {
+			return ""
+		}
 		return "WHERE instance_id <> ''"
 	}
 	for i := range instanceIDs {
