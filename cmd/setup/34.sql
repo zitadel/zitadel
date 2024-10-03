@@ -13,7 +13,7 @@ partition by list (cache_name);
 
 create unlogged table if not exists cache.string_keys(
     cache_name varchar not null check (cache_name <> ''),
-    index_id integer not null check (index_id <> 0),
+    index_id integer not null check (index_id > 0),
     index_key varchar not null check (index_key <> ''),
     object_id uuid not null,
 
