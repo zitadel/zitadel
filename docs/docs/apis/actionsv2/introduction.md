@@ -147,8 +147,9 @@ For Request and Response there are 3 levels the condition can be defined:
 - `All`, handling any request or response under the ZITADEL API
 
 The available conditions can be found under:
-- [All available Methods](/apis/resources/action_service_v3/action-service-list-execution-methods), for example `/zitadel.user.v2.UserService/AddHumanUser`
-- [All available Services](/apis/resources/action_service_v3/action-service-list-execution-services), for example `zitadel.user.v2.UserService`
+
+- [All available Methods](/apis/resources/action_service_v3/zitadel-actions-list-execution-methods), for example `/zitadel.user.v2.UserService/AddHumanUser`
+- [All available Services](/apis/resources/action_service_v3/zitadel-actions-list-execution-services), for example `zitadel.user.v2.UserService`
 
 ### Condition for Functions
 
