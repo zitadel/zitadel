@@ -113,7 +113,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgDomain{
-							OrgDomain: Instance.DefaultOrg.PrimaryDomain,
+							OrgDomain: Tester.Organisation.Domain,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -143,7 +143,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			want: &user.AddHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.DefaultOrg.Id,
+					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
 		},
