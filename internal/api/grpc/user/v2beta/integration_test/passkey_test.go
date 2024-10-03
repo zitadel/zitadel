@@ -18,6 +18,8 @@ import (
 )
 
 func TestServer_RegisterPasskey(t *testing.T) {
+	t.Parallel()
+
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
@@ -138,6 +140,8 @@ func TestServer_RegisterPasskey(t *testing.T) {
 }
 
 func TestServer_VerifyPasskeyRegistration(t *testing.T) {
+	t.Parallel()
+
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
@@ -226,6 +230,8 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 }
 
 func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
+	t.Parallel()
+
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	type args struct {
