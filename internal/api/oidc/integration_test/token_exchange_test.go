@@ -561,6 +561,8 @@ func TestServer_TokenExchange(t *testing.T) {
 // This test tries to call the zitadel API with an impersonated token,
 // which should fail.
 func TestImpersonation_API_Call(t *testing.T) {
+	t.Parallel()
+
 	client, keyData, err := Instance.CreateOIDCTokenExchangeClient(CTX)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()

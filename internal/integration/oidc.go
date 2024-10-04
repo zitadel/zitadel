@@ -31,7 +31,7 @@ func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedi
 	}
 	resp, err := i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                projectID,
-		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
+		Name:                     fmt.Sprintf("app-%s", gofakeit.AppName()),
 		RedirectUris:             []string{redirectURI},
 		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
 		GrantTypes:               grantTypes,
@@ -124,14 +124,14 @@ func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redire
 
 func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string) (*management.AddOIDCAppResponse, error) {
 	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
+		Name: fmt.Sprintf("project-%s", gofakeit.AppName()),
 	})
 	if err != nil {
 		return nil, err
 	}
 	resp, err := i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                project.GetId(),
-		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
+		Name:                     fmt.Sprintf("app-%s", gofakeit.AppName()),
 		RedirectUris:             []string{redirectURI},
 		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN},
 		GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_IMPLICIT},
@@ -162,7 +162,7 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI
 
 func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
 	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
+		Name: fmt.Sprintf("project-%s", gofakeit.AppName()),
 	})
 	if err != nil {
 		return nil, nil, err
@@ -172,14 +172,14 @@ func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context) (client *m
 
 func (i *Instance) CreateProject(ctx context.Context) (*management.AddProjectResponse, error) {
 	return i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
-		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
+		Name: fmt.Sprintf("project-%s", gofakeit.AppName()),
 	})
 }
 
 func (i *Instance) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
 	return i.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
 		ProjectId:      projectID,
-		Name:           fmt.Sprintf("api-%d", time.Now().UnixNano()),
+		Name:           fmt.Sprintf("api-%s", gofakeit.AppName()),
 		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 	})
 }
@@ -187,7 +187,7 @@ func (i *Instance) CreateAPIClientJWT(ctx context.Context, projectID string) (*m
 func (i *Instance) CreateAPIClientBasic(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
 	return i.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
 		ProjectId:      projectID,
-		Name:           fmt.Sprintf("api-%d", time.Now().UnixNano()),
+		Name:           fmt.Sprintf("api-%s", gofakeit.AppName()),
 		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
 	})
 }

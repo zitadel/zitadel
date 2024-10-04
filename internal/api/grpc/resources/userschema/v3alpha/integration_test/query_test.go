@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	schema "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
@@ -206,12 +207,12 @@ func TestServer_ListUserSchemas(t *testing.T) {
 						return
 					}
 					for i := range tt.want.Result {
-						want := tt.want.Result[i]
-						got := got.Result[i]
+						wantSchema := tt.want.Result[i]
+						gotSchema := got.Result[i]
 
-						integration.AssertResourceDetails(ttt, want.GetDetails(), got.GetDetails())
-						want.Details = got.Details
-						assert.EqualExportedValues(ttt, want, got)
+						integration.AssertResourceDetails(ttt, wantSchema.GetDetails(), gotSchema.GetDetails())
+						wantSchema.Details = gotSchema.GetDetails()
+						grpc.AllFieldsEqual(t, wantSchema.ProtoReflect(), gotSchema.ProtoReflect(), grpc.CustomMappers)
 					}
 					integration.AssertListDetails(ttt, tt.want, got)
 				}
@@ -319,8 +320,8 @@ func TestServer_GetUserSchema(t *testing.T) {
 					wantSchema := tt.want.GetUserSchema()
 					gotSchema := got.GetUserSchema()
 					integration.AssertResourceDetails(ttt, wantSchema.GetDetails(), gotSchema.GetDetails())
-					tt.want.UserSchema.Details = got.GetUserSchema().GetDetails()
-					assert.EqualExportedValues(ttt, wantSchema, gotSchema)
+					wantSchema.Details = got.GetUserSchema().GetDetails()
+					grpc.AllFieldsEqual(t, wantSchema.ProtoReflect(), gotSchema.ProtoReflect(), grpc.CustomMappers)
 				}
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
 		})

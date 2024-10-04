@@ -102,7 +102,7 @@ func TestServer_ListInstances(t *testing.T) {
 				require.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			got := resp.GetResult()
 			assert.Len(t, got, len(tt.want))
 			for i := 0; i < len(tt.want); i++ {

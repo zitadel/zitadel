@@ -97,12 +97,16 @@ func TestServer_ListIAMMembers(t *testing.T) {
 				if tt.wantErr {
 					assert.Error(ct, err)
 					return
-				}
-				require.NoError(ct, err)
-				wantResult := tt.want.GetResult()
-				gotResult := got.GetResult()
+				} else {
+					if !assert.NoError(ct, err) {
+						return
+					}
+					wantResult := tt.want.GetResult()
+					gotResult := got.GetResult()
 
-				if assert.Len(ct, gotResult, len(wantResult)) {
+					if !assert.Len(ct, gotResult, len(wantResult)) {
+						return
+					}
 					for i, want := range wantResult {
 						assert.Equal(ct, want.GetUserId(), gotResult[i].GetUserId())
 						assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
