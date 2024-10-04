@@ -65,6 +65,8 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetRequest := instance.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, false)
 				instance.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
 
+				waitForExecutionOnMethod(ctx, t, instance, conditionRequestFullMethod(fullMethod))
+
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
 					Target: &action.GetTarget{
@@ -120,6 +122,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetResponse := instance.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, false)
 				instance.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
+				waitForExecutionOnMethod(ctx, t, instance, conditionResponseFullMethod(fullMethod))
 				return func() {
 					closeRequest()
 					closeResponse()
@@ -163,6 +166,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// GetTarget with used target
 				request.Id = targetRequest.GetDetails().GetId()
 
+				waitForExecutionOnMethod(ctx, t, instance, conditionRequestFullMethod(fullMethod))
 				return func() {
 					closeRequest()
 				}, nil
@@ -232,6 +236,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetResponse := instance.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, true)
 				instance.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
+				waitForExecutionOnMethod(ctx, t, instance, conditionResponseFullMethod(fullMethod))
 				return func() {
 					closeResponse()
 				}, nil
@@ -260,14 +265,14 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				if tt.wantErr {
 					assert.Error(ttt, err, "Error: "+err.Error())
 				} else {
-					assert.NoError(ttt, err)
-				}
-				if err != nil {
-					return
-				}
+					if !assert.NoError(ttt, err) {
+						return
+					}
 
-				integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
-				assert.Equal(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+					integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
+					tt.want.Target.Details = got.GetTarget().GetDetails()
+					assert.EqualExportedValues(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+				}
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
 
 			if tt.clean != nil {
@@ -275,6 +280,29 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			}
 		})
 	}
+}
+
+func waitForExecutionOnMethod(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition) {
+	retryDuration := 5 * time.Second
+	if ctxDeadline, ok := ctx.Deadline(); ok {
+		retryDuration = time.Until(ctxDeadline)
+	}
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, err := instance.Client.ActionV3Alpha.SearchExecutions(ctx, &action.SearchExecutionsRequest{
+			Filters: []*action.ExecutionSearchFilter{
+				{Filter: &action.ExecutionSearchFilter_InConditionsFilter{
+					InConditionsFilter: &action.InConditionsFilter{Conditions: []*action.Condition{condition}},
+				}},
+			},
+		})
+		if !assert.NoError(ttt, err) {
+			return
+		}
+		if assert.Len(ttt, got.GetResult(), 1) {
+			return
+		}
+	}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
+	return
 }
 
 func conditionRequestFullMethod(fullMethod string) *action.Condition {
