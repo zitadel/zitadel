@@ -60,7 +60,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/twilio/twilio-go v1.22.2
-	github.com/zitadel/logging v0.6.0
+	github.com/zitadel/logging v0.6.1
 	github.com/zitadel/oidc/v3 v3.28.1
 	github.com/zitadel/passwap v0.6.0
 	github.com/zitadel/saml v0.2.0
@@ -198,7 +198,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
-	golang.org/x/sys v0.22.0
+	golang.org/x/sys v0.25.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
