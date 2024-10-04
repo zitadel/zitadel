@@ -14,7 +14,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
@@ -233,8 +232,7 @@ func TestServer_GetTarget(t *testing.T) {
 					wantTarget := tt.want.GetTarget()
 					gotTarget := got.GetTarget()
 					integration.AssertResourceDetails(ttt, wantTarget.GetDetails(), gotTarget.GetDetails())
-					gotTarget.Details = wantTarget.GetDetails()
-					grpc.AllFieldsEqual(t, wantTarget.ProtoReflect(), gotTarget.ProtoReflect(), grpc.CustomMappers)
+					assert.EqualExportedValues(ttt, wantTarget.GetConfig(), gotTarget.GetConfig())
 				}
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected target result")
 		})
@@ -495,21 +493,19 @@ func TestServer_ListTargets(t *testing.T) {
 				if tt.wantErr {
 					assert.Error(ttt, listErr, "Error: "+listErr.Error())
 				} else {
-					assert.NoError(ttt, listErr)
+					if !assert.NoError(ttt, listErr) {
+						return
+					}
+					// always first check length, otherwise its failed anyway
+					if !assert.Len(ttt, got.Result, len(tt.want.Result)) {
+						return
+					}
+					for i := range tt.want.Result {
+						integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
+						assert.EqualExportedValues(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
+					}
+					integration.AssertResourceListDetails(ttt, tt.want, got)
 				}
-				if listErr != nil {
-					return
-				}
-				// always first check length, otherwise its failed anyway
-				if !assert.Len(ttt, got.Result, len(tt.want.Result)) {
-					return
-				}
-				for i := range tt.want.Result {
-					integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
-					got.Result[i].Details = tt.want.Result[i].GetDetails()
-					grpc.AllFieldsEqual(t, tt.want.Result[i].ProtoReflect(), got.Result[i].ProtoReflect(), grpc.CustomMappers)
-				}
-				integration.AssertResourceListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
 		})
 	}
@@ -888,22 +884,24 @@ func TestServer_SearchExecutions(t *testing.T) {
 				if tt.wantErr {
 					assert.Error(ttt, listErr, "Error: "+listErr.Error())
 				} else {
-					assert.NoError(ttt, listErr)
-				}
-				if listErr != nil {
-					return
-				}
-				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
-				for i := range tt.want.Result {
-					// as not sorted, all elements have to be checked
-					// workaround as oneof elements can only be checked with assert.EqualExportedValues()
-					if j, found := containExecution(got.Result, tt.want.Result[i]); found {
-						got.Result[j].Details = tt.want.Result[i].GetDetails()
-						grpc.AllFieldsEqual(t, tt.want.Result[i].ProtoReflect(), got.Result[j].ProtoReflect(), grpc.CustomMappers)
+					if !assert.NoError(ttt, listErr) {
+						return
 					}
+					// always first check length, otherwise its failed anyway
+					if !assert.Len(ttt, got.Result, len(tt.want.Result)) {
+						return
+					}
+					for i := range tt.want.Result {
+						// as not sorted, all elements have to be checked
+						// workaround as oneof elements can only be checked with assert.EqualExportedValues()
+						if j, found := containExecution(got.Result, tt.want.Result[i]); found {
+							integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[j].GetDetails())
+							got.Result[j].Details = tt.want.Result[i].GetDetails()
+							assert.EqualExportedValues(ttt, tt.want.Result[i], got.Result[j])
+						}
+					}
+					integration.AssertResourceListDetails(ttt, tt.want, got)
 				}
-				integration.AssertResourceListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
 		})
 	}

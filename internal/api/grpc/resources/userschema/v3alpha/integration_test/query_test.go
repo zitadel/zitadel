@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	schema "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
@@ -198,22 +197,24 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				if tt.wantErr {
 					require.Error(ttt, err)
 					return
-				}
-				assert.NoError(ttt, err)
+				} else {
+					if !assert.NoError(ttt, err) {
+						return
+					}
+					// always first check length, otherwise its failed anyway
+					if !assert.Len(ttt, got.Result, len(tt.want.Result)) {
+						return
+					}
+					for i := range tt.want.Result {
+						want := tt.want.Result[i]
+						got := got.Result[i]
 
-				// always first check length, otherwise its failed anyway
-				if !assert.Len(ttt, got.Result, len(tt.want.Result)) {
-					return
+						integration.AssertResourceDetails(ttt, want.GetDetails(), got.GetDetails())
+						want.Details = got.Details
+						assert.EqualExportedValues(ttt, want, got)
+					}
+					integration.AssertListDetails(ttt, tt.want, got)
 				}
-				for i := range tt.want.Result {
-					want := tt.want.Result[i]
-					got := got.Result[i]
-
-					integration.AssertResourceDetails(ttt, want.GetDetails(), got.GetDetails())
-					want.Details = got.Details
-					grpc.AllFieldsEqual(t, want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
-				}
-				integration.AssertListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
 		})
 	}
@@ -312,12 +313,14 @@ func TestServer_GetUserSchema(t *testing.T) {
 				if tt.wantErr {
 					assert.Error(ttt, err, "Error: "+err.Error())
 				} else {
-					assert.NoError(ttt, err)
+					if !assert.NoError(ttt, err) {
+						return
+					}
 					wantSchema := tt.want.GetUserSchema()
 					gotSchema := got.GetUserSchema()
 					integration.AssertResourceDetails(ttt, wantSchema.GetDetails(), gotSchema.GetDetails())
 					tt.want.UserSchema.Details = got.GetUserSchema().GetDetails()
-					grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
+					assert.EqualExportedValues(ttt, wantSchema, gotSchema)
 				}
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
 		})
