@@ -721,8 +721,8 @@ github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/zenazn/goji v1.0.1 h1:4lbD8Mx2h7IvloP7r2C0D6ltZP6Ufip8Hn0wmSK5LR8=
 github.com/zenazn/goji v1.0.1/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
-github.com/zitadel/logging v0.6.0 h1:t5Nnt//r+m2ZhhoTmoPX+c96pbMarqJvW1Vq6xFTank=
-github.com/zitadel/logging v0.6.0/go.mod h1:Y4CyAXHpl3Mig6JOszcV5Rqqsojj+3n7y2F591Mp/ow=
+github.com/zitadel/logging v0.6.1 h1:Vyzk1rl9Kq9RCevcpX6ujUaTYFX43aa4LkvV1TvUk+Y=
+github.com/zitadel/logging v0.6.1/go.mod h1:Y4CyAXHpl3Mig6JOszcV5Rqqsojj+3n7y2F591Mp/ow=
 github.com/zitadel/oidc/v3 v3.28.1 h1:PsbFm5CzEMQq9HBXUNJ8yvnWmtVYxpwV5Cinj7TTsHo=
 github.com/zitadel/oidc/v3 v3.28.1/go.mod h1:WmDFu3dZ9YNKrIoZkmxjGG8QyUR4PbbhsVVSY+rpojM=
 github.com/zitadel/passwap v0.6.0 h1:m9F3epFC0VkBXu25rihSLGyHvWiNlCzU5kk8RoI+SXQ=
