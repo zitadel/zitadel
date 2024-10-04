@@ -8,20 +8,3 @@ Database:
       Username: zitadel
     Admin:
       Username: root
-
-Caches:
-  Connectors:
-    Memory:
-      Enabled: true
-      AutoPrune:
-        Interval: 30s
-        TimeOut: 1s 
-  Instance:
-    Connector: "memory"
-    MaxAge: 1h
-    LastUsage: 30m
-    Log:
-      Level: info
-      AddSource: true
-      Formatter:
-        Format: text

@@ -77,7 +77,7 @@ func TestNewCache(t *testing.T) {
 			require.NoError(t, err)
 			tt.expect(pool)
 
-			c, err := NewCache[testIndex, string, *testObject](context.Background(), cacheName, conf, testIndices, pool)
+			c, err := NewCache[testIndex, string, *testObject](context.Background(), cacheName, conf, testIndices, pool, "postgres")
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.wantErr == nil {
 				assert.NotNil(t, c)
@@ -513,7 +513,7 @@ func prepareCache(t *testing.T, conf cache.CacheConfig) (cache.PrunerCache[testI
 	pool.ExpectExec(regexp.QuoteMeta(expectedCreatePartitionQuery)).
 		WillReturnResult(pgxmock.NewResult("CREATE TABLE", 0))
 
-	c, err := NewCache[testIndex, string, *testObject](context.Background(), cacheName, conf, testIndices, pool)
+	c, err := NewCache[testIndex, string, *testObject](context.Background(), cacheName, conf, testIndices, pool, "postgres")
 	require.NoError(t, err)
 	return c, pool
 }

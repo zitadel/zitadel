@@ -48,7 +48,7 @@ type pgCache[I ~int, K ~string, V cache.Entry[I, K]] struct {
 }
 
 // NewCache returns a cache that stores and retrieves objects using PostgreSQL unlogged tables.
-func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, name string, config cache.CacheConfig, indices []I, pool PGXPool) (cache.PrunerCache[I, K, V], error) {
+func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, name string, config cache.CacheConfig, indices []I, pool PGXPool, dialect string) (cache.PrunerCache[I, K, V], error) {
 	c := &pgCache[I, K, V]{
 		name:    name,
 		config:  &config,
@@ -57,8 +57,11 @@ func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, name 
 		logger:  config.Log.Slog().With("cache_name", name),
 	}
 	c.logger.InfoContext(ctx, "pg cache logging enabled")
-	if err := c.createPartition(ctx); err != nil {
-		return nil, err
+
+	if dialect == "postgres" {
+		if err := c.createPartition(ctx); err != nil {
+			return nil, err
+		}
 	}
 	return c, nil
 }

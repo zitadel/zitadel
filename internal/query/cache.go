@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/cache"
@@ -48,7 +47,7 @@ type cacheConnectors struct {
 
 type pgxPoolCacheConnector struct {
 	*cache.AutoPruneConfig
-	pool *pgxpool.Pool
+	client *database.DB
 }
 
 func startCacheConnectors(_ context.Context, conf *cache.CachesConfig, client *database.DB) (_ *cacheConnectors, err error) {
@@ -57,12 +56,9 @@ func startCacheConnectors(_ context.Context, conf *cache.CachesConfig, client *d
 		connectors.memory = &conf.Connectors.Memory.AutoPrune
 	}
 	if conf.Connectors.Postgres.Enabled {
-		if client.Type() != "postgres" {
-			return nil, fmt.Errorf("pg cache not supported for dialect %s", client.Type())
-		}
 		connectors.postgres = &pgxPoolCacheConnector{
 			AutoPruneConfig: &conf.Connectors.Postgres.AutoPrune,
-			pool:            client.Pool,
+			client:          client,
 		}
 	}
 	return connectors, nil
@@ -78,7 +74,8 @@ func startCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Conte
 		return c, nil
 	}
 	if strings.EqualFold(conf.Connector, "postgres") && connectors.postgres != nil {
-		c, err := pg.NewCache[I, K, V](background, name, *conf, indices, connectors.postgres.pool)
+		client := connectors.postgres.client
+		c, err := pg.NewCache[I, K, V](background, name, *conf, indices, client.Pool, client.Type())
 		if err != nil {
 			return nil, fmt.Errorf("query start cache: %w", err)
 		}

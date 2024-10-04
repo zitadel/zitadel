@@ -3,29 +3,33 @@ package setup
 import (
 	"context"
 	_ "embed"
-
-	"github.com/zitadel/logging"
+	"fmt"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
-	//go:embed 34.sql
-	addCacheSchema string
+	//go:embed 34/cockroach/34_cache_schema.sql
+	addCacheSchemaCockroach string
+	//go:embed 34/postgres/34_cache_schema.sql
+	addCacheSchemaPostgres string
 )
 
 type AddCacheSchema struct {
 	dbClient *database.DB
 }
 
-func (mig *AddCacheSchema) Execute(ctx context.Context, _ eventstore.Event) error {
-	if mig.dbClient.Type() == "postgres" {
-		_, err := mig.dbClient.ExecContext(ctx, addCacheSchema)
-		return err
+func (mig *AddCacheSchema) Execute(ctx context.Context, _ eventstore.Event) (err error) {
+	switch mig.dbClient.Type() {
+	case "cockroach":
+		_, err = mig.dbClient.ExecContext(ctx, addCacheSchemaCockroach)
+	case "postgres":
+		_, err = mig.dbClient.ExecContext(ctx, addCacheSchemaPostgres)
+	default:
+		err = fmt.Errorf("add cache schema: unsupported db type %q", mig.dbClient.Type())
 	}
-	logging.WithFields("name", mig.String(), "dialect", mig.dbClient.Type()).Info("unlogged tables not supported")
-	return nil
+	return err
 }
 
 func (mig *AddCacheSchema) String() string {
