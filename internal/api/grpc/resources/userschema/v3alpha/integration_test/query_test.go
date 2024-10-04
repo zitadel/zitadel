@@ -202,16 +202,18 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				assert.NoError(ttt, err)
 
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
+				if !assert.Len(ttt, got.Result, len(tt.want.Result)) {
+					return
+				}
 				for i := range tt.want.Result {
 					want := tt.want.Result[i]
 					got := got.Result[i]
 
-					integration.AssertResourceDetails(t, want.GetDetails(), got.GetDetails())
+					integration.AssertResourceDetails(ttt, want.GetDetails(), got.GetDetails())
 					want.Details = got.Details
 					grpc.AllFieldsEqual(t, want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 				}
-				integration.AssertListDetails(t, tt.want, got)
+				integration.AssertListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
 		})
 	}
@@ -308,12 +310,12 @@ func TestServer_GetUserSchema(t *testing.T) {
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.UserSchemaV3.GetUserSchema(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assert.Error(t, err, "Error: "+err.Error())
+					assert.Error(ttt, err, "Error: "+err.Error())
 				} else {
-					assert.NoError(t, err)
+					assert.NoError(ttt, err)
 					wantSchema := tt.want.GetUserSchema()
 					gotSchema := got.GetUserSchema()
-					integration.AssertResourceDetails(t, wantSchema.GetDetails(), gotSchema.GetDetails())
+					integration.AssertResourceDetails(ttt, wantSchema.GetDetails(), gotSchema.GetDetails())
 					tt.want.UserSchema.Details = got.GetUserSchema().GetDetails()
 					grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 				}

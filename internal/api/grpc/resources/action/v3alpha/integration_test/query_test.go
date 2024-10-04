@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
@@ -216,16 +217,26 @@ func TestServer_GetTarget(t *testing.T) {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
 			}
-			got, getErr := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				assert.Error(t, getErr, "Error: "+getErr.Error())
-			} else {
-				assert.NoError(t, getErr)
-				wantTarget := tt.want.GetTarget()
-				gotTarget := got.GetTarget()
-				integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
-				assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
+			retryDuration := 5 * time.Second
+			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
+				retryDuration = time.Until(ctxDeadline)
 			}
+
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, getErr := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ttt, getErr, "Error: "+getErr.Error())
+				} else {
+					if !assert.NoError(ttt, getErr) {
+						return
+					}
+					wantTarget := tt.want.GetTarget()
+					gotTarget := got.GetTarget()
+					integration.AssertResourceDetails(ttt, wantTarget.GetDetails(), gotTarget.GetDetails())
+					gotTarget.Details = wantTarget.GetDetails()
+					grpc.AllFieldsEqual(t, wantTarget.ProtoReflect(), gotTarget.ProtoReflect(), grpc.CustomMappers)
+				}
+			}, retryDuration, time.Millisecond*100, "timeout waiting for expected target result")
 		})
 	}
 }
@@ -495,7 +506,8 @@ func TestServer_ListTargets(t *testing.T) {
 				}
 				for i := range tt.want.Result {
 					integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
-					assert.Equal(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
+					got.Result[i].Details = tt.want.Result[i].GetDetails()
+					grpc.AllFieldsEqual(t, tt.want.Result[i].ProtoReflect(), got.Result[i].ProtoReflect(), grpc.CustomMappers)
 				}
 				integration.AssertResourceListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
@@ -887,7 +899,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 					// as not sorted, all elements have to be checked
 					// workaround as oneof elements can only be checked with assert.EqualExportedValues()
 					if j, found := containExecution(got.Result, tt.want.Result[i]); found {
-						assert.EqualExportedValues(t, tt.want.Result[i], got.Result[j])
+						got.Result[j].Details = tt.want.Result[i].GetDetails()
+						grpc.AllFieldsEqual(t, tt.want.Result[i].ProtoReflect(), got.Result[j].ProtoReflect(), grpc.CustomMappers)
 					}
 				}
 				integration.AssertResourceListDetails(ttt, tt.want, got)
