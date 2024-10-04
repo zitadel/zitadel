@@ -420,10 +420,9 @@ func (p *smtpConfigProjection) reduceSMTPConfigRemoved(event eventstore.Event) (
 }
 
 func getSMTPConfigID(id string, aggregate *eventstore.Aggregate) string {
-	// Deal with old and unique SMTP settings (empty ID)
-	returnedID := id
-	if returnedID == "" {
-		returnedID = aggregate.ResourceOwner
+	if id != "" {
+		return id
 	}
-	return returnedID
+	// Deal with old and unique SMTP settings (empty ID)
+	return aggregate.ResourceOwner
 }
