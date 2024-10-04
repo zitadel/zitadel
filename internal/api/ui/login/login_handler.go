@@ -69,6 +69,17 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if data.Register {
+		restrictions, err := l.query.GetInstanceRestrictions(r.Context())
+		if err != nil {
+			l.renderError(w, r, authReq, err)
+			return
+		}
+
+		if !restrictions.DisallowPublicOrgRegistration && (authReq == nil || authReq.LoginPolicy == nil || !authReq.LoginPolicy.AllowRegister) {
+			l.handleRegisterOrg(w, r)
+			return
+		}
+
 		if authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0 {
 			l.handleRegisterOption(w, r)
 			return
@@ -101,6 +112,13 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := l.getUserData(r, authReq, translator, "Login.Title", "Login.Description", errID, errMessage)
+
+	restrictions, err := l.query.GetInstanceRestrictions(r.Context())
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+
 	funcs := map[string]interface{}{
 		"hasUsernamePasswordLogin": func() bool {
 			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword
@@ -109,7 +127,7 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
 		},
 		"hasRegistration": func() bool {
-			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowRegister
+			return (authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowRegister) || !restrictions.DisallowPublicOrgRegistration
 		},
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplLogin], data, funcs)
