@@ -89,7 +89,7 @@ func StartQueries(
 	if startProjections {
 		projection.Start(ctx)
 	}
-	repo.caches, err = startCaches(ctx, caches)
+	repo.caches, err = startCaches(ctx, caches, querySqlClient)
 	if err != nil {
 		return nil, err
 	}
