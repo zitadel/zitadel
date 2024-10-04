@@ -208,8 +208,8 @@ func (p *smtpConfigProjection) reduceSMTPConfigHTTPAdded(event eventstore.Event)
 		),
 		handler.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
+				handler.NewCol(SMTPConfigHTTPColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCol(SMTPConfigHTTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCol(SMTPConfigHTTPColumnEndpoint, e.Endpoint),
 			},
 			handler.WithTableSuffix(smtpConfigHTTPTableSuffix),
