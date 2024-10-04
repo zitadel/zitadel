@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable = "projections.smtp_configs4"
+	SMTPConfigProjectionTable = "projections.smtp_configs5"
 	SMTPConfigTable           = SMTPConfigProjectionTable + "_" + smtpConfigSMTPTableSuffix
 	SMTPConfigHTTPTable       = SMTPConfigProjectionTable + "_" + smtpConfigHTTPTableSuffix
 
@@ -146,12 +146,9 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 		return nil, err
 	}
 
-	// Deal with old and unique SMTP settings (empty ID)
-	id := e.ID
 	description := e.Description
 	state := domain.SMTPConfigStateInactive
 	if e.ID == "" {
-		id = e.Aggregate().ResourceOwner
 		description = "generic"
 		state = domain.SMTPConfigStateActive
 	}
@@ -165,7 +162,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 				handler.NewCol(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 				handler.NewCol(SMTPConfigColumnAggregateID, e.Aggregate().ID),
-				handler.NewCol(SMTPConfigColumnID, id),
+				handler.NewCol(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
 				handler.NewCol(SMTPConfigColumnState, state),
 				handler.NewCol(SMTPConfigColumnDescription, description),
@@ -174,7 +171,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(SMTPConfigSMTPColumnID, id),
+				handler.NewCol(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCol(SMTPConfigSMTPColumnTLS, e.TLS),
 				handler.NewCol(SMTPConfigSMTPColumnSenderAddress, e.SenderAddress),
 				handler.NewCol(SMTPConfigSMTPColumnSenderName, e.SenderName),
@@ -203,7 +200,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigHTTPAdded(event eventstore.Event)
 				handler.NewCol(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 				handler.NewCol(SMTPConfigColumnAggregateID, e.Aggregate().ID),
-				handler.NewCol(SMTPConfigColumnID, e.ID),
+				handler.NewCol(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
 				handler.NewCol(SMTPConfigColumnState, domain.SMTPConfigStateInactive),
 				handler.NewCol(SMTPConfigColumnDescription, e.Description),
@@ -211,8 +208,8 @@ func (p *smtpConfigProjection) reduceSMTPConfigHTTPAdded(event eventstore.Event)
 		),
 		handler.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(SMTPConfigSMTPColumnID, e.ID),
+				handler.NewCol(SMTPConfigHTTPColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCol(SMTPConfigHTTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCol(SMTPConfigHTTPColumnEndpoint, e.Endpoint),
 			},
 			handler.WithTableSuffix(smtpConfigHTTPTableSuffix),
@@ -238,7 +235,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigHTTPChanged(event eventstore.Even
 		stmts = append(stmts, handler.AddUpdateStatement(
 			columns,
 			[]handler.Condition{
-				handler.NewCond(SMTPConfigColumnID, e.ID),
+				handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		))
@@ -252,7 +249,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigHTTPChanged(event eventstore.Even
 		stmts = append(stmts, handler.AddUpdateStatement(
 			smtpColumns,
 			[]handler.Condition{
-				handler.NewCond(SMTPConfigHTTPColumnID, e.ID),
+				handler.NewCond(SMTPConfigHTTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCond(SMTPConfigHTTPColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			handler.WithTableSuffix(smtpConfigHTTPTableSuffix),
@@ -268,12 +265,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		return nil, err
 	}
 
-	// Deal with old and unique SMTP settings (empty ID)
-	id := e.ID
-	if e.ID == "" {
-		id = e.Aggregate().ResourceOwner
-	}
-
 	stmts := make([]func(eventstore.Event) handler.Exec, 0, 3)
 	columns := []handler.Column{
 		handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
@@ -286,39 +277,39 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		stmts = append(stmts, handler.AddUpdateStatement(
 			columns,
 			[]handler.Condition{
-				handler.NewCond(SMTPConfigColumnID, id),
+				handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		))
 	}
 
-	httpColumns := make([]handler.Column, 0, 7)
+	smtpColumns := make([]handler.Column, 0, 7)
 	if e.TLS != nil {
-		httpColumns = append(httpColumns, handler.NewCol(SMTPConfigSMTPColumnTLS, *e.TLS))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnTLS, *e.TLS))
 	}
 	if e.FromAddress != nil {
-		httpColumns = append(httpColumns, handler.NewCol(SMTPConfigSMTPColumnSenderAddress, *e.FromAddress))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnSenderAddress, *e.FromAddress))
 	}
 	if e.FromName != nil {
-		httpColumns = append(httpColumns, handler.NewCol(SMTPConfigSMTPColumnSenderName, *e.FromName))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnSenderName, *e.FromName))
 	}
 	if e.ReplyToAddress != nil {
-		httpColumns = append(httpColumns, handler.NewCol(SMTPConfigSMTPColumnReplyToAddress, *e.ReplyToAddress))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnReplyToAddress, *e.ReplyToAddress))
 	}
 	if e.Host != nil {
-		httpColumns = append(httpColumns, handler.NewCol(SMTPConfigSMTPColumnHost, *e.Host))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnHost, *e.Host))
 	}
 	if e.User != nil {
-		httpColumns = append(httpColumns, handler.NewCol(SMTPConfigSMTPColumnUser, *e.User))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnUser, *e.User))
 	}
 	if e.Password != nil {
-		httpColumns = append(httpColumns, handler.NewCol(SMTPConfigSMTPColumnPassword, *e.Password))
+		smtpColumns = append(smtpColumns, handler.NewCol(SMTPConfigSMTPColumnPassword, *e.Password))
 	}
-	if len(httpColumns) > 0 {
+	if len(smtpColumns) > 0 {
 		stmts = append(stmts, handler.AddUpdateStatement(
-			httpColumns,
+			smtpColumns,
 			[]handler.Condition{
-				handler.NewCond(SMTPConfigSMTPColumnID, e.ID),
+				handler.NewCond(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCond(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			handler.WithTableSuffix(smtpConfigSMTPTableSuffix),
@@ -334,12 +325,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 		return nil, err
 	}
 
-	// Deal with old and unique SMTP settings (empty ID)
-	id := e.ID
-	if e.ID == "" {
-		id = e.Aggregate().ResourceOwner
-	}
-
 	return handler.NewMultiStatement(
 		e,
 		handler.AddUpdateStatement(
@@ -347,8 +332,8 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 				handler.NewCol(SMTPConfigSMTPColumnPassword, e.Password),
 			},
 			[]handler.Condition{
-				handler.NewCond(SMTPConfigColumnID, id),
-				handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(SMTPConfigSMTPColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
+				handler.NewCond(SMTPConfigSMTPColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			handler.WithTableSuffix(smtpConfigSMTPTableSuffix),
 		),
@@ -358,7 +343,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 				handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond(SMTPConfigColumnID, id),
+				handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
@@ -371,12 +356,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigActivated(event eventstore.Event)
 		return nil, err
 	}
 
-	// Deal with old and unique SMTP settings (empty ID)
-	id := e.ID
-	if e.ID == "" {
-		id = e.Aggregate().ResourceOwner
-	}
-
 	return handler.NewMultiStatement(
 		e,
 		handler.AddUpdateStatement(
@@ -386,7 +365,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigActivated(event eventstore.Event)
 				handler.NewCol(SMTPConfigColumnState, domain.SMTPConfigStateInactive),
 			},
 			[]handler.Condition{
-				handler.Not(handler.NewCond(SMTPConfigColumnID, e.ID)),
+				handler.Not(handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate()))),
 				handler.NewCond(SMTPConfigColumnState, domain.SMTPConfigStateActive),
 				handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
@@ -398,7 +377,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigActivated(event eventstore.Event)
 				handler.NewCol(SMTPConfigColumnState, domain.SMTPConfigStateActive),
 			},
 			[]handler.Condition{
-				handler.NewCond(SMTPConfigColumnID, id),
+				handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 				handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 			},
 		),
@@ -411,12 +390,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigDeactivated(event eventstore.Even
 		return nil, err
 	}
 
-	// Deal with old and unique SMTP settings (empty ID)
-	id := e.ID
-	if e.ID == "" {
-		id = e.Aggregate().ResourceOwner
-	}
-
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
@@ -425,7 +398,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigDeactivated(event eventstore.Even
 			handler.NewCol(SMTPConfigColumnState, domain.SMTPConfigStateInactive),
 		},
 		[]handler.Condition{
-			handler.NewCond(SMTPConfigColumnID, id),
+			handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
@@ -437,17 +410,19 @@ func (p *smtpConfigProjection) reduceSMTPConfigRemoved(event eventstore.Event) (
 		return nil, err
 	}
 
-	// Deal with old and unique SMTP settings (empty ID)
-	id := e.ID
-	if e.ID == "" {
-		id = e.Aggregate().ResourceOwner
-	}
-
 	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
-			handler.NewCond(SMTPConfigColumnID, id),
+			handler.NewCond(SMTPConfigColumnID, getSMTPConfigID(e.ID, e.Aggregate())),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
+}
+
+func getSMTPConfigID(id string, aggregate *eventstore.Aggregate) string {
+	if id != "" {
+		return id
+	}
+	// Deal with old and unique SMTP settings (empty ID)
+	return aggregate.ResourceOwner
 }
