@@ -8,15 +8,15 @@ TLS:
 
 Caches:
   Connectors:
-    Memory:
+    Postgres:
       Enabled: true
       AutoPrune:
         Interval: 30s
         TimeOut: 1s
   Instance:
-    Connector: "memory"
-    MaxAge: 1m
-    LastUsage: 30s
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUsage: 30m
     Log:
       Level: info
       AddSource: true

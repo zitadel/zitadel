@@ -1,0 +1,7 @@
+create unlogged table if not exists cache.objects_{{ . }}
+partition of cache.objects
+for values in ('{{ . }}');
+
+create unlogged table if not exists cache.string_keys_{{ . }}
+partition of cache.string_keys
+for values in ('{{ . }}');
