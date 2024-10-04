@@ -62,6 +62,8 @@ func orgQueryToQuery(ctx context.Context, orgQuery *org.SearchQuery) (query.Sear
 		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	case *org.SearchQuery_StateQuery:
 		return query.NewOrgStateSearchQuery(orgStateToDomain(q.StateQuery.State))
+	case *org.SearchQuery_IdQuery:
+		return query.NewOrgIDSearchQuery(q.IdQuery.Id)
 	case *org.SearchQuery_DefaultQuery:
 		return query.NewOrgIDSearchQuery(authz.GetInstance(ctx).DefaultOrganisationID())
 	default:
