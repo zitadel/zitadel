@@ -593,3 +593,19 @@ func TestImpersonation_API_Call(t *testing.T) {
 	assert.Equal(t, codes.PermissionDenied, status.Code())
 	assert.Equal(t, "Errors.TokenExchange.Token.NotForAPI (APP-Shi0J)", status.Message())
 }
+
+func ensureTokenExchangeFeature(t *testing.T, instance *integration.Instance, set bool) {
+	ctxIam := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctxIam, &feature.SetInstanceFeaturesRequest{
+		OidcTokenExchange: proto.Bool(set),
+	})
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctxIam, &feature.SetInstanceFeaturesRequest{
+			OidcTokenExchange: proto.Bool(false),
+		})
+		require.NoError(t, err)
+	})
+}

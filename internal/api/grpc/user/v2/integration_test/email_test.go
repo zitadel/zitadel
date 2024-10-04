@@ -3,18 +3,17 @@
 package user_test
 
 import (
-	"fmt"
 	"testing"
-	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_SetEmail(t *testing.T) {
@@ -145,7 +144,7 @@ func TestServer_SetEmail(t *testing.T) {
 
 func TestServer_ResendEmailCode(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email()).GetUserId()
 
 	tests := []struct {
 		name    string

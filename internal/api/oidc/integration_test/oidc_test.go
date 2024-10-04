@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -121,7 +122,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 
 func Test_ZITADEL_API_missing_mfa_policy(t *testing.T) {
 	clientID, _ := createClient(t, Instance)
-	org := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_API_MISSING_MFA_%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	org := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_API_MISSING_MFA_%s", gofakeit.AppName()), gofakeit.Email())
 	userID := org.CreatedAdmins[0].GetUserId()
 	Instance.SetUserPassword(CTXIAM, userID, integration.UserPassword, false)
 	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)

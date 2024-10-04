@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -135,14 +135,14 @@ func testServer_UserInfo(t *testing.T) {
 			prepare: func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
 				_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 					Id:                   projectID,
-					Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
+					Name:                 fmt.Sprintf("project-%s", gofakeit.AppName()),
 					ProjectRoleAssertion: true,
 				})
 				require.NoError(t, err)
 				t.Cleanup(func() {
 					_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 						Id:                   projectID,
-						Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
+						Name:                 fmt.Sprintf("project-%s", gofakeit.AppName()),
 						ProjectRoleAssertion: false,
 					})
 					require.NoError(t, err)
@@ -245,7 +245,7 @@ func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
 
 	_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 		Id:                   projectID,
-		Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
+		Name:                 fmt.Sprintf("project-%s", gofakeit.AppName()),
 		ProjectRoleAssertion: true,
 	})
 	require.NoError(t, err)
@@ -356,7 +356,7 @@ func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...stri
 // addProjectOrgGrant adds a new organization which will be granted on the projectID with the specified roles.
 // The userID will be granted in the new organization to the project with the same roles.
 func addProjectOrgGrant(t *testing.T, userID, projectID string, roles ...string) (grantedOrgID string) {
-	grantedOrg := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_GRANTED_%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	grantedOrg := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_GRANTED_%s", gofakeit.AppName()), gofakeit.Email())
 	projectGrant, err := Instance.Client.Mgmt.AddProjectGrant(CTX, &management.AddProjectGrantRequest{
 		ProjectId:    projectID,
 		GrantedOrgId: grantedOrg.GetOrganizationId(),

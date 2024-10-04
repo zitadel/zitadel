@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
@@ -348,8 +349,8 @@ func TestServer_CreateSession(t *testing.T) {
 func TestServer_CreateSession_lock_user(t *testing.T) {
 	// create a separate org so we don't interfere with any other test
 	org := Instance.CreateOrganization(IAMOwnerCTX,
-		fmt.Sprintf("TestServer_CreateSession_lock_user_%d", time.Now().UnixNano()),
-		fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+		fmt.Sprintf("TestServer_CreateSession_lock_user_%s", gofakeit.AppName()),
+		gofakeit.Email(),
 	)
 	userID := org.CreatedAdmins[0].GetUserId()
 	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)

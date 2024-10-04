@@ -49,10 +49,10 @@ func TestServer_ListOrganizations(t *testing.T) {
 				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
 					count := 3
 					orgs := make([]orgAttr, count)
-					prefix := fmt.Sprintf("ListOrgs%d", time.Now().UnixNano())
+					prefix := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
 					for i := 0; i < count; i++ {
 						name := prefix + strconv.Itoa(i)
-						orgResp := Instance.CreateOrganization(ctx, name, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+						orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
 						orgs[i] = orgAttr{
 							ID:      orgResp.GetOrganizationId(),
 							Name:    name,
