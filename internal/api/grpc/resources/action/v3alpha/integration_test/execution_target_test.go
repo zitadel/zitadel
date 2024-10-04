@@ -65,7 +65,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetRequest := instance.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, false)
 				instance.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
 
-				waitForExecutionOnMethod(ctx, t, instance, conditionRequestFullMethod(fullMethod))
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod))
 
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
@@ -122,7 +122,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetResponse := instance.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, false)
 				instance.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
-				waitForExecutionOnMethod(ctx, t, instance, conditionResponseFullMethod(fullMethod))
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod))
 				return func() {
 					closeRequest()
 					closeResponse()
@@ -166,7 +166,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// GetTarget with used target
 				request.Id = targetRequest.GetDetails().GetId()
 
-				waitForExecutionOnMethod(ctx, t, instance, conditionRequestFullMethod(fullMethod))
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod))
 				return func() {
 					closeRequest()
 				}, nil
@@ -236,7 +236,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetResponse := instance.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, true)
 				instance.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
-				waitForExecutionOnMethod(ctx, t, instance, conditionResponseFullMethod(fullMethod))
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod))
 				return func() {
 					closeResponse()
 				}, nil
@@ -282,7 +282,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	}
 }
 
-func waitForExecutionOnMethod(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition) {
+func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition) {
 	retryDuration := 5 * time.Second
 	if ctxDeadline, ok := ctx.Deadline(); ok {
 		retryDuration = time.Until(ctxDeadline)
