@@ -72,15 +72,15 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 	return connector, nil
 }
 
-func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, error) {
+func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, *pgxpool.Pool, error) {
 	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if connConfig.MaxOpenConns != 0 {
@@ -95,14 +95,14 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 		config,
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if err := pool.Ping(context.Background()); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return stdlib.OpenDBFromPool(pool), nil
+	return stdlib.OpenDBFromPool(pool), pool, nil
 }
 
 func (c *Config) DatabaseName() string {
