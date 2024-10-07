@@ -559,7 +559,8 @@ func TestAppProjection_reduces(t *testing.T) {
                         "clockSkew": 1000,
                         "additionalOrigins": ["origin.one.ch", "origin.two.ch"],
 						"skipNativeAppSuccessPage": true,
-						"backChannelLogoutURI": "back.channel.one.ch"
+						"backChannelLogoutURI": "back.channel.one.ch",
+						"useLoginV2": true
 		}`),
 					), project.OIDCConfigAddedEventMapper),
 			},
@@ -570,7 +571,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)",
+							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, use_login_v2) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)",
 							expectedArgs: []interface{}{
 								"app-id",
 								"instance-id",
@@ -592,6 +593,7 @@ func TestAppProjection_reduces(t *testing.T) {
 								database.TextArray[string]{"origin.one.ch", "origin.two.ch"},
 								true,
 								"back.channel.one.ch",
+								true,
 							},
 						},
 						{
@@ -633,7 +635,8 @@ func TestAppProjection_reduces(t *testing.T) {
                         "clockSkew": 1000,
                         "additionalOrigins": ["origin.one.ch", "origin.two.ch"],
 						"skipNativeAppSuccessPage": true,
-						"backChannelLogoutURI": "back.channel.one.ch"
+						"backChannelLogoutURI": "back.channel.one.ch",
+						"useLoginV2": true
 		}`),
 					), project.OIDCConfigAddedEventMapper),
 			},
@@ -644,7 +647,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)",
+							expectedStmt: "INSERT INTO projections.apps7_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, use_login_v2) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)",
 							expectedArgs: []interface{}{
 								"app-id",
 								"instance-id",
@@ -666,6 +669,7 @@ func TestAppProjection_reduces(t *testing.T) {
 								database.TextArray[string]{"origin.one.ch", "origin.two.ch"},
 								true,
 								"back.channel.one.ch",
+								true,
 							},
 						},
 						{
@@ -705,7 +709,8 @@ func TestAppProjection_reduces(t *testing.T) {
                         "clockSkew": 1000,
                         "additionalOrigins": ["origin.one.ch", "origin.two.ch"],
 						"skipNativeAppSuccessPage": true,
-						"backChannelLogoutURI": "back.channel.one.ch"
+						"backChannelLogoutURI": "back.channel.one.ch",
+						"useLoginV2": true
 		}`),
 					), project.OIDCConfigChangedEventMapper),
 			},
@@ -716,7 +721,7 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps7_oidc_configs SET (version, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) WHERE (app_id = $17) AND (instance_id = $18)",
+							expectedStmt: "UPDATE projections.apps7_oidc_configs SET (version, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins, skip_native_app_success_page, back_channel_logout_uri, use_login_v2) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) WHERE (app_id = $18) AND (instance_id = $19)",
 							expectedArgs: []interface{}{
 								domain.OIDCVersionV1,
 								database.TextArray[string]{"redirect.one.ch", "redirect.two.ch"},
@@ -732,6 +737,7 @@ func TestAppProjection_reduces(t *testing.T) {
 								true,
 								1 * time.Microsecond,
 								database.TextArray[string]{"origin.one.ch", "origin.two.ch"},
+								true,
 								true,
 								"back.channel.one.ch",
 								"app-id",

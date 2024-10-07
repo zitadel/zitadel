@@ -176,6 +176,7 @@ func TestAddOIDCApp(t *testing.T) {
 						[]string{"https://sub.test.ch"},
 						false,
 						"",
+						false,
 					),
 				},
 			},
@@ -242,6 +243,7 @@ func TestAddOIDCApp(t *testing.T) {
 						nil,
 						false,
 						"",
+						false,
 					),
 				},
 			},
@@ -308,6 +310,7 @@ func TestAddOIDCApp(t *testing.T) {
 						nil,
 						false,
 						"",
+						false,
 					),
 				},
 			},
@@ -374,6 +377,7 @@ func TestAddOIDCApp(t *testing.T) {
 						nil,
 						false,
 						"",
+						false,
 					),
 				},
 			},
@@ -521,6 +525,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							[]string{"https://sub.test.ch"},
 							true,
 							"https://test.ch/backchannel",
+							true,
 						),
 					),
 				),
@@ -549,6 +554,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{" https://sub.test.ch "},
 					SkipNativeAppSuccessPage: true,
 					BackChannelLogoutURI:     " https://test.ch/backchannel ",
+					UseLoginV2:               true,
 				},
 				resourceOwner: "org1",
 			},
@@ -578,6 +584,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
 					BackChannelLogoutURI:     "https://test.ch/backchannel",
+					UseLoginV2:               true,
 					State:                    domain.AppStateActive,
 					Compliance:               &domain.Compliance{},
 				},
@@ -622,6 +629,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							[]string{"https://sub.test.ch"},
 							true,
 							"https://test.ch/backchannel",
+							true,
 						),
 					),
 				),
@@ -650,6 +658,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
 					BackChannelLogoutURI:     "https://test.ch/backchannel",
+					UseLoginV2:               true,
 				},
 				resourceOwner: "org1",
 			},
@@ -679,6 +688,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
 					BackChannelLogoutURI:     "https://test.ch/backchannel",
+					UseLoginV2:               true,
 					State:                    domain.AppStateActive,
 					Compliance:               &domain.Compliance{},
 				},
@@ -712,7 +722,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 
 func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -732,9 +742,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 		{
 			name: "invalid app, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -753,9 +761,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 		{
 			name: "missing appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -777,9 +783,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 		{
 			name: "missing aggregateid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -801,8 +805,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -826,8 +829,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 		{
 			name: "no changes, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -858,6 +860,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								[]string{"https://sub.test.ch"},
 								true,
 								"https://test.ch/backchannel",
+								true,
 							),
 						),
 					),
@@ -887,6 +890,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
 					BackChannelLogoutURI:     "https://test.ch/backchannel",
+					UseLoginV2:               true,
 				},
 				resourceOwner: "org1",
 			},
@@ -897,8 +901,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 		{
 			name: "no changes whitespaces are ignored, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -929,6 +932,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								[]string{"https://sub.test.ch"},
 								true,
 								"https://test.ch/backchannel",
+								true,
 							),
 						),
 					),
@@ -958,6 +962,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{" https://sub.test.ch "},
 					SkipNativeAppSuccessPage: true,
 					BackChannelLogoutURI:     " https://test.ch/backchannel ",
+					UseLoginV2:               true,
 				},
 				resourceOwner: "org1",
 			},
@@ -968,8 +973,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 		{
 			name: "change oidc app, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -1000,6 +1004,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								[]string{"https://sub.test.ch"},
 								true,
 								"https://test.ch/backchannel",
+								true,
 							),
 						),
 					),
@@ -1035,6 +1040,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
 					BackChannelLogoutURI:     "https://test.ch/backchannel",
+					UseLoginV2:               true,
 				},
 				resourceOwner: "org1",
 			},
@@ -1063,6 +1069,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
 					BackChannelLogoutURI:     "https://test.ch/backchannel",
+					UseLoginV2:               true,
 					Compliance:               &domain.Compliance{},
 					State:                    domain.AppStateActive,
 				},
@@ -1072,7 +1079,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ChangeOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -1188,6 +1195,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 								[]string{"https://sub.test.ch"},
 								false,
 								"",
+								false,
 							),
 						),
 					),
@@ -1232,6 +1240,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: false,
 					BackChannelLogoutURI:     "",
+					UseLoginV2:               false,
 					State:                    domain.AppStateActive,
 				},
 			},
@@ -1347,6 +1356,7 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 							[]string{"https://sub.test.ch"},
 							false,
 							"",
+							false,
 						),
 					),
 				),
@@ -1383,6 +1393,7 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 							[]string{"https://sub.test.ch"},
 							false,
 							"",
+							false,
 						),
 					),
 				),
@@ -1418,6 +1429,7 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 							[]string{"https://sub.test.ch"},
 							false,
 							"",
+							false,
 						),
 					),
 				),

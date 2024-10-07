@@ -46,6 +46,7 @@ type OIDCApp struct {
 	AdditionalOrigins        []string
 	SkipNativeAppSuccessPage bool
 	BackChannelLogoutURI     string
+	UseLoginV2               bool
 
 	State AppState
 }

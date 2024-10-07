@@ -44,6 +44,7 @@ type OIDCConfigAddedEvent struct {
 	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
 	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
+	UseLoginV2               bool                       `json:"useLoginV2,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -76,6 +77,7 @@ func NewOIDCConfigAddedEvent(
 	additionalOrigins []string,
 	skipNativeAppSuccessPage bool,
 	backChannelLogoutURI string,
+	useLoginV2 bool,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -102,6 +104,7 @@ func NewOIDCConfigAddedEvent(
 		AdditionalOrigins:        additionalOrigins,
 		SkipNativeAppSuccessPage: skipNativeAppSuccessPage,
 		BackChannelLogoutURI:     backChannelLogoutURI,
+		UseLoginV2:               useLoginV2,
 	}
 }
 
@@ -190,7 +193,10 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.SkipNativeAppSuccessPage != c.SkipNativeAppSuccessPage {
 		return false
 	}
-	return e.BackChannelLogoutURI == c.BackChannelLogoutURI
+	if e.BackChannelLogoutURI != c.BackChannelLogoutURI {
+		return false
+	}
+	return e.UseLoginV2 == c.UseLoginV2
 }
 
 func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -226,6 +232,7 @@ type OIDCConfigChangedEvent struct {
 	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
 	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
+	UseLoginV2               *bool                       `json:"useLoginV2,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
@@ -355,6 +362,12 @@ func ChangeSkipNativeAppSuccessPage(skipNativeAppSuccessPage bool) func(event *O
 func ChangeBackChannelLogoutURI(backChannelLogoutURI string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.BackChannelLogoutURI = &backChannelLogoutURI
+	}
+}
+
+func ChangeUseLoginV2(useLoginV2 bool) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.UseLoginV2 = &useLoginV2
 	}
 }
 

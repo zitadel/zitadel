@@ -37,6 +37,7 @@ type OIDCApplicationWriteModel struct {
 	AdditionalOrigins        []string
 	SkipNativeAppSuccessPage bool
 	BackChannelLogoutURI     string
+	UseLoginV2               bool
 	oidc                     bool
 }
 
@@ -167,6 +168,7 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.AdditionalOrigins = e.AdditionalOrigins
 	wm.SkipNativeAppSuccessPage = e.SkipNativeAppSuccessPage
 	wm.BackChannelLogoutURI = e.BackChannelLogoutURI
+	wm.UseLoginV2 = e.UseLoginV2
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
@@ -218,6 +220,9 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.BackChannelLogoutURI != nil {
 		wm.BackChannelLogoutURI = *e.BackChannelLogoutURI
 	}
+	if e.UseLoginV2 != nil {
+		wm.UseLoginV2 = *e.UseLoginV2
+	}
 }
 
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -260,6 +265,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	additionalOrigins []string,
 	skipNativeAppSuccessPage bool,
 	backChannelLogoutURI string,
+	useLoginV2 bool,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
@@ -311,6 +317,9 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	}
 	if wm.BackChannelLogoutURI != backChannelLogoutURI {
 		changes = append(changes, project.ChangeBackChannelLogoutURI(backChannelLogoutURI))
+	}
+	if wm.UseLoginV2 != useLoginV2 {
+		changes = append(changes, project.ChangeUseLoginV2(useLoginV2))
 	}
 
 	if len(changes) == 0 {
