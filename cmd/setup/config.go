@@ -120,6 +120,7 @@ type Steps struct {
 	s31AddAggregateIndexToFields            *AddAggregateIndexToFields
 	s32AddAuthSessionID                     *AddAuthSessionID
 	s33SMSConfigs3TwilioAddVerifyServiceSid *SMSConfigs3TwilioAddVerifyServiceSid
+	s34AddCacheSchema                       *AddCacheSchema
 	s35AddPositionToIndexEsWm               *AddPositionToIndexEsWm
 }
 

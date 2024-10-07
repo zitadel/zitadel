@@ -435,71 +435,71 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 }
 
 type authzInstance struct {
-	id                  string
-	iamProjectID        string
-	consoleID           string
-	consoleAppID        string
-	defaultLang         language.Tag
-	defaultOrgID        string
-	csp                 csp
-	enableImpersonation bool
-	block               *bool
-	auditLogRetention   *time.Duration
-	features            feature.Features
-	externalDomains     database.TextArray[string]
-	trustedDomains      database.TextArray[string]
+	ID              string                     `json:"id,omitempty"`
+	IAMProjectID    string                     `json:"iam_project_id,omitempty"`
+	ConsoleID       string                     `json:"console_id,omitempty"`
+	ConsoleAppID    string                     `json:"console_app_id,omitempty"`
+	DefaultLang     language.Tag               `json:"default_lang,omitempty"`
+	DefaultOrgID    string                     `json:"default_org_id,omitempty"`
+	CSP             csp                        `json:"csp,omitempty"`
+	Impersonation   bool                       `json:"impersonation,omitempty"`
+	IsBlocked       *bool                      `json:"is_blocked,omitempty"`
+	LogRetention    *time.Duration             `json:"log_retention,omitempty"`
+	Feature         feature.Features           `json:"feature,omitempty"`
+	ExternalDomains database.TextArray[string] `json:"external_domains,omitempty"`
+	TrustedDomains  database.TextArray[string] `json:"trusted_domains,omitempty"`
 }
 
 type csp struct {
-	enableIframeEmbedding bool
-	allowedOrigins        database.TextArray[string]
+	EnableIframeEmbedding bool                       `json:"enable_iframe_embedding,omitempty"`
+	AllowedOrigins        database.TextArray[string] `json:"allowed_origins,omitempty"`
 }
 
 func (i *authzInstance) InstanceID() string {
-	return i.id
+	return i.ID
 }
 
 func (i *authzInstance) ProjectID() string {
-	return i.iamProjectID
+	return i.IAMProjectID
 }
 
 func (i *authzInstance) ConsoleClientID() string {
-	return i.consoleID
+	return i.ConsoleID
 }
 
 func (i *authzInstance) ConsoleApplicationID() string {
-	return i.consoleAppID
+	return i.ConsoleAppID
 }
 
 func (i *authzInstance) DefaultLanguage() language.Tag {
-	return i.defaultLang
+	return i.DefaultLang
 }
 
 func (i *authzInstance) DefaultOrganisationID() string {
-	return i.defaultOrgID
+	return i.DefaultOrgID
 }
 
 func (i *authzInstance) SecurityPolicyAllowedOrigins() []string {
-	if !i.csp.enableIframeEmbedding {
+	if !i.CSP.EnableIframeEmbedding {
 		return nil
 	}
-	return i.csp.allowedOrigins
+	return i.CSP.AllowedOrigins
 }
 
 func (i *authzInstance) EnableImpersonation() bool {
-	return i.enableImpersonation
+	return i.Impersonation
 }
 
 func (i *authzInstance) Block() *bool {
-	return i.block
+	return i.IsBlocked
 }
 
 func (i *authzInstance) AuditLogRetention() *time.Duration {
-	return i.auditLogRetention
+	return i.LogRetention
 }
 
 func (i *authzInstance) Features() feature.Features {
-	return i.features
+	return i.Feature
 }
 
 var errPublicDomain = "public domain %q not trusted"
@@ -509,7 +509,7 @@ func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
 	if publicDomain == "" || instanceDomain == publicDomain {
 		return nil
 	}
-	if !slices.Contains(i.trustedDomains, publicDomain) {
+	if !slices.Contains(i.TrustedDomains, publicDomain) {
 		return zerrors.ThrowNotFound(fmt.Errorf(errPublicDomain, publicDomain), "QUERY-IuGh1", "Errors.IAM.NotFound")
 	}
 	return nil
@@ -519,9 +519,9 @@ func (i *authzInstance) checkDomain(instanceDomain, publicDomain string) error {
 func (i *authzInstance) Keys(index instanceIndex) []string {
 	switch index {
 	case instanceIndexByID:
-		return []string{i.id}
+		return []string{i.ID}
 	case instanceIndexByHost:
-		return i.externalDomains
+		return i.ExternalDomains
 	default:
 		return nil
 	}
@@ -539,20 +539,20 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 			features              []byte
 		)
 		err := row.Scan(
-			&instance.id,
-			&instance.defaultOrgID,
-			&instance.iamProjectID,
-			&instance.consoleID,
-			&instance.consoleAppID,
+			&instance.ID,
+			&instance.DefaultOrgID,
+			&instance.IAMProjectID,
+			&instance.ConsoleID,
+			&instance.ConsoleAppID,
 			&lang,
 			&enableIframeEmbedding,
-			&instance.csp.allowedOrigins,
+			&instance.CSP.AllowedOrigins,
 			&enableImpersonation,
 			&auditLogRetention,
 			&block,
 			&features,
-			&instance.externalDomains,
-			&instance.trustedDomains,
+			&instance.ExternalDomains,
+			&instance.TrustedDomains,
 		)
 		if errors.Is(err, sql.ErrNoRows) {
 			return zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
@@ -560,19 +560,19 @@ func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
 		if err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
 		}
-		instance.defaultLang = language.Make(lang)
+		instance.DefaultLang = language.Make(lang)
 		if auditLogRetention.Valid {
-			instance.auditLogRetention = &auditLogRetention.Duration
+			instance.LogRetention = &auditLogRetention.Duration
 		}
 		if block.Valid {
-			instance.block = &block.Bool
+			instance.IsBlocked = &block.Bool
 		}
-		instance.csp.enableIframeEmbedding = enableIframeEmbedding.Bool
-		instance.enableImpersonation = enableImpersonation.Bool
+		instance.CSP.EnableIframeEmbedding = enableIframeEmbedding.Bool
+		instance.Impersonation = enableImpersonation.Bool
 		if len(features) == 0 {
 			return nil
 		}
-		if err = json.Unmarshal(features, &instance.features); err != nil {
+		if err = json.Unmarshal(features, &instance.Feature); err != nil {
 			return zerrors.ThrowInternal(err, "QUERY-Po8ki", "Errors.Internal")
 		}
 		return nil
@@ -598,10 +598,12 @@ func (c *Caches) registerInstanceInvalidation() {
 	})
 }
 
-type instanceIndex int16
+type instanceIndex int
 
-//go:generate enumer -type instanceIndex
+//go:generate enumer -type instanceIndex -linecomment
 const (
-	instanceIndexByID instanceIndex = iota
+	// Empty line comment ensures empty string for unspecified value
+	instanceIndexUnspecified instanceIndex = iota //
+	instanceIndexByID
 	instanceIndexByHost
 )
