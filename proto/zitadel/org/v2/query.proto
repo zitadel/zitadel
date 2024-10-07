@@ -20,6 +20,7 @@ message SearchQuery {
     OrganizationDomainQuery domain_query = 2;
     OrganizationStateQuery state_query = 3;
     OrganizationIDQuery id_query = 4;
+    DefaultOrganizationQuery default_query = 5;
   }
 }
 
@@ -81,3 +82,5 @@ enum OrganizationFieldName {
   ORGANIZATION_FIELD_NAME_UNSPECIFIED = 0;
   ORGANIZATION_FIELD_NAME_NAME = 1;
 }
+
+message DefaultOrganizationQuery {}
