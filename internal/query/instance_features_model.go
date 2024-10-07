@@ -72,6 +72,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
 			feature_v2.InstanceDisableUserTokenEvent,
 			feature_v2.InstanceEnableBackChannelLogout,
+			feature_v2.InstanceRequireLoginV2,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -98,6 +99,7 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.OIDCSingleV1SessionTermination = m.system.OIDCSingleV1SessionTermination
 	m.instance.DisableUserTokenEvent = m.system.DisableUserTokenEvent
 	m.instance.EnableBackChannelLogout = m.system.EnableBackChannelLogout
+	m.instance.RequireLoginV2 = m.system.RequireLoginV2
 	return true
 }
 
@@ -133,6 +135,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.DisableUserTokenEvent.set(level, event.Value)
 	case feature.KeyEnableBackChannelLogout:
 		features.EnableBackChannelLogout.set(level, event.Value)
+	case feature.KeyRequireLoginV2:
+		features.RequireLoginV2.set(level, event.Value)
 	}
 	return nil
 }

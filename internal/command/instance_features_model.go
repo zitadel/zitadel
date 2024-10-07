@@ -72,6 +72,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
 			feature_v2.InstanceDisableUserTokenEvent,
 			feature_v2.InstanceEnableBackChannelLogout,
+			feature_v2.InstanceRequireLoginV2,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -120,6 +121,9 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyEnableBackChannelLogout:
 		v := value.(bool)
 		features.EnableBackChannelLogout = &v
+	case feature.KeyRequireLoginV2:
+		v := value.(bool)
+		features.RequireLoginV2 = &v
 	}
 }
 
@@ -138,5 +142,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCSingleV1SessionTermination, f.OIDCSingleV1SessionTermination, feature_v2.InstanceOIDCSingleV1SessionTerminationEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DisableUserTokenEvent, f.DisableUserTokenEvent, feature_v2.InstanceDisableUserTokenEvent)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.InstanceEnableBackChannelLogout)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.RequireLoginV2, f.RequireLoginV2, feature_v2.InstanceRequireLoginV2)
 	return cmds
 }

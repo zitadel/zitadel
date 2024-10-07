@@ -84,6 +84,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: true,
 		},
+		RequireLoginV2: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetSystemFeaturesResponse{
 		Details: &object.Details{
@@ -128,6 +132,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
 		EnableBackChannelLogout: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		RequireLoginV2: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
@@ -214,6 +222,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		RequireLoginV2: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -268,6 +280,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		EnableBackChannelLogout: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		RequireLoginV2: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 	}
 	got := instanceFeaturesToPb(arg)

@@ -21,6 +21,7 @@ type InstanceFeatures struct {
 	OIDCSingleV1SessionTermination  FeatureSource[bool]
 	DisableUserTokenEvent           FeatureSource[bool]
 	EnableBackChannelLogout         FeatureSource[bool]
+	RequireLoginV2                  FeatureSource[bool]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

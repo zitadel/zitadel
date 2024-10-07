@@ -20,6 +20,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
 		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 		EnableBackChannelLogout:         req.EnableBackChannelLogout,
+		RequireLoginV2:                  req.RequireLoginV2,
 	}
 }
 
@@ -36,6 +37,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:             featureSourceToFlagPb(&f.EnableBackChannelLogout),
+		RequireLoginV2:                      featureSourceToFlagPb(&f.RequireLoginV2),
 	}
 }
 
@@ -53,6 +55,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
 		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 		EnableBackChannelLogout:         req.EnableBackChannelLogout,
+		RequireLoginV2:                  req.RequireLoginV2,
 	}
 }
 
@@ -71,6 +74,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:             featureSourceToFlagPb(&f.EnableBackChannelLogout),
+		RequireLoginV2:                      featureSourceToFlagPb(&f.RequireLoginV2),
 	}
 }
 

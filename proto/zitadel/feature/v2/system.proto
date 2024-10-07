@@ -82,6 +82,13 @@ message SetSystemFeaturesRequest{
       description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.";
     }
   ];
+
+  optional bool require_login_v2 = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, all users will be use the login V2 regardless of the application's preference.";
+    }
+  ];
 }
 
 message SetSystemFeaturesResponse {
@@ -165,6 +172,13 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.";
+    }
+  ];
+
+  FeatureFlag require_login_v2 = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, all users will be use the login V2 regardless of the application's preference.";
     }
   ];
 }

@@ -19,6 +19,7 @@ const (
 	KeyOIDCSingleV1SessionTermination
 	KeyDisableUserTokenEvent
 	KeyEnableBackChannelLogout
+	KeyRequireLoginV2
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -47,6 +48,7 @@ type Features struct {
 	OIDCSingleV1SessionTermination  bool                      `json:"oidc_single_v1_session_termination,omitempty"`
 	DisableUserTokenEvent           bool                      `json:"disable_user_token_event,omitempty"`
 	EnableBackChannelLogout         bool                      `json:"enable_back_channel_logout,omitempty"`
+	RequireLoginV2                  bool                      `json:"require_login_v2,omitempty"`
 }
 
 type ImprovedPerformanceType int32
