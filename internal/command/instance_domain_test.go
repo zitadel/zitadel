@@ -156,7 +156,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								[]string{"https://sub.test.ch"},
 								false,
 								"",
-								false,
+								domain.LoginVersionUnspecified,
 							),
 						),
 					),

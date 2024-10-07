@@ -37,7 +37,7 @@ type OIDCApplicationWriteModel struct {
 	AdditionalOrigins        []string
 	SkipNativeAppSuccessPage bool
 	BackChannelLogoutURI     string
-	UseLoginV2               bool
+	LoginVersion             domain.LoginVersion
 	oidc                     bool
 }
 
@@ -168,7 +168,7 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.AdditionalOrigins = e.AdditionalOrigins
 	wm.SkipNativeAppSuccessPage = e.SkipNativeAppSuccessPage
 	wm.BackChannelLogoutURI = e.BackChannelLogoutURI
-	wm.UseLoginV2 = e.UseLoginV2
+	wm.LoginVersion = e.LoginVersion
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
@@ -220,8 +220,8 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.BackChannelLogoutURI != nil {
 		wm.BackChannelLogoutURI = *e.BackChannelLogoutURI
 	}
-	if e.UseLoginV2 != nil {
-		wm.UseLoginV2 = *e.UseLoginV2
+	if e.LoginVersion != nil {
+		wm.LoginVersion = *e.LoginVersion
 	}
 }
 
@@ -264,8 +264,8 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	clockSkew time.Duration,
 	additionalOrigins []string,
 	skipNativeAppSuccessPage bool,
-	backChannelLogoutURI string,
-	useLoginV2 bool,
+	skipNativeAppSuccessPage bool,
+	loginVersion domain.LoginVersion,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
@@ -318,8 +318,8 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	if wm.BackChannelLogoutURI != backChannelLogoutURI {
 		changes = append(changes, project.ChangeBackChannelLogoutURI(backChannelLogoutURI))
 	}
-	if wm.UseLoginV2 != useLoginV2 {
-		changes = append(changes, project.ChangeUseLoginV2(useLoginV2))
+	if wm.LoginVersion != loginVersion {
+		changes = append(changes, project.ChangeLoginVersion(loginVersion))
 	}
 
 	if len(changes) == 0 {

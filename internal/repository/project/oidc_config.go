@@ -44,7 +44,7 @@ type OIDCConfigAddedEvent struct {
 	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
 	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
-	UseLoginV2               bool                       `json:"useLoginV2,omitempty"`
+	LoginVersion             domain.LoginVersion        `json:"loginVersion,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -77,7 +77,7 @@ func NewOIDCConfigAddedEvent(
 	additionalOrigins []string,
 	skipNativeAppSuccessPage bool,
 	backChannelLogoutURI string,
-	useLoginV2 bool,
+	loginVersion domain.LoginVersion,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -104,7 +104,7 @@ func NewOIDCConfigAddedEvent(
 		AdditionalOrigins:        additionalOrigins,
 		SkipNativeAppSuccessPage: skipNativeAppSuccessPage,
 		BackChannelLogoutURI:     backChannelLogoutURI,
-		UseLoginV2:               useLoginV2,
+		LoginVersion:             loginVersion,
 	}
 }
 
@@ -196,7 +196,7 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.BackChannelLogoutURI != c.BackChannelLogoutURI {
 		return false
 	}
-	return e.UseLoginV2 == c.UseLoginV2
+	return e.LoginVersion == c.LoginVersion
 }
 
 func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -232,7 +232,7 @@ type OIDCConfigChangedEvent struct {
 	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
 	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
-	UseLoginV2               *bool                       `json:"useLoginV2,omitempty"`
+	LoginVersion             *domain.LoginVersion        `json:"loginVersion,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
@@ -365,9 +365,9 @@ func ChangeBackChannelLogoutURI(backChannelLogoutURI string) func(event *OIDCCon
 	}
 }
 
-func ChangeUseLoginV2(useLoginV2 bool) func(event *OIDCConfigChangedEvent) {
+func ChangeLoginVersion(loginVersion domain.LoginVersion) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
-		e.UseLoginV2 = &useLoginV2
+		e.LoginVersion = &loginVersion
 	}
 }
 

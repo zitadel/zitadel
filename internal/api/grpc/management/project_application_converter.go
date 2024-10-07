@@ -58,7 +58,7 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) *domain.OIDCApp {
 		AdditionalOrigins:        req.AdditionalOrigins,
 		SkipNativeAppSuccessPage: req.SkipNativeAppSuccessPage,
 		BackChannelLogoutURI:     req.GetBackChannelLogoutUri(),
-		UseLoginV2:               req.GetUseLoginV2(),
+		LoginVersion:             app_grpc.LoginVersionToDomain(req.GetLoginVersion()),
 	}
 }
 
@@ -111,7 +111,7 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 		AdditionalOrigins:        app.AdditionalOrigins,
 		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 		BackChannelLogoutURI:     app.BackChannelLogoutUri,
-		UseLoginV2:               app.GetUseLoginV2(),
+		LoginVersion:             app_grpc.LoginVersionToDomain(app.GetLoginVersion()),
 	}
 }
 

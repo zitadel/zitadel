@@ -39,3 +39,11 @@ func (a *ChangeApp) GetApplicationName() string {
 func (a *ChangeApp) GetState() AppState {
 	return a.State
 }
+
+type LoginVersion int32
+
+const (
+	LoginVersionUnspecified LoginVersion = iota
+	LoginVersion1
+	LoginVersion2
+)

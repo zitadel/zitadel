@@ -62,8 +62,21 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			AllowedOrigins:           app.AllowedOrigins,
 			SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 			BackChannelLogoutUri:     app.BackChannelLogoutURI,
-			UseLoginV2:               app.UseLoginV2,
+			LoginVersion:             loginVersionToPb(app.LoginVersion),
 		},
+	}
+}
+
+func loginVersionToPb(version domain.LoginVersion) app_pb.LoginVersion {
+	switch version {
+	case domain.LoginVersionUnspecified:
+		return app_pb.LoginVersion_LOGIN_VERSION_UNSPECIFIED
+	case domain.LoginVersion1:
+		return app_pb.LoginVersion_LOGIN_VERSION_1
+	case domain.LoginVersion2:
+		return app_pb.LoginVersion_LOGIN_VERSION_2
+	default:
+		return app_pb.LoginVersion_LOGIN_VERSION_UNSPECIFIED
 	}
 }
 
@@ -310,5 +323,18 @@ func AppQueryToModel(appQuery *app_pb.AppQuery) (query.SearchQuery, error) {
 		return query.NewAppNameSearchQuery(object_grpc.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "APP-Add46", "List.Query.Invalid")
+	}
+}
+
+func LoginVersionToDomain(version app_pb.LoginVersion) domain.LoginVersion {
+	switch version {
+	case app_pb.LoginVersion_LOGIN_VERSION_UNSPECIFIED:
+		return domain.LoginVersionUnspecified
+	case app_pb.LoginVersion_LOGIN_VERSION_1:
+		return domain.LoginVersion1
+	case app_pb.LoginVersion_LOGIN_VERSION_2:
+		return domain.LoginVersion2
+	default:
+		return domain.LoginVersionUnspecified
 	}
 }

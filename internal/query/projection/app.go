@@ -59,7 +59,7 @@ const (
 	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
 	AppOIDCConfigColumnSkipNativeAppSuccessPage = "skip_native_app_success_page"
 	AppOIDCConfigColumnBackChannelLogoutURI     = "back_channel_logout_uri"
-	AppOIDCConfigColumnUseLoginV2               = "use_login_v2"
+	AppOIDCConfigColumnLoginVersion             = "login_version"
 
 	appSAMLTableSuffix             = "saml_configs"
 	AppSAMLConfigColumnAppID       = "app_id"
@@ -128,7 +128,7 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppOIDCConfigColumnAdditionalOrigins, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnSkipNativeAppSuccessPage, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(AppOIDCConfigColumnBackChannelLogoutURI, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(AppOIDCConfigColumnUseLoginV2, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(AppOIDCConfigColumnLoginVersion, handler.ColumnTypeEnum),
 		},
 			handler.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
@@ -505,7 +505,7 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.TextArray[string](e.AdditionalOrigins)),
 				handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, e.SkipNativeAppSuccessPage),
 				handler.NewCol(AppOIDCConfigColumnBackChannelLogoutURI, e.BackChannelLogoutURI),
-				handler.NewCol(AppOIDCConfigColumnUseLoginV2, e.UseLoginV2),
+				handler.NewCol(AppOIDCConfigColumnLoginVersion, e.LoginVersion),
 			},
 			handler.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -577,8 +577,8 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	if e.BackChannelLogoutURI != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnBackChannelLogoutURI, *e.BackChannelLogoutURI))
 	}
-	if e.UseLoginV2 != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnUseLoginV2, *e.UseLoginV2))
+	if e.LoginVersion != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnLoginVersion, *e.LoginVersion))
 	}
 
 	if len(cols) == 0 {
