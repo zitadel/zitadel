@@ -27,7 +27,7 @@ type NewEventsTable struct {
 func (mig *NewEventsTable) Execute(ctx context.Context, _ eventstore.Event) error {
 	// if events already exists events2 is created during a setup job
 	var count int
-	err := mig.dbClient.QueryRow(
+	err := mig.dbClient.QueryRowContext(ctx,
 		func(row *sql.Row) error {
 			if err := row.Scan(&count); err != nil {
 				return err
