@@ -57,12 +57,15 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
+			} else {
+				if !assert.NoError(t, err) {
+					return
+				}
+				got, want := resp.GetPolicy(), tt.want.GetPolicy()
+				assert.Equal(t, want.GetEnableIframeEmbedding(), got.GetEnableIframeEmbedding(), "enable iframe embedding")
+				assert.Equal(t, want.GetAllowedOrigins(), got.GetAllowedOrigins(), "allowed origins")
+				assert.Equal(t, want.GetEnableImpersonation(), got.GetEnableImpersonation(), "enable impersonation")
 			}
-			require.NoError(t, err)
-			got, want := resp.GetPolicy(), tt.want.GetPolicy()
-			assert.Equal(t, want.GetEnableIframeEmbedding(), got.GetEnableIframeEmbedding(), "enable iframe embedding")
-			assert.Equal(t, want.GetAllowedOrigins(), got.GetAllowedOrigins(), "allowed origins")
-			assert.Equal(t, want.GetEnableImpersonation(), got.GetEnableImpersonation(), "enable impersonation")
 		})
 	}
 }
@@ -164,9 +167,12 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
+			} else {
+				if !assert.NoError(t, err) {
+					return
+				}
+				integration.AssertDetails(t, tt.want, got)
 			}
-			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }

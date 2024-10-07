@@ -36,13 +36,13 @@ func TestMain(m *testing.M) {
 
 func await(t *testing.T, ctx context.Context, cb func(*assert.CollectT)) {
 	deadline, ok := ctx.Deadline()
-	require.True(t, ok, "context must have deadline")
+	assert.True(t, ok, "context must have deadline")
 	require.EventuallyWithT(
 		t,
 		func(tt *assert.CollectT) {
 			defer func() {
 				// Panics are not recovered and don't mark the test as failed, so we need to do that ourselves
-				require.Nil(t, recover(), "panic in await callback")
+				assert.Nil(tt, recover(), "panic in await callback")
 			}()
 			cb(tt)
 		},

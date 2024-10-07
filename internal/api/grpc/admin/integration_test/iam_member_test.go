@@ -29,7 +29,7 @@ var iamRoles = []string{
 
 func TestServer_ListIAMMemberRoles(t *testing.T) {
 	got, err := Client.ListIAMMemberRoles(AdminCTX, &admin_pb.ListIAMMemberRolesRequest{})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.ElementsMatch(t, iamRoles, got.GetRoles())
 }
 
@@ -184,9 +184,12 @@ func TestServer_AddIAMMember(t *testing.T) {
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
+			} else {
+				if !assert.NoError(t, err) {
+					return
+				}
+				integration.AssertDetails(t, tt.want, got)
 			}
-			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
@@ -265,9 +268,12 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
+			} else {
+				if !assert.NoError(t, err) {
+					return
+				}
+				integration.AssertDetails(t, tt.want, got)
 			}
-			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
@@ -322,9 +328,12 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
+			} else {
+				if !assert.NoError(t, err) {
+					return
+				}
+				integration.AssertDetails(t, tt.want, got)
 			}
-			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
