@@ -181,6 +181,10 @@ var (
 		name:  projection.AppOIDCConfigColumnAppID,
 		table: appOIDCConfigsTable,
 	}
+	AppOIDCConfigColumnInstanceID = Column{
+		name:  projection.AppOIDCConfigColumnInstanceID,
+		table: appOIDCConfigsTable,
+	}
 	AppOIDCConfigColumnVersion = Column{
 		name:  projection.AppOIDCConfigColumnVersion,
 		table: appOIDCConfigsTable,
@@ -504,6 +508,30 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
 	return ids, nil
+}
+
+func (q *Queries) OIDCClientLoginVersion(ctx context.Context, clientID string) (loginVersion domain.LoginVersion, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareLoginVersionByClientID(ctx, q.client)
+	eq := sq.Eq{
+		AppOIDCConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		AppOIDCConfigColumnClientID.identifier():   clientID,
+	}
+	stmt, args, err := query.Where(eq).ToSql()
+	if err != nil {
+		return domain.LoginVersionUnspecified, zerrors.ThrowInvalidArgument(err, "QUERY-WEh31", "Errors.Query.InvalidRequest")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		loginVersion, err = scan(row)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-W2gsa", "Errors.Internal")
+	}
+	return loginVersion, nil
 }
 
 func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -1021,6 +1049,21 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			}
 
 			return ids, nil
+		}
+}
+
+func prepareLoginVersionByClientID(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
+	return sq.Select(
+			AppOIDCConfigColumnLoginVersion.identifier(),
+		).From(appOIDCConfigsTable.identifier()).
+			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (domain.LoginVersion, error) {
+			var loginVersion sql.NullInt16
+			if err := row.Scan(
+				&loginVersion,
+			); err != nil {
+				return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-KL2io", "Errors.Internal")
+			}
+			return domain.LoginVersion(loginVersion.Int16), nil
 		}
 }
 

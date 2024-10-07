@@ -37,11 +37,32 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	}()
 
 	headers, _ := http_utils.HeadersFromCtx(ctx)
-	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
-		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
+	loginClient := headers.Get(LoginClientHeader)
+
+	// if the instance requires the v2 login, use it no matter what the application configured
+	if authz.GetFeatures(ctx).RequireLoginV2 {
+		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient) // TODO ?
 	}
 
-	return o.createAuthRequest(ctx, req, userID)
+	version, err := o.query.OIDCClientLoginVersion(ctx, req.ClientID)
+	if err != nil {
+		return nil, err
+	}
+
+	switch version {
+	case domain.LoginVersion1:
+		return o.createAuthRequest(ctx, req, userID)
+	case domain.LoginVersion2:
+		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
+	case domain.LoginVersionUnspecified:
+		fallthrough
+	default:
+		// if undefined, use the v2 login if the header is sent, to retain the current behavior
+		if loginClient != "" {
+			return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
+		}
+		return o.createAuthRequest(ctx, req, userID)
+	}
 }
 
 func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, err error) {
@@ -241,7 +262,8 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	// check for the login client header
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	// in case there is no id_token_hint, redirect to the UI and let it decide which session to terminate
-	if headers.Get(LoginClientHeader) != "" && endSessionRequest.IDTokenHintClaims == nil {
+	if endSessionRequest.IDTokenHintClaims == nil &&
+		(authz.GetFeatures(ctx).RequireLoginV2 || headers.Get(LoginClientHeader) != "") {
 		return o.defaultLogoutURLV2 + endSessionRequest.RedirectURI, nil
 	}
 
