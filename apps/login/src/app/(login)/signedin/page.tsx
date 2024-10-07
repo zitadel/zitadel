@@ -1,8 +1,8 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { SelfServiceMenu } from "@/components/self-service-menu";
+import { UserAvatar } from "@/components/user-avatar";
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
 import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
-import DynamicTheme from "@/ui/DynamicTheme";
-import SelfServiceMenu from "@/ui/SelfServiceMenu";
-import UserAvatar from "@/ui/UserAvatar";
 import { create } from "@zitadel/client";
 import {
   CreateCallbackRequestSchema,

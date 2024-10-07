@@ -1,3 +1,6 @@
+import { Alert, AlertType } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { IdpSignin } from "@/components/idp-signin";
 import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
 import {
   addIDPLink,
@@ -7,9 +10,6 @@ import {
   listUsers,
   retrieveIDPIntent,
 } from "@/lib/zitadel";
-import Alert, { AlertType } from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import IdpSignin from "@/ui/IdpSignin";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 
 export default async function Page({

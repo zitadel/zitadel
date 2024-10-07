@@ -1,12 +1,3 @@
-import {
-  CreateCallbackRequestSchema,
-  SessionSchema,
-} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
-
-export const dynamic = "force-dynamic";
-export const revalidate = false;
-export const fetchCache = "default-no-store";
-
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
 import {
@@ -22,8 +13,16 @@ import {
   AuthRequest,
   Prompt,
 } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import {
+  CreateCallbackRequestSchema,
+  SessionSchema,
+} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+export const revalidate = false;
+export const fetchCache = "default-no-store";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(

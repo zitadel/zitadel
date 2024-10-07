@@ -1,3 +1,8 @@
+import { Alert } from "@/components/alert";
+import { BackButton } from "@/components/back-button";
+import { ChooseSecondFactor } from "@/components/choose-second-factor";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
 import {
@@ -5,11 +10,6 @@ import {
   getSession,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import BackButton from "@/ui/BackButton";
-import ChooseSecondFactor from "@/ui/ChooseSecondFactor";
-import DynamicTheme from "@/ui/DynamicTheme";
-import UserAvatar from "@/ui/UserAvatar";
 
 export default async function Page({
   searchParams,

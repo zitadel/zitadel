@@ -1,10 +1,10 @@
+import { Alert } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { LoginPasskey } from "@/components/login-passkey";
+import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import LoginPasskey from "@/ui/LoginPasskey";
-import UserAvatar from "@/ui/UserAvatar";
 
 const title = "Authenticate with a passkey";
 const description =

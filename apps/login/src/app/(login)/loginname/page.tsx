@@ -1,12 +1,12 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { SignInWithIdp } from "@/components/sign-in-with-idp";
+import { UsernameForm } from "@/components/username-form";
 import {
   getBrandingSettings,
   getLegalAndSupportSettings,
   getLoginSettings,
   settingsService,
 } from "@/lib/zitadel";
-import DynamicTheme from "@/ui/DynamicTheme";
-import { SignInWithIDP } from "@/ui/SignInWithIDP";
-import UsernameForm from "@/ui/UsernameForm";
 import { makeReqCtx } from "@zitadel/client/v2";
 
 function getIdentityProviders(orgId?: string) {
@@ -52,12 +52,12 @@ export default async function Page({
           allowRegister={!!loginSettings?.allowRegister}
         >
           {legal && identityProviders && process.env.ZITADEL_API_URL && (
-            <SignInWithIDP
+            <SignInWithIdp
               host={host}
               identityProviders={identityProviders}
               authRequestId={authRequestId}
               organization={organization}
-            ></SignInWithIDP>
+            ></SignInWithIdp>
           )}
         </UsernameForm>
       </div>

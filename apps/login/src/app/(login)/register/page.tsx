@@ -1,11 +1,11 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { RegisterFormWithoutPassword } from "@/components/register-form-without-password";
+import { SetPasswordForm } from "@/components/set-password-form";
 import {
   getBrandingSettings,
   getLegalAndSupportSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
-import DynamicTheme from "@/ui/DynamicTheme";
-import RegisterFormWithoutPassword from "@/ui/RegisterFormWithoutPassword";
-import SetPasswordForm from "@/ui/SetPasswordForm";
 
 export default async function Page({
   searchParams,

@@ -1,5 +1,5 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
 import { getBrandingSettings } from "@/lib/zitadel";
-import DynamicTheme from "@/ui/DynamicTheme";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 // This configuration shows the given name in the respective IDP button as fallback

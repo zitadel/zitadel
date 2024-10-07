@@ -1,13 +1,13 @@
+import { Alert } from "@/components/alert";
+import { ChangePasswordForm } from "@/components/change-password-form";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import {
   getBrandingSettings,
   getPasswordComplexitySettings,
   getSession,
 } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import ChangePasswordForm from "@/ui/ChangePasswordForm";
-import DynamicTheme from "@/ui/DynamicTheme";
-import UserAvatar from "@/ui/UserAvatar";
 
 export default async function Page({
   searchParams,

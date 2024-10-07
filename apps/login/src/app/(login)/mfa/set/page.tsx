@@ -1,3 +1,8 @@
+import { Alert } from "@/components/alert";
+import { BackButton } from "@/components/back-button";
+import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-setup";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
 import {
@@ -7,11 +12,6 @@ import {
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import BackButton from "@/ui/BackButton";
-import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
-import DynamicTheme from "@/ui/DynamicTheme";
-import UserAvatar from "@/ui/UserAvatar";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
