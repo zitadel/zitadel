@@ -283,7 +283,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		},
 		RequireLoginV2: &feature_pb.FeatureFlag{
 			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_SYSTEM,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 	}
 	got := instanceFeaturesToPb(arg)
