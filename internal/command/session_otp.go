@@ -180,7 +180,7 @@ func CheckOTPEmail(code string) SessionCommand {
 			writeModel,
 			cmd.eventstore.FilterToQueryReducer,
 			cmd.otpAlg,
-			cmd.getCodeVerifier,
+			nil, // email currently always uses local code checks
 			succeededEvent,
 			failedEvent,
 		)
