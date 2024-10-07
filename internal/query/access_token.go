@@ -206,18 +206,18 @@ func (s *sessionTerminatedModel) Query() *eventstore.SearchQueryBuilder {
 			).
 			PositionAfter(s.position).
 			Builder()
-	}
-	if s.fingerPrintID != "" {
-		// for specific logout on v1 sessions from the same user agent
-		builder = builder.AddQuery().
-			AggregateTypes(user.AggregateType).
-			AggregateIDs(s.userID).
-			EventTypes(
-				user.HumanSignedOutType,
-			).
-			EventData(map[string]interface{}{"userAgentID": s.fingerPrintID}).
-			PositionAfter(s.position).
-			Builder()
+		if s.fingerPrintID != "" {
+			// for specific logout on v1 sessions from the same user agent
+			builder = builder.AddQuery().
+				AggregateTypes(user.AggregateType).
+				AggregateIDs(s.userID).
+				EventTypes(
+					user.HumanSignedOutType,
+				).
+				EventData(map[string]interface{}{"userAgentID": s.fingerPrintID}).
+				PositionAfter(s.position).
+				Builder()
+		}
 	}
 	return builder
 }
