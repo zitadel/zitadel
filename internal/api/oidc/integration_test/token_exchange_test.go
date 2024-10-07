@@ -25,35 +25,66 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
-func setTokenExchangeFeature(t *testing.T, value bool) {
-	iamCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+func setTokenExchangeFeature(t *testing.T, instance *integration.Instance, value bool) {
+	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	_, err := Instance.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
+	_, err := instance.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
 		OidcTokenExchange: proto.Bool(value),
 	})
 	require.NoError(t, err)
-	time.Sleep(time.Second)
+	retryDuration := time.Minute
+	if ctxDeadline, ok := iamCTX.Deadline(); ok {
+		retryDuration = time.Until(ctxDeadline)
+	}
+	require.EventuallyWithT(t,
+		func(ttt *assert.CollectT) {
+			f, err := instance.Client.FeatureV2.GetInstanceFeatures(iamCTX, &feature.GetInstanceFeaturesRequest{
+				Inheritance: true,
+			})
+			assert.NoError(ttt, err)
+			if f.OidcTokenExchange.GetEnabled() {
+				return
+			}
+		},
+		retryDuration,
+		time.Second,
+		"timed out waiting for ensuring instance feature")
 }
 
-func resetFeatures(t *testing.T) {
-	iamCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
+func resetFeatures(t *testing.T, instance *integration.Instance) {
+	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	_, err := instance.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
 	require.NoError(t, err)
-	time.Sleep(time.Second)
+	time.Sleep(5 * time.Second)
 }
 
-func setImpersonationPolicy(t *testing.T, value bool) {
-	iamCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+func setImpersonationPolicy(t *testing.T, instance *integration.Instance, value bool) {
+	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	policy, err := Instance.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
+	policy, err := instance.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
 	require.NoError(t, err)
 	if policy.GetPolicy().GetEnableImpersonation() != value {
-		_, err = Instance.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
+		_, err = instance.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
 			EnableImpersonation: value,
 		})
 		require.NoError(t, err)
 	}
-	time.Sleep(time.Second)
+
+	retryDuration := time.Minute
+	if ctxDeadline, ok := iamCTX.Deadline(); ok {
+		retryDuration = time.Until(ctxDeadline)
+	}
+	require.EventuallyWithT(t,
+		func(ttt *assert.CollectT) {
+			f, err := instance.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
+			assert.NoError(ttt, err)
+			if f.GetPolicy().GetEnableImpersonation() != value {
+				return
+			}
+		},
+		retryDuration,
+		time.Second,
+		"timed out waiting for ensuring impersonation policy")
 }
 
 func createMachineUserPATWithMembership(t *testing.T, roles ...string) (userID, pat string) {
@@ -115,8 +146,8 @@ func TestServer_TokenExchange(t *testing.T) {
 	t.Parallel()
 
 	t.Cleanup(func() {
-		resetFeatures(t)
-		setImpersonationPolicy(t, false)
+		resetFeatures(t, Instance)
+		setImpersonationPolicy(t, Instance, false)
 	})
 
 	client, keyData, err := Instance.CreateOIDCTokenExchangeClient(CTX)
@@ -133,7 +164,7 @@ func TestServer_TokenExchange(t *testing.T) {
 	serviceUserID, noPermPAT := createMachineUserPATWithMembership(t)
 
 	// exchange some tokens for later use
-	setTokenExchangeFeature(t, true)
+	setTokenExchangeFeature(t, Instance, true)
 	teResp, err := tokenexchange.ExchangeToken(CTX, exchanger, noPermPAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 
@@ -532,8 +563,8 @@ func TestServer_TokenExchange(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			setTokenExchangeFeature(t, tt.settings.tokenExchangeFeature)
-			setImpersonationPolicy(t, tt.settings.impersonationPolicy)
+			setTokenExchangeFeature(t, Instance, tt.settings.tokenExchangeFeature)
+			setImpersonationPolicy(t, Instance, tt.settings.impersonationPolicy)
 
 			got, err := tokenexchange.ExchangeToken(CTX, exchanger, tt.args.SubjectToken, tt.args.SubjectTokenType, tt.args.ActorToken, tt.args.ActorTokenType, tt.args.Resource, tt.args.Audience, tt.args.Scopes, tt.args.RequestedTokenType)
 			if tt.wantErr {
@@ -572,11 +603,11 @@ func TestImpersonation_API_Call(t *testing.T) {
 	resourceServer, err := Instance.CreateResourceServerJWTProfile(CTX, keyData)
 	require.NoError(t, err)
 
-	setTokenExchangeFeature(t, true)
-	setImpersonationPolicy(t, true)
+	setTokenExchangeFeature(t, Instance, true)
+	setImpersonationPolicy(t, Instance, true)
 	t.Cleanup(func() {
-		resetFeatures(t)
-		setImpersonationPolicy(t, false)
+		resetFeatures(t, Instance)
+		setImpersonationPolicy(t, Instance, false)
 	})
 
 	iamUserID, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
@@ -592,20 +623,4 @@ func TestImpersonation_API_Call(t *testing.T) {
 	status := status.Convert(err)
 	assert.Equal(t, codes.PermissionDenied, status.Code())
 	assert.Equal(t, "Errors.TokenExchange.Token.NotForAPI (APP-Shi0J)", status.Message())
-}
-
-func ensureTokenExchangeFeature(t *testing.T, instance *integration.Instance, set bool) {
-	ctxIam := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-
-	_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctxIam, &feature.SetInstanceFeaturesRequest{
-		OidcTokenExchange: proto.Bool(set),
-	})
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctxIam, &feature.SetInstanceFeaturesRequest{
-			OidcTokenExchange: proto.Bool(false),
-		})
-		require.NoError(t, err)
-	})
 }
