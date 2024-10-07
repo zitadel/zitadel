@@ -55,6 +55,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		createCode:        c.newEncryptedCodeWithDefault,
 		createPhoneCode:   c.newPhoneCode,
 		createToken:       c.sessionTokenCreator,
+		getCodeVerifier:   c.phoneCodeVerifierFromConfig,
 		now:               time.Now,
 	}
 }
