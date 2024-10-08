@@ -4,9 +4,13 @@ import { AddressBar } from "@/components/address-bar";
 import { GlobalNav } from "@/components/global-nav";
 import { Theme } from "@/components/theme";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TranslationsProvider } from "@/components/translations-provider";
 import { Analytics } from "@vercel/analytics/react";
+import i18nConfig from "i18nConfig";
+import { dir } from "i18next";
 import { Lato } from "next/font/google";
 import { ReactNode } from "react";
+import initTranslations from "./i18n";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
@@ -15,11 +19,20 @@ const lato = Lato({
 
 export const revalidate = 60; // revalidate every minute
 
+export function generateStaticParams() {
+  return i18nConfig.locales.map((locale) => ({ locale }));
+}
+
 export default async function RootLayout({
   children,
+  params: { locale },
 }: {
   children: ReactNode;
+  params: { locale: string };
 }) {
+  const i18nNamespaces = ["common", "footer"];
+  const { t, resources } = await initTranslations(locale, i18nNamespaces);
+
   // later only shown with dev mode enabled
   const showNav = process.env.DEBUG === "true";
 
@@ -27,45 +40,56 @@ export default async function RootLayout({
   domain = domain ? domain.replace("https://", "") : "acme.com";
 
   return (
-    <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={dir(locale)}
+      className={`${lato.className}`}
+      suppressHydrationWarning
+    >
       <head />
       <body>
         <ThemeProvider>
-          <div
-            className={`h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600 ${
-              showNav
-                ? "bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]"
-                : ""
-            }`}
+          <TranslationsProvider
+            namespaces={i18nNamespaces}
+            locale={locale}
+            resources={resources}
           >
-            {showNav ? (
-              <GlobalNav />
-            ) : (
-              <div className="absolute bottom-0 right-0 flex flex-row p-4">
-                <Theme />
-              </div>
-            )}
-
             <div
-              className={`${
-                showNav ? "lg:pl-72" : ""
-              } pb-4 flex flex-col justify-center h-full`}
+              className={`h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600 ${
+                showNav
+                  ? "bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]"
+                  : ""
+              }`}
             >
-              <div className="mx-auto max-w-[440px] space-y-8 pt-20 lg:py-8 w-full">
-                {showNav && (
-                  <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
-                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
-                      <AddressBar domain={domain} />
-                    </div>
-                  </div>
-                )}
+              {showNav ? (
+                <GlobalNav />
+              ) : (
+                <div className="absolute bottom-0 right-0 flex flex-row p-4">
+                  <Theme />
+                </div>
+              )}
 
-                {children}
+              <div
+                className={`${
+                  showNav ? "lg:pl-72" : ""
+                } pb-4 flex flex-col justify-center h-full`}
+              >
+                <div className="mx-auto max-w-[440px] space-y-8 pt-20 lg:py-8 w-full">
+                  {showNav && (
+                    <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
+                      <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
+                        <AddressBar domain={domain} />
+                      </div>
+                    </div>
+                  )}
+
+                  {children}
+                </div>
               </div>
             </div>
-          </div>
 
-          <Analytics />
+            <Analytics />
+          </TranslationsProvider>
         </ThemeProvider>
       </body>
     </html>

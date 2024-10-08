@@ -32,6 +32,7 @@ export function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
   request.nextUrl.href = `${INSTANCE}${request.nextUrl.pathname}${request.nextUrl.search}`;
+
   return NextResponse.rewrite(request.nextUrl, {
     request: {
       headers: requestHeaders,
