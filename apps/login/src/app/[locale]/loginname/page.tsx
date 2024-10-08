@@ -1,3 +1,4 @@
+import initTranslations from "@/app/i18n";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UsernameForm } from "@/components/username-form";
@@ -19,9 +20,13 @@ function getIdentityProviders(orgId?: string) {
 
 export default async function Page({
   searchParams,
+  params: { locale },
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
+  params: { locale: string };
 }) {
+  const { t } = await initTranslations(locale, ["loginname"]);
+
   const loginName = searchParams?.loginName;
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
@@ -41,8 +46,8 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Welcome back!</h1>
-        <p className="ztdl-p">Enter your login data.</p>
+        <h1>{t("title")}</h1>
+        <p className="ztdl-p">{t("description")}</p>
 
         <UsernameForm
           loginName={loginName}

@@ -45,7 +45,7 @@
     "i18next": "^23.15.2",
     "i18next-resources-to-backend": "^1.2.1",
     "moment": "^2.29.4",
-    "next": "14.2.10",
+    "next": "14.2.14",
     "next-i18n-router": "^5.5.1",
     "next-themes": "^0.2.1",
     "nice-grpc": "2.0.1",
@@ -85,7 +85,7 @@
     "prettier-plugin-tailwindcss": "0.6.6",
     "sass": "^1.79.1",
     "start-server-and-test": "^2.0.8",
-    "tailwindcss": "3.4.12",
+    "tailwindcss": "3.4.13",
     "ts-proto": "^2.2.0",
     "typescript": "^5.6.2",
     "zitadel-tailwind-config": "workspace:*"

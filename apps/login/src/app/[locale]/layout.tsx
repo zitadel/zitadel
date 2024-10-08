@@ -10,14 +10,14 @@ import i18nConfig from "i18nConfig";
 import { dir } from "i18next";
 import { Lato } from "next/font/google";
 import { ReactNode } from "react";
-import initTranslations from "./i18n";
+import initTranslations from "../i18n";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
   subsets: ["latin"],
 });
 
-export const revalidate = 60; // revalidate every minute
+// export const revalidate = 60; // revalidate every minute
 
 export function generateStaticParams() {
   return i18nConfig.locales.map((locale) => ({ locale }));
@@ -30,7 +30,8 @@ export default async function RootLayout({
   children: ReactNode;
   params: { locale: string };
 }) {
-  const i18nNamespaces = ["common", "footer"];
+  const i18nNamespaces = ["loginname"];
+  console.log("layout:", locale);
   const { t, resources } = await initTranslations(locale, i18nNamespaces);
 
   // later only shown with dev mode enabled
