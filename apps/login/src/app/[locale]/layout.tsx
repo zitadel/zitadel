@@ -18,7 +18,7 @@ const lato = Lato({
   subsets: ["latin"],
 });
 
-// export const revalidate = 60; // revalidate every minute
+export const revalidate = 60; // revalidate every minute
 
 export function generateStaticParams() {
   return i18nConfig.locales.map((locale) => ({ locale }));
@@ -26,13 +26,12 @@ export function generateStaticParams() {
 
 export default async function RootLayout({
   children,
-  params: { locale },
+  params: { locale, hl },
 }: {
   children: ReactNode;
-  params: { locale: string };
+  params: { locale: string; hl: string };
 }) {
   const i18nNamespaces = ["loginname"];
-  console.log("layout:", locale);
   const { t, resources } = await initTranslations(locale, i18nNamespaces);
 
   // later only shown with dev mode enabled
