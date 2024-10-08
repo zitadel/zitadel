@@ -9,8 +9,8 @@ import (
 
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
-
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
