@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/notification/senders/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -763,6 +764,7 @@ func TestCheckOTPSMS(t *testing.T) {
 		userID           string
 		otpCodeChallenge *OTPCode
 		otpAlg           crypto.EncryptionAlgorithm
+		getCodeVerifier  func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	}
 	type args struct {
 		code string
@@ -949,6 +951,41 @@ func TestCheckOTPSMS(t *testing.T) {
 			},
 		},
 		{
+			name: "check ok (external)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(user.NewHumanOTPSMSAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate)),
+					),
+					expectFilter(), // recheck
+				),
+				userID: "userID",
+				otpCodeChallenge: &OTPCode{
+					Code:           nil,
+					Expiry:         0,
+					GeneratorID:    "generatorID",
+					VerificationID: "verificationID",
+					CreationDate:   testNow,
+				},
+				getCodeVerifier: func(ctx context.Context, id string) (senders.CodeGenerator, error) {
+					sender := mock.NewMockCodeGenerator(gomock.NewController(t))
+					sender.EXPECT().VerifyCode("verificationID", "code").Return(nil)
+					return sender, nil
+				},
+			},
+			args: args{
+				code: "code",
+			},
+			res: res{
+				commands: []eventstore.Command{
+					user.NewHumanOTPSMSCheckSucceededEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, nil),
+					session.NewOTPSMSCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+						testNow,
+					),
+				},
+			},
+		},
+		{
 			name: "check ok, locked in the meantime",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -996,6 +1033,7 @@ func TestCheckOTPSMS(t *testing.T) {
 				sessionWriteModel: sessionModel,
 				eventstore:        tt.fields.eventstore(t),
 				otpAlg:            tt.fields.otpAlg,
+				getCodeVerifier:   tt.fields.getCodeVerifier,
 				now: func() time.Time {
 					return testNow
 				},
