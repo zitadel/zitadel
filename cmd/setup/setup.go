@@ -5,6 +5,7 @@ import (
 	"embed"
 	_ "embed"
 	"net/http"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -162,6 +163,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: esPusherDBClient}
 	steps.s32AddAuthSessionID = &AddAuthSessionID{dbClient: esPusherDBClient}
 	steps.s33SMSConfigs3TwilioAddVerifyServiceSid = &SMSConfigs3TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
+	steps.s34AddCacheSchema = &AddCacheSchema{dbClient: queryDBClient}
+	steps.s35AddPositionToIndexEsWm = &AddPositionToIndexEsWm{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -204,6 +207,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s26AuthUsers3,
 		steps.s29FillFieldsForProjectGrant,
 		steps.s30FillFieldsForOrgDomainVerified,
+		steps.s34AddCacheSchema,
+		steps.s35AddPositionToIndexEsWm,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -243,9 +248,39 @@ func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Even
 	logging.WithFields("name", step.String()).OnError(err).Fatal(errorMsg)
 }
 
+// readStmt reads a single file from the embedded FS,
+// under the folder/typ/filename path.
+// Typ describes the database dialect and may be omitted if no
+// dialect specific migration is specified.
 func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
-	stmt, err := fs.ReadFile(folder + "/" + typ + "/" + filename)
+	stmt, err := fs.ReadFile(filepath.Join(folder, typ, filename))
 	return string(stmt), err
+}
+
+type statement struct {
+	file  string
+	query string
+}
+
+// readStatements reads all files from the embedded FS,
+// under the folder/type path.
+// Typ describes the database dialect and may be omitted if no
+// dialect specific migration is specified.
+func readStatements(fs embed.FS, folder, typ string) ([]statement, error) {
+	basePath := filepath.Join(folder, typ)
+	dir, err := fs.ReadDir(basePath)
+	if err != nil {
+		return nil, err
+	}
+	statements := make([]statement, len(dir))
+	for i, file := range dir {
+		statements[i].file = file.Name()
+		statements[i].query, err = readStmt(fs, folder, typ, file.Name())
+		if err != nil {
+			return nil, err
+		}
+	}
+	return statements, nil
 }
 
 func initProjections(

@@ -19,4 +19,3 @@ func (noop[I, K, V]) Invalidate(context.Context, I, ...K) (err error) { return }
 func (noop[I, K, V]) Delete(context.Context, I, ...K) (err error)     { return }
 func (noop[I, K, V]) Prune(context.Context) (err error)               { return }
 func (noop[I, K, V]) Truncate(context.Context) (err error)            { return }
-func (noop[I, K, V]) Close(context.Context) (err error)               { return }
