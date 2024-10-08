@@ -2,6 +2,7 @@ import "@/styles/globals.scss";
 
 import { AddressBar } from "@/components/address-bar";
 import { GlobalNav } from "@/components/global-nav";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Theme } from "@/components/theme";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TranslationsProvider } from "@/components/translations-provider";
@@ -65,7 +66,8 @@ export default async function RootLayout({
               {showNav ? (
                 <GlobalNav />
               ) : (
-                <div className="absolute bottom-0 right-0 flex flex-row p-4">
+                <div className="absolute bottom-0 right-0 flex flex-row p-4 items-center space-x-4">
+                  <LanguageSwitcher locale={locale} />
                   <Theme />
                 </div>
               )}

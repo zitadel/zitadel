@@ -21,7 +21,7 @@ export function Theme() {
 
   return (
     <div
-      className={`relative grid grid-cols-2 rounded-full border border-divider-light dark:border-divider-dark p-1`}
+      className={`h-fit relative grid grid-cols-2 rounded-full border border-divider-light dark:border-divider-dark p-1`}
     >
       <button
         className={`h-8 w-8 rounded-full flex flex-row items-center justify-center hover:opacity-100 transition-all ${

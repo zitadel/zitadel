@@ -1,6 +1,12 @@
 "use client";
 
-import { Listbox, Transition } from "@headlessui/react";
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOption,
+  ListboxOptions,
+  Transition,
+} from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { usePathname, useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
@@ -39,7 +45,7 @@ type Props = {
   locale: string;
 };
 
-export default function LanguageSwitcher({ locale }: Props) {
+export function LanguageSwitcher({ locale }: Props) {
   const { i18n } = useTranslation();
 
   const currentLocale = locale || i18n.language || i18nConfig.defaultLocale;
@@ -77,10 +83,10 @@ export default function LanguageSwitcher({ locale }: Props) {
   };
 
   return (
-    <div className="mb-4 w-32">
+    <div className="w-32">
       <Listbox value={selected} onChange={handleChange}>
-        <div className="relative mt-1">
-          <Listbox.Button className="relative w-full cursor-default rounded-lg border border-divider-light bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+        <div className="relative">
+          <ListboxButton className="relative w-full cursor-default rounded-lg border border-divider-light bg-background-light-500 dark:bg-background-dark-500 py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
             <span className="block truncate">{selected.name}</span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <ChevronUpDownIcon
@@ -88,20 +94,25 @@ export default function LanguageSwitcher({ locale }: Props) {
                 aria-hidden="true"
               />
             </span>
-          </Listbox.Button>
+          </ListboxButton>
           <Transition
             as={Fragment}
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+            <ListboxOptions
+              anchor="bottom"
+              className="absolute mt-1 max-h-60 w-[var(--button-width)] w-full overflow-auto rounded-md text-text-light-500 dark:text-text-dark-500 bg-background-light-500 dark:bg-background-dark-500 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
+            >
               {LANGS.map((lang, index) => (
-                <Listbox.Option
+                <ListboxOption
                   key={lang.code}
                   className={({ active }) =>
                     `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                      active ? "bg-amber-100 text-amber-900" : "text-gray-900"
+                      active
+                        ? "bg-background-light-300 dark:bg-background-dark-300"
+                        : ""
                     }`
                   }
                   value={lang}
@@ -116,15 +127,15 @@ export default function LanguageSwitcher({ locale }: Props) {
                         {lang.name}
                       </span>
                       {selected ? (
-                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary-light-500 dark:text-primary-dark-500">
                           <CheckIcon className="h-5 w-5" aria-hidden="true" />
                         </span>
                       ) : null}
                     </>
                   )}
-                </Listbox.Option>
+                </ListboxOption>
               ))}
-            </Listbox.Options>
+            </ListboxOptions>
           </Transition>
         </div>
       </Listbox>
