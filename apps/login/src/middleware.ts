@@ -6,6 +6,10 @@ import i18nConfig from "../i18nConfig";
 const INSTANCE = process.env.ZITADEL_API_URL;
 const SERVICE_USER_ID = process.env.ZITADEL_SERVICE_USER_ID as string;
 
+export const config = {
+  matcher: "/((?!api|static|.*\\..*|_next).*)",
+};
+
 export function middleware(request: NextRequest) {
   // OIDC specific routes
   if (
