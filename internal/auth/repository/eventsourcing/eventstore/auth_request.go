@@ -726,7 +726,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		request.DefaultTranslations = defaultLoginTranslations
 	}
 	if len(request.OrgTranslations) == 0 || request.PolicyOrgID() != orgID {
-		orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
+		orgLoginTranslations, err := repo.getLoginTexts(ctx, request.PrivateLabelingOrgID(orgID))
 		if err != nil {
 			return err
 		}
