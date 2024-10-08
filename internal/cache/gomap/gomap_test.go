@@ -49,7 +49,6 @@ func Test_mapCache_Get(t *testing.T) {
 			AddSource: true,
 		},
 	})
-	defer c.Close(context.Background())
 	obj := &testObject{
 		id:    "id",
 		names: []string{"foo", "bar"},
@@ -112,7 +111,6 @@ func Test_mapCache_Invalidate(t *testing.T) {
 			AddSource: true,
 		},
 	})
-	defer c.Close(context.Background())
 	obj := &testObject{
 		id:    "id",
 		names: []string{"foo", "bar"},
@@ -134,7 +132,6 @@ func Test_mapCache_Delete(t *testing.T) {
 			AddSource: true,
 		},
 	})
-	defer c.Close(context.Background())
 	obj := &testObject{
 		id:    "id",
 		names: []string{"foo", "bar"},
@@ -168,7 +165,6 @@ func Test_mapCache_Prune(t *testing.T) {
 			AddSource: true,
 		},
 	})
-	defer c.Close(context.Background())
 
 	objects := []*testObject{
 		{
@@ -205,7 +201,6 @@ func Test_mapCache_Truncate(t *testing.T) {
 			AddSource: true,
 		},
 	})
-	defer c.Close(context.Background())
 	objects := []*testObject{
 		{
 			id:    "id1",
