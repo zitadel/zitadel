@@ -26,6 +26,8 @@ type orgAttr struct {
 }
 
 func TestServer_ListOrganizations(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx context.Context
 		req *org.ListOrganizationsRequest
@@ -37,6 +39,38 @@ func TestServer_ListOrganizations(t *testing.T) {
 		want    *org.ListOrganizationsResponse
 		wantErr bool
 	}{
+		{
+			name: "list org by default, ok",
+			args: args{
+				CTX,
+				&org.ListOrganizationsRequest{
+					Queries: []*org.SearchQuery{
+						DefaultOrganizationQuery(),
+					},
+				},
+				nil,
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*org.Organization{
+					{
+						Id:            Instance.DefaultOrg.Id,
+						Name:          Instance.DefaultOrg.Name,
+						PrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
+						State:         org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
+						Details: &object.Details{
+							Sequence:      Instance.DefaultOrg.Details.Sequence,
+							ChangeDate:    Instance.DefaultOrg.Details.ChangeDate,
+							ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
+						},
+					},
+				},
+			},
+		},
 		{
 			name: "list org by id, ok, multiple",
 			args: args{
@@ -399,6 +433,12 @@ func TestServer_ListOrganizations(t *testing.T) {
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user result")
 		})
 	}
+}
+
+func DefaultOrganizationQuery() *org.SearchQuery {
+	return &org.SearchQuery{Query: &org.SearchQuery_DefaultQuery{
+		DefaultQuery: &org.DefaultOrganizationQuery{},
+	}}
 }
 
 func OrganizationIdQuery(resourceowner string) *org.SearchQuery {

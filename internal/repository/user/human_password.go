@@ -137,6 +137,7 @@ func NewHumanPasswordCodeAddedEventV2(
 	notificationType domain.NotificationType,
 	urlTemplate string,
 	codeReturned bool,
+	generatorID string,
 ) *HumanPasswordCodeAddedEvent {
 	return &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -150,6 +151,7 @@ func NewHumanPasswordCodeAddedEventV2(
 		URLTemplate:       urlTemplate,
 		CodeReturned:      codeReturned,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
+		GeneratorID:       generatorID,
 	}
 }
 
