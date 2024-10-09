@@ -20,9 +20,10 @@ type Eventstore struct {
 	PushTimeout time.Duration
 	maxRetries  int
 
-	pusher   Pusher
-	querier  Querier
-	searcher Searcher
+	pusher    Pusher
+	querier   Querier
+	searcher  Searcher
+	snapshots Snapshotter
 
 	instances         []string
 	lastInstanceQuery time.Time

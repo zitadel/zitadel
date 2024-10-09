@@ -12,6 +12,7 @@ type WriteModel struct {
 	ResourceOwner     string    `json:"-"`
 	InstanceID        string    `json:"-"`
 	ChangeDate        time.Time `json:"-"`
+	Position          float64   `json:"-"`
 }
 
 // AppendEvents adds all the events to the read model.
@@ -39,6 +40,7 @@ func (wm *WriteModel) Reduce() error {
 
 	wm.ProcessedSequence = wm.Events[len(wm.Events)-1].Sequence()
 	wm.ChangeDate = wm.Events[len(wm.Events)-1].CreatedAt()
+	wm.Position = wm.Events[len(wm.Events)-1].Position()
 
 	// all events processed and not needed anymore
 	wm.Events = nil
