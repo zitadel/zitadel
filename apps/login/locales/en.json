@@ -48,7 +48,19 @@
       "description": "An error occurred while trying to link your account."
     }
   },
+  "mfa": {
+    "verify": {
+      "title": "Verify your identity",
+      "description": "Choose one of the following factors.",
+      "noResults": "No second factors available to setup."
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Choose one of the following second factors."
+    }
+  },
   "error": {
-    "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam."
+    "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
+    "sessionExpired": "You need to have a valid session in order to continue."
   }
 }

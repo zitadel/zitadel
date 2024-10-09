@@ -2,7 +2,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { getBrandingSettings, settingsService } from "@/lib/zitadel";
 import { makeReqCtx } from "@zitadel/client/v2";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
 function getIdentityProviders(orgId?: string) {
   return settingsService
@@ -17,7 +17,9 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const t = useTranslations("idp");
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "idp" });
+
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 

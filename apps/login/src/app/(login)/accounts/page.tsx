@@ -3,7 +3,7 @@ import { SessionsList } from "@/components/sessions-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getBrandingSettings, listSessions } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 async function loadSessions() {
@@ -25,7 +25,9 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const t = useTranslations("accounts");
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "accounts" });
+
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
