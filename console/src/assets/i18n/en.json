@@ -760,7 +760,7 @@
         "3": "Deleted"
       },
       "DIALOG": {
-        "MFA_DELETE_TITLE": "Remove Secondfactor",
+        "MFA_DELETE_TITLE": "Remove Second factor",
         "MFA_DELETE_DESCRIPTION": "You are about to delete a second factor. Are you sure?",
         "ADD_MFA_TITLE": "Add Second Factor",
         "ADD_MFA_DESCRIPTION": "Select one of the following options."
