@@ -122,7 +122,7 @@ export default async function Page({
         )}
 
         {!(loginName || sessionId) && (
-          <Alert>{t("error.unknownContext")}</Alert>
+          <Alert>{t("error:unknownContext")}</Alert>
         )}
 
         {!valid && <Alert>{t("error.sessionExpired")}</Alert>}

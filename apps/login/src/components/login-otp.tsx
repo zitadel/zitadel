@@ -4,6 +4,7 @@ import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -35,6 +36,8 @@ export function LoginOTP({
   method,
   code,
 }: Props) {
+  const t = useTranslations("otp");
+
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -191,7 +194,7 @@ export function LoginOTP({
         <Alert type={AlertType.INFO}>
           <div className="flex flex-row">
             <span className="flex-1 mr-auto text-left">
-              Did not get the Code?
+              {t("noCodeReceived")}
             </span>
             <button
               aria-label="Resend OTP Code"
@@ -209,7 +212,7 @@ export function LoginOTP({
                   });
               }}
             >
-              Resend
+              {t("resendCode")}
             </button>
           </div>
         </Alert>
@@ -241,7 +244,7 @@ export function LoginOTP({
           })}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("submit")}
         </Button>
       </div>
     </form>

@@ -85,7 +85,7 @@ export default async function Page({
         )}
 
         {!(loginName || sessionId) && (
-          <Alert>{t("error.unknownContext")}</Alert>
+          <Alert>{t("error:unknownContext")}</Alert>
         )}
 
         {sessionFactors ? (

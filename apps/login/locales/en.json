@@ -59,6 +59,25 @@
       "description": "Choose one of the following second factors."
     }
   },
+  "otp": {
+    "verify": {
+      "title": "Verify 2-Factor",
+      "totpDescription": "Enter the code from your authenticator app.",
+      "smsDescription": "Enter the code you received via SMS.",
+      "emailDescription": "Enter the code you received via email.",
+      "noCodeReceived": "Didn't receive a code?",
+      "resendCode": "Resend code",
+      "submit": "Continue"
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "totpDescription": "Scan the QR code with your authenticator app.",
+      "smsDescription": "Enter your phone number to receive a code via SMS.",
+      "emailDescription": "Enter your email address to receive a code via email.",
+      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "submit": "Continue"
+    }
+  },
   "error": {
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
     "sessionExpired": "You need to have a valid session in order to continue."

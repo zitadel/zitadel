@@ -12,6 +12,7 @@ import {
   registerTOTP,
 } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -22,6 +23,9 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "otp" });
+
   const { loginName, organization, sessionId, authRequestId, checkAfter } =
     searchParams;
   const { method } = params;
@@ -98,13 +102,10 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Register 2-factor</h1>
+        <h1>{t("set.title")}</h1>
         {!session && (
           <div className="py-4">
-            <Alert>
-              Could not get the context of the user. Make sure to enter the
-              username first or provide a loginName as searchParam.
-            </Alert>
+            <Alert>{t("error:unknownContext")}</Alert>
           </div>
         )}
 
@@ -125,9 +126,7 @@ export default async function Page({
 
         {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
           <>
-            <p className="ztdl-p">
-              Scan the QR Code or navigate to the URL manually.
-            </p>
+            <p className="ztdl-p">{t("set.totpRegisterDescription")}</p>
             <div>
               <TotpRegister
                 uri={totpResponse.uri as string}
@@ -160,7 +159,7 @@ export default async function Page({
                   className="self-end"
                   variant={ButtonVariants.Primary}
                 >
-                  continue
+                  {t("set.submit")}
                 </Button>
               </Link>
             </div>

@@ -1,5 +1,6 @@
 "use client";
 import { verifyTOTP } from "@/lib/server-actions";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
@@ -33,6 +34,8 @@ export function TotpRegister({
   organization,
   checkAfter,
 }: Props) {
+  const t = useTranslations("otp");
+
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -138,7 +141,7 @@ export function TotpRegister({
                 onClick={handleSubmit(continueWithCode)}
               >
                 {loading && <Spinner className="h-5 w-5 mr-2" />}
-                continue
+                {t("set.submit")}
               </Button>
             </div>
           </form>
