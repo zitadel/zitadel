@@ -173,7 +173,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 }
 
 // checkAuthentication ensures the session or token was authenticated (at least a single [domain.UserAuthMethodType]).
-// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any second factor
+// It will also check if there was a multifactor authentication, if either MFA is forced by the login policy or if the user has set up any second factor
 func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID string) error {
 	if len(authMethods) == 0 {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
