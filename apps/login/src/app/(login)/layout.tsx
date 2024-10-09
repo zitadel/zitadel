@@ -54,7 +54,7 @@ export default async function RootLayout({
                 <GlobalNav />
               ) : (
                 <div className="absolute bottom-0 right-0 flex flex-row p-4 items-center space-x-4">
-                  {locale && <LanguageSwitcher locale={locale} />}
+                  <LanguageSwitcher />
                   <Theme />
                 </div>
               )}

@@ -9,6 +9,7 @@ import {
   Transition,
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
 
@@ -40,12 +41,8 @@ const LANGS: Lang[] = [
   },
 ];
 
-type Props = {
-  locale: string;
-};
-
-export function LanguageSwitcher({ locale }: Props) {
-  const currentLocale = locale || "en";
+export function LanguageSwitcher() {
+  const currentLocale = useLocale();
 
   const [selected, setSelected] = useState(
     LANGS.find((l) => l.code === currentLocale) || LANGS[0],
@@ -83,7 +80,7 @@ export function LanguageSwitcher({ locale }: Props) {
           >
             <ListboxOptions
               anchor="bottom"
-              className="absolute mt-1 max-h-60 w-[var(--button-width)] w-full overflow-auto rounded-md text-text-light-500 dark:text-text-dark-500 bg-background-light-500 dark:bg-background-dark-500 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
+              className="absolute mt-1 max-h-60 w-52 w-full overflow-auto rounded-md text-text-light-500 dark:text-text-dark-500 bg-background-light-500 dark:bg-background-dark-500 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
             >
               {LANGS.map((lang, index) => (
                 <ListboxOption

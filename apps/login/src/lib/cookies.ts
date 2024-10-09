@@ -28,8 +28,8 @@ function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
 
 export async function setLanguageCookie(language: string) {
   const cookiesList = cookies();
-  // @ts-ignore
-  return cookiesList.set({
+
+  await cookiesList.set({
     name: "NEXT_LOCALE",
     value: language,
     httpOnly: true,
