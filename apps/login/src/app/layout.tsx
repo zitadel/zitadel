@@ -2,16 +2,13 @@ import "@/styles/globals.scss";
 
 import { AddressBar } from "@/components/address-bar";
 import { GlobalNav } from "@/components/global-nav";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { Theme } from "@/components/theme";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TranslationsProvider } from "@/components/translations-provider";
 import { Analytics } from "@vercel/analytics/react";
-import i18nConfig from "i18nConfig";
-import { dir } from "i18next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { Lato } from "next/font/google";
 import { ReactNode } from "react";
-import initTranslations from "../i18n";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
@@ -20,19 +17,13 @@ const lato = Lato({
 
 export const revalidate = 60; // revalidate every minute
 
-export function generateStaticParams() {
-  return i18nConfig.locales.map((locale) => ({ locale }));
-}
-
 export default async function RootLayout({
   children,
-  params: { locale, hl },
 }: {
   children: ReactNode;
-  params: { locale: string; hl: string };
 }) {
-  const i18nNamespaces = ["loginname"];
-  const { t, resources } = await initTranslations(locale, i18nNamespaces);
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   // later only shown with dev mode enabled
   const showNav = process.env.DEBUG === "true";
@@ -43,18 +34,13 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      dir={dir(locale)}
       className={`${lato.className}`}
       suppressHydrationWarning
     >
       <head />
       <body>
         <ThemeProvider>
-          <TranslationsProvider
-            namespaces={i18nNamespaces}
-            locale={locale}
-            resources={resources}
-          >
+          <NextIntlClientProvider messages={messages}>
             <div
               className={`h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600 ${
                 showNav
@@ -66,7 +52,7 @@ export default async function RootLayout({
                 <GlobalNav />
               ) : (
                 <div className="absolute bottom-0 right-0 flex flex-row p-4 items-center space-x-4">
-                  <LanguageSwitcher locale={locale} />
+                  {/*<LanguageSwitcher locale={locale} /> */}
                   <Theme />
                 </div>
               )}
@@ -91,7 +77,7 @@ export default async function RootLayout({
             </div>
 
             <Analytics />
-          </TranslationsProvider>
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>

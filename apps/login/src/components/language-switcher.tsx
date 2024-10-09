@@ -1,5 +1,6 @@
 "use client";
 
+import { setLanguageCookie } from "@/lib/cookies";
 import {
   Listbox,
   ListboxButton,
@@ -8,10 +9,9 @@ import {
   Transition,
 } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { Fragment, useState } from "react";
-import { useTranslation } from "react-i18next";
-import i18nConfig from "../../i18nConfig";
 
 interface Lang {
   id: number;
@@ -46,9 +46,9 @@ type Props = {
 };
 
 export function LanguageSwitcher({ locale }: Props) {
-  const { i18n } = useTranslation();
+  const { i18n } = useTranslations();
 
-  const currentLocale = locale || i18n.language || i18nConfig.defaultLocale;
+  const currentLocale = locale || i18n.language || "en";
 
   const [selected, setSelected] = useState(
     LANGS.find((l) => l.code === currentLocale) || LANGS[0],
@@ -57,27 +57,27 @@ export function LanguageSwitcher({ locale }: Props) {
   const router = useRouter();
   const currentPathname = usePathname();
 
-  const handleChange = (language: Lang) => {
+  const handleChange = async (language: Lang) => {
     setSelected(language);
     const newLocale = language.code;
-    // set cookie for next-i18n-router
-    const days = 30;
-    const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    const expires = date.toUTCString();
-    document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
+
+    // set cookie
+    // const days = 30;
+    // const date = new Date();
+    // date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    // const expires = date.toUTCString();
+    // document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
 
     // redirect to the new locale path
-    if (
-      currentLocale === i18nConfig.defaultLocale &&
-      !i18nConfig.prefixDefault
-    ) {
-      router.push("/" + newLocale + currentPathname);
-    } else {
-      router.push(
-        currentPathname.replace(`/${currentLocale}`, `/${newLocale}`),
-      );
-    }
+    // if (currentLocale === "en" /*i18nConfig.defaultLocale*/) {
+    //   router.push("/" + newLocale + currentPathname);
+    // } else {
+    //   router.push(
+    //     currentPathname.replace(`/${currentLocale}`, `/${newLocale}`),
+    //   );
+    // }
+
+    await setLanguageCookie(newLocale);
 
     router.refresh();
   };

@@ -1,4 +1,3 @@
-import initTranslations from "@/app/i18n";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UsernameForm } from "@/components/username-form";
@@ -9,6 +8,7 @@ import {
   settingsService,
 } from "@/lib/zitadel";
 import { makeReqCtx } from "@zitadel/client/v2";
+import { getLocale, getTranslations } from "next-intl/server";
 
 function getIdentityProviders(orgId?: string) {
   return settingsService
@@ -20,12 +20,12 @@ function getIdentityProviders(orgId?: string) {
 
 export default async function Page({
   searchParams,
-  params: { locale },
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
-  params: { locale: string };
 }) {
-  const { t } = await initTranslations(locale, ["loginname"]);
+  // const t = useTranslations("loginname");
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "loginname" });
 
   const loginName = searchParams?.loginName;
   const authRequestId = searchParams?.authRequestId;

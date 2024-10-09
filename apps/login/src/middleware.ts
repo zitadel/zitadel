@@ -1,14 +1,8 @@
-import { i18nRouter } from "next-i18n-router";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import i18nConfig from "../i18nConfig";
 
 const INSTANCE = process.env.ZITADEL_API_URL;
 const SERVICE_USER_ID = process.env.ZITADEL_SERVICE_USER_ID as string;
-
-export const config = {
-  matcher: "/((?!api|static|.*\\..*|_next).*)",
-};
 
 export function middleware(request: NextRequest) {
   // OIDC specific routes
@@ -44,6 +38,4 @@ export function middleware(request: NextRequest) {
       headers: responseHeaders,
     });
   }
-
-  return i18nRouter(request, i18nConfig);
 }
