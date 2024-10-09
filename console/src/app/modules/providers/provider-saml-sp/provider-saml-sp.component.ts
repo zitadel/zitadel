@@ -198,7 +198,7 @@ export class ProviderSamlSpComponent {
       req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       if (this.metadataXml?.value) {
-        req.setMetadataUrl('')
+        req.setMetadataUrl('');
         req.setMetadataXml(this.metadataXml?.value);
       } else {
         req.setMetadataXml('');
@@ -235,10 +235,10 @@ export class ProviderSamlSpComponent {
         : new AdminAddSAMLProviderRequest();
     req.setName(this.name?.value);
     if (this.metadataXml?.value) {
-      req.setMetadataUrl('')
+      req.setMetadataUrl('');
       req.setMetadataXml(this.metadataXml?.value);
     } else {
-      req.setMetadataXml('')
+      req.setMetadataXml('');
       req.setMetadataUrl(this.metadataUrl?.value);
     }
     req.setProviderOptions(this.options);
