@@ -98,7 +98,7 @@ export function UsernameForm({
             type="button"
             disabled={loading}
           >
-            {t("registerButton")}
+            {t("register")}
           </button>
         )}
       </div>
