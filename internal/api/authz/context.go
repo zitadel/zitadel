@@ -113,7 +113,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		var sysTokenErr error
 		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
 		if sysTokenErr != nil || sysMemberships == nil {
-			return CtxData{}, zerrors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "AUTH-7fs1e", "Errors.Token.Invalid")
+			return CtxData{}, zerrors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "ELIO-7fs1e", "Errors.Token.Invalid")
 		}
 	}
 	projectID, err := projectIDAndCheckOriginForClientID(ctx, clientID, t)
