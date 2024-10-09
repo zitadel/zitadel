@@ -175,7 +175,7 @@ func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	return userAuthMethods, err
 }
 
-func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, activeOnly bool, queryDomain string) (userAuthMethodTypes *AuthMethodTypes, err error) {
+func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, activeOnly bool, external bool, queryDomain string) (userAuthMethodTypes *AuthMethodTypes, err error) {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
 		if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, userID); err != nil {
@@ -185,7 +185,7 @@ func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, ac
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodTypesQuery(ctx, q.client, activeOnly, queryDomain)
+	query, scan := prepareUserAuthMethodTypesQuery(ctx, q.client, activeOnly, external, queryDomain)
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -252,10 +252,6 @@ func NewUserAuthMethodTokenIDSearchQuery(value string) (SearchQuery, error) {
 
 func NewUserAuthMethodResourceOwnerSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(UserAuthMethodColumnResourceOwner, value, TextEquals)
-}
-
-func NewUserAuthMethodDomainSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(UserAuthMethodColumnDomain, value, TextEquals)
 }
 
 func NewUserAuthMethodTypeSearchQuery(value domain.UserAuthMethodType) (SearchQuery, error) {
@@ -386,8 +382,8 @@ func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 		}
 }
 
-func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, activeOnly bool, queryDomain string) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
-	authMethodsQuery, authMethodsArgs, err := prepareAuthMethodQuery(activeOnly, queryDomain)
+func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, activeOnly bool, external bool, queryDomain string) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+	authMethodsQuery, authMethodsArgs, err := prepareAuthMethodQuery(activeOnly, external, queryDomain)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -501,7 +497,7 @@ func prepareAuthMethodsIDPsQuery() (string, error) {
 	return idpsQuery, err
 }
 
-func prepareAuthMethodQuery(activeOnly bool, queryDomain string) (string, []interface{}, error) {
+func prepareAuthMethodQuery(activeOnly bool, external bool, queryDomain string) (string, []interface{}, error) {
 	q := sq.Select(
 		"DISTINCT("+authMethodTypeType.identifier()+")",
 		authMethodTypeUserID.identifier(),
@@ -511,8 +507,20 @@ func prepareAuthMethodQuery(activeOnly bool, queryDomain string) (string, []inte
 		q = q.Where(sq.Eq{authMethodTypeState.identifier(): domain.MFAStateReady})
 	}
 	if queryDomain != "" {
-		// or-condition as there are domain specific auth methods and without domain when it's empty
-		q = q.Where(sq.Or{sq.Eq{authMethodTypeDomain.identifier(): ""}, sq.Eq{authMethodTypeDomain.identifier(): queryDomain}})
+		if external {
+			// or-condition, NULL for not domain specific, and domain for specific domains
+			q = q.Where(sq.Or{
+				sq.Eq{authMethodTypeDomain.identifier(): nil},
+				sq.Eq{authMethodTypeDomain.identifier(): queryDomain},
+			})
+		} else {
+			// or-condition, NULL for not domain specific, empty for internal, and domain for specific domains
+			q = q.Where(sq.Or{
+				sq.Eq{authMethodTypeDomain.identifier(): nil},
+				sq.Eq{authMethodTypeDomain.identifier(): ""},
+				sq.Eq{authMethodTypeDomain.identifier(): queryDomain},
+			})
+		}
 	}
 	return q.ToSql()
 }
