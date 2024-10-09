@@ -18,6 +18,7 @@ type TargetWriteModel struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	SigningKey       string
 
 	State domain.TargetState
 }
@@ -41,6 +42,7 @@ func (wm *TargetWriteModel) Reduce() error {
 			wm.Endpoint = e.Endpoint
 			wm.Timeout = e.Timeout
 			wm.State = domain.TargetActive
+			wm.SigningKey = e.SigningKey
 		case *target.ChangedEvent:
 			if e.Name != nil {
 				wm.Name = *e.Name
@@ -56,6 +58,9 @@ func (wm *TargetWriteModel) Reduce() error {
 			}
 			if e.InterruptOnError != nil {
 				wm.InterruptOnError = *e.InterruptOnError
+			}
+			if e.SigningKey != nil {
+				wm.SigningKey = *e.SigningKey
 			}
 		case *target.RemovedEvent:
 			wm.State = domain.TargetRemoved
@@ -84,6 +89,7 @@ func (wm *TargetWriteModel) NewChangedEvent(
 	endpoint *string,
 	timeout *time.Duration,
 	interruptOnError *bool,
+	signingKey *string,
 ) *target.ChangedEvent {
 	changes := make([]target.Changes, 0)
 	if name != nil && wm.Name != *name {
@@ -100,6 +106,9 @@ func (wm *TargetWriteModel) NewChangedEvent(
 	}
 	if interruptOnError != nil && wm.InterruptOnError != *interruptOnError {
 		changes = append(changes, target.ChangeInterruptOnError(*interruptOnError))
+	}
+	if signingKey != nil && wm.SigningKey != *signingKey {
+		changes = append(changes, target.ChangeSingingKey(*signingKey))
 	}
 	if len(changes) == 0 {
 		return nil

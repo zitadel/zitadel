@@ -352,6 +352,7 @@ type ExecutionTarget struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	SigningKey       string
 }
 
 func (e *ExecutionTarget) GetExecutionID() string {
@@ -372,6 +373,9 @@ func (e *ExecutionTarget) GetTargetType() domain.TargetType {
 func (e *ExecutionTarget) GetTimeout() time.Duration {
 	return e.Timeout
 }
+func (e *ExecutionTarget) GetSigningKey() string {
+	return e.SigningKey
+}
 
 func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 	targets := make([]*ExecutionTarget, 0)
@@ -386,6 +390,7 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 			endpoint         = &sql.NullString{}
 			timeout          = &sql.NullInt64{}
 			interruptOnError = &sql.NullBool{}
+			signingKey       = &sql.NullString{}
 		)
 
 		err := rows.Scan(
@@ -396,6 +401,7 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 			endpoint,
 			timeout,
 			interruptOnError,
+			signingKey,
 		)
 
 		if err != nil {
@@ -409,6 +415,7 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 		target.Endpoint = endpoint.String
 		target.Timeout = time.Duration(timeout.Int64)
 		target.InterruptOnError = interruptOnError.Bool
+		target.SigningKey = signingKey.String
 
 		targets = append(targets, target)
 	}

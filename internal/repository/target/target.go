@@ -23,6 +23,7 @@ type AddedEvent struct {
 	Endpoint         string            `json:"endpoint"`
 	Timeout          time.Duration     `json:"timeout"`
 	InterruptOnError bool              `json:"interruptOnError"`
+	SigningKey       string            `json:"signingKey"`
 }
 
 func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -45,12 +46,13 @@ func NewAddedEvent(
 	endpoint string,
 	timeout time.Duration,
 	interruptOnError bool,
+	signingKey string,
 ) *AddedEvent {
 	return &AddedEvent{
 		*eventstore.NewBaseEventForPush(
 			ctx, aggregate, AddedEventType,
 		),
-		name, targetType, endpoint, timeout, interruptOnError}
+		name, targetType, endpoint, timeout, interruptOnError, signingKey}
 }
 
 type ChangedEvent struct {
@@ -61,6 +63,7 @@ type ChangedEvent struct {
 	Endpoint         *string            `json:"endpoint,omitempty"`
 	Timeout          *time.Duration     `json:"timeout,omitempty"`
 	InterruptOnError *bool              `json:"interruptOnError,omitempty"`
+	SigningKey       *string            `json:"signingKey,omitempty"`
 
 	oldName string
 }
@@ -131,6 +134,12 @@ func ChangeTimeout(timeout time.Duration) func(event *ChangedEvent) {
 func ChangeInterruptOnError(interruptOnError bool) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
 		e.InterruptOnError = &interruptOnError
+	}
+}
+
+func ChangeSingingKey(signingKey string) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.SigningKey = &signingKey
 	}
 }
 

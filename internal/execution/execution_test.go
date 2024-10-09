@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/pkg/actions"
 )
 
 func Test_Call(t *testing.T) {
@@ -29,6 +30,7 @@ func Test_Call(t *testing.T) {
 		body       []byte
 		respBody   []byte
 		statusCode int
+		signingKey string
 	}
 	type res struct {
 		body    []byte
@@ -84,6 +86,22 @@ func Test_Call(t *testing.T) {
 				body: []byte("{\"response\": \"values\"}"),
 			},
 		},
+		{
+			"ok, signed",
+			args{
+				ctx:        context.Background(),
+				timeout:    time.Minute,
+				sleep:      time.Second,
+				method:     http.MethodPost,
+				body:       []byte("{\"request\": \"values\"}"),
+				respBody:   []byte("{\"response\": \"values\"}"),
+				statusCode: http.StatusOK,
+				signingKey: "signingkey",
+			},
+			res{
+				body: []byte("{\"response\": \"values\"}"),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -95,7 +113,7 @@ func Test_Call(t *testing.T) {
 					statusCode:  tt.args.statusCode,
 					respondBody: tt.args.respBody,
 				},
-				testCall(tt.args.ctx, tt.args.timeout, tt.args.body),
+				testCall(tt.args.ctx, tt.args.timeout, tt.args.body, tt.args.signingKey),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
@@ -187,6 +205,29 @@ func Test_CallTarget(t *testing.T) {
 			},
 		},
 		{
+			"webhook, signed, ok",
+			args{
+				ctx:  context.Background(),
+				info: requestContextInfo1,
+				server: &callTestServer{
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
+					respondBody: []byte("{\"request\":\"content2\"}"),
+					statusCode:  http.StatusOK,
+					signingKey:  "signingkey",
+				},
+				target: &mockTarget{
+					TargetType: domain.TargetTypeWebhook,
+					Timeout:    time.Minute,
+					SigningKey: "signingkey",
+				},
+			},
+			res{
+				body: nil,
+			},
+		},
+		{
 			"request response, error",
 			args{
 				ctx:  context.Background(),
@@ -222,6 +263,29 @@ func Test_CallTarget(t *testing.T) {
 				target: &mockTarget{
 					TargetType: domain.TargetTypeCall,
 					Timeout:    time.Minute,
+				},
+			},
+			res{
+				body: []byte("{\"request\":\"content2\"}"),
+			},
+		},
+		{
+			"request response, signed, ok",
+			args{
+				ctx:  context.Background(),
+				info: requestContextInfo1,
+				server: &callTestServer{
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
+					respondBody: []byte("{\"request\":\"content2\"}"),
+					statusCode:  http.StatusOK,
+					signingKey:  "signingkey",
+				},
+				target: &mockTarget{
+					TargetType: domain.TargetTypeCall,
+					Timeout:    time.Minute,
+					SigningKey: "signingkey",
 				},
 			},
 			res{
@@ -392,6 +456,7 @@ type mockTarget struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	SigningKey       string
 }
 
 func (e *mockTarget) GetTargetID() string {
@@ -409,6 +474,9 @@ func (e *mockTarget) GetTargetType() domain.TargetType {
 func (e *mockTarget) GetTimeout() time.Duration {
 	return e.Timeout
 }
+func (e *mockTarget) GetSigningKey() string {
+	return e.SigningKey
+}
 
 type callTestServer struct {
 	method      string
@@ -416,6 +484,7 @@ type callTestServer struct {
 	timeout     time.Duration
 	statusCode  int
 	respondBody []byte
+	signingKey  string
 }
 
 func testServers(
@@ -447,7 +516,7 @@ func listen(
 	c *callTestServer,
 ) (url string, close func()) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		checkRequest(t, r, c.method, c.expectBody)
+		checkRequest(t, r, c.method, c.expectBody, c.signingKey)
 
 		if c.statusCode != http.StatusOK {
 			http.Error(w, "error", c.statusCode)
@@ -466,16 +535,19 @@ func listen(
 	return server.URL, server.Close
 }
 
-func checkRequest(t *testing.T, sent *http.Request, method string, expectedBody []byte) {
+func checkRequest(t *testing.T, sent *http.Request, method string, expectedBody []byte, signingKey string) {
 	sentBody, err := io.ReadAll(sent.Body)
 	require.NoError(t, err)
 	require.Equal(t, expectedBody, sentBody)
 	require.Equal(t, method, sent.Method)
+	if signingKey != "" {
+		require.NoError(t, actions.ValidatePayload(sentBody, sent.Header.Get(actions.SigningHeader), signingKey))
+	}
 }
 
-func testCall(ctx context.Context, timeout time.Duration, body []byte) func(string) ([]byte, error) {
+func testCall(ctx context.Context, timeout time.Duration, body []byte, signingKey string) func(string) ([]byte, error) {
 	return func(url string) ([]byte, error) {
-		return execution.Call(ctx, url, timeout, body)
+		return execution.Call(ctx, url, timeout, body, signingKey)
 	}
 }
 
