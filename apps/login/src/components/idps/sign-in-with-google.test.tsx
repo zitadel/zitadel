@@ -11,7 +11,11 @@ describe("<SignInWithGoogle />", async () => {
   const messages = await getMessages({ locale: "en" });
 
   test("renders without crashing", () => {
-    const { container } = render(<SignInWithGoogle />);
+    const { container } = render(
+      <NextIntlClientProvider messages={messages}>
+        <SignInWithGoogle />
+      </NextIntlClientProvider>,
+    );
     expect(container.firstChild).toBeDefined();
   });
 

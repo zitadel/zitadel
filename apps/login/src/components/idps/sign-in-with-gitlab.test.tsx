@@ -1,16 +1,21 @@
 import { afterEach, describe, expect, test } from "vitest";
 
 import { cleanup, render, screen } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
+import { NextIntlClientProvider, useMessages } from "next-intl";
+
 import { SignInWithGitlab } from "./sign-in-with-gitlab";
 
 afterEach(cleanup);
 
 describe("<SignInWithGitlab />", async () => {
-  const messages = await getMessages({ locale: "en" });
+  const messages = useMessages();
 
   test("renders without crashing", () => {
-    const { container } = render(<SignInWithGitlab />);
+    const { container } = render(
+      <NextIntlClientProvider messages={messages}>
+        <SignInWithGitlab />
+      </NextIntlClientProvider>,
+    );
     expect(container.firstChild).toBeDefined();
   });
 
