@@ -1,6 +1,14 @@
 {
   "loginname": {
     "title": "Welcome back!",
-    "description": "Enter your login data."
+    "description": "Enter your login data.",
+    "registerButton": "Register new user"
+  },
+  "idp": {
+    "signInWithApple": "Sign in with Apple",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithAzureAD": "Sign in with AzureAD",
+    "signInWithGithub": "Sign in with GitHub",
+    "signInWithGitlab": "Sign in with GitLab"
   }
 }

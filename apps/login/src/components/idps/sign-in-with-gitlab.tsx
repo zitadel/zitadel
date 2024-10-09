@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { forwardRef } from "react";
 import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
@@ -8,6 +9,8 @@ export const SignInWithGitlab = forwardRef<
   SignInWithIdentityProviderProps
 >(function SignInWithGitlab(props, ref) {
   const { children, name, ...restProps } = props;
+  const t = useTranslations("idp");
+
   return (
     <BaseButton {...restProps} ref={ref}>
       <div className="h-12 w-12 flex items-center justify-center">
@@ -38,7 +41,7 @@ export const SignInWithGitlab = forwardRef<
       {children ? (
         children
       ) : (
-        <span className="ml-4">{name ? name : "Sign in with GitLab"}</span>
+        <span className="ml-4">{name ? name : t("signInWithGitlab")}</span>
       )}
     </BaseButton>
   );

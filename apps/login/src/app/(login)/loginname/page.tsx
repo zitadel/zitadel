@@ -23,7 +23,6 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  // const t = useTranslations("loginname");
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "loginname" });
 

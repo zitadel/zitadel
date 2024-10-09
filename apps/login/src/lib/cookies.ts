@@ -31,7 +31,7 @@ export async function setLanguageCookie(language: string) {
   // @ts-ignore
   return cookiesList.set({
     name: "NEXT_LOCALE",
-    value: JSON.stringify(language),
+    value: language,
     httpOnly: true,
     path: "/",
   });
