@@ -207,7 +207,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		oidcApp.SkipNativeAppSuccessPage,
 		strings.TrimSpace(oidcApp.BackChannelLogoutURI),
 		oidcApp.LoginVersion,
-		oidcApp.LoginBaseURI,
+		strings.TrimSpace(oidcApp.LoginBaseURI),
 	))
 
 	addedApplication.AppID = oidcApp.AppID
@@ -267,7 +267,7 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.SkipNativeAppSuccessPage,
 		strings.TrimSpace(oidc.BackChannelLogoutURI),
 		oidc.LoginVersion,
-		oidc.LoginBaseURI,
+		strings.TrimSpace(oidc.LoginBaseURI),
 	)
 	if err != nil {
 		return nil, err
