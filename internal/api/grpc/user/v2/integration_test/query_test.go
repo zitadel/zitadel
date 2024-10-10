@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -19,7 +20,7 @@ import (
 )
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest
@@ -151,7 +152,7 @@ func TestServer_GetUserByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			username := fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())
+			username := gofakeit.Email()
 			userAttr, err := tt.args.dep(tt.args.ctx, username, tt.args.req)
 			require.NoError(t, err)
 			retryDuration := time.Minute
@@ -188,8 +189,8 @@ func TestServer_GetUserByID(t *testing.T) {
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
 	timeNow := time.Now().UTC()
-	newOrgOwnerEmail := fmt.Sprintf("%d@permission.get.com", timeNow.UnixNano())
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -329,8 +330,8 @@ type userAttr struct {
 }
 
 func TestServer_ListUsers(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-	userResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listusers.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	userResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email())
 	type args struct {
 		ctx   context.Context
 		count int
@@ -800,7 +801,7 @@ func TestServer_ListUsers(t *testing.T) {
 				3,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
-					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner-%s", gofakeit.AppName()), gofakeit.Email())
 
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
@@ -891,7 +892,7 @@ func TestServer_ListUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			usernames := make([]string, tt.args.count)
 			for i := 0; i < tt.args.count; i++ {
-				usernames[i] = fmt.Sprintf("%d%d@mouse.com", time.Now().UnixNano(), i)
+				usernames[i] = gofakeit.Email()
 			}
 			infos, err := tt.args.dep(tt.args.ctx, usernames, tt.args.req)
 			require.NoError(t, err)

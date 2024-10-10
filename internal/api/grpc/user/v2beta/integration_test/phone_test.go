@@ -4,10 +4,9 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
-	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -123,7 +122,7 @@ func TestServer_SetPhone(t *testing.T) {
 
 func TestServer_ResendPhoneCode(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email()).GetUserId()
 
 	tests := []struct {
 		name    string
