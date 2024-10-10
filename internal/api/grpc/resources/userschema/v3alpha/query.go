@@ -146,8 +146,8 @@ func authenticatorTypeToPb(authenticator domain.AuthenticatorType) schema.Authen
 		return schema.AuthenticatorType_AUTHENTICATOR_TYPE_OTP_EMAIL
 	case domain.AuthenticatorTypeOTPSMS:
 		return schema.AuthenticatorType_AUTHENTICATOR_TYPE_OTP_SMS
-	case domain.AuthenticatorTypeAuthenticationKey:
-		return schema.AuthenticatorType_AUTHENTICATOR_TYPE_AUTHENTICATION_KEY
+	case domain.AuthenticatorTypePublicKey:
+		return schema.AuthenticatorType_AUTHENTICATOR_TYPE_PUBLIC_KEY
 	case domain.AuthenticatorTypeIdentityProvider:
 		return schema.AuthenticatorType_AUTHENTICATOR_TYPE_IDENTITY_PROVIDER
 	case domain.AuthenticatorTypeUnspecified:

@@ -20,7 +20,7 @@ const (
 	AuthenticatorTypeTOTP
 	AuthenticatorTypeOTPEmail
 	AuthenticatorTypeOTPSMS
-	AuthenticatorTypeAuthenticationKey
+	AuthenticatorTypePublicKey
 	AuthenticatorTypeIdentityProvider
 	authenticatorTypeCount
 )

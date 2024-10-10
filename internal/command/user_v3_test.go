@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/user/authenticator"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -37,6 +38,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 		eventstore                  func(t *testing.T) *eventstore.Eventstore
 		idGenerator                 id.Generator
 		checkPermission             domain.PermissionCheck
+		userPasswordHasher          *crypto.Hasher
+		tokenAlg                    crypto.EncryptionAlgorithm
 		newCode                     encrypedCodeFunc
 		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 		defaultSecretGenerators     *SecretGenerators
@@ -96,46 +99,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args{
-				ctx: authz.NewMockContext("instanceID", "", ""),
-				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
-				},
-			},
-			res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-N9QOuN4F7o", "Errors.UserSchema.NotExists"))
-				},
-			},
-		},
-		{
-			"no data, error",
-			fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
+					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     mock.ExpectID(t, "id1"),
@@ -143,9 +107,31 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists"))
+				},
+			},
+		},
+		{
+			"no data, error",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					filterSchemaExisting(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     mock.ExpectID(t, "id1"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 				},
 			},
 			res{
@@ -158,25 +144,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user create, no permission",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
+					expectFilter(),
+					filterSchemaExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				idGenerator:     mock.ExpectID(t, "id1"),
@@ -184,9 +153,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -202,26 +170,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user created",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
 					expectFilter(),
+					filterSchemaExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -240,9 +190,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -259,6 +208,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user create, no field permission as admin",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -288,9 +238,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -306,6 +255,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user create, no field permission as user",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -334,9 +284,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "id1"),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -352,25 +301,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user create, invalid data type",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
+					expectFilter(),
+					filterSchemaExisting(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     mock.ExpectID(t, "id1"),
@@ -378,9 +310,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": 1
 					}`),
@@ -396,6 +327,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user created, additional property",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -415,7 +347,6 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -434,9 +365,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"additional": "property"
 					}`),
@@ -453,6 +383,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user create, invalid data attribute name",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							schema.NewCreatedEvent(
@@ -480,9 +411,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"invalid": "user"
 					}`),
@@ -498,26 +428,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user created, email return",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
 					expectFilter(),
+					filterSchemaExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -553,9 +465,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -578,26 +489,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user created, email to verify",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
 					expectFilter(),
+					filterSchemaExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -633,9 +526,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -656,56 +548,10 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user created, phone return",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
 					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigTwilioAddedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-								"",
-								"sid",
-								"senderNumber",
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
-								"",
-							),
-						),
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
+					filterSchemaExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -742,9 +588,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -766,56 +611,10 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user created, phone to verify",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
 					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigTwilioAddedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-								"",
-								"sid",
-								"senderNumber",
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
-								"",
-							),
-						),
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
+					filterSchemaExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderInternalExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -852,9 +651,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -874,56 +672,10 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user created, phone to verify (external)",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
 					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSMSConfigTwilioAddedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-								"",
-								"sid",
-								"senderNumber",
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
-								"verifyServiceSid",
-							),
-						),
-						eventFromEventPusher(
-							instance.NewSMSConfigActivatedEvent(
-								context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								"id",
-							),
-						),
-					),
+					filterSchemaExisting(),
+					filterSMSProviderActivated(),
+					filterSMSProviderExternalExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -955,9 +707,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
@@ -977,26 +728,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			"user created, full verified",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
 					expectFilter(),
+					filterSchemaExisting(),
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
@@ -1029,14 +762,102 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
-					ResourceOwner:  "org1",
-					SchemaID:       "type",
-					schemaRevision: 1,
+					ResourceOwner: "org1",
+					SchemaID:      "type",
 					Data: json.RawMessage(`{
 						"name": "user"
 					}`),
 					Email: &Email{Address: "test@example.com", Verified: true},
 					Phone: &Phone{Number: "+41791234567", Verified: true},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "id1",
+				},
+			},
+		},
+		{
+			"user created, full authenticators",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					filterSchemaExisting(),
+					expectFilter(),
+					expectFilter(),
+					filterPasswordComplexityPolicyExisting(),
+					expectFilter(),
+					expectFilter(),
+					expectPush(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+						authenticator.NewUsernameCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("username1", "org1").Aggregate,
+							"id1",
+							true,
+							"username1",
+						),
+						authenticator.NewPasswordCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("id1", "org1").Aggregate,
+							"id1",
+							"$plain$x$password",
+							false,
+						),
+						authenticator.NewPublicKeyCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("pk1", "org1").Aggregate,
+							"id1",
+							time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+							[]byte("something"),
+						),
+						authenticator.NewPATCreatedEvent(
+							context.Background(),
+							&authenticator.NewAggregate("pat1", "org1").Aggregate,
+							"id1",
+							time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+							[]string{"first", "second", "third"},
+						),
+					),
+				),
+				idGenerator:        mock.NewIDGeneratorExpectIDs(t, "id1", "username1", "pk1", "pat1"),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+				tokenAlg:           crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner: "org1",
+					SchemaID:      "type",
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+					Usernames: []*Username{
+						{Username: "username1", IsOrgSpecific: true},
+					},
+					Password: &SchemaUserPassword{Password: "password"},
+					PublicKeys: []*PublicKey{
+						{
+							PublicKey:      []byte("something"),
+							ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+						},
+					},
+					PATs: []*PAT{
+						{
+							Scopes:         []string{"first", "second", "third"},
+							ExpirationDate: time.Date(2024, time.January, 1, 1, 1, 1, 1, time.UTC),
+						},
+					},
 				},
 			},
 			res{
@@ -1055,8 +876,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission:             tt.fields.checkPermission,
 				newEncryptedCode:            tt.fields.newCode,
 				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
-				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
-				userEncryption:              crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators, userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				userPasswordHasher: tt.fields.userPasswordHasher,
+				keyAlgorithm:       tt.fields.tokenAlg,
 			}
 			details, err := c.CreateSchemaUser(tt.args.ctx, tt.args.user)
 			if tt.res.err == nil {
@@ -1175,18 +997,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 			name: "remove user, ok",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
 					expectPush(
 						schemauser.NewDeletedEvent(context.Background(),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
@@ -1209,18 +1020,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 			name: "remove user, no permission",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
@@ -1288,848 +1088,6 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 	}
 }
 
-func TestCommandSide_LockSchemaUser(t *testing.T) {
-	type fields struct {
-		eventstore      func(*testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
-	}
-	type (
-		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
-		}
-	)
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore:      expectEventstore(),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Eu8I2VAfjF", "Errors.IDMissing"))
-				},
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-G4LOrnjY7q", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user removed, not found error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewDeletedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-G4LOrnjY7q", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user locked, precondition error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewLockedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-G4LOrnjY7q", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "lock user, ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
-					expectPush(
-						schemauser.NewLockedEvent(context.Background(),
-							&schemauser.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "lock user, no permission",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckNotAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				checkPermission: tt.fields.checkPermission,
-			}
-			got, err := r.LockSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.want, got)
-			}
-		})
-	}
-}
-
-func TestCommandSide_UnlockSchemaUser(t *testing.T) {
-	type fields struct {
-		eventstore      func(*testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
-	}
-	type (
-		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
-		}
-	)
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore:      expectEventstore(),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-krXtYscQZh", "Errors.IDMissing"))
-				},
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user removed, not found error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewDeletedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user not locked, precondition error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-gpBv46Lh9m", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "unlock user, ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewLockedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-					expectPush(
-						schemauser.NewUnlockedEvent(context.Background(),
-							&schemauser.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "unlock user, no permission",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewLockedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckNotAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				checkPermission: tt.fields.checkPermission,
-			}
-			got, err := r.UnlockSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.want, got)
-			}
-		})
-	}
-}
-
-func TestCommandSide_DeactivateSchemaUser(t *testing.T) {
-	type fields struct {
-		eventstore      func(*testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
-	}
-	type (
-		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
-		}
-	)
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore:      expectEventstore(),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-pjJhge86ZV", "Errors.IDMissing"))
-				},
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-Ob6lR5iFTe", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user removed, not found error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewDeletedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-Ob6lR5iFTe", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user not active, precondition error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewDeactivatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-Ob6lR5iFTe", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "deactivate user, ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
-					expectPush(
-						schemauser.NewDeactivatedEvent(context.Background(),
-							&schemauser.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "deactivate user, no permission",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckNotAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				checkPermission: tt.fields.checkPermission,
-			}
-			got, err := r.DeactivateSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.want, got)
-			}
-		})
-	}
-}
-
-func TestCommandSide_ReactivateSchemaUser(t *testing.T) {
-	type fields struct {
-		eventstore      func(*testing.T) *eventstore.Eventstore
-		checkPermission domain.PermissionCheck
-	}
-	type (
-		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
-		}
-	)
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore:      expectEventstore(),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-17XupGvxBJ", "Errors.IDMissing"))
-				},
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user removed, not found error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewDeletedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user not inactive, precondition error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-rQjbBr4J3j", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "activate user, ok",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewDeactivatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-					expectPush(
-						schemauser.NewActivatedEvent(context.Background(),
-							&schemauser.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "activate user, no permission",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"schema",
-								1,
-								json.RawMessage(`{
-						"name": "user"
-					}`),
-							),
-						),
-						eventFromEventPusher(
-							schemauser.NewDeactivatedEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-				checkPermission: newMockPermissionCheckNotAllowed(),
-			},
-			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				checkPermission: tt.fields.checkPermission,
-			}
-			got, err := r.ActivateSchemaUser(tt.args.ctx, tt.args.orgID, tt.args.userID)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assertObjectDetails(t, tt.res.want, got)
-			}
-		})
-	}
-}
-
 func TestCommands_ChangeSchemaUser(t *testing.T) {
 	defaultGenerators := &SecretGenerators{
 		OTPSMS: &crypto.GeneratorConfig{
@@ -2184,19 +1142,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"schema not existing, error",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
+					filterSchemaUserExisting(),
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -2212,7 +1158,7 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-VLDTtxT3If", "Errors.UserSchema.NotExists"))
 				},
 			},
 		},
@@ -2258,38 +1204,8 @@ func TestCommands_ChangeSchemaUser(t *testing.T) {
 			"user update, no permission",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							schemauser.NewCreatedEvent(
-								context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-								"id1",
-								1,
-								json.RawMessage(`{
-						"name": "user1"
-					}`),
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							schema.NewCreatedEvent(
-								context.Background(),
-								&schema.NewAggregate("id1", "instanceID").Aggregate,
-								"type",
-								json.RawMessage(`{
-								"$schema": "urn:zitadel:schema:v1",
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string"
-									}
-								}
-							}`),
-								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
-							),
-						),
-					),
+					filterSchemaUserExisting(),
+					filterSchemaExisting(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
