@@ -18,9 +18,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	user_v1 "github.com/zitadel/zitadel/pkg/grpc/user"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -2380,6 +2382,34 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 }
 */
 
+func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
+
+	pkr, err := Instance.Client.Auth.AddMyPasswordless(ctx, &auth.AddMyPasswordlessRequest{})
+	require.NoError(t, err)
+	require.NotEmpty(t, pkr.GetKey())
+	return ctx, userID, pkr
+}
+
+func ctxFromNewUserWithVerifiedPasswordlessLegacy(t *testing.T) (context.Context, string) {
+	ctx, userID, pkr := ctxFromNewUserWithRegisteredPasswordlessLegacy(t)
+
+	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponseData(pkr.GetKey().GetPublicKey())
+	require.NoError(t, err)
+
+	_, err = Instance.Client.Auth.VerifyMyPasswordless(ctx, &auth.VerifyMyPasswordlessRequest{
+		Verification: &user_v1.WebAuthNVerification{
+			TokenName:           "Mickey",
+			PublicKeyCredential: attestationResponse,
+		},
+	})
+	require.NoError(t, err)
+	return ctx, userID
+}
+
 func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	t.Parallel()
 
@@ -2417,6 +2447,9 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	_, err = Instance.Client.Mgmt.RemoveIDPFromLoginPolicy(CTX, &mgmt.RemoveIDPFromLoginPolicyRequest{
 		IdpId: provider.GetId(),
 	})
+	require.NoError(t, err)
+
+	_, userLegacyID := ctxFromNewUserWithVerifiedPasswordlessLegacy(t)
 	require.NoError(t, err)
 
 	type args struct {
@@ -2493,6 +2526,44 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 			want: &user.ListAuthenticationMethodTypesResponse{
 				Details: &object.ListDetails{
 					TotalResult: 0,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with legacy",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userLegacyID,
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with legacy included",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userLegacyID,
+					DomainQuery: &user.DomainQuery{
+						Domain:               "notexistent",
+						IncludeWithoutDomain: true,
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
 				},
 			},
 		},
