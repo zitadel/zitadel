@@ -14,11 +14,13 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestServer_SetPhone(t *testing.T) {
+	t.Parallel()
+
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {
@@ -122,6 +124,8 @@ func TestServer_SetPhone(t *testing.T) {
 }
 
 func TestServer_ResendPhoneCode(t *testing.T) {
+	t.Parallel()
+
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
 
@@ -196,6 +200,8 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 }
 
 func TestServer_VerifyPhone(t *testing.T) {
+	t.Parallel()
+
 	userResp := Instance.CreateHumanUser(CTX)
 	tests := []struct {
 		name    string
@@ -248,6 +254,8 @@ func TestServer_VerifyPhone(t *testing.T) {
 }
 
 func TestServer_RemovePhone(t *testing.T) {
+	t.Parallel()
+
 	userResp := Instance.CreateHumanUser(CTX)
 	failResp := Instance.CreateHumanUserNoPhone(CTX)
 	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
