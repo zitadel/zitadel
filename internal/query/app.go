@@ -61,6 +61,7 @@ type OIDCApp struct {
 	SkipNativeAppSuccessPage bool
 	BackChannelLogoutURI     string
 	LoginVersion             domain.LoginVersion
+	LoginBaseURI             *string
 }
 
 type SAMLApp struct {
@@ -255,6 +256,10 @@ var (
 	}
 	AppOIDCConfigColumnLoginVersion = Column{
 		name:  projection.AppOIDCConfigColumnLoginVersion,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnLoginBaseURI = Column{
+		name:  projection.AppOIDCConfigColumnLoginBaseURI,
 		table: appOIDCConfigsTable,
 	}
 )
@@ -576,6 +581,7 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase, activeOnly bool) (
 		AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
 		AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 		AppOIDCConfigColumnLoginVersion.identifier(),
+		AppOIDCConfigColumnLoginBaseURI.identifier(),
 
 		AppSAMLConfigColumnAppID.identifier(),
 		AppSAMLConfigColumnEntityID.identifier(),
@@ -642,6 +648,7 @@ func scanApp(row *sql.Row) (*App, error) {
 		&oidcConfig.skipNativeAppSuccessPage,
 		&oidcConfig.backChannelLogoutURI,
 		&oidcConfig.loginVersion,
+		&oidcConfig.loginBaseURI,
 
 		&samlConfig.appID,
 		&samlConfig.entityID,
@@ -693,6 +700,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
+			AppOIDCConfigColumnLoginBaseURI.identifier(),
 		).From(appsTable.identifier()).
 			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
@@ -731,6 +739,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.skipNativeAppSuccessPage,
 				&oidcConfig.backChannelLogoutURI,
 				&oidcConfig.loginVersion,
+				&oidcConfig.loginBaseURI,
 			)
 
 			if err != nil {
@@ -944,6 +953,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
 			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 			AppOIDCConfigColumnLoginVersion.identifier(),
+			AppOIDCConfigColumnLoginBaseURI.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
@@ -998,6 +1008,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 					&oidcConfig.skipNativeAppSuccessPage,
 					&oidcConfig.backChannelLogoutURI,
 					&oidcConfig.loginVersion,
+					&oidcConfig.loginBaseURI,
 
 					&samlConfig.appID,
 					&samlConfig.entityID,
@@ -1087,6 +1098,7 @@ type sqlOIDCConfig struct {
 	skipNativeAppSuccessPage sql.NullBool
 	backChannelLogoutURI     sql.NullString
 	loginVersion             sql.NullInt16
+	loginBaseURI             sql.NullString
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -1112,6 +1124,9 @@ func (c sqlOIDCConfig) set(app *App) {
 		SkipNativeAppSuccessPage: c.skipNativeAppSuccessPage.Bool,
 		BackChannelLogoutURI:     c.backChannelLogoutURI.String,
 		LoginVersion:             domain.LoginVersion(c.loginVersion.Int16),
+	}
+	if c.loginBaseURI.Valid {
+		app.OIDCConfig.LoginBaseURI = &c.loginBaseURI.String
 	}
 	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems

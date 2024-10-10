@@ -49,6 +49,7 @@ func oidcWriteModelToOIDCConfig(writeModel *OIDCApplicationWriteModel) *domain.O
 		SkipNativeAppSuccessPage: writeModel.SkipNativeAppSuccessPage,
 		BackChannelLogoutURI:     writeModel.BackChannelLogoutURI,
 		LoginVersion:             writeModel.LoginVersion,
+		LoginBaseURI:             writeModel.LoginBaseURI,
 	}
 }
 

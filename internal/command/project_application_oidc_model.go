@@ -38,6 +38,7 @@ type OIDCApplicationWriteModel struct {
 	SkipNativeAppSuccessPage bool
 	BackChannelLogoutURI     string
 	LoginVersion             domain.LoginVersion
+	LoginBaseURI             string
 	oidc                     bool
 }
 
@@ -169,6 +170,7 @@ func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAdd
 	wm.SkipNativeAppSuccessPage = e.SkipNativeAppSuccessPage
 	wm.BackChannelLogoutURI = e.BackChannelLogoutURI
 	wm.LoginVersion = e.LoginVersion
+	wm.LoginBaseURI = e.LoginBaseURI
 }
 
 func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfigChangedEvent) {
@@ -223,6 +225,9 @@ func (wm *OIDCApplicationWriteModel) appendChangeOIDCEvent(e *project.OIDCConfig
 	if e.LoginVersion != nil {
 		wm.LoginVersion = *e.LoginVersion
 	}
+	if e.LoginBaseURI != nil {
+		wm.LoginBaseURI = *e.LoginBaseURI
+	}
 }
 
 func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -266,6 +271,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	skipNativeAppSuccessPage bool,
 	skipNativeAppSuccessPage bool,
 	loginVersion domain.LoginVersion,
+	loginBaseURI string,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
@@ -320,6 +326,9 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	}
 	if wm.LoginVersion != loginVersion {
 		changes = append(changes, project.ChangeLoginVersion(loginVersion))
+	}
+	if wm.LoginBaseURI != loginBaseURI {
+		changes = append(changes, project.ChangeLoginBaseURI(loginBaseURI))
 	}
 
 	if len(changes) == 0 {

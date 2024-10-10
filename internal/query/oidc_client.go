@@ -39,6 +39,8 @@ type OIDCClient struct {
 	PublicKeys               map[string][]byte          `json:"public_keys,omitempty"`
 	ProjectID                string                     `json:"project_id,omitempty"`
 	ProjectRoleAssertion     bool                       `json:"project_role_assertion,omitempty"`
+	LoginVersion             domain.LoginVersion        `json:"login_version,omitempty"`
+	LoginBaseURI             *string                    `json:"login_base_uri,omitempty"`
 	ProjectRoleKeys          []string                   `json:"project_role_keys,omitempty"`
 	Settings                 *OIDCSettings              `json:"settings,omitempty"`
 }
@@ -59,7 +61,12 @@ func (q *Queries) ActiveOIDCClientByID(ctx context.Context, clientID string, get
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-ieR7R", "Errors.Internal")
 	}
-	if authz.GetInstance(ctx).ConsoleClientID() == clientID {
+	instance := authz.GetInstance(ctx)
+	if instance.Features().RequireLoginV2 {
+		client.LoginVersion = domain.LoginVersion2
+		client.LoginBaseURI = nil // TODO: !
+	}
+	if instance.ConsoleClientID() == clientID {
 		client.RedirectURIs = append(client.RedirectURIs, http_util.DomainContext(ctx).Origin()+path.RedirectPath)
 		client.PostLogoutRedirectURIs = append(client.PostLogoutRedirectURIs, http_util.DomainContext(ctx).Origin()+path.PostLogoutPath)
 	}

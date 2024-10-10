@@ -45,6 +45,7 @@ type OIDCConfigAddedEvent struct {
 	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
 	LoginVersion             domain.LoginVersion        `json:"loginVersion,omitempty"`
+	LoginBaseURI             string                     `json:"loginBaseURI,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -78,6 +79,7 @@ func NewOIDCConfigAddedEvent(
 	skipNativeAppSuccessPage bool,
 	backChannelLogoutURI string,
 	loginVersion domain.LoginVersion,
+	loginBaseURI string,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -105,6 +107,7 @@ func NewOIDCConfigAddedEvent(
 		SkipNativeAppSuccessPage: skipNativeAppSuccessPage,
 		BackChannelLogoutURI:     backChannelLogoutURI,
 		LoginVersion:             loginVersion,
+		LoginBaseURI:             loginBaseURI,
 	}
 }
 
@@ -196,7 +199,10 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 	if e.BackChannelLogoutURI != c.BackChannelLogoutURI {
 		return false
 	}
-	return e.LoginVersion == c.LoginVersion
+	if e.LoginVersion != c.LoginVersion {
+		return false
+	}
+	return e.LoginBaseURI == c.LoginBaseURI
 }
 
 func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -233,6 +239,7 @@ type OIDCConfigChangedEvent struct {
 	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
 	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
 	LoginVersion             *domain.LoginVersion        `json:"loginVersion,omitempty"`
+	LoginBaseURI             *string                     `json:"loginBaseURI,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
@@ -368,6 +375,12 @@ func ChangeBackChannelLogoutURI(backChannelLogoutURI string) func(event *OIDCCon
 func ChangeLoginVersion(loginVersion domain.LoginVersion) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.LoginVersion = &loginVersion
+	}
+}
+
+func ChangeLoginBaseURI(loginBaseURI string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.LoginBaseURI = &loginBaseURI
 	}
 }
 

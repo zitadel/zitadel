@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"net/url"
 	"slices"
 	"strings"
 	"time"
@@ -13,6 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+)
+
+const (
+	LoginAuthRequestIDParam = "authRequestID"
 )
 
 type Client struct {
@@ -49,10 +54,21 @@ func (c *Client) GetID() string {
 }
 
 func (c *Client) LoginURL(id string) string {
-	if strings.HasPrefix(id, command.IDPrefixV2) {
+	// if the authRequest does not have the v2 prefix, it was created for login V1
+	if !strings.HasPrefix(id, command.IDPrefixV2) {
+		return c.defaultLoginURL + id
+	}
+	// any v2 login without a specific base uri will be sent to the configured login v2 UI
+	// this way we're also backwards compatible
+	if c.client.LoginBaseURI == nil || *c.client.LoginBaseURI == "" {
 		return c.defaultLoginURLV2 + id
 	}
-	return c.defaultLoginURL + id
+	// for clients with a specific URI (internal or external) we only need to add the auth request id
+	baseURL, _ := url.Parse(*c.client.LoginBaseURI)
+	q := baseURL.Query()
+	q.Set(LoginAuthRequestIDParam, id)
+	baseURL.RawQuery = q.Encode()
+	return baseURL.String()
 }
 
 func (c *Client) RedirectURIs() []string {

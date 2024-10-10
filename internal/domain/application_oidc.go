@@ -47,6 +47,7 @@ type OIDCApp struct {
 	SkipNativeAppSuccessPage bool
 	BackChannelLogoutURI     string
 	LoginVersion             LoginVersion
+	LoginBaseURI             string
 
 	State AppState
 }
