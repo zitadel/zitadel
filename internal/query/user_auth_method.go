@@ -507,21 +507,16 @@ func prepareAuthMethodQuery(activeOnly bool, includeWithoutDomain bool, queryDom
 		q = q.Where(sq.Eq{authMethodTypeState.identifier(): domain.MFAStateReady})
 	}
 	if queryDomain != "" {
-		if includeWithoutDomain {
-			// or-condition, NULL for not domain specific, and domain for specific domains
-			q = q.Where(sq.Or{
-				sq.Eq{authMethodTypeDomain.identifier(): nil},
-				sq.Eq{authMethodTypeDomain.identifier(): ""},
-				sq.Eq{authMethodTypeDomain.identifier(): queryDomain},
-			})
-		} else {
-			// or-condition, NULL for not domain specific, empty for internal, and domain for specific domains
-			q = q.Where(sq.Or{
-				sq.Eq{authMethodTypeDomain.identifier(): nil},
-				sq.Eq{authMethodTypeDomain.identifier(): queryDomain},
-			})
+		conditions := sq.Or{
+			sq.Eq{authMethodTypeDomain.identifier(): nil},
+			sq.Eq{authMethodTypeDomain.identifier(): queryDomain},
 		}
+		if includeWithoutDomain {
+			conditions = append(conditions, sq.Eq{authMethodTypeDomain.identifier(): ""})
+		}
+		q = q.Where(conditions)
 	}
+
 	return q.ToSql()
 }
 
