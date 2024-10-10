@@ -19,8 +19,9 @@ import (
 
 func TestCommands_AddTarget(t *testing.T) {
 	type fields struct {
-		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		idGenerator                 id.Generator
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 	}
 	type args struct {
 		ctx           context.Context
@@ -132,10 +133,12 @@ func TestCommands_AddTarget(t *testing.T) {
 							"https://example.com",
 							time.Second,
 							false,
+							"12345678",
 						),
 					),
 				),
-				idGenerator: mock.ExpectID(t, "id1"),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 			},
 			args{
 				ctx: context.Background(),
@@ -186,7 +189,8 @@ func TestCommands_AddTarget(t *testing.T) {
 						targetAddEvent("id1", "instance"),
 					),
 				),
-				idGenerator: mock.ExpectID(t, "id1"),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 			},
 			args{
 				ctx: context.Background(),
@@ -219,7 +223,8 @@ func TestCommands_AddTarget(t *testing.T) {
 						}(),
 					),
 				),
-				idGenerator: mock.ExpectID(t, "id1"),
+				idGenerator:                 mock.ExpectID(t, "id1"),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 			},
 			args{
 				ctx: context.Background(),
@@ -244,8 +249,9 @@ func TestCommands_AddTarget(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				eventstore:                  tt.fields.eventstore(t),
+				idGenerator:                 tt.fields.idGenerator,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 			}
 			details, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
 			if tt.res.err == nil {
