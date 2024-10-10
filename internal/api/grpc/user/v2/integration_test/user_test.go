@@ -2465,7 +2465,9 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				CTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userIDWithPasskey,
-					Domain: gu.Ptr(Instance.Domain),
+					DomainQuery: &user.DomainQuery{
+						Domain: Instance.Domain,
+					},
 				},
 			},
 			want: &user.ListAuthenticationMethodTypesResponse{
@@ -2483,7 +2485,9 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				CTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userIDWithPasskey,
-					Domain: gu.Ptr("notexistent"),
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
 				},
 			},
 			want: &user.ListAuthenticationMethodTypesResponse{
@@ -2516,7 +2520,9 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				CTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userMultipleAuth,
-					Domain: gu.Ptr(Instance.Domain),
+					DomainQuery: &user.DomainQuery{
+						Domain: Instance.Domain,
+					},
 				},
 			},
 			want: &user.ListAuthenticationMethodTypesResponse{
@@ -2535,7 +2541,9 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				CTX,
 				&user.ListAuthenticationMethodTypesRequest{
 					UserId: userMultipleAuth,
-					Domain: gu.Ptr("notexistent"),
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
 				},
 			},
 			want: &user.ListAuthenticationMethodTypesResponse{

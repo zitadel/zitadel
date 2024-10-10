@@ -2133,10 +2133,14 @@ message ListAuthenticationMethodTypesRequest{
       example: "\"69629026806489455\"";
     }
   ];
-  // list only auth methods with external domains.
-  optional bool external = 2;
-  // list only auth methods with specific domain.
-  optional string domain = 3 [
+  optional DomainQuery domain_query = 2;
+}
+
+message DomainQuery {
+  // List also auth method types without domain information.
+  bool include_without_domain = 1;
+  // List only auth methods with specific domain.
+  string domain = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
