@@ -23,21 +23,27 @@ interface Lang {
 const LANGS: Lang[] = [
   {
     id: 1,
+    name: "English",
+    code: "en",
+    img: "/images/flags/us.png",
+  },
+  {
+    id: 2,
     name: "Deutsch",
     code: "de",
     img: "/images/flags/de.png",
   },
   {
-    id: 2,
+    id: 3,
     name: "Italiano",
     code: "it",
     img: "/images/flags/it.png",
   },
   {
-    id: 3,
-    name: "English",
-    code: "en",
-    img: "/images/flags/us.png",
+    id: 4,
+    name: "Español",
+    code: "es",
+    img: "/images/flags/es.png",
   },
 ];
 
@@ -80,7 +86,7 @@ export function LanguageSwitcher() {
           >
             <ListboxOptions
               anchor="bottom"
-              className="absolute mt-1 max-h-60 w-52 w-full overflow-auto rounded-md text-text-light-500 dark:text-text-dark-500 bg-background-light-500 dark:bg-background-dark-500 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
+              className="absolute mt-1 max-h-60 w-48 w-full overflow-auto rounded-md text-text-light-500 dark:text-text-dark-500 bg-background-light-500 dark:bg-background-dark-500 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
             >
               {LANGS.map((lang, index) => (
                 <ListboxOption
