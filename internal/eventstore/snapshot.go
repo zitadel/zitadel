@@ -44,7 +44,7 @@ type Snapshot[T any] struct {
 	Object T
 }
 
-// NewSnapshot returns an empty snapshot ready for Get.
+// NewSnapshot returns an empty snapshot ready for Populate.
 func NewSnapshot[T any](aggregate *Aggregate) *Snapshot[T] {
 	var object T
 	return &Snapshot[T]{
@@ -56,7 +56,7 @@ func NewSnapshot[T any](aggregate *Aggregate) *Snapshot[T] {
 	}
 }
 
-// SnapshotFromWriteModel returns a populated snapshot ready for Set.
+// SnapshotFromWriteModel returns a populated snapshot ready for Store.
 func SnapshotFromWriteModel[T any](model *WriteModel, object T) *Snapshot[T] {
 	return &Snapshot[T]{
 		SnapshotBase: SnapshotBase{
@@ -70,7 +70,7 @@ func SnapshotFromWriteModel[T any](model *WriteModel, object T) *Snapshot[T] {
 	}
 }
 
-// SnapshotFromReadModel returns a populated snapshot ready for Set.
+// SnapshotFromReadModel returns a populated snapshot ready for Store.
 func SnapshotFromReadModel[T any](model *ReadModel, object T) *Snapshot[T] {
 	return &Snapshot[T]{
 		SnapshotBase: SnapshotBase{
@@ -84,7 +84,7 @@ func SnapshotFromReadModel[T any](model *ReadModel, object T) *Snapshot[T] {
 	}
 }
 
-func (s *Snapshot[T]) Set(ctx context.Context, repo Snapshotter) (err error) {
+func (s *Snapshot[T]) Store(ctx context.Context, repo Snapshotter) (err error) {
 	payload, err := json.Marshal(s.Object)
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (s *Snapshot[T]) Set(ctx context.Context, repo Snapshotter) (err error) {
 	})
 }
 
-func (s *Snapshot[T]) Get(ctx context.Context, repo Snapshotter) (err error) {
+func (s *Snapshot[T]) Populate(ctx context.Context, repo Snapshotter) (err error) {
 	data, err := repo.GetSnapshot(ctx, s.InstanceID, NewSnapshotType(s.Object), s.AggregateID)
 	if err != nil {
 		return err

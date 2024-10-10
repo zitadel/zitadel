@@ -2,23 +2,29 @@ package admin
 
 import (
 	"context"
+	"slices"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	object_pb "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) ListMilestones(ctx context.Context, req *admin.ListMilestonesRequest) (*admin.ListMilestonesResponse, error) {
-	queries, err := listMilestonesToModel(authz.GetInstance(ctx).InstanceID(), req)
+	reached, err := milestoneQueriesReached(req.GetQueries())
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchMilestones(ctx, []string{authz.GetInstance(ctx).InstanceID()}, queries)
+	model, err := s.query.GetMilestones(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if reached {
+		model.Milestones = slices.DeleteFunc(model.Milestones, func(milestone *query.Milestone) bool {
+			return milestone.ReachedDate.IsZero()
+		})
 	}
 	return &admin.ListMilestonesResponse{
-		Result:  milestoneViewsToPb(resp.Milestones),
-		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.LastRun),
+		Result:  milestoneViewsToPb(model.Milestones),
+		Details: object_pb.ToListDetails(uint64(len(model.Milestones)), model.ProcessedSequence, model.ChangeDate),
 	}, nil
 }

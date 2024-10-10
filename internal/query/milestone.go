@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -135,4 +136,25 @@ func prepareMilestonesQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				},
 			}, nil
 		}
+}
+
+func (q *Queries) GetMilestones(ctx context.Context) (_ *MilestoneReadModel, err error) {
+	model, err := q.GetMilestoneSnapshot(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	if model.allDone() {
+		return model, nil
+	}
+	err = q.eventstore.FilterToQueryReducer(ctx, model)
+	if err != nil {
+		return nil, err
+	}
+	if model.Position > model.startPosition {
+		err = eventstore.SnapshotFromReadModel(&model.ReadModel, model).Store(ctx, q.eventstore)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return model, nil
 }

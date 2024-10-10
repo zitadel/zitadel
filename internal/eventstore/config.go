@@ -8,7 +8,8 @@ type Config struct {
 	PushTimeout time.Duration
 	MaxRetries  uint32
 
-	Pusher   Pusher
-	Querier  Querier
-	Searcher Searcher
+	Pusher      Pusher
+	Querier     Querier
+	Searcher    Searcher
+	Snapshotter Snapshotter
 }

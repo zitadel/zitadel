@@ -9213,10 +9213,8 @@ message ActivateFeatureLoginDefaultOrgResponse {
 }
 
 message ListMilestonesRequest {
-    //list limitations and ordering
-    zitadel.v1.ListQuery query = 1;
-    // the field the result is sorted
-    zitadel.milestone.v1.MilestoneFieldName sorting_column = 2;
+    // limit, ordering and sorting is not supported anymore
+    reserved 1, 2;
     //criteria the client is looking for
     repeated zitadel.milestone.v1.MilestoneQuery queries = 3;
 }

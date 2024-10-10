@@ -119,7 +119,7 @@ func (p *milestoneProjection) reduceInstanceAdded(event eventstore.Event) (*hand
 	if err != nil {
 		return nil, err
 	}
-	allTypes := milestone.AllTypes()
+	allTypes := milestone.TypeValues()
 	statements := make([]func(eventstore.Event) handler.Exec, 0, len(allTypes))
 	for _, msType := range allTypes {
 		createColumns := []handler.Column{

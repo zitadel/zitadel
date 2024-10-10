@@ -170,6 +170,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	config.Eventstore.Searcher = new_es.NewEventstore(queryDBClient)
+	config.Eventstore.Snapshotter = new_es.NewEventstore(queryDBClient)
 	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(queryDBClient, &es_v4_pg.Config{
