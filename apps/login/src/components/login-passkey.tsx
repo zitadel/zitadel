@@ -8,6 +8,7 @@ import {
   UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
@@ -33,6 +34,8 @@ export function LoginPasskey({
   organization,
   login = true,
 }: Props) {
+  const t = useTranslations("passkey");
+
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -232,7 +235,7 @@ export function LoginPasskey({
               );
             }}
           >
-            use password
+            {t("verify.usePassword")}
           </Button>
         ) : (
           <BackButton />
@@ -267,7 +270,7 @@ export function LoginPasskey({
           }}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("verify.submit")}
         </Button>
       </div>
     </div>

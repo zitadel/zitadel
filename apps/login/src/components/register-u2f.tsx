@@ -3,6 +3,7 @@
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert } from "./alert";
@@ -25,6 +26,8 @@ export function RegisterU2f({
   authRequestId,
   checkAfter,
 }: Props) {
+  const t = useTranslations("u2f");
+
   const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -198,7 +201,7 @@ export function RegisterU2f({
           onClick={submitRegisterAndContinue}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("set.submit")}
         </Button>
       </div>
     </form>

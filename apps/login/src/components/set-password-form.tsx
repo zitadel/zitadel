@@ -8,6 +8,7 @@ import {
 } from "@/helpers/validators";
 import { registerUser, RegisterUserResponse } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -42,6 +43,8 @@ export function SetPasswordForm({
   organization,
   authRequestId,
 }: Props) {
+  const t = useTranslations("register");
+
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -186,7 +189,7 @@ export function SetPasswordForm({
           onClick={handleSubmit(submitRegister)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("password.submit")}
         </Button>
       </div>
     </form>

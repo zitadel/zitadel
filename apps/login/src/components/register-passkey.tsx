@@ -2,6 +2,7 @@
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { registerPasskeyLink, verifyPasskey } from "@/lib/server/passkeys";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -25,6 +26,8 @@ export function RegisterPasskey({
   organization,
   authRequestId,
 }: Props) {
+  const t = useTranslations("passkey");
+
   const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -173,7 +176,7 @@ export function RegisterPasskey({
               continueAndLogin();
             }}
           >
-            skip
+            {t("set.skip")}
           </Button>
         ) : (
           <BackButton />
@@ -188,7 +191,7 @@ export function RegisterPasskey({
           onClick={handleSubmit(submitRegisterAndContinue)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("set.submit")}
         </Button>
       </div>
     </form>

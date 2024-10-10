@@ -6,12 +6,16 @@ import {
   getLegalAndSupportSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "register" });
+
   const { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
@@ -30,8 +34,8 @@ export default async function Page({
   return setPassword ? (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Set Password</h1>
-        <p className="ztdl-p">Set the password for your account</p>
+        <h1>{t("password.title")}</h1>
+        <p className="ztdl-p">{t("description")}</p>
 
         {legal && passwordComplexitySettings && (
           <SetPasswordForm
@@ -48,8 +52,8 @@ export default async function Page({
   ) : (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Register</h1>
-        <p className="ztdl-p">Create your ZITADEL account.</p>
+        <h1>{t("title")}</h1>
+        <p className="ztdl-p">{t("description")}</p>
 
         {legal && passwordComplexitySettings && (
           <RegisterFormWithoutPassword
