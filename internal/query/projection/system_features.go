@@ -89,8 +89,8 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceSystemSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.SystemRequireLoginV2,
-				Reduce: reduceSystemSetFeature[bool],
+				Event:  feature_v2.SystemLoginVersion,
+				Reduce: reduceSystemSetFeature[*feature.LoginV2],
 			},
 		},
 	}}

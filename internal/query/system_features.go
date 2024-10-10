@@ -30,7 +30,7 @@ type SystemFeatures struct {
 	OIDCSingleV1SessionTermination  FeatureSource[bool]
 	DisableUserTokenEvent           FeatureSource[bool]
 	EnableBackChannelLogout         FeatureSource[bool]
-	RequireLoginV2                  FeatureSource[bool]
+	LoginV2                         FeatureSource[*feature.LoginV2]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

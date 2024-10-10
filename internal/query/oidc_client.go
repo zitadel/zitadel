@@ -62,9 +62,10 @@ func (q *Queries) ActiveOIDCClientByID(ctx context.Context, clientID string, get
 		return nil, zerrors.ThrowInternal(err, "QUERY-ieR7R", "Errors.Internal")
 	}
 	instance := authz.GetInstance(ctx)
-	if instance.Features().RequireLoginV2 {
+	loginV2 := instance.Features().LoginV2
+	if loginV2.Required {
 		client.LoginVersion = domain.LoginVersion2
-		client.LoginBaseURI = nil // TODO: !
+		client.LoginBaseURI = &loginV2.BaseURI
 	}
 	if instance.ConsoleClientID() == clientID {
 		client.RedirectURIs = append(client.RedirectURIs, http_util.DomainContext(ctx).Origin()+path.RedirectPath)

@@ -1,6 +1,8 @@
 package feature
 
 import (
+	"net/url"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/feature"
@@ -8,7 +10,11 @@ import (
 	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
-func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.SystemFeatures {
+func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) (*command.SystemFeatures, error) {
+	loginV2, err := loginV2ToDomain(req.GetLoginV2())
+	if err != nil {
+		return nil, err
+	}
 	return &command.SystemFeatures{
 		LoginDefaultOrg:                 req.LoginDefaultOrg,
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
@@ -20,8 +26,8 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
 		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 		EnableBackChannelLogout:         req.EnableBackChannelLogout,
-		RequireLoginV2:                  req.RequireLoginV2,
-	}
+		LoginV2:                         loginV2,
+	}, nil
 }
 
 func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesResponse {
@@ -37,11 +43,15 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:             featureSourceToFlagPb(&f.EnableBackChannelLogout),
-		RequireLoginV2:                      featureSourceToFlagPb(&f.RequireLoginV2),
+		LoginV2:                             loginV2ToLoginV2FlagPb(f.LoginV2),
 	}
 }
 
-func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *command.InstanceFeatures {
+func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*command.InstanceFeatures, error) {
+	loginV2, err := loginV2ToDomain(req.GetLoginV2())
+	if err != nil {
+		return nil, err
+	}
 	return &command.InstanceFeatures{
 		LoginDefaultOrg:                 req.LoginDefaultOrg,
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
@@ -55,8 +65,8 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		OIDCSingleV1SessionTermination:  req.OidcSingleV1SessionTermination,
 		DisableUserTokenEvent:           req.DisableUserTokenEvent,
 		EnableBackChannelLogout:         req.EnableBackChannelLogout,
-		RequireLoginV2:                  req.RequireLoginV2,
-	}
+		LoginV2:                         loginV2,
+	}, nil
 }
 
 func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeaturesResponse {
@@ -74,7 +84,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
 		DisableUserTokenEvent:               featureSourceToFlagPb(&f.DisableUserTokenEvent),
 		EnableBackChannelLogout:             featureSourceToFlagPb(&f.EnableBackChannelLogout),
-		RequireLoginV2:                      featureSourceToFlagPb(&f.RequireLoginV2),
+		LoginV2:                             loginV2ToLoginV2FlagPb(f.LoginV2),
 	}
 }
 
@@ -82,6 +92,38 @@ func featureSourceToImprovedPerformanceFlagPb(fs *query.FeatureSource[[]feature.
 	return &feature_pb.ImprovedPerformanceFeatureFlag{
 		ExecutionPaths: improvedPerformanceTypesToPb(fs.Value),
 		Source:         featureLevelToSourcePb(fs.Level),
+	}
+}
+
+func loginV2ToDomain(loginV2 *feature_pb.LoginV2) (*feature.LoginV2, error) {
+	if loginV2 == nil {
+		return nil, nil
+	}
+	if loginV2.GetBaseUri() != "" {
+		_, err := url.Parse(loginV2.GetBaseUri())
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &feature.LoginV2{
+		Required: loginV2.GetRequired(),
+		BaseURI:  loginV2.GetBaseUri(),
+	}, nil
+}
+
+func loginV2ToLoginV2FlagPb(f query.FeatureSource[*feature.LoginV2]) *feature_pb.LoginV2FeatureFlag {
+	var required bool
+	var baseURI *string
+	if f.Value != nil {
+		required = f.Value.Required
+		if f.Value.BaseURI != "" { //TODO!
+			baseURI = &f.Value.BaseURI
+		}
+	}
+	return &feature_pb.LoginV2FeatureFlag{
+		Required: required,
+		BaseUri:  baseURI,
+		Source:   featureLevelToSourcePb(f.Level),
 	}
 }
 

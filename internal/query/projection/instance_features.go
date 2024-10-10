@@ -109,8 +109,8 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.InstanceRequireLoginV2,
-				Reduce: reduceInstanceSetFeature[bool],
+				Event:  feature_v2.InstanceLoginVersion,
+				Reduce: reduceInstanceSetFeature[*feature.LoginV2],
 			},
 			{
 				Event:  instance.InstanceRemovedEventType,

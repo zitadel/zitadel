@@ -36,12 +36,13 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 		span.EndWithError(err)
 	}()
 
+	// for backwards compatability we pass the login client if set
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	loginClient := headers.Get(LoginClientHeader)
 
 	// if the instance requires the v2 login, use it no matter what the application configured
-	if authz.GetFeatures(ctx).RequireLoginV2 {
-		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient) // TODO ?
+	if authz.GetFeatures(ctx).LoginV2.Required {
+		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
 	}
 
 	version, err := o.query.OIDCClientLoginVersion(ctx, req.ClientID)
@@ -263,7 +264,7 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	// in case there is no id_token_hint, redirect to the UI and let it decide which session to terminate
 	if endSessionRequest.IDTokenHintClaims == nil &&
-		(authz.GetFeatures(ctx).RequireLoginV2 || headers.Get(LoginClientHeader) != "") {
+		(authz.GetFeatures(ctx).LoginV2.Required || headers.Get(LoginClientHeader) != "") { //TODO: ?
 		return o.defaultLogoutURLV2 + endSessionRequest.RedirectURI, nil
 	}
 

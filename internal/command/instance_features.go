@@ -28,7 +28,7 @@ type InstanceFeatures struct {
 	OIDCSingleV1SessionTermination  *bool
 	DisableUserTokenEvent           *bool
 	EnableBackChannelLogout         *bool
-	RequireLoginV2                  *bool
+	LoginV2                         *feature.LoginV2
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
@@ -45,7 +45,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.OIDCSingleV1SessionTermination == nil &&
 		m.DisableUserTokenEvent == nil &&
 		m.EnableBackChannelLogout == nil &&
-		m.RequireLoginV2 == nil
+		m.LoginV2 == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {

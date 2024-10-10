@@ -94,10 +94,10 @@ message SetInstanceFeaturesRequest{
     }
   ];
 
-  optional bool require_login_v2 = 13 [
+  optional LoginV2 login_v2 = 13 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
-      description: "If the flag is enabled, all users will be use the login V2 regardless of the application's preference.";
+      description: "If the flag is set, all users will be redirected to the login V2 regardless of the application's preference.";
     }
   ];
 }
@@ -207,10 +207,10 @@ message GetInstanceFeaturesResponse {
     }
   ];
 
-  FeatureFlag require_login_v2 = 14 [
+  LoginV2FeatureFlag login_v2 = 14 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
-      description: "If the flag is enabled, all users will be use the login V2 regardless of the application's preference.";
+      description: "If the flag is set, all users will be redirected to the login V2 regardless of the application's preference.";
     }
   ];
 }
