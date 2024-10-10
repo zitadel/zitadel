@@ -97,6 +97,15 @@ export async function getLoginSettings(orgId?: string) {
   )().then((resp) => (resp ? fromJson(LoginSettingsSchema, resp) : undefined));
 }
 
+export async function listIDPLinks(userId: string) {
+  return userService.listIDPLinks(
+    {
+      userId,
+    },
+    {},
+  );
+}
+
 export async function addOTPEmail(userId: string) {
   return userService.addOTPEmail(
     {

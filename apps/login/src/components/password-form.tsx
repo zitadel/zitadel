@@ -70,6 +70,7 @@ export function PasswordForm({
 
     setLoading(false);
 
+    console.log(response);
     return response;
   }
 
@@ -111,6 +112,11 @@ export function PasswordForm({
       !submitted.authMethods ||
       !submitted.factors?.user?.loginName
     ) {
+      console.log(
+        !submitted,
+        !submitted?.authMethods,
+        !submitted?.factors?.user?.loginName,
+      );
       return;
     }
 
@@ -120,6 +126,7 @@ export function PasswordForm({
         m !== AuthenticationMethodType.PASSKEY,
     );
 
+    console.log(availableSecondFactors);
     if (availableSecondFactors?.length == 1) {
       const params = new URLSearchParams({
         loginName: submitted.factors?.user.loginName,
@@ -206,25 +213,25 @@ export function PasswordForm({
       }
 
       return router.push(`/login?` + params);
-    } else {
-      // without OIDC flow
-      const params = new URLSearchParams(
-        authRequestId
-          ? {
-              loginName: submitted.factors.user.loginName,
-              authRequestId,
-            }
-          : {
-              loginName: submitted.factors.user.loginName,
-            },
-      );
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      return router.push(`/signedin?` + params);
     }
+
+    // without OIDC flow
+    const params = new URLSearchParams(
+      authRequestId
+        ? {
+            loginName: submitted.factors.user.loginName,
+            authRequestId,
+          }
+        : {
+            loginName: submitted.factors.user.loginName,
+          },
+    );
+
+    if (organization) {
+      params.append("organization", organization);
+    }
+
+    return router.push(`/signedin?` + params);
   }
 
   return (
