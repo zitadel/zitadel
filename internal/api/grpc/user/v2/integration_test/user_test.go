@@ -18,9 +18,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	user_v1 "github.com/zitadel/zitadel/pkg/grpc/user"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -50,6 +52,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
+	t.Parallel()
+
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
@@ -672,6 +676,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_AddHumanUser_Permission(t *testing.T) {
+	t.Parallel()
+
 	newOrgOwnerEmail := fmt.Sprintf("%d@permission.com", time.Now().UnixNano())
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
 	type args struct {
@@ -865,6 +871,8 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 }
 
 func TestServer_UpdateHumanUser(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx context.Context
 		req *user.UpdateHumanUserRequest
@@ -1221,6 +1229,8 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 }
 
 func TestServer_UpdateHumanUser_Permission(t *testing.T) {
+	t.Parallel()
+
 	newOrgOwnerEmail := fmt.Sprintf("%d@permission.update.com", time.Now().UnixNano())
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
@@ -1304,6 +1314,8 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 }
 
 func TestServer_LockUser(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx     context.Context
 		req     *user.LockUserRequest
@@ -1412,6 +1424,8 @@ func TestServer_LockUser(t *testing.T) {
 }
 
 func TestServer_UnLockUser(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx     context.Context
 		req     *user.UnlockUserRequest
@@ -1520,6 +1534,8 @@ func TestServer_UnLockUser(t *testing.T) {
 }
 
 func TestServer_DeactivateUser(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx     context.Context
 		req     *user.DeactivateUserRequest
@@ -1628,6 +1644,8 @@ func TestServer_DeactivateUser(t *testing.T) {
 }
 
 func TestServer_ReactivateUser(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx     context.Context
 		req     *user.ReactivateUserRequest
@@ -1736,6 +1754,8 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
+	t.Parallel()
+
 	projectResp, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)
 	type args struct {
@@ -1835,6 +1855,8 @@ func TestServer_DeleteUser(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
+	t.Parallel()
+
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
@@ -2099,6 +2121,8 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 
 /*
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
+	t.Parallel()
+
 	idpID := Instance.AddGenericOAuthProvider(t, CTX)
 	intentID := Instance.CreateIntent(t, CTX, idpID)
 	successfulID, token, changeDate, sequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
@@ -2358,7 +2382,37 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 }
 */
 
+func ctxFromNewUserWithRegisteredPasswordlessLegacy(t *testing.T) (context.Context, string, *auth.AddMyPasswordlessResponse) {
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
+
+	pkr, err := Instance.Client.Auth.AddMyPasswordless(ctx, &auth.AddMyPasswordlessRequest{})
+	require.NoError(t, err)
+	require.NotEmpty(t, pkr.GetKey())
+	return ctx, userID, pkr
+}
+
+func ctxFromNewUserWithVerifiedPasswordlessLegacy(t *testing.T) (context.Context, string) {
+	ctx, userID, pkr := ctxFromNewUserWithRegisteredPasswordlessLegacy(t)
+
+	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponseData(pkr.GetKey().GetPublicKey())
+	require.NoError(t, err)
+
+	_, err = Instance.Client.Auth.VerifyMyPasswordless(ctx, &auth.VerifyMyPasswordlessRequest{
+		Verification: &user_v1.WebAuthNVerification{
+			TokenName:           "Mickey",
+			PublicKeyCredential: attestationResponse,
+		},
+	})
+	require.NoError(t, err)
+	return ctx, userID
+}
+
 func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
+	t.Parallel()
+
 	userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
 
 	userIDWithPasskey := Instance.CreateHumanUser(CTX).GetUserId()
@@ -2393,6 +2447,9 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	_, err = Instance.Client.Mgmt.RemoveIDPFromLoginPolicy(CTX, &mgmt.RemoveIDPFromLoginPolicyRequest{
 		IdpId: provider.GetId(),
 	})
+	require.NoError(t, err)
+
+	_, userLegacyID := ctxFromNewUserWithVerifiedPasswordlessLegacy(t)
 	require.NoError(t, err)
 
 	type args struct {
@@ -2436,6 +2493,81 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 			},
 		},
 		{
+			name: "with auth (passkey) with domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithPasskey,
+					DomainQuery: &user.DomainQuery{
+						Domain: Instance.Domain,
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with wrong domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userIDWithPasskey,
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with legacy",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userLegacyID,
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+			},
+		},
+		{
+			name: "with auth (passkey) with legacy included",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userLegacyID,
+					DomainQuery: &user.DomainQuery{
+						Domain:               "notexistent",
+						IncludeWithoutDomain: true,
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+				},
+			},
+		},
+		{
 			name: "multiple auth",
 			args: args{
 				CTX,
@@ -2449,6 +2581,47 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				},
 				AuthMethodTypes: []user.AuthenticationMethodType{
 					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+		{
+			name: "multiple auth with domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userMultipleAuth,
+					DomainQuery: &user.DomainQuery{
+						Domain: Instance.Domain,
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_PASSKEY,
+					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
+				},
+			},
+		},
+		{
+			name: "multiple auth with wrong domain",
+			args: args{
+				CTX,
+				&user.ListAuthenticationMethodTypesRequest{
+					UserId: userMultipleAuth,
+					DomainQuery: &user.DomainQuery{
+						Domain: "notexistent",
+					},
+				},
+			},
+			want: &user.ListAuthenticationMethodTypesResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				AuthMethodTypes: []user.AuthenticationMethodType{
 					user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_IDP,
 				},
 			},
@@ -2480,6 +2653,8 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 }
 
 func TestServer_CreateInviteCode(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx     context.Context
 		req     *user.CreateInviteCodeRequest
@@ -2610,6 +2785,8 @@ func TestServer_CreateInviteCode(t *testing.T) {
 }
 
 func TestServer_ResendInviteCode(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx     context.Context
 		req     *user.ResendInviteCodeRequest
@@ -2698,6 +2875,8 @@ func TestServer_ResendInviteCode(t *testing.T) {
 }
 
 func TestServer_VerifyInviteCode(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		ctx     context.Context
 		req     *user.VerifyInviteCodeRequest

@@ -442,7 +442,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if e.URLTmpl != "" {
 			urlTmpl = e.URLTmpl
 		}
-		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, code, user.ID, user.PreferredLoginName, user.DisplayName, user.PreferredLanguage); err != nil {
+		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, code, user.ID, user.PreferredLoginName, user.DisplayName, e.Aggregate().ID, user.PreferredLanguage); err != nil {
 			return "", err
 		}
 		return buf.String(), nil

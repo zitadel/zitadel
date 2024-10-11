@@ -72,7 +72,7 @@ func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) checkUserNoFirstFactor(ctx context.Context, userID string) bool {
-	authMethods, err := l.query.ListUserAuthMethodTypes(setUserContext(ctx, userID, ""), userID, false)
+	authMethods, err := l.query.ListUserAuthMethodTypes(setUserContext(ctx, userID, ""), userID, false, false, "")
 	if err != nil {
 		logging.WithFields("userID", userID).OnError(err).Warn("unable to load user's auth methods for mail verification")
 		return false
