@@ -745,10 +745,20 @@ module.exports = {
                 slug: "/apis/resources/action_service_v3",
                 description:
                   "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
+                  "The version 3 of actions provide much more options to customize ZITADELs behaviour than previous action versions.\n" +
+                  "Also, v3 actions are available instance-wide, whereas previous actions had to be managed for each organization individually\n" +
+                  "ZITADEL doesn't restrict the implementation languages, tooling and runtime for v3 action executions anymore.\n" +
+                  "Instead, it calls external endpoints which are implemented and maintained by action v3 users.\n" +
                   "\n" +
                   "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
-              items: require("./docs/apis/resources/action_service_v3/sidebar.ts"),
+              items: [{
+                type: "doc",
+                id: "apis/actions/v3/usage",
+              }, {
+                type: "doc",
+                id: "apis/actions/v3/testing-locally",
+              }].concat(require("./docs/apis/resources/action_service_v3/sidebar.ts")),
             },
             {
               type: "category",
@@ -814,12 +824,6 @@ module.exports = {
         "apis/actions/customize-samlresponse",
         "apis/actions/objects",
       ],
-    },
-    {
-      type: "category",
-      label: "Actions V2",
-      collapsed: false,
-      items: ["apis/actionsv2/introduction", "apis/actionsv2/execution-local"],
     },
     {
       type: "doc",

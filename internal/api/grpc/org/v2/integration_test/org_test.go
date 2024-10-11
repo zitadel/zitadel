@@ -42,6 +42,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddOrganization(t *testing.T) {
+	t.Parallel()
+
 	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
 	tests := []struct {

@@ -19,6 +19,8 @@ import (
 )
 
 func TestServer_GetUserByID(t *testing.T) {
+	t.Parallel()
+
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 	type args struct {
 		ctx context.Context
@@ -187,6 +189,8 @@ func TestServer_GetUserByID(t *testing.T) {
 }
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
+	t.Parallel()
+
 	timeNow := time.Now().UTC()
 	newOrgOwnerEmail := fmt.Sprintf("%d@permission.get.com", timeNow.UnixNano())
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
@@ -329,6 +333,8 @@ type userAttr struct {
 }
 
 func TestServer_ListUsers(t *testing.T) {
+	t.Parallel()
+
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 	userResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listusers.com", time.Now().UnixNano()))
 	type args struct {
