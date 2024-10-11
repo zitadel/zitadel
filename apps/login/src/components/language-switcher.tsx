@@ -1,5 +1,6 @@
 "use client";
 
+import { Lang, LANGS } from "@/i18n/request";
 import { setLanguageCookie } from "@/lib/cookies";
 import {
   Listbox,
@@ -12,40 +13,6 @@ import clsx from "clsx";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-interface Lang {
-  id: number;
-  name: string;
-  img: string;
-  code: string;
-}
-
-const LANGS: Lang[] = [
-  {
-    id: 1,
-    name: "English",
-    code: "en",
-    img: "/images/flags/us.png",
-  },
-  {
-    id: 2,
-    name: "Deutsch",
-    code: "de",
-    img: "/images/flags/de.png",
-  },
-  {
-    id: 3,
-    name: "Italiano",
-    code: "it",
-    img: "/images/flags/it.png",
-  },
-  {
-    id: 4,
-    name: "Español",
-    code: "es",
-    img: "/images/flags/es.png",
-  },
-];
 
 export function LanguageSwitcher() {
   const currentLocale = useLocale();

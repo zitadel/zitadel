@@ -1,5 +1,6 @@
 "use server";
 
+import { LANGUAGE_COOKIE_NAME } from "@/i18n/request";
 import { cookies } from "next/headers";
 
 export type Cookie = {
@@ -30,7 +31,7 @@ export async function setLanguageCookie(language: string) {
   const cookiesList = cookies();
 
   await cookiesList.set({
-    name: "NEXT_LOCALE",
+    name: LANGUAGE_COOKIE_NAME,
     value: language,
     httpOnly: true,
     path: "/",
