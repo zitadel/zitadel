@@ -2,6 +2,7 @@ name: Bug Report
 description: "Create a bug report to help us improve ZITADEL."
 title: "[Bug]: "
 labels: ["bug"]
+type: Bug
 body:
 - type: markdown
   attributes:
