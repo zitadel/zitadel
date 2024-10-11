@@ -103,6 +103,10 @@ func projections(
 	config *ProjectionsConfig,
 	masterKey string,
 ) {
+	if isDestFile {
+		return
+	}
+
 	start := time.Now()
 
 	client, err := database.Connect(config.Destination, false, dialect.DBPurposeQuery)
