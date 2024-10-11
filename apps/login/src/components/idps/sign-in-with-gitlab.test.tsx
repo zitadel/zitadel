@@ -1,18 +1,22 @@
 import { afterEach, describe, expect, test } from "vitest";
 
 import { cleanup, render, screen } from "@testing-library/react";
-import { NextIntlClientProvider, useMessages } from "next-intl";
+import { NextIntlClientProvider } from "next-intl";
 
 import { SignInWithGitlab } from "./sign-in-with-gitlab";
 
 afterEach(cleanup);
 
 describe("<SignInWithGitlab />", async () => {
-  const messages = useMessages();
+  const messages = {
+    idp: {
+      signInWithGitlab: "Sign in with GitLab",
+    },
+  };
 
   test("renders without crashing", () => {
     const { container } = render(
-      <NextIntlClientProvider messages={messages}>
+      <NextIntlClientProvider locale="en" messages={messages}>
         <SignInWithGitlab />
       </NextIntlClientProvider>,
     );
@@ -21,7 +25,7 @@ describe("<SignInWithGitlab />", async () => {
 
   test("displays the default text", () => {
     render(
-      <NextIntlClientProvider messages={messages}>
+      <NextIntlClientProvider locale="en" messages={messages}>
         <SignInWithGitlab />
       </NextIntlClientProvider>,
     );
@@ -31,7 +35,7 @@ describe("<SignInWithGitlab />", async () => {
 
   test("displays the given text", () => {
     render(
-      <NextIntlClientProvider messages={messages}>
+      <NextIntlClientProvider locale="en" messages={messages}>
         <SignInWithGitlab name={"Gitlab"} />
       </NextIntlClientProvider>,
     );

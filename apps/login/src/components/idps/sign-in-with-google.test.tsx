@@ -2,17 +2,20 @@ import { afterEach, describe, expect, test } from "vitest";
 
 import { cleanup, render, screen } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
 import { SignInWithGoogle } from "./sign-in-with-google";
 
 afterEach(cleanup);
 
 describe("<SignInWithGoogle />", async () => {
-  const messages = await getMessages({ locale: "en" });
+  const messages = {
+    idp: {
+      signInWithGoogle: "Sign in with Google",
+    },
+  };
 
   test("renders without crashing", () => {
     const { container } = render(
-      <NextIntlClientProvider messages={messages}>
+      <NextIntlClientProvider locale="en" messages={messages}>
         <SignInWithGoogle />
       </NextIntlClientProvider>,
     );
@@ -21,7 +24,7 @@ describe("<SignInWithGoogle />", async () => {
 
   test("displays the default text", () => {
     render(
-      <NextIntlClientProvider messages={messages}>
+      <NextIntlClientProvider locale="en" messages={messages}>
         <SignInWithGoogle />
       </NextIntlClientProvider>,
     );
@@ -31,7 +34,7 @@ describe("<SignInWithGoogle />", async () => {
 
   test("displays the given text", () => {
     render(
-      <NextIntlClientProvider messages={messages}>
+      <NextIntlClientProvider locale="en" messages={messages}>
         <SignInWithGoogle name={"Google"} />
       </NextIntlClientProvider>,
     );
