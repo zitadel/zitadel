@@ -11,8 +11,6 @@ export default getRequestConfig(async () => {
   const fallbackMessages = (await import(`../../locales/${fallback}.json`))
     .default;
 
-  console.log("i18nRequest", locale);
-
   return {
     locale,
     messages: deepmerge(fallbackMessages, userMessages),

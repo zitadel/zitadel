@@ -6,12 +6,12 @@ import {
   ListboxButton,
   ListboxOption,
   ListboxOptions,
-  Transition,
 } from "@headlessui/react";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 
 interface Lang {
   id: number;
@@ -68,59 +68,39 @@ export function LanguageSwitcher() {
   return (
     <div className="w-32">
       <Listbox value={selected} onChange={handleChange}>
-        <div className="relative">
-          <ListboxButton className="relative w-full cursor-default rounded-lg border border-divider-light bg-background-light-500 dark:bg-background-dark-500 py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-            <span className="block truncate">{selected.name}</span>
-            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-              <ChevronUpDownIcon
-                className="h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-            </span>
-          </ListboxButton>
-          <Transition
-            as={Fragment}
-            leave="transition ease-in duration-100"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <ListboxOptions
-              anchor="bottom"
-              className="absolute mt-1 max-h-60 w-48 w-full overflow-auto rounded-md text-text-light-500 dark:text-text-dark-500 bg-background-light-500 dark:bg-background-dark-500 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm"
+        <ListboxButton
+          className={clsx(
+            "relative block w-full rounded-lg bg-black/5 dark:bg-white/5 py-1.5 pr-8 pl-3 text-left text-sm/6 text-black dark:text-white",
+            "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
+          )}
+        >
+          {selected.name}
+          <ChevronDownIcon
+            className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
+            aria-hidden="true"
+          />
+        </ListboxButton>
+        <ListboxOptions
+          anchor="bottom"
+          transition
+          className={clsx(
+            "w-[var(--button-width)] rounded-xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 p-1 [--anchor-gap:var(--spacing-1)] focus:outline-none",
+            "transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0",
+          )}
+        >
+          {LANGS.map((lang, index) => (
+            <ListboxOption
+              key={lang.code}
+              value={lang}
+              className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-black/10 dark:data-[focus]:bg-white/10"
             >
-              {LANGS.map((lang, index) => (
-                <ListboxOption
-                  key={lang.code}
-                  className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                      active
-                        ? "bg-background-light-300 dark:bg-background-dark-300"
-                        : ""
-                    }`
-                  }
-                  value={lang}
-                >
-                  {({ selected }) => (
-                    <>
-                      <span
-                        className={`block truncate ${
-                          selected ? "font-medium" : "font-normal"
-                        }`}
-                      >
-                        {lang.name}
-                      </span>
-                      {selected ? (
-                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary-light-500 dark:text-primary-dark-500">
-                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                        </span>
-                      ) : null}
-                    </>
-                  )}
-                </ListboxOption>
-              ))}
-            </ListboxOptions>
-          </Transition>
-        </div>
+              <CheckIcon className="invisible size-4 fill-white group-data-[selected]:visible" />
+              <div className="text-sm/6 text-black dark:text-white">
+                {lang.name}
+              </div>
+            </ListboxOption>
+          ))}
+        </ListboxOptions>
       </Listbox>
     </div>
   );
