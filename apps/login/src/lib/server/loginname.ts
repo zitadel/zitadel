@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import {
+  getActiveIdentityProviders,
   getIDPByID,
   getLoginSettings,
   getOrgsByDomain,
