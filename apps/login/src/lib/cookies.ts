@@ -1,7 +1,7 @@
 "use server";
 
-import { LANGUAGE_COOKIE_NAME } from "@/i18n/request";
 import { cookies } from "next/headers";
+import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
 export type Cookie = {
   id: string;
