@@ -1,32 +1,7 @@
+import { LANGUAGE_COOKIE_NAME } from "@/lib/i18n";
 import deepmerge from "deepmerge";
 import { getRequestConfig } from "next-intl/server";
 import { cookies } from "next/headers";
-
-export interface Lang {
-  name: string;
-  code: string;
-}
-
-export const LANGS: Lang[] = [
-  {
-    name: "English",
-    code: "en",
-  },
-  {
-    name: "Deutsch",
-    code: "de",
-  },
-  {
-    name: "Italiano",
-    code: "it",
-  },
-  {
-    name: "Español",
-    code: "es",
-  },
-];
-
-export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
 
 export default getRequestConfig(async () => {
   const fallback = "en";

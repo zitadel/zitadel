@@ -1,7 +1,7 @@
 "use client";
 
-import { Lang, LANGS } from "@/i18n/request";
 import { setLanguageCookie } from "@/lib/cookies";
+import { Lang, LANGS } from "@/lib/i18n";
 import {
   Listbox,
   ListboxButton,
