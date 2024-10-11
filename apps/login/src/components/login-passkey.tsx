@@ -57,6 +57,7 @@ export function LoginPasskey({
           if (!pK) {
             setError("Could not request passkey challenge");
             setLoading(false);
+            return;
           }
 
           return submitLoginAndContinue(pK)
@@ -190,12 +191,6 @@ export function LoginPasskey({
             return router.push(`/signedin?` + params);
           }
         });
-      })
-      .catch((error) => {
-        // we log this error to the console, as it is not a critical error
-        console.error(error);
-        setLoading(false);
-        return null;
       });
   }
 
