@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/crypto"
 	user "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 )
 
@@ -14,19 +13,16 @@ var _ user.ZITADELUsersServer = (*Server)(nil)
 
 type Server struct {
 	user.UnimplementedZITADELUsersServer
-	command     *command.Commands
-	userCodeAlg crypto.EncryptionAlgorithm
+	command *command.Commands
 }
 
 type Config struct{}
 
 func CreateServer(
 	command *command.Commands,
-	userCodeAlg crypto.EncryptionAlgorithm,
 ) *Server {
 	return &Server{
-		command:     command,
-		userCodeAlg: userCodeAlg,
+		command: command,
 	}
 }
 

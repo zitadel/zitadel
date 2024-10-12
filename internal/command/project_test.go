@@ -53,6 +53,52 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
+			name: "org with project owner, resourceowner empty",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				project: &domain.Project{
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+				resourceOwner: "",
+				ownerID:       "user1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "org with project owner, ownerID empty",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				project: &domain.Project{
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+				resourceOwner: "org1",
+				ownerID:       "",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "org with project owner, error already exists",
 			fields: fields{
 				eventstore: eventstoreExpect(

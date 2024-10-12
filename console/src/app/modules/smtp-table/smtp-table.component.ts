@@ -205,6 +205,9 @@ export class SMTPTableComponent implements OnInit {
   }
 
   public navigateToProvider(row: SMTPConfig.AsObject) {
+    if (!row.senderAddress) {
+      return;
+    }
     this.router.navigate(this.routerLinkForRow(row));
   }
 }

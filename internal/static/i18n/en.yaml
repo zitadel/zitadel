@@ -53,6 +53,7 @@ Errors:
     NotFound: SMS configuration not found
     AlreadyActive: SMS configuration already active
     AlreadyDeactivated: SMS configuration already deactivated
+    NotExternalVerification: SMS configuration does not support code verification
   SMTP:
     NotEmailMessage: message is not EmailMessage
     RequiredAttributes: subject, recipients and content must be set but some or all of them are empty
@@ -687,6 +688,13 @@ EventTypes:
         check:
           succeeded: Initialization check succeeded
           failed: Initialization check failed
+      invite:
+        code:
+          added: Invitation code generated
+          sent: Invitation code sent
+        check:
+          succeeded: Invitation check succeeded
+          failed: Invitation check failed
       username:
         reserved: Username reserved
         released: Username released

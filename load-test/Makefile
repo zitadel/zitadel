@@ -41,6 +41,12 @@ machine_jwt_profile_grant: ensure_modules ensure_key_pair bundle
 	./../../xk6-modules/k6 run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/machine_jwt_profile_grant.js --iterations 1
 	# --vus ${VUS} --duration ${DURATION}
 
+.PHONY: machine_jwt_profile_grant_single_user
+machine_jwt_profile_grant_single_user: ensure_modules ensure_key_pair bundle
+	go install go.k6.io/xk6/cmd/xk6@latest
+	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/machine_jwt_profile_grant_single_user.js --vus ${VUS} --duration ${DURATION}
+
 .PHONY: lint
 lint:
 	npm i

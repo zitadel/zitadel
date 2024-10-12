@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Volgende
   CancelButtonText: Annuleren
 
+InviteUser:
+  Title: Gebruiker activeren
+  Description: Verifieer uw e-mail met de onderstaande code en stel uw wachtwoord in.
+  CodeLabel: Code
+  NewPasswordLabel: Nieuw wachtwoord
+  NewPasswordConfirm: Wachtwoord bevestigen
+  NextButtonText: Volgende
+  ResendButtonText: Code opnieuw verzenden
+
 InitMFAPrompt:
   Title: 2-Factor Setup
   Description: 2-factor authenticatie geeft u extra beveiliging voor uw gebruikersaccount. Hierdoor bent u de enige die toegang heeft tot uw account.
@@ -253,6 +262,8 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -293,6 +304,8 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Nederlands: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -367,6 +380,8 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:

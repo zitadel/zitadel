@@ -123,7 +123,9 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 			return nil, ctxTimeout.Err()
 		case result := <-ch:
 			logging.OnError(result.err).Errorf("error while importing: %v", result.err)
-			logging.Infof("Import done: %s", result.count.getProgress())
+			if result.count != nil {
+				logging.Infof("Import done: %s", result.count.getProgress())
+			}
 			return result.ret, result.err
 		}
 	} else {
@@ -793,6 +795,7 @@ func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 	importVerifyPhoneMessageTexts(ctx, s, errors, org)
 	importDomainClaimedMessageTexts(ctx, s, errors, org)
 	importPasswordlessRegistrationMessageTexts(ctx, s, errors, org)
+	importInviteUserMessageTexts(ctx, s, errors, org)
 	if err := importHumanUsers(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode); err != nil {
 		return err
 	}
@@ -971,6 +974,21 @@ func importPasswordlessRegistrationMessageTexts(ctx context.Context, s *Server, 
 		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetPasswordlessRegistrationCustomTextToDomain(message))
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "passwordless_registration_message", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+		}
+	}
+}
+
+func importInviteUserMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
+	if org.PasswordlessRegistrationMessages == nil {
+		return
+	}
+	for _, message := range org.GetInviteUserMessages() {
+		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetInviteUserCustomTextToDomain(message))
+		if err != nil {
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "invite_user_messages", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
 		}
 	}
 }
@@ -1236,6 +1254,7 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			VerifyPhoneMessages:              orgV1.GetVerifyPhoneMessages(),
 			DomainClaimedMessages:            orgV1.GetDomainClaimedMessages(),
 			PasswordlessRegistrationMessages: orgV1.GetPasswordlessRegistrationMessages(),
+			InviteUserMessages:               orgV1.GetInviteUserMessages(),
 			OidcIdps:                         orgV1.GetOidcIdps(),
 			JwtIdps:                          orgV1.GetJwtIdps(),
 			UserLinks:                        orgV1.GetUserLinks(),

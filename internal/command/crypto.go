@@ -13,12 +13,35 @@ type encrypedCodeFunc func(ctx context.Context, filter preparation.FilterToQuery
 
 type encryptedCodeWithDefaultFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, error)
 
+type encryptedCodeGeneratorWithDefaultFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error)
+
 var emptyConfig = &crypto.GeneratorConfig{}
 
 type EncryptedCode struct {
 	Crypted *crypto.CryptoValue
 	Plain   string
 	Expiry  time.Duration
+}
+
+func (e *EncryptedCode) CryptedCode() *crypto.CryptoValue {
+	if e == nil {
+		return nil
+	}
+	return e.Crypted
+}
+
+func (e *EncryptedCode) PlainCode() string {
+	if e == nil {
+		return ""
+	}
+	return e.Plain
+}
+
+func (e *EncryptedCode) CodeExpiry() time.Duration {
+	if e == nil {
+		return 0
+	}
+	return e.Expiry
 }
 
 func newEncryptedCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
@@ -39,14 +62,6 @@ func newEncryptedCodeWithDefaultConfig(ctx context.Context, filter preparation.F
 		Plain:   plain,
 		Expiry:  config.Expiry,
 	}, nil
-}
-
-func verifyEncryptedCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, creation time.Time, expiry time.Duration, crypted *crypto.CryptoValue, plain string) error {
-	gen, _, err := encryptedCodeGenerator(ctx, filter, typ, alg, emptyConfig)
-	if err != nil {
-		return err
-	}
-	return crypto.VerifyCode(creation, expiry, crypted, plain, gen.Alg())
 }
 
 func encryptedCodeGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (crypto.Generator, *crypto.GeneratorConfig, error) {

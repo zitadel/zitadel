@@ -17,6 +17,8 @@ type SystemFeatures struct {
 	UserSchema                      *bool
 	Actions                         *bool
 	ImprovedPerformance             []feature.ImprovedPerformanceType
+	OIDCSingleV1SessionTermination  *bool
+	DisableUserTokenEvent           *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {
@@ -27,7 +29,9 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.TokenExchange == nil &&
 		m.Actions == nil &&
 		// nil check to allow unset improvements
-		m.ImprovedPerformance == nil
+		m.ImprovedPerformance == nil &&
+		m.OIDCSingleV1SessionTermination == nil &&
+		m.DisableUserTokenEvent == nil
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {

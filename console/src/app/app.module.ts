@@ -6,6 +6,7 @@ import localeCs from '@angular/common/locales/cs';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
 import localeFr from '@angular/common/locales/fr';
+import localeId from '@angular/common/locales/id';
 import localeIt from '@angular/common/locales/it';
 import localeJa from '@angular/common/locales/ja';
 import localeMk from '@angular/common/locales/mk';
@@ -15,6 +16,7 @@ import localeZh from '@angular/common/locales/zh';
 import localeRu from '@angular/common/locales/ru';
 import localeNl from '@angular/common/locales/nl';
 import localeSv from '@angular/common/locales/sv';
+import localeHu from '@angular/common/locales/hu';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -80,6 +82,8 @@ registerLocaleData(localeEs);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/es.json'));
 registerLocaleData(localeFr);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/fr.json'));
+registerLocaleData(localeId);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/id.json'));
 registerLocaleData(localeIt);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/it.json'));
 registerLocaleData(localeJa);
@@ -102,6 +106,8 @@ registerLocaleData(localeNl);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/nl.json'));
 registerLocaleData(localeSv);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/sv.json'));
+registerLocaleData(localeHu);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/hu.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {

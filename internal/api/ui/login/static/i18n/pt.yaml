@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: próximo
   CancelButtonText: cancelar
 
+InviteUser:
+  Title: Ativar usuário
+  Description: Verifique seu e-mail com o código abaixo e defina sua senha.
+  CodeLabel: Código
+  NewPasswordLabel: Nova senha
+  NewPasswordConfirm: Confirmar senha
+  NextButtonText: Próximo
+  ResendButtonText: Reenviar código
+
 InitMFAPrompt:
   Title: Configuração de 2 fatores
   Description: A autenticação de 2 fatores fornece uma segurança adicional para sua conta de usuário. Isso garante que apenas você tenha acesso à sua conta.
@@ -249,6 +258,8 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -289,6 +300,8 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -363,6 +376,8 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 
 DeviceAuth:
   Title: Autorização de dispositivo

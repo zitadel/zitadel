@@ -18,6 +18,8 @@ type InstanceFeatures struct {
 	ImprovedPerformance             FeatureSource[[]feature.ImprovedPerformanceType]
 	WebKey                          FeatureSource[bool]
 	DebugOIDCParentError            FeatureSource[bool]
+	OIDCSingleV1SessionTermination  FeatureSource[bool]
+	DisableUserTokenEvent           FeatureSource[bool]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

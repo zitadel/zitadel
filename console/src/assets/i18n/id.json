@@ -1,0 +1,2335 @@
+{
+  "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadata",
+    "HOME": {
+      "TITLE": "Mulailah dengan ZITADEL",
+      "NEXT": {
+        "TITLE": "Langkah Anda selanjutnya",
+        "DESCRIPTION": "Selesaikan langkah-langkah berikut untuk mengamankan aplikasi Anda.",
+        "CREATE_PROJECT": { "TITLE": "Buat proyek", "DESCRIPTION": "Tambahkan proyek dan tentukan peran dan otorisasinya." }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Memulai",
+          "DESCRIPTION": "Ikuti panduan langkah demi langkah memulai cepat dan segera mulai membangun."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentasi",
+          "DESCRIPTION": "Jelajahi basis pengetahuan ZITADEL untuk membiasakan diri Anda dengan konsep dan ide inti. Pelajari cara kerja ZITADEL dan cara menggunakannya."
+        },
+        "EXAMPLES": {
+          "TITLE": "Contoh dan Perangkat Pengembangan Perangkat Lunak",
+          "DESCRIPTION": "Jelajahi contoh dan SDK kami untuk menggunakan ZITADEL bersama dengan bahasa dan alat pemrograman favorit Anda."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organisasi",
+      "DESCRIPTION": "Organisasi menampung pengguna, proyek dengan aplikasi, penyedia identitas, dan pengaturan seperti branding perusahaan. Apakah Anda ingin berbagi pengaturan di beberapa organisasi? Konfigurasikan pengaturan default.",
+      "METADATA": "Tambahkan atribut khusus ke organisasi seperti lokasinya atau pengidentifikasi di sistem lain. Anda dapat menggunakan informasi ini dalam tindakan Anda."
+    },
+    "PROJECTS": {
+      "TITLE": "Proyek",
+      "DESCRIPTION": "Sebuah proyek menghosting satu atau beberapa aplikasi, yang dapat Anda gunakan untuk mengautentikasi pengguna Anda. Anda juga dapat mengotorisasi pengguna Anda dengan proyek. Untuk mengizinkan pengguna dari organisasi lain masuk ke aplikasi Anda, beri mereka akses ke proyek Anda.<br/><br/>Jika Anda tidak dapat menemukan proyek, hubungi pemilik proyek atau seseorang dengan hak yang sesuai untuk mendapatkan akses .",
+      "OWNED": {
+        "TITLE": "Proyek Milik",
+        "DESCRIPTION": "Ini adalah proyek yang Anda miliki. Anda dapat mengelola pengaturan, otorisasi, dan aplikasi proyek ini."
+      },
+      "GRANTED": {
+        "TITLE": "Proyek yang Diberikan",
+        "DESCRIPTION": "Ini adalah proyek yang diberikan organisasi lain kepada Anda. Dengan proyek yang diberikan, Anda dapat memberikan pengguna Anda akses ke aplikasi organisasi lain."
+      }
+    },
+    "USERS": {
+      "TITLE": "Pengguna",
+      "DESCRIPTION": "Pengguna adalah manusia atau mesin yang dapat mengakses aplikasi Anda.",
+      "HUMANS": {
+        "TITLE": "Pengguna",
+        "DESCRIPTION": "Pengguna mengautentikasi secara interaktif dalam sesi browser dengan perintah login.",
+        "METADATA": "Tambahkan atribut khusus ke pengguna seperti departemen. Anda dapat menggunakan informasi ini dalam tindakan Anda."
+      },
+      "MACHINES": {
+        "TITLE": "Pengguna Layanan",
+        "DESCRIPTION": "Pengguna Layanan mengautentikasi secara non-interaktif menggunakan token pembawa JWT yang ditandatangani dengan kunci pribadi. Mereka juga dapat menggunakan token akses pribadi.",
+        "METADATA": "Tambahkan atribut khusus kepada pengguna seperti sistem autentikasi. Anda dapat menggunakan informasi ini dalam tindakan Anda."
+      },
+      "SELF": {
+        "METADATA": "Tambahkan atribut khusus ke pengguna Anda seperti departemen Anda. Anda dapat menggunakan informasi ini dalam tindakan organisasi Anda."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Otorisasi",
+      "DESCRIPTION": "Otorisasi menentukan hak akses pengguna ke suatu proyek. Anda dapat memberikan akses pengguna ke suatu proyek dan menentukan peran pengguna dalam proyek tersebut."
+    },
+    "ACTIONS": {
+      "TITLE": "Tindakan",
+      "DESCRIPTION": "Jalankan kode khusus pada peristiwa yang terjadi saat pengguna Anda mengautentikasi di ZITADEL. Otomatiskan proses Anda, perkaya metadata pengguna Anda dan token mereka, atau beri tahu sistem eksternal.",
+      "SCRIPTS": { "TITLE": "Skrip", "DESCRIPTION": "Tulis kode JavaScript Anda satu kali dan picu dalam beberapa aliran." },
+      "FLOWS": {
+        "TITLE": "Mengalir",
+        "DESCRIPTION": "Pilih alur autentikasi dan picu tindakan Anda pada peristiwa tertentu dalam alur ini."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Pengaturan Bawaan",
+        "DESCRIPTION": "Setelan default untuk semua organisasi. Dengan izin yang tepat, beberapa di antaranya dapat diganti di pengaturan organisasi."
+      },
+      "ORG": { "TITLE": "Pengaturan Organisasi", "DESCRIPTION": "Sesuaikan pengaturan organisasi Anda." },
+      "FEATURES": { "TITLE": "Pengaturan Fitur", "DESCRIPTION": "Buka kunci fitur untuk instans Anda." },
+      "IDPS": {
+        "TITLE": "Penyedia Identitas",
+        "DESCRIPTION": "Buat dan aktifkan penyedia identitas eksternal. Pilih penyedia terkenal atau konfigurasikan penyedia lain yang kompatibel dengan OIDC, OAuth, atau SAML pilihan Anda. Anda bahkan dapat menggunakan token JWT yang ada sebagai identitas gabungan dengan mengonfigurasi penyedia identitas JWT.",
+        "NEXT": "Bagaimana sekarang?",
+        "SAML": {
+          "TITLE": "Konfigurasikan Penyedia Identitas SAML Anda",
+          "DESCRIPTION": "ZITADEL dikonfigurasi. Sekarang Penyedia Identitas SAML Anda memerlukan beberapa konfigurasi. Sebagian besar penyedia mengizinkan Anda mengunggah seluruh XML metadata ZITADEL. Penyedia lain meminta Anda untuk memberikan beberapa URL berbeda saja, misalnya ID entitas (URL metadata), URL Assertion Consumer Service (ACS), atau URL Keluar Tunggal."
+        },
+        "CALLBACK": {
+          "TITLE": "Konfigurasikan {{ provider }} Penyedia Identitas Anda",
+          "DESCRIPTION": "Sebelum Anda dapat mengonfigurasi ZITADEL, teruskan URL ini ke Penyedia Identitas Anda untuk mengaktifkan pengalihan browser kembali ke ZITADEL setelah autentikasi."
+        },
+        "JWT": {
+          "TITLE": "Gunakan JWT sebagai Identitas gabungan",
+          "DESCRIPTION": "Penyedia Identitas JWT memungkinkan Anda menggunakan token JWT yang ada sebagai identitas gabungan. Fitur ini berguna jika Anda sudah memiliki penerbit JWT. Dengan IdP JWT, Anda dapat menggunakan JWT ini untuk membuat dan memperbarui pengguna di ZITADEL dengan cepat."
+        },
+        "LDAP": {
+          "TITLE": "Konfigurasikan ZITADEL untuk terhubung ke Penyedia Identitas LDAP Anda",
+          "DESCRIPTION": "Berikan detail koneksi ke server LDAP Anda dan konfigurasikan pemetaan atribut LDAP Anda ke atribut ZITADEL."
+        },
+        "AUTOFILL": {
+          "TITLE": "Isi otomatis data pengguna",
+          "DESCRIPTION": "Gunakan tindakan untuk meningkatkan pengalaman pengguna Anda. Anda dapat mengisi formulir pendaftaran ZITADEL terlebih dahulu dengan nilai dari penyedia identitas."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktifkan IdP",
+          "DESCRIPTION": "IdP Anda belum aktif. Aktifkan untuk memungkinkan pengguna Anda masuk."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Kompleksitas Kata Sandi",
+        "DESCRIPTION": "Pastikan pengguna Anda menggunakan kata sandi yang kuat dengan menentukan aturan kompleksitas."
+      },
+      "BRANDING": {
+        "TITLE": "merek",
+        "DESCRIPTION": "Sesuaikan tampilan dan nuansa formulir login Anda. Ingatlah untuk menerapkan konfigurasi Anda setelah selesai."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Tautan Eksternal",
+        "DESCRIPTION": "Pandu pengguna Anda ke sumber daya eksternal khusus yang ditampilkan di halaman login. Pengguna harus menerima Ketentuan Layanan dan Kebijakan Privasi sebelum mereka dapat mendaftar. Ubah tautan ke dokumentasi Anda atau setel string kosong untuk menyembunyikan tombol dokumentasi dari konsol. Tambahkan tautan eksternal khusus dan teks khusus untuk tautan tersebut di konsol, atau kosongkan untuk menyembunyikan tombol tersebut."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Pengaturan SMTP",
+        "DESCRIPTION": "Konfigurasikan server SMTP Anda untuk menggunakan domain untuk alamat pengirim yang diketahui dan dipercaya oleh pengguna Anda."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Pengaturan SMS",
+        "DESCRIPTION": "Untuk membuka kunci semua fitur ZITADEL, konfigurasikan Twilio untuk mengirim pesan SMS ke pengguna Anda."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Acara",
+        "DESCRIPTION": "Halaman ini menampilkan semua perubahan status di instans Anda hingga batas jejak audit instans Anda. Filter daftar berdasarkan rentang waktu untuk tujuan debugging atau filter berdasarkan agregat untuk tujuan audit."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Acara Gagal",
+        "DESCRIPTION": "Halaman ini menampilkan semua peristiwa yang gagal di instans Anda. Jika ZITADEL tidak berperilaku seperti yang Anda harapkan, selalu periksa daftar ini terlebih dahulu."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Tampilan",
+        "DESCRIPTION": "Halaman ini memperlihatkan semua tampilan database Anda dan kapan mereka memproses peristiwa terbarunya. Jika Anda melewatkan beberapa data, periksa apakah tampilannya sudah yang terbaru."
+      },
+      "LANGUAGES": {
+        "TITLE": "Bahasa",
+        "DESCRIPTION": "Batasi bahasa yang digunakan untuk menerjemahkan formulir login dan pesan notifikasi. Jika Anda ingin menonaktifkan beberapa bahasa, seret bahasa tersebut ke bagian Bahasa yang Tidak Diizinkan. Anda dapat menentukan bahasa yang diizinkan sebagai bahasa default. Jika bahasa pilihan pengguna tidak diperbolehkan, bahasa default akan digunakan."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Generator Rahasia",
+        "DESCRIPTION": "Tentukan kompleksitas dan masa hidup rahasia Anda. Kompleksitas dan masa pakai yang lebih tinggi akan meningkatkan keamanan, kompleksitas dan masa pakai yang lebih rendah akan meningkatkan kinerja dekripsi."
+      },
+      "SECURITY": {
+        "TITLE": "Pengaturan Keamanan",
+        "DESCRIPTION": "Aktifkan fitur ZITADEL yang dapat berdampak pada keamanan. Anda benar-benar harus mengetahui apa yang Anda lakukan sebelum mengubah pengaturan ini."
+      },
+      "OIDC": {
+        "TITLE": "Pengaturan Koneksi OpenID",
+        "DESCRIPTION": "Konfigurasikan masa pakai token OIDC Anda. Gunakan masa pakai yang lebih pendek untuk meningkatkan keamanan pengguna Anda, gunakan masa pakai yang lebih lama untuk meningkatkan kenyamanan pengguna Anda.",
+        "LABEL_HOURS": "Seumur Hidup Maksimum dalam hitungan jam",
+        "LABEL_DAYS": "Seumur Hidup Maksimum dalam beberapa hari",
+        "ACCESS_TOKEN": {
+          "TITLE": "Akses Token",
+          "DESCRIPTION": "Token akses digunakan untuk mengautentikasi pengguna. Ini adalah token berumur pendek yang digunakan untuk mengakses data pengguna. Gunakan masa pakai yang singkat untuk meminimalkan risiko akses tidak sah. Token akses dapat di-refresh secara otomatis menggunakan token refresh."
+        },
+        "ID_TOKEN": {
+          "TITLE": "Token Identitas",
+          "DESCRIPTION": "Token ID adalah JSON Web Token (JWT) yang berisi klaim tentang pengguna. Masa pakai token ID tidak boleh melebihi masa pakai token akses."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Segarkan Token",
+          "DESCRIPTION": "Token penyegaran digunakan untuk mendapatkan token akses baru. Ini adalah token berumur panjang yang digunakan untuk menyegarkan token akses. Pengguna harus mengautentikasi ulang secara manual ketika token penyegaran kedaluwarsa."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Token Penyegaran Menganggur",
+          "DESCRIPTION": "Masa pakai token penyegaran yang menganggur adalah waktu maksimum token penyegaran tidak dapat digunakan."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Teks Pesan",
+        "DESCRIPTION": "Sesuaikan teks email notifikasi atau pesan SMS Anda. Jika Anda ingin menonaktifkan beberapa bahasa, batasi bahasa tersebut di pengaturan bahasa instance Anda.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Saat Anda mengklaim domain untuk organisasi Anda, pengguna yang tidak menggunakan domain ini dalam nama loginnya akan diminta untuk mengubah nama loginnya agar sesuai dengan domain yang diklaim.",
+          "INIT": "Saat pengguna dibuat, mereka akan menerima email berisi tautan untuk menyetel kata sandinya.",
+          "PC": "Ketika pengguna mengubah kata sandinya, mereka akan menerima pemberitahuan tentang perubahan tersebut jika Anda telah mengaktifkannya di pengaturan pemberitahuan.",
+          "PL": "Saat pengguna menambahkan metode autentikasi tanpa kata sandi, mereka harus mengaktifkannya dengan mengeklik tautan di email.",
+          "PR": "Saat pengguna menyetel ulang kata sandinya, mereka akan menerima email berisi tautan untuk menyetel kata sandi baru.",
+          "VE": "Saat pengguna mengubah alamat emailnya, mereka akan menerima email berisi tautan untuk memverifikasi alamat baru.",
+          "VP": "Saat pengguna mengganti nomor teleponnya, mereka akan menerima SMS berisi kode untuk memverifikasi nomor baru.",
+          "VEO": "Ketika pengguna menambahkan Kata Sandi Sekali Pakai melalui metode email, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke alamat email mereka.",
+          "VSO": "Ketika pengguna menambahkan One-Time Password melalui metode SMS, mereka perlu mengaktifkannya dengan memasukkan kode yang dikirimkan ke nomor telepon mereka.",
+          "IU": "Ketika kode undangan pengguna dibuat, mereka akan menerima email dengan tautan untuk mengatur metode otentikasi mereka."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Teks Antarmuka Masuk",
+        "DESCRIPTION": "Sesuaikan teks formulir login Anda. Jika teks kosong, placeholder memperlihatkan nilai default. Jika Anda ingin menonaktifkan beberapa bahasa, batasi bahasa tersebut di pengaturan bahasa instance Anda."
+      },
+      "DOMAINS": {
+        "TITLE": "Pengaturan Domain",
+        "DESCRIPTION": "Tentukan batasan pada domain Anda dan konfigurasikan pola nama login Anda.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Wajibkan domain khusus untuk diverifikasi",
+          "DESCRIPTION": "Jika ini diaktifkan, domain organisasi harus diverifikasi sebelum dapat digunakan untuk penemuan domain atau akhiran nama pengguna."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Pola Nama Masuk",
+          "DESCRIPTION": "Kontrol pola nama login pengguna Anda. ZITADEL memilih organisasi pengguna Anda segera setelah mereka memasukkan nama login mereka. Oleh karena itu, nama login harus unik di semua organisasi. Jika Anda memiliki pengguna yang memiliki akun di beberapa domain, Anda dapat memastikan keunikan dengan menambahkan nama login Anda ke domain organisasi."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Verifikasi Domain",
+          "DESCRIPTION": "Hanya izinkan organisasi Anda menggunakan domain yang sebenarnya mereka kendalikan. Jika diaktifkan, domain organisasi diverifikasi secara berkala oleh tantangan DNS atau HTTP sebelum dapat digunakan. Ini adalah fitur keamanan untuk mencegah pembajakan domain."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Alamat Pengirim SMTP",
+          "DESCRIPTION": "Hanya izinkan alamat pengirim SMTP jika cocok dengan salah satu domain instans Anda."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Masa Masuk Seumur Hidup",
+          "DESCRIPTION": "Perkuat keamanan Anda dengan mengurangi masa pakai maksimum terkait login.",
+          "LABEL": "Seumur Hidup Maksimum dalam hitungan jam",
+          "PW_CHECK": {
+            "TITLE": "Pemeriksaan Kata Sandi",
+            "DESCRIPTION": "Pengguna akan diminta untuk mengautentikasi ulang kata sandi mereka setelah periode ini."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Pemeriksaan Login Eksternal",
+            "DESCRIPTION": "Pengguna Anda dialihkan ke penyedia identitas eksternal mereka pada periode ini."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Pemeriksaan Init Multifaktor",
+            "DESCRIPTION": "Pengguna Anda akan diminta untuk menyiapkan faktor kedua atau Multifaktor pada periode ini, jika mereka belum melakukannya. Seumur hidup 0 menonaktifkan prompt ini."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Pemeriksaan Faktor Kedua",
+            "DESCRIPTION": "Pengguna Anda harus memvalidasi ulang faktor kedua mereka dalam periode ini."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Pemeriksaan Multifaktor",
+            "DESCRIPTION": "Pengguna Anda harus memvalidasi ulang Multifaktor mereka pada periode ini."
+          }
+        },
+        "FORM": {
+          "TITLE": "Formulir Masuk",
+          "DESCRIPTION": "Sesuaikan formulir login.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Nama Pengguna dan Kata Sandi diperbolehkan",
+            "DESCRIPTION": "Izinkan pengguna Anda untuk masuk dengan nama pengguna dan kata sandi mereka. Jika ini dinonaktifkan, pengguna Anda hanya dapat masuk menggunakan autentikasi tanpa kata sandi atau dengan penyedia identitas eksternal."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Pendaftaran Pengguna diperbolehkan",
+            "DESCRIPTION": "Izinkan pengguna anonim untuk membuat akun."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Pendaftaran Organisasi diperbolehkan",
+            "DESCRIPTION": "Izinkan pengguna anonim membuat organisasi."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Login Eksternal diperbolehkan",
+            "DESCRIPTION": "Izinkan pengguna Anda untuk masuk dengan penyedia identitas eksternal alih-alih menggunakan pengguna ZITADEL untuk masuk."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Reset Kata Sandi disembunyikan",
+            "DESCRIPTION": "Jangan izinkan pengguna Anda menyetel ulang sandi mereka."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Penemuan Domain diperbolehkan",
+            "DESCRIPTION": "Temukan organisasi pengguna Anda bergantung pada nama login domain mereka, misalnya alamat email mereka."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Abaikan Nama Pengguna yang tidak dikenal",
+            "DESCRIPTION": "Jika diaktifkan, form login tidak akan menampilkan pesan error jika nama pengguna tidak diketahui. Ini membantu mencegah tebakan nama pengguna."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Nonaktifkan Login Email",
+            "DESCRIPTION": "Jika ini diaktifkan, pengguna Anda tidak dapat menggunakan alamat email mereka untuk login. Hati-hati jika Anda menonaktifkan ini, alamat email pengguna Anda harus unik di semua organisasi agar dapat login."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Nonaktifkan Login Telepon",
+            "DESCRIPTION": "Jika ini diaktifkan, pengguna Anda tidak dapat menggunakan nomor telepon mereka untuk login. Hati-hati jika Anda menonaktifkan ini, nomor telepon pengguna Anda harus unik di semua organisasi agar dapat login."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": { "PREVIOUS": "Sebelumnya", "NEXT": "Berikutnya", "COUNT": "Hasil Jumlah", "MORE": "Lagi" },
+  "FOOTER": {
+    "LINKS": { "CONTACT": "Kontak", "TOS": "Ketentuan Layanan", "PP": "Kebijakan Privasi" },
+    "THEME": { "DARK": "Gelap", "LIGHT": "Lampu" }
+  },
+  "HOME": {
+    "WELCOME": "Mulailah dengan ZITADEL",
+    "DISCLAIMER": "ZITADEL memperlakukan data Anda secara rahasia dan aman.",
+    "DISCLAIMERLINK": "Informasi lebih lanjut",
+    "DOCUMENTATION": { "DESCRIPTION": "Mulailah dengan ZITADEL dengan cepat." },
+    "GETSTARTED": { "DESCRIPTION": "Mulailah dengan ZITADEL dengan cepat." },
+    "QUICKSTARTS": { "LABEL": "Langkah Pertama", "DESCRIPTION": "Mulailah dengan ZITADEL dengan cepat." },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Jalan pintas",
+      "SETTINGS": "Pintasan yang tersedia",
+      "PROJECTS": "Proyek",
+      "REORDER": "Tahan dan seret ubin untuk memindahkannya",
+      "ADD": "Tahan dan seret ubin untuk ditambahkan"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Langkah Anda selanjutnya",
+    "MOREDESCRIPTION": "lebih banyak jalan pintas",
+    "COMPLETED": "selesai",
+    "DISMISS": "Tidak, terima kasih, saya seorang profesional.",
+    "CARD": {
+      "TITLE": "Jalankan ZITADEL Anda",
+      "DESCRIPTION": "Daftar periksa ini membantu menyiapkan instans Anda dan memandu Anda melalui langkah-langkah paling penting"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Siapkan merek Anda",
+        "description": "Tentukan warna dan bentuk login Anda dan unggah logo dan ikon Anda.",
+        "action": "Siapkan pencitraan merek"
+      },
+      "instance.smtp.config.added": {
+        "title": "Siapkan pengaturan SMTP Anda",
+        "description": "Tetapkan pengaturan server email Anda sendiri.",
+        "action": "Siapkan SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Buat proyek",
+        "description": "Tambahkan proyek dan tentukan peran dan otorisasinya.",
+        "action": "Buat proyek"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Daftarkan aplikasi Anda",
+        "description": "Daftarkan aplikasi web, asli, api, atau saml Anda dan siapkan alur autentikasi.",
+        "action": "Daftarkan aplikasi"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Masuk ke aplikasi Anda",
+        "description": "Integrasikan aplikasi Anda dengan ZITADEL untuk otentikasi dan uji dengan masuk menggunakan pengguna admin Anda.",
+        "action": "Masuk"
+      },
+      "user.human.added": {
+        "title": "Tambahkan pengguna",
+        "description": "Tambahkan pengguna aplikasi Anda",
+        "action": "Tambahkan pengguna"
+      },
+      "user.grant.added": {
+        "title": "Berikan pengguna",
+        "description": "Izinkan pengguna mengakses aplikasi Anda dan mengatur peran mereka.",
+        "action": "Berikan pengguna"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Pengaturan bawaan",
+    "DASHBOARD": "Rumah",
+    "PERSONAL_INFO": "Informasi Pribadi",
+    "DOCUMENTATION": "Dokumentasi",
+    "INSTANCEOVERVIEW": "Contoh",
+    "ORGS": "Organisasi",
+    "VIEWS": "Tampilan",
+    "EVENTS": "Acara",
+    "FAILEDEVENTS": "Acara Gagal",
+    "ORGANIZATION": "Organisasi",
+    "PROJECT": "Proyek",
+    "PROJECTOVERVIEW": "Ringkasan",
+    "PROJECTGRANTS": "Hibah",
+    "ROLES": "Peran",
+    "GRANTEDPROJECT": "Proyek yang Diberikan",
+    "HUMANUSERS": "Pengguna",
+    "MACHINEUSERS": "Pengguna Layanan",
+    "LOGOUT": "Logout Semua Pengguna",
+    "NEWORG": "Organisasi Baru",
+    "IAMADMIN": "Anda adalah Administrator IAM. Perhatikan bahwa Anda memiliki izin yang diperluas.",
+    "SHOWORGS": "Tampilkan Semua Organisasi",
+    "GRANTS": "Otorisasi",
+    "ACTIONS": "Tindakan",
+    "PRIVACY": "Pribadi",
+    "TOS": "Ketentuan Layanan",
+    "OPENSHORTCUTSTOOLTIP": "Jenis ? untuk menampilkan pintasan keyboard",
+    "SETTINGS": "Pengaturan",
+    "CUSTOMERPORTAL": "Portal Pelanggan"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integrasikan ZITADEL ke dalam aplikasi Anda",
+    "DESCRIPTION": "Integrasikan ZITADEL ke dalam aplikasi Anda atau gunakan salah satu sampel kami untuk memulai dalam hitungan menit.",
+    "BTN_START": "Buat Aplikasi",
+    "BTN_LEARNMORE": "Pelajari Lebih Lanjut",
+    "CREATEPROJECTFORAPP": "Buat Proyek {{value}}",
+    "SELECT_FRAMEWORK": "Pilih Kerangka",
+    "FRAMEWORK": "Kerangka",
+    "FRAMEWORK_OTHER": "Lainnya (OIDC, SAML, API)",
+    "ALMOSTDONE": "Anda hampir selesai.",
+    "REVIEWCONFIGURATION": "Tinjau Konfigurasi",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Kami telah membuat konfigurasi dasar untuk {{value}} aplikasi. Anda dapat menyesuaikan konfigurasi ini dengan kebutuhan Anda setelah pembuatan.",
+    "REDIRECTS": "Konfigurasikan pengalihan",
+    "DEVMODEWARN": "Mode Pengembang diaktifkan secara default. Anda dapat memperbarui nilai untuk produksi nanti.",
+    "GUIDE": "Memandu",
+    "BROWSEEXAMPLES": "Telusuri Contoh dan SDK",
+    "DUPLICATEAPPRENAME": "Aplikasi dengan nama yang sama sudah ada. Silakan pilih nama lain.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Ubah Kerangka",
+        "DESCRIPTION": "Pilih salah satu kerangka kerja yang tersedia untuk pengaturan cepat aplikasi Anda."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Tindakan",
+    "FILTER": "Menyaring",
+    "RENAME": "Ganti nama",
+    "SET": "Mengatur",
+    "COPY": "Salin ke Papan Klip",
+    "COPIED": "Disalin ke papan klip.",
+    "RESET": "Mengatur ulang",
+    "RESETDEFAULT": "Atur Ulang ke Default",
+    "RESETTO": "Setel ulang ke:",
+    "RESETCURRENT": "Setel ulang ke saat ini",
+    "SHOW": "Menunjukkan",
+    "HIDE": "Bersembunyi",
+    "SAVE": "Menyimpan",
+    "SAVENOW": "Simpan sekarang",
+    "NEW": "Baru",
+    "ADD": "Menambahkan",
+    "CREATE": "Membuat",
+    "CONTINUE": "Melanjutkan",
+    "CONTINUEWITH": "Lanjutkan dengan {{value}}",
+    "BACK": "Kembali",
+    "CLOSE": "Menutup",
+    "CLEAR": "Jernih",
+    "CANCEL": "Membatalkan",
+    "INFO": "Informasi",
+    "OK": "OKE",
+    "SELECT": "Memilih",
+    "VIEW": "Menunjukkan",
+    "SELECTIONDELETE": "Hapus pilihan",
+    "DELETE": "Menghapus",
+    "REMOVE": "Menghapus",
+    "VERIFY": "Memeriksa",
+    "FINISH": "Menyelesaikan",
+    "FINISHED": "Menutup",
+    "CHANGE": "Mengubah",
+    "REACTIVATE": "Mengaktifkan kembali",
+    "ACTIVATE": "Mengaktifkan",
+    "DEACTIVATE": "Menonaktifkan",
+    "REFRESH": "Menyegarkan",
+    "LOGIN": "Login",
+    "EDIT": "Sunting",
+    "PIN": "Sematkan / Lepas sematan",
+    "CONFIGURE": "Konfigurasikan",
+    "SEND": "Mengirim",
+    "NEWVALUE": "Nilai Baru",
+    "RESTORE": "Memulihkan",
+    "CONTINUEWITHOUTSAVE": "Lanjutkan tanpa menyimpan",
+    "OF": "dari",
+    "PREVIOUS": "Sebelumnya",
+    "NEXT": "Berikutnya",
+    "MORE": "lagi",
+    "STEP": "Melangkah",
+    "SETUP": "Pengaturan",
+    "TEST": "Tes",
+    "UNSAVEDCHANGES": "Perubahan yang belum disimpan",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Apakah Anda yakin ingin membuang tindakan baru ini? Tindakan Anda akan hilang",
+        "CANCEL": "Membatalkan",
+        "DISCARD": "Membuang"
+      }
+    },
+    "TABLE": { "SHOWUSER": "Tampilkan pengguna {{value}}" },
+    "DOWNLOAD": "Unduh",
+    "APPLY": "Menerapkan"
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Memiliki kendali atas seluruh instansi, termasuk semua organisasi",
+    "IAM_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh instansi, termasuk semua organisasi",
+    "IAM_ORG_MANAGER": "Memiliki izin untuk membuat dan mengelola organisasi",
+    "IAM_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna",
+    "IAM_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari semua organisasi",
+    "IAM_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari semua organisasi",
+    "ORG_OWNER": "Memiliki izin atas seluruh organisasi",
+    "ORG_USER_MANAGER": "Memiliki izin untuk membuat dan mengelola pengguna organisasi",
+    "ORG_OWNER_VIEWER": "Memiliki izin untuk meninjau seluruh organisasi",
+    "ORG_USER_PERMISSION_EDITOR": "Memiliki izin untuk mengelola izin pengguna",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Memiliki izin untuk mengelola hibah proyek",
+    "ORG_PROJECT_CREATOR": "Memiliki izin untuk membuat proyeknya sendiri dan pengaturan yang mendasarinya",
+    "ORG_ADMIN_IMPERSONATOR": "Memiliki izin untuk menyamar sebagai admin dan pengguna akhir dari organisasi",
+    "ORG_END_USER_IMPERSONATOR": "Memiliki izin untuk meniru identitas pengguna akhir dari organisasi",
+    "PROJECT_OWNER": "Memiliki izin atas keseluruhan proyek",
+    "PROJECT_OWNER_VIEWER": "Memiliki izin untuk meninjau keseluruhan proyek",
+    "PROJECT_OWNER_GLOBAL": "Memiliki izin atas keseluruhan proyek",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Memiliki izin untuk meninjau keseluruhan proyek",
+    "PROJECT_GRANT_OWNER": "Memiliki izin untuk mengelola hibah proyek",
+    "PROJECT_GRANT_OWNER_VIEWER": "Memiliki izin untuk meninjau hibah proyek"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Semua pengaturan organisasi dan tabel di konsol didasarkan pada organisasi yang dipilih. Klik tombol ini untuk berpindah organisasi atau membuat organisasi baru."
+    },
+    "INSTANCE": {
+      "TEXT": "Klik di sini untuk mendapatkan pengaturan default. Perhatikan bahwa Anda hanya memiliki akses ke tombol ini jika Anda memiliki izin yang ditingkatkan."
+    },
+    "PROFILE": { "TEXT": "Di sini Anda dapat beralih antar akun pengguna dan mengelola sesi dan profil Anda." },
+    "NAV": { "TEXT": "Navigasi ini berubah berdasarkan organisasi yang Anda pilih di atas atau instans Anda" },
+    "CONTEXTCHANGED": { "TEXT": "Konteks organisasi telah berubah." },
+    "SWITCHEDTOINSTANCE": { "TEXT": "Tampilannya baru saja berubah menjadi contoh!" }
+  },
+  "FILTER": {
+    "TITLE": "Menyaring",
+    "STATE": "Status",
+    "DISPLAYNAME": "Nama Tampilan Pengguna",
+    "EMAIL": "E-mail",
+    "USERNAME": "Nama belakang",
+    "ORGNAME": "Nama Organisasi",
+    "PRIMARYDOMAIN": "Domain Utama",
+    "PROJECTNAME": "Nama Proyek",
+    "RESOURCEOWNER": "Pemilik Sumber Daya",
+    "METHODS": { "1": "sama", "5": "berisi", "7": "berakhir dengan" }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Pintasan Papan Ketik",
+    "UNDERORGCONTEXT": "Dalam halaman organisasi",
+    "SIDEWIDE": "Pintasan seluruh situs",
+    "SHORTCUTS": {
+      "HOME": "<strong>Pergi</strong>ke <strong>H</strong>ome",
+      "INSTANCE": "<strong>G</strong>ke <strong>I</strong>contoh",
+      "ORG": "<strong>G</strong>ke <strong>O</strong>organisasi",
+      "ORGSETTINGS": "<strong>Buka</strong>pengaturan <strong>S</strong>Organisasi",
+      "ORGSWITCHER": "Ubah Organisasi",
+      "ME": "Buka profil sendiri",
+      "PROJECTS": "<strong>Buka</strong>ke <strong>P</strong>proyek",
+      "USERS": "<strong>G</strong>ke <strong>U</strong>ser",
+      "USERGRANTS": "<strong>Lakukan <strong>A</strong>otorisasi",
+      "ACTIONS": "<strong>G</strong>ke Tindakan dan <strong>F</strong>terendah",
+      "DOMAINS": "<strong>Pergi</strong>ke <strong>D</strong>omain"
+    }
+  },
+  "RESOURCEID": "Id Sumber Daya",
+  "NAME": "Nama",
+  "VERSION": "Versi",
+  "TABLE": { "NOROWS": "Tidak ada data" },
+  "ERRORS": {
+    "REQUIRED": "Silakan isi kolom ini.",
+    "ATLEASTONE": "Berikan setidaknya satu nilai.",
+    "TOKENINVALID": {
+      "TITLE": "Token otorisasi Anda telah kedaluwarsa.",
+      "DESCRIPTION": "Klik tombol di bawah untuk login kembali."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Instance Anda diblokir.",
+      "DESCRIPTION": "Minta administrator instans ZITADEL Anda untuk memperbarui langganan."
+    },
+    "INVALID_FORMAT": "Pemformatannya tidak valid.",
+    "NOTANEMAIL": "Nilai yang diberikan bukan alamat email.",
+    "MINLENGTH": "Panjangnya minimal harus {{requiredLength}} karakter.",
+    "MAXLENGTH": "Harus kurang dari {{requiredLength}} karakter.",
+    "UPPERCASEMISSING": "Harus menyertakan huruf besar.",
+    "LOWERCASEMISSING": "Harus menyertakan huruf kecil.",
+    "SYMBOLERROR": "Harus menyertakan simbol atau tanda baca.",
+    "NUMBERERROR": "Harus menyertakan angka.",
+    "PWNOTEQUAL": "Kata sandi yang diberikan tidak cocok.",
+    "PHONE": "Nomor telepon harus dimulai dengan +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Pengaturan",
+      "GENERAL": "Umum",
+      "IDP": "Penyedia Identitas",
+      "SECURITY": "Kata Sandi dan Keamanan",
+      "KEYS": "Kunci",
+      "PAT": "Token Akses Pribadi",
+      "USERGRANTS": "Otorisasi",
+      "MEMBERSHIPS": "Keanggotaan",
+      "METADATA": "Metadata"
+    },
+    "TITLE": "Informasi Pribadi",
+    "DESCRIPTION": "Kelola informasi dan pengaturan keamanan Anda.",
+    "PAGES": {
+      "TITLE": "Pengguna",
+      "DETAIL": "Detil",
+      "CREATE": "Membuat",
+      "MY": "Informasi Saya",
+      "LOGINNAMES": "Nama masuk",
+      "LOGINMETHODS": "Metode masuk",
+      "LOGINNAMESDESC": "Ini adalah nama login Anda:",
+      "NOUSER": "Tidak ada pengguna yang terkait.",
+      "REACTIVATE": "Mengaktifkan kembali",
+      "DEACTIVATE": "Menonaktifkan",
+      "FILTER": "Menyaring",
+      "STATE": "Status",
+      "DELETE": "Hapus Pengguna",
+      "UNLOCK": "Buka Kunci Pengguna",
+      "GENERATESECRET": "Hasilkan Rahasia Klien",
+      "REMOVESECRET": "Hapus Rahasia Klien",
+      "LOCKEDDESCRIPTION": "Pengguna ini telah dikunci karena melebihi upaya login maksimum dan harus dibuka kuncinya agar dapat digunakan kembali.",
+      "DELETEACCOUNT": "Hapus Akun",
+      "DELETEACCOUNT_DESC": "Jika Anda melakukan tindakan ini, Anda akan keluar dan tidak lagi memiliki akses ke akun Anda. Tindakan ini tidak dapat dibatalkan, jadi lanjutkan dengan hati-hati.",
+      "DELETEACCOUNT_BTN": "Hapus Akun",
+      "DELETEACCOUNT_SUCCESS": "Akun berhasil dihapus!"
+    },
+    "DETAILS": { "DATECREATED": "Dibuat", "DATECHANGED": "Berubah" },
+    "DIALOG": {
+      "DELETE_TITLE": "Hapus Pengguna",
+      "DELETE_SELF_TITLE": "Hapus Akun",
+      "DELETE_DESCRIPTION": "Anda akan menghapus pengguna secara permanen. Apa kamu yakin?",
+      "DELETE_SELF_DESCRIPTION": "Anda akan menghapus akun pribadi Anda secara permanen. Ini akan mengeluarkan Anda dan menghapus pengguna Anda. Tindakan ini tidak dapat dibatalkan!",
+      "DELETE_AUTH_DESCRIPTION": "Anda akan menghapus akun pribadi Anda secara permanen. Apa kamu yakin?",
+      "TYPEUSERNAME": "Ketik '{{value}}', untuk mengonfirmasi dan menghapus pengguna.",
+      "USERNAME": "Nama login",
+      "DELETE_BTN": "Hapus secara permanen"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Kirim Pemberitahuan Email",
+      "DESCRIPTION": "Klik tombol di bawah untuk mengirim pemberitahuan ke alamat email saat ini atau mengubah alamat email di kolom isian.",
+      "NEWEMAIL": "Alamat email baru"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Rahasia Klien",
+      "CLIENTSECRET_DESCRIPTION": "Jaga rahasia klien Anda di tempat yang aman karena akan hilang setelah dialog ditutup."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Menonaktifkan",
+      "ACTIVATE": "Mengaktifkan",
+      "CHANGEDATE": "Terakhir Dimodifikasi",
+      "CREATIONDATE": "Dibuat Pada",
+      "FILTER": {
+        "0": "Filter untuk Nama Tampilan",
+        "1": "Filter untuk Nama Pengguna",
+        "2": "filter untuk Nama Tampilan",
+        "3": "filter untuk Nama Pengguna",
+        "4": "filter untuk Email",
+        "5": "filter untuk Nama Tampilan",
+        "10": "filter untuk nama organisasi",
+        "12": "filter untuk nama proyek"
+      },
+      "EMPTY": "Tidak ada entri"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Kirim tautan pendaftaran",
+      "TABLETYPE": "Jenis",
+      "TABLESTATE": "Status",
+      "NAME": "Nama",
+      "EMPTY": "Tidak ada perangkat yang disetel",
+      "TITLE": "Otentikasi Tanpa Kata Sandi",
+      "DESCRIPTION": "Tambahkan Metode Otentikasi berbasis WebAuthn untuk masuk ke ZITADEL tanpa kata sandi.",
+      "MANAGE_DESCRIPTION": "Kelola metode faktor kedua pengguna Anda.",
+      "U2F": "Tambahkan metode",
+      "U2F_DIALOG_TITLE": "Verifikasi pengautentikasi",
+      "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Login tanpa kata sandi yang Anda gunakan",
+      "U2F_SUCCESS": "Auth Tanpa Kata Sandi berhasil dibuat!",
+      "U2F_ERROR": "Terjadi kesalahan saat penyiapan!",
+      "U2F_NAME": "Nama Pengautentikasi",
+      "TYPE": {
+        "0": "Tidak ada MFA yang ditentukan",
+        "1": "Kata Sandi Satu Kali (OTP)",
+        "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya"
+      },
+      "STATE": { "0": "Tidak ada negara bagian", "1": "Belum Siap", "2": "Siap", "3": "Dihapus" },
+      "DIALOG": {
+        "DELETE_TITLE": "Hapus Metode Otentikasi Tanpa Kata Sandi",
+        "DELETE_DESCRIPTION": "Anda akan menghapus metode Otentikasi tanpa kata sandi. Apa kamu yakin?",
+        "ADD_TITLE": "Otentikasi Tanpa Kata Sandi",
+        "ADD_DESCRIPTION": "Pilih salah satu opsi yang tersedia untuk membuat metode autentikasi tanpa kata sandi.",
+        "SEND_DESCRIPTION": "Kirimkan sendiri tautan pendaftaran ke alamat email Anda.",
+        "SEND": "Kirim tautan pendaftaran",
+        "SENT": "Email berhasil terkirim. Periksa kotak surat Anda untuk melanjutkan pengaturan.",
+        "QRCODE_DESCRIPTION": "Hasilkan kode QR untuk dipindai dengan perangkat lain.",
+        "QRCODE": "Hasilkan kode QR",
+        "QRCODE_SCAN": "Pindai kode QR ini untuk melanjutkan penyiapan di perangkat Anda.",
+        "NEW_DESCRIPTION": "Gunakan perangkat ini untuk mengatur Tanpa Kata Sandi.",
+        "NEW": "Tambahkan Baru"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Jenis",
+      "TABLESTATE": "Status",
+      "NAME": "Nama",
+      "EMPTY": "Tidak ada faktor tambahan",
+      "TITLE": "Otentikasi Multifaktor",
+      "DESCRIPTION": "Tambahkan faktor kedua untuk memastikan keamanan optimal untuk akun Anda.",
+      "MANAGE_DESCRIPTION": "Kelola metode faktor kedua pengguna Anda.",
+      "ADD": "Tambahkan Faktor",
+      "OTP": "Aplikasi Authenticator untuk TOTP (Kata Sandi Sekali Pakai Berbasis Waktu)",
+      "OTP_DIALOG_TITLE": "Tambahkan OTP",
+      "OTP_DIALOG_DESCRIPTION": "Pindai kode QR dengan aplikasi autentikator dan masukkan kode di bawah ini untuk memverifikasi dan mengaktifkan metode OTP.",
+      "U2F": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya",
+      "U2F_DIALOG_TITLE": "Verifikasi Faktor",
+      "U2F_DIALOG_DESCRIPTION": "Masukkan nama untuk Multifaktor universal yang Anda gunakan.",
+      "U2F_SUCCESS": "Faktor berhasil ditambahkan!",
+      "U2F_ERROR": "Terjadi kesalahan saat penyiapan!",
+      "U2F_NAME": "Nama Pengautentikasi",
+      "OTPSMS": "OTP (Kata Sandi Sekali Pakai) dengan SMS",
+      "OTPEMAIL": "OTP (Kata Sandi Sekali Pakai) dengan Email",
+      "SETUPOTPSMSDESCRIPTION": "Apakah Anda ingin mengatur nomor telepon ini sebagai faktor kedua OTP (One-Time password)?",
+      "OTPSMSSUCCESS": "Faktor OTP diatur dengan sukses.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Ponsel Anda harus diverifikasi untuk menggunakan metode ini.",
+      "OTPEMAILSUCCESS": "Faktor OTP diatur dengan sukses.",
+      "TYPE": {
+        "0": "Tidak ada MFA yang ditentukan",
+        "1": "Kata Sandi Satu Kali (OTP)",
+        "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya"
+      },
+      "STATE": { "0": "Tidak ada negara bagian", "1": "Belum Siap", "2": "Siap", "3": "Dihapus" },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Hapus Faktor Kedua",
+        "MFA_DELETE_DESCRIPTION": "Anda akan menghapus faktor kedua. Apa kamu yakin?",
+        "ADD_MFA_TITLE": "Tambahkan Faktor Kedua",
+        "ADD_MFA_DESCRIPTION": "Pilih salah satu opsi berikut."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Penyedia Identitas Eksternal",
+      "DESC": "",
+      "IDPCONFIGID": "ID Konfigurasi IDP",
+      "IDPNAME": "Nama Pengungsi",
+      "USERDISPLAYNAME": "Nama Eksternal",
+      "EXTERNALUSERID": "ID Pengguna Eksternal",
+      "EMPTY": "Tidak ditemukan IDP eksternal",
+      "DIALOG": {
+        "DELETE_TITLE": "Hapus IDP",
+        "DELETE_DESCRIPTION": "Anda akan menghapus Penyedia Identitas dari pengguna. Apakah Anda benar-benar ingin melanjutkan?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Buat Pengguna Baru",
+      "DESCRIPTION": "Harap berikan informasi yang diperlukan.",
+      "NAMEANDEMAILSECTION": "Nama dan Email",
+      "GENDERLANGSECTION": "Gender dan Bahasa",
+      "PHONESECTION": "Nomor telepon",
+      "PASSWORDSECTION": "Kata Sandi Awal",
+      "ADDRESSANDPHONESECTION": "Nomor telepon",
+      "INITMAILDESCRIPTION": "Jika kedua opsi dipilih, tidak ada email untuk inisialisasi yang akan dikirim. Jika hanya salah satu opsi yang dipilih, email untuk menyediakan/memverifikasi data akan dikirim."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Verifikasi Nomor Telepon",
+      "DESCRIPTION": "Masukkan kode yang Anda terima melalui pesan teks untuk memverifikasi nomor telepon Anda.",
+      "CODE": "Kode"
+    },
+    "DATA": {
+      "STATE": "Status",
+      "STATE0": "Tidak dikenal",
+      "STATE1": "Aktif",
+      "STATE2": "Tidak aktif",
+      "STATE3": "Dihapus",
+      "STATE4": "Terkunci",
+      "STATE5": "Tergantung",
+      "STATE6": "Awal"
+    },
+    "PROFILE": {
+      "TITLE": "Profil",
+      "EMAIL": "E-mail",
+      "PHONE": "Nomor telepon",
+      "PHONE_HINT": "Gunakan simbol + diikuti dengan kode negara pemanggil, atau pilih negara dari dropdown dan terakhir masukkan nomor telepon",
+      "USERNAME": "Nama belakang",
+      "CHANGEUSERNAME": "memodifikasi",
+      "CHANGEUSERNAME_TITLE": "Ubah nama pengguna",
+      "CHANGEUSERNAME_DESC": "Masukkan nama baru pada kolom di bawah.",
+      "FIRSTNAME": "Nama Pemberian",
+      "LASTNAME": "Nama keluarga",
+      "NICKNAME": "Nama panggilan",
+      "DISPLAYNAME": "Nama Tampilan",
+      "PREFERREDLOGINNAME": "Nama login pilihan",
+      "PREFERRED_LANGUAGE": "Bahasa",
+      "GENDER": "Jenis kelamin",
+      "PASSWORD": "Kata sandi",
+      "AVATAR": {
+        "UPLOADTITLE": "Unggah Gambar Profil Anda",
+        "UPLOADBTN": "Pilih berkas",
+        "UPLOAD": "Mengunggah",
+        "CURRENT": "Gambar Saat Ini",
+        "PREVIEW": "Pratinjau",
+        "DELETESUCCESS": "Berhasil dihapus!",
+        "CROPPERERROR": "Terjadi kesalahan saat mengunggah file Anda. Coba format dan ukuran lain jika perlu."
+      },
+      "COUNTRY": "Negara"
+    },
+    "MACHINE": {
+      "TITLE": "Detail Pengguna Layanan",
+      "USERNAME": "Nama belakang",
+      "NAME": "Nama",
+      "DESCRIPTION": "Keterangan",
+      "KEYSTITLE": "Kunci",
+      "KEYSDESC": "Tentukan kunci Anda dan tambahkan tanggal kedaluwarsa opsional.",
+      "TOKENSTITLE": "Token Akses Pribadi",
+      "TOKENSDESC": "Token akses pribadi berfungsi seperti token akses OAuth biasa.",
+      "ID": "ID Kunci",
+      "TYPE": "Jenis",
+      "EXPIRATIONDATE": "Kedaluwarsa",
+      "CHOOSEDATEAFTER": "Masukkan masa berlaku yang valid setelahnya",
+      "CHOOSEEXPIRY": "Pilih tanggal kedaluwarsa",
+      "CREATIONDATE": "Tanggal Pembuatan",
+      "KEYDETAILS": "Detail Utama",
+      "ACCESSTOKENTYPE": "Akses Jenis Token",
+      "ACCESSTOKENTYPES": { "0": "Pembawa", "1": "JWT" },
+      "ADD": { "TITLE": "Tambahkan Kunci", "DESCRIPTION": "Pilih jenis kunci Anda dan pilih tanggal kedaluwarsa opsional." },
+      "ADDED": {
+        "TITLE": "Kuncinya telah dibuat",
+        "DESCRIPTION": "Unduh kuncinya karena kuncinya tidak akan terlihat setelah menutup dialog ini!"
+      },
+      "KEYTYPES": { "1": "JSON" },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Hapus Kunci",
+          "DESCRIPTION": "Apakah Anda ingin menghapus kunci yang dipilih? Hal ini tidak dapat dibatalkan."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Kata sandi",
+      "LABEL": "Kata sandi yang aman membantu melindungi akun",
+      "DESCRIPTION": "Masukkan kata sandi baru sesuai dengan kebijakan di bawah ini.",
+      "OLD": "Kata Sandi Saat Ini",
+      "NEW": "Kata Sandi Baru",
+      "CONFIRM": "Konfirmasi Kata Sandi Baru",
+      "NEWINITIAL": "Kata sandi",
+      "CONFIRMINITIAL": "Konfirmasi Kata Sandi",
+      "RESET": "Atur Ulang Kata Sandi Saat Ini",
+      "SET": "Tetapkan Kata Sandi Baru",
+      "RESENDNOTIFICATION": "Kirim Tautan Reset Kata Sandi",
+      "REQUIRED": "Beberapa bidang wajib diisi tidak ada.",
+      "MINLENGTHERROR": "Panjangnya minimal harus {{value}} karakter.",
+      "MAXLENGTHERROR": "Harus kurang dari {{value}} karakter."
+    },
+    "ID": "PENGENAL",
+    "EMAIL": "E-mail",
+    "PHONE": "Nomor telepon",
+    "PHONEEMPTY": "Tidak ada nomor telepon yang ditentukan",
+    "PHONEVERIFIED": "Nomor telepon terverifikasi.",
+    "EMAILVERIFIED": "Email terverifikasi",
+    "NOTVERIFIED": "tidak diverifikasi",
+    "PREFERRED_LOGINNAME": "Nama Login Pilihan",
+    "ISINITIAL": "Pengguna belum aktif.",
+    "LOGINMETHODS": {
+      "TITLE": "Informasi Kontak",
+      "DESCRIPTION": "Informasi yang diberikan digunakan untuk mengirimkan informasi penting, seperti email pengaturan ulang kata sandi kepada Anda.",
+      "EMAIL": {
+        "TITLE": "E-mail",
+        "VALID": "divalidasi",
+        "ISVERIFIED": "Email Terverifikasi",
+        "ISVERIFIEDDESC": "Jika email terindikasi terverifikasi, tidak ada permintaan verifikasi email yang akan dilakukan.",
+        "RESEND": "Kirim Ulang Email Verifikasi",
+        "EDITTITLE": "Ubah Email",
+        "EDITDESC": "Masukkan email baru pada kolom di bawah ini."
+      },
+      "PHONE": {
+        "TITLE": "Telepon",
+        "VALID": "divalidasi",
+        "RESEND": "Kirim Ulang Pesan Teks Verifikasi",
+        "EDITTITLE": "Ganti nomor",
+        "EDITVALUE": "Nomor telepon",
+        "EDITDESC": "Masukkan nomor telepon baru pada kolom di bawah.",
+        "DELETETITLE": "Hapus nomor telepon",
+        "DELETEDESC": "Apakah Anda benar-benar ingin menghapus nomor telepon tersebut",
+        "OTPSMSREMOVALWARNING": "Akun ini menggunakan nomor telepon ini sebagai faktor kedua. Anda tidak akan dapat menggunakannya setelah melanjutkan."
+      },
+      "RESENDCODE": "Kirim Ulang Kode",
+      "ENTERCODE": "Memeriksa",
+      "ENTERCODE_DESC": "Verifikasi Kode"
+    },
+    "GRANTS": {
+      "TITLE": "Hibah Pengguna",
+      "DESCRIPTION": "Berikan pengguna ini akses ke proyek tertentu",
+      "CREATE": { "TITLE": "Buat Hibah Pengguna", "DESCRIPTION": "Cari organisasi, proyek, dan peran proyek terkait." },
+      "PROJECTNAME": "Nama Proyek",
+      "PROJECT-OWNED": "Proyek",
+      "PROJECT-GRANTED": "Proyek yang diberikan",
+      "FILTER": {
+        "0": "filter untuk pengguna",
+        "1": "filter untuk domain",
+        "2": "filter untuk nama proyek",
+        "3": "filter untuk nama peran"
+      }
+    },
+    "STATE": {
+      "0": "Tidak dikenal",
+      "1": "Aktif",
+      "2": "Tidak aktif",
+      "3": "Dihapus",
+      "4": "Terkunci",
+      "5": "Tergantung",
+      "6": "Awal"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Nama login (organisasi saat ini)",
+      "ADDITIONAL-EXTERNAL": "Nama login (organisasi eksternal)"
+    },
+    "TARGET": {
+      "SELF": "Jika Anda ingin memberikan pengguna dari organisasi lain",
+      "EXTERNAL": "Untuk memberikan pengguna organisasi Anda",
+      "CLICKHERE": "klik disini"
+    },
+    "SIGNEDOUT": "Anda sudah keluar. Klik tombol \"Masuk\" untuk masuk lagi.",
+    "SIGNEDOUT_BTN": "Masuk",
+    "EDITACCOUNT": "Sunting Akun",
+    "ADDACCOUNT": "Masuk Dengan Akun Lain",
+    "RESENDINITIALEMAIL": "Kirim ulang email aktivasi",
+    "RESENDEMAILNOTIFICATION": "Kirim ulang pemberitahuan Email",
+    "TOAST": {
+      "CREATED": "Pengguna berhasil dibuat.",
+      "SAVED": "Profil berhasil disimpan.",
+      "USERNAMECHANGED": "Nama pengguna diubah.",
+      "EMAILSAVED": "Email berhasil disimpan.",
+      "INITEMAILSENT": "Email inisialisasi terkirim.",
+      "PHONESAVED": "Ponsel berhasil disimpan.",
+      "PHONEREMOVED": "Telepon telah dihapus.",
+      "PHONEVERIFIED": "Telepon berhasil diverifikasi.",
+      "PHONEVERIFICATIONSENT": "Kode verifikasi telepon terkirim.",
+      "EMAILVERIFICATIONSENT": "Kode verifikasi email terkirim.",
+      "OTPREMOVED": "OTP dihapus.",
+      "U2FREMOVED": "Faktor dihilangkan.",
+      "PASSWORDLESSREMOVED": "Tanpa kata sandi dihapus.",
+      "INITIALPASSWORDSET": "Kata sandi awal ditetapkan.",
+      "PASSWORDNOTIFICATIONSENT": "Pemberitahuan perubahan kata sandi terkirim.",
+      "PASSWORDCHANGED": "Kata sandi berhasil diubah.",
+      "REACTIVATED": "Pengguna diaktifkan kembali.",
+      "DEACTIVATED": "Pengguna dinonaktifkan.",
+      "SELECTEDREACTIVATED": "Pengguna terpilih diaktifkan kembali.",
+      "SELECTEDDEACTIVATED": "Pengguna terpilih dinonaktifkan.",
+      "SELECTEDKEYSDELETED": "Kunci yang dipilih dihapus.",
+      "KEYADDED": "Kunci ditambahkan!",
+      "MACHINEADDED": "Pengguna Layanan dibuat!",
+      "DELETED": "Pengguna berhasil dihapus!",
+      "UNLOCKED": "Pengguna berhasil membuka kuncinya!",
+      "PASSWORDLESSREGISTRATIONSENT": "Tautan Pendaftaran berhasil dikirim.",
+      "SECRETGENERATED": "Rahasia berhasil dihasilkan!",
+      "SECRETREMOVED": "Rahasia berhasil dihapus!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Peran Manajer ZITADEL",
+      "DESCRIPTION": "Ini semua adalah hibah anggota dari pengguna. Anda juga dapat memodifikasinya di halaman detail organisasi, proyek, atau IAM.",
+      "ORGCONTEXT": "Anda melihat semua organisasi dan proyek yang terkait dengan organisasi yang dipilih saat ini.",
+      "USERCONTEXT": "Anda melihat semua organisasi dan proyek yang Anda izinkan. Termasuk organisasi lain.",
+      "CREATIONDATE": "Tanggal Pembuatan",
+      "CHANGEDATE": "Terakhir Dimodifikasi",
+      "DISPLAYNAME": "Nama Tampilan",
+      "REMOVE": "Menghapus",
+      "TYPE": "Jenis",
+      "ORGID": "ID Organisasi",
+      "UPDATED": "Keanggotaan telah diperbarui.",
+      "NOPERMISSIONTOEDIT": "Anda kehilangan izin yang diperlukan untuk mengedit peran!",
+      "TYPES": {
+        "UNKNOWN": "Tidak dikenal",
+        "ORG": "Organisasi",
+        "PROJECT": "Proyek",
+        "GRANTEDPROJECT": "Proyek yang Diberikan"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "PENGENAL",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Hasilkan Token Akses Pribadi baru",
+        "DESCRIPTION": "Tentukan masa berlaku khusus untuk token.",
+        "CHOOSEEXPIRY": "Pilih tanggal kedaluwarsa",
+        "CHOOSEDATEAFTER": "Masukkan masa berlaku yang valid setelahnya"
+      },
+      "ADDED": {
+        "TITLE": "Token Akses Pribadi",
+        "DESCRIPTION": "Pastikan untuk menyalin token akses pribadi Anda. Anda tidak akan dapat melihatnya lagi!"
+      },
+      "DELETE": { "TITLE": "Hapus Token", "DESCRIPTION": "Anda akan menghapus token akses pribadi. Apa kamu yakin?" },
+      "DELETED": "Token berhasil dihapus."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "KEY": "Kunci",
+    "VALUE": "Nilai",
+    "ADD": "Entri Baru",
+    "SAVE": "Menyimpan",
+    "EMPTY": "Tidak ada metadata",
+    "SETSUCCESS": "Elemen berhasil disimpan",
+    "REMOVESUCCESS": "Elemen berhasil dihapus"
+  },
+  "FLOWS": {
+    "ID": "PENGENAL",
+    "NAME": "Nama",
+    "STATE": "Negara",
+    "STATES": { "0": "tidak ada status", "1": "tidak aktif", "2": "aktif" },
+    "ADDTRIGGER": "Tambahkan pemicu",
+    "FLOWCHANGED": "Aliran berhasil diubah",
+    "FLOWCLEARED": "Aliran berhasil diatur ulang",
+    "TIMEOUT": "Batas waktu",
+    "TIMEOUTINSEC": "Batas waktu dalam hitungan detik",
+    "ALLOWEDTOFAIL": "Diizinkan Gagal",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Peringatan",
+      "DESCRIPTION": "Jika Anda menonaktifkan setelan ini, hal ini dapat menyebabkan pengguna di organisasi Anda tidak dapat masuk. Selain itu, Anda tidak lagi dapat mengakses konsol untuk menonaktifkan tindakan tersebut. Kami menyarankan untuk membuat pengguna administrator di organisasi terpisah atau menguji skrip terlebih dahulu di lingkungan pengembangan atau organisasi pengembangan."
+    },
+    "SCRIPT": "Naskah",
+    "FLOWTYPE": "Tipe Aliran",
+    "TRIGGERTYPE": "Jenis Pemicu",
+    "ACTIONS": "Tindakan",
+    "ACTIONSMAX": "Berdasarkan Tingkatan Anda, Anda memiliki Jumlah Tindakan yang terbatas ({{value}}). Pastikan untuk menonaktifkan layanan yang tidak Anda perlukan atau pertimbangkan untuk meningkatkan tingkatan Anda.",
+    "DIALOG": {
+      "ADD": { "TITLE": "Buat Tindakan" },
+      "UPDATE": { "TITLE": "Perbarui Tindakan" },
+      "DELETEACTION": {
+        "TITLE": "Hapus Tindakan?",
+        "DESCRIPTION": "Anda akan menghapus suatu tindakan. Hal ini tidak dapat dikembalikan. Apa kamu yakin?",
+        "DELETE_SUCCESS": "Tindakan berhasil dihapus."
+      },
+      "CLEAR": {
+        "TITLE": "Aliran yang jelas?",
+        "DESCRIPTION": "Anda akan mengatur ulang aliran beserta pemicu dan tindakannya. Perubahan ini tidak dapat dipulihkan. Apa kamu yakin?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Hapus Tindakan yang dipilih?",
+        "DESCRIPTION": "Apakah Anda yakin ingin menghapus tindakan yang dipilih dari alur?"
+      },
+      "ABOUTNAME": "Nama aksi dan nama fungsi di javascript harus sama"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Tindakan ditetapkan",
+      "ACTIONREACTIVATED": "Tindakan diaktifkan kembali dengan sukses",
+      "ACTIONDEACTIVATED": "Tindakan dinonaktifkan dengan sukses"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Kebijakan Sistem dan Pengaturan Akses",
+      "DESCRIPTION": "Kelola Kebijakan global dan Pengaturan Akses Manajemen Anda."
+    },
+    "EVENTSTORE": {
+      "TITLE": "Administrasi Penyimpanan IAM",
+      "DESCRIPTION": "Kelola tampilan ZITADEL Anda dan acara yang gagal."
+    },
+    "MEMBER": { "TITLE": "Manajer", "DESCRIPTION": "Manajer ini diizinkan untuk membuat perubahan pada instance Anda." },
+    "PAGES": { "STATE": "Status", "DOMAINLIST": "Domain Khusus" },
+    "STATE": { "0": "Tidak ditentukan", "1": "Menciptakan", "2": "Berlari", "3": "Henti", "4": "Berhenti" },
+    "VIEWS": {
+      "VIEWNAME": "Nama",
+      "DATABASE": "Basis data",
+      "SEQUENCE": "Urutan",
+      "EVENTTIMESTAMP": "Stempel waktu",
+      "LASTSPOOL": "Kumparan sukses",
+      "ACTIONS": "Tindakan",
+      "CLEAR": "Jernih",
+      "CLEARED": "Tampilan berhasil dibersihkan!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Tampilan Jelas",
+        "VIEW_CLEAR_DESCRIPTION": "Anda akan menghapus pandangan. Menghapus tampilan akan menciptakan proses yang selama itu data mungkin tidak tersedia untuk pengguna akhir. Apakah kamu benar-benar yakin?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Nama",
+      "DATABASE": "Basis data",
+      "FAILEDSEQUENCE": "Urutan Gagal",
+      "FAILURECOUNT": "Jumlah Kegagalan",
+      "LASTFAILED": "Terakhir gagal di",
+      "ERRORMESSAGE": "Pesan Kesalahan",
+      "ACTIONS": "Tindakan",
+      "DELETE": "Menghapus",
+      "DELETESUCCESS": "Acara yang gagal dihapus."
+    },
+    "EVENTS": {
+      "EDITOR": "Editor",
+      "EDITORID": "ID Editor",
+      "AGGREGATE": "Agregat",
+      "AGGREGATEID": "ID Agregat",
+      "AGGREGATETYPE": "Tipe Agregat",
+      "RESOURCEOWNER": "Pemilik Sumber Daya",
+      "SEQUENCE": "Urutan",
+      "CREATIONDATE": "Dibuat Pada",
+      "TYPE": "Jenis",
+      "PAYLOAD": "Muatan",
+      "FILTERS": {
+        "BTN": "Menyaring",
+        "USER": { "IDLABEL": "PENGENAL", "CHECKBOX": "Filter menurut Editor" },
+        "AGGREGATE": { "TYPELABEL": "Tipe Agregat", "IDLABEL": "PENGENAL", "CHECKBOX": "Filter berdasarkan Agregat" },
+        "TYPE": { "TYPELABEL": "Jenis", "CHECKBOX": "Filter berdasarkan Jenis" },
+        "RESOURCEOWNER": { "LABEL": "PENGENAL", "CHECKBOX": "Filter menurut Pemilik Sumber Daya" },
+        "SEQUENCE": { "LABEL": "Urutan", "CHECKBOX": "Filter berdasarkan Urutan" },
+        "SORT": "Menyortir",
+        "ASC": "Naik",
+        "DESC": "Menurun",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Dari",
+          "RADIO_RANGE": "Jangkauan",
+          "LABEL_SINCE": "Sejak",
+          "LABEL_UNTIL": "Sampai"
+        },
+        "OTHER": "lainnya",
+        "OTHERS": "yang lain"
+      },
+      "DIALOG": { "TITLE": "Detil Acara" }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Manajer dihapus.",
+      "MEMBERSADDED": "Manajer menambahkan.",
+      "MEMBERADDED": "Manajer menambahkan.",
+      "MEMBERCHANGED": "Manajer berubah.",
+      "ROLEREMOVED": "Peran dihapus.",
+      "ROLECHANGED": "Peran berubah.",
+      "REACTIVATED": "Diaktifkan kembali",
+      "DEACTIVATED": "Dinonaktifkan"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Nama",
+      "ID": "PENGENAL",
+      "CREATIONDATE": "Tanggal Pembuatan",
+      "DATECHANGED": "Berubah",
+      "FILTER": "Menyaring",
+      "FILTERPLACEHOLDER": "Filter untuk namanya",
+      "LIST": "Organisasi",
+      "LISTDESCRIPTION": "Pilih sebuah organisasi.",
+      "ACTIVE": "Aktif",
+      "CREATE": "Buat Organisasi",
+      "DEACTIVATE": "Nonaktifkan Organisasi",
+      "REACTIVATE": "Aktifkan kembali Organisasi",
+      "NOPERMISSION": "Anda tidak memiliki izin untuk mengakses pengaturan organisasi.",
+      "USERSELFACCOUNT": "Gunakan akun pribadi Anda sebagai pemilik organisasi",
+      "ORGDETAIL_TITLE": "Masukkan nama dan domain organisasi baru Anda.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Masukkan nama organisasi baru Anda.",
+      "ORGDETAILUSER_TITLE": "Konfigurasikan Pemilik Organisasi",
+      "DELETE": "Hapus organisasi",
+      "DEFAULTLABEL": "Bawaan",
+      "SETASDEFAULT": "Tetapkan sebagai organisasi default",
+      "DEFAULTORGSET": "Organisasi default berhasil diubah",
+      "RENAME": {
+        "ACTION": "Ganti nama",
+        "TITLE": "Ganti Nama Organisasi",
+        "DESCRIPTION": "Masukkan nama baru untuk organisasi Anda",
+        "BTN": "Ganti nama"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Verifikasi kepemilikan {{value}}",
+        "VERIFICATION": "Kami menawarkan dua metode untuk memvalidasi domain Anda secara manual:",
+        "VERIFICATION_HTML": "-HTTP. Host file verifikasi sementara di situs web Anda",
+        "VERIFICATION_DNS": "-DNS. Buat entri DNS Catatan TXT",
+        "VERIFICATION_DNS_DESC": "Jika Anda mengelola {{ value }} dan memiliki akses ke data DNS, Anda dapat membuat data TXT baru dengan nilai berikut:",
+        "VERIFICATION_DNS_HOST_LABEL": "Tuan rumah:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Gunakan kode ini untuk nilai data TXT:",
+        "VERIFICATION_HTTP_DESC": "Jika Anda memiliki akses ke hosting situs web Anda, cukup unduh file verifikasi dan unggah di URL yang disediakan",
+        "VERIFICATION_HTTP_URL_LABEL": "URL yang diharapkan:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Berkas verifikasi:",
+        "VERIFICATION_SKIP": "Anda dapat melewati verifikasi untuk saat ini dan terus membuat organisasi Anda, namun untuk menggunakan domain Anda, langkah ini harus diselesaikan!",
+        "VERIFICATION_VALIDATION_DESC": "Jangan hapus kode verifikasi, karena ZITADEL akan memeriksa ulang kepemilikan domain Anda dari waktu ke waktu.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Minta Token Baru",
+        "VERIFICATION_VALIDATION_ONGOING": "Metode {{ value }} telah dipilih untuk memverifikasi domain Anda. Klik tombol untuk memicu pemeriksaan verifikasi atau mengatur ulang proses verifikasi.",
+        "VERIFICATION_SUCCESSFUL": "Domain berhasil diverifikasi!",
+        "RESETMETHOD": "Setel ulang metode verifikasi"
+      },
+      "DOWNLOAD_FILE": "Unduh Berkas",
+      "SELECTORGTOOLTIP": "Pilih organisasi ini.",
+      "PRIMARYDOMAIN": "Domain Utama",
+      "STATE": "Negara",
+      "USEPASSWORD": "Tetapkan Kata Sandi Awal",
+      "USEPASSWORDDESC": "Pengguna tidak perlu mengatur kata sandi selama inisialisasi."
+    },
+    "LIST": { "TITLE": "Organisasi", "DESCRIPTION": "Ini adalah organisasi di instans Anda" },
+    "DOMAINS": {
+      "NEW": "Tambahkan Domain",
+      "TITLE": "Domain terverifikasi",
+      "DESCRIPTION": "Konfigurasikan domain organisasi Anda. Domain ini dapat digunakan untuk penemuan domain dan akhiran nama pengguna.",
+      "SETPRIMARY": "Tetapkan sebagai Utama",
+      "DELETE": { "TITLE": "Hapus Domain", "DESCRIPTION": "Anda akan menghapus salah satu domain Anda." },
+      "ADD": {
+        "TITLE": "Tambahkan Domain",
+        "DESCRIPTION": "Anda akan menambahkan domain untuk organisasi Anda. Setelah proses berhasil, domain dapat digunakan untuk penemuan domain dan sebagai akhiran bagi pengguna Anda."
+      }
+    },
+    "STATE": { "0": "Tidak ditentukan", "1": "Aktif", "2": "Dinonaktifkan" },
+    "MEMBER": {
+      "TITLE": "Manajer Organisasi",
+      "DESCRIPTION": "Tentukan pengguna yang dapat mengubah preferensi organisasi Anda."
+    },
+    "TOAST": {
+      "UPDATED": "Organisasi berhasil diperbarui.",
+      "DEACTIVATED": "Organisasi dinonaktifkan.",
+      "REACTIVATED": "Organisasi diaktifkan kembali.",
+      "DOMAINADDED": "Menambahkan domain.",
+      "DOMAINREMOVED": "Domain dihapus.",
+      "MEMBERADDED": "Manajer menambahkan.",
+      "MEMBERREMOVED": "Manajer dihapus.",
+      "MEMBERCHANGED": "Manajer berubah.",
+      "SETPRIMARY": "Kumpulan domain primer.",
+      "DELETED": "Organisasi berhasil dihapus",
+      "DEFAULTORGNOTFOUND": "Organisasi default tidak ditemukan",
+      "ORG_WAS_DELETED": "Organisasi telah dihapus."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Nonaktifkan organisasi",
+        "DESCRIPTION": "Anda akan menonaktifkan organisasi Anda. Pengguna tidak akan bisa login setelahnya. Apakah Anda yakin untuk melanjutkan?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Aktifkan kembali organisasi",
+        "DESCRIPTION": "Anda akan mengaktifkan kembali organisasi Anda. Pengguna akan dapat login kembali. Apakah Anda yakin untuk melanjutkan?"
+      },
+      "DELETE": {
+        "TITLE": "Hapus organisasi",
+        "DESCRIPTION": "Anda akan menghapus organisasi Anda. Ini memulai proses di mana semua data terkait organisasi akan dihapus. Anda tidak dapat mengembalikan tindakan ini seperti saat ini.",
+        "TYPENAME": "Ketik '{{value}}', untuk menghapus organisasi Anda.",
+        "ORGNAME": "Nama",
+        "BTN": "Menghapus"
+      }
+    }
+  },
+  "SETTINGS": {
+    "LIST": {
+      "ORGS": "Organisasi",
+      "FEATURESETTINGS": "Fitur",
+      "LANGUAGES": "Bahasa",
+      "LOGIN": "Perilaku dan Keamanan Login",
+      "LOCKOUT": "Penguncian",
+      "AGE": "Masa berlaku kata sandi sudah habis",
+      "COMPLEXITY": "Kompleksitas kata sandi",
+      "NOTIFICATIONS": "Pemberitahuan",
+      "SMTP_PROVIDER": "Penyedia SMTP",
+      "SMS_PROVIDER": "Penyedia SMS/Telepon",
+      "NOTIFICATIONS_DESC": "Pengaturan SMTP dan SMS",
+      "MESSAGETEXTS": "Teks Pesan",
+      "IDP": "Penyedia Identitas",
+      "VERIFIED_DOMAINS": "Domain terverifikasi",
+      "DOMAIN": "Pengaturan domain",
+      "LOGINTEXTS": "Teks Antarmuka Masuk",
+      "BRANDING": "merek",
+      "PRIVACYPOLICY": "Tautan eksternal",
+      "OIDC": "Masa berlaku dan masa berlaku Token OIDC",
+      "SECRETS": "Pembuat Rahasia",
+      "SECURITY": "Pengaturan keamanan",
+      "EVENTS": "Acara",
+      "FAILEDEVENTS": "Acara Gagal",
+      "VIEWS": "Tampilan"
+    },
+    "GROUPS": {
+      "GENERAL": "Informasi Umum",
+      "NOTIFICATIONS": "Pemberitahuan",
+      "LOGIN": "Masuk dan Akses",
+      "DOMAIN": "Domain",
+      "TEXTS": "Teks dan Bahasa",
+      "APPEARANCE": "Penampilan",
+      "OTHER": "Lainnya",
+      "STORAGE": "Penyimpanan"
+    }
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Bahasa Bawaan",
+      "ALLOWED": "Bahasa yang Diizinkan",
+      "NOT_ALLOWED": "Bahasa Tidak Diizinkan",
+      "ALLOW_ALL": "Izinkan Semua",
+      "DISALLOW_ALL": "Larang Semua",
+      "SETASDEFAULT": "Tetapkan sebagai Bahasa Default",
+      "DEFAULT_SAVED": "Bahasa Default disimpan",
+      "ALLOWED_SAVED": "Bahasa yang Diizinkan disimpan",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
+      }
+    },
+    "SMTP": {
+      "TITLE": "Penyedia SMTP",
+      "DESCRIPTION": "Keterangan",
+      "SENDERADDRESS": "Alamat Email Pengirim",
+      "SENDERNAME": "Nama Pengirim",
+      "REPLYTOADDRESS": "Alamat Balasan",
+      "HOSTANDPORT": "Tuan Rumah dan Pelabuhan",
+      "USER": "Pengguna",
+      "PASSWORD": "Kata sandi",
+      "SETPASSWORD": "Tetapkan Kata Sandi SMTP",
+      "PASSWORDSET": "Kata Sandi SMTP berhasil ditetapkan.",
+      "TLS": "Keamanan Lapisan Transportasi (TLS)",
+      "SAVED": "Berhasil disimpan!",
+      "NOCHANGES": "Tidak ada perubahan!",
+      "REQUIREDWARN": "Untuk mengirim notifikasi dari domain Anda, Anda harus memasukkan data SMTP Anda."
+    },
+    "SMS": {
+      "PROVIDERS": "Penyedia",
+      "PROVIDER": "Penyedia SMS",
+      "ADDPROVIDER": "Tambahkan Penyedia SMS",
+      "ADDPROVIDERDESCRIPTION": "Pilih salah satu penyedia yang tersedia dan masukkan data yang diperlukan.",
+      "REMOVEPROVIDER": "Hapus Penyedia",
+      "REMOVEPROVIDER_DESC": "Anda akan menghapus konfigurasi penyedia. Apakah Anda ingin melanjutkan?",
+      "SMSPROVIDERSTATE": { "0": "Tidak ditentukan", "1": "Aktif", "2": "Tidak aktif" },
+      "ACTIVATED": "Penyedia diaktifkan.",
+      "DEACTIVATED": "Penyedia dinonaktifkan.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Nomor Pengirim",
+        "VERIFYSERVICESID": "ID Layanan Verifikasi",
+        "VERIFYSERVICESID_DESCRIPTION": "Menetapkan ID Layanan Verifikasi memungkinkan penggunaan Layanan Verifikasi Twilio alih-alih Layanan Pesan untuk verifikasi nomor telepon dan SMS OTP.",
+        "ADDED": "Twilio menambahkan dengan sukses.",
+        "UPDATED": "Twilio berhasil diperbarui.",
+        "REMOVED": "Twilio dihapus",
+        "CHANGETOKEN": "Ganti Token",
+        "SETTOKEN": "Tetapkan Token",
+        "TOKENSET": "Token berhasil disetel."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Tipe Rahasia",
+      "TYPE": {
+        "1": "Inisialisasi Surat",
+        "2": "Verifikasi email",
+        "3": "Verifikasi telepon",
+        "4": "Reset Kata Sandi",
+        "5": "Inisialisasi Tanpa Kata Sandi",
+        "6": "Rahasia Aplikasi",
+        "7": "Kata Sandi Satu Kali (OTP) - SMS",
+        "8": "Kata Sandi Sekali Pakai (OTP) - Email"
+      },
+      "EXPIRY": "Kedaluwarsa (dalam menit)",
+      "INCLUDEDIGITS": "Sertakan Angka",
+      "INCLUDESYMBOLS": "Sertakan Simbol",
+      "INCLUDELOWERLETTERS": "Sertakan huruf kecil",
+      "INCLUDEUPPERLETTERS": "Sertakan huruf Atas",
+      "LENGTH": "Panjang",
+      "UPDATED": "Pengaturan diperbarui."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Pengaturan ini menyetel CSP untuk mengizinkan pembingkaian dari sekumpulan domain yang diizinkan. Perhatikan bahwa dengan mengaktifkan penggunaan iFrames, Anda berisiko mengizinkan clickjacking.",
+      "IFRAMEENABLED": "Izinkan iFrame",
+      "ALLOWEDORIGINS": "URL yang diizinkan",
+      "IMPERSONATIONTITLE": "Peniruan",
+      "IMPERSONATIONENABLED": "Izinkan Peniruan Identitas",
+      "IMPERSONATIONDESCRIPTION": "Pengaturan ini memungkinkan untuk menggunakan peniruan identitas pada prinsipnya. Perhatikan bahwa peniru identitas juga memerlukan peran `*_IMPERSONATOR` yang sesuai."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Masuk Organisasi Default",
+      "LOGINDEFAULTORG_DESCRIPTION": "UI login akan menggunakan pengaturan organisasi default (dan bukan dari instance) jika tidak ada konteks organisasi yang ditetapkan",
+      "OIDCLEGACYINTROSPECTION": "Introspeksi Warisan OIDC",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Kami baru-baru ini memfaktorkan ulang titik akhir introspeksi untuk alasan kinerja. Fitur ini dapat digunakan untuk melakukan rollback ke implementasi lama jika muncul bug yang tidak terduga.",
+      "OIDCTOKENEXCHANGE": "Pertukaran Token OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktifkan jenis pemberian urn:ietf:params:oauth:grant-type:token-exchange eksperimental untuk titik akhir token OIDC. Pertukaran token dapat digunakan untuk meminta token dengan cakupan yang lebih kecil atau menyamar sebagai pengguna lain. Lihat kebijakan keamanan untuk mengizinkan peniruan identitas pada sebuah instans.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Memicu Proyeksi Introspeksi",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktifkan pemicu proyeksi selama permintaan introspeksi. Hal ini dapat menjadi solusi jika terdapat masalah konsistensi yang nyata dalam respons introspeksi namun dapat berdampak pada kinerja. Kami berencana untuk menghilangkan pemicu permintaan introspeksi di masa depan.",
+      "USERSCHEMA": "Skema Pengguna",
+      "USERSCHEMA_DESCRIPTION": "Skema Pengguna memungkinkan untuk mengelola skema data pengguna. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
+      "ACTIONS": "Tindakan",
+      "ACTIONS_DESCRIPTION": "Tindakan v2 memungkinkan untuk mengelola eksekusi dan target data. Jika tanda ini diaktifkan, Anda akan dapat menggunakan API baru dan fitur-fiturnya.",
+      "STATES": { "INHERITED": "Mewarisi", "ENABLED": "Diaktifkan", "DISABLED": "Dengan disabilitas" },
+      "INHERITED_DESCRIPTION": "Ini menetapkan nilai ke nilai default sistem.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Diaktifkan\" diwariskan",
+        "DISABLED": "\"Dinonaktifkan\" diwariskan"
+      },
+      "RESET": "Tetapkan semua untuk diwarisi"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Atur Ulang Pengaturan",
+        "DEFAULTDESCRIPTION": "Anda akan mengatur ulang pengaturan Anda ke konfigurasi default instans Anda. Apakah Anda yakin ingin melanjutkan?",
+        "LOGINPOLICY_DESCRIPTION": "Peringatan: Jika Anda melanjutkan, pengaturan Penyedia Identitas juga akan diatur ulang ke pengaturan instans."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Diterapkan ke",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Kompleksitas Kata Sandi",
+      "DESCRIPTION": "Memastikan bahwa semua kata sandi yang ditetapkan sesuai dengan pola tertentu",
+      "SYMBOLANDNUMBERERROR": "Harus terdiri dari angka dan simbol/tanda baca.",
+      "SYMBOLERROR": "Harus mencantumkan simbol/tanda baca.",
+      "NUMBERERROR": "Harus menyertakan angka.",
+      "PATTERNERROR": "Kata sandi tidak memenuhi pola yang diperlukan."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Pemberitahuan",
+      "DESCRIPTION": "Menentukan perubahan apa, pemberitahuan akan dikirim.",
+      "PASSWORDCHANGE": "Perubahan kata sandi"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Berikan login gaya pribadi Anda dan ubah perilakunya.",
+      "PREVIEW_DESCRIPTION": "Perubahan kebijakan akan otomatis diterapkan ke lingkungan pratinjau.",
+      "BTN": "Pilih File",
+      "ACTIVATEPREVIEW": "Terapkan konfigurasi",
+      "DARK": "Mode Gelap",
+      "LIGHT": "Modus Cahaya",
+      "CHANGEVIEW": "Ubah Tampilan",
+      "ACTIVATED": "Perubahan kebijakan sekarang sudah LANGSUNG",
+      "THEME": "Tema",
+      "COLORS": "Warna",
+      "FONT": "huruf",
+      "ADVANCEDBEHAVIOR": "Perilaku Tingkat Lanjut",
+      "DROP": "Letakkan gambar di sini atau",
+      "RELEASE": "Melepaskan",
+      "DROPFONT": "Letakkan file font di sini",
+      "RELEASEFONT": "Melepaskan",
+      "USEOFLOGO": "Logo Anda akan digunakan di Login dan juga email, sedangkan ikon digunakan untuk elemen UI yang lebih kecil seperti pada pengalih organisasi di konsol",
+      "MAXSIZE": "Ukuran maksimum dibatasi hingga 524kB",
+      "EMAILNOSVG": "Format file SVG tidak didukung di email. Oleh karena itu unggah logo Anda dalam PNG atau format lain yang didukung.",
+      "MAXSIZEEXCEEDED": "Ukuran maksimum terlampaui 524kB.",
+      "NOSVGSUPPORTED": "SVG tidak didukung!",
+      "FONTINLOGINONLY": "Font saat ini hanya ditampilkan di antarmuka login.",
+      "BACKGROUNDCOLOR": "Warna latar belakang",
+      "PRIMARYCOLOR": "Warna primer",
+      "WARNCOLOR": "Warna peringatan",
+      "FONTCOLOR": "Warna huruf",
+      "VIEWS": { "PREVIEW": "Pratinjau", "CURRENT": "Konfigurasi Saat Ini" },
+      "PREVIEW": {
+        "TITLE": "Login",
+        "SECOND": "login dengan Akun ZITADEL Anda.",
+        "ERROR": "Pengguna tidak dapat ditemukan!",
+        "PRIMARYBUTTON": "Berikutnya",
+        "SECONDARYBUTTON": "daftar"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Modus Otomatis",
+        "THEME_MODE_LIGHT": "Mode Cahaya saja",
+        "THEME_MODE_DARK": "Hanya Mode Gelap"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Kata Sandi Kedaluwarsa",
+      "DESCRIPTION": "Anda dapat menetapkan kebijakan untuk masa berlaku kata sandi. Kebijakan ini akan memaksa pengguna untuk mengubah kata sandi pada login berikutnya setelah habis masa berlakunya. Tidak ada peringatan dan pemberitahuan otomatis."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Kebijakan Penguncian",
+      "DESCRIPTION": "Tetapkan jumlah maksimum percobaan ulang kata sandi, setelah itu akun akan diblokir."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "merek",
+      "BTN": "Pilih File",
+      "DESCRIPTION": "Sesuaikan tampilan Login",
+      "ACTIVATEPREVIEW": "Aktifkan Konfigurasi"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Pengaturan Masuk",
+      "DESCRIPTION": "Tentukan bagaimana Pengguna dapat diautentikasi dan mengonfigurasi Penyedia Identitas",
+      "DESCRIPTIONCREATEADMIN": "Pengguna dapat memilih dari penyedia identitas yang tersedia di bawah.",
+      "DESCRIPTIONCREATEMGMT": "Pengguna dapat memilih dari penyedia identitas yang tersedia di bawah. Catatan: Anda dapat menggunakan penyedia kumpulan sistem serta penyedia yang ditetapkan untuk organisasi Anda saja.",
+      "LIFETIME_INVALID": "Formulir berisi nilai yang tidak valid.",
+      "SAVED": "Berhasil disimpan!",
+      "PROVIDER_ADDED": "Penyedia identitas diaktifkan."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Tetapkan Kebijakan Privasi dan Tautan Ketentuan Layanan Anda",
+      "TOSLINK": "Tautan ke Persyaratan Layanan",
+      "POLICYLINK": "Tautan ke Kebijakan Privasi",
+      "HELPLINK": "Tautan ke Bantuan",
+      "SUPPORTEMAIL": "Email Dukungan",
+      "DOCSLINK": "Tautan Dokumen (Konsol)",
+      "CUSTOMLINK": "Tautan Khusus (Konsol)",
+      "CUSTOMLINKTEXT": "Teks Tautan Khusus (Konsol)",
+      "SAVED": "Berhasil disimpan!",
+      "RESET_TITLE": "Kembalikan Nilai Default",
+      "RESET_DESCRIPTION": "Anda akan memulihkan Tautan default untuk TOS dan Kebijakan Privasi. Apakah Anda benar-benar ingin melanjutkan?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Teks Antarmuka Masuk",
+      "DESCRIPTION": "Tentukan teks Anda untuk antarmuka login. Jika teks kosong, Nilai default yang ditampilkan sebagai placeholder akan digunakan.",
+      "DESCRIPTION_SHORT": "Tentukan teks Anda untuk antarmuka login.",
+      "NEWERVERSIONEXISTS": "Versi Baru ada",
+      "CURRENTDATE": "Konfigurasi saat ini",
+      "CHANGEDATE": "Versi Terbaru dari",
+      "KEYNAME": "Layar / Antarmuka Masuk",
+      "RESET_TITLE": "Kembalikan Nilai Default",
+      "RESET_DESCRIPTION": "Anda akan memulihkan semua nilai default. Semua perubahan yang Anda buat akan dihapus secara permanen. Apakah Anda benar-benar ingin melanjutkan?",
+      "UNSAVED_TITLE": "Lanjutkan tanpa menyimpan?",
+      "UNSAVED_DESCRIPTION": "Anda telah membuat perubahan tanpa menyimpan. Apakah Anda ingin menyimpan sekarang?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Anda memilih bahasa yang tidak diperbolehkan. Anda dapat terus memodifikasi teks. Namun jika Anda ingin pengguna Anda benar-benar dapat menggunakan bahasa ini, ubah batasan instance Anda.",
+      "LANGUAGES_NOT_ALLOWED": "Tidak diperbolehkan:",
+      "LANGUAGE": "Bahasa",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "Verifikasi email selesai",
+        "emailVerificationText": "Verifikasi email",
+        "externalUserNotFoundText": "Pengguna eksternal tidak ditemukan",
+        "footerText": "catatan kaki",
+        "initMfaDoneText": "Inisialisasi MFA selesai",
+        "initMfaOtpText": "Inisialisasi MFA",
+        "initMfaPromptText": "Inisialisasi Perintah MFA",
+        "initMfaU2fText": "Inisialisasi Faktor Kedua Universal",
+        "initPasswordDoneText": "Inisialisasi kata sandi selesai",
+        "initPasswordText": "Inisialisasi kata sandi",
+        "initializeDoneText": "Inisialisasi pengguna selesai",
+        "initializeUserText": "Inisialisasi pengguna",
+        "linkingUserPromptText": "Menautkan perintah pengguna",
+        "linkingUserDoneText": "Menautkan pengguna selesai",
+        "loginText": "Login",
+        "logoutText": "Keluar",
+        "mfaProvidersText": "Penyedia MFA",
+        "passwordChangeDoneText": "Perubahan kata sandi selesai",
+        "passwordChangeText": "Perubahan kata sandi",
+        "passwordResetDoneText": "Penyetelan ulang kata sandi selesai",
+        "passwordText": "Kata sandi",
+        "registrationOptionText": "Opsi Pendaftaran",
+        "registrationOrgText": "Daftarkan Organisasi",
+        "registrationUserText": "Daftarkan Pengguna",
+        "selectAccountText": "Pilih Akun",
+        "successLoginText": "Masuk dengan sukses",
+        "usernameChangeDoneText": "Perubahan nama pengguna selesai",
+        "usernameChangeText": "Perubahan nama pengguna",
+        "verifyMfaOtpText": "Verifikasi OTP",
+        "verifyMfaU2fText": "Verifikasi Faktor Kedua Universal",
+        "passwordlessPromptText": "Perintah Tanpa Kata Sandi",
+        "passwordlessRegistrationDoneText": "Pendaftaran Tanpa Kata Sandi Selesai",
+        "passwordlessRegistrationText": "Pendaftaran Tanpa Kata Sandi",
+        "passwordlessText": "Tanpa kata sandi",
+        "externalRegistrationUserOverviewText": "Ikhtisar Pengguna Registrasi Eksternal"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Pemberitahuan",
+      "TYPES": {
+        "INIT": "Inisialisasi",
+        "VE": "Verifikasi Email",
+        "VP": "Verifikasi Telepon",
+        "VSO": "Verifikasi SMS OTP",
+        "VEO": "Verifikasi OTP Email",
+        "PR": "Reset Kata Sandi",
+        "DC": "Klaim Domain",
+        "PL": "Tanpa kata sandi",
+        "PC": "Perubahan Kata Sandi",
+        "IU": "Mengundang Pengguna"
+      },
+      "CHIPS": {
+        "firstname": "Nama yang diberikan",
+        "lastname": "Nama keluarga",
+        "code": "Kode",
+        "preferredLoginName": "Nama Login Pilihan",
+        "displayName": "Nama tampilan",
+        "nickName": "Nama panggilan",
+        "loginnames": "Nama masuk",
+        "domain": "Domain",
+        "lastEmail": "Email terakhir",
+        "lastPhone": "Telepon terakhir",
+        "verifiedEmail": "Email terverifikasi",
+        "verifiedPhone": "Telepon terverifikasi",
+        "changedate": "Ubah tanggal",
+        "username": "Nama belakang",
+        "tempUsername": "Nama pengguna sementara",
+        "otp": "Kata sandi satu kali",
+        "verifyUrl": "Verifikasi URL kata sandi satu kali",
+        "expiry": "Kedaluwarsa",
+        "applicationName": "Nama aplikasi"
+      },
+      "TOAST": { "UPDATED": "Teks Khusus disimpan." }
+    },
+    "DEFAULTLABEL": "Pengaturan saat ini sesuai dengan standar Instance Anda.",
+    "BTN_INSTALL": "Pengaturan",
+    "BTN_EDIT": "Memodifikasi",
+    "DATA": {
+      "DESCRIPTION": "Keterangan",
+      "MINLENGTH": "harus memiliki panjang minimum",
+      "HASNUMBER": "harus menyertakan nomor",
+      "HASSYMBOL": "harus menyertakan simbol",
+      "HASLOWERCASE": "harus menyertakan huruf kecil",
+      "HASUPPERCASE": "harus menyertakan huruf besar",
+      "SHOWLOCKOUTFAILURES": "menunjukkan kegagalan penguncian",
+      "MAXPASSWORDATTEMPTS": "Upaya maksimal kata sandi",
+      "MAXOTPATTEMPTS": "Upaya maksimal OTP",
+      "EXPIREWARNDAYS": "Peringatan Kedaluwarsa setelah beberapa hari",
+      "MAXAGEDAYS": "Validitas maksimum dalam beberapa hari",
+      "USERLOGINMUSTBEDOMAIN": "Tambahkan domain organisasi sebagai akhiran pada nama login",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Jika Anda mengaktifkan setelan ini, semua nama login akan diberi akhiran domain organisasi. Jika pengaturan ini dinonaktifkan, Anda harus memastikan bahwa nama pengguna unik untuk semua organisasi.",
+      "VALIDATEORGDOMAINS": "Verifikasi domain organisasi diperlukan (tantangan DNS atau HTTP)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Alamat Pengirim SMTP cocok dengan Domain Instans",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Login konvensional dengan nama pengguna dan kata sandi diperbolehkan.",
+      "ALLOWEXTERNALIDP_DESC": "Login diperbolehkan untuk penyedia identitas yang mendasarinya",
+      "ALLOWREGISTER_DESC": "Jika opsi ini dipilih, langkah tambahan untuk mendaftarkan pengguna akan muncul di login.",
+      "FORCEMFA": "Paksa MFA",
+      "FORCEMFALOCALONLY": "Paksa MFA untuk pengguna lokal yang diautentikasi",
+      "FORCEMFALOCALONLY_DESC": "Jika opsi ini dipilih, pengguna yang diautentikasi lokal harus mengonfigurasi faktor kedua untuk login.",
+      "HIDEPASSWORDRESET_DESC": "Jika opsi ini dipilih, pengguna tidak dapat mengatur ulang kata sandinya dalam proses login.",
+      "HIDELOGINNAMESUFFIX": "Sembunyikan akhiran Nama Login",
+      "HIDELOGINNAMESUFFIX_DESC": "Menyembunyikan akhiran nama login di antarmuka login",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Jika opsi ini dipilih, layar kata sandi akan ditampilkan dalam proses login meskipun pengguna tidak ditemukan. Kesalahan pada pemeriksaan kata sandi tidak akan mengungkapkan apakah nama pengguna atau kata sandi salah.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Jika opsi ini dipilih, akhiran (@domain.com) dari nama pengguna yang tidak diketahui yang dimasukkan pada layar masuk akan dicocokkan dengan domain organisasi dan akan dialihkan ke pendaftaran organisasi tersebut jika berhasil.",
+      "DEFAULTREDIRECTURI": "URI Pengalihan Default",
+      "DEFAULTREDIRECTURI_DESC": "Menentukan ke mana pengguna akan diarahkan jika proses masuk dimulai tanpa konteks aplikasi (misalnya dari email)",
+      "ERRORMSGPOPUP": "Tampilkan Kesalahan dalam Dialog",
+      "DISABLEWATERMARK": "Sembunyikan Tanda Air",
+      "DISABLEWATERMARK_DESC": "Sembunyikan tanda air Powered by ZITADEL di antarmuka login"
+    },
+    "RESET": "Reset ke default Instans",
+    "CREATECUSTOM": "Buat Kebijakan Kustom",
+    "TOAST": {
+      "SET": "Kebijakan berhasil ditetapkan!",
+      "RESETSUCCESS": "Reset kebijakan berhasil!",
+      "UPLOADSUCCESS": "Berhasil diunggah!",
+      "DELETESUCCESS": "Berhasil dihapus!",
+      "UPLOADFAILED": "Gagal mengunggah!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organisasi",
+    "DESCRIPTION": "Di sini Anda dapat mengedit konfigurasi organisasi Anda dan mengelola anggotanya.",
+    "DETAIL": {
+      "TITLE": "Detil",
+      "NAME": "Nama",
+      "DOMAIN": "Domain",
+      "STATE": { "0": "Tidak ditentukan", "1": "Aktif", "2": "Tidak aktif" }
+    },
+    "MEMBER": {
+      "TITLE": "Anggota",
+      "USERNAME": "Nama belakang",
+      "DISPLAYNAME": "Nama Tampilan",
+      "LOGINNAME": "Nama Masuk",
+      "EMAIL": "E-mail",
+      "ROLES": "Peran",
+      "ADD": "Tambahkan Anggota",
+      "ADDDESCRIPTION": "Masukkan nama pengguna yang akan ditambahkan."
+    },
+    "TABLE": {
+      "TOTAL": "Jumlah entri",
+      "SELECTION": "Elemen yang Dipilih",
+      "DEACTIVATE": "Nonaktifkan Pengguna",
+      "ACTIVATE": "Aktifkan Pengguna",
+      "DELETE": "Hapus Pengguna",
+      "CLEAR": "Hapus pilihan"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Proyek",
+      "DESCRIPTION": "Di sini Anda dapat menentukan aplikasi, mengelola peran, dan mengizinkan organisasi lain untuk menggunakan proyek Anda.",
+      "DELETE": "Hapus Proyek",
+      "DETAIL": "Detil",
+      "CREATE": "Buat Proyek",
+      "CREATE_DESC": "Masukkan nama proyek Anda.",
+      "ROLE": "Peran",
+      "NOITEMS": "Tidak ada proyek",
+      "ZITADELPROJECT": "Ini milik proyek ZITADEL. Hati-hati: Jika Anda membuat perubahan, ZITADEL mungkin tidak berfungsi sebagaimana mestinya.",
+      "TYPE": {
+        "OWNED": "Proyek Milik",
+        "OWNED_SINGULAR": "Proyek Milik",
+        "GRANTED_SINGULAR": "Proyek yang Diberikan sebesar {{name}}"
+      },
+      "PRIVATELABEL": {
+        "0": {
+          "TITLE": "Tidak ditentukan",
+          "DESC": "Segera setelah pengguna diidentifikasi, merek organisasi dari pengguna yang diidentifikasi akan ditampilkan, sebelum default sistem ditampilkan."
+        },
+        "1": { "TITLE": "Gunakan pengaturan proyek", "DESC": "Pencitraan merek organisasi pemilik proyek akan ditampilkan" },
+        "2": {
+          "TITLE": "Gunakan pengaturan Organisasi Pengguna",
+          "DESC": "Pencitraan merek organisasi proyek akan ditampilkan, tetapi segera setelah pengguna diidentifikasi, pengaturan organisasi pengguna yang diidentifikasi akan ditampilkan."
+        },
+        "TITLE": "Pengaturan Merek",
+        "DIALOG": { "TITLE": "Pengaturan Merek", "DESCRIPTION": "Pilih perilaku login saat menggunakan proyek." }
+      },
+      "PINNED": "Disematkan",
+      "ALL": "Semua",
+      "CREATEDON": "Dibuat pada",
+      "LASTMODIFIED": "Terakhir diubah pada",
+      "ADDNEW": "Buat Proyek Baru",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Aktifkan kembali Proyek",
+          "DESCRIPTION": "Apakah Anda benar-benar ingin mengaktifkan kembali proyek Anda?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Nonaktifkan Proyek",
+          "DESCRIPTION": "Apakah Anda benar-benar ingin menonaktifkan proyek Anda?"
+        },
+        "DELETE": {
+          "TITLE": "Hapus Proyek",
+          "DESCRIPTION": "Apakah Anda benar-benar ingin menghapus proyek Anda?",
+          "TYPENAME": "Ketikkan nama proyek untuk menghapusnya secara permanen."
+        }
+      }
+    },
+    "SETTINGS": { "TITLE": "Pengaturan", "DESCRIPTION": "" },
+    "STATE": { "0": "Tidak ditentukan", "1": "Aktif", "2": "Tidak aktif", "TITLE": "Status" },
+    "TYPE": { "0": "Tipe tidak diketahui", "1": "Dimiliki", "2": "Diberikan", "TITLE": "Jenis" },
+    "NAME": "Nama",
+    "NAMEDIALOG": {
+      "TITLE": "Ganti Nama Proyek",
+      "DESCRIPTION": "Masukkan nama baru untuk proyek Anda",
+      "NAME": "Nama Baru"
+    },
+    "MEMBER": {
+      "TITLE": "Manajer",
+      "TITLEDESC": "Manajer dapat membuat perubahan pada proyek ini berdasarkan peran mereka.",
+      "DESCRIPTION": "Manajer ini mungkin dapat mengedit proyek Anda.",
+      "USERNAME": "Nama belakang",
+      "DISPLAYNAME": "Nama Tampilan",
+      "LOGINNAME": "Nama login",
+      "EMAIL": "E-mail",
+      "ROLES": "Peran",
+      "USERID": "ID Pengguna"
+    },
+    "GRANT": {
+      "EMPTY": "Tidak ada organisasi yang diberikan.",
+      "TITLE": "Hibah Proyek",
+      "DESCRIPTION": "Izinkan organisasi lain untuk menggunakan proyek Anda.",
+      "EDITTITLE": "Edit peran",
+      "CREATE": {
+        "TITLE": "Buat Hibah Organisasi",
+        "SEL_USERS": "Pilih pengguna yang ingin Anda berikan akses",
+        "SEL_PROJECT": "Cari proyek",
+        "SEL_ROLES": "Pilih peran yang ingin Anda tambahkan ke hibah",
+        "SEL_USER": "Pilih pengguna",
+        "SEL_ORG": "Cari sebuah organisasi",
+        "SEL_ORG_DESC": "Cari organisasi yang akan diberi hibah.",
+        "ORG_DESCRIPTION": "Anda akan memberikan pengguna untuk organisasi {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Ganti konteks pada header di atas untuk memberikan pengguna untuk organisasi lain.",
+        "SEL_ORG_FORMFIELD": "Organisasi",
+        "FOR_ORG": "Hibah ini dibuat untuk:"
+      },
+      "DETAIL": {
+        "TITLE": "Hibah Proyek",
+        "DESC": "Anda dapat memilih peran mana yang dapat digunakan oleh organisasi tertentu, dan memilih manajer",
+        "MEMBERTITLE": "Manajer",
+        "MEMBERDESC": "Ini adalah manajer dari organisasi yang diberikan. Tambahkan pengguna di sini yang harus mendapatkan akses untuk mengedit data proyek.",
+        "PROJECTNAME": "Nama Proyek",
+        "GRANTEDORG": "Organisasi yang Diberikan",
+        "RESOURCEOWNER": "Pemilik Sumber Daya"
+      },
+      "STATE": "Status",
+      "STATES": { "1": "Aktif", "2": "Tidak aktif" },
+      "ALL": "Semua",
+      "SHOWDETAIL": "Tampilkan Detail",
+      "USER": "Pengguna",
+      "MEMBERS": "Manajer",
+      "ORG": "Organisasi",
+      "PROJECTNAME": "Nama Proyek",
+      "GRANTEDORG": "Organisasi yang Diberikan",
+      "GRANTEDORGDOMAIN": "Domain",
+      "RESOURCEOWNER": "Pemilik Sumber Daya",
+      "GRANTEDORGNAME": "Nama Organisasi",
+      "GRANTID": "Id Hibah",
+      "CREATIONDATE": "Tanggal Pembuatan",
+      "CHANGEDATE": "Terakhir diubah",
+      "DATES": "Tanggal",
+      "ROLENAMESLIST": "Peran",
+      "NOROLES": "Tidak ada peran",
+      "TYPE": "Jenis",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Hibah proyek dibuat.",
+        "PROJECTGRANTADDED": "Hibah proyek dibuat.",
+        "PROJECTGRANTCHANGED": "Hibah proyek berubah.",
+        "PROJECTGRANTMEMBERADDED": "Manajer hibah menambahkan.",
+        "PROJECTGRANTMEMBERCHANGED": "Manajer hibah berubah.",
+        "PROJECTGRANTMEMBERREMOVED": "Manajer hibah dihapus.",
+        "PROJECTGRANTUPDATED": "Hibah Proyek diperbarui"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Hapus hibah proyek",
+        "DELETE_DESCRIPTION": "Anda akan menghapus hibah proyek. Apa kamu yakin?"
+      },
+      "ROLES": "Peran Proyek"
+    },
+    "APP": { "TITLE": "Aplikasi", "NAME": "Nama", "NAMEREQUIRED": "Diperlukan nama." },
+    "ROLE": {
+      "EMPTY": "Belum ada peran yang dibuat.",
+      "ADDNEWLINE": "Tambahkan peran tambahan",
+      "KEY": "Kunci",
+      "TITLE": "Peran",
+      "DESCRIPTION": "Tentukan beberapa peran yang dapat digunakan untuk membuat hibah proyek.",
+      "NAME": "Nama",
+      "DISPLAY_NAME": "Nama Tampilan",
+      "GROUP": "Kelompok",
+      "ACTIONS": "Tindakan",
+      "ADDTITLE": "Buat Peran",
+      "ADDDESCRIPTION": "Masukkan data untuk peran baru.",
+      "EDITTITLE": "Sunting Peran",
+      "EDITDESCRIPTION": "Masukkan data baru untuk peran tersebut.",
+      "DELETE": "Hapus Peran",
+      "CREATIONDATE": "Dibuat",
+      "CHANGEDATE": "Terakhir Dimodifikasi",
+      "SELECTGROUPTOOLTIP": "Pilih semua Peran grup {{group}}.",
+      "OPTIONS": "Pilihan",
+      "ASSERTION": "Menegaskan Peran pada Otentikasi",
+      "ASSERTION_DESCRIPTION": "Informasi peran dikirim dari titik akhir Userinfo dan bergantung pada pengaturan aplikasi Anda dalam token dan jenis lainnya.",
+      "CHECK": "Periksa otorisasi pada Otentikasi",
+      "CHECK_DESCRIPTION": "Jika disetel, pengguna hanya diperbolehkan mengautentikasi jika ada peran yang ditetapkan ke akun mereka.",
+      "DIALOG": { "DELETE_TITLE": "Hapus peran", "DELETE_DESCRIPTION": "Anda akan menghapus peran proyek. Apa kamu yakin?" }
+    },
+    "HAS_PROJECT": "Periksa Proyek pada Otentikasi",
+    "HAS_PROJECT_DESCRIPTION": "Diperiksa apakah organisasi pengguna memiliki proyek ini. Jika tidak, pengguna tidak dapat diautentikasi.",
+    "TABLE": {
+      "TOTAL": "Jumlah entri:",
+      "SELECTION": "Elemen yang Dipilih",
+      "DEACTIVATE": "Nonaktifkan Proyek",
+      "ACTIVATE": "Aktifkan Proyek",
+      "DELETE": "Hapus Proyek",
+      "ORGNAME": "Nama Organisasi",
+      "ORGDOMAIN": "Domain Organisasi",
+      "STATE": "Status",
+      "TYPE": "Jenis",
+      "CREATIONDATE": "Dibuat di",
+      "CHANGEDATE": "Terakhir diubah",
+      "RESOURCEOWNER": "Pemilik",
+      "SHOWTABLE": "Tampilkan meja",
+      "SHOWGRID": "Tampilkan kisi",
+      "EMPTY": "Tidak ada proyek yang ditemukan"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Manajer dihapus.",
+      "MEMBERSADDED": "Manajer menambahkan.",
+      "MEMBERADDED": "Manajer menambahkan.",
+      "MEMBERCHANGED": "Manajer berubah.",
+      "ROLESCREATED": "Peran dibuat.",
+      "ROLEREMOVED": "Peran dihapus.",
+      "ROLECHANGED": "Peran berubah.",
+      "REACTIVATED": "Diaktifkan kembali.",
+      "DEACTIVATED": "Dinonaktifkan.",
+      "CREATED": "Proyek dibuat.",
+      "UPDATED": "Proyek berubah.",
+      "GRANTUPDATED": "Hibah berubah.",
+      "DELETED": "Proyek dihapus."
+    }
+  },
+  "ROLES": {
+    "DIALOG": { "DELETE_TITLE": "Hapus peran", "DELETE_DESCRIPTION": "Anda akan menghapus peran. Apa kamu yakin?" }
+  },
+  "NEXTSTEPS": { "TITLE": "Langkah Selanjutnya" },
+  "IDP": {
+    "LIST": { "ACTIVETITLE": "Penyedia Identitas Aktif" },
+    "CREATE": {
+      "TITLE": "Tambahkan penyedia",
+      "DESCRIPTION": "Pilih satu atau lebih penyedia berikut.",
+      "STEPPERTITLE": "Buat Penyedia",
+      "OIDC": { "TITLE": "Penyedia OIDC", "DESCRIPTION": "Masukkan data yang diperlukan untuk penyedia OIDC Anda." },
+      "OAUTH": { "TITLE": "Penyedia OAuth", "DESCRIPTION": "Masukkan data yang diperlukan untuk penyedia OAuth Anda." },
+      "JWT": { "TITLE": "Penyedia JWT", "DESCRIPTION": "Masukkan data yang diperlukan untuk penyedia JWT Anda." },
+      "GOOGLE": { "TITLE": "Penyedia Google", "DESCRIPTION": "Masukkan kredensial Penyedia Identitas Google Anda" },
+      "GITLAB": { "TITLE": "Penyedia Gitlab", "DESCRIPTION": "Masukkan kredensial untuk Penyedia Identitas Gitlab Anda" },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Penyedia yang Dihosting Sendiri Gitlab",
+        "DESCRIPTION": "Masukkan kredensial Penyedia Identitas yang Dihosting Sendiri Gitlab Anda"
+      },
+      "GITHUBES": {
+        "TITLE": "Penyedia Server Perusahaan GitHub",
+        "DESCRIPTION": "Masukkan kredensial untuk Penyedia Identitas Server Perusahaan GitHub Anda"
+      },
+      "GITHUB": { "TITLE": "Penyedia Github", "DESCRIPTION": "Masukkan kredensial Penyedia Identitas Github Anda" },
+      "AZUREAD": {
+        "TITLE": "Penyedia Microsoft",
+        "DESCRIPTION": "Masukkan kredensial untuk Penyedia Identitas Microsoft Anda"
+      },
+      "LDAP": { "TITLE": "Direktori Aktif / LDAP", "DESCRIPTION": "Masukkan kredensial untuk Penyedia LDAP Anda" },
+      "APPLE": { "TITLE": "Masuk dengan Apple", "DESCRIPTION": "Masukkan kredensial untuk Penyedia Apple Anda" },
+      "SAML": { "TITLE": "Masuk dengan SAML", "DESCRIPTION": "Masukkan kredensial Penyedia SAML Anda" }
+    },
+    "DETAIL": {
+      "TITLE": "Penyedia Identitas",
+      "DESCRIPTION": "Perbarui konfigurasi penyedia Anda",
+      "DATECREATED": "Dibuat",
+      "DATECHANGED": "Berubah"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Pembuatan otomatis",
+      "ISAUTOCREATION_DESC": "Jika dipilih maka akan dibuatkan akun jika belum ada.",
+      "ISAUTOUPDATE": "Pembaruan otomatis",
+      "ISAUTOUPDATE_DESC": "Jika dipilih, akun akan diperbarui saat diautentikasi ulang.",
+      "ISCREATIONALLOWED": "Pembuatan akun diperbolehkan (secara manual)",
+      "ISCREATIONALLOWED_DESC": "Menentukan apakah akun dapat dibuat menggunakan akun eksternal. Nonaktifkan jika pengguna tidak dapat mengedit informasi akun saat auto_creation diaktifkan.",
+      "ISLINKINGALLOWED": "Penautan akun diperbolehkan (secara manual)",
+      "ISLINKINGALLOWED_DESC": "Menentukan apakah suatu identitas dapat ditautkan secara manual ke akun yang ada. Nonaktifkan jika pengguna hanya diperbolehkan menautkan akun yang diusulkan jika penautan_otomatis aktif.",
+      "AUTOLINKING_DESC": "Menentukan apakah suatu identitas akan diminta untuk ditautkan ke akun yang ada.",
+      "AUTOLINKINGTYPE": { "0": "Dengan disabilitas", "1": "Periksa Nama Pengguna yang ada", "2": "Periksa Email yang ada" }
+    },
+    "OWNERTYPES": { "0": "tidak dikenal", "1": "Contoh", "2": "Organisasi" },
+    "STATES": { "1": "aktif", "2": "tidak aktif" },
+    "AZUREADTENANTTYPES": { "0": "Umum", "1": "Organisasi", "2": "Konsumen", "3": "ID Penyewa" },
+    "AZUREADTENANTTYPE": "Tipe Penyewa",
+    "AZUREADTENANTID": "ID Penyewa",
+    "EMAILVERIFIED": "Email terverifikasi",
+    "NAMEHINT": "Jika ditentukan maka akan ditampilkan di antarmuka login.",
+    "OPTIONAL": "opsional",
+    "LDAPATTRIBUTES": "Atribut LDAP",
+    "UPDATEBINDPASSWORD": "perbarui Kata Sandi Ikat",
+    "UPDATECLIENTSECRET": "perbarui rahasia klien",
+    "ADD": "Tambahkan Penyedia Identitas",
+    "TYPE": "Jenis",
+    "OWNER": "Pemilik",
+    "ID": "PENGENAL",
+    "NAME": "Nama",
+    "AUTHORIZATIONENDPOINT": "Titik Akhir Otorisasi",
+    "TOKENENDPOINT": "Titik Akhir Token",
+    "USERENDPOINT": "Titik Akhir Pengguna",
+    "IDATTRIBUTE": "Atribut ID",
+    "AVAILABILITY": "Tersedianya",
+    "AVAILABLE": "tersedia",
+    "AVAILABLEBUTINACTIVE": "tersedia tetapi tidak aktif",
+    "SETAVAILABLE": "atur sesuai tersedia",
+    "SETUNAVAILABLE": "ditetapkan sebagai tidak tersedia",
+    "CONFIG": "Konfigurasi",
+    "STATE": "Status",
+    "ISSUER": "Penerbit",
+    "SCOPESLIST": "Daftar Cakupan",
+    "CLIENTID": "ID Klien",
+    "CLIENTSECRET": "Rahasia Klien",
+    "LDAPCONNECTION": "Koneksi",
+    "LDAPUSERBINDING": "Pengikatan pengguna",
+    "BASEDN": "BasisDn",
+    "BINDDN": "MengikatDn",
+    "BINDPASSWORD": "Ikat Kata Sandi",
+    "SERVERS": "Server",
+    "STARTTLS": "Mulai TLS",
+    "TIMEOUT": "Batas waktu dalam hitungan detik",
+    "USERBASE": "Basis pengguna",
+    "USERFILTERS": "Filter pengguna",
+    "USEROBJECTCLASSES": "Kelas Objek Pengguna",
+    "REQUIRED": "diperlukan",
+    "LDAPIDATTRIBUTE": "Atribut ID",
+    "AVATARURLATTRIBUTE": "Atribut Url Avatar",
+    "DISPLAYNAMEATTRIBUTE": "Atribut nama tampilan",
+    "EMAILATTRIBUTEATTRIBUTE": "Atribut email",
+    "EMAILVERIFIEDATTRIBUTE": "Atribut terverifikasi email",
+    "FIRSTNAMEATTRIBUTE": "Atribut nama yang diberikan",
+    "LASTNAMEATTRIBUTE": "Atribut nama keluarga",
+    "NICKNAMEATTRIBUTE": "Atribut nama panggilan",
+    "PHONEATTRIBUTE": "Atribut telepon",
+    "PHONEVERIFIEDATTRIBUTE": "Atribut terverifikasi telepon",
+    "PREFERREDLANGUAGEATTRIBUTE": "Atribut bahasa pilihan",
+    "PREFERREDUSERNAMEATTRIBUTE": "Atribut nama pengguna pilihan",
+    "PROFILEATTRIBUTE": "Atribut profil",
+    "IDPDISPLAYNAMMAPPING": "Pemetaan Nama Tampilan IDP",
+    "USERNAMEMAPPING": "Pemetaan Nama Pengguna",
+    "DATES": "Tanggal",
+    "CREATIONDATE": "Dibuat Pada",
+    "CHANGEDATE": "Terakhir Dimodifikasi",
+    "DEACTIVATE": "Menonaktifkan",
+    "ACTIVATE": "Mengaktifkan",
+    "DELETE": "Menghapus",
+    "DELETE_TITLE": "Hapus IDP",
+    "DELETE_DESCRIPTION": "Anda akan menghapus penyedia identitas. Perubahan yang dihasilkan tidak dapat dibatalkan. Apakah Anda benar-benar ingin melakukan ini?",
+    "REMOVE_WARN_TITLE": "Hapus IDP",
+    "REMOVE_WARN_DESCRIPTION": "Anda akan menghapus penyedia identitas. Ini akan menghapus pilihan IDP yang tersedia untuk pengguna Anda dan pengguna yang sudah terdaftar tidak akan bisa masuk lagi. Apakah Anda yakin untuk melanjutkan?",
+    "DELETE_SELECTION_TITLE": "Hapus IDP",
+    "DELETE_SELECTION_DESCRIPTION": "Anda akan menghapus penyedia identitas. Perubahan yang dihasilkan tidak dapat dibatalkan. Apakah Anda benar-benar ingin melakukan ini?",
+    "EMPTY": "Tidak ada pengungsi yang tersedia",
+    "OIDC": {
+      "GENERAL": "Informasi Umum",
+      "TITLE": "Konfigurasi OIDC",
+      "DESCRIPTION": "Masukkan data untuk Penyedia Identitas OIDC."
+    },
+    "JWT": {
+      "TITLE": "Konfigurasi JWT",
+      "DESCRIPTION": "Masukkan data Penyedia Identitas JWT.",
+      "HEADERNAME": "Nama Tajuk",
+      "JWTENDPOINT": "Titik Akhir JWT",
+      "JWTKEYSENDPOINT": "Titik Akhir Kunci JWT"
+    },
+    "APPLE": {
+      "TEAMID": "ID tim",
+      "KEYID": "ID Kunci",
+      "PRIVATEKEY": "Kunci Pribadi",
+      "UPDATEPRIVATEKEY": "Perbarui Kunci Pribadi",
+      "UPLOADPRIVATEKEY": "Unggah Kunci Pribadi",
+      "KEYMAXSIZEEXCEEDED": "Ukuran maksimum melebihi 5kB."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "URL metadata",
+      "BINDING": "Mengikat",
+      "SIGNEDREQUEST": "Permintaan yang Ditandatangani",
+      "NAMEIDFORMAT": "Format ID Nama",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Nama Atribut Pemetaan Khusus",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Nama atribut alternatif untuk memetakan pengguna jika `format nameid` yang dikembalikan adalah `sementara`, mis. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
+    "TOAST": {
+      "SAVED": "Berhasil disimpan.",
+      "REACTIVATED": "Idp diaktifkan kembali.",
+      "DEACTIVATED": "IDP dinonaktifkan.",
+      "SELECTEDREACTIVATED": "Idps yang dipilih diaktifkan kembali.",
+      "SELECTEDDEACTIVATED": "Idps yang dipilih dinonaktifkan.",
+      "SELECTEDKEYSDELETED": "Idps yang dipilih dihapus.",
+      "DELETED": "Idp berhasil dihapus!",
+      "ADDED": "Berhasil ditambahkan.",
+      "REMOVED": "Berhasil dihapus."
+    },
+    "ISIDTOKENMAPPING": "Peta dari token ID",
+    "ISIDTOKENMAPPING_DESC": "Jika dipilih, informasi penyedia akan dipetakan dari token ID, bukan dari titik akhir info pengguna."
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Tanpa kata sandi",
+      "MULTIFACTORDESCRIPTION": "Tentukan Multifaktor Anda untuk Otentikasi tanpa kata sandi Anda di sini.",
+      "SECONDFACTORTITLE": "Otentikasi Multifaktor",
+      "SECONDFACTORDESCRIPTION": "Tentukan lebih lanjut kemungkinan faktor yang dapat digunakan untuk mengamankan otentikasi kata sandi Anda."
+    },
+    "CREATE": { "TITLE": "Faktor Baru", "DESCRIPTION": "Pilih jenis Faktor baru Anda." },
+    "DELETE": {
+      "TITLE": "Hapus Faktor",
+      "DESCRIPTION": "Anda akan menghapus Faktor dari Pengaturan Login. Apa kamu yakin?"
+    },
+    "TOAST": { "ADDED": "Berhasil ditambahkan.", "SAVED": "Berhasil disimpan.", "DELETED": "Berhasil dihapus" },
+    "TYPE": "Jenis",
+    "MULTIFACTORTYPES": { "0": "Tidak dikenal", "1": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya" },
+    "SECONDFACTORTYPES": {
+      "0": "Tidak dikenal",
+      "1": "Kata Sandi Sekali Pakai oleh Aplikasi Authenticator (TOTP)",
+      "2": "Sidik Jari, Kunci Keamanan, ID Wajah dan lainnya",
+      "3": "Kata Sandi Satu Kali melalui Email (Email OTP)",
+      "4": "Kata Sandi Satu Kali melalui SMS (SMS OTP)"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Pengaturan Masuk",
+      "DESCRIPTION": "Tentukan bagaimana pengguna Anda dapat diautentikasi di organisasi Anda."
+    },
+    "IDPS": "Penyedia Identitas",
+    "ADDIDP": {
+      "TITLE": "Tambahkan Penyedia Identitas",
+      "DESCRIPTION": "Anda dapat memilih penyedia yang telah ditentukan sebelumnya atau dibuat sendiri untuk autentikasi.",
+      "SELECTIDPS": "Penyedia identitas"
+    },
+    "PASSWORDLESS": "Login Tanpa Kata Sandi",
+    "PASSWORDLESSTYPE": { "0": "Tidak diperbolehkan", "1": "Diizinkan" }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Penyedia SMTP",
+      "DESCRIPTION": "Ini adalah penyedia SMTP untuk instans ZITADEL Anda. Aktifkan yang ingin Anda gunakan untuk mengirim notifikasi ke pengguna Anda.",
+      "EMPTY": "Tidak ada Penyedia SMTP yang tersedia",
+      "ACTIVATED": "Diaktifkan",
+      "ACTIVATE": "Aktifkan penyedia",
+      "DEACTIVATE": "Nonaktifkan penyedia",
+      "TEST": "Uji penyedia Anda",
+      "TYPE": "Jenis",
+      "DIALOG": {
+        "ACTIVATED": "Konfigurasi SMTP telah diaktifkan",
+        "ACTIVATE_WARN_TITLE": "Aktifkan konfigurasi SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Anda akan mengaktifkan konfigurasi SMTP. Pertama kita akan menonaktifkan penyedia aktif saat ini dan kemudian mengaktifkan konfigurasi ini. Apa kamu yakin?",
+        "DEACTIVATE_WARN_TITLE": "Nonaktifkan konfigurasi SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Anda akan menonaktifkan konfigurasi SMTP. Apa kamu yakin?",
+        "DEACTIVATED": "Konfigurasi SMTP telah dinonaktifkan",
+        "DELETE_TITLE": "Hapus konfigurasi SMTP",
+        "DELETE_DESCRIPTION": "Anda akan menghapus konfigurasi. Konfirmasikan tindakan ini dengan mengetikkan nama pengirim",
+        "DELETED": "Konfigurasi SMTP telah dihapus",
+        "SENDER": "Ketik {{value}}, untuk menghapus konfigurasi SMTP ini.",
+        "TEST_TITLE": "Uji konfigurasi SMTP Anda",
+        "TEST_DESCRIPTION": "Tentukan alamat email untuk menguji konfigurasi SMTP Anda untuk penyedia ini",
+        "TEST_EMAIL": "Alamat email",
+        "TEST_RESULT": "Hasil tes"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Tambahkan penyedia SMTP",
+      "DESCRIPTION": "Pilih satu atau lebih penyedia berikut.",
+      "STEPS": {
+        "TITLE": "Tambahkan {{ value }} Penyedia SMTP",
+        "CREATE_DESC_TITLE": "Masukkan setelan SMTP {{ value }} Anda selangkah demi selangkah",
+        "CURRENT_DESC_TITLE": "Ini adalah pengaturan SMTP Anda",
+        "PROVIDER_SETTINGS": "Pengaturan Penyedia SMTP",
+        "SENDER_SETTINGS": "Pengaturan Pengirim",
+        "NEXT_STEPS": "Langkah Selanjutnya",
+        "ACTIVATE": {
+          "TITLE": "Aktifkan Penyedia SMTP Anda",
+          "DESCRIPTION": "ZITADEL tidak dapat menggunakan Penyedia SMTP ini untuk mengirimkan pemberitahuan sampai Anda mengaktifkannya. Jika Anda mengaktifkan penyedia ini, penyedia lain yang aktif sekarang akan dinonaktifkan."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Nonaktifkan Penyedia SMTP Anda",
+          "DESCRIPTION": "Jika Anda menonaktifkan Penyedia SMTP ini, ZITADEL tidak dapat menggunakannya untuk mengirimkan pemberitahuan sampai Anda mengaktifkannya kembali."
+        },
+        "SAVE_SETTINGS": "Simpan pengaturan Anda",
+        "TEST": {
+          "TITLE": "Uji pengaturan Anda",
+          "DESCRIPTION": "Anda dapat menguji pengaturan penyedia SMTP dan memeriksa hasil tes sebelum menyimpannya",
+          "RESULT": "Email Anda berhasil terkirim"
+        }
+      }
+    },
+    "DETAIL": { "TITLE": "Pengaturan Penyedia SMTP" },
+    "EMPTY": "Tidak ada penyedia SMTP yang tersedia",
+    "STEPS": { "SENDGRID": {} }
+  },
+  "APP": {
+    "LIST": "Aplikasi",
+    "COMPLIANCE": "Kepatuhan OIDC",
+    "URLS": "URL",
+    "CONFIGURATION": "Konfigurasi",
+    "TOKEN": "Pengaturan Token",
+    "PAGES": {
+      "TITLE": "Aplikasi",
+      "ID": "PENGENAL",
+      "DESCRIPTION": "Di sini Anda dapat mengedit data aplikasi dan konfigurasinya.",
+      "CREATE": "Buat aplikasi",
+      "CREATE_SELECT_PROJECT": "Pilih proyek Anda terlebih dahulu",
+      "CREATE_NEW_PROJECT": "atau masukkan nama untuk proyek baru Anda",
+      "CREATE_DESC_TITLE": "Masukkan Detail Aplikasi Anda Langkah demi Langkah",
+      "CREATE_DESC_SUB": "Konfigurasi yang disarankan akan dibuat secara otomatis.",
+      "STATE": "Status",
+      "DATECREATED": "Dibuat",
+      "DATECHANGED": "Berubah",
+      "URLS": "URL",
+      "DELETE": "Hapus Aplikasi",
+      "JUMPTOPROJECT": "Untuk mengonfigurasi peran, otorisasi, dan lainnya, navigasikan ke proyek.",
+      "DETAIL": { "TITLE": "Detil", "STATE": { "0": "Tidak ditentukan", "1": "Aktif", "2": "Tidak aktif" } },
+      "DIALOG": {
+        "CONFIG": { "TITLE": "Ubah Konfigurasi OIDC" },
+        "DELETE": { "TITLE": "Hapus Aplikasi", "DESCRIPTION": "Apakah Anda benar-benar ingin menghapus aplikasi ini?" }
+      },
+      "NEXTSTEPS": {
+        "0": { "TITLE": "Tambahkan peran", "DESC": "Masukkan peran proyek Anda" },
+        "1": { "TITLE": "Tambahkan pengguna", "DESC": "Tambahkan pengguna baru organisasi Anda" },
+        "2": {
+          "TITLE": "Bantuan & Dukungan",
+          "DESC": "Baca dokumentasi kami tentang pembuatan aplikasi atau hubungi dukungan kami"
+        },
+        "TITLE": "Langkah Selanjutnya"
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Ganti Nama Aplikasi",
+      "DESCRIPTION": "Masukkan nama baru untuk aplikasi Anda",
+      "NAME": "Nama Baru"
+    },
+    "NAME": "Nama",
+    "TYPE": "Jenis Aplikasi",
+    "AUTHMETHOD": "Metode Otentikasi",
+    "AUTHMETHODSECTION": "Metode Otentikasi",
+    "GRANT": "Jenis Hibah",
+    "ADDITIONALORIGINS": "Asal Tambahan",
+    "ADDITIONALORIGINSDESC": "Jika Anda ingin menambahkan Origins tambahan ke aplikasi Anda yang tidak digunakan sebagai pengalihan, Anda dapat melakukannya di sini.",
+    "ORIGINS": "Asal",
+    "NOTANORIGIN": "Nilai yang dimasukkan bukan merupakan asal",
+    "PROSWITCH": "Saya seorang profesional. Lewati wisaya ini.",
+    "NAMEANDTYPESECTION": "Nama dan Jenis",
+    "TITLEFIRST": "Nama aplikasi",
+    "TYPETITLE": "Jenis aplikasi",
+    "OIDC": {
+      "WELLKNOWN": "Tautan lebih lanjut dapat diambil dari <a href='{{url}}' title='Discovery endpoint' target='_blank'>discovery endpoint</a>.",
+      "INFO": { "ISSUER": "Penerbit", "CLIENTID": "Id Klien" },
+      "CURRENT": "Konfigurasi Saat Ini",
+      "TOKENSECTIONTITLE": "Opsi AuthToken",
+      "REDIRECTSECTIONTITLE": "Pengaturan Pengalihan",
+      "REDIRECTTITLE": "Tentukan URI tempat login akan dialihkan.",
+      "POSTREDIRECTTITLE": "Ini adalah URI pengalihan setelah logout.",
+      "REDIRECTDESCRIPTIONWEB": "URI pengalihan harus diawali dengan https://. http:// hanya valid dengan mode pengembangan yang diaktifkan.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI pengalihan harus diawali dengan protokol Anda sendiri, http://127.0.0.1, http://[::1] atau http://localhost.",
+      "REDIRECTNOTVALID": "URI pengalihan ini tidak valid.",
+      "COMMAORENTERSEPERATION": "pisahkan dengan ↵",
+      "TYPEREQUIRED": "Jenisnya wajib diisi.",
+      "TITLE": "Konfigurasi OIDC",
+      "CLIENTID": "ID Klien",
+      "CLIENTSECRET": "Rahasia Klien",
+      "CLIENTSECRET_NOSECRET": "Dengan alur autentikasi yang Anda pilih, tidak ada rahasia yang diperlukan dan oleh karena itu tidak tersedia.",
+      "CLIENTSECRET_DESCRIPTION": "Jaga rahasia klien Anda di tempat yang aman karena akan hilang setelah dialog ditutup.",
+      "REGENERATESECRET": "Regenerasi Rahasia Klien",
+      "DEVMODE": "Modus Pengembangan",
+      "DEVMODE_ENABLED": "Diaktifkan",
+      "DEVMODE_DISABLED": "Dengan disabilitas",
+      "DEVMODEDESC": "Hati-hati: Dengan mengaktifkan mode pengembangan, URI pengalihan tidak akan divalidasi.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Lewati Halaman Sukses Login",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Lewati halaman sukses setelah login untuk aplikasi asli ini.",
+      "REDIRECT": "Arahkan ulang URI",
+      "REDIRECTSECTION": "Arahkan ulang URI",
+      "POSTLOGOUTREDIRECT": "URI Posting Logout",
+      "RESPONSESECTION": "Jenis Respons",
+      "GRANTSECTION": "Jenis Hibah",
+      "GRANTTITLE": "Pilih jenis hibah Anda. Catatan: Implisit hanya tersedia untuk aplikasi berbasis browser.",
+      "APPTYPE": { "0": "jaring", "1": "Agen Pengguna", "2": "Warga asli" },
+      "RESPONSETYPE": "Jenis Respons",
+      "RESPONSE": { "0": "Kode", "1": "Token Identitas", "2": "Token-ID Token" },
+      "REFRESHTOKEN": "Segarkan Token",
+      "GRANTTYPE": "Jenis Hibah",
+      "GRANT": {
+        "0": "Kode Otorisasi",
+        "1": "Implisit",
+        "2": "Segarkan Token",
+        "3": "Kode Perangkat",
+        "4": "Pertukaran Token"
+      },
+      "AUTHMETHOD": { "0": "Dasar", "1": "Pos", "2": "Tidak ada", "3": "Kunci Pribadi JWT" },
+      "TOKENTYPE": "Jenis Token Otentikasi",
+      "TOKENTYPE0": "Token Pembawa",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Saya harap Anda tahu apa yang Anda lakukan.",
+      "OVERVIEWSECTION": "Ringkasan",
+      "OVERVIEWTITLE": "Anda sekarang sudah selesai. Tinjau konfigurasi Anda.",
+      "ACCESSTOKENROLEASSERTION": "Tambahkan peran pengguna ke token akses",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Jika dipilih, peran yang diminta dari pengguna yang diautentikasi akan ditambahkan ke token akses.",
+      "IDTOKENROLEASSERTION": "Peran pengguna di dalam Token ID",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Jika dipilih, peran yang diminta dari pengguna yang diautentikasi akan ditambahkan ke token ID.",
+      "IDTOKENUSERINFOASSERTION": "Info Pengguna di dalam Token ID",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Memungkinkan klien untuk mengambil klaim profil, email, telepon dan alamat dari token ID.",
+      "CLOCKSKEW": "Memungkinkan klien untuk menangani kemiringan jam OP dan klien. Durasi (0-5 detik) akan ditambahkan ke klaim exp dan dikurangi dari iats, auth_time, dan nbf.",
+      "RECOMMENDED": "direkomendasikan",
+      "NOTRECOMMENDED": "tidak disarankan",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": { "TITLE": "jaring", "DESCRIPTION": "Aplikasi Web biasa seperti .net, PHP, Node.js, Java, dll." },
+          "NATIVE": { "TITLE": "Warga asli", "DESCRIPTION": "Aplikasi Seluler, Desktop, Perangkat Cerdas, dll." },
+          "USERAGENT": {
+            "TITLE": "Agen Pengguna",
+            "DESCRIPTION": "Aplikasi Halaman Tunggal (SPA) dan secara umum semua kerangka JS dijalankan di browser"
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": { "CLIENTID": "Id Klien" },
+      "REGENERATESECRET": "Regenerasi Rahasia Klien",
+      "SELECTION": { "TITLE": "API", "DESCRIPTION": "API secara umum" },
+      "AUTHMETHOD": { "0": "Dasar", "1": "Kunci Pribadi JWT" }
+    },
+    "SAML": {
+      "SELECTION": { "TITLE": "SAML", "DESCRIPTION": "Aplikasi SAML" },
+      "CONFIGSECTION": "Konfigurasi SAML",
+      "CHOOSEMETADATASOURCE": "Berikan konfigurasi SAML Anda menggunakan salah satu opsi berikut:",
+      "METADATAOPT1": "Opsi 1. Tentukan url tempat file metadata berada",
+      "METADATAOPT2": "Opsi 2. Unggah file yang berisi XML metadata Anda",
+      "METADATAOPT3": "Opsi 3. Buat file metadata minimal dengan cepat yang menyediakan ENTITYID dan URL ACS",
+      "UPLOAD": "Unggah berkas XML",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata dari file",
+      "CERTIFICATE": "Sertifikat SAML",
+      "DOWNLOADCERT": "Unduh sertifikat SAML",
+      "CREATEMETADATA": "Buat metadata",
+      "ENTITYID": "ID Entitas",
+      "ACSURL": "URL titik akhir ACS"
+    },
+    "AUTHMETHODS": {
+      "CODE": { "TITLE": "Kode", "DESCRIPTION": "Tukarkan kode otorisasi dengan token" },
+      "PKCE": { "TITLE": "PKCE", "DESCRIPTION": "Gunakan hash acak alih-alih rahasia klien statis untuk keamanan lebih" },
+      "POST": { "TITLE": "POS", "DESCRIPTION": "Kirim client_id dan client_secret sebagai bagian dari formulir" },
+      "PK_JWT": { "TITLE": "Kunci Pribadi JWT", "DESCRIPTION": "Gunakan kunci pribadi untuk mengotorisasi aplikasi Anda" },
+      "BASIC": { "TITLE": "Dasar", "DESCRIPTION": "Otentikasi dengan Nama Pengguna dan Kata Sandi" },
+      "IMPLICIT": { "TITLE": "Implisit", "DESCRIPTION": "Dapatkan token langsung dari titik akhir otorisasi" },
+      "DEVICECODE": { "TITLE": "Kode Perangkat", "DESCRIPTION": "Otorisasi perangkat di komputer atau ponsel cerdas." },
+      "CUSTOM": { "TITLE": "Kebiasaan", "DESCRIPTION": "Pengaturan Anda tidak sesuai dengan opsi lainnya." }
+    },
+    "TOAST": {
+      "REACTIVATED": "Aplikasi diaktifkan kembali.",
+      "DEACTIVATED": "Aplikasi dinonaktifkan.",
+      "OIDCUPDATED": "Aplikasi diperbarui.",
+      "APIUPDATED": "Aplikasi diperbarui",
+      "UPDATED": "Aplikasi diperbarui.",
+      "CREATED": "Aplikasi dibuat.",
+      "CLIENTSECRETREGENERATED": "rahasia klien dihasilkan.",
+      "DELETED": "Aplikasi dihapus.",
+      "CONFIGCHANGED": "Perubahan terdeteksi!"
+    }
+  },
+  "GENDERS": { "0": "Tidak dikenal", "1": "Perempuan", "2": "Pria", "3": "Lainnya" },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
+  },
+  "MEMBER": {
+    "ADD": "Tambahkan Manajer",
+    "CREATIONTYPE": "Jenis Penciptaan",
+    "CREATIONTYPES": { "0": "Proyek Milik", "1": "Proyek yang Diberikan", "2": "Organisasi", "3": "SAYA", "4": "Proyek" },
+    "EDITROLE": "Edit peran",
+    "EDITFOR": "Edit peran pengguna: {{value}}",
+    "DIALOG": { "DELETE_TITLE": "Hapus Manajer", "DELETE_DESCRIPTION": "Anda akan menghapus pengelola. Apa kamu yakin?" },
+    "SHOWDETAILS": "Klik untuk menampilkan detail."
+  },
+  "ROLESLABEL": "Peran",
+  "GRANTS": {
+    "TITLE": "Otorisasi",
+    "DESC": "Ini semua adalah otorisasi pada organisasi Anda.",
+    "DELETE": "Hapus Otorisasi",
+    "EMPTY": "Tidak ada otorisasi yang ditemukan",
+    "ADD": "Buat Otorisasi",
+    "ADD_BTN": "Baru",
+    "PROJECT": {
+      "TITLE": "Otorisasi",
+      "DESCRIPTION": "Tentukan otorisasi untuk proyek yang ditentukan. Perhatikan bahwa Anda hanya dapat melihat entri proyek dan pengguna yang Anda miliki izinnya."
+    },
+    "USER": {
+      "TITLE": "Otorisasi",
+      "DESCRIPTION": "Tentukan otorisasi untuk pengguna tertentu. Perhatikan bahwa Anda hanya dapat melihat entri proyek dan pengguna yang Anda miliki izinnya."
+    },
+    "CREATE": { "TITLE": "Buat otorisasi", "DESCRIPTION": "Cari organisasi, proyek, dan peran terkait." },
+    "EDIT": { "TITLE": "Ubah otorisasi" },
+    "DETAIL": { "TITLE": "Detail Otorisasi", "DESCRIPTION": "Di sini Anda dapat melihat semua detail otorisasi." },
+    "TOAST": {
+      "UPDATED": "Otorisasi diperbarui.",
+      "REMOVED": "Otorisasi dihapus",
+      "BULKREMOVED": "Otorisasi dihapus.",
+      "CANTSHOWINFO": "Anda tidak dapat mengunjungi profil pengguna ini karena Anda bukan anggota organisasi tempat pengguna ini berada"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Hapus otorisasi",
+      "DELETE_DESCRIPTION": "Anda akan menghapus otorisasi. Apakah Anda ingin melanjutkan?",
+      "BULK_DELETE_TITLE": "Hapus otorisasi",
+      "BULK_DELETE_DESCRIPTION": "Anda akan menghapus beberapa otorisasi. Apakah Anda ingin melanjutkan?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Perubahan Terakhir",
+    "BOTTOM": "Anda telah mencapai akhir daftar.",
+    "LOADMORE": "Muat lebih banyak",
+    "ORG": {
+      "TITLE": "Aktivitas",
+      "DESCRIPTION": "Di sini Anda dapat melihat peristiwa terkini yang menyebabkan perubahan organisasi."
+    },
+    "PROJECT": {
+      "TITLE": "Aktivitas",
+      "DESCRIPTION": "Di sini Anda dapat melihat peristiwa terbaru yang menghasilkan perubahan proyek."
+    },
+    "USER": {
+      "TITLE": "Aktivitas",
+      "DESCRIPTION": "Di sini Anda dapat melihat peristiwa terbaru yang menghasilkan perubahan pengguna."
+    }
+  }
+}

@@ -173,9 +173,9 @@ func prepareLockoutPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexityPolicy.NotFound")
+					return nil, zerrors.ThrowNotFound(err, "QUERY-38pZnUemLP", "Errors.IAM.PasswordLockoutPolicy.NotFound")
 				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-PJURxRUoYG", "Errors.Internal")
 			}
 			return policy, nil
 		}
