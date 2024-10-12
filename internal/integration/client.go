@@ -776,6 +776,104 @@ func (i *Instance) CreateSchemaUser(ctx context.Context, orgID string, schemaID 
 	return user
 }
 
+func (i *Instance) AddAuthenticatorUsername(ctx context.Context, orgID string, userID string, username string, isOrgSpecific bool) *user_v3alpha.AddUsernameResponse {
+	user, err := i.Client.UserV3Alpha.AddUsername(ctx, &user_v3alpha.AddUsernameRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		Username: &user_v3alpha.SetUsername{
+			Username:               username,
+			IsOrganizationSpecific: isOrgSpecific,
+		},
+	})
+	logging.OnError(err).Fatal("create username")
+	return user
+}
+
+func (i *Instance) RemoveAuthenticatorUsername(ctx context.Context, orgID string, userid, id string) *user_v3alpha.RemoveUsernameResponse {
+	user, err := i.Client.UserV3Alpha.RemoveUsername(ctx, &user_v3alpha.RemoveUsernameRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userid,
+		UsernameId:   id,
+	})
+	logging.OnError(err).Fatal("remove username")
+	return user
+}
+
+func (i *Instance) SetAuthenticatorPassword(ctx context.Context, orgID string, userID string, password string) *user_v3alpha.SetPasswordResponse {
+	user, err := i.Client.UserV3Alpha.SetPassword(ctx, &user_v3alpha.SetPasswordRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		NewPassword: &user_v3alpha.SetPassword{
+			Type: &user_v3alpha.SetPassword_Password{Password: password},
+		},
+	})
+	logging.OnError(err).Fatal("create password")
+	return user
+}
+
+func (i *Instance) RequestAuthenticatorPasswordReset(ctx context.Context, orgID string, userID string) *user_v3alpha.RequestPasswordResetResponse {
+	user, err := i.Client.UserV3Alpha.RequestPasswordReset(ctx, &user_v3alpha.RequestPasswordResetRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		Medium:       &user_v3alpha.RequestPasswordResetRequest_ReturnCode{},
+	})
+	logging.OnError(err).Fatal("reset password")
+	return user
+}
+
+func (i *Instance) RemoveAuthenticatorPassword(ctx context.Context, orgID string, id string) *user_v3alpha.RemovePasswordResponse {
+	user, err := i.Client.UserV3Alpha.RemovePassword(ctx, &user_v3alpha.RemovePasswordRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           id,
+	})
+	logging.OnError(err).Fatal("remove username")
+	return user
+}
+
+func (i *Instance) AddAuthenticatorPublicKey(ctx context.Context, orgID string, userID string, pk []byte) *user_v3alpha.AddPublicKeyResponse {
+	user, err := i.Client.UserV3Alpha.AddPublicKey(ctx, &user_v3alpha.AddPublicKeyRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userID,
+		PublicKey: &user_v3alpha.SetPublicKey{
+			Type: &user_v3alpha.SetPublicKey_PublicKey{PublicKey: &user_v3alpha.ProvidedPublicKey{
+				PublicKey: pk,
+			}},
+		},
+	})
+	logging.OnError(err).Fatal("create pk")
+	return user
+}
+
+func (i *Instance) RemoveAuthenticatorPublicKey(ctx context.Context, orgID string, userid, id string) *user_v3alpha.RemovePublicKeyResponse {
+	user, err := i.Client.UserV3Alpha.RemovePublicKey(ctx, &user_v3alpha.RemovePublicKeyRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:           userid,
+		PublicKeyId:  id,
+	})
+	logging.OnError(err).Fatal("remove pk")
+	return user
+}
+
+func (i *Instance) AddAuthenticatorPersonalAccessToken(ctx context.Context, orgID string, userID string) *user_v3alpha.AddPersonalAccessTokenResponse {
+	user, err := i.Client.UserV3Alpha.AddPersonalAccessToken(ctx, &user_v3alpha.AddPersonalAccessTokenRequest{
+		Organization:        &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:                  userID,
+		PersonalAccessToken: &user_v3alpha.SetPersonalAccessToken{},
+	})
+	logging.OnError(err).Fatal("create pat")
+	return user
+}
+
+func (i *Instance) RemoveAuthenticatorPersonalAccessToken(ctx context.Context, orgID string, userid, id string) *user_v3alpha.RemovePersonalAccessTokenResponse {
+	user, err := i.Client.UserV3Alpha.RemovePersonalAccessToken(ctx, &user_v3alpha.RemovePersonalAccessTokenRequest{
+		Organization:          &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		Id:                    userid,
+		PersonalAccessTokenId: id,
+	})
+	logging.OnError(err).Fatal("remove pat")
+	return user
+}
+
 func (i *Instance) UpdateSchemaUserEmail(ctx context.Context, orgID string, userID string, email string) *user_v3alpha.SetContactEmailResponse {
 	user, err := i.Client.UserV3Alpha.SetContactEmail(ctx, &user_v3alpha.SetContactEmailRequest{
 		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},

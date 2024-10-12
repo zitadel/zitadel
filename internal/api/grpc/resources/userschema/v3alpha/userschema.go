@@ -149,8 +149,8 @@ func authenticatorTypeToDomain(authenticator schema.AuthenticatorType) domain.Au
 		return domain.AuthenticatorTypeOTPEmail
 	case schema.AuthenticatorType_AUTHENTICATOR_TYPE_OTP_SMS:
 		return domain.AuthenticatorTypeOTPSMS
-	case schema.AuthenticatorType_AUTHENTICATOR_TYPE_AUTHENTICATION_KEY:
-		return domain.AuthenticatorTypeAuthenticationKey
+	case schema.AuthenticatorType_AUTHENTICATOR_TYPE_PUBLIC_KEY:
+		return domain.AuthenticatorTypePublicKey
 	case schema.AuthenticatorType_AUTHENTICATOR_TYPE_IDENTITY_PROVIDER:
 		return domain.AuthenticatorTypeIdentityProvider
 	default:
