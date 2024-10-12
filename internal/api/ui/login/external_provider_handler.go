@@ -240,7 +240,7 @@ func (l *Login) validateIDPInitiatedLogin(ctx context.Context, relayState string
 
 	urlQuery, err := url.ParseQuery(relayState)
 	if err != nil {
-		logging.WithFields("relayState", relayState).Error("unable to parse relayState for idp initiated login")
+		logging.Error("unable to parse relayState for idp initiated login")
 		return data, false
 	}
 
@@ -252,31 +252,31 @@ func (l *Login) validateIDPInitiatedLogin(ctx context.Context, relayState string
 	)
 
 	if orgID == "" || idpID == "" || clientID == "" || redirectUri == "" {
-		logging.WithFields("relayState", relayState).Error("unable to load orgID, idpID, clientID and redirectURI from relayState for idp initiated login")
+		logging.Error("unable to load orgID, idpID, clientID and redirectURI from relayState for idp initiated login")
 		return data, false
 	}
 
 	parsedRedirectURI, err := url.Parse(redirectUri)
 	if err != nil {
-		logging.WithFields("relayState", relayState).Error("unable to parse redirectURI from relayState for idp initiated login")
+		logging.Error("unable to parse redirectURI from relayState for idp initiated login")
 		return data, false
 	}
 
 	_, err = l.command.GetProvider(ctx, idpID, l.oidcAuthCallbackURL(ctx, idpID), l.samlAuthCallbackURL(ctx, idpID))
 	if err != nil {
-		logging.WithFields("relayState", relayState).Error("unable to get idp provider for idp initiated login")
+		logging.Error("unable to get idp provider for idp initiated login")
 		return data, false
 	}
 
 	searchQuery, err := query.NewOrgDomainOrgIDSearchQuery(orgID)
 	if err != nil {
-		logging.WithFields("relayState", relayState).Error("unable to search query for idp initiated login")
+		logging.Error("unable to search query for idp initiated login")
 		return data, false
 	}
 
 	domains, err := l.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{searchQuery}}, false)
 	if err != nil {
-		logging.WithFields("relayState", relayState).Error("unable to load domains for idp initiated login")
+		logging.Error("unable to load domains for idp initiated login")
 		return data, false
 	}
 
@@ -288,17 +288,17 @@ func (l *Login) validateIDPInitiatedLogin(ctx context.Context, relayState string
 		}
 	}
 	if primaryDomain == nil {
-		logging.WithFields("relayState", relayState).Error("unable to primary domain for idp initiated login")
+		logging.Error("unable to primary domain for idp initiated login")
 		return data, false
 	}
-	
+
 	app, err := l.query.AppByOIDCClientID(ctx, clientID)
 	if err != nil {
-		logging.WithFields("relayState", relayState).Error("unable to oidc application by clientID for idp initiated login")
+		logging.Error("unable to oidc application by clientID for idp initiated login")
 		return data, false
 	}
 	if app.OIDCConfig == nil || !slices.Contains(app.OIDCConfig.RedirectURIs, parsedRedirectURI.String()) {
-		logging.WithFields("relayState", relayState).Debug("redirect URI not contained in OIDC application")
+		logging.Debug("redirect URI not contained in OIDC application")
 		return data, false
 	}
 
