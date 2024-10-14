@@ -134,6 +134,6 @@
   },
   "error": {
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
-    "sessionExpired": "Sie müssen eine gültige Sitzung haben, um fortzufahren."
+    "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
   }
 }

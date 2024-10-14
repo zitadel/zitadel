@@ -134,6 +134,6 @@
   },
   "error": {
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
-    "sessionExpired": "You need to have a valid session in order to continue."
+    "sessionExpired": "Your current session has expired. Please login again."
   }
 }
