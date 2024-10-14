@@ -70,7 +70,6 @@ export function PasswordForm({
 
     setLoading(false);
 
-    console.log(response);
     return response;
   }
 
@@ -112,11 +111,6 @@ export function PasswordForm({
       !submitted.authMethods ||
       !submitted.factors?.user?.loginName
     ) {
-      console.log(
-        !submitted,
-        !submitted?.authMethods,
-        !submitted?.factors?.user?.loginName,
-      );
       return;
     }
 
@@ -126,7 +120,6 @@ export function PasswordForm({
         m !== AuthenticationMethodType.PASSKEY,
     );
 
-    console.log(availableSecondFactors);
     if (availableSecondFactors?.length == 1) {
       const params = new URLSearchParams({
         loginName: submitted.factors?.user.loginName,
