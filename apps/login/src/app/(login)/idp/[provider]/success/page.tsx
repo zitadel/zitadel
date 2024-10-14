@@ -51,7 +51,7 @@ export default async function Page({
 
   const { idpInformation, userId } = intent;
 
-  if (userId && id && token) {
+  if (userId) {
     // TODO: update user if idp.options.isAutoUpdate is true
 
     return (
