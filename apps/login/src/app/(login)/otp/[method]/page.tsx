@@ -4,6 +4,7 @@ import { LoginOTP } from "@/components/login-otp";
 import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings } from "@/lib/zitadel";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
   searchParams,
@@ -12,6 +13,9 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "otp" });
+
   const { loginName, authRequestId, sessionId, organization, code, submit } =
     searchParams;
 
@@ -27,23 +31,20 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Verify 2-Factor</h1>
+        <h1>{t("verify.title")}</h1>
         {method === "time-based" && (
-          <p className="ztdl-p">Enter the code from your authenticator app.</p>
+          <p className="ztdl-p">{t("verify.totpDescription")}</p>
         )}
         {method === "sms" && (
-          <p className="ztdl-p">Enter the code you got on your phone.</p>
+          <p className="ztdl-p">{t("verify.smsDescription")}</p>
         )}
         {method === "email" && (
-          <p className="ztdl-p">Enter the code you got via your email.</p>
+          <p className="ztdl-p">{t("verify.emailDescription")}</p>
         )}
 
         {!session && (
           <div className="py-4">
-            <Alert>
-              Could not get the context of the user. Make sure to enter the
-              username first or provide a loginName as searchParam.
-            </Alert>
+            <Alert>{t("error:unknownContext")}</Alert>
           </div>
         )}
 

@@ -3,6 +3,7 @@ import { SessionsList } from "@/components/sessions-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
 import { getBrandingSettings, listSessions } from "@/lib/zitadel";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 async function loadSessions() {
@@ -24,6 +25,9 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "accounts" });
+
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
@@ -34,8 +38,8 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Accounts</h1>
-        <p className="ztdl-p mb-6 block">Use your ZITADEL Account</p>
+        <h1>{t("title")}</h1>
+        <p className="ztdl-p mb-6 block">{t("description")}</p>
 
         <div className="flex flex-col w-full space-y-2">
           <SessionsList sessions={sessions} authRequestId={authRequestId} />
@@ -53,7 +57,7 @@ export default async function Page({
               <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
                 <UserPlusIcon className="h-5 w-5" />
               </div>
-              <span className="text-sm">Add another account</span>
+              <span className="text-sm">{t("addAnother")}</span>
             </div>
           </Link>
         </div>

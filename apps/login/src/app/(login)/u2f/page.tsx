@@ -5,12 +5,16 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "u2f" });
+
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
   const branding = await getBrandingSettings(organization);
@@ -34,7 +38,7 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Verify 2-Factor</h1>
+        <h1>{t("verify.title")}</h1>
 
         {sessionFactors && (
           <UserAvatar
@@ -44,12 +48,10 @@ export default async function Page({
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">
-          Verify your account with your device.
-        </p>
+        <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
         {!(loginName || sessionId) && (
-          <Alert>Provide your active session as loginName param</Alert>
+          <Alert>{t("error:unknownContext")}</Alert>
         )}
 
         {(loginName || sessionId) && (

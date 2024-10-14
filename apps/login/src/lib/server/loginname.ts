@@ -5,12 +5,14 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { idpTypeToSlug } from "../idp";
+import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 import {
   getActiveIdentityProviders,
+  getIDPByID,
   getLoginSettings,
   getOrgsByDomain,
   listAuthenticationMethodTypes,
+  listIDPLinks,
   listUsers,
   startIdentityProviderFlow,
 } from "../zitadel";
@@ -57,6 +59,51 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const resp = await startIdentityProviderFlow({
         idpId: identityProviders[0].id,
+        urls: {
+          successUrl:
+            `${host}/idp/${provider}/success?` + new URLSearchParams(params),
+          failureUrl:
+            `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
+        },
+      });
+
+      if (resp?.nextStep.case === "authUrl") {
+        return redirect(resp.nextStep.value);
+      }
+    }
+  };
+
+  const redirectUserToIDP = async (userId: string) => {
+    const identityProviders = await listIDPLinks(userId).then((resp) => {
+      return resp.result;
+    });
+
+    if (identityProviders.length === 1) {
+      const host = headers().get("host");
+      const identityProviderId = identityProviders[0].idpId;
+
+      const idp = await getIDPByID(identityProviderId);
+      const idpType = idp?.type;
+
+      if (!idp || !idpType) {
+        throw new Error("Could not find identity provider");
+      }
+
+      const identityProviderType = idpTypeToIdentityProviderType(idpType);
+      const provider = idpTypeToSlug(identityProviderType);
+
+      const params = new URLSearchParams();
+
+      if (command.authRequestId) {
+        params.set("authRequestId", command.authRequestId);
+      }
+
+      if (command.organization) {
+        params.set("organization", command.organization);
+      }
+
+      const resp = await startIdentityProviderFlow({
+        idpId: idp.id,
         urls: {
           successUrl:
             `${host}/idp/${provider}/success?` + new URLSearchParams(params),
@@ -153,8 +200,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.IDP)
       ) {
-        // TODO: redirect user to idp
-        await redirectUserToSingleIDPIfAvailable();
+        await redirectUserToIDP(userId);
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)
       ) {

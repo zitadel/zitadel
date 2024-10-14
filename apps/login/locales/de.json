@@ -1,0 +1,139 @@
+{
+  "common": {
+    "back": "Zurück"
+  },
+  "accounts": {
+    "title": "Konten",
+    "description": "Wählen Sie das Konto aus, das Sie verwenden möchten.",
+    "addAnother": "Ein weiteres Konto hinzufügen",
+    "noResults": "Keine Konten gefunden"
+  },
+  "loginname": {
+    "title": "Willkommen zurück!",
+    "description": "Geben Sie Ihre Anmeldedaten ein.",
+    "register": "Neuen Benutzer registrieren"
+  },
+  "password": {
+    "title": "Passwort",
+    "description": "Geben Sie Ihr Passwort ein.",
+    "resetPassword": "Passwort zurücksetzen",
+    "submit": "Weiter"
+  },
+  "idp": {
+    "title": "Mit SSO anmelden",
+    "description": "Wählen Sie einen der folgenden Anbieter, um sich anzumelden",
+    "signInWithApple": "Mit Apple anmelden",
+    "signInWithGoogle": "Mit Google anmelden",
+    "signInWithAzureAD": "Mit AzureAD anmelden",
+    "signInWithGithub": "Mit GitHub anmelden",
+    "signInWithGitlab": "Mit GitLab anmelden",
+    "loginSuccess": {
+      "title": "Anmeldung erfolgreich",
+      "description": "Sie haben sich erfolgreich angemeldet!"
+    },
+    "linkingSuccess": {
+      "title": "Konto verknüpft",
+      "description": "Sie haben Ihr Konto erfolgreich verknüpft!"
+    },
+    "registerSuccess": {
+      "title": "Registrierung erfolgreich",
+      "description": "Sie haben sich erfolgreich registriert!"
+    },
+    "loginError": {
+      "title": "Anmeldung fehlgeschlagen",
+      "description": "Beim Anmelden ist ein Fehler aufgetreten."
+    },
+    "linkingError": {
+      "title": "Konto-Verknüpfung fehlgeschlagen",
+      "description": "Beim Verknüpfen Ihres Kontos ist ein Fehler aufgetreten."
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Bestätigen Sie Ihre Identität",
+      "description": "Wählen Sie einen der folgenden Faktoren.",
+      "noResults": "Keine zweiten Faktoren verfügbar, um sie einzurichten."
+    },
+    "set": {
+      "title": "2-Faktor einrichten",
+      "description": "Wählen Sie einen der folgenden zweiten Faktoren."
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "2-Faktor bestätigen",
+      "totpDescription": "Geben Sie den Code aus Ihrer Authentifizierungs-App ein.",
+      "smsDescription": "Geben Sie den Code ein, den Sie per SMS erhalten haben.",
+      "emailDescription": "Geben Sie den Code ein, den Sie per E-Mail erhalten haben.",
+      "noCodeReceived": "Keinen Code erhalten?",
+      "resendCode": "Code erneut senden",
+      "submit": "Weiter"
+    },
+    "set": {
+      "title": "2-Faktor einrichten",
+      "totpDescription": "Scannen Sie den QR-Code mit Ihrer Authentifizierungs-App.",
+      "smsDescription": "Geben Sie Ihre Telefonnummer ein, um einen Code per SMS zu erhalten.",
+      "emailDescription": "Geben Sie Ihre E-Mail-Adresse ein, um einen Code per E-Mail zu erhalten.",
+      "totpRegisterDescription": "Scannen Sie den QR-Code oder navigieren Sie manuell zur URL.",
+      "submit": "Weiter"
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Mit einem Passkey authentifizieren",
+      "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
+      "usePassword": "Passwort verwenden",
+      "submit": "Weiter"
+    },
+    "set": {
+      "title": "Passkey einrichten",
+      "description": "Ihr Gerät wird nach Ihrem Fingerabdruck, Gesicht oder Bildschirmsperre fragen",
+      "info": {
+        "description": "Ein Passkey ist eine Authentifizierungsmethode auf einem Gerät wie Ihr Fingerabdruck, Apple FaceID oder ähnliches.",
+        "link": "Passwortlose Authentifizierung"
+      },
+      "skip": "Überspringen",
+      "submit": "Weiter"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "2-Faktor bestätigen",
+      "description": "Bestätigen Sie Ihr Konto mit Ihrem Gerät."
+    },
+    "set": {
+      "title": "2-Faktor einrichten",
+      "description": "Richten Sie ein Gerät als zweiten Faktor ein.",
+      "submit": "Weiter"
+    }
+  },
+  "register": {
+    "title": "Registrieren",
+    "description": "Erstellen Sie Ihr ZITADEL-Konto.",
+    "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
+    "agreeTo": "Um sich zu registrieren, müssen Sie den Nutzungsbedingungen zustimmen",
+    "termsOfService": "Nutzungsbedingungen",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "submit": "Weiter",
+    "password": {
+      "title": "Passwort festlegen",
+      "description": "Legen Sie das Passwort für Ihr Konto fest",
+      "submit": "Weiter"
+    }
+  },
+  "signedin": {
+    "title": "Willkommen {user}!",
+    "description": "Sie sind angemeldet."
+  },
+  "verify": {
+    "title": "Benutzer verifizieren",
+    "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
+    "userIdMissing": "Keine Benutzer-ID angegeben!",
+    "resendCode": "Code erneut senden",
+    "submit": "Weiter"
+  },
+  "error": {
+    "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
+    "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+  }
+}

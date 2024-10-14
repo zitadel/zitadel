@@ -1,6 +1,7 @@
 "use client";
 
 import { sendLoginname } from "@/lib/server/loginname";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -31,6 +32,7 @@ export function UsernameForm({
   allowRegister,
   children,
 }: Props) {
+  const t = useTranslations("loginname");
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -96,7 +98,7 @@ export function UsernameForm({
             type="button"
             disabled={loading}
           >
-            Register new user
+            {t("register")}
           </button>
         )}
       </div>

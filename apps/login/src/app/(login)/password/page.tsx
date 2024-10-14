@@ -5,12 +5,16 @@ import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "password" });
+
   const { loginName, organization, authRequestId, alt } = searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
@@ -31,17 +35,14 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{sessionFactors?.factors?.user?.displayName ?? "Password"}</h1>
-        <p className="ztdl-p mb-6 block">Enter your password.</p>
+        <h1>{sessionFactors?.factors?.user?.displayName ?? t("title")}</h1>
+        <p className="ztdl-p mb-6 block">{t("description")}</p>
 
         {/* show error only if usernames should be shown to be unknown */}
         {(!sessionFactors || !loginName) &&
           !loginSettings?.ignoreUnknownUsernames && (
             <div className="py-4">
-              <Alert>
-                Could not get the context of the user. Make sure to enter the
-                username first or provide a loginName as searchParam.
-              </Alert>
+              <Alert>{t("error:unknownContext")}</Alert>
             </div>
           )}
 

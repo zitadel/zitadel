@@ -10,12 +10,16 @@ import {
   getSession,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "mfa" });
+
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
   const sessionFactors = sessionId
@@ -67,9 +71,9 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Verify 2-Factor</h1>
+        <h1>{t("verify.title")}</h1>
 
-        <p className="ztdl-p">Choose one of the following second factors.</p>
+        <p className="ztdl-p">{t("verify.description")}</p>
 
         {sessionFactors && (
           <UserAvatar
@@ -81,7 +85,7 @@ export default async function Page({
         )}
 
         {!(loginName || sessionId) && (
-          <Alert>Provide your active session as loginName param</Alert>
+          <Alert>{t("error:unknownContext")}</Alert>
         )}
 
         {sessionFactors ? (
@@ -93,7 +97,7 @@ export default async function Page({
             userMethods={sessionFactors.authMethods ?? []}
           ></ChooseSecondFactor>
         ) : (
-          <Alert>No second factors available to setup.</Alert>
+          <Alert>{t("verify.noResults")}</Alert>
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">

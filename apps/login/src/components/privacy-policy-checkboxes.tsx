@@ -1,5 +1,6 @@
 "use client";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
 import { Checkbox } from "./checkbox";
@@ -15,6 +16,7 @@ type AcceptanceState = {
 };
 
 export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
+  const t = useTranslations("register");
   const [acceptanceState, setAcceptanceState] = useState<AcceptanceState>({
     tosAccepted: false,
     privacyPolicyAccepted: false,
@@ -23,7 +25,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
   return (
     <>
       <p className="flex flex-row items-center text-text-light-secondary-500 dark:text-text-dark-secondary-500 mt-4 text-sm">
-        To register you must agree to the terms and conditions
+        {t("agreeTo")}
         {legal?.helpLink && (
           <span>
             <Link href={legal.helpLink} target="_blank">
@@ -62,9 +64,8 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
 
           <div className="mr-4 w-[28rem]">
             <p className="text-sm text-text-light-500 dark:text-text-dark-500">
-              Agree&nbsp;
               <Link href={legal.tosLink} className="underline" target="_blank">
-                Terms of Service
+                {t("termsOfService")}
               </Link>
             </p>
           </div>
@@ -87,13 +88,12 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
 
           <div className="mr-4 w-[28rem]">
             <p className="text-sm text-text-light-500 dark:text-text-dark-500">
-              Agree&nbsp;
               <Link
                 href={legal.privacyPolicyLink}
                 className="underline"
                 target="_blank"
               >
-                Privacy Policy
+                {t("privacyPolicy")}
               </Link>
             </p>
           </div>

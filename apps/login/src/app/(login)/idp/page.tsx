@@ -2,6 +2,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { getBrandingSettings, settingsService } from "@/lib/zitadel";
 import { makeReqCtx } from "@zitadel/client/v2";
+import { getLocale, getTranslations } from "next-intl/server";
 
 function getIdentityProviders(orgId?: string) {
   return settingsService
@@ -16,6 +17,9 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "idp" });
+
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
@@ -30,10 +34,8 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Sign in with SSO</h1>
-        <p className="ztdl-p">
-          Select one of the following providers to sign in
-        </p>
+        <h1>{t("title")}</h1>
+        <p className="ztdl-p">{t("description")}</p>
 
         {identityProviders && (
           <SignInWithIdp

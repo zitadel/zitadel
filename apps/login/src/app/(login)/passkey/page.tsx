@@ -5,16 +5,16 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
-
-const title = "Authenticate with a passkey";
-const description =
-  "Your device will ask for your fingerprint, face, or screen lock";
+import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "passkey" });
+
   const { loginName, altPassword, authRequestId, organization, sessionId } =
     searchParams;
 
@@ -39,7 +39,7 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{title}</h1>
+        <h1>{t("verify.title")}</h1>
 
         {sessionFactors && (
           <UserAvatar
@@ -49,10 +49,10 @@ export default async function Page({
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">{description}</p>
+        <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
         {!(loginName || sessionId) && (
-          <Alert>Provide your active session as loginName param</Alert>
+          <Alert>{t("error:unknownContext")}</Alert>
         )}
 
         {(loginName || sessionId) && (

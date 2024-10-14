@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { forwardRef } from "react";
 import { BaseButton, SignInWithIdentityProviderProps } from "./base-button";
 
@@ -8,6 +9,8 @@ export const SignInWithGithub = forwardRef<
   SignInWithIdentityProviderProps
 >(function SignInWithGithub(props, ref) {
   const { children, name, ...restProps } = props;
+  const t = useTranslations("idp");
+
   return (
     <BaseButton {...restProps} ref={ref}>
       <div className="mx-2 my-2 flex items-center justify-center">
@@ -41,7 +44,7 @@ export const SignInWithGithub = forwardRef<
       {children ? (
         children
       ) : (
-        <span className="ml-4">{name ? name : "Sign in with GitHub"}</span>
+        <span className="ml-4">{name ? name : t("signInWithGithub")}</span>
       )}
     </BaseButton>
   );

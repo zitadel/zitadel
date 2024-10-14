@@ -3,6 +3,7 @@
 import { Alert } from "@/components/alert";
 import { resendVerifyEmail, verifyUserByEmail } from "@/lib/server/email";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -35,6 +36,8 @@ export function VerifyEmailForm({
   sessionId,
   loginSettings,
 }: Props) {
+  const t = useTranslations("verify");
+
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -123,7 +126,7 @@ export function VerifyEmailForm({
           onClick={() => resendCode()}
           variant={ButtonVariants.Secondary}
         >
-          resend code
+          {t("resendCode")}
         </Button>
         <span className="flex-grow"></span>
         <Button
@@ -134,7 +137,7 @@ export function VerifyEmailForm({
           onClick={handleSubmit(submitCodeAndContinue)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("submit")}
         </Button>
       </div>
     </form>

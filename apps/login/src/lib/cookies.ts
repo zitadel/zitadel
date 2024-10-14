@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
 export type Cookie = {
   id: string;
@@ -17,10 +18,21 @@ type SessionCookie<T> = Cookie & T;
 
 function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
   const cookiesList = cookies();
-  // @ts-ignore
+
   return cookiesList.set({
     name: "sessions",
     value: JSON.stringify(sessions),
+    httpOnly: true,
+    path: "/",
+  });
+}
+
+export async function setLanguageCookie(language: string) {
+  const cookiesList = cookies();
+
+  await cookiesList.set({
+    name: LANGUAGE_COOKIE_NAME,
+    value: language,
     httpOnly: true,
     path: "/",
   });

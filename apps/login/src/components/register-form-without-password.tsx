@@ -2,6 +2,7 @@
 
 import { registerUser, RegisterUserResponse } from "@/lib/server/register";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -41,6 +42,8 @@ export function RegisterFormWithoutPassword({
   organization,
   authRequestId,
 }: Props) {
+  const t = useTranslations("register");
+
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -160,7 +163,7 @@ export function RegisterFormWithoutPassword({
       )}
 
       <p className="mt-4 ztdl-p mb-6 block text-text-light-secondary-500 dark:text-text-dark-secondary-500">
-        Select the method you would like to authenticate
+        {t("selectMethod")}
       </p>
 
       <div className="pb-4">
@@ -187,7 +190,7 @@ export function RegisterFormWithoutPassword({
           )}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("submit")}
         </Button>
       </div>
     </form>

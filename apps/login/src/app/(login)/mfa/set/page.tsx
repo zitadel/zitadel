@@ -14,6 +14,7 @@ import {
 } from "@/lib/zitadel";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { getLocale, getTranslations } from "next-intl/server";
 
 function isSessionValid(session: Partial<Session>): {
   valid: boolean;
@@ -36,6 +37,9 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "mfa" });
+
   const {
     loginName,
     checkAfter,
@@ -104,9 +108,9 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Set up 2-Factor</h1>
+        <h1>{t("set.title")}</h1>
 
-        <p className="ztdl-p">Choose one of the following second factors.</p>
+        <p className="ztdl-p">{t("set.description")}</p>
 
         {sessionWithData && (
           <UserAvatar
@@ -118,15 +122,10 @@ export default async function Page({
         )}
 
         {!(loginName || sessionId) && (
-          <Alert>Provide your active session as loginName param</Alert>
+          <Alert>{t("error:unknownContext")}</Alert>
         )}
 
-        {!valid && (
-          <Alert>
-            You need to have a valid session in order to set a second factor!
-            {/* TODO: show reauth button */}
-          </Alert>
-        )}
+        {!valid && <Alert>{t("error.sessionExpired")}</Alert>}
 
         {isSessionValid(sessionWithData).valid &&
           loginSettings &&

@@ -8,6 +8,7 @@ import {
   CreateCallbackRequestSchema,
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 async function loadSession(loginName: string, authRequestId?: string) {
@@ -39,6 +40,9 @@ async function loadSession(loginName: string, authRequestId?: string) {
 }
 
 export default async function Page({ searchParams }: { searchParams: any }) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "signedin" });
+
   const { loginName, authRequestId, organization } = searchParams;
   const sessionFactors = await loadSession(loginName, authRequestId);
 
@@ -47,8 +51,10 @@ export default async function Page({ searchParams }: { searchParams: any }) {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{`Welcome ${sessionFactors?.factors?.user?.displayName}`}</h1>
-        <p className="ztdl-p mb-6 block">You are signed in.</p>
+        <h1>
+          {t("title", { user: sessionFactors?.factors?.user?.displayName })}
+        </h1>
+        <p className="ztdl-p mb-6 block">{t("description")}</p>
 
         <UserAvatar
           loginName={loginName ?? sessionFactors?.factors?.user?.loginName}

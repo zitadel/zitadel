@@ -8,6 +8,7 @@ import {
   UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "./alert";
@@ -33,6 +34,8 @@ export function LoginPasskey({
   organization,
   login = true,
 }: Props) {
+  const t = useTranslations("passkey");
+
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -54,6 +57,7 @@ export function LoginPasskey({
           if (!pK) {
             setError("Could not request passkey challenge");
             setLoading(false);
+            return;
           }
 
           return submitLoginAndContinue(pK)
@@ -187,12 +191,6 @@ export function LoginPasskey({
             return router.push(`/signedin?` + params);
           }
         });
-      })
-      .catch((error) => {
-        // we log this error to the console, as it is not a critical error
-        console.error(error);
-        setLoading(false);
-        return null;
       });
   }
 
@@ -232,7 +230,7 @@ export function LoginPasskey({
               );
             }}
           >
-            use password
+            {t("verify.usePassword")}
           </Button>
         ) : (
           <BackButton />
@@ -267,7 +265,7 @@ export function LoginPasskey({
           }}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("verify.submit")}
         </Button>
       </div>
     </div>

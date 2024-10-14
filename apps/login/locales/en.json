@@ -1,0 +1,139 @@
+{
+  "common": {
+    "back": "Back"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "description": "Select the account you want to use.",
+    "addAnother": "Add another account",
+    "noResults": "No accounts found"
+  },
+  "loginname": {
+    "title": "Welcome back!",
+    "description": "Enter your login data.",
+    "register": "Register new user"
+  },
+  "password": {
+    "title": "Password",
+    "description": "Enter your password.",
+    "resetPassword": "Reset Password",
+    "submit": "Continue"
+  },
+  "idp": {
+    "title": "Sign in with SSO",
+    "description": "Select one of the following providers to sign in",
+    "signInWithApple": "Sign in with Apple",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithAzureAD": "Sign in with AzureAD",
+    "signInWithGithub": "Sign in with GitHub",
+    "signInWithGitlab": "Sign in with GitLab",
+    "loginSuccess": {
+      "title": "Login successful",
+      "description": "You have successfully been loggedIn!"
+    },
+    "linkingSuccess": {
+      "title": "Account linked",
+      "description": "You have successfully linked your account!"
+    },
+    "registerSuccess": {
+      "title": "Registration successful",
+      "description": "You have successfully registered!"
+    },
+    "loginError": {
+      "title": "Login failed",
+      "description": "An error occurred while trying to login."
+    },
+    "linkingError": {
+      "title": "Account linking failed",
+      "description": "An error occurred while trying to link your account."
+    }
+  },
+  "mfa": {
+    "verify": {
+      "title": "Verify your identity",
+      "description": "Choose one of the following factors.",
+      "noResults": "No second factors available to setup."
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Choose one of the following second factors."
+    }
+  },
+  "otp": {
+    "verify": {
+      "title": "Verify 2-Factor",
+      "totpDescription": "Enter the code from your authenticator app.",
+      "smsDescription": "Enter the code you received via SMS.",
+      "emailDescription": "Enter the code you received via email.",
+      "noCodeReceived": "Didn't receive a code?",
+      "resendCode": "Resend code",
+      "submit": "Continue"
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "totpDescription": "Scan the QR code with your authenticator app.",
+      "smsDescription": "Enter your phone number to receive a code via SMS.",
+      "emailDescription": "Enter your email address to receive a code via email.",
+      "totpRegisterDescription": "Scan the QR Code or navigate to the URL manually.",
+      "submit": "Continue"
+    }
+  },
+  "passkey": {
+    "verify": {
+      "title": "Authenticate with a passkey",
+      "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "usePassword": "Use password",
+      "submit": "Continue"
+    },
+    "set": {
+      "title": "Setup a passkey",
+      "description": "Your device will ask for your fingerprint, face, or screen lock",
+      "info": {
+        "description": "A passkey is an authentication method on a device like your fingerprint, Apple FaceID or similar. ",
+        "link": "Passwordless Authentication"
+      },
+      "skip": "Skip",
+      "submit": "Continue"
+    }
+  },
+  "u2f": {
+    "verify": {
+      "title": "Verify 2-Factor",
+      "description": "Verify your account with your device."
+    },
+    "set": {
+      "title": "Set up 2-Factor",
+      "description": "Set up a device as a second factor.",
+      "submit": "Continue"
+    }
+  },
+  "register": {
+    "title": "Register",
+    "description": "Create your ZITADEL account.",
+    "selectMethod": "Select the method you would like to authenticate",
+    "agreeTo": "To register you must agree to the terms and conditions",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "submit": "Continue",
+    "password": {
+      "title": "Set Password",
+      "description": "Set the password for your account",
+      "submit": "Continue"
+    }
+  },
+  "signedin": {
+    "title": "Welcome {user}!",
+    "description": "You are signed in."
+  },
+  "verify": {
+    "title": "Verify user",
+    "description": "Enter the Code provided in the verification email.",
+    "userIdMissing": "No userId provided!",
+    "resendCode": "Resend code",
+    "submit": "Continue"
+  },
+  "error": {
+    "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
+    "sessionExpired": "Your current session has expired. Please login again."
+  }
+}
