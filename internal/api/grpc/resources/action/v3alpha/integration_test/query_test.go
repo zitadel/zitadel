@@ -63,6 +63,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -93,6 +94,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -123,6 +125,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -155,6 +158,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -187,6 +191,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -216,16 +221,24 @@ func TestServer_GetTarget(t *testing.T) {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
 			}
-			got, getErr := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				assert.Error(t, getErr, "Error: "+getErr.Error())
-			} else {
-				assert.NoError(t, getErr)
-				wantTarget := tt.want.GetTarget()
-				gotTarget := got.GetTarget()
-				integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
-				assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
+			retryDuration := 5 * time.Second
+			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
+				retryDuration = time.Until(ctxDeadline)
 			}
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, getErr := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ttt, getErr, "Error: "+getErr.Error())
+				} else {
+					assert.NoError(ttt, getErr)
+					wantTarget := tt.want.GetTarget()
+					gotTarget := got.GetTarget()
+					integration.AssertResourceDetails(ttt, wantTarget.GetDetails(), gotTarget.GetDetails())
+					assert.Equal(ttt, wantTarget.GetConfig(), gotTarget.GetConfig())
+					assert.Equal(ttt, wantTarget.GetSigningKey(), gotTarget.GetSigningKey())
+				}
+			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
+
 		})
 	}
 }
@@ -496,6 +509,7 @@ func TestServer_ListTargets(t *testing.T) {
 				for i := range tt.want.Result {
 					integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
 					assert.Equal(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
+					assert.NotEmpty(ttt, got.Result[i].GetSigningKey())
 				}
 				integration.AssertResourceListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")

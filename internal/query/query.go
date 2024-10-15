@@ -29,10 +29,11 @@ type Queries struct {
 	client       *database.DB
 	caches       *Caches
 
-	keyEncryptionAlgorithm crypto.EncryptionAlgorithm
-	idpConfigEncryption    crypto.EncryptionAlgorithm
-	sessionTokenVerifier   func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
-	checkPermission        domain.PermissionCheck
+	keyEncryptionAlgorithm    crypto.EncryptionAlgorithm
+	idpConfigEncryption       crypto.EncryptionAlgorithm
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	sessionTokenVerifier      func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
+	checkPermission           domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
 	mutex                               sync.Mutex
@@ -52,7 +53,7 @@ func StartQueries(
 	caches *cache.CachesConfig,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
-	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm, targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 	permissionCheck func(q *Queries) domain.PermissionCheck,
@@ -70,6 +71,7 @@ func StartQueries(
 		zitadelRoles:                        zitadelRoles,
 		keyEncryptionAlgorithm:              keyEncryptionAlgorithm,
 		idpConfigEncryption:                 idpConfigEncryption,
+		targetEncryptionAlgorithm:           targetEncryptionAlgorithm,
 		sessionTokenVerifier:                sessionTokenVerifier,
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{

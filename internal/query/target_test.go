@@ -9,22 +9,24 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	prepareTargetsStmt = `SELECT projections.targets1.id,` +
-		` projections.targets1.creation_date,` +
-		` projections.targets1.change_date,` +
-		` projections.targets1.resource_owner,` +
-		` projections.targets1.name,` +
-		` projections.targets1.target_type,` +
-		` projections.targets1.timeout,` +
-		` projections.targets1.endpoint,` +
-		` projections.targets1.interrupt_on_error,` +
+	prepareTargetsStmt = `SELECT projections.targets2.id,` +
+		` projections.targets2.creation_date,` +
+		` projections.targets2.change_date,` +
+		` projections.targets2.resource_owner,` +
+		` projections.targets2.name,` +
+		` projections.targets2.target_type,` +
+		` projections.targets2.timeout,` +
+		` projections.targets2.endpoint,` +
+		` projections.targets2.interrupt_on_error,` +
+		` projections.targets2.signing_key,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.targets1`
+		` FROM projections.targets2`
 	prepareTargetsCols = []string{
 		"id",
 		"creation_date",
@@ -35,19 +37,21 @@ var (
 		"timeout",
 		"endpoint",
 		"interrupt_on_error",
+		"signing_key",
 		"count",
 	}
 
-	prepareTargetStmt = `SELECT projections.targets1.id,` +
-		` projections.targets1.creation_date,` +
-		` projections.targets1.change_date,` +
-		` projections.targets1.resource_owner,` +
-		` projections.targets1.name,` +
-		` projections.targets1.target_type,` +
-		` projections.targets1.timeout,` +
-		` projections.targets1.endpoint,` +
-		` projections.targets1.interrupt_on_error` +
-		` FROM projections.targets1`
+	prepareTargetStmt = `SELECT projections.targets2.id,` +
+		` projections.targets2.creation_date,` +
+		` projections.targets2.change_date,` +
+		` projections.targets2.resource_owner,` +
+		` projections.targets2.name,` +
+		` projections.targets2.target_type,` +
+		` projections.targets2.timeout,` +
+		` projections.targets2.endpoint,` +
+		` projections.targets2.interrupt_on_error,` +
+		` projections.targets2.signing_key` +
+		` FROM projections.targets2`
 	prepareTargetCols = []string{
 		"id",
 		"creation_date",
@@ -58,6 +62,7 @@ var (
 		"timeout",
 		"endpoint",
 		"interrupt_on_error",
+		"signing_key",
 	}
 )
 
@@ -102,6 +107,12 @@ func Test_TargetPrepares(t *testing.T) {
 							1 * time.Second,
 							"https://example.com",
 							true,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
 						},
 					},
 				),
@@ -123,6 +134,12 @@ func Test_TargetPrepares(t *testing.T) {
 						Timeout:          1 * time.Second,
 						Endpoint:         "https://example.com",
 						InterruptOnError: true,
+						signingKey: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "encKey",
+							Crypted:    []byte("crypted"),
+						},
 					},
 				},
 			},
@@ -145,6 +162,12 @@ func Test_TargetPrepares(t *testing.T) {
 							1 * time.Second,
 							"https://example.com",
 							true,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
 						},
 						{
 							"id-2",
@@ -156,6 +179,12 @@ func Test_TargetPrepares(t *testing.T) {
 							1 * time.Second,
 							"https://example.com",
 							false,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
 						},
 						{
 							"id-3",
@@ -167,6 +196,12 @@ func Test_TargetPrepares(t *testing.T) {
 							1 * time.Second,
 							"https://example.com",
 							false,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "alg",
+								KeyID:      "encKey",
+								Crypted:    []byte("crypted"),
+							},
 						},
 					},
 				),
@@ -188,6 +223,12 @@ func Test_TargetPrepares(t *testing.T) {
 						Timeout:          1 * time.Second,
 						Endpoint:         "https://example.com",
 						InterruptOnError: true,
+						signingKey: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "encKey",
+							Crypted:    []byte("crypted"),
+						},
 					},
 					{
 						ObjectDetails: domain.ObjectDetails{
@@ -201,6 +242,12 @@ func Test_TargetPrepares(t *testing.T) {
 						Timeout:          1 * time.Second,
 						Endpoint:         "https://example.com",
 						InterruptOnError: false,
+						signingKey: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "encKey",
+							Crypted:    []byte("crypted"),
+						},
 					},
 					{
 						ObjectDetails: domain.ObjectDetails{
@@ -214,6 +261,12 @@ func Test_TargetPrepares(t *testing.T) {
 						Timeout:          1 * time.Second,
 						Endpoint:         "https://example.com",
 						InterruptOnError: false,
+						signingKey: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "encKey",
+							Crypted:    []byte("crypted"),
+						},
 					},
 				},
 			},
@@ -270,6 +323,12 @@ func Test_TargetPrepares(t *testing.T) {
 						1 * time.Second,
 						"https://example.com",
 						true,
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "encKey",
+							Crypted:    []byte("crypted"),
+						},
 					},
 				),
 			},
@@ -285,6 +344,12 @@ func Test_TargetPrepares(t *testing.T) {
 				Timeout:          1 * time.Second,
 				Endpoint:         "https://example.com",
 				InterruptOnError: true,
+				signingKey: &crypto.CryptoValue{
+					CryptoType: crypto.TypeEncryption,
+					Algorithm:  "alg",
+					KeyID:      "encKey",
+					Crypted:    []byte("crypted"),
+				},
 			},
 		},
 		{
