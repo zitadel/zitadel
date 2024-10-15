@@ -50,7 +50,7 @@ func (*targetProjection) Init() *old_handler.Check {
 			handler.NewColumn(TargetEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(TargetTimeoutCol, handler.ColumnTypeInt64),
 			handler.NewColumn(TargetInterruptOnErrorCol, handler.ColumnTypeBool),
-			handler.NewColumn(TargetSigningKey, handler.ColumnTypeText),
+			handler.NewColumn(TargetSigningKey, handler.ColumnTypeJSONB),
 		},
 			handler.NewPrimaryKey(TargetInstanceIDCol, TargetIDCol),
 		),
@@ -138,7 +138,7 @@ func (p *targetProjection) reduceTargetChanged(event eventstore.Event) (*handler
 		values = append(values, handler.NewCol(TargetInterruptOnErrorCol, *e.InterruptOnError))
 	}
 	if e.SigningKey != nil {
-		values = append(values, handler.NewCol(TargetSigningKey, *e.SigningKey))
+		values = append(values, handler.NewCol(TargetSigningKey, e.SigningKey))
 	}
 	return handler.NewUpdateStatement(
 		e,

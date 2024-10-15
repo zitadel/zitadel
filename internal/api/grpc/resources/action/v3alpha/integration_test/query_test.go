@@ -63,6 +63,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -93,6 +94,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -123,6 +125,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -155,6 +158,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -187,6 +191,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -225,6 +230,7 @@ func TestServer_GetTarget(t *testing.T) {
 				gotTarget := got.GetTarget()
 				integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
 				assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
+				assert.Equal(t, wantTarget.GetSigningKey(), gotTarget.GetSigningKey())
 			}
 		})
 	}
@@ -496,6 +502,7 @@ func TestServer_ListTargets(t *testing.T) {
 				for i := range tt.want.Result {
 					integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
 					assert.Equal(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
+					assert.NotEmpty(ttt, got.Result[i].GetSigningKey())
 				}
 				integration.AssertResourceListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")

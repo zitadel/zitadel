@@ -83,6 +83,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		nil,
 		nil,
 		nil,
+		nil,
 		0,
 		0,
 		0,

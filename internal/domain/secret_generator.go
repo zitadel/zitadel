@@ -15,7 +15,7 @@ const (
 	SecretGeneratorTypeOTPSMS
 	SecretGeneratorTypeOTPEmail
 	SecretGeneratorTypeInviteCode
-	SecretGeneratorTypeSigninKey
+	SecretGeneratorTypeSigningKey
 
 	secretGeneratorTypeCount
 )

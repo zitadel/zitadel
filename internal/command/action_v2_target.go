@@ -21,6 +21,8 @@ type AddTarget struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+
+	SigningKey string
 }
 
 func (a *AddTarget) IsValid() error {
@@ -64,6 +66,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 	if err != nil {
 		return nil, err
 	}
+	add.SigningKey = code.PlainCode()
 	pushedEvents, err := c.eventstore.Push(ctx, target.NewAddedEvent(
 		ctx,
 		TargetAggregateFromWriteModel(&wm.WriteModel),
@@ -72,7 +75,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		add.Endpoint,
 		add.Timeout,
 		add.InterruptOnError,
-		code.PlainCode(),
+		code.Crypted,
 	))
 	if err != nil {
 		return nil, err
@@ -86,12 +89,14 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 type ChangeTarget struct {
 	models.ObjectRoot
 
-	Name             *string
-	TargetType       *domain.TargetType
-	Endpoint         *string
-	Timeout          *time.Duration
-	InterruptOnError *bool
-	NewSigningKey    bool
+	Name                 *string
+	TargetType           *domain.TargetType
+	Endpoint             *string
+	Timeout              *time.Duration
+	InterruptOnError     *bool
+	RegenerateSigningKey *bool
+
+	SigningKey *string
 }
 
 func (a *ChangeTarget) IsValid() error {
@@ -127,13 +132,14 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 	if !existing.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-xj14f2cccn", "Errors.Target.NotFound")
 	}
-	var changedSigningKey *string
-	if change.NewSigningKey {
+	var changedSigningKey *crypto.CryptoValue
+	if change.RegenerateSigningKey != nil && *change.RegenerateSigningKey {
 		code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.targetEncryption) //nolint
 		if err != nil {
 			return nil, err
 		}
-		changedSigningKey = &code.Plain
+		changedSigningKey = code.Crypted
+		change.SigningKey = &code.Plain
 	}
 
 	changedEvent := existing.NewChangedEvent(
@@ -204,5 +210,5 @@ func (c *Commands) getTargetWriteModelByID(ctx context.Context, id string, resou
 }
 
 func (c *Commands) newSigningKey(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
-	return c.newEncryptedCodeWithDefault(ctx, filter, domain.SecretGeneratorTypeSigninKey, alg, c.defaultSecretGenerators.InviteCode)
+	return c.newEncryptedCodeWithDefault(ctx, filter, domain.SecretGeneratorTypeSigningKey, alg, c.defaultSecretGenerators.SigningKey)
 }

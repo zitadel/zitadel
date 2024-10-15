@@ -51,6 +51,11 @@ message Target {
 message GetTarget {
   zitadel.resources.object.v3alpha.Details details = 1;
   Target config = 2;
+  string signing_key = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"\""
+    }
+  ];
 }
 
 message PatchTarget {
@@ -84,6 +89,8 @@ message PatchTarget {
       max_length: 1000
     }
   ];
+  // Regenerate the key used for signing and checking the payload sent to the target.
+  optional bool regenerate_signing_key = 7;
 }
 
 

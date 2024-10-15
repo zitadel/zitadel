@@ -26,6 +26,7 @@ type mockExecutionTarget struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	SigningKey       string
 }
 
 func (e *mockExecutionTarget) SetEndpoint(endpoint string) {
@@ -48,6 +49,9 @@ func (e *mockExecutionTarget) GetTargetID() string {
 }
 func (e *mockExecutionTarget) GetExecutionID() string {
 	return e.ExecutionID
+}
+func (e *mockExecutionTarget) GetSigningKey() string {
+	return e.SigningKey
 }
 
 type mockContentRequest struct {
@@ -157,6 +161,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetID:    "target",
 						TargetType:  domain.TargetTypeCall,
 						Timeout:     time.Minute,
+						SigningKey:  "signingkey",
 					},
 				},
 				targets: []target{
@@ -186,6 +191,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 
@@ -216,6 +222,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -245,6 +252,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -269,6 +277,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -297,6 +306,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetID:    "target",
 						TargetType:  domain.TargetTypeAsync,
 						Timeout:     time.Second,
+						SigningKey:  "signingkey",
 					},
 				},
 				targets: []target{
@@ -325,6 +335,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetID:    "target",
 						TargetType:  domain.TargetTypeAsync,
 						Timeout:     time.Minute,
+						SigningKey:  "signingkey",
 					},
 				},
 				targets: []target{
@@ -354,6 +365,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -382,6 +394,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          time.Second,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -411,6 +424,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -440,6 +454,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 					&mockExecutionTarget{
 						InstanceID:       "instance",
@@ -448,6 +463,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 					&mockExecutionTarget{
 						InstanceID:       "instance",
@@ -456,6 +472,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 
@@ -498,6 +515,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 					&mockExecutionTarget{
 						InstanceID:       "instance",
@@ -506,6 +524,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 					&mockExecutionTarget{
 						InstanceID:       "instance",
@@ -514,6 +533,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Second,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -692,6 +712,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{
@@ -721,6 +742,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
 						InterruptOnError: true,
+						SigningKey:       "signingkey",
 					},
 				},
 				targets: []target{

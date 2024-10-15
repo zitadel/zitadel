@@ -111,7 +111,7 @@ func Call(ctx context.Context, url string, timeout time.Duration, body []byte, s
 	}
 	req.Header.Set("Content-Type", "application/json")
 	if signingKey != "" {
-		req.Header.Set(actions.SigningHeader, actions.ComputeSignature(body, signingKey))
+		req.Header.Set(actions.SigningHeader, actions.ComputeSignatureHeader(time.Now(), body, signingKey))
 	}
 
 	client := http.DefaultClient
