@@ -36,5 +36,5 @@ Possible conditions for the Execution:
 
 ## Further reading
 
-- [Actions v2 example execution locally](/apis/actionsv2/execution-local)
-- [Actions v2 reference](/apis/actionsv2/introduction#action)
+- [Actions v2 reference](/apis/actions/v3/usage)
+- [Actions v2 example execution locally](/apis/actions/v3/testing-locally)
