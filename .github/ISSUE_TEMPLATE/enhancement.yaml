@@ -1,11 +1,12 @@
-name: 🛠️ Improvement
-description: "Create an new issue for an improvment in ZITADEL"
-labels: ["improvement"]
+name: 💡 Proposal / Feature request
+description: "Create an issue for a feature request/proposal."
+labels: ["enhancement"]
+type: enhancement
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this improvement request
+        Thanks for taking the time to fill out this proposal / feature reqeust
   - type: checkboxes
     id: preflight
     attributes:
@@ -20,8 +21,8 @@ body:
     id: problem
     attributes:
       label: Describe your problem
-      description: Please describe your problem this improvement is supposed to solve.
-      placeholder: Describe the problem you have
+      description: Please describe your problem this proposal / feature is supposed to solve.
+      placeholder: Describe the problem you have.
     validations:
       required: true
   - type: textarea
@@ -36,7 +37,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: Which version of the ZITADEL are you using.
+      description: Which version of ZITADEL are you using.
   - type: dropdown
     id: environment
     attributes:
