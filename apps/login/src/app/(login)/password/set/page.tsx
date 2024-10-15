@@ -1,10 +1,9 @@
 import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { PasswordForm } from "@/components/password-form";
+import { SetPasswordForm } from "@/components/set-password-form";
 import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
-import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
@@ -58,15 +57,11 @@ export default async function Page({
         )}
 
         {loginName && (
-          <PasswordForm
+          <SetPasswordForm
             loginName={loginName}
             authRequestId={authRequestId}
             organization={organization}
             loginSettings={loginSettings}
-            promptPasswordless={
-              loginSettings?.passkeysType === PasskeysType.ALLOWED
-            }
-            isAlternative={alt === "true"}
           />
         )}
       </div>

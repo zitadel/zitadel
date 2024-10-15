@@ -6,7 +6,7 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { RegisterUserResponse } from "@/lib/server/register";
+import { registerUser, RegisterUserResponse } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -28,12 +28,18 @@ type Inputs =
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
+  email: string;
+  firstname: string;
+  lastname: string;
   organization?: string;
   authRequestId?: string;
 };
 
-export function SetPasswordForm({
+export function SetRegisterPasswordForm({
   passwordComplexitySettings,
+  email,
+  firstname,
+  lastname,
   organization,
   authRequestId,
 }: Props) {
@@ -41,7 +47,11 @@ export function SetPasswordForm({
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
-    defaultValues: {},
+    defaultValues: {
+      email: email ?? "",
+      firstname: firstname ?? "",
+      lastname: lastname ?? "",
+    },
   });
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -51,7 +61,10 @@ export function SetPasswordForm({
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
-    const response = await changePassword({
+    const response = await registerUser({
+      email: email,
+      firstName: firstname,
+      lastName: lastname,
       organization: organization,
       authRequestId: authRequestId,
       password: values.password,

@@ -107,3 +107,25 @@ export async function sendPassword(command: UpdateSessionCommand) {
     authMethods,
   };
 }
+
+export async function changePassword(command: {
+  userId: string;
+  password: string;
+}) {
+  // check for init state
+  const users = await listUsers({
+    loginName: command.loginName,
+    organizationId: command.organization,
+  });
+
+  if (
+    !users.details ||
+    users.details.totalResult !== BigInt(1) ||
+    !users.result[0].userId
+  ) {
+    return { error: "Could not send Password Reset Link" };
+  }
+  const userId = users.result[0].userId;
+
+  return passwordReset(userId);
+}
