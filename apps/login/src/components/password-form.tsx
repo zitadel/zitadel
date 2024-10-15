@@ -175,27 +175,31 @@ export function PasswordForm({
 
       // TODO: provide a way to setup passkeys on mfa page?
       return router.push(`/mfa/set?` + params);
-    } else if (
-      submitted.factors &&
-      !submitted.factors.webAuthN && // if session was not verified with a passkey
-      promptPasswordless && // if explicitly prompted due policy
-      !isAlternative // escaped if password was used as an alternative method
-    ) {
-      const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
-        prompt: "true",
-      });
+    }
+    // TODO: implement passkey setup
 
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
+    //  else if (
+    //   submitted.factors &&
+    //   !submitted.factors.webAuthN && // if session was not verified with a passkey
+    //   promptPasswordless && // if explicitly prompted due policy
+    //   !isAlternative // escaped if password was used as an alternative method
+    // ) {
+    //   const params = new URLSearchParams({
+    //     loginName: submitted.factors.user.loginName,
+    //     prompt: "true",
+    //   });
 
-      if (organization) {
-        params.append("organization", organization);
-      }
+    //   if (authRequestId) {
+    //     params.append("authRequestId", authRequestId);
+    //   }
 
-      return router.push(`/passkey/set?` + params);
-    } else if (authRequestId && submitted.sessionId) {
+    //   if (organization) {
+    //     params.append("organization", organization);
+    //   }
+
+    //   return router.push(`/passkey/set?` + params);
+    // }
+    else if (authRequestId && submitted.sessionId) {
       const params = new URLSearchParams({
         sessionId: submitted.sessionId,
         authRequest: authRequestId,
