@@ -198,8 +198,10 @@ export class ProviderSamlSpComponent {
       req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       if (this.metadataXml?.value) {
+        req.setMetadataUrl('');
         req.setMetadataXml(this.metadataXml?.value);
       } else {
+        req.setMetadataXml('');
         req.setMetadataUrl(this.metadataUrl?.value);
       }
       req.setWithSignedRequest(this.withSignedRequest?.value);
@@ -210,7 +212,6 @@ export class ProviderSamlSpComponent {
       req.setTransientMappingAttributeName(this.transientMapping?.value);
       req.setProviderOptions(this.options);
 
-      console.log(req);
       this.loading = true;
       this.service
         .updateSAMLProvider(req)
@@ -234,8 +235,10 @@ export class ProviderSamlSpComponent {
         : new AdminAddSAMLProviderRequest();
     req.setName(this.name?.value);
     if (this.metadataXml?.value) {
+      req.setMetadataUrl('');
       req.setMetadataXml(this.metadataXml?.value);
     } else {
+      req.setMetadataXml('');
       req.setMetadataUrl(this.metadataUrl?.value);
     }
     req.setProviderOptions(this.options);
