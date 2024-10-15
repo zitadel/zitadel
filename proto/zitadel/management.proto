@@ -9208,7 +9208,7 @@ message AddOrgMemberRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 2  [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"IAM_OWNER\"]";
+            example: "[\"ORG_OWNER\"]";
             description: "If no roles are provided the user won't have any rights"
         }
     ];
