@@ -1,6 +1,6 @@
 services:
   zitadel:
-    user: "${ZITADEL_DEV_UID:-1000}"
+    user: "${USER}"
     image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
@@ -42,7 +42,7 @@ services:
       - zitadel
 
   setup:
-    user: "${ZITADEL_DEV_UID:-1000}"
+    user: "${USER}"
     container_name: setup
     build: .
     environment:
