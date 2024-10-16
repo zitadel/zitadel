@@ -34,8 +34,10 @@ jobs:
             echo "A background process failed with exit code $EXIT_STATUS."
             exit $EXIT_STATUS
           fi
-          # Exit the loop if all processes have finished
-          if ! kill -0 $DOCKER_COMPOSE_PID $GENERATE_BUILD_PID $PLAYWRIGHT_INSTALL_PID 2>/dev/null; then
+          # Check if all processes have finished
+          if ! kill -0 $DOCKER_COMPOSE_PID 2>/dev/null && \
+             ! kill -0 $GENERATE_BUILD_PID 2>/dev/null && \
+             ! kill -0 $PLAYWRIGHT_INSTALL_PID 2>/dev/null; then
             break
           fi
         done
