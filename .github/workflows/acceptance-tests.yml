@@ -12,20 +12,34 @@ jobs:
     - name: Run Docker Compose and Install Dependencies in Parallel
       run: |
         echo "Start docker-compose in the background"
-        docker-compose -f ./acceptance/docker-compose.yaml up -d &
-        
+        docker compose -f ./acceptance/docker-compose.yaml up -d &
+        DOCKER_COMPOSE_PID=$!
+                
         echo "Install node_modules in the foreground"
         npm install -g pnpm && pnpm install
         
         echo "Generate and create a production build in the background"
         pnpm build &
+        GENERATE_BUILD_PID=$!
 
         echo "Install Playwright with browsers in the background"
         pnpm exec playwright install --with-deps &
+        PLAYWRIGHT_INSTALL_PID=$!
         
         echo "Wait for all background processes to complete"
-        wait
-    - name: Run Playwright tests
+        while true; do
+          wait -n $DOCKER_COMPOSE_PID $GENERATE_BUILD_PID $PLAYWRIGHT_INSTALL_PID
+          EXIT_STATUS=$?
+          if [ $EXIT_STATUS -ne 0 ]; then
+            echo "A background process failed with exit code $EXIT_STATUS."
+            exit $EXIT_STATUS
+          fi
+          # Exit the loop if all processes have finished
+          if ! kill -0 $DOCKER_COMPOSE_PID $GENERATE_BUILD_PID $PLAYWRIGHT_INSTALL_PID 2>/dev/null; then
+            break
+          fi
+        done
+    - name: Run Playwright Tests
       run: pnpm exec playwright test
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
