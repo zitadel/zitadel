@@ -330,7 +330,6 @@ Errors:
       APIAuthMethodNoSecret: Chosen API Auth Method does not require a secret
       AuthMethodNoPrivateKeyJWT: Chosen Auth Method does not require a key
       ClientSecretInvalid: Client Secret is invalid
-      ClientSecretNotSet: Client Secret is not set
       Key:
         AlreadyExisting: Application key already existing
         NotFound: Application key not found

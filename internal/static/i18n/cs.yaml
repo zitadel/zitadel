@@ -329,7 +329,6 @@ Errors:
       APIAuthMethodNoSecret: Vybraná API Auth metoda nevyžaduje tajný klíč
       AuthMethodNoPrivateKeyJWT: Vybraná metoda ověření nevyžaduje klíč
       ClientSecretInvalid: Tajný klíč klienta je neplatný
-      ClientSecretNotSet: Tajný klíč klienta není nastaven
       Key:
         AlreadyExisting: Klíč aplikace již existuje
         NotFound: Klíč aplikace nebyl nalezen

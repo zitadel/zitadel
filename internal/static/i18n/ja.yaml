@@ -318,7 +318,6 @@ Errors:
       APIAuthMethodNoSecret: 選択されたAPIメソッドには、シークレットを必要としません
       AuthMethodNoPrivateKeyJWT: 選択されたメソッドには、キーを必要としません
       ClientSecretInvalid: 無効なクライアントシークレットです
-      ClientSecretNotSet: クライアントシークレットが設定されていません
       Key:
         AlreadyExisting: すでに存在しているアプリケーションキーです
         NotFound: アプリケーションキーが見つかりません

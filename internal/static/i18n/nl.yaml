@@ -329,7 +329,6 @@ Errors:
       APIAuthMethodNoSecret: Gekozen API Auth Methode vereist geen geheim
       AuthMethodNoPrivateKeyJWT: Gekozen Auth Methode vereist geen sleutel
       ClientSecretInvalid: Client Geheim is ongeldig
-      ClientSecretNotSet: Client geheim is niet ingesteld
       Key:
         AlreadyExisting: Applicatie sleutel bestaat al
         NotFound: Applicatie sleutel niet gevonden

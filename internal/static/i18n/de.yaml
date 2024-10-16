@@ -329,7 +329,6 @@ Errors:
       APIAuthMethodNoSecret: Gewählte API Auth Method benötigt kein Secret
       AuthMethodNoPrivateKeyJWT: Gewählte Auth Method benötigt keinen Key
       ClientSecretInvalid: Client Secret ist ungültig
-      ClientSecretNotSet: Das Client-Geheimnis ist nicht festgelegt
       Key:
         AlreadyExisting: Applikationsschlüssel existiert bereits
         NotFound: Applikationsschlüssel nicht gefunden
