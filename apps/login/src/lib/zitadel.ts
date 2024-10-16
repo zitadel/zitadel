@@ -500,6 +500,18 @@ export async function passwordReset(userId: string) {
   );
 }
 
+export async function setPassword(userId: string, password: string) {
+  return userService.setPassword(
+    {
+      userId,
+      newPassword: {
+        password,
+      },
+    },
+    {},
+  );
+}
+
 /**
  *
  * @param server

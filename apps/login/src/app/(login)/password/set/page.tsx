@@ -3,7 +3,11 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetPasswordForm } from "@/components/set-password-form";
 import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
+import {
+  getBrandingSettings,
+  getLoginSettings,
+  getPasswordComplexitySettings,
+} from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
@@ -14,24 +18,21 @@ export default async function Page({
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "password" });
 
-  const { loginName, organization, authRequestId, alt } = searchParams;
+  const { loginName, organization, authRequestId, code } = searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
-  let sessionFactors;
-  try {
-    sessionFactors = await loadMostRecentSession({
-      loginName,
-      organization,
-    });
-  } catch (error) {
-    // ignore error to continue to show the password form
-    console.warn(error);
-  }
+  const sessionFactors = await loadMostRecentSession({
+    loginName,
+    organization,
+  });
 
   const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(organization);
 
-  console.log(sessionFactors);
+  const passwordComplexity = await getPasswordComplexitySettings(
+    sessionFactors?.factors?.user?.organizationId,
+  );
+
+  const loginSettings = await getLoginSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>
@@ -56,13 +57,18 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        {loginName && (
+        {passwordComplexity && loginName ? (
           <SetPasswordForm
+            code={code}
             loginName={loginName}
             authRequestId={authRequestId}
             organization={organization}
-            loginSettings={loginSettings}
+            passwordComplexitySettings={passwordComplexity}
           />
+        ) : (
+          <div className="py-4">
+            <Alert>{t("error:failedLoading")}</Alert>
+          </div>
         )}
       </div>
     </DynamicTheme>

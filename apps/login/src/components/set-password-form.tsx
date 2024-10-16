@@ -6,6 +6,7 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
+import { changePassword } from "@/lib/server/password";
 import { RegisterUserResponse } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
@@ -27,7 +28,9 @@ type Inputs =
   | FieldValues;
 
 type Props = {
+  code?: string;
   passwordComplexitySettings: PasswordComplexitySettings;
+  loginName: string;
   organization?: string;
   authRequestId?: string;
 };

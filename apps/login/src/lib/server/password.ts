@@ -5,9 +5,11 @@ import {
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
 import {
+  getUserByID,
   listAuthenticationMethodTypes,
   listUsers,
   passwordReset,
+  setPassword,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import {
@@ -109,23 +111,17 @@ export async function sendPassword(command: UpdateSessionCommand) {
 }
 
 export async function changePassword(command: {
+  code?: string;
   userId: string;
   password: string;
 }) {
   // check for init state
-  const users = await listUsers({
-    loginName: command.loginName,
-    organizationId: command.organization,
-  });
+  const { user } = await getUserByID(command.userId);
 
-  if (
-    !users.details ||
-    users.details.totalResult !== BigInt(1) ||
-    !users.result[0].userId
-  ) {
+  if (!user || user.userId !== command.userId) {
     return { error: "Could not send Password Reset Link" };
   }
-  const userId = users.result[0].userId;
+  const userId = user.userId;
 
-  return passwordReset(userId);
+  return setPassword(userId, command.password);
 }
