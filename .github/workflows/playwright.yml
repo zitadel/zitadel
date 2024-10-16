@@ -1,15 +1,19 @@
-name: Playwright Tests
+name: Acceptance Tests
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
-  test:
+  acceptance-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Run docker-compose
+      uses: hoverkraft-tech/compose-action@v2.0.1
+      with:
+        compose-file: "./acceptance/docker-compose.yaml"
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*

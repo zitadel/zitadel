@@ -6,6 +6,7 @@
     "generate": "turbo run generate",
     "build": "turbo run build",
     "test": "turbo run test",
+    "start": "turbo run start",
     "test:unit": "turbo run test:unit -- --passWithNoTests",
     "test:integration": "turbo run test:integration",
     "test:watch": "turbo run test:watch",
