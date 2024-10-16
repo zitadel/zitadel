@@ -726,7 +726,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		request.DefaultTranslations = defaultLoginTranslations
 	}
 	if len(request.OrgTranslations) == 0 || request.PolicyOrgID() != orgID {
-		orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
+		orgLoginTranslations, err := repo.getLoginTexts(ctx, request.PrivateLabelingOrgID(orgID))
 		if err != nil {
 			return err
 		}
@@ -785,9 +785,12 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// the user was either not found or not active
 	// so check if the loginname suffix matches a verified org domain
-	ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginNameInput)
-	if errDomainDiscovery != nil || ok {
-		return errDomainDiscovery
+	// but only if no org was requested (by id or domain)
+	if request.RequestedOrgID == "" {
+		ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginNameInput)
+		if errDomainDiscovery != nil || ok {
+			return errDomainDiscovery
+		}
 	}
 	// let's once again check if the user was just inactive
 	if user != nil && user.State == int32(domain.UserStateInactive) {
@@ -1092,7 +1095,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 	if !user.IsEmailVerified {
 		steps = append(steps, &domain.VerifyEMailStep{
-			InitPassword: !user.PasswordSet,
+			InitPassword: !user.PasswordSet && len(idps.Links) == 0,
 		})
 	}
 	if user.UsernameChangeRequired {

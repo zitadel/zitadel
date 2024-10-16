@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shopspring/decimal"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -141,10 +140,13 @@ func (q *Queries) accessTokenByOIDCSessionAndTokenID(ctx context.Context, oidcSe
 
 // checkSessionNotTerminatedAfter checks if a [session.TerminateType] event (or user events leading to a session termination)
 // occurred after a certain time and will return an error if so.
-func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID, userID string, position decimal.Decimal, fingerprintID string) (err error) {
+func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID, userID string, position float64, fingerprintID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if sessionID == "" && userID == "" && fingerprintID == "" {
+		return nil
+	}
 	model := &sessionTerminatedModel{
 		sessionID:     sessionID,
 		position:      position,
@@ -163,7 +165,7 @@ func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID,
 }
 
 type sessionTerminatedModel struct {
-	position      decimal.Decimal
+	position      float64
 	sessionID     string
 	userID        string
 	fingerPrintID string
@@ -182,33 +184,40 @@ func (s *sessionTerminatedModel) AppendEvents(events ...eventstore.Event) {
 }
 
 func (s *sessionTerminatedModel) Query() *eventstore.SearchQueryBuilder {
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		PositionGreaterEqual(s.position).
-		AddQuery().
-		AggregateTypes(session.AggregateType).
-		AggregateIDs(s.sessionID).
-		EventTypes(
-			session.TerminateType,
-		).
-		Builder()
-	if s.userID == "" {
-		return query
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+	if s.sessionID != "" {
+		builder = builder.AddQuery().
+			AggregateTypes(session.AggregateType).
+			AggregateIDs(s.sessionID).
+			EventTypes(
+				session.TerminateType,
+			).
+			PositionAfter(s.position).
+			Builder()
 	}
-	return query.
-		AddQuery().
-		AggregateTypes(user.AggregateType).
-		AggregateIDs(s.userID).
-		EventTypes(
-			user.UserDeactivatedType,
-			user.UserLockedType,
-			user.UserRemovedType,
-		).
-		Or(). // for specific logout on v1 sessions from the same user agent
-		AggregateTypes(user.AggregateType).
-		AggregateIDs(s.userID).
-		EventTypes(
-			user.HumanSignedOutType,
-		).
-		EventData(map[string]interface{}{"userAgentID": s.fingerPrintID}).
-		Builder()
+	if s.userID != "" {
+		builder = builder.AddQuery().
+			AggregateTypes(user.AggregateType).
+			AggregateIDs(s.userID).
+			EventTypes(
+				user.UserDeactivatedType,
+				user.UserLockedType,
+				user.UserRemovedType,
+			).
+			PositionAfter(s.position).
+			Builder()
+		if s.fingerPrintID != "" {
+			// for specific logout on v1 sessions from the same user agent
+			builder = builder.AddQuery().
+				AggregateTypes(user.AggregateType).
+				AggregateIDs(s.userID).
+				EventTypes(
+					user.HumanSignedOutType,
+				).
+				EventData(map[string]interface{}{"userAgentID": s.fingerPrintID}).
+				PositionAfter(s.position).
+				Builder()
+		}
+	}
+	return builder
 }

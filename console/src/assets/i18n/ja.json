@@ -1383,7 +1383,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1420,6 +1421,8 @@
         "SID": "Sid",
         "TOKEN": "トークン",
         "SENDERNUMBER": "送信者番号",
+        "VERIFYSERVICESID": "検証サービス SID",
+        "VERIFYSERVICESID_DESCRIPTION": "検証サービス SID を設定すると、電話番号と OTP SMS の検証にメッセージサービスの代わりに Twilio Verify サービスを使用できるようになります。",
         "ADDED": "Twilioは正常に追加されました。",
         "UPDATED": "Twilio が正常に更新されました。",
         "REMOVED": "Twilioが削除されました",

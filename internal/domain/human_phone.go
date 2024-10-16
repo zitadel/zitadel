@@ -54,17 +54,6 @@ func (p *Phone) Normalize() error {
 	return nil
 }
 
-func NewPhoneCode(phoneGenerator crypto.Generator) (*PhoneCode, error) {
-	phoneCodeCrypto, _, err := crypto.NewCode(phoneGenerator)
-	if err != nil {
-		return nil, err
-	}
-	return &PhoneCode{
-		Code:   phoneCodeCrypto,
-		Expiry: phoneGenerator.Expiry(),
-	}, nil
-}
-
 type PhoneState int32
 
 const (

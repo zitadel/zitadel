@@ -1384,7 +1384,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1421,6 +1422,8 @@
         "SID": "SID",
         "TOKEN": "Token",
         "SENDERNUMBER": "Número do remetente",
+        "VERIFYSERVICESID": "SID do serviço de verificação",
+        "VERIFYSERVICESID_DESCRIPTION": "Configurar um SID do serviço de verificação permite usar o serviço Twilio Verify em vez do serviço de mensagens para a verificação de números de telefone e SMS OTP.",
         "ADDED": "Twilio adicionado com sucesso.",
         "UPDATED": "Twilio atualizado com sucesso.",
         "REMOVED": "Twilio removido",

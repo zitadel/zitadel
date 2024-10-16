@@ -3,7 +3,6 @@ package database
 import (
 	"time"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 )
@@ -95,7 +94,7 @@ func (c numberCompare) String() string {
 }
 
 type number interface {
-	constraints.Integer | constraints.Float | time.Time | decimal.Decimal
+	constraints.Integer | constraints.Float | time.Time
 	// TODO: condition must know if it's args are named parameters or not
 	// constraints.Integer | constraints.Float | time.Time | placeholder
 }

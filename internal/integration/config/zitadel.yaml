@@ -6,6 +6,23 @@ ExternalSecure: false
 TLS:
   Enabled: false
 
+Caches:
+  Connectors:
+    Postgres:
+      Enabled: true
+      AutoPrune:
+        Interval: 30s
+        TimeOut: 1s
+  Instance:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUsage: 30m
+    Log:
+      Level: info
+      AddSource: true
+      Formatter:
+        Format: text
+
 Quotas:
   Access:
     Enabled: true
@@ -33,7 +50,6 @@ LogStore:
 Projections:
   HandleActiveInstances: 30m
   RequeueEvery: 5s
-  TransactionDuration: 1m
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s

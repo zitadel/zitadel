@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
@@ -100,6 +101,20 @@ func (i *Instance) CreateOIDCInactivateClient(ctx context.Context, redirectURI, 
 	_, err = i.Client.Mgmt.DeactivateApp(ctx, &management.DeactivateAppRequest{
 		ProjectId: projectID,
 		AppId:     client.GetAppId(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return client, err
+}
+
+func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+	client, err := i.CreateOIDCNativeClient(ctx, redirectURI, logoutRedirectURI, projectID, false)
+	if err != nil {
+		return nil, err
+	}
+	_, err = i.Client.Mgmt.DeactivateProject(ctx, &management.DeactivateProjectRequest{
+		Id: projectID,
 	})
 	if err != nil {
 		return nil, err
@@ -333,6 +348,31 @@ func (i *Instance) CreateOIDCCredentialsClient(ctx context.Context) (machine *ma
 		return nil, "", "", "", err
 	}
 	secret, err := i.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
+		UserId: machine.GetUserId(),
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
+}
+
+func (i *Instance) CreateOIDCCredentialsClientInactive(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
+	name = gofakeit.Username()
+	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+		Name:            name,
+		UserName:        name,
+		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	secret, err := i.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
+		UserId: machine.GetUserId(),
+	})
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	_, err = i.Client.UserV2.DeactivateUser(ctx, &user_v2.DeactivateUserRequest{
 		UserId: machine.GetUserId(),
 	})
 	if err != nil {

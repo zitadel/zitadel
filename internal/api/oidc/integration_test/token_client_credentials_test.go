@@ -3,6 +3,7 @@
 package oidc_test
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -14,6 +15,8 @@ import (
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
@@ -22,6 +25,9 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 	t.Parallel()
 
 	machine, name, clientID, clientSecret, err := Instance.CreateOIDCCredentialsClient(CTX)
+	require.NoError(t, err)
+
+	_, _, clientIDInactive, clientSecretInactive, err := Instance.CreateOIDCCredentialsClientInactive(CTX)
 	require.NoError(t, err)
 
 	type claims struct {
@@ -72,6 +78,13 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			wantErr:      true,
 		},
 		{
+			name:         "inactive machine user error",
+			clientID:     clientIDInactive,
+			clientSecret: clientSecretInactive,
+			scope:        []string{oidc.ScopeOpenID},
+			wantErr:      true,
+		},
+		{
 			name:         "wrong secret error",
 			clientID:     clientID,
 			clientSecret: "bar",
@@ -89,6 +102,17 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			clientID:     clientID,
 			clientSecret: clientSecret,
 			scope:        []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			wantClaims: claims{
+				name:     name,
+				username: name,
+				updated:  machine.GetDetails().GetChangeDate().AsTime(),
+			},
+		},
+		{
+			name:         "openid, profile, email, zitadel",
+			clientID:     clientID,
+			clientSecret: clientSecret,
+			scope:        []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, domain.ProjectScopeZITADEL},
 			wantClaims: claims{
 				name:     name,
 				username: name,
@@ -163,6 +187,13 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			assert.Empty(t, userinfo.UserInfoEmail)
 			assert.Empty(t, userinfo.UserInfoPhone)
 			assert.Empty(t, userinfo.Address)
+
+			_, err = Instance.Client.Auth.GetMyUser(integration.WithAuthorizationToken(CTX, tokens.AccessToken), &auth.GetMyUserRequest{})
+			if slices.Contains(tt.scope, domain.ProjectScopeZITADEL) {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
 		})
 	}
 }

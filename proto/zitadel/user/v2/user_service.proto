@@ -385,6 +385,7 @@ service UserService {
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
       put: "/v2/users/human/{user_id}"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -2130,6 +2131,21 @@ message ListAuthenticationMethodTypesRequest{
       min_length: 1;
       max_length: 200;
       example: "\"69629026806489455\"";
+    }
+  ];
+  optional DomainQuery domain_query = 2;
+}
+
+message DomainQuery {
+  // List also auth method types without domain information like passkey and U2F added through V1 APIs / Login UI.
+  bool include_without_domain = 1;
+  // List only auth methods with specific domain.
+  string domain = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"example.com\"";
     }
   ];
 }

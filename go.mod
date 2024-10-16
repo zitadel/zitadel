@@ -38,12 +38,10 @@ require (
 	github.com/h2non/gock v1.2.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/improbable-eng/grpc-web v0.15.0
-	github.com/jackc/pgx-shopspring-decimal v0.0.0-20220624020537-1d36b5a1853e
-	github.com/jackc/pgx/v5 v5.6.0
+	github.com/jackc/pgx/v5 v5.7.0
 	github.com/jarcoal/jpath v0.0.0-20140328210829-f76b8b2dbf52
 	github.com/jinzhu/gorm v1.9.16
 	github.com/k3a/html2text v1.2.1
-	github.com/kevinburke/twilio-go v0.0.0-20240623211326-c7334b537077
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/minio/minio-go/v7 v7.0.73
 	github.com/mitchellh/mapstructure v1.5.0
@@ -51,18 +49,19 @@ require (
 	github.com/muhlemmer/gu v0.3.1
 	github.com/muhlemmer/httpforwarded v0.1.0
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
+	github.com/pashagolub/pgxmock/v4 v4.3.0
 	github.com/pquerna/otp v1.4.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.11.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
-	github.com/shopspring/decimal v1.4.0
 	github.com/sony/sonyflake v1.2.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
-	github.com/zitadel/logging v0.6.0
+	github.com/twilio/twilio-go v1.22.2
+	github.com/zitadel/logging v0.6.1
 	github.com/zitadel/oidc/v3 v3.28.1
 	github.com/zitadel/passwap v0.6.0
 	github.com/zitadel/saml v0.2.0
@@ -78,12 +77,12 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.28.0
 	go.opentelemetry.io/otel/trace v1.28.0
 	go.uber.org/mock v0.4.0
-	golang.org/x/crypto v0.25.0
+	golang.org/x/crypto v0.27.0
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.22.0
 	golang.org/x/sync v0.8.0
-	golang.org/x/text v0.17.0
+	golang.org/x/text v0.18.0
 	google.golang.org/api v0.187.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094
 	google.golang.org/grpc v1.65.0
@@ -105,6 +104,7 @@ require (
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-tpm v0.9.0 // indirect
 	github.com/google/pprof v0.0.0-20240528025155-186aa0362fba // indirect
@@ -159,7 +159,6 @@ require (
 	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
 	github.com/go-xmlfmt/xmlfmt v1.1.2 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
-	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang/geo v0.0.0-20230421003525-6adc56603217 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/uuid v1.6.0
@@ -171,11 +170,9 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jonboulle/clockwork v0.4.0
-	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
-	github.com/kevinburke/rest v0.0.0-20240617045629-3ed0ad3487f0 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
@@ -202,7 +199,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
-	golang.org/x/sys v0.22.0
+	golang.org/x/sys v0.25.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

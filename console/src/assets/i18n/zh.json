@@ -1383,7 +1383,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1420,6 +1421,8 @@
         "SID": "Sid",
         "TOKEN": "令牌",
         "SENDERNUMBER": "发件人号码",
+        "VERIFYSERVICESID": "验证服务 SID",
+        "VERIFYSERVICESID_DESCRIPTION": "设置验证服务 SID，允许使用 Twilio 验证服务而不是消息服务来验证电话号码和 OTP SMS。",
         "ADDED": "Twilio 添加成功。",
         "UPDATED": "Twilio 更新成功。",
         "REMOVED": "Twilio 已删除",
