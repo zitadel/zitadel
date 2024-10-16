@@ -335,17 +335,18 @@ func TestServer_SAMLACS(t *testing.T) {
 			location, err := integration.CheckPost(callbackURL, httpPostFormRequest(relayState, response))
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, relayState, location.Query().Get("id"))
-				if tt.want.successful {
-					assert.True(t, strings.HasPrefix(location.String(), tt.args.successURL))
-					assert.NotEmpty(t, location.Query().Get("token"))
-					assert.Equal(t, tt.want.user, location.Query().Get("user"))
-				} else {
-					assert.True(t, strings.HasPrefix(location.String(), tt.args.failureURL))
-				}
+				return
 			}
+			require.NoError(t, err)
+			assert.Equal(t, relayState, location.Query().Get("id"))
+			if tt.want.successful {
+				assert.True(t, strings.HasPrefix(location.String(), tt.args.successURL))
+				assert.NotEmpty(t, location.Query().Get("token"))
+				assert.Equal(t, tt.want.user, location.Query().Get("user"))
+			} else {
+				assert.True(t, strings.HasPrefix(location.String(), tt.args.failureURL))
+			}
+
 		})
 	}
 }

@@ -188,35 +188,26 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			retryDuration := 20 * time.Second
-			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
-
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 20*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.UserSchemaV3.SearchUserSchemas(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					require.Error(ttt, err)
 					return
-				} else {
-					if !assert.NoError(ttt, err) {
-						return
-					}
-					// always first check length, otherwise its failed anyway
-					if !assert.Len(ttt, got.Result, len(tt.want.Result)) {
-						return
-					}
-					for i := range tt.want.Result {
-						wantSchema := tt.want.Result[i]
-						gotSchema := got.Result[i]
-
-						integration.AssertResourceDetails(ttt, wantSchema.GetDetails(), gotSchema.GetDetails())
-						wantSchema.Details = gotSchema.GetDetails()
-						grpc.AllFieldsEqual(t, wantSchema.ProtoReflect(), gotSchema.ProtoReflect(), grpc.CustomMappers)
-					}
-					integration.AssertListDetails(ttt, tt.want, got)
 				}
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
+				require.NoError(ttt, err)
+				// always first check length, otherwise its failed anyway
+				require.Len(ttt, got.Result, len(tt.want.Result))
+				for i := range tt.want.Result {
+					wantSchema := tt.want.Result[i]
+					gotSchema := got.Result[i]
+
+					integration.AssertResourceDetails(ttt, wantSchema.GetDetails(), gotSchema.GetDetails())
+					wantSchema.Details = gotSchema.GetDetails()
+					grpc.AllFieldsEqual(ttt, wantSchema.ProtoReflect(), gotSchema.ProtoReflect(), grpc.CustomMappers)
+				}
+				integration.AssertListDetails(ttt, tt.want, got)
+			}, retryDuration, tick, "timeout waiting for expected user schema result")
 		})
 	}
 }
@@ -304,26 +295,21 @@ func TestServer_GetUserSchema(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
-
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 5*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.UserSchemaV3.GetUserSchema(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assert.Error(ttt, err, "Error: "+err.Error())
-				} else {
-					if !assert.NoError(ttt, err) {
-						return
-					}
-					wantSchema := tt.want.GetUserSchema()
-					gotSchema := got.GetUserSchema()
-					integration.AssertResourceDetails(ttt, wantSchema.GetDetails(), gotSchema.GetDetails())
-					wantSchema.Details = got.GetUserSchema().GetDetails()
-					grpc.AllFieldsEqual(t, wantSchema.ProtoReflect(), gotSchema.ProtoReflect(), grpc.CustomMappers)
+					require.Error(ttt, err, "Error: "+err.Error())
+					return
 				}
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
+				require.NoError(ttt, err)
+
+				wantSchema := tt.want.GetUserSchema()
+				gotSchema := got.GetUserSchema()
+				integration.AssertResourceDetails(ttt, wantSchema.GetDetails(), gotSchema.GetDetails())
+				wantSchema.Details = got.GetUserSchema().GetDetails()
+				grpc.AllFieldsEqual(ttt, wantSchema.ProtoReflect(), gotSchema.ProtoReflect(), grpc.CustomMappers)
+			}, retryDuration, tick, "timeout waiting for expected user schema result")
 		})
 	}
 }

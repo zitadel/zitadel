@@ -277,10 +277,10 @@ func TestServer_SetContactPhone(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.SetContactPhone(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCode {
 				assert.NotNil(t, got.VerificationCode)
@@ -474,10 +474,10 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.VerifyContactPhone(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 		})
 	}
@@ -686,10 +686,10 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.ResendContactPhoneCode(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCode {
 				assert.NotNil(t, got.VerificationCode)

@@ -656,16 +656,20 @@ func TestServer_AddHumanUser(t *testing.T) {
 			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
+			} else {
+				assert.Empty(t, got.GetEmailCode())
 			}
 			if tt.want.GetPhoneCode() != "" {
 				assert.NotEmpty(t, got.GetPhoneCode())
+			} else {
+				assert.Empty(t, got.GetPhoneCode())
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})
@@ -855,9 +859,9 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			integration.AssertDetails(t, tt.want, got)
@@ -1207,14 +1211,19 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			got, err := Client.UpdateHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
+			} else {
+				assert.Empty(t, got.GetEmailCode())
 			}
 			if tt.want.GetPhoneCode() != "" {
 				assert.NotEmpty(t, got.GetPhoneCode())
+			} else {
+				assert.Empty(t, got.GetPhoneCode())
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})
@@ -1404,9 +1413,9 @@ func TestServer_LockUser(t *testing.T) {
 			got, err := Client.LockUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1512,9 +1521,9 @@ func TestServer_UnLockUser(t *testing.T) {
 			got, err := Client.UnlockUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1620,9 +1629,10 @@ func TestServer_DeactivateUser(t *testing.T) {
 			got, err := Client.DeactivateUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1728,9 +1738,9 @@ func TestServer_ReactivateUser(t *testing.T) {
 			got, err := Client.ReactivateUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1827,9 +1837,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -2071,15 +2081,14 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			got, err := Client.StartIdentityProviderIntent(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			if tt.want.url != "" {
 				authUrl, err := url.Parse(got.GetAuthUrl())
-				assert.NoError(t, err)
-
-				assert.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
+				require.NoError(t, err)
+				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
 				for _, existing := range tt.want.parametersExisting {
 					assert.True(t, authUrl.Query().Has(existing))
@@ -2597,9 +2606,10 @@ func TestServer_CreateInviteCode(t *testing.T) {
 			got, err := Client.CreateInviteCode(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 			if tt.want.GetInviteCode() != "" {
 				assert.NotEmpty(t, got.GetInviteCode())
@@ -2690,9 +2700,10 @@ func TestServer_ResendInviteCode(t *testing.T) {
 			got, err := Client.ResendInviteCode(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -2779,9 +2790,9 @@ func TestServer_VerifyInviteCode(t *testing.T) {
 			got, err := Client.VerifyInviteCode(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}

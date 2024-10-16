@@ -255,25 +255,20 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				require.NoError(t, err)
 				defer close()
 			}
-			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
-
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 5*time.Second)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
 				if tt.wantErr {
-					assert.Error(ttt, err, "Error: "+err.Error())
-				} else {
-					if !assert.NoError(ttt, err) {
-						return
-					}
-
-					integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
-					tt.want.Target.Details = got.GetTarget().GetDetails()
-					assert.EqualExportedValues(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+					require.Error(ttt, err)
+					return
 				}
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
+				require.NoError(ttt, err)
+
+				integration.AssertResourceDetails(ttt, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
+				tt.want.Target.Details = got.GetTarget().GetDetails()
+				assert.EqualExportedValues(ttt, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+
+			}, retryDuration, tick, "timeout waiting for expected execution result")
 
 			if tt.clean != nil {
 				tt.clean(tt.ctx)
@@ -283,10 +278,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 }
 
 func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition) {
-	retryDuration := 5 * time.Second
-	if ctxDeadline, ok := ctx.Deadline(); ok {
-		retryDuration = time.Until(ctxDeadline)
-	}
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Second)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		got, err := instance.Client.ActionV3Alpha.SearchExecutions(ctx, &action.SearchExecutionsRequest{
 			Filters: []*action.ExecutionSearchFilter{
@@ -301,7 +293,7 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 		if assert.Len(ttt, got.GetResult(), 1) {
 			return
 		}
-	}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
+	}, retryDuration, tick, "timeout waiting for expected execution result")
 	return
 }
 

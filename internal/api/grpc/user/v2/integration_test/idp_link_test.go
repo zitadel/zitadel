@@ -90,10 +90,9 @@ func TestServer_AddIDPLink(t *testing.T) {
 			got, err := Client.AddIDPLink(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
-
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -233,27 +232,21 @@ func TestServer_ListIDPLinks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Client.ListIDPLinks(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.ListIDPLinks(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, listErr)
-				if listErr != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
+				require.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
 				integration.AssertListDetails(t, tt.want, got)
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected idplinks result")
+			}, retryDuration, tick, "timeout waiting for expected idplinks result")
 		})
 	}
 }
@@ -358,9 +351,9 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 			got, err := Client.RemoveIDPLink(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
 		})

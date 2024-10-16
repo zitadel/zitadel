@@ -35,8 +35,7 @@ func TestMain(m *testing.M) {
 }
 
 func await(t *testing.T, ctx context.Context, cb func(*assert.CollectT)) {
-	deadline, ok := ctx.Deadline()
-	assert.True(t, ok, "context must have deadline")
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(
 		t,
 		func(tt *assert.CollectT) {
@@ -46,8 +45,8 @@ func await(t *testing.T, ctx context.Context, cb func(*assert.CollectT)) {
 			}()
 			cb(tt)
 		},
-		time.Until(deadline),
-		time.Second,
+		retryDuration,
+		tick,
 		"awaiting successful callback failed",
 	)
 }

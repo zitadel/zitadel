@@ -155,20 +155,16 @@ func TestServer_GetUserByID(t *testing.T) {
 			username := gofakeit.Email()
 			userAttr, err := tt.args.dep(tt.args.ctx, username, tt.args.req)
 			require.NoError(t, err)
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, getErr := Client.GetUserByID(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, getErr)
-				if getErr != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
+
 				tt.want.User.Details = userAttr.Details
 				tt.want.User.UserId = userAttr.UserID
 				tt.want.User.Username = userAttr.Username
@@ -182,7 +178,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				}
 				assert.Equal(ttt, tt.want.User, got.User)
 				integration.AssertDetails(ttt, tt.want, got)
-			}, retryDuration, time.Second)
+			}, retryDuration, tick)
 		})
 	}
 }
@@ -304,20 +300,21 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				tt.want.User.UserId = tt.args.req.GetUserId()
-				tt.want.User.Username = newOrgOwnerEmail
-				tt.want.User.PreferredLoginName = newOrgOwnerEmail
-				tt.want.User.LoginNames = []string{newOrgOwnerEmail}
-				if human := tt.want.User.GetHuman(); human != nil {
-					human.Email.Email = newOrgOwnerEmail
-				}
-				// details tested in GetUserByID
-				tt.want.User.Details = got.User.GetDetails()
-
-				assert.Equal(t, tt.want.User, got.User)
+				return
 			}
+			require.NoError(t, err)
+
+			tt.want.User.UserId = tt.args.req.GetUserId()
+			tt.want.User.Username = newOrgOwnerEmail
+			tt.want.User.PreferredLoginName = newOrgOwnerEmail
+			tt.want.User.LoginNames = []string{newOrgOwnerEmail}
+			if human := tt.want.User.GetHuman(); human != nil {
+				human.Email.Email = newOrgOwnerEmail
+			}
+			// details tested in GetUserByID
+			tt.want.User.Details = got.User.GetDetails()
+
+			assert.Equal(t, tt.want.User, got.User)
 		})
 	}
 }
@@ -896,24 +893,20 @@ func TestServer_ListUsers(t *testing.T) {
 			}
 			infos, err := tt.args.dep(tt.args.ctx, usernames, tt.args.req)
 			require.NoError(t, err)
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Client.ListUsers(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, listErr)
-				if listErr != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
+
 				// always only give back dependency infos which are required for the response
-				assert.Len(ttt, tt.want.Result, len(infos))
+				require.Len(ttt, tt.want.Result, len(infos))
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
+				require.Len(ttt, got.Result, len(tt.want.Result))
 
 				// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
 				tt.want.Details.TotalResult = got.Details.TotalResult
@@ -936,7 +929,7 @@ func TestServer_ListUsers(t *testing.T) {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
 				integration.AssertListDetails(ttt, tt.want, got)
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user result")
+			}, retryDuration, tick, "timeout waiting for expected user result")
 		})
 	}
 }

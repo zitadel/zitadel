@@ -213,20 +213,18 @@ func TestServer_CreateUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := instance.Client.UserV3Alpha.CreateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
-			} else {
-				if !assert.NoError(t, err) {
-					return
-				}
-				integration.AssertResourceDetails(t, tt.res.want, got.Details)
-				if tt.res.returnCodeEmail {
-					require.NotNil(t, got.EmailCode)
-				}
-				if tt.res.returnCodePhone {
-					require.NotNil(t, got.PhoneCode)
-				}
 			}
+			require.NoError(t, err)
+			integration.AssertResourceDetails(t, tt.res.want, got.Details)
+			if tt.res.returnCodeEmail {
+				require.NotNil(t, got.EmailCode)
+			}
+			if tt.res.returnCodePhone {
+				require.NotNil(t, got.PhoneCode)
+			}
+
 		})
 	}
 }
@@ -632,24 +630,20 @@ func TestServer_PatchUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.PatchUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
+			}
+			require.NoError(t, err)
+			integration.AssertResourceDetails(t, tt.res.want, got.Details)
+			if tt.res.returnCodeEmail {
+				assert.NotNil(t, got.EmailCode)
 			} else {
-				if !assert.NoError(t, err) {
-					return
-				}
-				integration.AssertResourceDetails(t, tt.res.want, got.Details)
-				if tt.res.returnCodeEmail {
-					assert.NotNil(t, got.EmailCode)
-				} else {
-					assert.Nil(t, got.EmailCode)
-				}
-				if tt.res.returnCodePhone {
-					assert.NotNil(t, got.PhoneCode)
-				} else {
-					assert.Nil(t, got.PhoneCode)
-				}
-
+				assert.Nil(t, got.EmailCode)
+			}
+			if tt.res.returnCodePhone {
+				assert.NotNil(t, got.PhoneCode)
+			} else {
+				assert.Nil(t, got.PhoneCode)
 			}
 		})
 	}
@@ -855,14 +849,11 @@ func TestServer_DeleteUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.DeleteUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
-			} else {
-				if !assert.NoError(t, err) {
-					return
-				}
-				integration.AssertResourceDetails(t, tt.want, got.Details)
 			}
+			require.NoError(t, err)
+			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
@@ -1069,14 +1060,11 @@ func TestServer_LockUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.LockUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
-			} else {
-				if !assert.NoError(t, err) {
-					return
-				}
-				integration.AssertResourceDetails(t, tt.want, got.Details)
 			}
+			require.NoError(t, err)
+			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
@@ -1255,14 +1243,11 @@ func TestServer_UnlockUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.UnlockUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
-			} else {
-				if !assert.NoError(t, err) {
-					return
-				}
-				integration.AssertResourceDetails(t, tt.want, got.Details)
 			}
+			require.NoError(t, err)
+			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
@@ -1460,14 +1445,11 @@ func TestServer_DeactivateUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.DeactivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
-			} else {
-				if !assert.NoError(t, err) {
-					return
-				}
-				integration.AssertResourceDetails(t, tt.want, got.Details)
 			}
+			require.NoError(t, err)
+			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
@@ -1646,14 +1628,11 @@ func TestServer_ActivateUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.ActivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
-			} else {
-				if !assert.NoError(t, err) {
-					return
-				}
-				integration.AssertResourceDetails(t, tt.want, got.Details)
 			}
+			require.NoError(t, err)
+			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
