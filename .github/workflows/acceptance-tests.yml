@@ -1,6 +1,5 @@
 name: Acceptance Tests
-on:
-  pull_request:
+on: pull_request
 jobs:
   acceptance-tests:
     timeout-minutes: 60
