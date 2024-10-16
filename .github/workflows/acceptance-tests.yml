@@ -12,7 +12,7 @@ jobs:
     - name: Run Docker Compose and Install Dependencies in Parallel
       run: |
         echo "Start docker-compose in the background"
-        docker compose -f ./acceptance/docker-compose.yaml up -d &
+        docker compose -f ./acceptance/docker-compose.yaml run setup &
         DOCKER_COMPOSE_PID=$!
         echo "Docker Compose PID: $DOCKER_COMPOSE_PID"
         
