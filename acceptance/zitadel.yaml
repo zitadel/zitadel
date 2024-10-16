@@ -1,12 +1,19 @@
 FirstInstance:
-  MachineKeyPath: /machinekey/zitadel-admin-sa.json
+  PatPath: /pat/zitadel-admin-sa.pat
   Org:
+    Human:
+      UserName: zitadel-admin
+      FirstName: ZITADEL
+      LastName: Admin
+      Password: Password1!
+      PasswordChangeRequired: true
+      PreferredLanguage: en
     Machine:
       Machine:
         Username: zitadel-admin-sa
         Name: Admin
-      MachineKey:
-        Type: 1
+      Pat:
+        ExpirationDate: 2099-01-01T00:00:00Z
 
 Database:
   EventPushConnRatio: 0.2 # 4

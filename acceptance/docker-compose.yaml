@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./machinekey:/machinekey
+      - ./pat:/pat
       - ./zitadel.yaml:/zitadel.yaml
     depends_on:
       db:
@@ -46,11 +46,11 @@ services:
     container_name: setup
     build: .
     environment:
-      KEY: /key/zitadel-admin-sa.json
-      SERVICE: http://zitadel:8080
+      PAT_FILE: /pat/zitadel-admin-sa.pat
+      ZITADEL_API_INTERNAL_URL: http://zitadel:8080
       WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
     volumes:
-      - "./machinekey:/key"
+      - "./pat:/pat"
       - "../apps/login:/apps/login"
     depends_on:
       wait_for_zitadel:
