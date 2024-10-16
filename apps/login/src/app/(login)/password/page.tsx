@@ -32,13 +32,13 @@ export default async function Page({
   const branding = await getBrandingSettings(organization);
   const loginSettings = await getLoginSettings(organization);
 
-  console.log(sessionFactors);
-
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{sessionFactors?.factors?.user?.displayName ?? t("title")}</h1>
-        <p className="ztdl-p mb-6 block">{t("description")}</p>
+        <h1>
+          {sessionFactors?.factors?.user?.displayName ?? t("verify.title")}
+        </h1>
+        <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
         {/* show error only if usernames should be shown to be unknown */}
         {(!sessionFactors || !loginName) &&

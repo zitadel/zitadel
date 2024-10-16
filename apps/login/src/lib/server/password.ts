@@ -111,7 +111,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
 }
 
 export async function changePassword(command: {
-  code?: string;
+  code: string;
   userId: string;
   password: string;
 }) {
@@ -123,5 +123,5 @@ export async function changePassword(command: {
   }
   const userId = user.userId;
 
-  return setPassword(userId, command.password);
+  return setPassword(userId, command.password, command.code);
 }

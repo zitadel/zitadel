@@ -1,4 +1,4 @@
-import { Alert } from "@/components/alert";
+import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetPasswordForm } from "@/components/set-password-form";
 import { UserAvatar } from "@/components/user-avatar";
@@ -37,8 +37,8 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{sessionFactors?.factors?.user?.displayName ?? t("title")}</h1>
-        <p className="ztdl-p mb-6 block">{t("description")}</p>
+        <h1>{sessionFactors?.factors?.user?.displayName ?? t("set.title")}</h1>
+        <p className="ztdl-p mb-6 block">{t("set.description")}</p>
 
         {/* show error only if usernames should be shown to be unknown */}
         {(!sessionFactors || !loginName) &&
@@ -57,9 +57,14 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        {passwordComplexity && loginName ? (
+        <Alert type={AlertType.INFO}>{t("set.codeSent")}</Alert>
+
+        {passwordComplexity &&
+        loginName &&
+        sessionFactors?.factors?.user?.id ? (
           <SetPasswordForm
             code={code}
+            userId={sessionFactors.factors.user.id}
             loginName={loginName}
             authRequestId={authRequestId}
             organization={organization}

@@ -14,10 +14,19 @@
     "register": "Registrati come nuovo utente"
   },
   "password": {
-    "title": "Password",
-    "description": "Inserisci la tua password.",
-    "resetPassword": "Reimposta Password",
-    "submit": "Continua"
+    "verify": {
+      "title": "Password",
+      "description": "Inserisci la tua password.",
+      "resetPassword": "Reimposta Password",
+      "submit": "Continua"
+    },
+    "set": {
+      "title": "Imposta Password",
+      "description": "Imposta la password per il tuo account",
+      "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
+      "resend": "Invia di nuovo",
+      "submit": "Continua"
+    }
   },
   "idp": {
     "title": "Accedi con SSO",

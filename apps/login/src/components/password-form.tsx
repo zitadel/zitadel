@@ -87,13 +87,25 @@ export function PasswordForm({
 
     if (response && "error" in response) {
       setError(response.error);
-    } else {
-      setInfo("Password was reset. Please check your email.");
+      return;
     }
 
-    setLoading(false);
+    setInfo("Password was reset. Please check your email.");
 
-    return response;
+    setLoading(false);
+    const params = new URLSearchParams({
+      loginName: loginName,
+    });
+
+    if (organization) {
+      params.append("organization", organization);
+    }
+
+    if (authRequestId) {
+      params.append("authRequestId", authRequestId);
+    }
+
+    return router.push("/password/set?" + params);
   }
 
   async function submitPasswordAndContinue(
@@ -247,7 +259,7 @@ export function PasswordForm({
             type="button"
             disabled={loading}
           >
-            {t("resetPassword")}
+            {t("verify.resetPassword")}
           </button>
         )}
 
@@ -284,7 +296,7 @@ export function PasswordForm({
           onClick={handleSubmit(submitPasswordAndContinue)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("submit")}
+          {t("verify.submit")}
         </Button>
       </div>
     </form>

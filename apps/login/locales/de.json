@@ -14,10 +14,19 @@
     "register": "Neuen Benutzer registrieren"
   },
   "password": {
-    "title": "Passwort",
-    "description": "Geben Sie Ihr Passwort ein.",
-    "resetPassword": "Passwort zurücksetzen",
-    "submit": "Weiter"
+    "verify": {
+      "title": "Passwort",
+      "description": "Geben Sie Ihr Passwort ein.",
+      "resetPassword": "Passwort zurücksetzen",
+      "submit": "Weiter"
+    },
+    "set": {
+      "title": "Passwort festlegen",
+      "description": "Legen Sie das Passwort für Ihr Konto fest",
+      "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
+      "resend": "Erneut senden",
+      "submit": "Weiter"
+    }
   },
   "idp": {
     "title": "Mit SSO anmelden",

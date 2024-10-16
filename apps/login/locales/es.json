@@ -14,10 +14,19 @@
     "register": "Registrar nuevo usuario"
   },
   "password": {
-    "title": "Contraseña",
-    "description": "Introduce tu contraseña.",
-    "resetPassword": "Restablecer Contraseña",
-    "submit": "Continuar"
+    "verify": {
+      "title": "Contraseña",
+      "description": "Introduce tu contraseña.",
+      "resetPassword": "Restablecer contraseña",
+      "submit": "Continuar"
+    },
+    "set": {
+      "title": "Establecer Contraseña",
+      "description": "Establece la contraseña para tu cuenta",
+      "codeSent": "Se ha enviado un código a su correo electrónico.",
+      "resend": "Reenviar código",
+      "submit": "Continuar"
+    }
   },
   "idp": {
     "title": "Iniciar sesión con SSO",

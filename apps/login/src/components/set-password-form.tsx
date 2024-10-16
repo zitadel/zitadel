@@ -7,8 +7,8 @@ import {
   upperCaseValidator,
 } from "@/helpers/validators";
 import { changePassword } from "@/lib/server/password";
-import { RegisterUserResponse } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { SetPasswordResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,6 +22,7 @@ import { Spinner } from "./spinner";
 
 type Inputs =
   | {
+      code: string;
       password: string;
       confirmPassword: string;
     }
@@ -31,6 +32,7 @@ type Props = {
   code?: string;
   passwordComplexitySettings: PasswordComplexitySettings;
   loginName: string;
+  userId: string;
   organization?: string;
   authRequestId?: string;
 };
@@ -39,12 +41,17 @@ export function SetPasswordForm({
   passwordComplexitySettings,
   organization,
   authRequestId,
+  loginName,
+  userId,
+  code,
 }: Props) {
-  const t = useTranslations("register");
+  const t = useTranslations("password");
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
-    defaultValues: {},
+    defaultValues: {
+      code: code ?? "",
+    },
   });
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,9 +62,9 @@ export function SetPasswordForm({
   async function submitRegister(values: Inputs) {
     setLoading(true);
     const response = await changePassword({
-      organization: organization,
-      authRequestId: authRequestId,
+      userId: userId,
       password: values.password,
+      code: values.code,
     }).catch(() => {
       setError("Could not register user");
     });
@@ -73,18 +80,17 @@ export function SetPasswordForm({
       return;
     }
 
-    const userResponse = response as RegisterUserResponse;
+    const userResponse = response as SetPasswordResponse & {
+      sessionId: string;
+    };
 
-    const params = new URLSearchParams({ userId: userResponse.userId });
+    const params = new URLSearchParams({});
 
-    if (userResponse.factors?.user?.loginName) {
-      params.append("loginName", userResponse.factors.user.loginName);
+    if (loginName) {
+      params.append("loginName", loginName);
     }
     if (organization) {
       params.append("organization", organization);
-    }
-    if (userResponse && userResponse.sessionId) {
-      params.append("sessionId", userResponse.sessionId);
     }
 
     // skip verification for now as it is an app based flow
@@ -129,6 +135,24 @@ export function SetPasswordForm({
   return (
     <form className="w-full">
       <div className="pt-4 grid grid-cols-1 gap-4 mb-4">
+        <div className="flex flex-row items-end">
+          <div className="flex-1">
+            <TextInput
+              type="text"
+              required
+              {...register("code", {
+                required: "This field is required",
+              })}
+              label="Code"
+              error={errors.code?.message as string}
+            />
+          </div>
+          <div className="ml-4 mb-1">
+            <Button variant={ButtonVariants.Secondary}>
+              {t("set.resend")}
+            </Button>
+          </div>
+        </div>
         <div className="">
           <TextInput
             type="password"
@@ -137,7 +161,7 @@ export function SetPasswordForm({
             {...register("password", {
               required: "You have to provide a password!",
             })}
-            label="Password"
+            label="New Password"
             error={errors.password?.message as string}
           />
         </div>
@@ -179,7 +203,7 @@ export function SetPasswordForm({
           onClick={handleSubmit(submitRegister)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("password.submit")}
+          {t("set.submit")}
         </Button>
       </div>
     </form>

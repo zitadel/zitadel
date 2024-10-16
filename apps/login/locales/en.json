@@ -14,10 +14,19 @@
     "register": "Register new user"
   },
   "password": {
-    "title": "Password",
-    "description": "Enter your password.",
-    "resetPassword": "Reset Password",
-    "submit": "Continue"
+    "verify": {
+      "title": "Password",
+      "description": "Enter your password.",
+      "resetPassword": "Reset Password",
+      "submit": "Continue"
+    },
+    "set": {
+      "title": "Set Password",
+      "description": "Set the password for your account",
+      "codeSent": "A code has been sent to your email address.",
+      "resend": "Resend code",
+      "submit": "Continue"
+    }
   },
   "idp": {
     "title": "Sign in with SSO",
