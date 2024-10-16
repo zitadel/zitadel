@@ -1,7 +1,5 @@
 name: Acceptance Tests
 on: pull_request
-env:
-  ZITADEL_DEV_UID: runneradmin
 jobs:
   acceptance-tests:
     timeout-minutes: 60
@@ -12,6 +10,8 @@ jobs:
       with:
         node-version: lts/*
     - name: Run Docker Compose and Install Dependencies in Parallel
+      env:
+        ZITADEL_DEV_UID: root
       run: |
         echo "Start docker-compose in the background"
         docker compose -f ./acceptance/docker-compose.yaml run setup &
