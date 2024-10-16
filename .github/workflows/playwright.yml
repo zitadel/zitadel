@@ -1,9 +1,6 @@
 name: Acceptance Tests
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 jobs:
   acceptance-tests:
     timeout-minutes: 60
