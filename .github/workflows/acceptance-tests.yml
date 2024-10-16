@@ -29,21 +29,26 @@ jobs:
         GENERATE_PID=$!
         echo "Generate stubs PID: $GENERATE_PID"
         
-        echo "Wait for all background processes to finish"
-        while true; do
-          wait -n $DOCKER_COMPOSE_PID $INSTALL_BROWSERS_PID $GENERATE_PID
-          EXIT_STATUS=$?
-          if [ $EXIT_STATUS -ne 0 ]; then
-            echo "A background process failed with exit code $EXIT_STATUS."
-            exit $EXIT_STATUS
-          fi
-          # Check if all processes have finished
-          if ! kill -0 $DOCKER_COMPOSE_PID 2>/dev/null && \
-             ! kill -0 $INSTALL_BROWSERS_PID 2>/dev/null && \
-             ! kill -0 GENERATE_PID 2>/dev/null; then
-            break
-          fi
-        done
+        # Wait for docker-compose
+        wait $DOCKER_COMPOSE_PID
+        if [ $? -ne 0 ]; then
+          echo "Docker Compose failed"
+          exit 1
+        fi
+
+        # Wait for Playwright browser installation
+        wait $INSTALL_BROWSERS_PID
+        if [ $? -ne 0 ]; then
+          echo "Playwright browser installation failed"
+          exit 1
+        fi
+
+        # Wait for gRPC stubs generation
+        wait $GENERATE_PID
+        if [ $? -ne 0 ]; then
+          echo "gRPC stubs generation failed"
+          exit 1
+        fi
         
         echo "Generate and create a production build in the foreground"
         pnpm build
