@@ -6,17 +6,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Run docker-compose
-      uses: hoverkraft-tech/compose-action@v2.0.1
-      with:
-        compose-file: "./acceptance/docker-compose.yaml"
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - name: Install dependencies
-      run: npm install -g pnpm && pnpm install && pnpm generate
-    - name: Install Playwright Browsers
-      run: pnpm exec playwright install --with-deps
+    - name: Run Docker Compose and Install Dependencies in Parallel
+      run: |
+        echo "Start docker-compose in the background"
+        docker-compose -f ./acceptance/docker-compose.yaml up -d &
+        
+        echo "Install node_modules in the foreground"
+        npm install -g pnpm && pnpm install
+        
+        echo "Generate and create a production build in the background"
+        pnpm build &
+
+        echo "Install Playwright with browsers in the background"
+        pnpm exec playwright install --with-deps &
+        
+        echo "Wait for all background processes to complete"
+        wait
     - name: Run Playwright tests
       run: pnpm exec playwright test
     - uses: actions/upload-artifact@v4
