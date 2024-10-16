@@ -26,6 +26,11 @@
       "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
       "resend": "Invia di nuovo",
       "submit": "Continua"
+    },
+    "change": {
+      "title": "Cambia Password",
+      "description": "Imposta la password per il tuo account",
+      "submit": "Continua"
     }
   },
   "idp": {

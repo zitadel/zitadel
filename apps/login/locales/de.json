@@ -26,6 +26,11 @@
       "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
       "resend": "Erneut senden",
       "submit": "Weiter"
+    },
+    "change": {
+      "title": "Passwort ändern",
+      "description": "Legen Sie das Passwort für Ihr Konto fest",
+      "submit": "Weiter"
     }
   },
   "idp": {

@@ -26,6 +26,11 @@
       "codeSent": "Se ha enviado un código a su correo electrónico.",
       "resend": "Reenviar código",
       "submit": "Continuar"
+    },
+    "change": {
+      "title": "Cambiar Contraseña",
+      "description": "Establece la contraseña para tu cuenta",
+      "submit": "Continuar"
     }
   },
   "idp": {

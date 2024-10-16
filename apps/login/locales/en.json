@@ -26,6 +26,11 @@
       "codeSent": "A code has been sent to your email address.",
       "resend": "Resend code",
       "submit": "Continue"
+    },
+    "change": {
+      "title": "Change Password",
+      "description": "Set the password for your account",
+      "submit": "Continue"
     }
   },
   "idp": {

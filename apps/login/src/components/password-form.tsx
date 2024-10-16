@@ -61,14 +61,16 @@ export function PasswordForm({
       }),
       authRequestId,
     }).catch(() => {
+      setLoading(false);
       setError("Could not verify password");
+      return;
     });
+
+    setLoading(false);
 
     if (response && "error" in response && response.error) {
       setError(response.error);
     }
-
-    setLoading(false);
 
     return response;
   }

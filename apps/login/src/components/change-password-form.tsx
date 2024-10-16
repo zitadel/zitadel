@@ -6,8 +6,9 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { setPassword } from "@/lib/self";
+import { setMyPassword } from "@/lib/self";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
@@ -27,15 +28,21 @@ type Inputs =
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
-  userId: string;
   sessionId: string;
+  loginName: string;
+  authRequestId?: string;
+  organization?: string;
 };
 
 export function ChangePasswordForm({
   passwordComplexitySettings,
-  userId,
   sessionId,
+  loginName,
+  authRequestId,
+  organization,
 }: Props) {
+  const t = useTranslations("password");
+
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -51,9 +58,8 @@ export function ChangePasswordForm({
 
   async function submitChange(values: Inputs) {
     setLoading(true);
-    const response = await setPassword({
+    const response = await setMyPassword({
       sessionId: sessionId,
-      userId: userId,
       password: values.password,
     }).catch(() => {
       setError("Could not change password");
@@ -61,12 +67,36 @@ export function ChangePasswordForm({
 
     setLoading(false);
 
+    if (response && "error" in response) {
+      setError(response.error);
+      return;
+    }
+
     if (!response) {
       setError("Could not change password");
       return;
     }
 
-    return response;
+    const params = new URLSearchParams({});
+
+    if (loginName) {
+      params.append("loginName", loginName);
+    }
+    if (organization) {
+      params.append("organization", organization);
+    }
+
+    if (authRequestId && sessionId) {
+      if (authRequestId) {
+        params.append("authRequest", authRequestId);
+      }
+      return router.push(`/login?` + params);
+    } else {
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+      return router.push(`/signedin?` + params);
+    }
   }
 
   const { errors } = formState;
@@ -99,9 +129,9 @@ export function ChangePasswordForm({
             autoComplete="new-password"
             required
             {...register("password", {
-              required: "You have to provide a password!",
+              required: "You have to provide a new password!",
             })}
-            label="Password"
+            label="New Password"
             error={errors.password?.message as string}
           />
         </div>
@@ -143,7 +173,7 @@ export function ChangePasswordForm({
           onClick={handleSubmit(submitChange)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          continue
+          {t("change.submit")}
         </Button>
       </div>
     </form>
