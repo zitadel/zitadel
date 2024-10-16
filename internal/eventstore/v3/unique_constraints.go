@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -25,10 +24,7 @@ var (
 	addConstraintStmt string
 )
 
-func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
+func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) error {
 	deletePlaceholders := make([]string, 0)
 	deleteArgs := make([]any, 0)
 

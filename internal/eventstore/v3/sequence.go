@@ -11,7 +11,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -23,10 +22,7 @@ type latestSequence struct {
 //go:embed sequences_query.sql
 var latestSequencesStmt string
 
-func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) (_ []*latestSequence, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
+func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) ([]*latestSequence, error) {
 	sequences := commandsToSequences(ctx, commands)
 
 	conditions, args := sequencesToSql(sequences)
