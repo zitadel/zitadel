@@ -11,7 +11,7 @@ echo "Using audience ${AUDIENCE} for which the key is used."
 SERVICE=${SERVICE:-$AUDIENCE}
 echo "Using the service ${SERVICE} to connect to ZITADEL. For example in docker compose this can differ from the audience."
 
-WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.acceptance}
+WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.local}
 echo "Writing environment file to ${WRITE_ENVIRONMENT_FILE} when done."
 
 AUDIENCE_HOST="$(echo $AUDIENCE | cut -d/ -f3)"

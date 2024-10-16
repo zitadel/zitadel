@@ -18,3 +18,7 @@ packages/zitadel-server/src/app/proto
 .idea
 .vercel
 .env*.local
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
