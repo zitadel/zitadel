@@ -7,6 +7,9 @@ import {
   upperCaseValidator,
 } from "@/helpers/validators";
 import { setMyPassword } from "@/lib/self";
+import { sendPassword } from "@/lib/server/password";
+import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -58,7 +61,7 @@ export function ChangePasswordForm({
 
   async function submitChange(values: Inputs) {
     setLoading(true);
-    const response = await setMyPassword({
+    const changeResponse = await setMyPassword({
       sessionId: sessionId,
       password: values.password,
     }).catch(() => {
@@ -67,36 +70,40 @@ export function ChangePasswordForm({
 
     setLoading(false);
 
-    if (response && "error" in response) {
-      setError(response.error);
+    if (changeResponse && "error" in changeResponse) {
+      setError(changeResponse.error);
       return;
     }
 
-    if (!response) {
+    if (!changeResponse) {
       setError("Could not change password");
       return;
     }
 
-    const params = new URLSearchParams({});
+    const passwordResponse = await sendPassword({
+      loginName,
+      organization,
+      checks: create(ChecksSchema, {
+        password: { password: values.password },
+      }),
+      authRequestId,
+    }).catch(() => {
+      setLoading(false);
+      setError("Could not verify password");
+      return;
+    });
 
-    if (loginName) {
-      params.append("loginName", loginName);
-    }
-    if (organization) {
-      params.append("organization", organization);
+    setLoading(false);
+
+    if (
+      passwordResponse &&
+      "error" in passwordResponse &&
+      passwordResponse.error
+    ) {
+      setError(passwordResponse.error);
     }
 
-    if (authRequestId && sessionId) {
-      if (authRequestId) {
-        params.append("authRequest", authRequestId);
-      }
-      return router.push(`/login?` + params);
-    } else {
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-      return router.push(`/signedin?` + params);
-    }
+    return;
   }
 
   const { errors } = formState;
