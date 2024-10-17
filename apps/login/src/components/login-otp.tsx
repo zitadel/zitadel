@@ -194,7 +194,7 @@ export function LoginOTP({
         <Alert type={AlertType.INFO}>
           <div className="flex flex-row">
             <span className="flex-1 mr-auto text-left">
-              {t("noCodeReceived")}
+              {t("verify.noCodeReceived")}
             </span>
             <button
               aria-label="Resend OTP Code"
@@ -212,7 +212,7 @@ export function LoginOTP({
                   });
               }}
             >
-              {t("resendCode")}
+              {t("verify.resendCode")}
             </button>
           </div>
         </Alert>
@@ -244,7 +244,7 @@ export function LoginOTP({
           })}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("submit")}
+          {t("verify.submit")}
         </Button>
       </div>
     </form>

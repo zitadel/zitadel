@@ -6,9 +6,10 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { changePassword } from "@/lib/server/password";
+import { changePassword, sendPassword } from "@/lib/server/password";
+import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
-import { SetPasswordResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -61,7 +62,7 @@ export function SetPasswordForm({
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
-    const response = await changePassword({
+    const changeResponse = await changePassword({
       userId: userId,
       password: values.password,
       code: values.code,
@@ -69,20 +70,16 @@ export function SetPasswordForm({
       setError("Could not register user");
     });
 
-    if (response && "error" in response) {
-      setError(response.error);
+    if (changeResponse && "error" in changeResponse) {
+      setError(changeResponse.error);
     }
 
     setLoading(false);
 
-    if (!response) {
+    if (!changeResponse) {
       setError("Could not register user");
       return;
     }
-
-    const userResponse = response as SetPasswordResponse & {
-      sessionId: string;
-    };
 
     const params = new URLSearchParams({});
 
@@ -93,22 +90,45 @@ export function SetPasswordForm({
       params.append("organization", organization);
     }
 
-    // skip verification for now as it is an app based flow
-    // return router.push(`/verify?` + params);
+    const passwordResponse = await sendPassword({
+      loginName,
+      organization,
+      checks: create(ChecksSchema, {
+        password: { password: values.password },
+      }),
+      authRequestId,
+    }).catch(() => {
+      setLoading(false);
+      setError("Could not verify password");
+      return;
+    });
 
-    // check for mfa force to continue with mfa setup
+    setLoading(false);
 
-    if (authRequestId && userResponse.sessionId) {
-      if (authRequestId) {
-        params.append("authRequest", authRequestId);
-      }
-      return router.push(`/login?` + params);
-    } else {
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-      return router.push(`/signedin?` + params);
+    if (
+      passwordResponse &&
+      "error" in passwordResponse &&
+      passwordResponse.error
+    ) {
+      setError(passwordResponse.error);
     }
+
+    // // skip verification for now as it is an app based flow
+    // // return router.push(`/verify?` + params);
+
+    // // check for mfa force to continue with mfa setup
+
+    // if (authRequestId && changeResponse.sessionId) {
+    //   if (authRequestId) {
+    //     params.append("authRequest", authRequestId);
+    //   }
+    //   return router.push(`/login?` + params);
+    // } else {
+    //   if (authRequestId) {
+    //     params.append("authRequestId", authRequestId);
+    //   }
+    //   return router.push(`/signedin?` + params);
+    // }
   }
 
   const { errors } = formState;
