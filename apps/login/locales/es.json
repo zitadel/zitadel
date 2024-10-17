@@ -14,10 +14,24 @@
     "register": "Registrar nuevo usuario"
   },
   "password": {
-    "title": "Contraseña",
-    "description": "Introduce tu contraseña.",
-    "resetPassword": "Restablecer Contraseña",
-    "submit": "Continuar"
+    "verify": {
+      "title": "Contraseña",
+      "description": "Introduce tu contraseña.",
+      "resetPassword": "Restablecer contraseña",
+      "submit": "Continuar"
+    },
+    "set": {
+      "title": "Establecer Contraseña",
+      "description": "Establece la contraseña para tu cuenta",
+      "codeSent": "Se ha enviado un código a su correo electrónico.",
+      "resend": "Reenviar código",
+      "submit": "Continuar"
+    },
+    "change": {
+      "title": "Cambiar Contraseña",
+      "description": "Establece la contraseña para tu cuenta",
+      "submit": "Continuar"
+    }
   },
   "idp": {
     "title": "Iniciar sesión con SSO",
@@ -134,6 +148,7 @@
   },
   "error": {
     "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",
-    "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo."
+    "sessionExpired": "Tu sesión actual ha expirado. Por favor, inicia sesión de nuevo.",
+    "failedLoading": "No se pudieron cargar los datos. Por favor, inténtalo de nuevo."
   }
 }

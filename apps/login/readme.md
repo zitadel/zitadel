@@ -24,14 +24,17 @@ This diagram shows the available pages and flows.
     passkey --> B[signedin]
     password -- hasMFA --> mfa
     password -- allowPasskeys --> passkey-add
+    password -- reset --> password-set
+    email -- reset --> password-set
+    password-set --> B[signedin]
+    password-change --> B[signedin]
+    password -- userstate=initial --> password-change
+
     mfa --> otp
     otp --> B[signedin]
     mfa--> u2f
     u2f -->B[signedin]
-    register --> passkey-add
-    register --> password-set
-    password-set --> B[signedin]
-    passkey-add --> B[signedin]
+    register -- password/passkey --> B[signedin]
     password --> B[signedin]
     password-- forceMFA -->mfaset
     mfaset --> u2fset
@@ -103,9 +106,13 @@ Requests to the APIs made:
 - `listAuthenticationMethodTypes`
 - `getSession()`
 - `updateSession()`
+- `listUsers()`
+- `getUserById()`
 
 **MFA AVAILABLE:** After the password has been submitted, additional authentication methods are loaded.
 If the user has set up an additional **single** second factor, it is redirected to add the next factor. Depending on the available method he is redirected to `/otp/time-based`,`/otp/sms?`, `/otp/email?` or `/u2f?`. If the user has multiple second factors, he is redirected to `/mfa` to select his preferred method to continue.
+
+**NO MFA, USER STATE INITIAL** If the user has no MFA methods and is in an initial state, we redirect to `/password/change` where a new password can be set.
 
 **NO MFA, FORCE MFA:** If no MFA method is available, and the settings force MFA, the user is sent to `/mfa/set` which prompts to setup a second factor.
 
@@ -114,6 +121,38 @@ If the user has set up an additional **single** second factor, it is redirected 
 If none of the previous conditions apply, we continue to sign in.
 
 > NOTE: `listAuthenticationMethodTypes()` does not consider different domains for u2f methods or passkeys. The check whether a user should be redirected to one of the pages `/passkey` or `/u2f`, should be extended to use a domain filter (https://github.com/zitadel/zitadel/issues/8615)
+
+### /password/change
+
+This page allows to change the password. It is used after a user is in an initial state and is required to change the password, or it can be directly invoked with an active session.
+
+<img src="./screenshots/password_change.png" alt="/password/change" width="400px" />
+
+Requests to the APIs made:
+
+- `getLoginSettings(org?)`
+- `getPasswordComplexitySettings(user?)`
+- `getBrandingSettings(org?)`
+- `getSession()`
+- `setPassword()`
+
+> NOTE: The request to change the password is using the session of the user itself not the service user, therefore no code is required.
+
+### /password/set
+
+This page allows to set a password. It is used after a user has requested to reset the password on the `/password` page.
+
+<img src="./screenshots/password_set.png" alt="/password/set" width="400px" />
+
+Requests to the APIs made:
+
+- `getLoginSettings(org?)`
+- `getPasswordComplexitySettings(user?)`
+- `getBrandingSettings(org?)`
+- `getUserByID()`
+- `setPassword()`
+
+The page allows to enter a code or be invoked directly from a email link which prefills the code. The user can enter a new password and submit.
 
 ### /otp/[method]
 
