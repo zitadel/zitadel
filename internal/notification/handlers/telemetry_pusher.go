@@ -92,17 +92,13 @@ func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.State
 		if err != nil {
 			return err
 		}
-		hasPrimaryDomain, err := query.NewNotNullQuery(query.MilestonePrimaryDomainColID)
-		if err != nil {
-			return err
-		}
 		unpushedMilestones, err := t.queries.Queries.SearchMilestones(ctx, scheduledEvent.InstanceIDs, &query.MilestonesSearchQueries{
 			SearchRequest: query.SearchRequest{
 				Limit:         t.cfg.Limit,
 				SortingColumn: query.MilestoneReachedDateColID,
 				Asc:           true,
 			},
-			Queries: []query.SearchQuery{isReached, isNotPushed, hasPrimaryDomain},
+			Queries: []query.SearchQuery{isReached, isNotPushed},
 		})
 		if err != nil {
 			return err
@@ -150,5 +146,5 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 			return err
 		}
 	}
-	return t.commands.MilestonePushed(ctx, ms.Type, t.cfg.Endpoints, ms.PrimaryDomain)
+	return t.commands.MilestonePushed(ctx, ms.InstanceID, ms.Type, t.cfg.Endpoints, ms.PrimaryDomain)
 }

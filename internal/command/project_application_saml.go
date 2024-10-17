@@ -77,7 +77,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 			samlApp.Metadata,
 			samlApp.MetadataURL,
 		),
-	}, nil
+	}, c.applicationCreatedMilestone(ctx)
 }
 
 func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SAMLApp, resourceOwner string) (*domain.SAMLApp, error) {
