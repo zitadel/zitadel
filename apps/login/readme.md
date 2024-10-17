@@ -32,10 +32,7 @@ This diagram shows the available pages and flows.
     otp --> B[signedin]
     mfa--> u2f
     u2f -->B[signedin]
-    register --> passkey-add
-    register --> password-set
-    password-set --> B[signedin]
-    passkey-add --> B[signedin]
+    register -- password/passkey --> B[signedin]
     password --> B[signedin]
     password-- forceMFA -->mfaset
     mfaset --> u2fset
