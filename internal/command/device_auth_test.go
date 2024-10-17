@@ -708,9 +708,9 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(),
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
+							"accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "accessTokenID"),
 						deviceauth.NewDoneEvent(ctx,
 							deviceauth.NewAggregate("123", "instance1"),
 						),
@@ -727,7 +727,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				"123",
 			},
 			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				TokenID:           "eyJpZCI6IlYyX29pZGNTZXNzaW9uSUQiLCJhY2Nlc3NfdG9rZW4iOiJhY2Nlc3NUb2tlbklEIn0=", // Base64({"id":"V2_oidcSessionID","access_token":"accessTokenID"})
 				ClientID:          "clientID",
 				UserID:            "userID",
 				Audience:          []string{"audience"},
@@ -805,11 +805,11 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(),
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
+							"accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
 						),
-						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "accessTokenID"),
 						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour,
+							"refreshTokenID", 7*24*time.Hour, 24*time.Hour,
 						),
 						deviceauth.NewDoneEvent(ctx,
 							deviceauth.NewAggregate("123", "instance1"),
@@ -827,7 +827,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				"123",
 			},
 			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				TokenID:           "eyJpZCI6IlYyX29pZGNTZXNzaW9uSUQiLCJhY2Nlc3NfdG9rZW4iOiJhY2Nlc3NUb2tlbklEIn0=", // Base64({"id":"V2_oidcSessionID","access_token":"accessTokenID"})
 				ClientID:          "clientID",
 				UserID:            "userID",
 				Audience:          []string{"audience"},
@@ -843,7 +843,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
 				Reason:       domain.TokenReasonAuthRequest,
-				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+				RefreshToken: "ZXlKcFpDSTZJbFl5WDI5cFpHTlRaWE56YVc5dVNVUWlMQ0p5WldaeVpYTm9YM1J2YTJWdUlqb2ljbVZtY21WemFGUnZhMlZ1U1VRaWZRPT06dXNlcklE", // Base64(Base64({"id":"V2_oidcSessionID","refresh_token":"refreshTokenID"}):userID)
 				SessionID:    "sessionID",
 			},
 		},
