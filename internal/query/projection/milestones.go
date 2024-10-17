@@ -69,7 +69,7 @@ func (p *milestoneProjection) reduceReached(event eventstore.Event) (*handler.St
 	return handler.NewCreateStatement(event, []handler.Column{
 		handler.NewCol(MilestoneColumnInstanceID, e.Agg.InstanceID),
 		handler.NewCol(MilestoneColumnType, e.MilestoneType),
-		handler.NewCol(MilestoneColumnReachedDate, e.Creation),
+		handler.NewCol(MilestoneColumnReachedDate, e.ReachedDate),
 	}), nil
 }
 
@@ -78,11 +78,14 @@ func (p *milestoneProjection) reducePushed(event eventstore.Event) (*handler.Sta
 	if err != nil {
 		return nil, err
 	}
+	if e.Agg.Version != milestone.AggregateVersion {
+		return handler.NewNoOpStatement(event), nil // Skip v1 events.
+	}
 	if e.MilestoneType != milestone.InstanceDeleted {
 		return handler.NewUpdateStatement(
 			event,
 			[]handler.Column{
-				handler.NewCol(MilestoneColumnPushedDate, event.CreatedAt()),
+				handler.NewCol(MilestoneColumnPushedDate, e.PushedDate),
 			},
 			[]handler.Condition{
 				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),

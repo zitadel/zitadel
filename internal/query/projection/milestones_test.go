@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
@@ -14,7 +15,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
-	now := time.Now()
+	date, err := time.Parse(time.RFC3339, "2006-01-02T15:04:05Z")
+	require.NoError(t, err)
 	tests := []struct {
 		name   string
 		args   args
@@ -27,8 +29,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(timedTestEvent(
 					milestone.ReachedEventType,
 					milestone.AggregateType,
-					[]byte(`{"type": "instance_created"}`),
-					now,
+					[]byte(`{"type": "instance_created", "reachedDate":"2006-01-02T15:04:05Z"}`),
+					time.Now(),
 				), milestone.ReachedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reduceReached,
@@ -42,7 +44,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"instance-id",
 								milestone.InstanceCreated,
-								now,
+								date,
 							},
 						},
 					},
@@ -55,8 +57,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(timedTestEvent(
 					milestone.PushedEventType,
 					milestone.AggregateType,
-					[]byte(`{"type": "project_created"}`),
-					now,
+					[]byte(`{"type": "project_created", "pushedDate":"2006-01-02T15:04:05Z"}`),
+					time.Now(),
 				), milestone.PushedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reducePushed,
@@ -68,7 +70,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.milestones2 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
 							expectedArgs: []interface{}{
-								now,
+								date,
 								"instance-id",
 								milestone.ProjectCreated,
 							},

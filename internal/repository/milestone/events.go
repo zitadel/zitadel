@@ -2,6 +2,7 @@ package milestone
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -26,8 +27,9 @@ const (
 
 type ReachedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-	MilestoneType         Type   `json:"type"`
-	PrimaryDomain         string `json:"primaryDomain"`
+	MilestoneType         Type      `json:"type"`
+	PrimaryDomain         string    `json:"primaryDomain"`
+	ReachedDate           time.Time `json:"reachedDate"`
 }
 
 // Payload implements eventstore.Command.
@@ -47,6 +49,7 @@ func NewReachedEvent(
 	ctx context.Context,
 	aggregate *Aggregate,
 	typ Type,
+	reachedDate time.Time,
 ) *ReachedEvent {
 	return &ReachedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -55,15 +58,17 @@ func NewReachedEvent(
 			ReachedEventType,
 		),
 		MilestoneType: typ,
+		ReachedDate:   reachedDate,
 	}
 }
 
 type PushedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-	MilestoneType         Type     `json:"type"`
-	ExternalDomain        string   `json:"externalDomain"`
-	PrimaryDomain         string   `json:"primaryDomain"`
-	Endpoints             []string `json:"endpoints"`
+	MilestoneType         Type      `json:"type"`
+	PushedDate            time.Time `json:"pushedDate"`
+	ExternalDomain        string    `json:"externalDomain"`
+	PrimaryDomain         string    `json:"primaryDomain"`
+	Endpoints             []string  `json:"endpoints"`
 }
 
 // Payload implements eventstore.Command.
@@ -83,6 +88,7 @@ func NewPushedEvent(
 	ctx context.Context,
 	aggregate *Aggregate,
 	typ Type,
+	pushedDate time.Time,
 	endpoints []string,
 	externalDomain, primaryDomain string,
 ) *PushedEvent {
@@ -93,6 +99,7 @@ func NewPushedEvent(
 			PushedEventType,
 		),
 		MilestoneType:  typ,
+		PushedDate:     pushedDate,
 		Endpoints:      endpoints,
 		ExternalDomain: externalDomain,
 		PrimaryDomain:  primaryDomain,

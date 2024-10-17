@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/saml/pkg/provider/xml"
 
@@ -77,7 +78,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 			samlApp.Metadata,
 			samlApp.MetadataURL,
 		),
-	}, c.applicationCreatedMilestone(ctx)
+	}, c.applicationCreatedMilestone(ctx, time.Now())
 }
 
 func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SAMLApp, resourceOwner string) (*domain.SAMLApp, error) {

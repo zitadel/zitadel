@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -40,7 +41,7 @@ func (c *Commands) GetMilestonesReached(ctx context.Context) (*MilestonesReached
 	if ok {
 		return milestones, nil
 	}
-	model := NewMilestonesReachedWriteModel(ctx)
+	model := NewMilestonesReachedWriteModel(authz.GetInstance(ctx).InstanceID())
 	if err := c.eventstore.FilterToQueryReducer(ctx, model); err != nil {
 		return nil, err
 	}
@@ -91,24 +92,25 @@ func (c *Commands) MilestonePushed(
 	ctx context.Context,
 	instanceID string,
 	msType milestone.Type,
+	pushedDate time.Time,
 	endpoints []string,
 	primaryDomain string,
 ) error {
-	_, err := c.eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewInstanceAggregate(instanceID), msType, endpoints, c.externalDomain, primaryDomain))
+	_, err := c.eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewInstanceAggregate(instanceID), msType, pushedDate, endpoints, c.externalDomain, primaryDomain))
 	return err
 }
 
-func setupInstanceCreatedMilestone(validations *[]preparation.Validation, instanceID string) {
+func setupInstanceCreatedMilestone(validations *[]preparation.Validation, instanceID string, reachedDate time.Time) {
 	*validations = append(*validations, func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				milestone.NewReachedEvent(ctx, milestone.NewInstanceAggregate(instanceID), milestone.InstanceCreated),
+				milestone.NewReachedEvent(ctx, milestone.NewInstanceAggregate(instanceID), milestone.InstanceCreated, reachedDate),
 			}, nil
 		}, nil
 	})
 }
 
-func (c *Commands) oidcSessionMilestones(ctx context.Context, clientID string, isHuman bool) error {
+func (c *Commands) oidcSessionMilestones(ctx context.Context, clientID string, isHuman bool, reachedDate time.Time) error {
 	milestones, err := c.GetMilestonesReached(ctx)
 	if err != nil {
 		return err
@@ -118,10 +120,10 @@ func (c *Commands) oidcSessionMilestones(ctx context.Context, clientID string, i
 	var cmds []eventstore.Command
 	aggregate := milestone.NewAggregate(ctx)
 	if !milestones.AuthenticationSucceededOnInstance {
-		cmds = append(cmds, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance))
+		cmds = append(cmds, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance, reachedDate))
 	}
 	if !milestones.AuthenticationSucceededOnApplication && isHuman && clientID != instance.ConsoleClientID() {
-		cmds = append(cmds, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication))
+		cmds = append(cmds, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication, reachedDate))
 	}
 	if len(cmds) == 0 {
 		return nil
@@ -132,7 +134,7 @@ func (c *Commands) oidcSessionMilestones(ctx context.Context, clientID string, i
 	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, instance.InstanceID())
 }
 
-func (c *Commands) projectCreatedMilestone(ctx context.Context) error {
+func (c *Commands) projectCreatedMilestone(ctx context.Context, reachedDate time.Time) error {
 	if isSystemUser(ctx) {
 		return nil
 	}
@@ -144,14 +146,14 @@ func (c *Commands) projectCreatedMilestone(ctx context.Context) error {
 		return nil
 	}
 	aggregate := milestone.NewAggregate(ctx)
-	_, err = c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.ProjectCreated))
+	_, err = c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.ProjectCreated, reachedDate))
 	if err != nil {
 		return err
 	}
 	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, authz.GetInstance(ctx).InstanceID())
 }
 
-func (c *Commands) applicationCreatedMilestone(ctx context.Context) error {
+func (c *Commands) applicationCreatedMilestone(ctx context.Context, reachedDate time.Time) error {
 	if isSystemUser(ctx) {
 		return nil
 	}
@@ -163,16 +165,16 @@ func (c *Commands) applicationCreatedMilestone(ctx context.Context) error {
 		return nil
 	}
 	aggregate := milestone.NewAggregate(ctx)
-	_, err = c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.ApplicationCreated))
+	_, err = c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.ApplicationCreated, reachedDate))
 	if err != nil {
 		return err
 	}
 	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, authz.GetInstance(ctx).InstanceID())
 }
 
-func (c *Commands) instanceRemovedMilestone(ctx context.Context, instanceID string) error {
+func (c *Commands) instanceRemovedMilestone(ctx context.Context, instanceID string, reachedDate time.Time) error {
 	aggregate := milestone.NewInstanceAggregate(instanceID)
-	_, err := c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.InstanceDeleted))
+	_, err := c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.InstanceDeleted, reachedDate))
 	if err != nil {
 		return err
 	}

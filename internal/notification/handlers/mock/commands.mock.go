@@ -12,6 +12,7 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	senders "github.com/zitadel/zitadel/internal/notification/senders"
 	milestone "github.com/zitadel/zitadel/internal/repository/milestone"
@@ -141,17 +142,17 @@ func (mr *MockCommandsMockRecorder) InviteCodeSent(arg0, arg1, arg2 any) *gomock
 }
 
 // MilestonePushed mocks base method.
-func (m *MockCommands) MilestonePushed(arg0 context.Context, arg1 string, arg2 milestone.Type, arg3 []string, arg4 string) error {
+func (m *MockCommands) MilestonePushed(arg0 context.Context, arg1 string, arg2 milestone.Type, arg3 time.Time, arg4 []string, arg5 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MilestonePushed", arg0, arg1, arg2, arg3, arg4)
+	ret := m.ctrl.Call(m, "MilestonePushed", arg0, arg1, arg2, arg3, arg4, arg5)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // MilestonePushed indicates an expected call of MilestonePushed.
-func (mr *MockCommandsMockRecorder) MilestonePushed(arg0, arg1, arg2, arg3, arg4 any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) MilestonePushed(arg0, arg1, arg2, arg3, arg4, arg5 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MilestonePushed", reflect.TypeOf((*MockCommands)(nil).MilestonePushed), arg0, arg1, arg2, arg3, arg4)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MilestonePushed", reflect.TypeOf((*MockCommands)(nil).MilestonePushed), arg0, arg1, arg2, arg3, arg4, arg5)
 }
 
 // OTPEmailSent mocks base method.

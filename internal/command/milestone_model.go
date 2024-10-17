@@ -1,9 +1,6 @@
 package command
 
 import (
-	"context"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 )
@@ -13,8 +10,7 @@ type MilestonesReachedWriteModel struct {
 	MilestonesReached
 }
 
-func NewMilestonesReachedWriteModel(ctx context.Context) *MilestonesReachedWriteModel {
-	instanceID := authz.GetInstance(ctx).InstanceID()
+func NewMilestonesReachedWriteModel(instanceID string) *MilestonesReachedWriteModel {
 	return &MilestonesReachedWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID: instanceID,

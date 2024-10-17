@@ -406,7 +406,7 @@ func generatedDomainEvents(ctx context.Context, instanceID, orgID, projectID, ap
 
 func instanceCreatedMilestoneEvent(ctx context.Context, instanceID string) []eventstore.Command {
 	return []eventstore.Command{
-		milestone.NewReachedEvent(ctx, milestone.NewInstanceAggregate(instanceID), milestone.InstanceCreated),
+		milestone.NewReachedEvent(ctx, milestone.NewInstanceAggregate(instanceID), milestone.InstanceCreated, time.Now()),
 	}
 }
 
@@ -1491,6 +1491,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 						milestone.NewReachedEvent(context.Background(),
 							milestone.NewInstanceAggregate("INSTANCE"),
 							milestone.InstanceDeleted,
+							time.Now(),
 						),
 					),
 				),

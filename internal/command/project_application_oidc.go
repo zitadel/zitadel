@@ -213,7 +213,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	result := oidcWriteModelToOIDCConfig(addedApplication)
 	result.ClientSecretString = plain
 	result.FillCompliance()
-	return result, c.applicationCreatedMilestone(ctx)
+	return result, c.applicationCreatedMilestone(ctx, time.Now())
 }
 
 func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCApp, resourceOwner string) (*domain.OIDCApp, error) {
