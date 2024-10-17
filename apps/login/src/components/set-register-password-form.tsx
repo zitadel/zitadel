@@ -6,10 +6,7 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { setMyPassword } from "@/lib/self";
-import { sendPassword } from "@/lib/server/password";
-import { create } from "@zitadel/client";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { registerUser, RegisterUserResponse } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -31,26 +28,29 @@ type Inputs =
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
-  sessionId: string;
-  loginName: string;
-  authRequestId?: string;
+  email: string;
+  firstname: string;
+  lastname: string;
   organization?: string;
+  authRequestId?: string;
 };
 
-export function ChangePasswordForm({
+export function SetRegisterPasswordForm({
   passwordComplexitySettings,
-  sessionId,
-  loginName,
-  authRequestId,
+  email,
+  firstname,
+  lastname,
   organization,
+  authRequestId,
 }: Props) {
-  const t = useTranslations("password");
+  const t = useTranslations("register");
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
-      password: "",
-      comfirmPassword: "",
+      email: email ?? "",
+      firstname: firstname ?? "",
+      lastname: lastname ?? "",
     },
   });
 
@@ -59,51 +59,60 @@ export function ChangePasswordForm({
 
   const router = useRouter();
 
-  async function submitChange(values: Inputs) {
+  async function submitRegister(values: Inputs) {
     setLoading(true);
-    const changeResponse = await setMyPassword({
-      sessionId: sessionId,
+    const response = await registerUser({
+      email: email,
+      firstName: firstname,
+      lastName: lastname,
+      organization: organization,
+      authRequestId: authRequestId,
       password: values.password,
     }).catch(() => {
-      setError("Could not change password");
+      setError("Could not register user");
     });
+
+    if (response && "error" in response) {
+      setError(response.error);
+    }
 
     setLoading(false);
 
-    if (changeResponse && "error" in changeResponse) {
-      setError(changeResponse.error);
+    if (!response) {
+      setError("Could not register user");
       return;
     }
 
-    if (!changeResponse) {
-      setError("Could not change password");
-      return;
+    const userResponse = response as RegisterUserResponse;
+
+    const params = new URLSearchParams({ userId: userResponse.userId });
+
+    if (userResponse.factors?.user?.loginName) {
+      params.append("loginName", userResponse.factors.user.loginName);
+    }
+    if (organization) {
+      params.append("organization", organization);
+    }
+    if (userResponse && userResponse.sessionId) {
+      params.append("sessionId", userResponse.sessionId);
     }
 
-    const passwordResponse = await sendPassword({
-      loginName,
-      organization,
-      checks: create(ChecksSchema, {
-        password: { password: values.password },
-      }),
-      authRequestId,
-    }).catch(() => {
-      setLoading(false);
-      setError("Could not verify password");
-      return;
-    });
+    // skip verification for now as it is an app based flow
+    // return router.push(`/verify?` + params);
 
-    setLoading(false);
+    // check for mfa force to continue with mfa setup
 
-    if (
-      passwordResponse &&
-      "error" in passwordResponse &&
-      passwordResponse.error
-    ) {
-      setError(passwordResponse.error);
+    if (authRequestId && userResponse.sessionId) {
+      if (authRequestId) {
+        params.append("authRequest", authRequestId);
+      }
+      return router.push(`/login?` + params);
+    } else {
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+      return router.push(`/signedin?` + params);
     }
-
-    return;
   }
 
   const { errors } = formState;
@@ -136,9 +145,9 @@ export function ChangePasswordForm({
             autoComplete="new-password"
             required
             {...register("password", {
-              required: "You have to provide a new password!",
+              required: "You have to provide a password!",
             })}
-            label="New Password"
+            label="Password"
             error={errors.password?.message as string}
           />
         </div>
@@ -177,10 +186,10 @@ export function ChangePasswordForm({
             !formState.isValid ||
             watchPassword !== watchConfirmPassword
           }
-          onClick={handleSubmit(submitChange)}
+          onClick={handleSubmit(submitRegister)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("change.submit")}
+          {t("password.submit")}
         </Button>
       </div>
     </form>
