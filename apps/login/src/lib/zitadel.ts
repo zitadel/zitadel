@@ -30,7 +30,7 @@ import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/setting
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
-  SendPasswordResetLink,
+  SendPasswordResetLinkSchema,
 } from "@zitadel/proto/zitadel/user/v2/password_pb";
 import {
   SearchQuery,
@@ -496,9 +496,9 @@ export function createUser(
  * @returns the newly set email
  */
 export async function passwordReset(userId: string, host: string | null) {
-  let medium: Partial<SendPasswordResetLink> = {
+  let medium = create(SendPasswordResetLinkSchema, {
     notificationType: NotificationType.Email,
-  };
+  });
 
   if (host) {
     medium = {
