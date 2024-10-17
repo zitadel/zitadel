@@ -7,7 +7,7 @@ WITH auth_methods AS (
     , instance_id
     , name
   FROM
-    projections.user_auth_methods4
+    projections.user_auth_methods5
   WHERE
     instance_id = $1
     AND user_id = $2

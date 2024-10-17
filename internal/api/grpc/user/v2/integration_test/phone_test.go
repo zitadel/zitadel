@@ -18,6 +18,8 @@ import (
 )
 
 func TestServer_SetPhone(t *testing.T) {
+	t.Parallel()
+
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {
@@ -122,6 +124,8 @@ func TestServer_SetPhone(t *testing.T) {
 }
 
 func TestServer_ResendPhoneCode(t *testing.T) {
+	t.Parallel()
+
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email()).GetUserId()
 
@@ -197,6 +201,8 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 }
 
 func TestServer_VerifyPhone(t *testing.T) {
+	t.Parallel()
+
 	userResp := Instance.CreateHumanUser(CTX)
 	tests := []struct {
 		name    string
@@ -250,6 +256,8 @@ func TestServer_VerifyPhone(t *testing.T) {
 }
 
 func TestServer_RemovePhone(t *testing.T) {
+	t.Parallel()
+
 	userResp := Instance.CreateHumanUser(CTX)
 	failResp := Instance.CreateHumanUserNoPhone(CTX)
 	otherUser := Instance.CreateHumanUser(CTX).GetUserId()

@@ -20,6 +20,8 @@ import (
 )
 
 func TestServer_AddIDPLink(t *testing.T) {
+	t.Parallel()
+
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
@@ -99,6 +101,8 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_ListIDPLinks(t *testing.T) {
+	t.Parallel()
+
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks-%s", gofakeit.AppName()), gofakeit.Email())
 
 	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
@@ -252,6 +256,8 @@ func TestServer_ListIDPLinks(t *testing.T) {
 }
 
 func TestServer_RemoveIDPLink(t *testing.T) {
+	t.Parallel()
+
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks-%s", gofakeit.AppName()), gofakeit.Email())
 
 	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
