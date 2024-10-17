@@ -14,10 +14,24 @@
     "register": "Register new user"
   },
   "password": {
-    "title": "Password",
-    "description": "Enter your password.",
-    "resetPassword": "Reset Password",
-    "submit": "Continue"
+    "verify": {
+      "title": "Password",
+      "description": "Enter your password.",
+      "resetPassword": "Reset Password",
+      "submit": "Continue"
+    },
+    "set": {
+      "title": "Set Password",
+      "description": "Set the password for your account",
+      "codeSent": "A code has been sent to your email address.",
+      "resend": "Resend code",
+      "submit": "Continue"
+    },
+    "change": {
+      "title": "Change Password",
+      "description": "Set the password for your account",
+      "submit": "Continue"
+    }
   },
   "idp": {
     "title": "Sign in with SSO",
@@ -134,6 +148,7 @@
   },
   "error": {
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",
-    "sessionExpired": "Your current session has expired. Please login again."
+    "sessionExpired": "Your current session has expired. Please login again.",
+    "failedLoading": "Failed to load data. Please try again."
   }
 }
