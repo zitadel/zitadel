@@ -118,7 +118,7 @@ You can already use the current state, and extend it with your needs.
     password -- reset --> password-set
     email -- reset --> password-set
     password-set --> B[signedin]
-    password-cahnge --> B[signedin]
+    password-change --> B[signedin]
     password -- userstate=initial --> password-change
 
     mfa --> otp

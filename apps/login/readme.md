@@ -27,7 +27,7 @@ This diagram shows the available pages and flows.
     password -- reset --> password-set
     email -- reset --> password-set
     password-set --> B[signedin]
-    password-cahnge --> B[signedin]
+    password-change --> B[signedin]
     password -- userstate=initial --> password-change
 
     mfa --> otp
