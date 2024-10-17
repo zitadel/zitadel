@@ -214,7 +214,12 @@ func (wm *OrgDomainVerifiedWriteModel) Reduce() error {
 		case *org.DomainVerifiedEvent:
 			wm.Verified = true
 			wm.ResourceOwner = e.Aggregate().ResourceOwner
-		case *org.DomainRemovedEvent, *org.OrgRemovedEvent:
+		case *org.DomainRemovedEvent:
+			wm.Verified = false
+		case *org.OrgRemovedEvent:
+			if wm.ResourceOwner != e.Aggregate().ID {
+				continue
+			}
 			wm.Verified = false
 		}
 	}
