@@ -8,7 +8,6 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
@@ -474,7 +473,7 @@ func TestServer_ImportData(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.ImportData(AdminCTX, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
