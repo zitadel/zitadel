@@ -18,6 +18,7 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getSessionCookieByLoginName } from "../cookies";
 
@@ -27,6 +28,8 @@ type ResetPasswordCommand = {
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
+  const host = headers().get("host");
+
   const users = await listUsers({
     loginName: command.loginName,
     organizationId: command.organization,
@@ -41,7 +44,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
   const userId = users.result[0].userId;
 
-  return passwordReset(userId);
+  return passwordReset(userId, host);
 }
 
 export type UpdateSessionCommand = {

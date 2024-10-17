@@ -492,16 +492,24 @@ export function createUser(
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function passwordReset(userId: string) {
+export async function passwordReset(userId: string, host: string | null) {
   return userService.passwordReset(
     {
       userId,
-      medium: {
-        case: "sendLink",
-        value: {
-          notificationType: NotificationType.Email,
-        },
-      },
+      medium: host
+        ? {
+            case: "sendLink",
+            value: {
+              notificationType: NotificationType.Email,
+              urlTemplate: `https://${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
+            },
+          }
+        : {
+            case: "sendLink",
+            value: {
+              notificationType: NotificationType.Email,
+            },
+          },
     },
     {},
   );
