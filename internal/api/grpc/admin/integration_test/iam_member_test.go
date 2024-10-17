@@ -29,7 +29,7 @@ var iamRoles = []string{
 
 func TestServer_ListIAMMemberRoles(t *testing.T) {
 	got, err := Client.ListIAMMemberRoles(AdminCTX, &admin_pb.ListIAMMemberRolesRequest{})
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.ElementsMatch(t, iamRoles, got.GetRoles())
 }
 
@@ -92,23 +92,23 @@ func TestServer_ListIAMMembers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 20*time.Second)
 			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
 				got, err := Client.ListIAMMembers(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assert.Error(ct, err)
+					require.Error(ct, err)
 					return
 				}
 				require.NoError(ct, err)
 				wantResult := tt.want.GetResult()
 				gotResult := got.GetResult()
 
-				if assert.Len(ct, gotResult, len(wantResult)) {
-					for i, want := range wantResult {
-						assert.Equal(ct, want.GetUserId(), gotResult[i].GetUserId())
-						assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
-					}
+				require.Len(ct, gotResult, len(wantResult))
+				for i, want := range wantResult {
+					assert.Equal(ct, want.GetUserId(), gotResult[i].GetUserId())
+					assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
 				}
-			}, time.Minute, time.Second)
+			}, retryDuration, tick)
 		})
 	}
 }
@@ -178,7 +178,7 @@ func TestServer_AddIAMMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.AddIAMMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -259,7 +259,7 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.UpdateIAMMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -316,7 +316,7 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.RemoveIAMMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
