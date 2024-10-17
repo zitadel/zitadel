@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -616,16 +617,20 @@ func TestServer_AddHumanUser(t *testing.T) {
 			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
+			} else {
+				assert.Empty(t, got.GetEmailCode())
 			}
 			if tt.want.GetPhoneCode() != "" {
 				assert.NotEmpty(t, got.GetPhoneCode())
+			} else {
+				assert.Empty(t, got.GetPhoneCode())
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})
@@ -635,8 +640,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 func TestServer_AddHumanUser_Permission(t *testing.T) {
 	t.Parallel()
 
-	newOrgOwnerEmail := fmt.Sprintf("%d@permission.com", time.Now().UnixNano())
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -817,9 +821,9 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
 			integration.AssertDetails(t, tt.want, got)
@@ -865,7 +869,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Username: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1171,14 +1175,19 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			got, err := Client.UpdateHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			if tt.want.GetEmailCode() != "" {
 				assert.NotEmpty(t, got.GetEmailCode())
+			} else {
+				assert.Empty(t, got.GetEmailCode())
 			}
 			if tt.want.GetPhoneCode() != "" {
 				assert.NotEmpty(t, got.GetPhoneCode())
+			} else {
+				assert.Empty(t, got.GetPhoneCode())
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})
@@ -1188,8 +1197,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 	t.Parallel()
 
-	newOrgOwnerEmail := fmt.Sprintf("%d@permission.update.com", time.Now().UnixNano())
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), gofakeit.Email())
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -1207,7 +1215,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				SystemCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(fmt.Sprint("system", time.Now().UnixNano()+1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1223,7 +1231,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				IamCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(fmt.Sprint("instance", time.Now().UnixNano()+1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			want: &user.UpdateHumanUserResponse{
@@ -1239,7 +1247,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				CTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(fmt.Sprint("org", time.Now().UnixNano()+1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			wantErr: true,
@@ -1250,7 +1258,7 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 				UserCTX,
 				&user.UpdateHumanUserRequest{
 					UserId:   newUserID,
-					Username: gu.Ptr(fmt.Sprint("user", time.Now().UnixNano()+1)),
+					Username: gu.Ptr(gofakeit.Username()),
 				},
 			},
 			wantErr: true,
@@ -1262,9 +1270,9 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 			got, err := Client.UpdateHumanUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1482,9 +1490,9 @@ func TestServer_UnLockUser(t *testing.T) {
 			got, err := Client.UnlockUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1592,9 +1600,9 @@ func TestServer_DeactivateUser(t *testing.T) {
 			got, err := Client.DeactivateUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1702,9 +1710,9 @@ func TestServer_ReactivateUser(t *testing.T) {
 			got, err := Client.ReactivateUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1803,9 +1811,9 @@ func TestServer_DeleteUser(t *testing.T) {
 			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1884,10 +1892,9 @@ func TestServer_AddIDPLink(t *testing.T) {
 			got, err := Client.AddIDPLink(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
-
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
@@ -1898,7 +1905,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	orgIdpID := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	notDefaultOrgIdpID := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
 	samlIdpID := Instance.AddSAMLProvider(IamCTX)
 	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
@@ -2131,15 +2138,14 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			got, err := Client.StartIdentityProviderIntent(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			if tt.want.url != "" {
 				authUrl, err := url.Parse(got.GetAuthUrl())
-				assert.NoError(t, err)
-
-				assert.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
+				require.NoError(t, err)
+				require.Len(t, authUrl.Query(), len(tt.want.parametersEqual)+len(tt.want.parametersExisting))
 
 				for _, existing := range tt.want.parametersExisting {
 					assert.True(t, authUrl.Query().Has(existing))
