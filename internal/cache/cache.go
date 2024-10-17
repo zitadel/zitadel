@@ -77,7 +77,8 @@ type CachesConfig struct {
 		Postgres PostgresConnectorConfig
 		// Redis redis.Config?
 	}
-	Instance *CacheConfig
+	Instance   *CacheConfig
+	Milestones *CacheConfig
 }
 
 type CacheConfig struct {

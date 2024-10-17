@@ -65,7 +65,7 @@ func (c *Commands) getCachedMilestonesReached(ctx context.Context) (*MilestonesR
 			InstanceDeleted:                      false,
 		}, ok
 	}
-	return c.milestoneCache.Get(ctx, milestoneIndexInstanceID, instanceID)
+	return c.caches.milestones.Get(ctx, milestoneIndexInstanceID, instanceID)
 }
 
 // setCachedMilestonesReached stores the current milestones state in the milestones cache.
@@ -75,7 +75,7 @@ func (c *Commands) setCachedMilestonesReached(ctx context.Context, milestones *M
 		c.milestonesCompleted.Store(milestones.InstanceID, struct{}{})
 		return
 	}
-	c.milestoneCache.Set(ctx, milestones)
+	c.caches.milestones.Set(ctx, milestones)
 }
 
 // Keys implements cache.Entry
@@ -129,7 +129,7 @@ func (c *Commands) oidcSessionMilestones(ctx context.Context, clientID string, i
 	if _, err = c.eventstore.Push(ctx, cmds...); err != nil {
 		return err
 	}
-	return c.milestoneCache.Invalidate(ctx, milestoneIndexInstanceID, instance.InstanceID())
+	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, instance.InstanceID())
 }
 
 func (c *Commands) projectCreatedMilestone(ctx context.Context) error {
@@ -148,7 +148,7 @@ func (c *Commands) projectCreatedMilestone(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.milestoneCache.Invalidate(ctx, milestoneIndexInstanceID, authz.GetInstance(ctx).InstanceID())
+	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, authz.GetInstance(ctx).InstanceID())
 }
 
 func (c *Commands) applicationCreatedMilestone(ctx context.Context) error {
@@ -167,7 +167,7 @@ func (c *Commands) applicationCreatedMilestone(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.milestoneCache.Invalidate(ctx, milestoneIndexInstanceID, authz.GetInstance(ctx).InstanceID())
+	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, authz.GetInstance(ctx).InstanceID())
 }
 
 func (c *Commands) instanceRemovedMilestone(ctx context.Context, instanceID string) error {
@@ -176,7 +176,7 @@ func (c *Commands) instanceRemovedMilestone(ctx context.Context, instanceID stri
 	if err != nil {
 		return err
 	}
-	return c.milestoneCache.Invalidate(ctx, milestoneIndexInstanceID, instanceID)
+	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, instanceID)
 }
 
 func isSystemUser(ctx context.Context) bool {

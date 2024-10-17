@@ -188,8 +188,10 @@ func TestCommands_GetMilestonesReached(t *testing.T) {
 			cache.Set(context.Background(), cached)
 
 			c := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				milestoneCache: cache,
+				eventstore: tt.fields.eventstore(t),
+				caches: &Caches{
+					milestones: cache,
+				},
 			}
 			got, err := c.GetMilestonesReached(tt.args.ctx)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -200,7 +202,9 @@ func TestCommands_GetMilestonesReached(t *testing.T) {
 
 func TestCommands_milestonesCompleted(t *testing.T) {
 	c := &Commands{
-		milestoneCache: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+		caches: &Caches{
+			milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+		},
 	}
 	ctx := authz.WithInstanceID(context.Background(), "instanceID")
 	arg := &MilestonesReached{
@@ -442,8 +446,10 @@ func TestCommands_oidcSessionMilestones(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				milestoneCache: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				eventstore: tt.fields.eventstore(t),
+				caches: &Caches{
+					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				},
 			}
 			err := c.oidcSessionMilestones(tt.args.ctx, tt.args.clientID, tt.args.isHuman)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -545,8 +551,10 @@ func TestCommands_projectCreatedMilestone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				milestoneCache: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				eventstore: tt.fields.eventstore(t),
+				caches: &Caches{
+					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				},
 			}
 			err := c.projectCreatedMilestone(tt.args.ctx)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -648,8 +656,10 @@ func TestCommands_applicationCreatedMilestone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				milestoneCache: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				eventstore: tt.fields.eventstore(t),
+				caches: &Caches{
+					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				},
 			}
 			err := c.applicationCreatedMilestone(tt.args.ctx)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -709,8 +719,10 @@ func TestCommands_instanceRemovedMilestone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				milestoneCache: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				eventstore: tt.fields.eventstore(t),
+				caches: &Caches{
+					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				},
 			}
 			err := c.instanceRemovedMilestone(tt.args.ctx, tt.args.instanceID)
 			assert.ErrorIs(t, err, tt.wantErr)

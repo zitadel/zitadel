@@ -390,6 +390,7 @@ func initProjections(
 	}
 	commands, err := command.StartCommands(
 		eventstoreClient,
+		config.Caches,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		staticStorage,

@@ -33,6 +33,7 @@ func (mig *externalConfigChange) Check(lastRun map[string]interface{}) bool {
 func (mig *externalConfigChange) Execute(ctx context.Context, _ eventstore.Event) error {
 	cmd, err := command.StartCommands(
 		mig.es,
+		nil,
 		mig.defaults,
 		nil,
 		nil,

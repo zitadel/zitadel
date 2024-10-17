@@ -163,6 +163,7 @@ func projections(
 	}
 	commands, err := command.StartCommands(
 		es,
+		config.Caches,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		staticStorage,

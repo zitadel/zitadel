@@ -90,7 +90,7 @@ type Commands struct {
 
 	GenerateDomain func(instanceName, domain string) (string, error)
 
-	milestoneCache cache.Cache[milestoneIndex, string, *MilestonesReached]
+	caches *Caches
 	// Store instance IDs where all milestones are reached (except InstanceDeleted).
 	// These instance's milestones never need to be invalidated,
 	// so the query and cache overhead can completely eliminated.
@@ -99,6 +99,7 @@ type Commands struct {
 
 func StartCommands(
 	es *eventstore.Eventstore,
+	cachesConfig *cache.CachesConfig,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
@@ -129,6 +130,10 @@ func StartCommands(
 	userPasswordHasher, err := defaults.PasswordHasher.NewHasher()
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
+	}
+	caches, err := startCaches(context.TODO(), cachesConfig, es.Client())
+	if err != nil {
+		return nil, fmt.Errorf("caches: %w", err)
 	}
 	repo = &Commands{
 		eventstore:                      es,
@@ -183,6 +188,7 @@ func StartCommands(
 			},
 		},
 		GenerateDomain: domain.NewGeneratedInstanceDomain,
+		caches:         caches,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {

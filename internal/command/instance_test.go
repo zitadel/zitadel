@@ -1509,8 +1509,10 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				milestoneCache: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				eventstore: tt.fields.eventstore(t),
+				caches: &Caches{
+					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				},
 			}
 			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID)
 			if tt.res.err == nil {
