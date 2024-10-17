@@ -175,32 +175,56 @@ To run the application make sure to install the dependencies with
 pnpm install
 ```
 
-then setup the environment for the login application which needs a `.env.local` in `/apps/login`.
-Go to your instance and create a service user for the application having the `IAM_OWNER` manager role.
-This user is required to have access to create users on your primary organization and reading policy data so it can be
-restricted to your personal use case but we'll stick with `IAM_OWNER` for convenience. Create a PAT and copy the value to
-paste it under the `ZITADEL_SERVICE_USER_TOKEN` key.
-The file should look as follows:
-
-```
-ZITADEL_API_URL=[yourinstanceurl]
-ZITADEL_ORG_ID=[yourprimaryorg]
-ZITADEL_SERVICE_USER_TOKEN=[yourserviceuserpersonalaccesstoken]
-```
-
 then generate the GRPC stubs with
 
 ```sh
 pnpm generate
 ```
 
-and then run it with
+To run the application against a local ZITADEL instance, run the following command:
+
+```sh
+pnpm run-zitadel
+```
+
+This sets up ZITADEL using docker compose and writes the configuration to the file `apps/login/.env.local`.
+
+<details>
+<summary>Alternatively, use another environment</summary>
+You can develop against any ZITADEL instance in which you have sufficient rights to execute the following steps.
+Just create or overwrite the file `apps/login/.env.local` yourself.
+Add your instances base URL to the file at the key `ZITADEL_API_URL`.
+Go to your instance and create a service user for the login application.
+The login application creates users on your primary organization and reads policy data.
+For the sake of simplicity, just make the service user an instance member with the role `IAM_OWNER`.
+Create a PAT and copy it to the file `apps/login/.env.local` using the key `ZITADEL_SERVICE_USER_TOKEN`.
+Also add the users ID to the file using the key `ZITADEL_SERVICE_USER_ID`.
+
+The file should look similar to this:
+
+```
+ZITADEL_API_URL=https://zitadel-tlx3du.us1.zitadel.cloud
+ZITADEL_SERVICE_USER_ID=289106423158521850
+ZITADEL_SERVICE_USER_TOKEN=1S6w48thfWFI2klgfwkCnhXJLf9FQ457E-_3H74ePQxfO3Af0Tm4V5Xi-ji7urIl_xbn-Rk
+```
+</details>
+
+Start the login application in dev mode:
 
 ```sh
 pnpm dev
 ```
 
 Open the login application with your favorite browser at `localhost:3000`.
+Change the source code and see the changes live in your browser.
+
+Make sure the application still behaves as expected by running all tests
+
+```sh
+pnpm test
+```
+
+To satisfy your unique workflow requirements, check out the package.json in the root directory for more detailed scripts.
 
 ### Deploy to Vercel
 

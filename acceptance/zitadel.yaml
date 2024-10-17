@@ -6,7 +6,7 @@ FirstInstance:
       FirstName: ZITADEL
       LastName: Admin
       Password: Password1!
-      PasswordChangeRequired: true
+      PasswordChangeRequired: false
       PreferredLanguage: en
     Machine:
       Machine:
@@ -39,7 +39,3 @@ Logstore:
   Access:
     Stdout:
       Enabled: true
-
-DefaultInstance:
-  LoginPolicy:
-    MfaInitSkipLifetime: 0h
