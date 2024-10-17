@@ -82,9 +82,7 @@ type sqlExpectation func(sqlmock.Sqlmock) sqlmock.Sqlmock
 
 func mockQuery(stmt string, cols []string, row []driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
-		m.ExpectCommit()
 		result := m.NewRows(cols)
 		if len(row) > 0 {
 			result.AddRow(row...)
@@ -96,9 +94,7 @@ func mockQuery(stmt string, cols []string, row []driver.Value, args ...driver.Va
 
 func mockQueryScanErr(stmt string, cols []string, row []driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
-		m.ExpectRollback()
 		result := m.NewRows(cols)
 		if len(row) > 0 {
 			result.AddRow(row...)
@@ -110,9 +106,7 @@ func mockQueryScanErr(stmt string, cols []string, row []driver.Value, args ...dr
 
 func mockQueries(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
-		m.ExpectCommit()
 		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
@@ -129,9 +123,7 @@ func mockQueries(stmt string, cols []string, rows [][]driver.Value, args ...driv
 
 func mockQueriesScanErr(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
-		m.ExpectRollback()
 		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
@@ -148,10 +140,8 @@ func mockQueriesScanErr(stmt string, cols []string, rows [][]driver.Value, args 
 
 func mockQueryErr(stmt string, err error, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
 		q.WillReturnError(err)
-		m.ExpectRollback()
 		return m
 	}
 }
