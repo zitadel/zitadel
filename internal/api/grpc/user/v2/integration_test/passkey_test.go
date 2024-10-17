@@ -95,14 +95,29 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user mismatch",
+			name: "user no permission",
 			args: args{
-				ctx: CTX,
+				ctx: UserCTX,
 				req: &user.RegisterPasskeyRequest{
 					UserId: userID,
 				},
 			},
 			wantErr: true,
+		},
+		{
+			name: "user permission",
+			args: args{
+				ctx: IamCTX,
+				req: &user.RegisterPasskeyRequest{
+					UserId: userID,
+				},
+			},
+			want: &user.RegisterPasskeyResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
 		},
 		{
 			name: "user setting its own passkey",
