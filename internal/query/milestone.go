@@ -102,7 +102,7 @@ func prepareMilestonesQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			countColumn.identifier(),
 		).
 			From(milestonesTable.identifier() + db.Timetravel(call.Took(ctx))).
-			LeftJoin(join(MilestoneInstanceIDColID, InstanceDomainInstanceIDCol)).
+			LeftJoin(join(InstanceDomainInstanceIDCol, MilestoneInstanceIDColID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Milestones, error) {
 			milestones := make([]*Milestone, 0)
