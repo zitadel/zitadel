@@ -202,6 +202,8 @@ func (wm *OrgDomainVerifiedWriteModel) AppendEvents(events ...eventstore.Event) 
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *org.OrgRemovedEvent:
+			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }
@@ -212,7 +214,7 @@ func (wm *OrgDomainVerifiedWriteModel) Reduce() error {
 		case *org.DomainVerifiedEvent:
 			wm.Verified = true
 			wm.ResourceOwner = e.Aggregate().ResourceOwner
-		case *org.DomainRemovedEvent:
+		case *org.DomainRemovedEvent, *org.OrgRemovedEvent:
 			wm.Verified = false
 		}
 	}
@@ -225,6 +227,7 @@ func (wm *OrgDomainVerifiedWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(org.AggregateType).
 		EventTypes(
 			org.OrgDomainVerifiedEventType,
-			org.OrgDomainRemovedEventType).
+			org.OrgDomainRemovedEventType,
+			org.OrgRemovedEventType).
 		Builder()
 }
