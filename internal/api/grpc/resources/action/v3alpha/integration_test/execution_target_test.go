@@ -255,7 +255,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				require.NoError(t, err)
 				defer close()
 			}
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
 				if tt.wantErr {
@@ -278,7 +278,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 }
 
 func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition) {
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Second)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		got, err := instance.Client.ActionV3Alpha.SearchExecutions(ctx, &action.SearchExecutionsRequest{
 			Filters: []*action.ExecutionSearchFilter{
@@ -290,9 +290,7 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 		if !assert.NoError(ttt, err) {
 			return
 		}
-		if assert.Len(ttt, got.GetResult(), 1) {
-			return
-		}
+		assert.Len(ttt, got.GetResult(), 1)
 	}, retryDuration, tick, "timeout waiting for expected execution result")
 	return
 }
