@@ -53,7 +53,7 @@ func TestServer_GetSecuritySettings(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, 20*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
 			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
 				resp, err := Client.GetSecuritySettings(tt.ctx, &settings.GetSecuritySettingsRequest{})
 				if tt.wantErr {

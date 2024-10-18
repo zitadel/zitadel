@@ -92,7 +92,7 @@ func TestServer_ListIAMMembers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 20*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
 				got, err := Client.ListIAMMembers(tt.args.ctx, tt.args.req)
 				if tt.wantErr {

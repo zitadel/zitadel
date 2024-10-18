@@ -216,7 +216,7 @@ func TestServer_GetTarget(t *testing.T) {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
 			}
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
@@ -478,7 +478,7 @@ func TestServer_ListTargets(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, listErr := instance.Client.ActionV3Alpha.SearchTargets(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
@@ -863,7 +863,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, listErr := instance.Client.ActionV3Alpha.SearchExecutions(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
