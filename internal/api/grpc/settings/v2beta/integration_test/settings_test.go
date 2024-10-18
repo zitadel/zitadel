@@ -57,10 +57,12 @@ func TestServer_GetSecuritySettings(t *testing.T) {
 			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
 				resp, err := Client.GetSecuritySettings(tt.ctx, &settings.GetSecuritySettingsRequest{})
 				if tt.wantErr {
-					require.Error(ct, err)
+					assert.Error(ct, err)
 					return
 				}
-				require.NoError(ct, err)
+				if !assert.NoError(ct, err) {
+					return
+				}
 				got, want := resp.GetSettings(), tt.want.GetSettings()
 				assert.Equal(ct, want.GetEmbeddedIframe().GetEnabled(), got.GetEmbeddedIframe().GetEnabled(), "enable iframe embedding")
 				assert.Equal(ct, want.GetEmbeddedIframe().GetAllowedOrigins(), got.GetEmbeddedIframe().GetAllowedOrigins(), "allowed origins")

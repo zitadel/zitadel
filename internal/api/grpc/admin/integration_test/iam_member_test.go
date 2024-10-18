@@ -103,10 +103,11 @@ func TestServer_ListIAMMembers(t *testing.T) {
 				wantResult := tt.want.GetResult()
 				gotResult := got.GetResult()
 
-				require.Len(ct, gotResult, len(wantResult))
-				for i, want := range wantResult {
-					assert.Equal(ct, want.GetUserId(), gotResult[i].GetUserId())
-					assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
+				if assert.Len(ct, gotResult, len(wantResult)) {
+					for i, want := range wantResult {
+						assert.Equal(ct, want.GetUserId(), gotResult[i].GetUserId())
+						assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
+					}
 				}
 			}, retryDuration, tick)
 		})

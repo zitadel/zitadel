@@ -290,9 +290,7 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 		if !assert.NoError(ttt, err) {
 			return
 		}
-		if assert.Len(ttt, got.GetResult(), 1) {
-			return
-		}
+		assert.Len(ttt, got.GetResult(), 1)
 	}, retryDuration, tick, "timeout waiting for expected execution result")
 	return
 }
