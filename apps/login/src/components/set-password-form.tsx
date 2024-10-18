@@ -161,6 +161,7 @@ export function SetPasswordForm({
                 required: "This field is required",
               })}
               label="Code"
+              autoComplete="one-time-code"
               error={errors.code?.message as string}
             />
           </div>
