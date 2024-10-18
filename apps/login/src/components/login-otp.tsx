@@ -139,9 +139,10 @@ export function LoginOTP({
       organization,
       checks,
       authRequestId,
-    }).catch((error) => {
-      setError(error.message ?? "Could not verify OTP code");
+    }).catch(() => {
+      setError("Could not verify OTP code");
       setLoading(false);
+      return;
     });
 
     setLoading(false);
@@ -151,39 +152,41 @@ export function LoginOTP({
 
   function setCodeAndContinue(values: Inputs, organization?: string) {
     return submitCode(values, organization).then((response) => {
-      if (authRequestId && response && response.sessionId) {
-        const params = new URLSearchParams({
-          sessionId: response.sessionId,
-          authRequest: authRequestId,
-        });
+      if (response) {
+        if (authRequestId && response && response.sessionId) {
+          const params = new URLSearchParams({
+            sessionId: response.sessionId,
+            authRequest: authRequestId,
+          });
 
-        if (organization) {
-          params.append("organization", organization);
-        }
+          if (organization) {
+            params.append("organization", organization);
+          }
 
-        if (authRequestId) {
-          params.append("authRequest", authRequestId);
-        }
+          if (authRequestId) {
+            params.append("authRequest", authRequestId);
+          }
 
-        if (sessionId) {
-          params.append("sessionId", sessionId);
-        }
+          if (sessionId) {
+            params.append("sessionId", sessionId);
+          }
 
-        return router.push(`/login?` + params);
-      } else {
-        const params = new URLSearchParams();
-        if (response?.factors?.user?.loginName) {
-          params.append("loginName", response.factors.user.loginName);
-        }
-        if (authRequestId) {
-          params.append("authRequestId", authRequestId);
-        }
+          return router.push(`/login?` + params);
+        } else {
+          const params = new URLSearchParams();
+          if (response?.factors?.user?.loginName) {
+            params.append("loginName", response.factors.user.loginName);
+          }
+          if (authRequestId) {
+            params.append("authRequestId", authRequestId);
+          }
 
-        if (organization) {
-          params.append("organization", organization);
-        }
+          if (organization) {
+            params.append("organization", organization);
+          }
 
-        return router.push(`/signedin?` + params);
+          return router.push(`/signedin?` + params);
+        }
       }
     });
   }

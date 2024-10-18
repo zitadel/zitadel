@@ -39,6 +39,7 @@ export default async function Page({
 }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "mfa" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
   const {
     loginName,
@@ -121,11 +122,9 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        {!(loginName || sessionId) && (
-          <Alert>{t("error:unknownContext")}</Alert>
-        )}
+        {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
 
-        {!valid && <Alert>{t("error.sessionExpired")}</Alert>}
+        {!valid && <Alert>{tError("sessionExpired")}</Alert>}
 
         {isSessionValid(sessionWithData).valid &&
           loginSettings &&

@@ -14,6 +14,7 @@ export default async function Page({
 }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "u2f" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
@@ -50,9 +51,7 @@ export default async function Page({
         )}
         <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
-        {!(loginName || sessionId) && (
-          <Alert>{t("error:unknownContext")}</Alert>
-        )}
+        {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
 
         {(loginName || sessionId) && (
           <LoginPasskey

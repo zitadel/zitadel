@@ -8,6 +8,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 export default async function Page({ searchParams }: { searchParams: any }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "verify" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
   const {
     userId,
@@ -31,7 +32,7 @@ export default async function Page({ searchParams }: { searchParams: any }) {
 
         {!userId && (
           <div className="py-4">
-            <Alert>{t("error:unknownContext")}</Alert>
+            <Alert>{tError("unknownContext")}</Alert>
           </div>
         )}
 

@@ -7,7 +7,10 @@ import {
   getBrandingSettings,
   getLoginSettings,
   getPasswordComplexitySettings,
+  getUserByID,
 } from "@/lib/zitadel";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
@@ -17,62 +20,83 @@ export default async function Page({
 }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "password" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, organization, authRequestId, code } = searchParams;
+  const { userId, loginName, organization, authRequestId, code } = searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
-  const sessionFactors = await loadMostRecentSession({
-    loginName,
-    organization,
-  });
+  let session: Session | undefined;
+  if (loginName) {
+    session = await loadMostRecentSession({
+      loginName,
+      organization,
+    });
+  }
 
   const branding = await getBrandingSettings(organization);
 
   const passwordComplexity = await getPasswordComplexitySettings(
-    sessionFactors?.factors?.user?.organizationId,
+    session?.factors?.user?.organizationId,
   );
 
   const loginSettings = await getLoginSettings(organization);
 
+  let user: User | undefined;
+  let displayName: string | undefined;
+  if (userId) {
+    const userResponse = await getUserByID(userId);
+    user = userResponse.user;
+
+    if (user?.type.case === "human") {
+      displayName = (user.type.value as HumanUser).profile?.displayName;
+    }
+  }
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{sessionFactors?.factors?.user?.displayName ?? t("set.title")}</h1>
+        <h1>{session?.factors?.user?.displayName ?? t("set.title")}</h1>
         <p className="ztdl-p mb-6 block">{t("set.description")}</p>
 
         {/* show error only if usernames should be shown to be unknown */}
-        {(!sessionFactors || !loginName) &&
-          !loginSettings?.ignoreUnknownUsernames && (
-            <div className="py-4">
-              <Alert>{t("error:unknownContext")}</Alert>
-            </div>
-          )}
+        {loginName && !session && !loginSettings?.ignoreUnknownUsernames && (
+          <div className="py-4">
+            <Alert>{tError("unknownContext")}</Alert>
+          </div>
+        )}
 
-        {sessionFactors && (
+        {session ? (
           <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
+            loginName={loginName ?? session.factors?.user?.loginName}
+            displayName={session.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
-        )}
+        ) : user ? (
+          <UserAvatar
+            loginName={user?.preferredLoginName}
+            displayName={displayName}
+            showDropdown
+            searchParams={searchParams}
+          ></UserAvatar>
+        ) : null}
 
         <Alert type={AlertType.INFO}>{t("set.codeSent")}</Alert>
 
         {passwordComplexity &&
-        loginName &&
-        sessionFactors?.factors?.user?.id ? (
+        (loginName ?? user?.preferredLoginName) &&
+        (userId ?? session?.factors?.user?.id) ? (
           <SetPasswordForm
             code={code}
-            userId={sessionFactors.factors.user.id}
-            loginName={loginName}
+            userId={userId ?? (session?.factors?.user?.id as string)}
+            loginName={loginName ?? (user?.preferredLoginName as string)}
             authRequestId={authRequestId}
             organization={organization}
             passwordComplexitySettings={passwordComplexity}
           />
         ) : (
           <div className="py-4">
-            <Alert>{t("error:failedLoading")}</Alert>
+            <Alert>{tError("failedLoading")}</Alert>
           </div>
         )}
       </div>

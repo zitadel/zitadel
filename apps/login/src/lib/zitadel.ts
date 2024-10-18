@@ -28,7 +28,10 @@ import {
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import { NotificationType } from "@zitadel/proto/zitadel/user/v2/password_pb";
+import {
+  NotificationType,
+  SendPasswordResetLinkSchema,
+} from "@zitadel/proto/zitadel/user/v2/password_pb";
 import {
   SearchQuery,
   SearchQuerySchema,
@@ -492,15 +495,24 @@ export function createUser(
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function passwordReset(userId: string) {
+export async function passwordReset(userId: string, host: string | null) {
+  let medium = create(SendPasswordResetLinkSchema, {
+    notificationType: NotificationType.Email,
+  });
+
+  if (host) {
+    medium = {
+      ...medium,
+      urlTemplate: `https://${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
+    };
+  }
+
   return userService.passwordReset(
     {
       userId,
       medium: {
         case: "sendLink",
-        value: {
-          notificationType: NotificationType.Email,
-        },
+        value: medium,
       },
     },
     {},

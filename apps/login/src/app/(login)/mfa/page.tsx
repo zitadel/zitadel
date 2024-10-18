@@ -19,6 +19,7 @@ export default async function Page({
 }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "mfa" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
@@ -84,9 +85,7 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        {!(loginName || sessionId) && (
-          <Alert>{t("error:unknownContext")}</Alert>
-        )}
+        {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
 
         {sessionFactors ? (
           <ChooseSecondFactor
