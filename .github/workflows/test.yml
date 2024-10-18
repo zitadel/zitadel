@@ -85,7 +85,7 @@ jobs:
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Install Playwright Browsers
-        run: sudo pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Set up Docker Buildx
