@@ -8,5 +8,5 @@ test("username and password", async ({ page }) => {
   const password = page.getByLabel("Password");
   await password.pressSequentially("Password1!");
   await password.press("Enter");
-  await page.getByText("Skip").click();
+  await page.getByRole("heading", {name: "Welcome ZITADEL Admin!"}).click();
 });
