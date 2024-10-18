@@ -1691,7 +1691,7 @@
         "username": "Username",
         "tempUsername": "Temp username",
         "otp": "One-time password",
-        "verifyUrl": "Verify One-time-password URL",
+        "verifyUrl": "Verify One-time password URL",
         "expiry": "Expiry",
         "applicationName": "Application name"
       },

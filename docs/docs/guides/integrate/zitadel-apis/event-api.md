@@ -141,7 +141,7 @@ The following example shows you how you could use the events search to find out 
 You have to include all the event types that tell you that a login attempt has failed.
 In this case these are the following events:
 - Password verification failed
-- One-time-password (OTP) check failed (Authenticator Apps like Authy, Google Authenticator, etc)
+- One-time password (OTP) check failed (Authenticator Apps like Authy, Google Authenticator, etc)
 - Universal Second Factor (U2F) check failed (FaceID, WindowsHello, FingerPrint, etc)
 - Passwordless/Passkey check failed (FaceID, WindowsHello, FingerPrint, etc)
 

@@ -35,7 +35,7 @@ VerifyEmailOTP:
   ButtonText: Authenticate
 VerifySMSOTP:
   Text: >-
-    {{.OTP}} is your one-time-password for {{ .Domain }}. Use it within the next {{.Expiry}}.
+    {{.OTP}} is your one-time password for {{ .Domain }}. Use it within the next {{.Expiry}}.
     
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
