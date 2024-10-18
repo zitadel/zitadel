@@ -769,7 +769,7 @@ service UserService {
 
   // Remove TOTP generator from a user
   //
-  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward.
+  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second factor afterward.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc RemoveTOTP (RemoveTOTPRequest) returns (RemoveTOTPResponse) {
@@ -822,7 +822,7 @@ service UserService {
 
   // Remove One-Time-Password (OTP) SMS from a user
   //
-  // Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward.
+  // Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc RemoveOTPSMS (RemoveOTPSMSRequest) returns (RemoveOTPSMSResponse) {
@@ -875,7 +875,7 @@ service UserService {
 
   // Remove One-Time-Password (OTP) Email from a user
   //
-  // Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward.
+  // Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
   //
   // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc RemoveOTPEmail (RemoveOTPEmailRequest) returns (RemoveOTPEmailResponse) {

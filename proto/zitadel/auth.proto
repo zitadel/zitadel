@@ -597,7 +597,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "List Authentication Factors";
-            description: "Returns a list of possible authentication factors, multi-factor (MFA), second-factor (2FA)"
+            description: "Returns a list of possible authentication factors, multi-factor (MFA), second factor (2FA)"
         };
     }
 
@@ -646,7 +646,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Remove One-Time-Password (OTP)";
-            description: "Remove the configured One-Time-Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. As only one OTP per user is allowed, the user will not have OTP as a second-factor afterward."
+            description: "Remove the configured One-Time-Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. As only one OTP per user is allowed, the user will not have OTP as a second factor afterward."
         };
     }
 
@@ -678,7 +678,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Remove One-Time-Password (OTP) SMS";
-            description: "Remove the configured One-Time-Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+            description: "Remove the configured One-Time-Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward."
         };
     }
 
@@ -710,7 +710,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Remove One-Time-Password (OTP) Email";
-            description: "Remove the configured One-Time-Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
+            description: "Remove the configured One-Time-Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward."
         };
     }
 
@@ -726,7 +726,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Add Universal Second Factor (U2F)";
-            description: "Add a new Universal-Second-Factor (U2F) to the authenticated user. U2F is a device-dependent authentication like FingerScan, FaceID, WindowHello, etc. The factor has to be verified after adding. Multiple factors can be added."
+            description: "Add a new Universal Second Factor (U2F) to the authenticated user. U2F is a device-dependent authentication like FingerScan, FaceID, WindowHello, etc. The factor has to be verified after adding. Multiple factors can be added."
         };
     }
 
@@ -743,7 +743,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Add Universal Second Factor (U2F)";
-            description: "Verify the last added new Universal-Second-Factor (U2F) to the authenticated user."
+            description: "Verify the last added new Universal Second Factor (U2F) to the authenticated user."
         };
     }
 
@@ -759,7 +759,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Remove Universal Second Factor (U2F)";
-            description: "Remove a specific Universal-Second-Factor (U2F) from the authenticated user by sending the id."
+            description: "Remove a specific Universal Second Factor (U2F) from the authenticated user by sending the id."
         };
     }
 

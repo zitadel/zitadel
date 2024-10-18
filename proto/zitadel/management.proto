@@ -1345,7 +1345,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Authentication Factors (2FA/MFA)";
-            description: "Get a list of authentication factors the user has set. Including Second-Factors (2FA) and Multi-Factors (MFA).\n\nDeprecated: please use user service v2 ListAuthenticationMethodTypes"
+            description: "Get a list of authentication factors the user has set. Including Second Factors (2FA) and Multi-Factors (MFA).\n\nDeprecated: please use user service v2 ListAuthenticationMethodTypes"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1412,7 +1412,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor U2F";
             deprecated: true;
-            description: "Remove the configured Universal-Second-Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.\n\nDeprecated: please use user service v2 RemoveU2F"
+            description: "Remove the configured Universal Second Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.\n\nDeprecated: please use user service v2 RemoveU2F"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1444,7 +1444,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP SMS";
-            description: "Remove the configured One-Time-Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPSMS"
+            description: "Remove the configured One-Time-Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPSMS"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1477,7 +1477,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP SMS";
-            description: "Remove the configured One-Time-Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPEmail"
+            description: "Remove the configured One-Time-Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPEmail"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
