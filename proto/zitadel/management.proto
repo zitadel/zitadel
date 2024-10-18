@@ -4618,7 +4618,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Authentication Methods"
-            summary: "List Multifactors (MFA)";
+            summary: "List Multi-factors (MFA)";
             description: "Returns a list of multifactors (MFA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             parameters: {
                 headers: {
