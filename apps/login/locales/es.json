@@ -135,6 +135,19 @@
       "submit": "Continuar"
     }
   },
+  "invite": {
+    "title": "Invitar usuario",
+    "description": "Introduce el correo electrónico del usuario que deseas invitar.",
+    "info": "El usuario recibirá un correo electrónico con un enlace para completar el registro.",
+    "submit": "Invitar usuario",
+    "success": {
+      "title": "¡Usuario invitado!",
+      "description": "El usuario ha sido invitado.",
+      "verified": "El usuario ha sido invitado y ya ha verificado su correo electrónico.",
+      "notVerifiedYet": "El usuario ha sido invitado. Recibirá un correo electrónico con más instrucciones.",
+      "submit": "Invitar a otro usuario"
+    }
+  },
   "signedin": {
     "title": "¡Bienvenido {user}!",
     "description": "Has iniciado sesión."

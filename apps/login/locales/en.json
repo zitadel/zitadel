@@ -135,6 +135,19 @@
       "submit": "Continue"
     }
   },
+  "invite": {
+    "title": "Invite User",
+    "description": "Provide the email address and the name of the user you want to invite.",
+    "info": "The user will receive an email with further instructions.",
+    "submit": "Continue",
+    "success": {
+      "title": "Invite User",
+      "description": "The email has successfully been sent.",
+      "verified": "The user has been invited and has already verified his email.",
+      "notVerifiedYet": "The user has been invited. They will receive an email with further instructions.",
+      "submit": "Invite another user"
+    }
+  },
   "signedin": {
     "title": "Welcome {user}!",
     "description": "You are signed in."

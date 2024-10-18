@@ -135,6 +135,19 @@
       "submit": "Weiter"
     }
   },
+  "invite": {
+    "title": "Benutzer einladen",
+    "description": "Geben Sie die E-Mail-Adresse des Benutzers ein, den Sie einladen möchten.",
+    "info": "Der Benutzer erhält eine E-Mail mit einem Link, um sich zu registrieren.",
+    "submit": "Einladen",
+    "success": {
+      "title": "Einladung erfolgreich",
+      "description": "Der Benutzer wurde erfolgreich eingeladen.",
+      "verified": "Der Benutzer wurde eingeladen und hat seine E-Mail bereits verifiziert.",
+      "notVerifiedYet": "Der Benutzer wurde eingeladen. Er erhält eine E-Mail mit weiteren Anweisungen.",
+      "submit": "Weiteren Benutzer einladen"
+    }
+  },
   "signedin": {
     "title": "Willkommen {user}!",
     "description": "Sie sind angemeldet."

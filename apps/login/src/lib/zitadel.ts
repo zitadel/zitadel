@@ -36,6 +36,7 @@ import {
   SearchQuery,
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
+import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
@@ -300,6 +301,41 @@ export async function getUserByID(userId: string) {
   return userService.getUserByID({ userId }, {});
 }
 
+export async function verifyInviteCode(
+  userId: string,
+  verificationCode: string,
+) {
+  return userService.verifyInviteCode({ userId, verificationCode }, {});
+}
+
+export async function resendInviteCode(userId: string) {
+  return userService.resendInviteCode({ userId }, {});
+}
+
+export async function createInviteCode(userId: string, host?: string) {
+  let medium = create(SendInviteCodeSchema, {
+    applicationName: "Typescript Login",
+  });
+
+  if (host) {
+    medium = {
+      ...medium,
+      urlTemplate: `https://${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
+    };
+  }
+
+  return userService.createInviteCode(
+    {
+      userId,
+      verification: {
+        case: "sendCode",
+        value: medium,
+      },
+    },
+    {},
+  );
+}
+
 export async function listUsers({
   loginName,
   userName,
@@ -368,6 +404,24 @@ export async function listUsers({
   }
 
   return userService.listUsers({ queries: queries });
+}
+
+export async function getDefaultOrg() {
+  return orgService
+    .listOrganizations(
+      {
+        queries: [
+          {
+            query: {
+              case: "defaultQuery",
+              value: {},
+            },
+          },
+        ],
+      },
+      {},
+    )
+    .then((resp) => resp.result[0]);
 }
 
 export async function getOrgsByDomain(domain: string) {

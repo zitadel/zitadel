@@ -135,6 +135,19 @@
       "submit": "Continua"
     }
   },
+  "invite": {
+    "title": "Invita Utente",
+    "description": "Inserisci l'indirizzo email dell'utente che desideri invitare.",
+    "info": "L'utente riceverà un'email con ulteriori istruzioni.",
+    "submit": "Invita Utente",
+    "success": {
+      "title": "Invito inviato",
+      "description": "L'utente è stato invitato con successo.",
+      "verified": "L'utente è stato invitato e ha già verificato la sua email.",
+      "notVerifiedYet": "L'utente è stato invitato. Riceverà un'email con ulteriori istruzioni.",
+      "submit": "Invita un altro utente"
+    }
+  },
   "signedin": {
     "title": "Benvenuto {user}!",
     "description": "Sei connesso."

@@ -162,9 +162,7 @@ export function RegisterFormWithoutPassword({
         />
       )}
 
-      <p className="mt-4 ztdl-p mb-6 block text-text-light-secondary-500 dark:text-text-dark-secondary-500">
-        {t("selectMethod")}
-      </p>
+      <p className="mt-4 ztdl-p mb-6 block text-left">{t("selectMethod")}</p>
 
       <div className="pb-4">
         <AuthenticationMethodRadio
