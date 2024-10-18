@@ -31,8 +31,6 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4.1.6
 
-      - run : ls -la acceptance/pat
-
       - name: Setup Node.js 20.x
         uses: actions/setup-node@v4.0.2
         with:
@@ -95,7 +93,7 @@ jobs:
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Run ZITADEL
-        run: pnpm run-zitadel
+        run: ZITADEL_DEV_UID=root pnpm run-zitadel
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Check
