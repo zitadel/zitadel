@@ -12,7 +12,7 @@ You need to give a user the [manager role](/docs/guides/manage/console/managers)
 If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](/docs/concepts/eventstore/overview).
 ## Request Events
 
-Call the [ListEvents](/apis/resources/admin) enpoint in the Administration API to get all the events you need.
+Call the [ListEvents](/apis/resources/admin) endpoint in the Administration API to get all the events you need.
 To further restrict your result you can add the following filters:
 - sequence
 - editor user id
