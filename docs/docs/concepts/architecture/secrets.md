@@ -92,7 +92,7 @@ Some secrets cannot be hashed because they need to be used in their raw form. Th
 
 - Federation
   - Client Secrets of Identity Providers (IdPs)
-- Multi Factor Authentication
+- Multi-factor Authentication
   - TOTP Seed Values
 - Validation Secrets
   - Verifying contact information like eMail, Phonenumbers

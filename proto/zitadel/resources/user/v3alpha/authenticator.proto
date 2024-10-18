@@ -18,12 +18,12 @@ message Authenticators {
   Password password = 2;
   // Meta information about the user's WebAuthN authenticators.
   repeated WebAuthN web_auth_n = 3;
-  // A list of the user's time-based one-time-password (TOTP) authenticators,
+  // A list of the user's time-based one-time password (TOTP) authenticators,
   // incl. the name for identification.
   repeated TOTP totps = 4;
-  // A list of the user's one-time-password (OTP) SMS authenticators.
+  // A list of the user's one-time password (OTP) SMS authenticators.
   repeated OTPSMS otp_sms = 5;
-  // A list of the user's one-time-password (OTP) Email authenticators.
+  // A list of the user's one-time password (OTP) Email authenticators.
   repeated OTPEmail otp_email = 6;
   // A list of the user's authentication keys. They can be used to authenticate e.g. by JWT Profile.
   repeated AuthenticationKey authentication_keys = 7;
@@ -100,7 +100,7 @@ message WebAuthN {
   // State whether the WebAuthN registration has been completed.
   bool is_verified = 3;
   // States if the user has been verified during the registration. Authentication with this device
-  // will be considered as multi factor authentication (MFA) without the need to check a password
+  // will be considered as multi-factor authentication (MFA) without the need to check a password
   // (typically known as Passkeys).
   // Without user verification it will be a second factor authentication (2FA), typically done
   // after a password check.
@@ -154,7 +154,7 @@ message VerifyWebAuthNRegistration {
 }
 
 message OTPSMS {
-  // unique identifier of the one-time-password (OTP) SMS authenticator.
+  // unique identifier of the one-time password (OTP) SMS authenticator.
   string otp_sms_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
@@ -171,7 +171,7 @@ message OTPSMS {
 }
 
 message OTPEmail {
-  // unique identifier of the one-time-password (OTP) Email authenticator.
+  // unique identifier of the one-time password (OTP) Email authenticator.
   string otp_email_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
@@ -188,7 +188,7 @@ message OTPEmail {
 }
 
 message TOTP {
-  // unique identifier of the time-based one-time-password (TOTP) authenticator.
+  // unique identifier of the time-based one-time password (TOTP) authenticator.
   string totp_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\""
