@@ -196,7 +196,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				require.Error(t, err)
 				return
 			}
-
 			require.NoError(t, err)
 
 			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
