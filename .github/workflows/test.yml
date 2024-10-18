@@ -57,9 +57,9 @@ jobs:
         run: CYPRESS_INSTALL_BINARY=0 pnpm install
 
       # We build already here so we can fail fast if the build fails
-      - name: Run ZITADEL
+      - name: Build Production
         run: pnpm build
-        if: ${{ matrix.command }} == "test:acceptance"
+        if: ${{ matrix.command == 'test:acceptance' }}
 
       - run: |
           echo "CYPRESS_VERSION=$(pnpm list -r | grep cypress | cut -d ' ' -f 2)" >> $GITHUB_ENV
@@ -72,11 +72,11 @@ jobs:
           key: ${{ runner.os }}-cypress-binary-${{ env.CYPRESS_VERSION }}
           restore-keys: |
             ${{ runner.os }}-cypress-binary-
-        if: ${{ matrix.command }} == "test:integration"
+        if: ${{ matrix.command == 'test:integration' }}
 
       - name: Install Cypress Browsers
         run: pnpm install
-        if: ${{ matrix.command }} == "test:integration"
+        if: ${{ matrix.command == 'test:integration' }}
 
       - uses: actions/cache@v4.0.2
         name: Setup Playwright binary cache
@@ -85,19 +85,19 @@ jobs:
           key: ${{ runner.os }}-playwright-binary-${{ env.PLAYWRIGHT_VERSION }}
           restore-keys: |
             ${{ runner.os }}-playwright-binary-
-        if: ${{ matrix.command }} == "test:acceptance"
+        if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Install Playwright Browsers
         run: sudo pnpm exec playwright install --with-deps
-        if: ${{ matrix.command }} == "test:acceptance"
+        if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        if: ${{ matrix.command }} == "test:acceptance"
+        if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Run ZITADEL
         run: pnpm run-zitadel
-        if: ${{ matrix.command }} == "test:acceptance"
+        if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Check
         id: check
