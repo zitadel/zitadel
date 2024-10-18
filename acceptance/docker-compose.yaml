@@ -14,7 +14,7 @@ services:
 
   db:
     restart: 'always'
-    image: 'postgres:latest'
+    image: "${POSTGRES_IMAGE:-postgres:latest}"
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel

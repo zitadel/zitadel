@@ -1,0 +1,104 @@
+name: Quality
+
+on: pull_request
+
+jobs:
+  quality:
+    env:
+      ZITADEL_IMAGE: ghcr.io/zitadel/zitadel:v2.63.4
+      POSTGRES_IMAGE: postgres:17.0-alpine3.19
+
+    name: Ensure Quality
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    permissions:
+      contents: "read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        command:
+          - format --check
+          - lint
+          - test:unit
+          - test:integration
+          - test:acceptance
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4.1.6
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: 20.x
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4.0.2
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install Dependencies
+        run: CYPRESS_INSTALL_BINARY=0 pnpm install
+
+      # We build already here so we can fail fast if the build fails
+      - name: Run ZITADEL
+        run: pnpm build
+        if: ${{ matrix.command }} == "test:acceptance"
+
+      - run: |
+          echo "CYPRESS_VERSION=$(pnpm list -r | grep cypress | cut -d ' ' -f 2)" >> $GITHUB_ENV
+          echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v4.0.2
+        name: Setup Cypress binary cache
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-binary-${{ env.CYPRESS_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-binary-
+        if: ${{ matrix.command }} == "test:integration"
+
+      - name: Install Cypress Browsers
+        run: pnpm install
+        if: ${{ matrix.command }} == "test:integration"
+
+      - uses: actions/cache@v4.0.2
+        name: Setup Playwright binary cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-binary-${{ env.PLAYWRIGHT_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-binary-
+        if: ${{ matrix.command }} == "test:acceptance"
+
+      - name: Install Playwright Browsers
+        run: sudo pnpm exec playwright install --with-deps
+        if: ${{ matrix.command }} == "test:acceptance"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        if: ${{ matrix.command }} == "test:acceptance"
+
+      - name: Run ZITADEL
+        run: pnpm run-zitadel
+        if: ${{ matrix.command }} == "test:acceptance"
+
+      - name: Check
+        id: check
+        run: pnpm ${{ matrix.command }}
