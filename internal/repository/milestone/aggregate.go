@@ -9,20 +9,23 @@ import (
 
 const (
 	AggregateType    = "milestone"
-	AggregateVersion = "v1"
+	AggregateVersion = "v2"
 )
 
 type Aggregate struct {
 	eventstore.Aggregate
 }
 
-func NewAggregate(ctx context.Context, id string) *Aggregate {
-	instanceID := authz.GetInstance(ctx).InstanceID()
+func NewAggregate(ctx context.Context) *Aggregate {
+	return NewInstanceAggregate(authz.GetInstance(ctx).InstanceID())
+}
+
+func NewInstanceAggregate(instanceID string) *Aggregate {
 	return &Aggregate{
 		Aggregate: eventstore.Aggregate{
 			Type:          AggregateType,
 			Version:       AggregateVersion,
-			ID:            id,
+			ID:            instanceID,
 			ResourceOwner: instanceID,
 			InstanceID:    instanceID,
 		},
