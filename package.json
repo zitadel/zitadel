@@ -15,6 +15,7 @@
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "clean": "turbo run clean && rm -rf node_modules",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "format": "prettier --check \"**/*.{ts,tsx,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",

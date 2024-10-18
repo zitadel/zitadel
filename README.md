@@ -210,6 +210,7 @@ ZITADEL_API_URL=https://zitadel-tlx3du.us1.zitadel.cloud
 ZITADEL_SERVICE_USER_ID=289106423158521850
 ZITADEL_SERVICE_USER_TOKEN=1S6w48thfWFI2klgfwkCnhXJLf9FQ457E-_3H74ePQxfO3Af0Tm4V5Xi-ji7urIl_xbn-Rk
 ```
+
 </details>
 
 Start the login application in dev mode:
