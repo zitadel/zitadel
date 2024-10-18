@@ -85,13 +85,13 @@ export function PasswordForm({
       organization,
     }).catch(() => {
       setError("Could not reset password");
+      return;
     });
 
     setLoading(false);
 
     if (response && "error" in response) {
       setError(response.error);
-
       return;
     }
 

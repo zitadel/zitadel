@@ -15,6 +15,7 @@ export default async function Page({
 }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "otp" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
   const { loginName, authRequestId, sessionId, organization, code, submit } =
     searchParams;
@@ -44,7 +45,7 @@ export default async function Page({
 
         {!session && (
           <div className="py-4">
-            <Alert>{t("error:unknownContext")}</Alert>
+            <Alert>{tError("unknownContext")}</Alert>
           </div>
         )}
 
