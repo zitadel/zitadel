@@ -56,14 +56,8 @@ jobs:
       - name: Install Dependencies
         run: CYPRESS_INSTALL_BINARY=0 pnpm install
 
-      # We build already here so we can fail fast if the build fails
-      - name: Build Production
-        run: pnpm build
-        if: ${{ matrix.command == 'test:acceptance' }}
-
-      - run: |
-          echo "CYPRESS_VERSION=$(pnpm list -r | grep cypress | cut -d ' ' -f 2)" >> $GITHUB_ENV
-          echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
+      - run: echo "CYPRESS_VERSION=$(pnpm list -r | grep cypress | cut -d ' ' -f 2)" >> $GITHUB_ENV
+        if: ${{ matrix.command == 'test:integration' }}
 
       - uses: actions/cache@v4.0.2
         name: Setup Cypress binary cache
@@ -77,6 +71,9 @@ jobs:
       - name: Install Cypress Browsers
         run: pnpm install
         if: ${{ matrix.command == 'test:integration' }}
+
+      - run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
+        if: ${{ matrix.command == 'test:acceptance' }}
 
       - uses: actions/cache@v4.0.2
         name: Setup Playwright binary cache
