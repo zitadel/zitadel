@@ -2957,7 +2957,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "multifactor type not defined on policy";
+                    description: "multi-factor type not defined on policy";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
