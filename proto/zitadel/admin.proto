@@ -2827,7 +2827,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "invalid second-factor type";
+                    description: "invalid second factor type";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -2862,7 +2862,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "Invalid second-factor type";
+                    description: "Invalid second factor type";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
