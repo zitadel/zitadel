@@ -312,7 +312,7 @@ export async function resendInviteCode(userId: string) {
   return userService.resendInviteCode({ userId }, {});
 }
 
-export async function createInviteCode(userId: string, host?: string) {
+export async function createInviteCode(userId: string, host: string | null) {
   let medium = create(SendInviteCodeSchema, {
     applicationName: "Typescript Login",
   });

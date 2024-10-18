@@ -141,7 +141,7 @@
     "info": "The user will receive an email with further instructions.",
     "submit": "Continue",
     "success": {
-      "title": "Invite User",
+      "title": "User invited",
       "description": "The email has successfully been sent.",
       "verified": "The user has been invited and has already verified his email.",
       "notVerifiedYet": "The user has been invited. They will receive an email with further instructions.",

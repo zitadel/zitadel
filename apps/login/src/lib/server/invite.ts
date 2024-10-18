@@ -2,6 +2,7 @@
 
 import { addHumanUser, createInviteCode } from "@/lib/zitadel";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { headers } from "next/headers";
 
 type InviteUserCommand = {
   email: string;
@@ -19,6 +20,8 @@ export type RegisterUserResponse = {
 };
 
 export async function inviteUser(command: InviteUserCommand) {
+  const host = headers().get("host");
+
   const human = await addHumanUser({
     email: command.email,
     firstName: command.firstName,
@@ -31,7 +34,7 @@ export async function inviteUser(command: InviteUserCommand) {
     return { error: "Could not create user" };
   }
 
-  const codeResponse = await createInviteCode(human.userId);
+  const codeResponse = await createInviteCode(human.userId, host);
 
   if (!codeResponse || !human) {
     return { error: "Could not create invite code" };
