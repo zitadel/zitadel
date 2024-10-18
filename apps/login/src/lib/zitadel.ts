@@ -28,6 +28,7 @@ import {
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import { NotificationType } from "@zitadel/proto/zitadel/user/v2/password_pb";
 import {
   SearchQuery,
   SearchQuerySchema,
@@ -495,6 +496,32 @@ export async function passwordReset(userId: string) {
   return userService.passwordReset(
     {
       userId,
+      medium: {
+        case: "sendLink",
+        value: {
+          notificationType: NotificationType.Email,
+        },
+      },
+    },
+    {},
+  );
+}
+
+export async function setPassword(
+  userId: string,
+  password: string,
+  code: string,
+) {
+  return userService.setPassword(
+    {
+      userId,
+      newPassword: {
+        password,
+      },
+      verification: {
+        case: "verificationCode",
+        value: code,
+      },
     },
     {},
   );

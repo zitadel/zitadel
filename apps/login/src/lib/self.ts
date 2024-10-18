@@ -6,6 +6,7 @@ import {
 } from "@zitadel/client/v2";
 import { createServerTransport } from "@zitadel/node";
 import { getSessionCookieById } from "./cookies";
+import { getSession } from "./zitadel";
 
 const transport = (token: string) =>
   createServerTransport(token, {
@@ -19,26 +20,46 @@ const sessionService = (sessionId: string) => {
   });
 };
 
-const userService = (sessionId: string) => {
-  return getSessionCookieById({ sessionId }).then((session) => {
-    return createUserServiceClient(transport(session.token));
-  });
+const myUserService = (sessionToken: string) => {
+  return createUserServiceClient(transport(sessionToken));
 };
 
-export async function setPassword({
+export async function setMyPassword({
   sessionId,
-  userId,
   password,
 }: {
   sessionId: string;
-  userId: string;
   password: string;
 }) {
-  return (await userService(sessionId)).setPassword(
-    {
-      userId,
-      newPassword: { password, changeRequired: false },
-    },
-    {},
-  );
+  const sessionCookie = await getSessionCookieById({ sessionId });
+
+  const { session } = await getSession({
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
+
+  if (!session) {
+    return { error: "Could not load session" };
+  }
+
+  const service = await myUserService(sessionCookie.token);
+
+  if (!session?.factors?.user?.id) {
+    return { error: "No user id found in session" };
+  }
+
+  return service
+    .setPassword(
+      {
+        userId: session.factors.user.id,
+        newPassword: { password, changeRequired: false },
+      },
+      {},
+    )
+    .catch((error) => {
+      if (error.code === 7) {
+        return { error: "Session is not valid." };
+      }
+      throw error;
+    });
 }

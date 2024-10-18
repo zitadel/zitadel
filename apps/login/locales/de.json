@@ -14,10 +14,24 @@
     "register": "Neuen Benutzer registrieren"
   },
   "password": {
-    "title": "Passwort",
-    "description": "Geben Sie Ihr Passwort ein.",
-    "resetPassword": "Passwort zurücksetzen",
-    "submit": "Weiter"
+    "verify": {
+      "title": "Passwort",
+      "description": "Geben Sie Ihr Passwort ein.",
+      "resetPassword": "Passwort zurücksetzen",
+      "submit": "Weiter"
+    },
+    "set": {
+      "title": "Passwort festlegen",
+      "description": "Legen Sie das Passwort für Ihr Konto fest",
+      "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
+      "resend": "Erneut senden",
+      "submit": "Weiter"
+    },
+    "change": {
+      "title": "Passwort ändern",
+      "description": "Legen Sie das Passwort für Ihr Konto fest",
+      "submit": "Weiter"
+    }
   },
   "idp": {
     "title": "Mit SSO anmelden",
@@ -134,6 +148,7 @@
   },
   "error": {
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
-    "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+    "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+    "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut."
   }
 }

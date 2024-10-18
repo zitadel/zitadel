@@ -14,10 +14,24 @@
     "register": "Registrati come nuovo utente"
   },
   "password": {
-    "title": "Password",
-    "description": "Inserisci la tua password.",
-    "resetPassword": "Reimposta Password",
-    "submit": "Continua"
+    "verify": {
+      "title": "Password",
+      "description": "Inserisci la tua password.",
+      "resetPassword": "Reimposta Password",
+      "submit": "Continua"
+    },
+    "set": {
+      "title": "Imposta Password",
+      "description": "Imposta la password per il tuo account",
+      "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
+      "resend": "Invia di nuovo",
+      "submit": "Continua"
+    },
+    "change": {
+      "title": "Cambia Password",
+      "description": "Imposta la password per il tuo account",
+      "submit": "Continua"
+    }
   },
   "idp": {
     "title": "Accedi con SSO",
@@ -134,6 +148,7 @@
   },
   "error": {
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",
-    "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso."
+    "sessionExpired": "La tua sessione attuale è scaduta. Effettua nuovamente l'accesso.",
+    "failedLoading": "Impossibile caricare i dati. Riprova."
   }
 }

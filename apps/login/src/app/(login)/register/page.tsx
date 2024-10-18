@@ -1,6 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterFormWithoutPassword } from "@/components/register-form-without-password";
-import { SetPasswordForm } from "@/components/set-password-form";
+import { SetRegisterPasswordForm } from "@/components/set-register-password-form";
 import {
   getBrandingSettings,
   getLegalAndSupportSettings,
@@ -38,14 +38,14 @@ export default async function Page({
         <p className="ztdl-p">{t("description")}</p>
 
         {legal && passwordComplexitySettings && (
-          <SetPasswordForm
+          <SetRegisterPasswordForm
             passwordComplexitySettings={passwordComplexitySettings}
             email={email}
             firstname={firstname}
             lastname={lastname}
             organization={organization}
             authRequestId={authRequestId}
-          ></SetPasswordForm>
+          ></SetRegisterPasswordForm>
         )}
       </div>
     </DynamicTheme>

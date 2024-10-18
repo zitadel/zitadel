@@ -2,6 +2,7 @@
 
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -133,6 +134,25 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (!session.factors?.user?.id) {
       return { error: "Could not create session for user" };
+    }
+
+    if (users.result[0].state === UserState.INITIAL) {
+      const params = new URLSearchParams({
+        loginName: session.factors?.user?.loginName,
+      });
+
+      if (command.organization || session.factors?.user?.organizationId) {
+        params.append(
+          "organization",
+          command.organization ?? session.factors?.user?.organizationId,
+        );
+      }
+
+      if (command.authRequestId) {
+        params.append("authRequestid", command.authRequestId);
+      }
+
+      return redirect("/password/set?" + params);
     }
 
     const methods = await listAuthenticationMethodTypes(

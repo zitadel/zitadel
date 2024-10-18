@@ -4,7 +4,6 @@ import { resetPassword, sendPassword } from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -60,15 +59,18 @@ export function PasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
+      forceMfa: loginSettings?.forceMfa,
     }).catch(() => {
+      setLoading(false);
       setError("Could not verify password");
+      return;
     });
+
+    setLoading(false);
 
     if (response && "error" in response && response.error) {
       setError(response.error);
     }
-
-    setLoading(false);
 
     return response;
   }
@@ -85,146 +87,29 @@ export function PasswordForm({
       setError("Could not reset password");
     });
 
-    if (response && "error" in response) {
-      setError(response.error);
-    } else {
-      setInfo("Password was reset. Please check your email.");
-    }
-
     setLoading(false);
 
-    return response;
-  }
+    if (response && "error" in response) {
+      setError(response.error);
 
-  async function submitPasswordAndContinue(
-    value: Inputs,
-  ): Promise<boolean | void> {
-    const submitted = await submitPassword(value);
-    setInfo("");
-    // if user has mfa -> /otp/[method] or /u2f
-    // if mfa is forced and user has no mfa -> /mfa/set
-    // if no passwordless -> /passkey/set
-
-    // exclude password and passwordless
-    if (
-      !submitted ||
-      !submitted.authMethods ||
-      !submitted.factors?.user?.loginName
-    ) {
       return;
     }
 
-    const availableSecondFactors = submitted?.authMethods?.filter(
-      (m: AuthenticationMethodType) =>
-        m !== AuthenticationMethodType.PASSWORD &&
-        m !== AuthenticationMethodType.PASSKEY,
-    );
+    setInfo("Password was reset. Please check your email.");
 
-    if (availableSecondFactors?.length == 1) {
-      const params = new URLSearchParams({
-        loginName: submitted.factors?.user.loginName,
-      });
-
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      const factor = availableSecondFactors[0];
-      // if passwordless is other method, but user selected password as alternative, perform a login
-      if (factor === AuthenticationMethodType.TOTP) {
-        return router.push(`/otp/time-based?` + params);
-      } else if (factor === AuthenticationMethodType.OTP_SMS) {
-        return router.push(`/otp/sms?` + params);
-      } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
-        return router.push(`/otp/email?` + params);
-      } else if (factor === AuthenticationMethodType.U2F) {
-        return router.push(`/u2f?` + params);
-      }
-    } else if (availableSecondFactors?.length >= 1) {
-      const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
-      });
-
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      return router.push(`/mfa?` + params);
-    } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
-      const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
-        force: "true", // this defines if the mfa is forced in the settings
-        checkAfter: "true", // this defines if the check is directly made after the setup
-      });
-
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      // TODO: provide a way to setup passkeys on mfa page?
-      return router.push(`/mfa/set?` + params);
-    } else if (
-      submitted.factors &&
-      !submitted.factors.webAuthN && // if session was not verified with a passkey
-      promptPasswordless && // if explicitly prompted due policy
-      !isAlternative // escaped if password was used as an alternative method
-    ) {
-      const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
-        prompt: "true",
-      });
-
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      return router.push(`/passkey/set?` + params);
-    } else if (authRequestId && submitted.sessionId) {
-      const params = new URLSearchParams({
-        sessionId: submitted.sessionId,
-        authRequest: authRequestId,
-      });
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      return router.push(`/login?` + params);
-    }
-
-    // without OIDC flow
-    const params = new URLSearchParams(
-      authRequestId
-        ? {
-            loginName: submitted.factors.user.loginName,
-            authRequestId,
-          }
-        : {
-            loginName: submitted.factors.user.loginName,
-          },
-    );
+    const params = new URLSearchParams({
+      loginName: loginName,
+    });
 
     if (organization) {
       params.append("organization", organization);
     }
 
-    return router.push(`/signedin?` + params);
+    if (authRequestId) {
+      params.append("authRequestId", authRequestId);
+    }
+
+    return router.push("/password/set?" + params);
   }
 
   return (
@@ -243,7 +128,7 @@ export function PasswordForm({
             type="button"
             disabled={loading}
           >
-            {t("resetPassword")}
+            {t("verify.resetPassword")}
           </button>
         )}
 
@@ -277,10 +162,10 @@ export function PasswordForm({
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitPasswordAndContinue)}
+          onClick={handleSubmit(submitPassword)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("submit")}
+          {t("verify.submit")}
         </Button>
       </div>
     </form>
