@@ -22,6 +22,7 @@
     "build": {},
     "test": {},
     "start": {},
+    "start:built": {},
     "test:unit": {},
     "test:integration": {},
     "test:watch": {
