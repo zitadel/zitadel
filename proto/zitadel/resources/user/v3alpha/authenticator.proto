@@ -100,7 +100,7 @@ message WebAuthN {
   // State whether the WebAuthN registration has been completed.
   bool is_verified = 3;
   // States if the user has been verified during the registration. Authentication with this device
-  // will be considered as multifactor authentication (MFA) without the need to check a password
+  // will be considered as multi-factor authentication (MFA) without the need to check a password
   // (typically known as Passkeys).
   // Without user verification it will be a second factor authentication (2FA), typically done
   // after a password check.
