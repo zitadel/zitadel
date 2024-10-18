@@ -6,9 +6,9 @@
   "license": "MIT",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -28,7 +28,8 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf src/proto"
   },
   "peerDependencies": {
-    "@zitadel/client": "workspace:*"
+    "@zitadel/client": "workspace:*",
+    "@connectrpc/connect": "^2.0.0-alpha.1"
   },
   "dependencies": {
     "@connectrpc/connect-node": "^2.0.0-alpha.1",
@@ -36,6 +37,7 @@
     "jose": "^5.3.0"
   },
   "devDependencies": {
+    "@connectrpc/connect": "^2.0.0-alpha.1",
     "@types/node": "^22.5.5",
     "@zitadel/client": "workspace:*",
     "@zitadel/tsconfig": "workspace:*",
