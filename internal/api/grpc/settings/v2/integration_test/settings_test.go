@@ -53,10 +53,11 @@ func TestServer_GetSecuritySettings(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, 20*time.Second)
 			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
 				resp, err := Client.GetSecuritySettings(tt.ctx, &settings.GetSecuritySettingsRequest{})
 				if tt.wantErr {
-					assert.Error(ct, err)
+					require.Error(ct, err)
 					return
 				}
 				require.NoError(ct, err)
@@ -64,7 +65,7 @@ func TestServer_GetSecuritySettings(t *testing.T) {
 				assert.Equal(ct, want.GetEmbeddedIframe().GetEnabled(), got.GetEmbeddedIframe().GetEnabled(), "enable iframe embedding")
 				assert.Equal(ct, want.GetEmbeddedIframe().GetAllowedOrigins(), got.GetEmbeddedIframe().GetAllowedOrigins(), "allowed origins")
 				assert.Equal(ct, want.GetEnableImpersonation(), got.GetEnableImpersonation(), "enable impersonation")
-			}, time.Minute, time.Second/10)
+			}, retryDuration, tick)
 		})
 	}
 }
@@ -167,7 +168,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.SetSecuritySettings(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)

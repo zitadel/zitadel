@@ -584,27 +584,21 @@ func TestServer_ListPasskeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Client.ListPasskeys(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.ListPasskeys(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, listErr)
-				if listErr != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
-				integration.AssertListDetails(t, tt.want, got)
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected idplinks result")
+				integration.AssertListDetails(ttt, tt.want, got)
+			}, retryDuration, tick, "timeout waiting for expected idplinks result")
 		})
 	}
 }

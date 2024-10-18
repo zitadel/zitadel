@@ -191,6 +191,8 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 		})
 		require.NoError(t, err)
 	}
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamCTX, time.Minute)
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
 		if enableFeature {
@@ -199,7 +201,7 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 		} else {
 			assert.Error(collect, err)
 		}
-	}, time.Minute, time.Second)
+	}, retryDuration, tick)
 
 	return instance, iamCTX
 }
@@ -213,6 +215,8 @@ func assertFeatureDisabledError(t *testing.T, err error) {
 }
 
 func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integration.Instance, nKeys int, expectActiveKeyID string, config any) {
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
 		require.NoError(collect, err)
@@ -243,5 +247,5 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integrati
 		if expectActiveKeyID != "" {
 			assert.Equal(collect, expectActiveKeyID, gotActiveKeyID)
 		}
-	}, time.Minute, time.Second)
+	}, retryDuration, tick)
 }
