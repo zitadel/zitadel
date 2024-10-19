@@ -10,6 +10,8 @@ import (
 	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/cache/gomap"
 	"github.com/zitadel/zitadel/internal/cache/noop"
+	"github.com/zitadel/zitadel/internal/cache/pg"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -18,14 +20,14 @@ type Caches struct {
 	instance   cache.Cache[instanceIndex, string, *authzInstance]
 }
 
-func startCaches(background context.Context, conf *cache.CachesConfig) (_ *Caches, err error) {
+func startCaches(background context.Context, conf *cache.CachesConfig, client *database.DB) (_ *Caches, err error) {
 	caches := &Caches{
 		instance: noop.NewCache[instanceIndex, string, *authzInstance](),
 	}
 	if conf == nil {
 		return caches, nil
 	}
-	caches.connectors, err = startCacheConnectors(background, conf)
+	caches.connectors, err = startCacheConnectors(background, conf, client)
 	if err != nil {
 		return nil, err
 	}
@@ -39,20 +41,30 @@ func startCaches(background context.Context, conf *cache.CachesConfig) (_ *Cache
 }
 
 type cacheConnectors struct {
-	memory *cache.AutoPruneConfig
-	// pool   *pgxpool.Pool
+	memory   *cache.AutoPruneConfig
+	postgres *pgxPoolCacheConnector
 }
 
-func startCacheConnectors(_ context.Context, conf *cache.CachesConfig) (*cacheConnectors, error) {
+type pgxPoolCacheConnector struct {
+	*cache.AutoPruneConfig
+	client *database.DB
+}
+
+func startCacheConnectors(_ context.Context, conf *cache.CachesConfig, client *database.DB) (_ *cacheConnectors, err error) {
 	connectors := new(cacheConnectors)
 	if conf.Connectors.Memory.Enabled {
 		connectors.memory = &conf.Connectors.Memory.AutoPrune
 	}
-
+	if conf.Connectors.Postgres.Enabled {
+		connectors.postgres = &pgxPoolCacheConnector{
+			AutoPruneConfig: &conf.Connectors.Postgres.AutoPrune,
+			client:          client,
+		}
+	}
 	return connectors, nil
 }
 
-func startCache[I, K comparable, V cache.Entry[I, K]](background context.Context, indices []I, name string, conf *cache.CacheConfig, connectors *cacheConnectors) (cache.Cache[I, K, V], error) {
+func startCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Context, indices []I, name string, conf *cache.CacheConfig, connectors *cacheConnectors) (cache.Cache[I, K, V], error) {
 	if conf == nil || conf.Connector == "" {
 		return noop.NewCache[I, K, V](), nil
 	}
@@ -61,12 +73,15 @@ func startCache[I, K comparable, V cache.Entry[I, K]](background context.Context
 		connectors.memory.StartAutoPrune(background, c, name)
 		return c, nil
 	}
-
-	/* TODO
-	if strings.EqualFold(conf.Connector, "sql") && connectors.pool != nil {
-		return ...
+	if strings.EqualFold(conf.Connector, "postgres") && connectors.postgres != nil {
+		client := connectors.postgres.client
+		c, err := pg.NewCache[I, K, V](background, name, *conf, indices, client.Pool, client.Type())
+		if err != nil {
+			return nil, fmt.Errorf("query start cache: %w", err)
+		}
+		connectors.postgres.StartAutoPrune(background, c, name)
+		return c, nil
 	}
-	*/
 
 	return nil, fmt.Errorf("cache connector %q not enabled", conf.Connector)
 }

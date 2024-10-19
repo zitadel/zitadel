@@ -109,13 +109,9 @@ func (c *mapCache[I, K, V]) Prune(ctx context.Context) error {
 func (c *mapCache[I, K, V]) Truncate(ctx context.Context) error {
 	for name, index := range c.indexMap {
 		index.Truncate()
-		c.logger.DebugContext(ctx, "map cache clear", "index", name)
+		c.logger.DebugContext(ctx, "map cache truncate", "index", name)
 	}
 	return nil
-}
-
-func (c *mapCache[I, K, V]) Close(ctx context.Context) error {
-	return ctx.Err()
 }
 
 type index[K comparable, V any] struct {

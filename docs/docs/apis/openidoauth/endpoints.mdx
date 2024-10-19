@@ -219,10 +219,11 @@ Send your `client_id` and `client_secret` as parameters in the body:
 </TabItem>
 <TabItem value="none">
 
-Send your `code_verifier` for us to recompute the `code_challenge` of the authorization request.
+Send your `client_id` and `code_verifier` for us to recompute the `code_challenge` of the authorization request.
 
 | Parameter     | Description                                                  |
 | ------------- | ------------------------------------------------------------ |
+| client_id     | client_id of the application                                 |
 | code_verifier | code_verifier previously used to generate the code_challenge |
 
 </TabItem>

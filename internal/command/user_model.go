@@ -97,6 +97,7 @@ func (wm *UserWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			user.HumanAddedType,
 			user.HumanRegisteredType,
+			user.HumanInitialCodeAddedType,
 			user.HumanInitializedCheckSucceededType,
 			user.UserIDPLinkAddedType,
 			user.UserIDPLinkRemovedType,

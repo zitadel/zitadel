@@ -61,7 +61,7 @@ func (c *Commands) OTPSMSSent(ctx context.Context, sessionID, resourceOwner stri
 }
 
 func (c *Commands) CreateOTPEmailChallengeURLTemplate(urlTmpl string) (SessionCommand, error) {
-	if err := domain.RenderOTPEmailURLTemplate(io.Discard, urlTmpl, "code", "userID", "loginName", "displayName", language.English); err != nil {
+	if err := domain.RenderOTPEmailURLTemplate(io.Discard, urlTmpl, "code", "userID", "loginName", "displayName", "sessionID", language.English); err != nil {
 		return nil, err
 	}
 	return c.createOTPEmailChallenge(false, urlTmpl, nil), nil
@@ -180,7 +180,7 @@ func CheckOTPEmail(code string) SessionCommand {
 			writeModel,
 			cmd.eventstore.FilterToQueryReducer,
 			cmd.otpAlg,
-			cmd.getCodeVerifier,
+			nil, // email currently always uses local code checks
 			succeededEvent,
 			failedEvent,
 		)

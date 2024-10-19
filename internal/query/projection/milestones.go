@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 const (
@@ -91,17 +90,6 @@ func (p *milestoneProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  project.APIConfigAddedType,
 					Reduce: p.reduceAPIConfigAdded,
-				},
-			},
-		},
-		{
-			Aggregate: user.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					// user.UserTokenAddedType is not emitted on creation of personal access tokens
-					// PATs have no effect on milestone.AuthenticationSucceededOnApplication or milestone.AuthenticationSucceededOnInstance
-					Event:  user.UserTokenAddedType,
-					Reduce: p.reduceUserTokenAdded,
 				},
 			},
 		},
@@ -191,40 +179,6 @@ func (p *milestoneProjection) reduceAPIConfigAdded(event eventstore.Event) (*han
 		return nil, err
 	}
 	return p.reduceAppConfigAdded(e, e.ClientID)
-}
-
-func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*user.UserTokenAddedEvent](event)
-	if err != nil {
-		return nil, err
-	}
-	statements := []func(eventstore.Event) handler.Exec{
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(MilestoneColumnReachedDate, event.CreatedAt()),
-			},
-			[]handler.Condition{
-				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
-				handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnInstance),
-				handler.NewIsNullCond(MilestoneColumnReachedDate),
-			},
-		),
-	}
-	// We ignore authentications without app, for example JWT profile or PAT
-	if e.ApplicationID != "" {
-		statements = append(statements, handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(MilestoneColumnReachedDate, event.CreatedAt()),
-			},
-			[]handler.Condition{
-				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
-				handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnApplication),
-				handler.Not(handler.NewTextArrayContainsCond(MilestoneColumnIgnoreClientIDs, e.ApplicationID)),
-				handler.NewIsNullCond(MilestoneColumnReachedDate),
-			},
-		))
-	}
-	return handler.NewMultiStatement(e, statements...), nil
 }
 
 func (p *milestoneProjection) reduceOIDCSessionAdded(event eventstore.Event) (*handler.Statement, error) {

@@ -181,17 +181,17 @@ func TestUser_authMethodsCheckPermission(t *testing.T) {
 }
 
 var (
-	prepareUserAuthMethodsStmt = `SELECT projections.user_auth_methods4.token_id,` +
-		` projections.user_auth_methods4.creation_date,` +
-		` projections.user_auth_methods4.change_date,` +
-		` projections.user_auth_methods4.resource_owner,` +
-		` projections.user_auth_methods4.user_id,` +
-		` projections.user_auth_methods4.sequence,` +
-		` projections.user_auth_methods4.name,` +
-		` projections.user_auth_methods4.state,` +
-		` projections.user_auth_methods4.method_type,` +
+	prepareUserAuthMethodsStmt = `SELECT projections.user_auth_methods5.token_id,` +
+		` projections.user_auth_methods5.creation_date,` +
+		` projections.user_auth_methods5.change_date,` +
+		` projections.user_auth_methods5.resource_owner,` +
+		` projections.user_auth_methods5.user_id,` +
+		` projections.user_auth_methods5.sequence,` +
+		` projections.user_auth_methods5.name,` +
+		` projections.user_auth_methods5.state,` +
+		` projections.user_auth_methods5.method_type,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.user_auth_methods4` +
+		` FROM projections.user_auth_methods5` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareUserAuthMethodsCols = []string{
 		"token_id",
@@ -210,7 +210,7 @@ var (
 		` user_idps_count.count` +
 		` FROM projections.users13` +
 		` LEFT JOIN projections.users13_notifications ON projections.users13.id = projections.users13_notifications.user_id AND projections.users13.instance_id = projections.users13_notifications.instance_id` +
-		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods4 AS auth_method_types` +
+		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods5 AS auth_method_types` +
 		` WHERE auth_method_types.state = $1) AS auth_method_types` +
 		` ON auth_method_types.user_id = projections.users13.id AND auth_method_types.instance_id = projections.users13.instance_id` +
 		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
@@ -218,6 +218,40 @@ var (
 		` ON user_idps_count.user_id = projections.users13.id AND user_idps_count.instance_id = projections.users13.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms`
 	prepareActiveAuthMethodTypesCols = []string{
+		"password_set",
+		"method_type",
+		"idps_count",
+	}
+	prepareActiveAuthMethodTypesDomainStmt = `SELECT projections.users13_notifications.password_set,` +
+		` auth_method_types.method_type,` +
+		` user_idps_count.count` +
+		` FROM projections.users13` +
+		` LEFT JOIN projections.users13_notifications ON projections.users13.id = projections.users13_notifications.user_id AND projections.users13.instance_id = projections.users13_notifications.instance_id` +
+		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods5 AS auth_method_types` +
+		` WHERE auth_method_types.state = $1 AND (auth_method_types.domain IS NULL OR auth_method_types.domain = $2 OR auth_method_types.domain = $3)) AS auth_method_types` +
+		` ON auth_method_types.user_id = projections.users13.id AND auth_method_types.instance_id = projections.users13.instance_id` +
+		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
+		` GROUP BY user_idps_count.user_id, user_idps_count.instance_id) AS user_idps_count` +
+		` ON user_idps_count.user_id = projections.users13.id AND user_idps_count.instance_id = projections.users13.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms`
+	prepareActiveAuthMethodTypesDomainCols = []string{
+		"password_set",
+		"method_type",
+		"idps_count",
+	}
+	prepareActiveAuthMethodTypesDomainExternalStmt = `SELECT projections.users13_notifications.password_set,` +
+		` auth_method_types.method_type,` +
+		` user_idps_count.count` +
+		` FROM projections.users13` +
+		` LEFT JOIN projections.users13_notifications ON projections.users13.id = projections.users13_notifications.user_id AND projections.users13.instance_id = projections.users13_notifications.instance_id` +
+		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods5 AS auth_method_types` +
+		` WHERE auth_method_types.state = $1 AND (auth_method_types.domain IS NULL OR auth_method_types.domain = $2)) AS auth_method_types` +
+		` ON auth_method_types.user_id = projections.users13.id AND auth_method_types.instance_id = projections.users13.instance_id` +
+		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
+		` GROUP BY user_idps_count.user_id, user_idps_count.instance_id) AS user_idps_count` +
+		` ON user_idps_count.user_id = projections.users13.id AND user_idps_count.instance_id = projections.users13.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms`
+	prepareActiveAuthMethodTypesDomainExternalCols = []string{
 		"password_set",
 		"method_type",
 		"idps_count",
@@ -384,7 +418,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		{
 			name: "prepareUserAuthMethodTypesQuery no result",
 			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
-				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true)
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true, true, "")
 				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
@@ -401,7 +435,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		{
 			name: "prepareUserAuthMethodTypesQuery one second factor",
 			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
-				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true)
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true, true, "")
 				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
@@ -431,9 +465,73 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			},
 		},
 		{
+			name: "prepareUserAuthMethodTypesQuery one second factor with domain",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true, true, "example.com")
+				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+					return scan(rows)
+				}
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(prepareActiveAuthMethodTypesDomainStmt),
+					prepareActiveAuthMethodTypesDomainCols,
+					[][]driver.Value{
+						{
+							true,
+							domain.UserAuthMethodTypePasswordless,
+							1,
+						},
+					},
+				),
+			},
+			object: &AuthMethodTypes{
+				SearchResponse: SearchResponse{
+					Count: 3,
+				},
+				AuthMethodTypes: []domain.UserAuthMethodType{
+					domain.UserAuthMethodTypePasswordless,
+					domain.UserAuthMethodTypePassword,
+					domain.UserAuthMethodTypeIDP,
+				},
+			},
+		},
+		{
+			name: "prepareUserAuthMethodTypesQuery one second factor with domain external",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true, false, "example.com")
+				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+					return scan(rows)
+				}
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(prepareActiveAuthMethodTypesDomainExternalStmt),
+					prepareActiveAuthMethodTypesDomainExternalCols,
+					[][]driver.Value{
+						{
+							true,
+							domain.UserAuthMethodTypePasswordless,
+							1,
+						},
+					},
+				),
+			},
+			object: &AuthMethodTypes{
+				SearchResponse: SearchResponse{
+					Count: 3,
+				},
+				AuthMethodTypes: []domain.UserAuthMethodType{
+					domain.UserAuthMethodTypePasswordless,
+					domain.UserAuthMethodTypePassword,
+					domain.UserAuthMethodTypeIDP,
+				},
+			},
+		},
+		{
 			name: "prepareUserAuthMethodTypesQuery multiple second factors",
 			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
-				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true)
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true, true, "")
 				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}
@@ -469,9 +567,85 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			},
 		},
 		{
+			name: "prepareUserAuthMethodTypesQuery multiple second factors domain",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true, true, "example.com")
+				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+					return scan(rows)
+				}
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(prepareActiveAuthMethodTypesDomainStmt),
+					prepareActiveAuthMethodTypesDomainCols,
+					[][]driver.Value{
+						{
+							true,
+							domain.UserAuthMethodTypePasswordless,
+							1,
+						},
+						{
+							true,
+							domain.UserAuthMethodTypeTOTP,
+							1,
+						},
+					},
+				),
+			},
+			object: &AuthMethodTypes{
+				SearchResponse: SearchResponse{
+					Count: 4,
+				},
+				AuthMethodTypes: []domain.UserAuthMethodType{
+					domain.UserAuthMethodTypePasswordless,
+					domain.UserAuthMethodTypeTOTP,
+					domain.UserAuthMethodTypePassword,
+					domain.UserAuthMethodTypeIDP,
+				},
+			},
+		},
+		{
+			name: "prepareUserAuthMethodTypesQuery multiple second factors domain external",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true, false, "example.com")
+				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+					return scan(rows)
+				}
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(prepareActiveAuthMethodTypesDomainExternalStmt),
+					prepareActiveAuthMethodTypesDomainExternalCols,
+					[][]driver.Value{
+						{
+							true,
+							domain.UserAuthMethodTypePasswordless,
+							1,
+						},
+						{
+							true,
+							domain.UserAuthMethodTypeTOTP,
+							1,
+						},
+					},
+				),
+			},
+			object: &AuthMethodTypes{
+				SearchResponse: SearchResponse{
+					Count: 4,
+				},
+				AuthMethodTypes: []domain.UserAuthMethodType{
+					domain.UserAuthMethodTypePasswordless,
+					domain.UserAuthMethodTypeTOTP,
+					domain.UserAuthMethodTypePassword,
+					domain.UserAuthMethodTypeIDP,
+				},
+			},
+		},
+		{
 			name: "prepareUserAuthMethodTypesQuery sql err",
 			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
-				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true)
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true, true, "")
 				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
 					return scan(rows)
 				}

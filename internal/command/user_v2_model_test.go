@@ -1494,6 +1494,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 								domain.NotificationTypeEmail,
 								"",
 								false,
+								"",
 							),
 						),
 					),
@@ -1556,6 +1557,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 								domain.NotificationTypeEmail,
 								"",
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
