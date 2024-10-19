@@ -92,9 +92,8 @@ func (c *Commands) MilestonePushed(
 	instanceID string,
 	msType milestone.Type,
 	endpoints []string,
-	primaryDomain string,
 ) error {
-	_, err := c.eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewInstanceAggregate(instanceID), msType, endpoints, c.externalDomain, primaryDomain))
+	_, err := c.eventstore.Push(ctx, milestone.NewPushedEvent(ctx, milestone.NewInstanceAggregate(instanceID), msType, endpoints, c.externalDomain))
 	return err
 }
 

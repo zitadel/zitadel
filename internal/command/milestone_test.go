@@ -228,11 +228,10 @@ func TestCommands_MilestonePushed(t *testing.T) {
 		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		instanceID    string
-		msType        milestone.Type
-		endpoints     []string
-		primaryDomain string
+		ctx        context.Context
+		instanceID string
+		msType     milestone.Type
+		endpoints  []string
 	}
 	tests := []struct {
 		name    string
@@ -251,17 +250,15 @@ func TestCommands_MilestonePushed(t *testing.T) {
 							milestone.ApplicationCreated,
 							[]string{"foo.com", "bar.com"},
 							"example.com",
-							"zitadel.com",
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				instanceID:    "instanceID",
-				msType:        milestone.ApplicationCreated,
-				endpoints:     []string{"foo.com", "bar.com"},
-				primaryDomain: "zitadel.com",
+				ctx:        context.Background(),
+				instanceID: "instanceID",
+				msType:     milestone.ApplicationCreated,
+				endpoints:  []string{"foo.com", "bar.com"},
 			},
 			wantErr: nil,
 		},
@@ -277,17 +274,15 @@ func TestCommands_MilestonePushed(t *testing.T) {
 							milestone.ApplicationCreated,
 							[]string{"foo.com", "bar.com"},
 							"example.com",
-							"zitadel.com",
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
-				instanceID:    "instanceID",
-				msType:        milestone.ApplicationCreated,
-				endpoints:     []string{"foo.com", "bar.com"},
-				primaryDomain: "zitadel.com",
+				ctx:        context.Background(),
+				instanceID: "instanceID",
+				msType:     milestone.ApplicationCreated,
+				endpoints:  []string{"foo.com", "bar.com"},
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -298,7 +293,7 @@ func TestCommands_MilestonePushed(t *testing.T) {
 				eventstore:     tt.fields.eventstore(t),
 				externalDomain: "example.com",
 			}
-			err := c.MilestonePushed(tt.args.ctx, tt.args.instanceID, tt.args.msType, tt.args.endpoints, tt.args.primaryDomain)
+			err := c.MilestonePushed(tt.args.ctx, tt.args.instanceID, tt.args.msType, tt.args.endpoints)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}

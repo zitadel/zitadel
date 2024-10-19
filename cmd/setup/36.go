@@ -32,7 +32,6 @@ type instanceMilestone struct {
 	Type    milestone.Type
 	Reached time.Time
 	Pushed  *time.Time
-	Domain  string
 }
 
 func (mig *FillV2Milestones) Execute(ctx context.Context, _ eventstore.Event) error {
@@ -49,7 +48,6 @@ func (mig *FillV2Milestones) getProjectedMilestones(ctx context.Context) (map[st
 		Type       milestone.Type
 		Reached    time.Time
 		Pushed     *time.Time
-		Domain     string
 	}
 
 	rows, _ := mig.dbClient.Pool.Query(ctx, getProjectedMilestones)
@@ -68,7 +66,6 @@ func (mig *FillV2Milestones) getProjectedMilestones(ctx context.Context) (map[st
 			Type:    s.Type,
 			Reached: s.Reached,
 			Pushed:  s.Pushed,
-			Domain:  s.Domain,
 		})
 	}
 	return milestoneMap, nil
@@ -105,7 +102,7 @@ func (mig *FillV2Milestones) pushEventsByInstance(ctx context.Context, milestone
 		for _, m := range milestoneMap[instanceID] {
 			cmds = append(cmds, milestone.NewReachedEventWithDate(ctx, aggregate, m.Type, &m.Reached))
 			if m.Pushed != nil {
-				cmds = append(cmds, milestone.NewPushedEventWithDate(ctx, aggregate, m.Type, nil, "", m.Domain, m.Pushed))
+				cmds = append(cmds, milestone.NewPushedEventWithDate(ctx, aggregate, m.Type, nil, "", m.Pushed))
 			}
 		}
 

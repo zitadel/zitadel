@@ -44,6 +44,13 @@ func (e *ReachedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	e.BaseEvent = b
 }
 
+func (e *ReachedEvent) GetReachedDate() time.Time {
+	if e.ReachedDate != nil {
+		return *e.ReachedDate
+	}
+	return e.Creation
+}
+
 func NewReachedEvent(
 	ctx context.Context,
 	aggregate *Aggregate,
@@ -92,14 +99,21 @@ func (p *PushedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 	p.BaseEvent = b
 }
 
+func (e *PushedEvent) GetPushedDate() time.Time {
+	if e.PushedDate != nil {
+		return *e.PushedDate
+	}
+	return e.Creation
+}
+
 func NewPushedEvent(
 	ctx context.Context,
 	aggregate *Aggregate,
 	typ Type,
 	endpoints []string,
-	externalDomain, primaryDomain string,
+	externalDomain string,
 ) *PushedEvent {
-	return NewPushedEventWithDate(ctx, aggregate, typ, endpoints, externalDomain, primaryDomain, nil)
+	return NewPushedEventWithDate(ctx, aggregate, typ, endpoints, externalDomain, nil)
 }
 
 // NewPushedEventWithDate creates a [PushedEvent] with a fixed Pushed Date.
@@ -108,7 +122,7 @@ func NewPushedEventWithDate(
 	aggregate *Aggregate,
 	typ Type,
 	endpoints []string,
-	externalDomain, primaryDomain string,
+	externalDomain string,
 	pushedDate *time.Time,
 ) *PushedEvent {
 	return &PushedEvent{
@@ -120,7 +134,6 @@ func NewPushedEventWithDate(
 		MilestoneType:  typ,
 		Endpoints:      endpoints,
 		ExternalDomain: externalDomain,
-		PrimaryDomain:  primaryDomain,
 		PushedDate:     pushedDate,
 	}
 }
