@@ -103,9 +103,9 @@ func (mig *FillV2Milestones) pushEventsByInstance(ctx context.Context, milestone
 
 		cmds := make([]eventstore.Command, 0, len(milestoneMap[instanceID])*2)
 		for _, m := range milestoneMap[instanceID] {
-			cmds = append(cmds, milestone.NewReachedEvent(ctx, aggregate, m.Type, m.Reached))
+			cmds = append(cmds, milestone.NewReachedEventWithDate(ctx, aggregate, m.Type, &m.Reached))
 			if m.Pushed != nil {
-				cmds = append(cmds, milestone.NewPushedEvent(ctx, aggregate, m.Type, *m.Pushed, nil, "", m.Domain))
+				cmds = append(cmds, milestone.NewPushedEventWithDate(ctx, aggregate, m.Type, nil, "", m.Domain, m.Pushed))
 			}
 		}
 

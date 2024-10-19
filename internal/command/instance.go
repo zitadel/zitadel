@@ -292,7 +292,7 @@ func setUpInstance(ctx context.Context, c *Commands, setup *InstanceSetup) (vali
 	setupFeatures(&validations, setup.Features, setup.zitadel.instanceID)
 	setupLimits(c, &validations, limits.NewAggregate(setup.zitadel.limitsID, setup.zitadel.instanceID), setup.Limits)
 	setupRestrictions(c, &validations, restrictions.NewAggregate(setup.zitadel.restrictionsID, setup.zitadel.instanceID, setup.zitadel.instanceID), setup.Restrictions)
-	setupInstanceCreatedMilestone(&validations, setup.zitadel.instanceID, time.Now())
+	setupInstanceCreatedMilestone(&validations, setup.zitadel.instanceID)
 	return validations, pat, machineKey, nil
 }
 
@@ -895,7 +895,7 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.Objec
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, c.instanceRemovedMilestone(ctx, id, time.Now())
+	}, c.instanceRemovedMilestone(ctx, id)
 }
 
 func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {

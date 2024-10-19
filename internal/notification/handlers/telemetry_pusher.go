@@ -146,5 +146,5 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 			return err
 		}
 	}
-	return t.commands.MilestonePushed(ctx, ms.InstanceID, ms.Type, time.Now(), t.cfg.Endpoints, ms.PrimaryDomain)
+	return t.commands.MilestonePushed(ctx, ms.InstanceID, ms.Type, t.cfg.Endpoints, ms.PrimaryDomain)
 }

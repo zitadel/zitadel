@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
@@ -23,5 +22,5 @@ type Commands interface {
 	HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) error
 	InviteCodeSent(ctx context.Context, orgID, userID string) error
 	UsageNotificationSent(ctx context.Context, dueEvent *quota.NotificationDueEvent) error
-	MilestonePushed(ctx context.Context, instanceID string, msType milestone.Type, pushedDate time.Time, endpoints []string, primaryDomain string) error
+	MilestonePushed(ctx context.Context, instanceID string, msType milestone.Type, endpoints []string, primaryDomain string) error
 }

@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/zitadel/logging"
 
@@ -39,7 +38,7 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 	if err != nil {
 		return nil, err
 	}
-	return project, c.projectCreatedMilestone(ctx, time.Now())
+	return project, c.projectCreatedMilestone(ctx)
 }
 
 func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
@@ -62,7 +61,7 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 	if err != nil {
 		return nil, err
 	}
-	return project, c.projectCreatedMilestone(ctx, time.Now())
+	return project, c.projectCreatedMilestone(ctx)
 }
 
 func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
@@ -15,6 +16,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
+	now := time.Now()
 	date, err := time.Parse(time.RFC3339, "2006-01-02T15:04:05Z")
 	require.NoError(t, err)
 	tests := []struct {
@@ -29,8 +31,38 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(timedTestEvent(
 					milestone.ReachedEventType,
 					milestone.AggregateType,
+					[]byte(`{"type": "instance_created"}`),
+					now,
+					withVersion(milestone.AggregateVersion),
+				), milestone.ReachedEventMapper),
+			},
+			reduce: (&milestoneProjection{}).reduceReached,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("milestone"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.milestones2 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								milestone.InstanceCreated,
+								now,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceInstanceAdded with reached date",
+			args: args{
+				event: getEvent(timedTestEvent(
+					milestone.ReachedEventType,
+					milestone.AggregateType,
 					[]byte(`{"type": "instance_created", "reachedDate":"2006-01-02T15:04:05Z"}`),
-					time.Now(),
+					now,
+					withVersion(milestone.AggregateVersion),
 				), milestone.ReachedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reduceReached,
@@ -57,8 +89,38 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(timedTestEvent(
 					milestone.PushedEventType,
 					milestone.AggregateType,
+					[]byte(`{"type": "project_created"}`),
+					now,
+					withVersion(milestone.AggregateVersion),
+				), milestone.PushedEventMapper),
+			},
+			reduce: (&milestoneProjection{}).reducePushed,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("milestone"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.milestones2 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
+							expectedArgs: []interface{}{
+								now,
+								"instance-id",
+								milestone.ProjectCreated,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceMilestonePushed normal milestone with pushed date",
+			args: args{
+				event: getEvent(timedTestEvent(
+					milestone.PushedEventType,
+					milestone.AggregateType,
 					[]byte(`{"type": "project_created", "pushedDate":"2006-01-02T15:04:05Z"}`),
-					time.Now(),
+					now,
+					withVersion(milestone.AggregateVersion),
 				), milestone.PushedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reducePushed,
@@ -86,6 +148,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					milestone.PushedEventType,
 					milestone.AggregateType,
 					[]byte(`{"type": "instance_deleted"}`),
+					withVersion(milestone.AggregateVersion),
 				), milestone.PushedEventMapper),
 			},
 			reduce: (&milestoneProjection{}).reducePushed,
