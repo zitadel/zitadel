@@ -96,7 +96,7 @@ func TestServer_SetSystemFeatures(t *testing.T) {
 			})
 			got, err := Client.SetSystemFeatures(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -137,7 +137,7 @@ func TestServer_ResetSystemFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.ResetSystemFeatures(tt.ctx, &feature.ResetSystemFeaturesRequest{})
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -211,7 +211,7 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			}
 			got, err := Client.GetSystemFeatures(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -278,7 +278,7 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 			})
 			got, err := Client.SetInstanceFeatures(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -319,7 +319,7 @@ func TestServer_ResetInstanceFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.ResetInstanceFeatures(tt.ctx, &feature.ResetInstanceFeaturesRequest{})
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -480,7 +480,7 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			}
 			got, err := Client.GetInstanceFeatures(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)

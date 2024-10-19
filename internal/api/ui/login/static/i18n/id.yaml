@@ -233,6 +233,7 @@ RegistrationUser:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Jenis kelamin
   Female: Perempuan
   Male: Pria
@@ -342,6 +343,7 @@ ExternalNotFound:
   Dutch: Nederlands
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
   Title: Otorisasi Perangkat
   UserCode:

@@ -785,9 +785,12 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// the user was either not found or not active
 	// so check if the loginname suffix matches a verified org domain
-	ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginNameInput)
-	if errDomainDiscovery != nil || ok {
-		return errDomainDiscovery
+	// but only if no org was requested (by id or domain)
+	if request.RequestedOrgID == "" {
+		ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginNameInput)
+		if errDomainDiscovery != nil || ok {
+			return errDomainDiscovery
+		}
 	}
 	// let's once again check if the user was just inactive
 	if user != nil && user.State == int32(domain.UserStateInactive) {

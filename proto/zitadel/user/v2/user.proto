@@ -286,6 +286,8 @@ enum AuthFactorState {
 message SendInviteCode {
   // Optionally set a url_template, which will be used in the invite mail sent by ZITADEL to guide the user to your invitation page.
   // If no template is set, the default ZITADEL url will be used.
+  //
+  // The following placeholders can be used: UserID, OrgID, Code
   optional string url_template = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

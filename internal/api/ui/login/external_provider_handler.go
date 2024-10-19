@@ -525,12 +525,7 @@ func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *do
 //   - creation by user
 //   - linking to existing user
 func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) {
-	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		resourceOwner = authReq.RequestedOrgID
-	}
-
+	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	orgIAMPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
@@ -587,35 +582,21 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	if orgIAMPolicy == nil {
-		resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-		if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-			resourceOwner = authReq.RequestedOrgID
-		}
-
 		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return
 		}
-
 	}
 
 	if human == nil || idpLink == nil {
-
 		// TODO (LS): how do we get multiple and why do we use the last of them (taken as is)?
 		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
 		human, idpLink, _ = mapExternalUserToLoginUser(linkingUser, orgIAMPolicy.UserLoginMustBeDomain)
 	}
 
-	var resourceOwner string
-	if authReq != nil {
-		resourceOwner = authReq.RequestedOrgID
-	}
-	if resourceOwner == "" {
-		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
-	}
 	labelPolicy, err := l.getLabelPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -718,11 +699,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 //
 // it is called from either the [autoCreateExternalUser] or [handleExternalNotFoundOptionCheck]
 func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) {
-	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
-		resourceOwner = authReq.RequestedOrgID
-	}
+	resourceOwner := determineResourceOwner(r.Context(), authReq)
 
 	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {

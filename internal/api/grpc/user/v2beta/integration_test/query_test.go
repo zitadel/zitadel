@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -28,7 +29,9 @@ func detailsV2ToV2beta(obj *object.Details) *object_v2beta.Details {
 }
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	t.Parallel()
+
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest
@@ -160,23 +163,19 @@ func TestServer_GetUserByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			username := fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())
+			username := gofakeit.Email()
 			userAttr, err := tt.args.dep(tt.args.ctx, username, tt.args.req)
 			require.NoError(t, err)
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, getErr := Client.GetUserByID(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, getErr)
-				if getErr != nil {
+					require.Error(t, err)
 					return
 				}
+				require.NoError(t, err)
+
 				tt.want.User.Details = detailsV2ToV2beta(userAttr.Details)
 				tt.want.User.UserId = userAttr.UserID
 				tt.want.User.Username = userAttr.Username
@@ -190,15 +189,17 @@ func TestServer_GetUserByID(t *testing.T) {
 				}
 				assert.Equal(ttt, tt.want.User, got.User)
 				integration.AssertDetails(t, tt.want, got)
-			}, retryDuration, time.Second)
+			}, retryDuration, tick)
 		})
 	}
 }
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
+	t.Parallel()
+
 	timeNow := time.Now().UTC()
-	newOrgOwnerEmail := fmt.Sprintf("%d@permission.get.com", timeNow.UnixNano())
-	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrgOwnerEmail := gofakeit.Email()
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -309,11 +310,14 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					require.Error(ttt, err)
+					return
+				}
+				require.NoError(ttt, err)
 				tt.want.User.UserId = tt.args.req.GetUserId()
 				tt.want.User.Username = newOrgOwnerEmail
 				tt.want.User.PreferredLoginName = newOrgOwnerEmail
@@ -324,8 +328,8 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 				// details tested in GetUserByID
 				tt.want.User.Details = got.User.GetDetails()
 
-				assert.Equal(t, tt.want.User, got.User)
-			}
+				assert.Equal(ttt, tt.want.User, got.User)
+			}, retryDuration, tick, "timeout waiting for expected user result")
 		})
 	}
 }
@@ -338,8 +342,10 @@ type userAttr struct {
 }
 
 func TestServer_ListUsers(t *testing.T) {
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-	userResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listusers.com", time.Now().UnixNano()))
+	t.Parallel()
+
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
+	userResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email())
 	type args struct {
 		ctx   context.Context
 		count int
@@ -809,7 +815,7 @@ func TestServer_ListUsers(t *testing.T) {
 				3,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
-					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner-%s", gofakeit.AppName()), gofakeit.Email())
 
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
@@ -900,28 +906,24 @@ func TestServer_ListUsers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			usernames := make([]string, tt.args.count)
 			for i := 0; i < tt.args.count; i++ {
-				usernames[i] = fmt.Sprintf("%d%d@mouse.com", time.Now().UnixNano(), i)
+				usernames[i] = gofakeit.Email()
 			}
 			infos, err := tt.args.dep(tt.args.ctx, usernames, tt.args.req)
 			require.NoError(t, err)
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Client.ListUsers(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.ListUsers(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, listErr)
-				if listErr != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
+
 				// always only give back dependency infos which are required for the response
-				assert.Len(ttt, tt.want.Result, len(infos))
+				require.Len(ttt, tt.want.Result, len(infos))
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
+				require.Len(ttt, got.Result, len(tt.want.Result))
 				// fill in userid and username as it is generated
 
 				// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
@@ -943,8 +945,8 @@ func TestServer_ListUsers(t *testing.T) {
 				for i := range tt.want.Result {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
-				integration.AssertListDetails(t, tt.want, got)
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user result")
+				integration.AssertListDetails(ttt, tt.want, got)
+			}, retryDuration, tick, "timeout waiting for expected user result")
 		})
 	}
 }
