@@ -49,7 +49,7 @@ func (c *Client) GetID() string {
 }
 
 func (c *Client) LoginURL(id string) string {
-	if strings.HasPrefix(id, command.IDPrefixV2) {
+	if command.HasIDPrefixV2(id) {
 		return c.defaultLoginURLV2 + id
 	}
 	return c.defaultLoginURL + id
