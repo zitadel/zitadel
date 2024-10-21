@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert } from "@/components/alert";
-import { resendVerifyEmail, verifyUser } from "@/lib/server/email";
+import { resendVerification, verifyUser } from "@/lib/server/email";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
@@ -49,7 +49,7 @@ export function VerifyEmailForm({
 
   const [authMethods, setAuthMethods] = useState<
     AuthenticationMethodType[] | null
-  >(null);
+  >([]);
 
   useEffect(() => {
     if (code && userId) {
@@ -82,10 +82,14 @@ export function VerifyEmailForm({
 
   async function resendCode() {
     setLoading(true);
-    const response = await resendVerifyEmail({
+
+    const response = await resendVerification({
       userId,
+      isInvite: isInvite,
     }).catch(() => {
       setError("Could not resend email");
+      setLoading(false);
+      return;
     });
 
     setLoading(false);
@@ -94,12 +98,15 @@ export function VerifyEmailForm({
 
   async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     setLoading(true);
+
+    console.log("verifyUser", value.code, userId, isInvite);
     const verifyResponse = await verifyUser({
       code: value.code,
       userId,
       isInvite: isInvite,
     }).catch(() => {
       setError("Could not verify email");
+      return;
     });
 
     setLoading(false);
@@ -111,8 +118,10 @@ export function VerifyEmailForm({
 
     if (verifyResponse.authMethodTypes) {
       setAuthMethods(verifyResponse.authMethodTypes);
+      return;
     }
 
+    // if auth methods fall trough, we complete to login
     const params = new URLSearchParams({});
 
     if (organization) {

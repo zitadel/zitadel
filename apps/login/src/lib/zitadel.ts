@@ -281,7 +281,13 @@ export async function addHumanUser({
   organization,
 }: AddHumanUserData) {
   return userService.addHumanUser({
-    email: { email },
+    email: {
+      email,
+      verification: {
+        case: "isVerified",
+        value: false,
+      },
+    },
     username: email,
     profile: { givenName: firstName, familyName: lastName },
     organization: organization
@@ -309,6 +315,7 @@ export async function verifyInviteCode(
 }
 
 export async function resendInviteCode(userId: string) {
+  console.log("resetInit");
   return userService.resendInviteCode({ userId }, {});
 }
 

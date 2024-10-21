@@ -3,6 +3,7 @@
 import {
   listAuthenticationMethodTypes,
   resendEmailCode,
+  resendInviteCode,
   verifyEmail,
   verifyInviteCode,
 } from "@/lib/zitadel";
@@ -35,8 +36,11 @@ export async function verifyUser(command: VerifyUserByEmailCommand) {
 
 type resendVerifyEmailCommand = {
   userId: string;
+  isInvite: boolean;
 };
 
-export async function resendVerifyEmail(command: resendVerifyEmailCommand) {
-  return resendEmailCode(command.userId);
+export async function resendVerification(command: resendVerifyEmailCommand) {
+  return command.isInvite
+    ? resendEmailCode(command.userId)
+    : resendInviteCode(command.userId);
 }
