@@ -173,7 +173,7 @@ In case the hashes can't be transferred directly, you always have the option to 
 If your legacy system receives the passwords in clear text (eg, login form) you could also directly create users via ZITADEL API.
 We will explain this pattern in more detail in this guide.
 
-### One-time-passwords (OTP)
+### One-time passwords (OTP)
 
 You can pass the OTP secret when creating users:
 

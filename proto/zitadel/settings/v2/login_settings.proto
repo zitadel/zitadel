@@ -70,7 +70,7 @@ message LoginSettings {
   ];
   google.protobuf.Duration second_factor_check_lifetime = 12 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Defines after how long the second-factor check is valid.";
+      description: "Defines after how long the second factor check is valid.";
       example: "\"64800s\"";
     }
   ];

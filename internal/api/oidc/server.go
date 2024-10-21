@@ -46,7 +46,7 @@ type Server struct {
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
-	// some defaults. The new Server will disable enpoints that are nil.
+	// some defaults. The new Server will disable endpoints that are nil.
 	endpoints := op.Endpoints{
 		Authorization:       op.NewEndpoint("/oauth/v2/authorize"),
 		Token:               op.NewEndpoint("/oauth/v2/token"),
