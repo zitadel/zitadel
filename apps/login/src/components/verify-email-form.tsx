@@ -1,12 +1,14 @@
 "use client";
 
 import { Alert } from "@/components/alert";
-import { resendVerifyEmail, verifyUserByEmail } from "@/lib/server/email";
+import { resendVerifyEmail, verifyUser } from "@/lib/server/email";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { PASSKEYS, PASSWORD } from "./auth-methods";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
@@ -19,22 +21,22 @@ type Props = {
   userId: string;
   loginName: string;
   code: string;
-  submit: boolean;
   organization?: string;
   authRequestId?: string;
   sessionId?: string;
   loginSettings?: LoginSettings;
+  isInvite: boolean;
 };
 
 export function VerifyEmailForm({
   userId,
   loginName,
   code,
-  submit,
   organization,
   authRequestId,
   sessionId,
   loginSettings,
+  isInvite,
 }: Props) {
   const t = useTranslations("verify");
 
@@ -45,8 +47,12 @@ export function VerifyEmailForm({
     },
   });
 
+  const [authMethods, setAuthMethods] = useState<
+    AuthenticationMethodType[] | null
+  >(null);
+
   useEffect(() => {
-    if (submit && code && userId) {
+    if (code && userId) {
       // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
       // For programmatic verification, the /verifyemail API should be used.
       submitCodeAndContinue({ code });
@@ -58,6 +64,21 @@ export function VerifyEmailForm({
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+
+  const params = new URLSearchParams({});
+
+  if (loginName) {
+    params.append("loginName", loginName);
+  }
+  if (sessionId) {
+    params.append("sessionId", sessionId);
+  }
+  if (authRequestId) {
+    params.append("authRequestId", authRequestId);
+  }
+  if (organization) {
+    params.append("organization", organization);
+  }
 
   async function resendCode() {
     setLoading(true);
@@ -73,9 +94,10 @@ export function VerifyEmailForm({
 
   async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     setLoading(true);
-    const verifyResponse = await verifyUserByEmail({
+    const verifyResponse = await verifyUser({
       code: value.code,
       userId,
+      isInvite: isInvite,
     }).catch(() => {
       setError("Could not verify email");
     });
@@ -85,6 +107,10 @@ export function VerifyEmailForm({
     if (!verifyResponse) {
       setError("Could not verify email");
       return;
+    }
+
+    if (verifyResponse.authMethodTypes) {
+      setAuthMethods(verifyResponse.authMethodTypes);
     }
 
     const params = new URLSearchParams({});
@@ -102,7 +128,7 @@ export function VerifyEmailForm({
     }
   }
 
-  return (
+  return !authMethods ? (
     <form className="w-full">
       <div className="">
         <TextInput
@@ -141,5 +167,12 @@ export function VerifyEmailForm({
         </Button>
       </div>
     </form>
+  ) : (
+    <div className="grid grid-cols-1 gap-5 w-full pt-4">
+      {!authMethods.includes(AuthenticationMethodType.PASSWORD) &&
+        PASSWORD(false, "/password/set?" + params)}
+      {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
+        PASSKEYS(false, "/passkeys/set?" + params)}
+    </div>
   );
 }

@@ -320,7 +320,7 @@ export async function createInviteCode(userId: string, host: string | null) {
   if (host) {
     medium = {
       ...medium,
-      urlTemplate: `https://${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
+      urlTemplate: `https://${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
     };
   }
 
