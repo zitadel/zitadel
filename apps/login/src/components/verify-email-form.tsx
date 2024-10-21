@@ -49,7 +49,7 @@ export function VerifyEmailForm({
 
   const [authMethods, setAuthMethods] = useState<
     AuthenticationMethodType[] | null
-  >([]);
+  >(null);
 
   useEffect(() => {
     if (code && userId) {
@@ -99,7 +99,6 @@ export function VerifyEmailForm({
   async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     setLoading(true);
 
-    console.log("verifyUser", value.code, userId, isInvite);
     const verifyResponse = await verifyUser({
       code: value.code,
       userId,
