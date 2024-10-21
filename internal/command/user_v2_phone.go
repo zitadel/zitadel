@@ -82,10 +82,8 @@ func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, pho
 	if err != nil {
 		return nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if err = cmd.Change(ctx, domain.PhoneNumber(phone)); err != nil {
 		return nil, err
@@ -104,10 +102,8 @@ func (c *Commands) resendUserPhoneCodeWithGenerator(ctx context.Context, userID 
 	if err != nil {
 		return nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if cmd.model.Code == nil && cmd.model.GeneratorID == "" {
 		return nil, zerrors.ThrowPreconditionFailed(err, "PHONE-5xrra88eq8", "Errors.User.Code.Empty")
