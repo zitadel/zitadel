@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -44,7 +45,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				project:       &domain.Project{},
 				resourceOwner: "org1",
 			},
@@ -60,7 +61,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				project: &domain.Project{
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
@@ -121,7 +122,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				project: &domain.Project{
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
@@ -159,7 +160,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				project: &domain.Project{
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
@@ -187,11 +188,12 @@ func TestCommandSide_AddProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner, tt.args.ownerID)
+			c.setMilestonesCompletedForTest("instanceID")
+			got, err := c.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner, tt.args.ownerID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

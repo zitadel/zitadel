@@ -114,7 +114,15 @@ func WithConsole(ctx context.Context, projectID, appID string) context.Context {
 
 	i.projectID = projectID
 	i.appID = appID
-	//i.clientID = clientID
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithConsoleClientID(ctx context.Context, clientID string) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+	i.clientID = clientID
 	return context.WithValue(ctx, instanceKey, i)
 }
 

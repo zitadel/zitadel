@@ -118,8 +118,10 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		}
 	}
 	cmd.SetAuthRequestSuccessful(ctx, authReqModel.aggregate)
-	session, err = cmd.PushEvents(ctx)
-	return session, authReqModel.State, err
+	if session, err = cmd.PushEvents(ctx); err != nil {
+		return nil, "", err
+	}
+	return session, authReqModel.State, c.oidcSessionMilestones(ctx, authReqModel.ClientID, true)
 }
 
 func (c *Commands) CreateOIDCSession(ctx context.Context,
@@ -161,7 +163,10 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 			return nil, err
 		}
 	}
-	return cmd.PushEvents(ctx)
+	if session, err = cmd.PushEvents(ctx); err != nil {
+		return nil, err
+	}
+	return session, c.oidcSessionMilestones(ctx, clientID, sessionID != "")
 }
 
 type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string) (scope []string, err error)
