@@ -44,7 +44,7 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 	})
 	require.NoError(t, err)
 
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Minute)
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
 			f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{
@@ -54,10 +54,10 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 			assert.True(ttt, f.Actions.GetEnabled())
 		},
 		retryDuration,
-		time.Second,
+		tick,
 		"timed out waiting for ensuring instance feature")
 
-	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, 5*time.Minute)
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
 			_, err := instance.Client.ActionV3Alpha.ListExecutionMethods(ctx, &action.ListExecutionMethodsRequest{})

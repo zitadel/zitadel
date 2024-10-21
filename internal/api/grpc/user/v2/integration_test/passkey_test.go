@@ -593,9 +593,10 @@ func TestServer_ListPasskeys(t *testing.T) {
 				}
 				require.NoError(ttt, err)
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
-				for i := range tt.want.Result {
-					assert.Contains(ttt, got.Result, tt.want.Result[i])
+				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
+					for i := range tt.want.Result {
+						assert.Contains(ttt, got.Result, tt.want.Result[i])
+					}
 				}
 				integration.AssertListDetails(ttt, tt.want, got)
 			}, retryDuration, tick, "timeout waiting for expected idplinks result")
