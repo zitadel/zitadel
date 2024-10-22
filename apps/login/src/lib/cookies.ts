@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
 // TODO: improve this to handle overflow
-export const MAX_COOKIE_SIZE = 4096;
+const MAX_COOKIE_SIZE = 2048;
 
 export type Cookie = {
   id: string;
@@ -61,7 +61,8 @@ export async function addSessionToCookie<T>(
   } else {
     const temp = [...currentSessions, session];
 
-    if (temp.length > MAX_COOKIE_SIZE) {
+    if (JSON.stringify(temp).length >= MAX_COOKIE_SIZE) {
+      console.log("WARNING COOKIE OVERFLOW");
       // TODO: improve cookie handling
       // this replaces the first session (oldest) with the new one
       currentSessions = [session].concat(currentSessions.slice(1));
