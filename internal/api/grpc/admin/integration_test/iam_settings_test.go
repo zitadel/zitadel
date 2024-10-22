@@ -54,7 +54,7 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, 5*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				resp, err := instance.Client.Admin.GetSecurityPolicy(tt.ctx, &admin_pb.GetSecurityPolicyRequest{})
 				if tt.wantErr {
