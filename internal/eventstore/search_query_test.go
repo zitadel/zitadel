@@ -116,10 +116,10 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 		{
 			name: "set columns",
 			args: args{
-				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetColumns(ColumnsMaxPosition)},
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{testSetColumns(ColumnsMaxSequence)},
 			},
 			res: &SearchQueryBuilder{
-				columns: ColumnsMaxPosition,
+				columns: ColumnsMaxSequence,
 			},
 		},
 		{

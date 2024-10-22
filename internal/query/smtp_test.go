@@ -14,26 +14,26 @@ import (
 )
 
 var (
-	prepareSMTPConfigStmt = `SELECT projections.smtp_configs4.creation_date,` +
-		` projections.smtp_configs4.change_date,` +
-		` projections.smtp_configs4.resource_owner,` +
-		` projections.smtp_configs4.sequence,` +
-		` projections.smtp_configs4.id,` +
-		` projections.smtp_configs4.state,` +
-		` projections.smtp_configs4.description,` +
-		` projections.smtp_configs4_smtp.id,` +
-		` projections.smtp_configs4_smtp.tls,` +
-		` projections.smtp_configs4_smtp.sender_address,` +
-		` projections.smtp_configs4_smtp.sender_name,` +
-		` projections.smtp_configs4_smtp.reply_to_address,` +
-		` projections.smtp_configs4_smtp.host,` +
-		` projections.smtp_configs4_smtp.username,` +
-		` projections.smtp_configs4_smtp.password,` +
-		` projections.smtp_configs4_http.id,` +
-		` projections.smtp_configs4_http.endpoint` +
-		` FROM projections.smtp_configs4` +
-		` LEFT JOIN projections.smtp_configs4_smtp ON projections.smtp_configs4.id = projections.smtp_configs4_smtp.id AND projections.smtp_configs4.instance_id = projections.smtp_configs4_smtp.instance_id` +
-		` LEFT JOIN projections.smtp_configs4_http ON projections.smtp_configs4.id = projections.smtp_configs4_http.id AND projections.smtp_configs4.instance_id = projections.smtp_configs4_http.instance_id` +
+	prepareSMTPConfigStmt = `SELECT projections.smtp_configs5.creation_date,` +
+		` projections.smtp_configs5.change_date,` +
+		` projections.smtp_configs5.resource_owner,` +
+		` projections.smtp_configs5.sequence,` +
+		` projections.smtp_configs5.id,` +
+		` projections.smtp_configs5.state,` +
+		` projections.smtp_configs5.description,` +
+		` projections.smtp_configs5_smtp.id,` +
+		` projections.smtp_configs5_smtp.tls,` +
+		` projections.smtp_configs5_smtp.sender_address,` +
+		` projections.smtp_configs5_smtp.sender_name,` +
+		` projections.smtp_configs5_smtp.reply_to_address,` +
+		` projections.smtp_configs5_smtp.host,` +
+		` projections.smtp_configs5_smtp.username,` +
+		` projections.smtp_configs5_smtp.password,` +
+		` projections.smtp_configs5_http.id,` +
+		` projections.smtp_configs5_http.endpoint` +
+		` FROM projections.smtp_configs5` +
+		` LEFT JOIN projections.smtp_configs5_smtp ON projections.smtp_configs5.id = projections.smtp_configs5_smtp.id AND projections.smtp_configs5.instance_id = projections.smtp_configs5_smtp.instance_id` +
+		` LEFT JOIN projections.smtp_configs5_http ON projections.smtp_configs5.id = projections.smtp_configs5_http.id AND projections.smtp_configs5.instance_id = projections.smtp_configs5_http.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareSMTPConfigCols = []string{
 		"creation_date",

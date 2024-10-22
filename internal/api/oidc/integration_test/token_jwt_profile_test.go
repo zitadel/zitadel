@@ -3,6 +3,7 @@
 package oidc_test
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -11,9 +12,12 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/profile"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/oauth2"
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 
 func TestServer_JWTProfile(t *testing.T) {
@@ -47,6 +51,16 @@ func TestServer_JWTProfile(t *testing.T) {
 			name:    "openid, profile, email",
 			keyData: keyData,
 			scope:   []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			wantClaims: claims{
+				name:     name,
+				username: name,
+				updated:  user.GetDetails().GetChangeDate().AsTime(),
+			},
+		},
+		{
+			name:    "openid, profile, email, zitadel",
+			keyData: keyData,
+			scope:   []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, domain.ProjectScopeZITADEL},
 			wantClaims: claims{
 				name:     name,
 				username: name,
@@ -98,13 +112,19 @@ func TestServer_JWTProfile(t *testing.T) {
 			tokenSource, err := profile.NewJWTProfileTokenSourceFromKeyFileData(CTX, Instance.OIDCIssuer(), tt.keyData, tt.scope)
 			require.NoError(t, err)
 
-			tokens, err := tokenSource.TokenCtx(CTX)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			require.NotNil(t, tokens)
+			var tokens *oauth2.Token
+			require.EventuallyWithT(
+				t, func(collect *assert.CollectT) {
+					tokens, err = tokenSource.TokenCtx(CTX)
+					if tt.wantErr {
+						assert.Error(collect, err)
+						return
+					}
+					assert.NoError(collect, err)
+					assert.NotNil(collect, tokens)
+				},
+				time.Minute, time.Second,
+			)
 
 			provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), "", "", redirectURI, tt.scope)
 			require.NoError(t, err)
@@ -122,6 +142,13 @@ func TestServer_JWTProfile(t *testing.T) {
 			assert.Empty(t, userinfo.UserInfoEmail)
 			assert.Empty(t, userinfo.UserInfoPhone)
 			assert.Empty(t, userinfo.Address)
+
+			_, err = Instance.Client.Auth.GetMyUser(integration.WithAuthorizationToken(CTX, tokens.AccessToken), &auth.GetMyUserRequest{})
+			if slices.Contains(tt.scope, domain.ProjectScopeZITADEL) {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
 		})
 	}
 }

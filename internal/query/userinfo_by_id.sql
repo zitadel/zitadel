@@ -2,7 +2,7 @@ with usr as (
 	select u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, n.login_name as preferred_login_name
 	from projections.users13 u
 	left join projections.login_names3 n on u.id = n.user_id and u.instance_id = n.instance_id
-	where u.id = $1
+	where u.id = $1 and u.state = 1 -- only allow active users
 	and u.instance_id = $2
 	and n.is_primary = true
 ),
@@ -38,6 +38,7 @@ user_grants as (
 	where user_id = $1
 	and instance_id = $2
 	and project_id = any($3)
+    and state = 1
 	{{ if . -}}
 	and resource_owner = any($4)
 	{{- end }}

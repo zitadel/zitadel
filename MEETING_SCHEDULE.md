@@ -3,6 +3,34 @@
 Dear community!
 We're excited to announce bi-weekly office hours.
 
+## #5 Q&A
+
+Dear community,
+
+This week's office hour is dedicated for you to drop by and ask any questions you may have about ZITADEL. We are happy to discuss anything, from Actions to Zero downtime deployments. 
+
+Join us on the stage or ask your questions in the chat next Wednesday in the office hours channel on Discord. We're looking forward to have a nice chat with you.
+
+**What to expect:**
+
+* **Q&A Session**: Ask your questions and feel free to join the discussion to help others getting their questions answered
+
+**Details:**
+
+* **Target Audience:** Developers and IT Ops personnel using ZITADEL  
+* **Topic:** Q\&A session  
+* **When**: Wednesday 25th of September 6 pm UTC  
+* **Duration**: about 1 hour  
+* **Platform:** Zitadel Discord Server (Join us here:  https://discord.gg/zitadel-927474939156643850?event=1286221582838272000 )
+
+**In the meantime:**
+
+If you have questions upfront, feel free to already post them in the chat of the [office hours channel](https://zitadel.com/office-hours) on our Discord server :gigi:
+
+We look forward to seeing you there\!
+
+**P.S.** Spread the word\! Share this announcement with your fellow ZITADEL users who might be interested 📢
+
 ## #4 Login UI deepdive
 
 Dear community,

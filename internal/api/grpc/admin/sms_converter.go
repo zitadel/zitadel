@@ -64,8 +64,9 @@ func HTTPConfigToPb(http *query.HTTP) *settings_pb.SMSProvider_Http {
 func TwilioConfigToPb(twilio *query.Twilio) *settings_pb.SMSProvider_Twilio {
 	return &settings_pb.SMSProvider_Twilio{
 		Twilio: &settings_pb.TwilioConfig{
-			Sid:          twilio.SID,
-			SenderNumber: twilio.SenderNumber,
+			Sid:              twilio.SID,
+			SenderNumber:     twilio.SenderNumber,
+			VerifyServiceSid: twilio.VerifyServiceSID,
 		},
 	}
 }
@@ -83,21 +84,23 @@ func smsStateToPb(state domain.SMSConfigState) settings_pb.SMSProviderConfigStat
 
 func addSMSConfigTwilioToConfig(ctx context.Context, req *admin_pb.AddSMSProviderTwilioRequest) *command.AddTwilioConfig {
 	return &command.AddTwilioConfig{
-		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
-		Description:   req.Description,
-		SID:           req.Sid,
-		SenderNumber:  req.SenderNumber,
-		Token:         req.Token,
+		ResourceOwner:    authz.GetInstance(ctx).InstanceID(),
+		Description:      req.Description,
+		SID:              req.Sid,
+		SenderNumber:     req.SenderNumber,
+		Token:            req.Token,
+		VerifyServiceSID: req.VerifyServiceSid,
 	}
 }
 
 func updateSMSConfigTwilioToConfig(ctx context.Context, req *admin_pb.UpdateSMSProviderTwilioRequest) *command.ChangeTwilioConfig {
 	return &command.ChangeTwilioConfig{
-		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
-		ID:            req.Id,
-		Description:   gu.Ptr(req.Description),
-		SID:           gu.Ptr(req.Sid),
-		SenderNumber:  gu.Ptr(req.SenderNumber),
+		ResourceOwner:    authz.GetInstance(ctx).InstanceID(),
+		ID:               req.Id,
+		Description:      gu.Ptr(req.Description),
+		SID:              gu.Ptr(req.Sid),
+		SenderNumber:     gu.Ptr(req.SenderNumber),
+		VerifyServiceSID: gu.Ptr(req.VerifyServiceSid),
 	}
 }
 

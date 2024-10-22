@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -22,7 +21,7 @@ type event struct {
 	typ       eventstore.EventType
 	createdAt time.Time
 	sequence  uint64
-	position  decimal.Decimal
+	position  float64
 	payload   Payload
 }
 
@@ -85,8 +84,8 @@ func (e *event) Sequence() uint64 {
 	return e.sequence
 }
 
-// Position implements [eventstore.Event]
-func (e *event) Position() decimal.Decimal {
+// Sequence implements [eventstore.Event]
+func (e *event) Position() float64 {
 	return e.position
 }
 

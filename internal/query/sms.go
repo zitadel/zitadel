@@ -37,9 +37,10 @@ type SMSConfig struct {
 }
 
 type Twilio struct {
-	SID          string
-	Token        *crypto.CryptoValue
-	SenderNumber string
+	SID              string
+	Token            *crypto.CryptoValue
+	SenderNumber     string
+	VerifyServiceSID string
 }
 
 type HTTP struct {
@@ -121,6 +122,10 @@ var (
 	}
 	SMSTwilioColumnSenderNumber = Column{
 		name:  projection.SMSTwilioColumnSenderNumber,
+		table: smsTwilioTable,
+	}
+	SMSTwilioColumnVerifyServiceSID = Column{
+		name:  projection.SMSTwilioColumnVerifyServiceSID,
 		table: smsTwilioTable,
 	}
 )
@@ -227,6 +232,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			SMSTwilioColumnSID.identifier(),
 			SMSTwilioColumnToken.identifier(),
 			SMSTwilioColumnSenderNumber.identifier(),
+			SMSTwilioColumnVerifyServiceSID.identifier(),
 
 			SMSHTTPColumnSMSID.identifier(),
 			SMSHTTPColumnEndpoint.identifier(),
@@ -255,6 +261,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				&twilioConfig.sid,
 				&twilioConfig.token,
 				&twilioConfig.senderNumber,
+				&twilioConfig.verifyServiceSid,
 
 				&httpConfig.id,
 				&httpConfig.endpoint,
@@ -289,6 +296,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMSTwilioColumnSID.identifier(),
 			SMSTwilioColumnToken.identifier(),
 			SMSTwilioColumnSenderNumber.identifier(),
+			SMSTwilioColumnVerifyServiceSID.identifier(),
 
 			SMSHTTPColumnSMSID.identifier(),
 			SMSHTTPColumnEndpoint.identifier(),
@@ -321,6 +329,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 					&twilioConfig.sid,
 					&twilioConfig.token,
 					&twilioConfig.senderNumber,
+					&twilioConfig.verifyServiceSid,
 
 					&httpConfig.id,
 					&httpConfig.endpoint,
@@ -343,10 +352,11 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 }
 
 type sqlTwilioConfig struct {
-	smsID        sql.NullString
-	sid          sql.NullString
-	token        *crypto.CryptoValue
-	senderNumber sql.NullString
+	smsID            sql.NullString
+	sid              sql.NullString
+	token            *crypto.CryptoValue
+	senderNumber     sql.NullString
+	verifyServiceSid sql.NullString
 }
 
 func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
@@ -354,9 +364,10 @@ func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
 		return
 	}
 	smsConfig.TwilioConfig = &Twilio{
-		SID:          c.sid.String,
-		Token:        c.token,
-		SenderNumber: c.senderNumber.String,
+		SID:              c.sid.String,
+		Token:            c.token,
+		SenderNumber:     c.senderNumber.String,
+		VerifyServiceSID: c.verifyServiceSid.String,
 	}
 }
 

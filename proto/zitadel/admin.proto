@@ -437,7 +437,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -457,7 +457,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -478,7 +478,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -499,7 +499,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -520,7 +520,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -541,7 +541,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Provider";
+            tags: "SMTP Configs";
             summary: "Activate SMTP Provider";
             description: "Activate an SMTP provider."
             deprecated: true;
@@ -564,7 +564,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Provider";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -584,7 +584,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -605,7 +605,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Provider";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -626,7 +626,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Provider";
+            tags: "SMTP Configs";
             deprecated: true;
         };
     }
@@ -663,7 +663,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email providers";
+            tags: "Email Provider";
             summary: "List Email providers";
             description: "Returns a list of Email providers."
         };
@@ -679,7 +679,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email";
+            tags: "Email Provider";
             summary: "Get active Email provider";
             description: "Returns the active Email provider from the system. This is used to send E-Mails to the users."
         };
@@ -695,7 +695,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email";
+            tags: "Email Provider";
             summary: "Get Email provider by its id";
             description: "Get a specific Email provider by its ID.";
         };
@@ -712,7 +712,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email";
+            tags: "Email Provider";
             summary: "Add SMTP Email provider";
             description: "Add a new SMTP Email provider if nothing is set yet."
         };
@@ -729,7 +729,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email";
+            tags: "Email Provider";
             summary: "Update SMTP Email provider";
             description: "Update the SMTP Email provider, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
         };
@@ -746,7 +746,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email";
+            tags: "Email Provider";
             summary: "Add HTTP Email provider";
             description: "Add a new HTTP Email provider if nothing is set yet."
         };
@@ -763,7 +763,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email";
+            tags: "Email Provider";
             summary: "Update HTTP Email provider";
             description: "Update the HTTP Email provider, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured HTTP."
         };
@@ -780,7 +780,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP";
+            tags: "Email Provider";
             summary: "Update SMTP Password";
             description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
         };
@@ -830,7 +830,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Email";
+            tags: "Email Provider";
             summary: "Remove Email provider";
             description: "Remove the Email provider, be aware that the users will not get an E-Mail if no provider is set."
         };
@@ -847,7 +847,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP Email Provider";
+            tags: "Email Provider";
             summary: "Test SMTP Email Provider";
             description: "Test an SMTP Email provider identified by its ID. After testing the provider, the users will receive information about the test results."
         };
@@ -864,7 +864,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "SMTP EMailProvider";
+            tags: "Email Provider";
             summary: "Test SMTP Email Provider";
             description: "Test an SMTP Email provider. After testing the provider, the users will receive information about the test results."
         };
@@ -5176,11 +5176,10 @@ message AddSMSProviderTwilioRequest {
         }
     ];
     string sender_number = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
-            min_length: 1;
+            min_length: 0;
             max_length: 200;
         }
     ];
@@ -5188,6 +5187,14 @@ message AddSMSProviderTwilioRequest {
         (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    string verify_service_sid = 5 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
             min_length: 0;
             max_length: 200;
         }
@@ -5211,8 +5218,7 @@ message UpdateSMSProviderTwilioRequest {
         }
     ];
     string sender_number = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
-        (google.api.field_behavior) = REQUIRED,
+        (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
             min_length: 1;
@@ -5223,6 +5229,14 @@ message UpdateSMSProviderTwilioRequest {
         (validate.rules).string = {min_len: 0, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"provider description\"";
+            min_length: 0;
+            max_length: 200;
+        }
+    ];
+    string verify_service_sid = 5 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
             min_length: 0;
             max_length: 200;
         }

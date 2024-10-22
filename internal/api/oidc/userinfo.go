@@ -66,7 +66,10 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		false,
 	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
 	if err != nil {
-		return nil, err
+		if !zerrors.IsNotFound(err) {
+			return nil, err
+		}
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("no active user").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)
 	}
 	return op.NewResponse(userInfo), nil
 }

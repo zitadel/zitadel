@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -26,7 +25,7 @@ type querier interface {
 	conditionFormat(repository.Operation) string
 	placeholder(query string) string
 	eventQuery(useV1 bool) string
-	maxPositionQuery(useV1 bool) string
+	maxSequenceQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
 	db() *database.DB
 	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
@@ -75,7 +74,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 
 	// instead of using the max function of the database (which doesn't work for postgres)
 	// we select the most recent row
-	if q.Columns == eventstore.ColumnsMaxPosition {
+	if q.Columns == eventstore.ColumnsMaxSequence {
 		q.Limit = 1
 		q.Desc = true
 	}
@@ -92,7 +91,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 
 	switch q.Columns {
 	case eventstore.ColumnsEvent,
-		eventstore.ColumnsMaxPosition:
+		eventstore.ColumnsMaxSequence:
 		query += criteria.orderByEventSequence(q.Desc, shouldOrderBySequence, useV1)
 	}
 
@@ -136,8 +135,8 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 
 func prepareColumns(criteria querier, columns eventstore.Columns, useV1 bool) (string, func(s scan, dest interface{}) error) {
 	switch columns {
-	case eventstore.ColumnsMaxPosition:
-		return criteria.maxPositionQuery(useV1), maxPositionScanner
+	case eventstore.ColumnsMaxSequence:
+		return criteria.maxSequenceQuery(useV1), maxSequenceScanner
 	case eventstore.ColumnsInstanceIDs:
 		return criteria.instanceIDsQuery(useV1), instanceIDsScanner
 	case eventstore.ColumnsEvent:
@@ -155,15 +154,13 @@ func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string
 	return criteria.Timetravel(took)
 }
 
-func maxPositionScanner(row scan, dest interface{}) (err error) {
-	position, ok := dest.(*decimal.Decimal)
+func maxSequenceScanner(row scan, dest interface{}) (err error) {
+	position, ok := dest.(*sql.NullFloat64)
 	if !ok {
-		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be decimal.Decimal got: %T", dest)
+		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
 	}
-	var res decimal.NullDecimal
-	err = row(&res)
+	err = row(position)
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
-		*position = res.Decimal
 		return nil
 	}
 	return zerrors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
@@ -192,7 +189,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			return zerrors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
 		}
 		event := new(repository.Event)
-		position := new(decimal.NullDecimal)
+		position := new(sql.NullFloat64)
 
 		if useV1 {
 			err = scanner(
@@ -229,7 +226,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 			logging.New().WithError(err).Warn("unable to scan row")
 			return zerrors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 		}
-		event.Pos = position.Decimal
+		event.Pos = position.Float64
 		return reduce(event)
 	}
 }

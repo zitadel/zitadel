@@ -87,6 +87,7 @@ func SendSMS(
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
 	triggeringEvent eventstore.Event,
+	generatorInfo *senders.CodeGeneratorInfo,
 ) Notify {
 	return func(
 		url string,
@@ -104,6 +105,7 @@ func SendSMS(
 			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
+			generatorInfo,
 		)
 	}
 }

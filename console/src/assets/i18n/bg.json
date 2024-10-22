@@ -1382,7 +1382,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1419,6 +1420,8 @@
         "SID": "Сид",
         "TOKEN": "Токен",
         "SENDERNUMBER": "Номер на изпращача",
+        "VERIFYSERVICESID": "Идентификатор на услугата за проверка",
+        "VERIFYSERVICESID_DESCRIPTION": "Задаването на идентификатор на услугата за проверка позволява използването на услугата за проверка на Twilio вместо услугата за съобщения за проверка на телефонни номера и OTP SMS.",
         "ADDED": "Twilio добави успешно.",
         "UPDATED": "Twilio се актуализира успешно.",
         "REMOVED": "Twilio премахнат",

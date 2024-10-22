@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -251,44 +250,6 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 								"client-id",
 								"instance-id",
 								milestone.AuthenticationSucceededOnApplication,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceUserTokenAdded",
-			args: args{
-				event: getEvent(timedTestEvent(
-					user.UserTokenAddedType,
-					user.AggregateType,
-					[]byte(`{"applicationId": "client-id"}`),
-					now,
-				), user.UserTokenAddedEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceUserTokenAdded,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("user"),
-				sequence:      15,
-				executer: &testExecuter{
-					// TODO: This can be optimized to only use one statement with OR
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
-							expectedArgs: []interface{}{
-								now,
-								"instance-id",
-								milestone.AuthenticationSucceededOnInstance,
-							},
-						},
-						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (NOT (ignore_client_ids @> $4)) AND (reached_date IS NULL)",
-							expectedArgs: []interface{}{
-								now,
-								"instance-id",
-								milestone.AuthenticationSucceededOnApplication,
-								database.TextArray[string]{"client-id"},
 							},
 						},
 					},

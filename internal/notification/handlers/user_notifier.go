@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -258,9 +259,12 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if alreadyHandled {
 			return nil
 		}
-		code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
-		if err != nil {
-			return err
+		var code string
+		if e.Code != nil {
+			code, err = crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+			if err != nil {
+				return err
+			}
 		}
 		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 		if err != nil {
@@ -285,15 +289,16 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if err != nil {
 			return err
 		}
+		generatorInfo := new(senders.CodeGeneratorInfo)
 		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
 		if e.NotificationType == domain.NotificationTypeSms {
-			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e)
+			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo)
 		}
 		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
-		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
 	}), nil
 }
 
@@ -345,7 +350,7 @@ func (u *userNotifier) reduceOTPSMS(
 	expiry time.Duration,
 	userID,
 	resourceOwner string,
-	sentCommand func(ctx context.Context, userID string, resourceOwner string) (err error),
+	sentCommand func(ctx context.Context, userID, resourceOwner string, generatorInfo *senders.CodeGeneratorInfo) (err error),
 	eventTypes ...eventstore.EventType,
 ) (*handler.Statement, error) {
 	ctx := HandlerContext(event.Aggregate())
@@ -356,9 +361,12 @@ func (u *userNotifier) reduceOTPSMS(
 	if alreadyHandled {
 		return handler.NewNoOpStatement(event), nil
 	}
-	plainCode, err := crypto.DecryptString(code, u.queries.UserDataCrypto)
-	if err != nil {
-		return nil, err
+	var plainCode string
+	if code != nil {
+		plainCode, err = crypto.DecryptString(code, u.queries.UserDataCrypto)
+		if err != nil {
+			return nil, err
+		}
 	}
 	colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, resourceOwner, false)
 	if err != nil {
@@ -377,12 +385,13 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event)
+	generatorInfo := new(senders.CodeGeneratorInfo)
+	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event, generatorInfo)
 	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
 	if err != nil {
 		return nil, err
 	}
-	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner)
+	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner, generatorInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -433,7 +442,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if e.URLTmpl != "" {
 			urlTmpl = e.URLTmpl
 		}
-		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, code, user.ID, user.PreferredLoginName, user.DisplayName, user.PreferredLanguage); err != nil {
+		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, code, user.ID, user.PreferredLoginName, user.DisplayName, e.Aggregate().ID, user.PreferredLanguage); err != nil {
 			return "", err
 		}
 		return buf.String(), nil
@@ -691,9 +700,12 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if alreadyHandled {
 			return nil
 		}
-		code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
-		if err != nil {
-			return err
+		var code string
+		if e.Code != nil {
+			code, err = crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+			if err != nil {
+				return err
+			}
 		}
 		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 		if err != nil {
@@ -713,12 +725,12 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if err != nil {
 			return err
 		}
-		err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e).
-			SendPhoneVerificationCode(ctx, code)
-		if err != nil {
+		generatorInfo := new(senders.CodeGeneratorInfo)
+		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo).
+			SendPhoneVerificationCode(ctx, code); err != nil {
 			return err
 		}
-		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
 	}), nil
 }
 
@@ -778,7 +790,7 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 }
 
 func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, event eventstore.Event, expiry time.Duration, data map[string]interface{}, eventTypes ...eventstore.EventType) (bool, error) {
-	if event.CreatedAt().Add(expiry).Before(time.Now().UTC()) {
+	if expiry > 0 && event.CreatedAt().Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
 	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)

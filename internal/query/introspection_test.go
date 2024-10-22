@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 )
 
-func TestQueries_GetIntrospectionClientByID(t *testing.T) {
+func TestQueries_ActiveIntrospectionClientByID(t *testing.T) {
 	pubkeys := database.Map[[]byte]{
 		"key1": {1, 2, 3},
 		"key2": {4, 5, 6},
@@ -96,7 +96,7 @@ func TestQueries_GetIntrospectionClientByID(t *testing.T) {
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "userID")
-				got, err := q.GetIntrospectionClientByID(ctx, tt.args.clientID, tt.args.getKeys)
+				got, err := q.ActiveIntrospectionClientByID(ctx, tt.args.clientID, tt.args.getKeys)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
 			})

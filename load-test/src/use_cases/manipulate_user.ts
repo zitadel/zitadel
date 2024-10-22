@@ -45,4 +45,3 @@ export function teardown(data: any) {
   removeOrg(data.org, data.tokens.accessToken);
   console.info('teardown: org removed');
 }
-

@@ -1,6 +1,7 @@
 ---
-title: Introduction
+title: Examples and SDKs for ZITADEL
 sidebar_label: Introduction
+sidebar_position: 1
 ---
 
 You can integrate ZITADEL quickly into your application and be up and running within minutes.
@@ -10,7 +11,7 @@ The SDKs and integration depend on the framework and language you are using.
 
 import { Frameworks } from "../../src/components/frameworks";
 
-### Resources
+## Resources
 
 <Frameworks />
 
@@ -20,7 +21,7 @@ To further streamline your setup, simply visit the console in ZITADEL where you 
 
 To begin configuring login for any of these samples, start [here](https://zitadel.com/signin).
 
-### OIDC Libraries
+## OIDC Libraries
 
 OIDC is a standard for authentication and most languages and frameworks do provide a OIDC library which can be easily integrated to your application.
 If we do not provide an specific example, SDK or guide, we strongly recommend using existing authentication libraries for your
@@ -34,7 +35,7 @@ You might want to check out the following links to find a good library:
 - [OpenID General References](https://openid.net/developers/libraries/)
 - [OpenID certified developer tools](https://openid.net/certified-open-id-developer-tools/)
 
-### Other example applications
+## Other example applications
 
 - [B2B customer portal](https://github.com/zitadel/zitadel-nextjs-b2b): Showcase the use of personal access tokens in a B2B environment. Uses NextJS Framework.
 - [Frontend with backend API](https://github.com/zitadel/example-quote-generator-app): A simple web application using a React front-end and a Python back-end API, both secured using ZITADEL
@@ -43,7 +44,7 @@ You might want to check out the following links to find a good library:
 
 Search for the "example" tag in our repository to [explore all examples](https://github.com/search?q=topic%3Aexamples+org%3Azitadel&type=repositories).
 
-### Missing SDK
+## Missing SDK
 
 Is your language/framework missing? Fear not, you can generate your gRPC API Client with ease.
 
@@ -54,7 +55,7 @@ Is your language/framework missing? Fear not, you can generate your gRPC API Cli
 Let us make an example with Ruby. Any other supported language by buf will work as well. Consult
 the [buf plugin registry](https://buf.build/plugins) for more ideas.
 
-#### Example with Ruby
+### Example with Ruby
 
 With gRPC we usually need to generate the client stub and the messages/types. This is why we need two plugins.
 The plugin `grpc/ruby` generates the client stub and the plugin `protocolbuffers/ruby` takes care of the messages/types.

@@ -1427,7 +1427,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1464,6 +1465,8 @@
         "SID": "ID Безопасности",
         "TOKEN": "Токен",
         "SENDERNUMBER": "Номер отправителя",
+        "VERIFYSERVICESID": "Идентификатор службы проверки",
+        "VERIFYSERVICESID_DESCRIPTION": "Установка идентификатора службы проверки позволяет использовать службу проверки Twilio вместо службы сообщений для проверки телефонных номеров и SMS OTP.",
         "ADDED": "Twilio успешно добавлен.",
         "REMOVED": "Twilio удалён",
         "CHANGETOKEN": "Изменить токен",

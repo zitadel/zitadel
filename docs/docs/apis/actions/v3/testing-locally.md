@@ -1,5 +1,5 @@
 ---
-title: Actions v2 example execution locally
+title: Test Actions Locally
 ---
 
 In this guide, you will create a ZITADEL execution and target. After a user is created through the API, the target is called.
@@ -52,7 +52,7 @@ What happens here is only a target which prints out the received request, which 
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:
 
-[Create a target](/apis/resources/action_service_v3/action-service-create-target)
+[Create a target](/apis/resources/action_service_v3/zitadel-actions-create-target)
 
 ```shell
 curl -L -X POST 'https://$CUSTOM-DOMAIN/v3alpha/targets' \
@@ -75,7 +75,7 @@ Save the returned ID to set in the execution.
 
 To call the target just created before, with the intention to print the request used for user creation by the user V2 API, we define an execution with a method condition.
 
-[Set an execution](/apis/resources/action_service_v3/action-service-set-execution)
+[Set an execution](/apis/resources/action_service_v3/zitadel-actions-set-execution)
 
 ```shell
 curl -L -X PUT 'https://$CUSTOM-DOMAIN/v3alpha/executions' \
@@ -116,7 +116,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 }'
 ```
 
-Should print out something like, also described under [Sent information Request](./introduction#sent-information-request):
+Should print out something like, also described under [Sent information Request](./usage#sent-information-request):
 ```shell
 {
   "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",

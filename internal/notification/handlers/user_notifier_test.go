@@ -7,11 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
@@ -19,6 +21,7 @@ import (
 	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
 	"github.com/zitadel/zitadel/internal/notification/messages"
@@ -36,10 +39,13 @@ const (
 	codeID                  = "event1"
 	logoURL                 = "logo.png"
 	eventOrigin             = "https://triggered.here"
+	eventOriginDomain       = "triggered.here"
 	assetsPath              = "/assets/v1"
 	preferredLoginName      = "loginName1"
 	lastEmail               = "last@email.com"
 	verifiedEmail           = "verified@email.com"
+	lastPhone               = "+41797654321"
+	verifiedPhone           = "+41791234567"
 	instancePrimaryDomain   = "primary.domain"
 	externalDomain          = "external.domain"
 	externalPort            = 3000
@@ -47,6 +53,9 @@ const (
 	externalProtocol        = "http"
 	defaultOTPEmailTemplate = "/otp/verify?loginName={{.LoginName}}&code={{.Code}}"
 	authRequestID           = "authRequestID"
+	smsProviderID           = "smsProviderID"
+	emailProviderID         = "emailProviderID"
+	verificationID          = "verificationID"
 )
 
 func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
@@ -59,7 +68,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -92,7 +101,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -131,7 +140,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/user/init?authRequestID=%s&code=%s&loginname=%s&orgID=%s&passwordset=%t&userID=%s", eventOrigin, "", testCode, preferredLoginName, orgID, false, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -165,7 +174,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/user/init?authRequestID=%s&code=%s&loginname=%s&orgID=%s&passwordset=%t&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, "", testCode, preferredLoginName, orgID, false, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -204,7 +213,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/user/init?authRequestID=%s&code=%s&loginname=%s&orgID=%s&passwordset=%t&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, authRequestID, testCode, preferredLoginName, orgID, false, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -272,7 +281,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -307,7 +316,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -348,7 +357,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/mail/verification?authRequestID=%s&code=%s&orgID=%s&userID=%s", eventOrigin, "", testCode, orgID, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -385,7 +394,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?authRequestID=%s&code=%s&orgID=%s&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, "", testCode, orgID, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -426,7 +435,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?authRequestID=%s&code=%s&orgID=%s&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, authRequestID, testCode, orgID, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -469,7 +478,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -533,14 +542,14 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateQueries(queries, givenTemplate)
-			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -568,7 +577,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -581,7 +590,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateQueries(queries, givenTemplate)
-			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -609,14 +618,14 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/password/init?authRequestID=%s&code=%s&orgID=%s&userID=%s", eventOrigin, "", testCode, orgID, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateQueries(queries, givenTemplate)
-			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -646,7 +655,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/password/init?authRequestID=%s&code=%s&orgID=%s&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, "", testCode, orgID, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -659,7 +668,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateQueries(queries, givenTemplate)
-			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -687,7 +696,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/password/init?authRequestID=%s&code=%s&orgID=%s&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, authRequestID, testCode, orgID, userID)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -700,7 +709,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateQueries(queries, givenTemplate)
-			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -730,14 +739,14 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateQueries(queries, givenTemplate)
-			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{}).Return(nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -761,7 +770,44 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 					},
 				}, w
 		},
-	}}
+	}, {
+		name: "external code",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.URL}}"
+			expectContent := "We received a password reset request. Please use the button below to reset your password. (Code ) If you didn't ask for this mail, please ignore it."
+			w.messageSMS = &messages.SMS{
+				SenderPhoneNumber:    "senderNumber",
+				RecipientPhoneNumber: lastPhone,
+				Content:              expectContent,
+			}
+			expectTemplateQueries(queries, givenTemplate)
+			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              nil,
+						Expiry:            0,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						NotificationType:  domain.NotificationTypeSms,
+						GeneratorID:       smsProviderID,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	},
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
@@ -794,7 +840,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -823,7 +869,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -885,7 +931,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -921,7 +967,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -964,7 +1010,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			testCode := "testcode"
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectContent := fmt.Sprintf("%s/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code=%s", eventOrigin, userID, orgID, codeID, testCode)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1002,7 +1048,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			testCode := "testcode"
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, codeID, testCode)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1044,7 +1090,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1109,7 +1155,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1141,7 +1187,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{lastEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1206,7 +1252,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{verifiedEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1242,7 +1288,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{verifiedEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1284,7 +1330,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/otp/verify?loginName=%s&code=%s", eventOrigin, preferredLoginName, testCode)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{verifiedEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1322,7 +1368,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/otp/verify?loginName=%s&code=%s", externalProtocol, instancePrimaryDomain, externalPort, preferredLoginName, testCode)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{verifiedEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1364,7 +1410,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			urlTemplate := "https://my.custom.url/user/{{.LoginName}}/verify"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/user/%s/verify", preferredLoginName)
-			w.message = messages.Email{
+			w.message = &messages.Email{
 				Recipients: []string{verifiedEmail},
 				Subject:    expectMailSubject,
 				Content:    expectContent,
@@ -1413,6 +1459,107 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 	}
 }
 
+func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
+	tests := []struct {
+		name string
+		test func(*gomock.Controller, *mock.MockQueries, *mock.MockCommands) (fields, args, want)
+	}{{
+		name: "asset url with event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.LogoURL}}"
+			testCode := ""
+			expiry := 0 * time.Hour
+			expectContent := fmt.Sprintf(`%[1]s is your one-time-password for %[2]s. Use it within the next %[3]s.
+@%[2]s #%[1]s`, testCode, eventOriginDomain, expiry)
+			w.messageSMS = &messages.SMS{
+				SenderPhoneNumber:    "senderNumber",
+				RecipientPhoneNumber: verifiedPhone,
+				Content:              expectContent,
+			}
+			expectTemplateQueriesSMS(queries, givenTemplate)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              nil,
+						Expiry:            expiry,
+						CodeReturned:      false,
+						GeneratorID:       smsProviderID,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "asset url without event trigger url",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
+			givenTemplate := "{{.LogoURL}}"
+			testCode := ""
+			expiry := 0 * time.Hour
+			expectContent := fmt.Sprintf(`%[1]s is your one-time-password for %[2]s. Use it within the next %[3]s.
+@%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
+			w.messageSMS = &messages.SMS{
+				SenderPhoneNumber:    "senderNumber",
+				RecipientPhoneNumber: verifiedPhone,
+				Content:              expectContent,
+			}
+			expectTemplateQueriesSMS(queries, givenTemplate)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:         nil,
+						Expiry:       expiry,
+						CodeReturned: false,
+						GeneratorID:  smsProviderID,
+					},
+				}, w
+		},
+	},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			queries := mock.NewMockQueries(ctrl)
+			commands := mock.NewMockCommands(ctrl)
+			f, a, w := tt.test(ctrl, queries, commands)
+			_, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceSessionOTPSMSChallenged(a.event)
+			if w.err != nil {
+				w.err(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
 type fields struct {
 	queries        *mock.MockQueries
 	commands       *mock.MockCommands
@@ -1424,8 +1571,9 @@ type args struct {
 	event eventstore.Event
 }
 type want struct {
-	message messages.Email
-	err     assert.ErrorAssertionFunc
+	message    *messages.Email
+	messageSMS *messages.SMS
+	err        assert.ErrorAssertionFunc
 }
 
 func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields, a args, w want) *userNotifier {
@@ -1433,8 +1581,17 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
 	if w.err == nil {
-		w.message.TriggeringEvent = a.event
-		channel.EXPECT().HandleMessage(&w.message).Return(nil)
+		if w.message != nil {
+			w.message.TriggeringEvent = a.event
+			channel.EXPECT().HandleMessage(w.message).Return(nil)
+		}
+		if w.messageSMS != nil {
+			w.messageSMS.TriggeringEvent = a.event
+			channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
+				message.VerificationID = gu.Ptr(verificationID)
+				return nil
+			})
+		}
 	}
 	return &userNotifier{
 		commands: f.commands,
@@ -1454,8 +1611,8 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			Chain: *senders.ChainChannels(channel),
 			EmailConfig: &email.Config{
 				ProviderConfig: &email.Provider{
-					ID:          "ID",
-					Description: "Description",
+					ID:          "emailProviderID",
+					Description: "description",
 				},
 				SMTPConfig: &smtp.Config{
 					SMTP: smtp.SMTP{
@@ -1470,6 +1627,18 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 				},
 				WebhookConfig: nil,
 			},
+			SMSConfig: &sms.Config{
+				ProviderConfig: &sms.Provider{
+					ID:          "smsProviderID",
+					Description: "description",
+				},
+				TwilioConfig: &twilio.Config{
+					SID:              "sid",
+					Token:            "token",
+					SenderNumber:     "senderNumber",
+					VerifyServiceSID: "verifyServiceSID",
+				},
+			},
 		},
 	}
 }
@@ -1479,6 +1648,7 @@ var _ types.ChannelChains = (*channels)(nil)
 type channels struct {
 	senders.Chain
 	EmailConfig *email.Config
+	SMSConfig   *sms.Config
 }
 
 func (c *channels) Email(context.Context) (*senders.Chain, *email.Config, error) {
@@ -1486,7 +1656,7 @@ func (c *channels) Email(context.Context) (*senders.Chain, *email.Config, error)
 }
 
 func (c *channels) SMS(context.Context) (*senders.Chain, *sms.Config, error) {
-	return &c.Chain, nil, nil
+	return &c.Chain, c.SMSConfig, nil
 }
 
 func (c *channels) Webhook(context.Context, webhook.Config) (*senders.Chain, error) {
@@ -1510,6 +1680,31 @@ func expectTemplateQueries(queries *mock.MockQueries, template string) {
 		LastEmail:          lastEmail,
 		VerifiedEmail:      verifiedEmail,
 		PreferredLoginName: preferredLoginName,
+		LastPhone:          lastPhone,
+		VerifiedPhone:      verifiedPhone,
+	}, nil)
+	queries.EXPECT().GetDefaultLanguage(gomock.Any()).Return(language.English)
+	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)
+}
+
+func expectTemplateQueriesSMS(queries *mock.MockQueries, template string) {
+	queries.EXPECT().GetInstanceRestrictions(gomock.Any()).Return(query.Restrictions{
+		AllowedLanguages: []language.Tag{language.English},
+	}, nil)
+	queries.EXPECT().ActiveLabelPolicyByOrg(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.LabelPolicy{
+		ID: policyID,
+		Light: query.Theme{
+			LogoURL: logoURL,
+		},
+	}, nil)
+	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{
+		ID:                 userID,
+		ResourceOwner:      orgID,
+		LastEmail:          lastEmail,
+		VerifiedEmail:      verifiedEmail,
+		PreferredLoginName: preferredLoginName,
+		LastPhone:          lastPhone,
+		VerifiedPhone:      verifiedPhone,
 	}, nil)
 	queries.EXPECT().GetDefaultLanguage(gomock.Any()).Return(language.English)
 	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)

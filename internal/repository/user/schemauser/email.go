@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -21,9 +20,13 @@ const (
 )
 
 type EmailUpdatedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
 	EmailAddress domain.EmailAddress `json:"email,omitempty"`
+}
+
+func (e *EmailUpdatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *EmailUpdatedEvent) Payload() interface{} {
@@ -36,7 +39,7 @@ func (e *EmailUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func NewEmailUpdatedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress domain.EmailAddress) *EmailUpdatedEvent {
 	return &EmailUpdatedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			EmailUpdatedType,
@@ -45,22 +48,14 @@ func NewEmailUpdatedEvent(ctx context.Context, aggregate *eventstore.Aggregate, 
 	}
 }
 
-func EmailUpdatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	emailChangedEvent := &EmailUpdatedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(emailChangedEvent)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "USER-4M0sd", "unable to unmarshal human password changed")
-	}
-
-	return emailChangedEvent, nil
-}
-
 type EmailVerifiedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
 	IsEmailVerified bool `json:"-"`
+}
+
+func (e *EmailVerifiedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *EmailVerifiedEvent) Payload() interface{} {
@@ -73,7 +68,7 @@ func (e *EmailVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 
 func NewEmailVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *EmailVerifiedEvent {
 	return &EmailVerifiedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			EmailVerifiedType,
@@ -81,18 +76,13 @@ func NewEmailVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate)
 	}
 }
 
-func HumanVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	emailVerified := &EmailVerifiedEvent{
-		BaseEvent:       *eventstore.BaseEventFromRepo(event),
-		IsEmailVerified: true,
-	}
-	return emailVerified, nil
-}
-
 type EmailVerificationFailedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 }
 
+func (e *EmailVerificationFailedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
 func (e *EmailVerificationFailedEvent) Payload() interface{} {
 	return nil
 }
@@ -101,9 +91,9 @@ func (e *EmailVerificationFailedEvent) UniqueConstraints() []*eventstore.UniqueC
 	return nil
 }
 
-func NewHumanEmailVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *EmailVerificationFailedEvent {
+func NewEmailVerificationFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *EmailVerificationFailedEvent {
 	return &EmailVerificationFailedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			EmailVerificationFailedType,
@@ -111,20 +101,18 @@ func NewHumanEmailVerificationFailedEvent(ctx context.Context, aggregate *events
 	}
 }
 
-func EmailVerificationFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &EmailVerificationFailedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
-}
-
 type EmailCodeAddedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
 	Code              *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry            time.Duration       `json:"expiry,omitempty"`
 	URLTemplate       string              `json:"url_template,omitempty"`
 	CodeReturned      bool                `json:"code_returned,omitempty"`
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
+}
+
+func (e *EmailCodeAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *EmailCodeAddedEvent) Payload() interface{} {
@@ -148,7 +136,7 @@ func NewEmailCodeAddedEvent(
 	codeReturned bool,
 ) *EmailCodeAddedEvent {
 	return &EmailCodeAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			EmailCodeAddedType,
@@ -161,22 +149,13 @@ func NewEmailCodeAddedEvent(
 	}
 }
 
-func EmailCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	codeAdded := &EmailCodeAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(codeAdded)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "USER-3M0sd", "unable to unmarshal human email code added")
-	}
-
-	return codeAdded, nil
-}
-
 type EmailCodeSentEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 }
 
+func (e *EmailCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
 func (e *EmailCodeSentEvent) Payload() interface{} {
 	return nil
 }
@@ -185,18 +164,12 @@ func (e *EmailCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 	return nil
 }
 
-func NewHumanEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *EmailCodeSentEvent {
+func NewEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *EmailCodeSentEvent {
 	return &EmailCodeSentEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			EmailCodeSentType,
 		),
 	}
-}
-
-func EmailCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &EmailCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }

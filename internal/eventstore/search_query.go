@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/shopspring/decimal"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -25,7 +23,7 @@ type SearchQueryBuilder struct {
 	queries               []*SearchQuery
 	tx                    *sql.Tx
 	allowTimeTravel       bool
-	positionGreaterEqual  decimal.Decimal
+	positionAfter         float64
 	awaitOpenTransactions bool
 	creationDateAfter     time.Time
 	creationDateBefore    time.Time
@@ -76,8 +74,8 @@ func (b *SearchQueryBuilder) GetAllowTimeTravel() bool {
 	return b.allowTimeTravel
 }
 
-func (b SearchQueryBuilder) GetPositionAfter() decimal.Decimal {
-	return b.positionGreaterEqual
+func (b SearchQueryBuilder) GetPositionAfter() float64 {
+	return b.positionAfter
 }
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
@@ -109,6 +107,7 @@ type SearchQuery struct {
 	aggregateIDs   []string
 	eventTypes     []EventType
 	eventData      map[string]interface{}
+	positionAfter  float64
 }
 
 func (q SearchQuery) GetAggregateTypes() []AggregateType {
@@ -127,14 +126,18 @@ func (q SearchQuery) GetEventData() map[string]interface{} {
 	return q.eventData
 }
 
+func (q SearchQuery) GetPositionAfter() float64 {
+	return q.positionAfter
+}
+
 // Columns defines which fields of the event are needed for the query
 type Columns int8
 
 const (
 	//ColumnsEvent represents all fields of an event
 	ColumnsEvent = iota + 1
-	// ColumnsMaxPosition represents the latest sequence of the filtered events
-	ColumnsMaxPosition
+	// ColumnsMaxSequence represents the latest sequence of the filtered events
+	ColumnsMaxSequence
 	// ColumnsInstanceIDs represents the instance ids of the filtered events
 	ColumnsInstanceIDs
 
@@ -269,8 +272,8 @@ func (builder *SearchQueryBuilder) AllowTimeTravel() *SearchQueryBuilder {
 }
 
 // PositionAfter filters for events which happened after the specified time
-func (builder *SearchQueryBuilder) PositionGreaterEqual(position decimal.Decimal) *SearchQueryBuilder {
-	builder.positionGreaterEqual = position
+func (builder *SearchQueryBuilder) PositionAfter(position float64) *SearchQueryBuilder {
+	builder.positionAfter = position
 	return builder
 }
 
@@ -343,6 +346,11 @@ func (query *SearchQuery) EventTypes(types ...EventType) *SearchQuery {
 // Use this call with care as it will be slower than the other filters.
 func (query *SearchQuery) EventData(data map[string]interface{}) *SearchQuery {
 	query.eventData = data
+	return query
+}
+
+func (query *SearchQuery) PositionAfter(position float64) *SearchQuery {
+	query.positionAfter = position
 	return query
 }
 

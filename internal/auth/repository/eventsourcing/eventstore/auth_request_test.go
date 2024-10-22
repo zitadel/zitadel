@@ -1059,6 +1059,74 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"password not set (email not verified), verify email with password step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordInitRequired: true,
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{
+				&domain.AuthRequest{
+					UserID: "UserID",
+					LoginPolicy: &domain.LoginPolicy{
+						AllowUsernamePassword: true,
+					},
+				},
+				false,
+			},
+			[]domain.NextStep{&domain.VerifyEMailStep{InitPassword: true}},
+			nil,
+		},
+		{
+			"password not set, but idp, email not verified, verify email step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					ExternalLoginVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider:  &mockViewUser{},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					[]*query.IDPUserLink{
+						{
+							IDPID:            "idpID",
+							UserID:           "userID",
+							IDPName:          "idpName",
+							ProvidedUserID:   "providedUserID",
+							ProvidedUsername: "providedUsername",
+						},
+					},
+				},
+			},
+			args{
+				&domain.AuthRequest{
+					UserID: "UserID",
+					LoginPolicy: &domain.LoginPolicy{
+						AllowUsernamePassword:      true,
+						ExternalLoginCheckLifetime: 10 * 24 * time.Hour,
+					},
+					SelectedIDPConfigID: "idpID",
+				},
+				false,
+			},
+			[]domain.NextStep{&domain.VerifyEMailStep{}},
+			nil,
+		},
+		{
 			"password not set (email not verified), init password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},

@@ -20,6 +20,12 @@ import (
 func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-w8tnSoJxtn", "Errors.ResourceOwnerMissing")
+	}
+	if projectID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-nDXf5vXoUj", "Errors.IDMissing")
+	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
@@ -34,6 +40,12 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
 	if !project.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
+	}
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-fmq7bqQX1s", "Errors.ResourceOwnerMissing")
+	}
+	if ownerUserID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xe95Gl3Dro", "Errors.IDMissing")
 	}
 
 	projectID, err := c.idGenerator.Next()

@@ -55,8 +55,6 @@ const (
 	//OperationNotIn checks if a stored value does not match one of the passed value list
 	OperationNotIn
 
-	OperationGreaterEqual
-
 	operationCount
 )
 
@@ -158,6 +156,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 			aggregateIDFilter,
 			eventTypeFilter,
 			eventDataFilter,
+			eventPositionAfterFilter,
 		} {
 			filter := f(q)
 			if filter == nil {
@@ -234,10 +233,10 @@ func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuer
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if builder.GetPositionAfter().IsZero() {
+	if builder.GetPositionAfter() == 0 {
 		return nil
 	}
-	query.Position = NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreaterEqual)
+	query.Position = NewFilter(FieldPosition, builder.GetPositionAfter(), OperationGreater)
 	return query.Position
 }
 
@@ -276,4 +275,11 @@ func eventDataFilter(query *eventstore.SearchQuery) *Filter {
 		return nil
 	}
 	return NewFilter(FieldEventData, query.GetEventData(), OperationJSONContains)
+}
+
+func eventPositionAfterFilter(query *eventstore.SearchQuery) *Filter {
+	if pos := query.GetPositionAfter(); pos != 0 {
+		return NewFilter(FieldPosition, pos, OperationGreater)
+	}
+	return nil
 }

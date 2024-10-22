@@ -123,7 +123,9 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 			return nil, ctxTimeout.Err()
 		case result := <-ch:
 			logging.OnError(result.err).Errorf("error while importing: %v", result.err)
-			logging.Infof("Import done: %s", result.count.getProgress())
+			if result.count != nil {
+				logging.Infof("Import done: %s", result.count.getProgress())
+			}
 			return result.ret, result.err
 		}
 	} else {

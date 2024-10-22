@@ -8,7 +8,7 @@ export function Tile({ title, imageSource, imageSourceLight, link, external }) {
       className={styles.tile}
       target={external ? "_blank" : "_self"}
     >
-      <h4>{title}</h4>
+      <h3>{title}</h3>
       <img
         className={imageSourceLight ? "hideonlight" : ""}
         src={imageSource}

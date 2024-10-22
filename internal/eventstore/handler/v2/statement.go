@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 
@@ -81,12 +80,10 @@ func (h *Handler) reduce(event eventstore.Event) (*Statement, error) {
 }
 
 type Statement struct {
-	AggregateType eventstore.AggregateType
-	AggregateID   string
-	Sequence      uint64
-	Position      decimal.Decimal
-	CreationDate  time.Time
-	InstanceID    string
+	Aggregate    *eventstore.Aggregate
+	Sequence     uint64
+	Position     float64
+	CreationDate time.Time
 
 	offset uint32
 
@@ -109,13 +106,11 @@ var (
 
 func NewStatement(event eventstore.Event, e Exec) *Statement {
 	return &Statement{
-		AggregateType: event.Aggregate().Type,
-		Sequence:      event.Sequence(),
-		Position:      event.Position(),
-		AggregateID:   event.Aggregate().ID,
-		CreationDate:  event.CreatedAt(),
-		InstanceID:    event.Aggregate().InstanceID,
-		Execute:       e,
+		Aggregate:    event.Aggregate(),
+		Sequence:     event.Sequence(),
+		Position:     event.Position(),
+		CreationDate: event.CreatedAt(),
+		Execute:      e,
 	}
 }
 
@@ -682,18 +677,6 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 			opt(&config)
 		}
 
-		_, err = ex.Exec("SAVEPOINT stmt_exec")
-		if err != nil {
-			return zerrors.ThrowInternal(err, "CRDB-YdOXD", "create savepoint failed")
-		}
-		defer func() {
-			if err != nil {
-				_, rollbackErr := ex.Exec("ROLLBACK TO SAVEPOINT stmt_exec")
-				logging.OnError(rollbackErr).Debug("rollback failed")
-				return
-			}
-			_, err = ex.Exec("RELEASE SAVEPOINT stmt_exec")
-		}()
 		_, err = ex.Exec(q(config), config.args...)
 		if err != nil {
 			return zerrors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")

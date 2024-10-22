@@ -80,7 +80,7 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		return nil, "", err
 	}
 
-	cmd, err := c.newOIDCSessionAddEvents(ctx, sessionModel.UserResourceOwner)
+	cmd, err := c.newOIDCSessionAddEvents(ctx, sessionModel.UserID, sessionModel.UserResourceOwner)
 	if err != nil {
 		return nil, "", err
 	}
@@ -141,7 +141,7 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	cmd, err := c.newOIDCSessionAddEvents(ctx, resourceOwner)
+	cmd, err := c.newOIDCSessionAddEvents(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +265,14 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 	return c.pushAppendAndReduce(ctx, writeModel, oidcsession.NewAccessTokenRevokedEvent(ctx, writeModel.aggregate))
 }
 
-func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, resourceOwner string, pending ...eventstore.Command) (*OIDCSessionEvents, error) {
+func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resourceOwner string, pending ...eventstore.Command) (*OIDCSessionEvents, error) {
+	userStateModel, err := c.userStateWriteModel(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if !userStateModel.UserState.IsEnabled() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-kj3g2", "Errors.User.NotActive")
+	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {
 		return nil, err
@@ -281,6 +288,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, resourceOwner st
 		encryptionAlg:            c.keyAlgorithm,
 		events:                   pending,
 		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, resourceOwner),
+		userStateModel:           userStateModel,
 		accessTokenLifetime:      accessTokenLifetime,
 		refreshTokenLifeTime:     refreshTokenLifeTime,
 		refreshTokenIdleLifetime: refreshTokenIdleLifetime,
@@ -321,6 +329,13 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	if err = sessionWriteModel.CheckRefreshToken(refreshTokenID); err != nil {
 		return nil, err
 	}
+	userStateWriteModel, err := c.userStateWriteModel(ctx, sessionWriteModel.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if !userStateWriteModel.UserState.IsEnabled() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDCS-J39h2", "Errors.User.NotActive")
+	}
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {
 		return nil, err
@@ -342,6 +357,7 @@ type OIDCSessionEvents struct {
 	encryptionAlg         crypto.EncryptionAlgorithm
 	events                []eventstore.Command
 	oidcSessionWriteModel *OIDCSessionWriteModel
+	userStateModel        *UserV2WriteModel
 
 	accessTokenLifetime      time.Duration
 	refreshTokenLifeTime     time.Duration
@@ -407,10 +423,10 @@ func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, 
 		return err
 	}
 	c.accessTokenID = AccessTokenPrefix + accessTokenID
-	c.events = append(c.events,
-		oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime, reason, actor),
-		user.NewUserTokenV2AddedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, c.accessTokenID), // for user audit log
-	)
+	c.events = append(c.events, oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime, reason, actor))
+	if !authz.GetFeatures(ctx).DisableUserTokenEvent {
+		c.events = append(c.events, user.NewUserTokenV2AddedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, c.accessTokenID))
+	}
 	return nil
 }
 

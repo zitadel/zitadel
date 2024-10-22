@@ -38,7 +38,8 @@ func TestSMSProjection_reduces(t *testing.T) {
 							"crypted": "Y3J5cHRlZA=="
 						},
 						"senderNumber": "sender-number",
-						"description": "description"
+						"description": "description",
+						"verifyServiceSid": "verify-service-sid"
 					}`),
 					), eventstore.GenericEventMapper[instance.SMSConfigTwilioAddedEvent]),
 			},
@@ -63,7 +64,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.sms_configs3_twilio (sms_id, instance_id, sid, token, sender_number) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.sms_configs3_twilio (sms_id, instance_id, sid, token, sender_number, verify_service_sid) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"id",
 								"instance-id",
@@ -75,6 +76,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 									Crypted:    []byte("crypted"),
 								},
 								"sender-number",
+								"verify-service-sid",
 							},
 						},
 					},
@@ -92,7 +94,8 @@ func TestSMSProjection_reduces(t *testing.T) {
 						"id": "id",
 						"sid": "sid",
 						"senderNumber": "sender-number",
-						"description": "description"
+						"description": "description",
+						"verifyServiceSid": "verify-service-sid"
 					}`),
 					), eventstore.GenericEventMapper[instance.SMSConfigTwilioChangedEvent]),
 			},
@@ -113,10 +116,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.sms_configs3_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs3_twilio SET (sid, sender_number, verify_service_sid) = ($1, $2, $3) WHERE (sms_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								"sid",
 								"sender-number",
+								"verify-service-sid",
 								"id",
 								"instance-id",
 							},
@@ -240,6 +244,46 @@ func TestSMSProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								"id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "instance reduceSMSConfigTwilioChanged, only sid",
+			args: args{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigTwilioChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
+						"id": "id",
+						"verifyServiceSid": "verify-service-sid"
+					}`),
+					), eventstore.GenericEventMapper[instance.SMSConfigTwilioChangedEvent]),
+			},
+			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioChanged,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.sms_configs3 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.sms_configs3_twilio SET verify_service_sid = $1 WHERE (sms_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"verify-service-sid",
 								"id",
 								"instance-id",
 							},

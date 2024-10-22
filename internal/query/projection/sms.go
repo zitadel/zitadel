@@ -25,12 +25,13 @@ const (
 	SMSColumnInstanceID    = "instance_id"
 	SMSColumnDescription   = "description"
 
-	smsTwilioTableSuffix        = "twilio"
-	SMSTwilioColumnSMSID        = "sms_id"
-	SMSTwilioColumnInstanceID   = "instance_id"
-	SMSTwilioColumnSID          = "sid"
-	SMSTwilioColumnSenderNumber = "sender_number"
-	SMSTwilioColumnToken        = "token"
+	smsTwilioTableSuffix            = "twilio"
+	SMSTwilioColumnSMSID            = "sms_id"
+	SMSTwilioColumnInstanceID       = "instance_id"
+	SMSTwilioColumnSID              = "sid"
+	SMSTwilioColumnSenderNumber     = "sender_number"
+	SMSTwilioColumnToken            = "token"
+	SMSTwilioColumnVerifyServiceSID = "verify_service_sid"
 
 	smsHTTPTableSuffix      = "http"
 	SMSHTTPColumnSMSID      = "sms_id"
@@ -69,6 +70,7 @@ func (*smsConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMSTwilioColumnSID, handler.ColumnTypeText),
 			handler.NewColumn(SMSTwilioColumnSenderNumber, handler.ColumnTypeText),
 			handler.NewColumn(SMSTwilioColumnToken, handler.ColumnTypeJSONB),
+			handler.NewColumn(SMSTwilioColumnVerifyServiceSID, handler.ColumnTypeText),
 		},
 			handler.NewPrimaryKey(SMSTwilioColumnInstanceID, SMSTwilioColumnSMSID),
 			smsTwilioTableSuffix,
@@ -172,6 +174,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 				handler.NewCol(SMSTwilioColumnSID, e.SID),
 				handler.NewCol(SMSTwilioColumnToken, e.Token),
 				handler.NewCol(SMSTwilioColumnSenderNumber, e.SenderNumber),
+				handler.NewCol(SMSTwilioColumnVerifyServiceSID, e.VerifyServiceSID),
 			},
 			handler.WithTableSuffix(smsTwilioTableSuffix),
 		),
@@ -202,12 +205,15 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 		))
 	}
 
-	twilioColumns := make([]handler.Column, 0)
+	twilioColumns := make([]handler.Column, 0, 3)
 	if e.SID != nil {
 		twilioColumns = append(twilioColumns, handler.NewCol(SMSTwilioColumnSID, *e.SID))
 	}
 	if e.SenderNumber != nil {
 		twilioColumns = append(twilioColumns, handler.NewCol(SMSTwilioColumnSenderNumber, *e.SenderNumber))
+	}
+	if e.VerifyServiceSID != nil {
+		twilioColumns = append(twilioColumns, handler.NewCol(SMSTwilioColumnVerifyServiceSID, *e.VerifyServiceSID))
 	}
 	if len(twilioColumns) > 0 {
 		stmts = append(stmts, handler.AddUpdateStatement(

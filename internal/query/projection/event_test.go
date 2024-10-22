@@ -74,8 +74,8 @@ func assertReduce(t *testing.T, stmt *handler.Statement, err error, projection s
 	if want.err != nil && want.err(err) {
 		return
 	}
-	if stmt.AggregateType != want.aggregateType {
-		t.Errorf("wrong aggregate type: want: %q got: %q", want.aggregateType, stmt.AggregateType)
+	if stmt.Aggregate.Type != want.aggregateType {
+		t.Errorf("wrong aggregate type: want: %q got: %q", want.aggregateType, stmt.Aggregate.Type)
 	}
 
 	if stmt.Sequence != want.sequence {

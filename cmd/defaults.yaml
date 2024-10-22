@@ -183,6 +183,37 @@ Database:
         Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
         Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
+# Caches are EXPERIMENTAL. The following config may have breaking changes in the future.
+# If no config is provided, caching is disabled by default.
+# Caches:
+  # Connectors are reused by caches.
+#  Connectors:
+    # Memory connector works with local server memory.
+    # It is the simplest (and probably fastest) cache implementation.
+    # Unsuitable for deployments with multiple containers,
+    # as each container's cache may hold a different state of the same object.
+#    Memory:
+#      Enabled: true
+      # AutoPrune removes invalidated or expired object from the cache.
+#      AutoPrune:
+#        Interval: 15m
+#        TimeOut: 30s
+
+  # Instance caches auth middleware instances, gettable by domain or ID.
+#  Instance:
+    # Connector must be enabled above.
+    # When connector is empty, this cache will be disabled.
+#    Connector: "memory"
+#    MaxAge: 1h
+#    LastUsage: 10m
+#
+    # Log enables cache-specific logging. Default to error log to stdout when omitted.
+#    Log:
+#      Level: debug
+#      AddSource: true
+#      Formatter:
+#        Format: text
+
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
   Identification:
@@ -231,7 +262,7 @@ Projections:
   # The maximum duration a transaction remains open
   # before it spots left folding additional events
   # and updates the table.
-  TransactionDuration: 500ms # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
+  TransactionDuration: 1m # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
@@ -246,10 +277,7 @@ Projections:
   HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
-    Projects:
-      TransactionDuration: 2s
     custom_texts:
-      TransactionDuration: 2s
       BulkLimit: 400
     project_grant_fields:
       TransactionDuration: 0s
@@ -829,7 +857,7 @@ DefaultInstance:
       PreHeader: User initialisieren
       Subject: User initialisieren
       Greeting: Hallo {{.DisplayName}},
-      Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
+      Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>{{.PreferredLoginName}}</strong><br> kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
       ButtonText: Initialisierung abschliessen
     - MessageTextType: PasswordReset
       Language: de
@@ -837,7 +865,7 @@ DefaultInstance:
       PreHeader: Passwort zurücksetzen
       Subject: Passwort zurücksetzen
       Greeting: Hallo {{.DisplayName}},
-      Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
+      Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
       ButtonText: Passwort zurücksetzen
     - MessageTextType: VerifyEmail
       Language: de
@@ -845,7 +873,7 @@ DefaultInstance:
       PreHeader: Email verifizieren
       Subject: Email verifizieren
       Greeting: Hallo {{.DisplayName}},
-      Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
+      Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren <br>(Code <strong>{{.Code}}</strong>).<br> Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
       ButtonText: Email verifizieren
     - MessageTextType: VerifyPhone
       Language: de

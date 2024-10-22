@@ -19,18 +19,31 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddHuman(t *testing.T) {
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore         func(t *testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
-		userPasswordHasher *crypto.Hasher
-		codeAlg            crypto.EncryptionAlgorithm
-		newCode            encrypedCodeFunc
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		idGenerator                 id.Generator
+		userPasswordHasher          *crypto.Hasher
+		codeAlg                     crypto.EncryptionAlgorithm
+		newCode                     encrypedCodeFunc
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx             context.Context
@@ -660,7 +673,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockEncryptedCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1042,6 +1054,36 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "+41711234567", AllowedLanguage),
 						user.NewHumanEmailVerifiedEvent(
@@ -1057,13 +1099,15 @@ func TestCommandSide_AddHuman(t *testing.T) {
 								Crypted:    []byte("phonecode"),
 							},
 							time.Hour*1,
+							"",
 						),
 					),
 				),
-				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher: mockPasswordHasher("x"),
-				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockEncryptedCode("phonecode", time.Hour),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher:          mockPasswordHasher("x"),
+				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phonecode", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1183,6 +1227,36 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						newAddHumanEvent("$plain$x$password", false, true, "+41711234567", AllowedLanguage),
 						user.NewHumanEmailVerifiedEvent(context.Background(),
@@ -1198,13 +1272,15 @@ func TestCommandSide_AddHuman(t *testing.T) {
 							},
 							1*time.Hour,
 							true,
+							"",
 						),
 					),
 				),
-				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				userPasswordHasher: mockPasswordHasher("x"),
-				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockEncryptedCode("phoneCode", time.Hour),
+				idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher:          mockPasswordHasher("x"),
+				codeAlg:                     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("phoneCode", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1307,11 +1383,13 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore(t),
-				userPasswordHasher: tt.fields.userPasswordHasher,
-				userEncryption:     tt.fields.codeAlg,
-				idGenerator:        tt.fields.idGenerator,
-				newEncryptedCode:   tt.fields.newCode,
+				eventstore:                  tt.fields.eventstore(t),
+				userPasswordHasher:          tt.fields.userPasswordHasher,
+				userEncryption:              tt.fields.codeAlg,
+				idGenerator:                 tt.fields.idGenerator,
+				newEncryptedCode:            tt.fields.newCode,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
 			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
@@ -1332,10 +1410,22 @@ func TestCommandSide_AddHuman(t *testing.T) {
 }
 
 func TestCommandSide_ImportHuman(t *testing.T) {
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
 	type fields struct {
-		eventstore         func(*testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
-		userPasswordHasher *crypto.Hasher
+		eventstore                  func(*testing.T) *eventstore.Eventstore
+		idGenerator                 id.Generator
+		userPasswordHasher          *crypto.Hasher
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx                  context.Context
@@ -1889,6 +1979,36 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectFilter(
+								eventFromEventPusher(
+									instance.NewSMSConfigActivatedEvent(
+										context.Background(),
+										&instance.NewAggregate("instanceID").Aggregate,
+										"id",
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									instance.NewSMSConfigTwilioAddedEvent(
+										context.Background(),
+										&instance.NewAggregate("instanceID").Aggregate,
+										"id",
+										"",
+										"sid",
+										"senderNumber",
+										&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+										"",
+									),
+								),
+								eventFromEventPusher(
+									instance.NewSMSConfigActivatedEvent(
+										context.Background(),
+										&instance.NewAggregate("instanceID").Aggregate,
+										"id",
+									),
+								),
+							),
 							expectPush(
 								newAddHumanEvent("$plain$x$password", false, true, "+41711234567", AllowedLanguage),
 								user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -1910,11 +2030,15 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 										KeyID:      "id",
 										Crypted:    []byte("a"),
 									},
-									time.Hour*1),
+									time.Hour*1,
+									"",
+								),
 							),
 						),
-						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-						userPasswordHasher: mockPasswordHasher("x"),
+						idGenerator:                 id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher:          mockPasswordHasher("x"),
+						newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("a", time.Hour),
+						defaultSecretGenerators:     defaultGenerators,
 					},
 					args{
 						ctx:   context.Background(),
@@ -2866,9 +2990,11 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, a := tt.given(t)
 			r := &Commands{
-				eventstore:         f.eventstore(t),
-				idGenerator:        f.idGenerator,
-				userPasswordHasher: f.userPasswordHasher,
+				eventstore:                  f.eventstore(t),
+				idGenerator:                 f.idGenerator,
+				userPasswordHasher:          f.userPasswordHasher,
+				newEncryptedCodeWithDefault: f.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     f.defaultSecretGenerators,
 			}
 			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
 			if tt.res.err == nil {

@@ -213,7 +213,7 @@ func (s *Server) clientFromCredentials(ctx context.Context, cc *op.ClientCredent
 	if err != nil {
 		return nil, err
 	}
-	client, err = s.query.GetIntrospectionClientByID(ctx, clientID, assertion)
+	client, err = s.query.ActiveIntrospectionClientByID(ctx, clientID, assertion)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, oidc.ErrUnauthorizedClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
