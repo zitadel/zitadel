@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
-
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func SetHTTPConfig(config *HTTPConfig) {
@@ -48,7 +46,7 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 
 	for _, unsplit := range config.DenyList {
 		for _, split := range strings.Split(unsplit, ",") {
-			parsed, parseErr := parseDenyListEntry(split)
+			parsed, parseErr := NewHostChecker(split)
 			if parseErr != nil {
 				return nil, parseErr
 			}
@@ -61,46 +59,36 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 	return c, nil
 }
 
-func parseDenyListEntry(entry string) (AddressChecker, error) {
-	if checker, err := NewIPChecker(entry); err == nil {
-		return checker, nil
-	}
-	return &DomainChecker{Domain: entry}, nil
-}
-
-func NewIPChecker(i string) (AddressChecker, error) {
-	_, network, err := net.ParseCIDR(i)
+func NewHostChecker(entry string) (AddressChecker, error) {
+	_, network, err := net.ParseCIDR(entry)
 	if err == nil {
-		return &IPChecker{Net: network}, nil
+		return &HostChecker{Net: network}, nil
 	}
-	if ip := net.ParseIP(i); ip != nil {
-		return &IPChecker{IP: ip}, nil
+	if ip := net.ParseIP(entry); ip != nil {
+		return &HostChecker{IP: ip}, nil
 	}
-	return nil, zerrors.ThrowInvalidArgument(nil, "ACTIO-ddJ7h", "invalid ip")
+	return &HostChecker{Domain: entry}, nil
 }
 
-type IPChecker struct {
-	Net *net.IPNet
-	IP  net.IP
-}
-
-func (c *IPChecker) Matches(address string) bool {
-	ip := net.ParseIP(address)
-	if ip == nil {
-		return false
-	}
-
-	if c.IP != nil {
-		return c.IP.Equal(ip)
-	}
-	return c.Net.Contains(ip)
-}
-
-type DomainChecker struct {
+type HostChecker struct {
+	Net    *net.IPNet
+	IP     net.IP
 	Domain string
 }
 
-func (c *DomainChecker) Matches(domain string) bool {
-	//TODO: allow wild cards
-	return c.Domain == domain
+func (c *HostChecker) Matches(ips []net.IP, address string) bool {
+	// if the address matches the domain, no additional checks as needed
+	if c.Domain == address {
+		return true
+	}
+	// otherwise we need to check on ips (incl. the resolved ips of the host)
+	for _, ip := range ips {
+		if c.Net != nil && c.Net.Contains(ip) {
+			return true
+		}
+		if c.IP != nil && c.IP.Equal(ip) {
+			return true
+		}
+	}
+	return false
 }
