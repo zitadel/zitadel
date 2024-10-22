@@ -2891,7 +2891,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "multifactors of default login policy";
+                    description: "multi-factors of default login policy";
                 };
             };
         };
