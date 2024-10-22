@@ -72,7 +72,7 @@ export function SetPasswordForm({
     }
 
     const changeResponse = await changePassword(payload).catch(() => {
-      setError("Could not register user");
+      setError("Could not set password");
     });
 
     if (changeResponse && "error" in changeResponse) {
