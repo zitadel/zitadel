@@ -19,7 +19,7 @@ export default async function Page({
   const t = await getTranslations({ locale, namespace: "password" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, organization, authRequestId, code } = searchParams;
+  const { loginName, organization, authRequestId } = searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
   const sessionFactors = await loadMostRecentSession({

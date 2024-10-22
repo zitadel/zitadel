@@ -3,6 +3,9 @@
 import { cookies } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
+// TODO: improve this to handle overflow
+export const MAX_COOKIE_SIZE = 4096;
+
 export type Cookie = {
   id: string;
   token: string;
@@ -56,7 +59,13 @@ export async function addSessionToCookie<T>(
   if (index > -1) {
     currentSessions[index] = session;
   } else {
-    currentSessions = [...currentSessions, session];
+    const temp = [...currentSessions, session];
+
+    if (temp.length > MAX_COOKIE_SIZE) {
+      // TODO: improve cookie handling
+      // this replaces the first session (oldest) with the new one
+      currentSessions = [session].concat(currentSessions.slice(1));
+    }
   }
 
   if (cleanup) {

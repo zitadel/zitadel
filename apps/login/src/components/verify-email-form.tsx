@@ -65,7 +65,13 @@ export function VerifyEmailForm({
 
   const router = useRouter();
 
-  const params = new URLSearchParams({});
+  const params = new URLSearchParams({
+    userId: userId,
+  });
+
+  if (isInvite) {
+    params.append("initial", "true");
+  }
 
   if (loginName) {
     params.append("loginName", loginName);
@@ -121,7 +127,10 @@ export function VerifyEmailForm({
     }
 
     // if auth methods fall trough, we complete to login
-    const params = new URLSearchParams({});
+    const params = new URLSearchParams({
+      userId: userId,
+      initial: "true", // defines that a code is not required and is therefore not shown in the UI
+    });
 
     if (organization) {
       params.set("organization", organization);

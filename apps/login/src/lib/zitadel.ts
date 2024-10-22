@@ -13,6 +13,7 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
+  SetPasswordRequestSchema,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -315,7 +316,6 @@ export async function verifyInviteCode(
 }
 
 export async function resendInviteCode(userId: string) {
-  console.log("resetInit");
   return userService.resendInviteCode({ userId }, {});
 }
 
@@ -580,24 +580,50 @@ export async function passwordReset(userId: string, host: string | null) {
   );
 }
 
+/**
+ *
+ * @param userId userId of the user to set the password for
+ * @param password the new password
+ * @param code optional if the password should be set with a code (reset), no code for initial setup of password
+ * @returns
+ */
 export async function setPassword(
   userId: string,
   password: string,
-  code: string,
+  code?: string,
 ) {
-  return userService.setPassword(
-    {
-      userId,
-      newPassword: {
-        password,
-      },
+  let payload = create(SetPasswordRequestSchema, {
+    userId,
+    newPassword: {
+      password,
+    },
+  });
+
+  // check if the user has no password set in order to set a password
+  if (!code) {
+    const authmethods = await listAuthenticationMethodTypes(userId);
+
+    // if the user has no authmethods set, we can set a password otherwise we need a code
+    if (
+      !authmethods ||
+      !authmethods.authMethodTypes ||
+      authmethods.authMethodTypes.length === 0
+    ) {
+      return { error: "Provide a code to set a password" };
+    }
+  }
+
+  if (code) {
+    payload = {
+      ...payload,
       verification: {
         case: "verificationCode",
         value: code,
       },
-    },
-    {},
-  );
+    };
+  }
+
+  return userService.setPassword(payload, {});
 }
 
 /**

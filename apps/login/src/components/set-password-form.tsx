@@ -35,6 +35,7 @@ type Props = {
   userId: string;
   organization?: string;
   authRequestId?: string;
+  codeRequired: boolean;
 };
 
 export function SetPasswordForm({
@@ -44,6 +45,7 @@ export function SetPasswordForm({
   loginName,
   userId,
   code,
+  codeRequired,
 }: Props) {
   const t = useTranslations("password");
 
@@ -59,11 +61,17 @@ export function SetPasswordForm({
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
-    const changeResponse = await changePassword({
+    let payload: { userId: string; password: string; code?: string } = {
       userId: userId,
       password: values.password,
-      code: values.code,
-    }).catch(() => {
+    };
+
+    // this is not required for initial password setup
+    if (codeRequired) {
+      payload = { ...payload, code: values.code };
+    }
+
+    const changeResponse = await changePassword(payload).catch(() => {
       setError("Could not register user");
     });
 
@@ -94,7 +102,8 @@ export function SetPasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
-    }).catch(() => {
+    }).catch((error) => {
+      console.error("verifyerror", error);
       setLoading(false);
       setError("Could not verify password");
       return;
@@ -109,23 +118,6 @@ export function SetPasswordForm({
     ) {
       setError(passwordResponse.error);
     }
-
-    // // skip verification for now as it is an app based flow
-    // // return router.push(`/verify?` + params);
-
-    // // check for mfa force to continue with mfa setup
-
-    // if (authRequestId && changeResponse.sessionId) {
-    //   if (authRequestId) {
-    //     params.append("authRequest", authRequestId);
-    //   }
-    //   return router.push(`/login?` + params);
-    // } else {
-    //   if (authRequestId) {
-    //     params.append("authRequestId", authRequestId);
-    //   }
-    //   return router.push(`/signedin?` + params);
-    // }
   }
 
   const { errors } = formState;
@@ -152,25 +144,28 @@ export function SetPasswordForm({
   return (
     <form className="w-full">
       <div className="pt-4 grid grid-cols-1 gap-4 mb-4">
-        <div className="flex flex-row items-end">
-          <div className="flex-1">
-            <TextInput
-              type="text"
-              required
-              {...register("code", {
-                required: "This field is required",
-              })}
-              label="Code"
-              autoComplete="one-time-code"
-              error={errors.code?.message as string}
-            />
+        {codeRequired && (
+          <div className="flex flex-row items-end">
+            <div className="flex-1">
+              <TextInput
+                type="text"
+                required
+                {...register("code", {
+                  required: "This field is required",
+                })}
+                label="Code"
+                autoComplete="one-time-code"
+                error={errors.code?.message as string}
+              />
+            </div>
+
+            <div className="ml-4 mb-1">
+              <Button variant={ButtonVariants.Secondary}>
+                {t("set.resend")}
+              </Button>
+            </div>
           </div>
-          <div className="ml-4 mb-1">
-            <Button variant={ButtonVariants.Secondary}>
-              {t("set.resend")}
-            </Button>
-          </div>
-        </div>
+        )}
         <div className="">
           <TextInput
             type="password"
