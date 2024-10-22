@@ -16,7 +16,7 @@ The following scripts don't include:
 - Global policies
 - IAM members
 - Global IDPs
-- Global second factor / multifactors
+- Global second factor / multi-factors
 - Machine keys
 - Personal Access Tokens
 - Application keys
