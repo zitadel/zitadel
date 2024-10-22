@@ -213,16 +213,16 @@ func TestServer_CreateUser(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := instance.Client.UserV3Alpha.CreateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCodeEmail {
-				require.NotNil(t, got.EmailCode)
+				assert.NotNil(t, got.EmailCode)
 			}
 			if tt.res.returnCodePhone {
-				require.NotNil(t, got.PhoneCode)
+				assert.NotNil(t, got.PhoneCode)
 			}
 
 		})

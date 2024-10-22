@@ -30,20 +30,54 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (_
 	}, nil
 }
 
+type authenticators struct {
+	Usernames  []*command.Username
+	Password   *command.SchemaUserPassword
+	PublicKeys []*command.PublicKey
+	PATs       []*command.PAT
+}
+
+func setAuthenticatorsToAuthenticators(set *user.SetAuthenticators) *authenticators {
+	if set == nil {
+		return nil
+	}
+	auths := &authenticators{}
+	for _, u := range set.GetUsernames() {
+		auths.Usernames = append(auths.Usernames, setUsernameToAddUsername(u))
+	}
+	if set.GetPassword() != nil {
+		auths.Password = setPasswordToSchemaUserPassword(set.GetPassword().GetPassword(), set.GetPassword().GetHash(), set.GetPassword().GetChangeRequired())
+	}
+	for _, p := range set.GetPublicKey() {
+		auths.PublicKeys = append(auths.PublicKeys, setPublicKeyToAddPublicKey(p))
+	}
+	for _, p := range set.GetPersonalAccessToken() {
+		auths.PATs = append(auths.PATs, setPersonalAccessTokenToAddPAT(p))
+	}
+	return auths
+}
+
 func createUserRequestToCreateSchemaUser(ctx context.Context, req *user.CreateUserRequest) (*command.CreateSchemaUser, error) {
 	data, err := req.GetUser().GetData().MarshalJSON()
 	if err != nil {
 		return nil, err
 	}
 
-	return &command.CreateSchemaUser{
+	user := &command.CreateSchemaUser{
 		ResourceOwner: organizationToCreateResourceOwner(ctx, req.Organization),
 		SchemaID:      req.GetUser().GetSchemaId(),
 		ID:            req.GetUser().GetUserId(),
 		Data:          data,
 		Email:         setEmailToEmail(req.GetUser().GetContact().GetEmail()),
 		Phone:         setPhoneToPhone(req.GetUser().GetContact().GetPhone()),
-	}, nil
+	}
+	if auths := setAuthenticatorsToAuthenticators(req.GetUser().Authenticators); auths != nil {
+		user.Usernames = auths.Usernames
+		user.Password = auths.Password
+		user.PublicKeys = auths.PublicKeys
+		user.PATs = auths.PATs
+	}
+	return user, nil
 }
 
 func organizationToCreateResourceOwner(ctx context.Context, org *object.Organization) string {
