@@ -937,8 +937,8 @@ EventTypes:
           added: Doble factor añadido a la política de inicio de sesión
           removed: Doble factor eliminado de la política de inicio de sesión
         multifactor:
-          added: Multifactor añadido a la política de inicio de sesión
-          removed: Multifactor eliminado de la política de inicio de sesión
+          added: Multi-factor añadido a la política de inicio de sesión
+          removed: Multi-factor eliminado de la política de inicio de sesión
       password:
         complexity:
           added: Política de complejidad de la contraseña añadida
