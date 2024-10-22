@@ -19,14 +19,12 @@ import (
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 var (
 	CTX      context.Context
 	Instance *integration.Instance
 	Client   oidc_pb.OIDCServiceClient
-	User     *user.AddHumanUserResponse
 )
 
 const (
@@ -44,7 +42,6 @@ func TestMain(m *testing.M) {
 		Client = Instance.Client.OIDCv2beta
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
-		User = Instance.CreateHumanUser(CTX)
 		return m.Run()
 	}())
 }
