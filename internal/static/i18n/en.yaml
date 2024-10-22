@@ -938,8 +938,8 @@ EventTypes:
           added: Second factor added to Login Policy
           removed: Second factor removed from Login Policy
         multifactor:
-          added: Multifactor added to Login Policy
-          removed: Multifactor removed from Login Policy
+          added: Multi-factor added to Login Policy
+          removed: Multi-factor removed from Login Policy
       password:
         complexity:
           added: Password complexity policy added
