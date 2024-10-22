@@ -572,7 +572,10 @@ Actions:
     # Wildcard sub domains are currently unsupported
     DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
       - localhost
-      - "127.0.0.1"
+      - "127.0.0.0/8"
+      - "::1"
+      - "0.0.0.0"
+      - "::"
 
 LogStore:
   Access:
