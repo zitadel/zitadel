@@ -161,8 +161,8 @@ func (c *Commands) removeProjectOld(ctx context.Context, projectID, resourceOwne
 	return writeModelToObjectDetails(&existingProject.WriteModel), nil
 }
 
-func (c *Commands) checkProjectGrantPreConditionOld(ctx context.Context, projectGrant *domain.ProjectGrant) error {
-	preConditions := NewProjectGrantPreConditionReadModel(projectGrant.AggregateID, projectGrant.GrantedOrgID)
+func (c *Commands) checkProjectGrantPreConditionOld(ctx context.Context, projectGrant *domain.ProjectGrant, resourceOwner string) error {
+	preConditions := NewProjectGrantPreConditionReadModel(projectGrant.AggregateID, projectGrant.GrantedOrgID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
 		return err
