@@ -228,7 +228,9 @@ func TestServer_GetTarget(t *testing.T) {
 					assert.Error(ttt, err, "Error: "+err.Error())
 					return
 				}
-				assert.NoError(ttt, err)
+				if !assert.NoError(ttt, err) {
+					return
+				}
 
 				wantTarget := tt.want.GetTarget()
 				gotTarget := got.GetTarget()
