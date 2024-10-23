@@ -142,7 +142,10 @@ func buildSearchCondition(builder *strings.Builder, index int, conditions map[ev
 	return args
 }
 
-func handleFieldCommands(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) error {
+func handleFieldCommands(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	for _, command := range commands {
 		if len(command.Fields()) > 0 {
 			if err := handleFieldOperations(ctx, tx, command.Fields()); err != nil {

@@ -9,6 +9,7 @@ import (
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -24,15 +25,12 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	}
 
 	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() (err error) {
-		inTxCtx, span := tracing.NewSpan(ctx)
-		defer func() { span.EndWithError(err) }()
-
-		events, err = insertEvents2(inTxCtx, tx, commands)
+		events, err = insertEvents2(ctx, tx, commands)
 		if err != nil {
 			return err
 		}
 
-		if err = handleUniqueConstraints(inTxCtx, tx, commands); err != nil {
+		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
 			return err
 		}
 
@@ -45,7 +43,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			}
 		}
 
-		return handleFieldCommands(inTxCtx, tx, commands)
+		return handleFieldCommands(ctx, tx, commands)
 	})
 
 	if err != nil {
@@ -66,7 +64,7 @@ func insertEvents2(ctx context.Context, tx *sql.Tx, commands []eventstore.Comman
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	events, cmds, err := commandsToEvents2(commands)
+	events, cmds, err := commandsToEvents2(ctx, commands)
 	if err != nil {
 		return nil, err
 	}
@@ -90,11 +88,14 @@ func insertEvents2(ctx context.Context, tx *sql.Tx, commands []eventstore.Comman
 	return events, nil
 }
 
-func commandsToEvents2(cmds []eventstore.Command) (_ []eventstore.Event, _ []*command, err error) {
+func commandsToEvents2(ctx context.Context, cmds []eventstore.Command) (_ []eventstore.Event, _ []*command, err error) {
 	events := make([]eventstore.Event, len(cmds))
 	commands := make([]*command, len(cmds))
-	for i, command := range cmds {
-		events[i], err = commandToEvent2(command)
+	for i, cmd := range cmds {
+		if cmd.Aggregate().InstanceID == "" {
+			cmd.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
+		}
+		events[i], err = commandToEvent2(ctx, cmd)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -103,7 +104,7 @@ func commandsToEvents2(cmds []eventstore.Command) (_ []eventstore.Event, _ []*co
 	return events, commands, nil
 }
 
-func commandToEvent2(cmd eventstore.Command) (_ eventstore.Event, err error) {
+func commandToEvent2(ctx context.Context, cmd eventstore.Command) (_ eventstore.Event, err error) {
 	var payload Payload
 	if cmd.Payload() != nil {
 		payload, err = json.Marshal(cmd.Payload())
