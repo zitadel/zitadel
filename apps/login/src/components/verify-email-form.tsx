@@ -18,7 +18,7 @@ type Inputs = {
 };
 
 type Props = {
-  userId: string;
+  userId?: string;
   loginName: string;
   code: string;
   organization?: string;
@@ -39,6 +39,7 @@ export function VerifyEmailForm({
   isInvite,
 }: Props) {
   const t = useTranslations("verify");
+  const tError = useTranslations("error");
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -65,9 +66,11 @@ export function VerifyEmailForm({
 
   const router = useRouter();
 
-  const params = new URLSearchParams({
-    userId: userId,
-  });
+  const params = new URLSearchParams({});
+
+  if (userId) {
+    params.append("userId", userId);
+  }
 
   if (isInvite) {
     params.append("initial", "true");
@@ -128,9 +131,12 @@ export function VerifyEmailForm({
 
     // if auth methods fall trough, we complete to login
     const params = new URLSearchParams({
-      userId: userId,
       initial: "true", // defines that a code is not required and is therefore not shown in the UI
     });
+
+    if (userId) {
+      params.set("userId", userId);
+    }
 
     if (organization) {
       params.set("organization", organization);
@@ -146,50 +152,66 @@ export function VerifyEmailForm({
   }
 
   return !authMethods ? (
-    <form className="w-full">
-      <div className="">
-        <TextInput
-          type="text"
-          autoComplete="one-time-code"
-          {...register("code", { required: "This field is required" })}
-          label="Code"
-          //   error={errors.username?.message as string}
-        />
-      </div>
+    <>
+      <h1>{t("title")}</h1>
+      <p className="ztdl-p mb-6 block">{t("description")}</p>
 
-      {error && (
+      {!userId && (
         <div className="py-4">
-          <Alert>{error}</Alert>
+          <Alert>{tError("unknownContext")}</Alert>
         </div>
       )}
 
-      <div className="mt-8 flex w-full flex-row items-center">
-        <Button
-          type="button"
-          onClick={() => resendCode()}
-          variant={ButtonVariants.Secondary}
-        >
-          {t("resendCode")}
-        </Button>
-        <span className="flex-grow"></span>
-        <Button
-          type="submit"
-          className="self-end"
-          variant={ButtonVariants.Primary}
-          disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitCodeAndContinue)}
-        >
-          {loading && <Spinner className="h-5 w-5 mr-2" />}
-          {t("submit")}
-        </Button>
-      </div>
-    </form>
+      <form className="w-full">
+        <div className="">
+          <TextInput
+            type="text"
+            autoComplete="one-time-code"
+            {...register("code", { required: "This field is required" })}
+            label="Code"
+            //   error={errors.username?.message as string}
+          />
+        </div>
+
+        {error && (
+          <div className="py-4">
+            <Alert>{error}</Alert>
+          </div>
+        )}
+
+        <div className="mt-8 flex w-full flex-row items-center">
+          <Button
+            type="button"
+            onClick={() => resendCode()}
+            variant={ButtonVariants.Secondary}
+          >
+            {t("resendCode")}
+          </Button>
+          <span className="flex-grow"></span>
+          <Button
+            type="submit"
+            className="self-end"
+            variant={ButtonVariants.Primary}
+            disabled={loading || !formState.isValid}
+            onClick={handleSubmit(submitCodeAndContinue)}
+          >
+            {loading && <Spinner className="h-5 w-5 mr-2" />}
+            {t("submit")}
+          </Button>
+        </div>
+      </form>
+    </>
   ) : (
-    <div className="grid grid-cols-1 gap-5 w-full pt-4">
-      {!authMethods.includes(AuthenticationMethodType.PASSWORD) &&
-        PASSWORD(false, "/password/set?" + params)}
-      {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
-        PASSKEYS(false, "/passkeys/set?" + params)}
-    </div>
+    <>
+      <h1>{t("title")}</h1>
+      <p className="ztdl-p mb-6 block">{t("description")}</p>
+
+      <div className="grid grid-cols-1 gap-5 w-full pt-4">
+        {!authMethods.includes(AuthenticationMethodType.PASSWORD) &&
+          PASSWORD(false, "/password/set?" + params)}
+        {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
+          PASSKEYS(false, "/passkeys/set?" + params)}
+      </div>
+    </>
   );
 }
