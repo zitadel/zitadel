@@ -176,6 +176,9 @@ func (wm *OIDCSessionWriteModel) CheckClient(clientID string) error {
 	return zerrors.ThrowPreconditionFailed(nil, "OIDCS-SKjl3", "Errors.OIDCSession.InvalidClient")
 }
 
-func (wm *OIDCSessionWriteModel) OIDCRefreshTokenID(refreshTokenID string) string {
-	return wm.AggregateID + TokenDelimiter + refreshTokenID
+func (wm *OIDCSessionWriteModel) OIDCRefreshTokenID(refreshTokenID string) (string, error) {
+	return (&OIDCSessionToken{
+		ID:           wm.AggregateID,
+		RefreshToken: refreshTokenID,
+	}).Encode()
 }

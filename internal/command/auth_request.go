@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -40,6 +41,15 @@ type CurrentAuthRequest struct {
 }
 
 const IDPrefixV2 = "V2_"
+
+func HasIDPrefixV2(token string) bool {
+	if sessionToken, err := DecodeOIDCSessionToken(token); strings.HasPrefix(token, IDPrefixV2) ||
+		(err == nil && strings.HasPrefix(sessionToken.ID, IDPrefixV2)) {
+		return true
+	}
+
+	return false
+}
 
 func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (_ *CurrentAuthRequest, err error) {
 	authRequestID, err := c.idGenerator.Next()
