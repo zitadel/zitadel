@@ -21,6 +21,9 @@ ARRAY[
 ]::eventstore.command[]
 );
 */
+
+create index e_push_idx on eventstore.events2(instance_id, aggregate_type, aggregate_id, owner) INCLUDE (sequence);
+
 DROP FUNCTION IF EXISTS eventstore.commands_to_events(eventstore.command[]);
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 AS $$
 WITH commands AS (
