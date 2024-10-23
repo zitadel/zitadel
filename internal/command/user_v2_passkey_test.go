@@ -34,8 +34,9 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 	}
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		idGenerator     id.Generator
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -51,18 +52,22 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "wrong user",
+			name: "no permission",
+			fields: fields{
+				eventstore:      expectEventstore(),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
 			args: args{
 				userID:        "foo",
 				resourceOwner: "org1",
 				authenticator: domain.AuthenticatorAttachmentCrossPlattform,
 			},
-			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "get human passwordless error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
 			},
@@ -76,7 +81,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(), // getHumanPasswordlessTokens
 					expectFilter(eventFromEventPusher(
 						user.NewHumanAddedEvent(ctx,
@@ -118,9 +123,10 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore,
-				idGenerator:    tt.fields.idGenerator,
-				webauthnConfig: webauthnConfig,
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				webauthnConfig:  webauthnConfig,
+				checkPermission: tt.fields.checkPermission,
 			}
 			_, err := c.RegisterUserPasskey(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.rpID, tt.args.authenticator)
 			require.ErrorIs(t, err, tt.wantErr)

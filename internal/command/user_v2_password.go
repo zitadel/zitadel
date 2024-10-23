@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -50,10 +49,8 @@ func (c *Commands) requestPasswordReset(ctx context.Context, userID string, retu
 	if model.UserState == domain.UserStateInitial {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised")
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err = c.checkPermission(ctx, domain.PermissionUserWrite, model.ResourceOwner, userID); err != nil {
-			return nil, nil, err
-		}
+	if err = c.checkPermissionUpdateUser(ctx, model.ResourceOwner, userID); err != nil {
+		return nil, nil, err
 	}
 	var passwordCode *EncryptedCode
 	var generatorID string

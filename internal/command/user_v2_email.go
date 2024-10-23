@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -118,10 +117,8 @@ func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userI
 	if err != nil {
 		return nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {
 		return nil, err
@@ -137,10 +134,8 @@ func (c *Commands) resendUserEmailCodeWithGeneratorEvents(ctx context.Context, u
 	if err != nil {
 		return nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err = c.checkPermissionUpdateUser(ctx, cmd.aggregate.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if cmd.model.Code == nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "EMAIL-5w5ilin4yt", "Errors.User.Code.Empty")
