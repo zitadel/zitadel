@@ -1,13 +1,14 @@
 "use client";
 
 import { Alert } from "@/components/alert";
-import { resendVerification, verifyUser } from "@/lib/server/email";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import {
+  resendVerification,
+  verifyUserAndCreateSession,
+} from "@/lib/server/email";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { AuthenticatorMethods } from "./authenticator-methods";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
@@ -18,25 +19,12 @@ type Inputs = {
 
 type Props = {
   userId: string;
-  loginName: string;
-  code: string;
-  organization?: string;
-  authRequestId?: string;
-  sessionId?: string;
+  code?: string;
   isInvite: boolean;
-  verifyError?: string;
+  params: URLSearchParams;
 };
 
-export function VerifyForm({
-  userId,
-  loginName,
-  code,
-  organization,
-  authRequestId,
-  sessionId,
-  isInvite,
-  verifyError,
-}: Props) {
+export function VerifyForm({ userId, code, isInvite, params }: Props) {
   const t = useTranslations("verify");
   const tError = useTranslations("error");
 
@@ -47,35 +35,11 @@ export function VerifyForm({
     },
   });
 
-  const [authMethods, setAuthMethods] = useState<
-    AuthenticationMethodType[] | null
-  >(null);
-
-  const [error, setError] = useState<string>(verifyError || "");
+  const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
-
-  const params = new URLSearchParams({
-    userId: userId,
-  });
-
-  if (isInvite) {
-    params.append("initial", "true");
-  }
-  if (loginName) {
-    params.append("loginName", loginName);
-  }
-  if (sessionId) {
-    params.append("sessionId", sessionId);
-  }
-  if (authRequestId) {
-    params.append("authRequestId", authRequestId);
-  }
-  if (organization) {
-    params.append("organization", organization);
-  }
 
   async function resendCode() {
     setLoading(true);
@@ -96,12 +60,13 @@ export function VerifyForm({
   async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     setLoading(true);
 
-    const verifyResponse = await verifyUser({
+    const verifyResponse = await verifyUserAndCreateSession({
       code: value.code,
       userId,
       isInvite: isInvite,
     }).catch(() => {
       setError("Could not verify email");
+      setLoading(false);
       return;
     });
 
@@ -110,33 +75,12 @@ export function VerifyForm({
     if (!verifyResponse) {
       setError("Could not verify email");
       return;
-    }
-
-    if (verifyResponse.authMethodTypes) {
-      setAuthMethods(verifyResponse.authMethodTypes);
-      return;
-    }
-
-    // if auth methods fall trough, we complete to login
-    const params = new URLSearchParams({
-      userId: userId,
-      initial: "true", // defines that a code is not required and is therefore not shown in the UI
-    });
-
-    if (organization) {
-      params.set("organization", organization);
-    }
-
-    if (authRequestId && sessionId) {
-      params.set("authRequest", authRequestId);
-      params.set("sessionId", sessionId);
-      return router.push(`/login?` + params);
     } else {
-      return router.push(`/loginname?` + params);
+      router.push("/authenticator/set?" + params);
     }
   }
 
-  return !authMethods ? (
+  return (
     <>
       <h1>{t("verify.title")}</h1>
       <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
@@ -178,13 +122,6 @@ export function VerifyForm({
           </Button>
         </div>
       </form>
-    </>
-  ) : (
-    <>
-      <h1>{t("setup.title")}</h1>
-      <p className="ztdl-p mb-6 block">{t("setup.description")}</p>
-
-      <AuthenticatorMethods authMethods={authMethods} params={params} />
     </>
   );
 }

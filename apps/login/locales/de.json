@@ -160,11 +160,12 @@
       "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
       "resendCode": "Code erneut senden",
       "submit": "Weiter"
-    },
-    "setup": {
-      "title": "Authentifizierungsmethode auswählen",
-      "description": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten."
     }
+  },
+  "authenticator": {
+    "title": "Authentifizierungsmethode auswählen",
+    "description": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten.",
+    "noMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar"
   },
   "error": {
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",

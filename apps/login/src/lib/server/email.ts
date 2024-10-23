@@ -1,27 +1,31 @@
 "use server";
 
 import {
-  listAuthenticationMethodTypes,
+  getUserByID,
   resendEmailCode,
   resendInviteCode,
   verifyEmail,
   verifyInviteCode,
 } from "@/lib/zitadel";
+import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { createSessionAndUpdateCookie } from "./cookie";
 
 type VerifyUserByEmailCommand = {
   userId: string;
   code: string;
   isInvite: boolean;
+  authRequestId?: string;
 };
 
-export async function verifyUser(command: VerifyUserByEmailCommand) {
+export async function verifyUserAndCreateSession(
+  command: VerifyUserByEmailCommand,
+) {
   const verifyResponse = command.isInvite
     ? await verifyInviteCode(command.userId, command.code).catch((error) => {
-        console.log(error.code);
         return { error: "Could not verify invite" };
       })
     : await verifyEmail(command.userId, command.code).catch((error) => {
-        console.log(error.code);
         return { error: "Could not verify email" };
       });
 
@@ -29,15 +33,31 @@ export async function verifyUser(command: VerifyUserByEmailCommand) {
     return { error: "Could not verify user" };
   }
 
-  const authMethodResponse = await listAuthenticationMethodTypes(
-    command.userId,
-  );
+  const userResponse = await getUserByID(command.userId);
 
-  if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
-    return { error: "Could not load possible authenticators" };
+  if (!userResponse || !userResponse.user) {
+    return { error: "Could not load user" };
   }
 
-  return { authMethodTypes: authMethodResponse.authMethodTypes };
+  const checks = create(ChecksSchema, {
+    user: {
+      search: {
+        case: "loginName",
+        value: userResponse.user.preferredLoginName,
+      },
+    },
+  });
+
+  const session = await createSessionAndUpdateCookie(
+    checks,
+    undefined,
+    command.authRequestId,
+  );
+
+  return {
+    sessionId: session.id,
+    factors: session.factors,
+  };
 }
 
 type resendVerifyEmailCommand = {

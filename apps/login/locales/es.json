@@ -160,11 +160,12 @@
       "description": "Introduce el código proporcionado en el correo electrónico de verificación.",
       "resendCode": "Reenviar código",
       "submit": "Continuar"
-    },
-    "setup": {
-      "title": "Seleccionar método de autenticación",
-      "description": "Selecciona el método con el que deseas autenticarte"
     }
+  },
+  "authenticator": {
+    "title": "Seleccionar método de autenticación",
+    "description": "Selecciona el método con el que deseas autenticarte",
+    "noMethodsAvailable": "No hay métodos de autenticación disponibles"
   },
   "error": {
     "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",
