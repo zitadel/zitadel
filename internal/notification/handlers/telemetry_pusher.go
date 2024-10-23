@@ -2,13 +2,9 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/zitadel/logging"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -16,9 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/notification/types"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
-	"github.com/zitadel/zitadel/internal/repository/pseudo"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -30,7 +24,6 @@ type TelemetryPusherConfig struct {
 	Enabled   bool
 	Endpoints []string
 	Headers   http.Header
-	Limit     uint64
 }
 
 type telemetryPusher struct {
@@ -54,7 +47,6 @@ func NewTelemetryPusher(
 		queries:  queries,
 		channels: channels,
 	}
-	handlerCfg.TriggerWithoutEvents = pusher.pushMilestones
 	return handler.NewHandler(
 		ctx,
 		&handlerCfg,
@@ -68,9 +60,9 @@ func (u *telemetryPusher) Name() string {
 
 func (t *telemetryPusher) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{{
-		Aggregate: pseudo.AggregateType,
+		Aggregate: milestone.AggregateType,
 		EventReducers: []handler.EventReducer{{
-			Event:  pseudo.ScheduledEventType,
+			Event:  milestone.ReachedEventType,
 			Reduce: t.pushMilestones,
 		}},
 	}}
@@ -78,51 +70,20 @@ func (t *telemetryPusher) Reducers() []handler.AggregateReducer {
 
 func (t *telemetryPusher) pushMilestones(event eventstore.Event) (*handler.Statement, error) {
 	ctx := call.WithTimestamp(context.Background())
-	scheduledEvent, ok := event.(*pseudo.ScheduledEvent)
+	e, ok := event.(*milestone.ReachedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-lDTs5", "reduce.wrong.event.type %s", event.Type())
 	}
-
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		isReached, err := query.NewNotNullQuery(query.MilestoneReachedDateColID)
-		if err != nil {
-			return err
+	return handler.NewStatement(event, func(handler.Executer, string) error {
+		// Do not push the milestone again if this was a migration event.
+		if e.ReachedDate != nil {
+			return nil
 		}
-		isNotPushed, err := query.NewIsNullQuery(query.MilestonePushedDateColID)
-		if err != nil {
-			return err
-		}
-		hasPrimaryDomain, err := query.NewNotNullQuery(query.MilestonePrimaryDomainColID)
-		if err != nil {
-			return err
-		}
-		unpushedMilestones, err := t.queries.Queries.SearchMilestones(ctx, scheduledEvent.InstanceIDs, &query.MilestonesSearchQueries{
-			SearchRequest: query.SearchRequest{
-				Limit:         t.cfg.Limit,
-				SortingColumn: query.MilestoneReachedDateColID,
-				Asc:           true,
-			},
-			Queries: []query.SearchQuery{isReached, isNotPushed, hasPrimaryDomain},
-		})
-		if err != nil {
-			return err
-		}
-		var errs int
-		for _, ms := range unpushedMilestones.Milestones {
-			if err = t.pushMilestone(ctx, scheduledEvent, ms); err != nil {
-				errs++
-				logging.Warnf("pushing milestone %+v failed: %s", *ms, err.Error())
-			}
-		}
-		if errs > 0 {
-			return fmt.Errorf("pushing %d of %d milestones failed", errs, unpushedMilestones.Count)
-		}
-		return nil
+		return t.pushMilestone(ctx, e)
 	}), nil
 }
 
-func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.ScheduledEvent, ms *query.Milestone) error {
-	ctx = authz.WithInstanceID(ctx, ms.InstanceID)
+func (t *telemetryPusher) pushMilestone(ctx context.Context, e *milestone.ReachedEvent) error {
 	for _, endpoint := range t.cfg.Endpoints {
 		if err := types.SendJSON(
 			ctx,
@@ -135,20 +96,18 @@ func (t *telemetryPusher) pushMilestone(ctx context.Context, event *pseudo.Sched
 			&struct {
 				InstanceID     string         `json:"instanceId"`
 				ExternalDomain string         `json:"externalDomain"`
-				PrimaryDomain  string         `json:"primaryDomain"`
 				Type           milestone.Type `json:"type"`
 				ReachedDate    time.Time      `json:"reached"`
 			}{
-				InstanceID:     ms.InstanceID,
+				InstanceID:     e.Agg.InstanceID,
 				ExternalDomain: t.queries.externalDomain,
-				PrimaryDomain:  ms.PrimaryDomain,
-				Type:           ms.Type,
-				ReachedDate:    ms.ReachedDate,
+				Type:           e.MilestoneType,
+				ReachedDate:    e.GetReachedDate(),
 			},
-			event,
+			e,
 		).WithoutTemplate(); err != nil {
 			return err
 		}
 	}
-	return t.commands.MilestonePushed(ctx, ms.Type, t.cfg.Endpoints, ms.PrimaryDomain)
+	return t.commands.MilestonePushed(ctx, e.Agg.InstanceID, e.MilestoneType, t.cfg.Endpoints)
 }
