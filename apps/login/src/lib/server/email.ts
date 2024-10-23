@@ -2,6 +2,7 @@
 
 import {
   getUserByID,
+  listAuthenticationMethodTypes,
   resendEmailCode,
   resendInviteCode,
   verifyEmail,
@@ -9,6 +10,7 @@ import {
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { redirect } from "next/navigation";
 import { createSessionAndUpdateCookie } from "./cookie";
 
 type VerifyUserByEmailCommand = {
@@ -54,10 +56,37 @@ export async function verifyUserAndCreateSession(
     command.authRequestId,
   );
 
-  return {
-    sessionId: session.id,
-    factors: session.factors,
-  };
+  const authMethodResponse = await listAuthenticationMethodTypes(
+    command.userId,
+  );
+
+  if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
+    return { error: "Could not load possible authenticators" };
+  }
+  console.log("xs");
+  // if no authmethods are found on the user, redirect to set one up
+  if (
+    authMethodResponse &&
+    authMethodResponse.authMethodTypes &&
+    authMethodResponse.authMethodTypes.length == 0
+  ) {
+    const params = new URLSearchParams({
+      sessionId: session.id,
+    });
+
+    if (session.factors?.user?.loginName) {
+      params.set("loginName", session.factors?.user?.loginName);
+    }
+
+    console.log("/authenticator/set?" + params);
+    return redirect("/authenticator/set?" + params);
+  }
+
+  // return {
+  //   authMethodTypes: authMethodResponse.authMethodTypes,
+  //   sessionId: session.id,
+  //   factors: session.factors,
+  // };
 }
 
 type resendVerifyEmailCommand = {

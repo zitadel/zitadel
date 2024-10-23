@@ -58,6 +58,7 @@ export function InviteForm({
     }).catch(() => {
       setError("Could not create invitation Code");
       setLoading(false);
+      return;
     });
 
     setLoading(false);
@@ -69,6 +70,7 @@ export function InviteForm({
 
     if (!response) {
       setError("Could not create invitation Code");
+      return;
     }
 
     const params = new URLSearchParams({});

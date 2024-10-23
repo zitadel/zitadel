@@ -6,7 +6,7 @@ import {
   verifyUserAndCreateSession,
 } from "@/lib/server/email";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariants } from "./button";
@@ -65,6 +65,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
       userId,
       isInvite: isInvite,
     }).catch(() => {
+      console.log(error);
       setError("Could not verify email");
       setLoading(false);
       return;
