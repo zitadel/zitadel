@@ -37,7 +37,11 @@ import {
   SearchQuery,
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
-import { SendInviteCodeSchema } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import {
+  SendInviteCodeSchema,
+  User,
+  UserState,
+} from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
@@ -327,7 +331,7 @@ export async function createInviteCode(userId: string, host: string | null) {
   if (host) {
     medium = {
       ...medium,
-      urlTemplate: `https://${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
+      urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
     };
   }
 
@@ -564,7 +568,7 @@ export async function passwordReset(userId: string, host: string | null) {
   if (host) {
     medium = {
       ...medium,
-      urlTemplate: `https://${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
+      urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
     };
   }
 
@@ -590,6 +594,7 @@ export async function passwordReset(userId: string, host: string | null) {
 export async function setPassword(
   userId: string,
   password: string,
+  user: User,
   code?: string,
 ) {
   let payload = create(SetPasswordRequestSchema, {
@@ -605,9 +610,8 @@ export async function setPassword(
 
     // if the user has no authmethods set, we can set a password otherwise we need a code
     if (
-      !authmethods ||
-      !authmethods.authMethodTypes ||
-      authmethods.authMethodTypes.length === 0
+      !(authmethods.authMethodTypes.length === 0) &&
+      user.state !== UserState.INITIAL
     ) {
       return { error: "Provide a code to set a password" };
     }
@@ -623,7 +627,14 @@ export async function setPassword(
     };
   }
 
-  return userService.setPassword(payload, {});
+  return userService.setPassword(payload, {}).catch((error) => {
+    // throw error if failed precondition (ex. User is not yet initialized)
+    if (error.code === 9 && error.message) {
+      return { error: error.message };
+    } else {
+      throw error;
+    }
+  });
 }
 
 /**

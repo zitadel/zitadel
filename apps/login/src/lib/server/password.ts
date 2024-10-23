@@ -284,5 +284,5 @@ export async function changePassword(command: {
   }
   const userId = user.userId;
 
-  return setPassword(userId, command.password, command.code);
+  return setPassword(userId, command.password, user, command.code);
 }

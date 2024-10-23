@@ -139,6 +139,7 @@
     "title": "Invita Utente",
     "description": "Inserisci l'indirizzo email dell'utente che desideri invitare.",
     "info": "L'utente riceverà un'email con ulteriori istruzioni.",
+    "notAllowed": "Non hai i permessi per invitare un utente.",
     "submit": "Invita Utente",
     "success": {
       "title": "Invito inviato",
@@ -153,11 +154,17 @@
     "description": "Sei connesso."
   },
   "verify": {
-    "title": "Verifica utente",
-    "description": "Inserisci il codice fornito nell'email di verifica.",
     "userIdMissing": "Nessun userId fornito!",
-    "resendCode": "Invia di nuovo il codice",
-    "submit": "Continua"
+    "verify": {
+      "title": "Verifica utente",
+      "description": "Inserisci il codice fornito nell'email di verifica.",
+      "resendCode": "Invia di nuovo il codice",
+      "submit": "Continua"
+    },
+    "setup": {
+      "title": "Seleziona metodo di autenticazione",
+      "description": "Seleziona il metodo con cui desideri autenticarti"
+    }
   },
   "error": {
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",

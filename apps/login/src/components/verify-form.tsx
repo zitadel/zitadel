@@ -2,13 +2,12 @@
 
 import { Alert } from "@/components/alert";
 import { resendVerification, verifyUser } from "@/lib/server/email";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { PASSKEYS, PASSWORD } from "./auth-methods";
+import { AuthenticatorMethods } from "./authenticator-methods";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
@@ -18,25 +17,25 @@ type Inputs = {
 };
 
 type Props = {
-  userId?: string;
+  userId: string;
   loginName: string;
   code: string;
   organization?: string;
   authRequestId?: string;
   sessionId?: string;
-  loginSettings?: LoginSettings;
   isInvite: boolean;
+  verifyError?: string;
 };
 
-export function VerifyEmailForm({
+export function VerifyForm({
   userId,
   loginName,
   code,
   organization,
   authRequestId,
   sessionId,
-  loginSettings,
   isInvite,
+  verifyError,
 }: Props) {
   const t = useTranslations("verify");
   const tError = useTranslations("error");
@@ -52,30 +51,19 @@ export function VerifyEmailForm({
     AuthenticationMethodType[] | null
   >(null);
 
-  useEffect(() => {
-    if (code && userId) {
-      // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
-      // For programmatic verification, the /verifyemail API should be used.
-      submitCodeAndContinue({ code });
-    }
-  }, []);
-
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>(verifyError || "");
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
 
-  const params = new URLSearchParams({});
-
-  if (userId) {
-    params.append("userId", userId);
-  }
+  const params = new URLSearchParams({
+    userId: userId,
+  });
 
   if (isInvite) {
     params.append("initial", "true");
   }
-
   if (loginName) {
     params.append("loginName", loginName);
   }
@@ -131,12 +119,9 @@ export function VerifyEmailForm({
 
     // if auth methods fall trough, we complete to login
     const params = new URLSearchParams({
+      userId: userId,
       initial: "true", // defines that a code is not required and is therefore not shown in the UI
     });
-
-    if (userId) {
-      params.set("userId", userId);
-    }
 
     if (organization) {
       params.set("organization", organization);
@@ -153,14 +138,8 @@ export function VerifyEmailForm({
 
   return !authMethods ? (
     <>
-      <h1>{t("title")}</h1>
-      <p className="ztdl-p mb-6 block">{t("description")}</p>
-
-      {!userId && (
-        <div className="py-4">
-          <Alert>{tError("unknownContext")}</Alert>
-        </div>
-      )}
+      <h1>{t("verify.title")}</h1>
+      <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
       <form className="w-full">
         <div className="">
@@ -169,7 +148,6 @@ export function VerifyEmailForm({
             autoComplete="one-time-code"
             {...register("code", { required: "This field is required" })}
             label="Code"
-            //   error={errors.username?.message as string}
           />
         </div>
 
@@ -185,7 +163,7 @@ export function VerifyEmailForm({
             onClick={() => resendCode()}
             variant={ButtonVariants.Secondary}
           >
-            {t("resendCode")}
+            {t("verify.resendCode")}
           </Button>
           <span className="flex-grow"></span>
           <Button
@@ -196,22 +174,17 @@ export function VerifyEmailForm({
             onClick={handleSubmit(submitCodeAndContinue)}
           >
             {loading && <Spinner className="h-5 w-5 mr-2" />}
-            {t("submit")}
+            {t("verify.submit")}
           </Button>
         </div>
       </form>
     </>
   ) : (
     <>
-      <h1>{t("title")}</h1>
-      <p className="ztdl-p mb-6 block">{t("description")}</p>
+      <h1>{t("setup.title")}</h1>
+      <p className="ztdl-p mb-6 block">{t("setup.description")}</p>
 
-      <div className="grid grid-cols-1 gap-5 w-full pt-4">
-        {!authMethods.includes(AuthenticationMethodType.PASSWORD) &&
-          PASSWORD(false, "/password/set?" + params)}
-        {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
-          PASSKEYS(false, "/passkeys/set?" + params)}
-      </div>
+      <AuthenticatorMethods authMethods={authMethods} params={params} />
     </>
   );
 }

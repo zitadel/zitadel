@@ -77,6 +77,8 @@ export function ChangePasswordForm({
       return;
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // wait for a second, to prevent eventual consistency issues
+
     const passwordResponse = await sendPassword({
       loginName,
       organization,

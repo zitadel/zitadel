@@ -7,7 +7,7 @@ import {
   getSession,
   setSession,
 } from "@/lib/zitadel";
-import { timestampDate } from "@zitadel/client";
+import { timestampMs } from "@zitadel/client";
 import {
   Challenges,
   RequestChallenges,
@@ -43,13 +43,13 @@ export async function createSessionAndUpdateCookie(
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationDate: response.session.creationDate
-            ? `${timestampDate(response.session.creationDate).toDateString()}`
+            ? `${timestampMs(response.session.creationDate)}`
             : "",
           expirationDate: response.session.expirationDate
-            ? `${timestampDate(response.session.expirationDate).toDateString()}`
+            ? `${timestampMs(response.session.expirationDate)}`
             : "",
           changeDate: response.session.changeDate
-            ? `${timestampDate(response.session.changeDate).toDateString()}`
+            ? `${timestampMs(response.session.changeDate)}`
             : "",
           loginName: response.session.factors.user.loginName ?? "",
         };
@@ -98,13 +98,13 @@ export async function createSessionForIdpAndUpdateCookie(
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationDate: response.session.creationDate
-            ? `${timestampDate(response.session.creationDate).toDateString()}`
+            ? `${timestampMs(response.session.creationDate)}`
             : "",
           expirationDate: response.session.expirationDate
-            ? `${timestampDate(response.session.expirationDate).toDateString()}`
+            ? `${timestampMs(response.session.expirationDate)}`
             : "",
           changeDate: response.session.changeDate
-            ? `${timestampDate(response.session.changeDate).toDateString()}`
+            ? `${timestampMs(response.session.changeDate)}`
             : "",
           loginName: response.session.factors.user.loginName ?? "",
           organization: response.session.factors.user.organizationId ?? "",
@@ -155,7 +155,7 @@ export async function setSessionAndUpdateCookie(
         expirationDate: recentCookie.expirationDate,
         // just overwrite the changeDate with the new one
         changeDate: updatedSession.details?.changeDate
-          ? `${timestampDate(updatedSession.details.changeDate).toDateString()}`
+          ? `${timestampMs(updatedSession.details.changeDate)}`
           : "",
         loginName: recentCookie.loginName,
         organization: recentCookie.organization,
@@ -178,7 +178,7 @@ export async function setSessionAndUpdateCookie(
             expirationDate: sessionCookie.expirationDate,
             // just overwrite the changeDate with the new one
             changeDate: updatedSession.details?.changeDate
-              ? `${timestampDate(updatedSession.details.changeDate).toDateString()}`
+              ? `${timestampMs(updatedSession.details.changeDate)}`
               : "",
             loginName: session.factors?.user?.loginName ?? "",
             organization: session.factors?.user?.organizationId ?? "",

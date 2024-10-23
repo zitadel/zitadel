@@ -59,7 +59,7 @@ export function SetPasswordForm({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  async function submitRegister(values: Inputs) {
+  async function submitPassword(values: Inputs) {
     setLoading(true);
     let payload: { userId: string; password: string; code?: string } = {
       userId: userId,
@@ -73,16 +73,19 @@ export function SetPasswordForm({
 
     const changeResponse = await changePassword(payload).catch(() => {
       setError("Could not set password");
+      setLoading(false);
+      return;
     });
-
-    if (changeResponse && "error" in changeResponse) {
-      setError(changeResponse.error);
-    }
 
     setLoading(false);
 
+    if (changeResponse && "error" in changeResponse) {
+      setError(changeResponse.error);
+      return;
+    }
+
     if (!changeResponse) {
-      setError("Could not register user");
+      setError("Could not set password");
       return;
     }
 
@@ -94,6 +97,8 @@ export function SetPasswordForm({
     if (organization) {
       params.append("organization", organization);
     }
+
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for a second to avoid eventual consistency issues with an initial password being set
 
     const passwordResponse = await sendPassword({
       loginName,
@@ -213,7 +218,7 @@ export function SetPasswordForm({
             !formState.isValid ||
             watchPassword !== watchConfirmPassword
           }
-          onClick={handleSubmit(submitRegister)}
+          onClick={handleSubmit(submitPassword)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("set.submit")}

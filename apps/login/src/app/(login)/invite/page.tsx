@@ -4,6 +4,7 @@ import { InviteForm } from "@/components/invite-form";
 import {
   getBrandingSettings,
   getDefaultOrg,
+  getLoginSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -27,6 +28,8 @@ export default async function Page({
     organization = org.id;
   }
 
+  const loginSettings = await getLoginSettings(organization);
+
   const passwordComplexitySettings =
     await getPasswordComplexitySettings(organization);
 
@@ -38,9 +41,13 @@ export default async function Page({
         <h1>{t("title")}</h1>
         <p className="ztdl-p">{t("description")}</p>
 
-        <Alert type={AlertType.INFO}>{t("info")}</Alert>
+        {!loginSettings?.allowRegister ? (
+          <Alert type={AlertType.ALERT}>{t("notAllowed")}</Alert>
+        ) : (
+          <Alert type={AlertType.INFO}>{t("info")}</Alert>
+        )}
 
-        {passwordComplexitySettings && (
+        {passwordComplexitySettings && loginSettings?.allowRegister && (
           <InviteForm
             organization={organization}
             firstname={firstname}

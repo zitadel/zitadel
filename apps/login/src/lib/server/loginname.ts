@@ -139,6 +139,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (users.result[0].state === UserState.INITIAL) {
       const params = new URLSearchParams({
         loginName: session.factors?.user?.loginName,
+        initial: "true", // this does not require a code to be set
       });
 
       if (command.organization || session.factors?.user?.organizationId) {
