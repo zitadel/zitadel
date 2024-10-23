@@ -92,7 +92,7 @@ func TestServer_ListIAMMembers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, 20*time.Second)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
 				got, err := Client.ListIAMMembers(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
@@ -103,10 +103,11 @@ func TestServer_ListIAMMembers(t *testing.T) {
 				wantResult := tt.want.GetResult()
 				gotResult := got.GetResult()
 
-				require.Len(ct, gotResult, len(wantResult))
-				for i, want := range wantResult {
-					assert.Equal(ct, want.GetUserId(), gotResult[i].GetUserId())
-					assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
+				if assert.Len(ct, gotResult, len(wantResult)) {
+					for i, want := range wantResult {
+						assert.Equal(ct, want.GetUserId(), gotResult[i].GetUserId())
+						assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
+					}
 				}
 			}, retryDuration, tick)
 		})
