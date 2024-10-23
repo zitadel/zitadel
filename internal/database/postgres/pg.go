@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/mitchellh/mapstructure"
@@ -81,6 +82,15 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
 	if err != nil {
 		return nil, nil, err
+	}
+
+	config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		for _, f := range connConfig.AfterConnect {
+			if err := f(ctx, conn); err != nil {
+				return err
+			}
+		}
+		return nil
 	}
 
 	if connConfig.MaxOpenConns != 0 {
