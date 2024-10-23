@@ -841,6 +841,16 @@ module.exports = {
       label: "Rate Limits (Cloud)", // The link label
       href: "/legal/policies/rate-limit-policy", // The internal path
     },
+    {
+      type: "category",
+      label: "Benchmarks",
+      collapsed: true,      
+      link: {
+        type: "doc",
+        id: "apis/benchmarks/index",
+      },
+      items: [],
+    },
   ],
   selfHosting: [
     {
