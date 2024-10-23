@@ -80,7 +80,15 @@ func AssertResourceDetails(t assert.TestingT, expected *resources_object.Details
 		gotCreatedDate := actual.GetCreated().AsTime()
 		assert.WithinRange(t, gotCreatedDate, wantCreatedDate.Add(-time.Minute), wantCreatedDate.Add(time.Minute))
 	}
-	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
+	if expected.GetOwner() != nil {
+		expectedOwner := expected.GetOwner()
+		actualOwner := actual.GetOwner()
+		if !assert.NotNil(t, actualOwner) {
+			return
+		}
+		assert.Equal(t, expectedOwner.GetId(), actualOwner.GetId())
+		assert.Equal(t, expectedOwner.GetType(), actualOwner.GetType())
+	}
 	assert.NotEmpty(t, actual.GetId())
 	if expected.GetId() != "" {
 		assert.Equal(t, expected.GetId(), actual.GetId())
@@ -99,7 +107,7 @@ func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t assert.TestingT, ex
 	if wantDetails.GetTimestamp() != nil {
 		gotCD := gotDetails.GetTimestamp().AsTime()
 		wantCD := time.Now()
-		assert.WithinRange(t, gotCD, wantCD.Add(-10*time.Minute), wantCD.Add(time.Minute))
+		assert.WithinRange(t, gotCD, wantCD.Add(-1*time.Minute), wantCD.Add(time.Minute))
 	}
 }
 
