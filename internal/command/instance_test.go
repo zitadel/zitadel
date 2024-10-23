@@ -1486,8 +1486,6 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 								"custom.domain",
 							},
 						),
-					),
-					expectPush(
 						milestone.NewReachedEvent(context.Background(),
 							milestone.NewInstanceAggregate("INSTANCE"),
 							milestone.InstanceDeleted,

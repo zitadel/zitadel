@@ -38,7 +38,7 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 	if err != nil {
 		return nil, err
 	}
-	return project, c.projectCreatedMilestone(ctx)
+	return project, nil
 }
 
 func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
@@ -61,7 +61,7 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 	if err != nil {
 		return nil, err
 	}
-	return project, c.projectCreatedMilestone(ctx)
+	return project, nil
 }
 
 func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {
@@ -79,11 +79,15 @@ func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Proj
 			projectAdd.HasProjectCheck,
 			projectAdd.PrivateLabelingSetting),
 	}
-
+	postCommit, err := c.projectCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedProject, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -111,11 +115,15 @@ func (c *Commands) addProjectWithIDWithOwner(ctx context.Context, projectAdd *do
 			projectAdd.PrivateLabelingSetting),
 		project.NewProjectMemberAddedEvent(ctx, projectAgg, ownerUserID, projectRole),
 	}
-
+	postCommit, err := c.projectCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedProject, pushedEvents...)
 	if err != nil {
 		return nil, err

@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/limits"
+	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -890,12 +891,12 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.Objec
 	if err != nil {
 		return nil, err
 	}
-
+	c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, id)
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, c.instanceRemovedMilestone(ctx, id)
+	}, nil
 }
 
 func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Validation {
@@ -908,10 +909,16 @@ func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Vali
 			if !writeModel.State.Exists() {
 				return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
 			}
-			return []eventstore.Command{instance.NewInstanceRemovedEvent(ctx,
-					&a.Aggregate,
-					writeModel.Name,
-					writeModel.Domains)},
+			milestoneAggregate := milestone.NewInstanceAggregate(a.ID)
+			return []eventstore.Command{
+					instance.NewInstanceRemovedEvent(ctx,
+						&a.Aggregate,
+						writeModel.Name,
+						writeModel.Domains),
+					milestone.NewReachedEvent(ctx,
+						milestoneAggregate,
+						milestone.InstanceDeleted),
+				},
 				nil
 		}, nil
 	}

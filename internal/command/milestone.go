@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -107,75 +108,69 @@ func setupInstanceCreatedMilestone(validations *[]preparation.Validation, instan
 	})
 }
 
-func (c *Commands) oidcSessionMilestones(ctx context.Context, clientID string, isHuman bool) error {
-	milestones, err := c.GetMilestonesReached(ctx)
+func (s *OIDCSessionEvents) SetMilestones(ctx context.Context, clientID string, isHuman bool) (postCommit func(ctx context.Context), err error) {
+	postCommit = func(ctx context.Context) {}
+	milestones, err := s.commands.GetMilestonesReached(ctx)
 	if err != nil {
-		return err
+		return postCommit, err
 	}
 
 	instance := authz.GetInstance(ctx)
-	var cmds []eventstore.Command
 	aggregate := milestone.NewAggregate(ctx)
+	var invalidate bool
 	if !milestones.AuthenticationSucceededOnInstance {
-		cmds = append(cmds, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance))
+		s.events = append(s.events, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance))
+		invalidate = true
 	}
 	if !milestones.AuthenticationSucceededOnApplication && isHuman && clientID != instance.ConsoleClientID() {
-		cmds = append(cmds, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication))
+		s.events = append(s.events, milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication))
+		invalidate = true
 	}
-	if len(cmds) == 0 {
-		return nil
+	if invalidate {
+		postCommit = s.commands.invalidateMilestoneCachePostCommit(instance.InstanceID())
 	}
-	if _, err = c.eventstore.Push(ctx, cmds...); err != nil {
-		return err
-	}
-	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, instance.InstanceID())
+	return postCommit, nil
 }
 
-func (c *Commands) projectCreatedMilestone(ctx context.Context) error {
+func (c *Commands) projectCreatedMilestone(ctx context.Context, cmds *[]eventstore.Command) (postCommit func(ctx context.Context), err error) {
+	postCommit = func(ctx context.Context) {}
 	if isSystemUser(ctx) {
-		return nil
+		return postCommit, nil
 	}
 	milestones, err := c.GetMilestonesReached(ctx)
 	if err != nil {
-		return err
+		return postCommit, err
 	}
 	if milestones.ProjectCreated {
-		return nil
+		return postCommit, nil
 	}
 	aggregate := milestone.NewAggregate(ctx)
-	_, err = c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.ProjectCreated))
-	if err != nil {
-		return err
-	}
-	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, authz.GetInstance(ctx).InstanceID())
+	*cmds = append(*cmds, milestone.NewReachedEvent(ctx, aggregate, milestone.ProjectCreated))
+	return c.invalidateMilestoneCachePostCommit(aggregate.InstanceID), nil
 }
 
-func (c *Commands) applicationCreatedMilestone(ctx context.Context) error {
+func (c *Commands) applicationCreatedMilestone(ctx context.Context, cmds *[]eventstore.Command) (postCommit func(ctx context.Context), err error) {
+	postCommit = func(ctx context.Context) {}
 	if isSystemUser(ctx) {
-		return nil
+		return postCommit, nil
 	}
 	milestones, err := c.GetMilestonesReached(ctx)
 	if err != nil {
-		return err
+		return postCommit, err
 	}
 	if milestones.ApplicationCreated {
-		return nil
+		return postCommit, nil
 	}
 	aggregate := milestone.NewAggregate(ctx)
-	_, err = c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.ApplicationCreated))
-	if err != nil {
-		return err
-	}
-	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, authz.GetInstance(ctx).InstanceID())
+	*cmds = append(*cmds, milestone.NewReachedEvent(ctx, aggregate, milestone.ApplicationCreated))
+	return c.invalidateMilestoneCachePostCommit(aggregate.InstanceID), nil
 }
 
-func (c *Commands) instanceRemovedMilestone(ctx context.Context, instanceID string) error {
-	aggregate := milestone.NewInstanceAggregate(instanceID)
-	_, err := c.eventstore.Push(ctx, milestone.NewReachedEvent(ctx, aggregate, milestone.InstanceDeleted))
-	if err != nil {
-		return err
+func (c *Commands) invalidateMilestoneCachePostCommit(instanceID string) func(ctx context.Context) {
+	return func(ctx context.Context) {
+		err := c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, instanceID)
+		logging.WithFields("instance_id", instanceID).OnError(err).Error("failed to invalidate milestone cache")
 	}
-	return c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, instanceID)
 }
 
 func isSystemUser(ctx context.Context) bool {

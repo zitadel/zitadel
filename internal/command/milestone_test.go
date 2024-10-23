@@ -299,7 +299,7 @@ func TestCommands_MilestonePushed(t *testing.T) {
 	}
 }
 
-func TestCommands_oidcSessionMilestones(t *testing.T) {
+func TestOIDCSessionEvents_SetMilestones(t *testing.T) {
 	ctx := authz.WithInstanceID(context.Background(), "instanceID")
 	ctx = authz.WithConsoleClientID(ctx, "console")
 	aggregate := milestone.NewAggregate(ctx)
@@ -313,10 +313,11 @@ func TestCommands_oidcSessionMilestones(t *testing.T) {
 		isHuman  bool
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr error
+		name       string
+		fields     fields
+		args       args
+		wantEvents []eventstore.Command
+		wantErr    error
 	}{
 		{
 			name: "get error",
@@ -354,15 +355,15 @@ func TestCommands_oidcSessionMilestones(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
-					expectPush(
-						milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance),
-					),
 				),
 			},
 			args: args{
 				ctx:      ctx,
 				clientID: "console",
 				isHuman:  true,
+			},
+			wantEvents: []eventstore.Command{
+				milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance),
 			},
 			wantErr: nil,
 		},
@@ -405,37 +406,17 @@ func TestCommands_oidcSessionMilestones(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance)),
 					),
-					expectPush(
-						milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication),
-					),
 				),
 			},
 			args: args{
 				ctx:      ctx,
 				clientID: "client",
 				isHuman:  true,
+			},
+			wantEvents: []eventstore.Command{
+				milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication),
 			},
 			wantErr: nil,
-		},
-		{
-			name: "pusher error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnInstance)),
-					),
-					expectPushFailed(
-						io.ErrClosedPipe,
-						milestone.NewReachedEvent(ctx, aggregate, milestone.AuthenticationSucceededOnApplication),
-					),
-				),
-			},
-			args: args{
-				ctx:      ctx,
-				clientID: "client",
-				isHuman:  true,
-			},
-			wantErr: io.ErrClosedPipe,
 		},
 	}
 	for _, tt := range tests {
@@ -446,8 +427,13 @@ func TestCommands_oidcSessionMilestones(t *testing.T) {
 					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
 				},
 			}
-			err := c.oidcSessionMilestones(tt.args.ctx, tt.args.clientID, tt.args.isHuman)
-			assert.ErrorIs(t, err, tt.wantErr)
+			s := &OIDCSessionEvents{
+				commands: c,
+			}
+			postCommit, err := s.SetMilestones(tt.args.ctx, tt.args.clientID, tt.args.isHuman)
+			postCommit(tt.args.ctx)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantEvents, s.events)
 		})
 	}
 }
@@ -470,10 +456,11 @@ func TestCommands_projectCreatedMilestone(t *testing.T) {
 		ctx context.Context
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr error
+		name       string
+		fields     fields
+		args       args
+		wantEvents []eventstore.Command
+		wantErr    error
 	}{
 		{
 			name: "system user",
@@ -512,35 +499,19 @@ func TestCommands_projectCreatedMilestone(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "milestone pushed",
+			name: "milestone reached event",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
-					expectPush(
-						milestone.NewReachedEvent(ctx, aggregate, milestone.ProjectCreated),
-					),
 				),
 			},
 			args: args{
 				ctx: ctx,
+			},
+			wantEvents: []eventstore.Command{
+				milestone.NewReachedEvent(ctx, aggregate, milestone.ProjectCreated),
 			},
 			wantErr: nil,
-		},
-		{
-			name: "pusher error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-					expectPushFailed(
-						io.ErrClosedPipe,
-						milestone.NewReachedEvent(ctx, aggregate, milestone.ProjectCreated),
-					),
-				),
-			},
-			args: args{
-				ctx: ctx,
-			},
-			wantErr: io.ErrClosedPipe,
 		},
 	}
 	for _, tt := range tests {
@@ -551,8 +522,11 @@ func TestCommands_projectCreatedMilestone(t *testing.T) {
 					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
 				},
 			}
-			err := c.projectCreatedMilestone(tt.args.ctx)
-			assert.ErrorIs(t, err, tt.wantErr)
+			var cmds []eventstore.Command
+			postCommit, err := c.projectCreatedMilestone(tt.args.ctx, &cmds)
+			postCommit(tt.args.ctx)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantEvents, cmds)
 		})
 	}
 }
@@ -575,10 +549,11 @@ func TestCommands_applicationCreatedMilestone(t *testing.T) {
 		ctx context.Context
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr error
+		name       string
+		fields     fields
+		args       args
+		wantEvents []eventstore.Command
+		wantErr    error
 	}{
 		{
 			name: "system user",
@@ -617,35 +592,19 @@ func TestCommands_applicationCreatedMilestone(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "milestone pushed",
+			name: "milestone reached event",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
-					expectPush(
-						milestone.NewReachedEvent(ctx, aggregate, milestone.ApplicationCreated),
-					),
 				),
 			},
 			args: args{
 				ctx: ctx,
+			},
+			wantEvents: []eventstore.Command{
+				milestone.NewReachedEvent(ctx, aggregate, milestone.ApplicationCreated),
 			},
 			wantErr: nil,
-		},
-		{
-			name: "pusher error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(),
-					expectPushFailed(
-						io.ErrClosedPipe,
-						milestone.NewReachedEvent(ctx, aggregate, milestone.ApplicationCreated),
-					),
-				),
-			},
-			args: args{
-				ctx: ctx,
-			},
-			wantErr: io.ErrClosedPipe,
 		},
 	}
 	for _, tt := range tests {
@@ -656,71 +615,11 @@ func TestCommands_applicationCreatedMilestone(t *testing.T) {
 					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
 				},
 			}
-			err := c.applicationCreatedMilestone(tt.args.ctx)
-			assert.ErrorIs(t, err, tt.wantErr)
-		})
-	}
-}
-
-func TestCommands_instanceRemovedMilestone(t *testing.T) {
-	ctx := authz.WithInstanceID(context.Background(), "instanceID")
-	aggregate := milestone.NewInstanceAggregate("instanceID")
-
-	type fields struct {
-		eventstore func(*testing.T) *eventstore.Eventstore
-	}
-	type args struct {
-		ctx        context.Context
-		instanceID string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr error
-	}{
-		{
-			name: "milestone pushed",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectPush(
-						milestone.NewReachedEvent(ctx, aggregate, milestone.InstanceDeleted),
-					),
-				),
-			},
-			args: args{
-				ctx:        ctx,
-				instanceID: "instanceID",
-			},
-			wantErr: nil,
-		},
-		{
-			name: "pusher error",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectPushFailed(
-						io.ErrClosedPipe,
-						milestone.NewReachedEvent(ctx, aggregate, milestone.InstanceDeleted),
-					),
-				),
-			},
-			args: args{
-				ctx:        ctx,
-				instanceID: "instanceID",
-			},
-			wantErr: io.ErrClosedPipe,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
-				caches: &Caches{
-					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
-				},
-			}
-			err := c.instanceRemovedMilestone(tt.args.ctx, tt.args.instanceID)
-			assert.ErrorIs(t, err, tt.wantErr)
+			var cmds []eventstore.Command
+			postCommit, err := c.applicationCreatedMilestone(tt.args.ctx, &cmds)
+			postCommit(tt.args.ctx)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantEvents, cmds)
 		})
 	}
 }

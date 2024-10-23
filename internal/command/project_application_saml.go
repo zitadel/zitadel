@@ -28,10 +28,15 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, err
 	}
 	addedApplication.AppID = application.AppID
+	postCommit, err := c.applicationCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedApplication, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -77,7 +82,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 			samlApp.Metadata,
 			samlApp.MetadataURL,
 		),
-	}, c.applicationCreatedMilestone(ctx)
+	}, nil
 }
 
 func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SAMLApp, resourceOwner string) (*domain.SAMLApp, error) {
