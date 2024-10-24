@@ -5,6 +5,13 @@ describe("register", () => {
     stub("zitadel.user.v2.UserService", "AddHumanUser", {
       data: {
         userId: "123",
+        email: {
+          email: "john@zitadel.com",
+        },
+        profile: {
+          givenName: "John",
+          familyName: "Doe",
+        },
       },
     });
   });
