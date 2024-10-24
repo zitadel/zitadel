@@ -35,16 +35,13 @@ export default async function RootLayout({
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
             <div
-              className={`relative min-h-screen bg-background-light-600 dark:bg-background-dark-600`}
+              className={`relative min-h-screen bg-background-light-600 dark:bg-background-dark-600 flex flex-col justify-center`}
             >
-              <div className="absolute bottom-0 right-0 flex flex-row p-4 items-center space-x-4">
-                <LanguageSwitcher />
-                <Theme />
-              </div>
-
-              <div className={`pb-4 flex flex-col justify-center h-full`}>
-                <div className="mx-auto max-w-[440px] space-y-8 pt-20 lg:py-8 w-full">
-                  {children}
+              <div className="relative mx-auto max-w-[440px] py-8 w-full ">
+                {children}
+                <div className="flex flex-row justify-end py-4 items-center space-x-4">
+                  <LanguageSwitcher />
+                  <Theme />
                 </div>
               </div>
             </div>
