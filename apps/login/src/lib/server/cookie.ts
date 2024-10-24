@@ -20,9 +20,9 @@ type CustomCookieData = {
   token: string;
   loginName: string;
   organization?: string;
-  creationDate: string;
-  expirationDate: string;
-  changeDate: string;
+  creationTs: string;
+  expirationTs: string;
+  changeTs: string;
   authRequestId?: string; // if its linked to an OIDC flow
 };
 
@@ -42,13 +42,13 @@ export async function createSessionAndUpdateCookie(
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: response.session.creationDate
+          creationTs: response.session.creationDate
             ? `${timestampMs(response.session.creationDate)}`
             : "",
-          expirationDate: response.session.expirationDate
+          expirationTs: response.session.expirationDate
             ? `${timestampMs(response.session.expirationDate)}`
             : "",
-          changeDate: response.session.changeDate
+          changeTs: response.session.changeDate
             ? `${timestampMs(response.session.changeDate)}`
             : "",
           loginName: response.session.factors.user.loginName ?? "",
@@ -97,13 +97,13 @@ export async function createSessionForIdpAndUpdateCookie(
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: response.session.creationDate
+          creationTs: response.session.creationDate
             ? `${timestampMs(response.session.creationDate)}`
             : "",
-          expirationDate: response.session.expirationDate
+          expirationTs: response.session.expirationDate
             ? `${timestampMs(response.session.expirationDate)}`
             : "",
-          changeDate: response.session.changeDate
+          changeTs: response.session.changeDate
             ? `${timestampMs(response.session.changeDate)}`
             : "",
           loginName: response.session.factors.user.loginName ?? "",
@@ -151,10 +151,10 @@ export async function setSessionAndUpdateCookie(
       const sessionCookie: CustomCookieData = {
         id: recentCookie.id,
         token: updatedSession.sessionToken,
-        creationDate: recentCookie.creationDate,
-        expirationDate: recentCookie.expirationDate,
+        creationTs: recentCookie.creationTs,
+        expirationTs: recentCookie.expirationTs,
         // just overwrite the changeDate with the new one
-        changeDate: updatedSession.details?.changeDate
+        changeTs: updatedSession.details?.changeDate
           ? `${timestampMs(updatedSession.details.changeDate)}`
           : "",
         loginName: recentCookie.loginName,
@@ -174,10 +174,10 @@ export async function setSessionAndUpdateCookie(
           const newCookie: CustomCookieData = {
             id: sessionCookie.id,
             token: updatedSession.sessionToken,
-            creationDate: sessionCookie.creationDate,
-            expirationDate: sessionCookie.expirationDate,
+            creationTs: sessionCookie.creationTs,
+            expirationTs: sessionCookie.expirationTs,
             // just overwrite the changeDate with the new one
-            changeDate: updatedSession.details?.changeDate
+            changeTs: updatedSession.details?.changeDate
               ? `${timestampMs(updatedSession.details.changeDate)}`
               : "",
             loginName: session.factors?.user?.loginName ?? "",

@@ -1,6 +1,5 @@
 import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
-import { ChooseAuthenticatorToSetup } from "@/components/choose-authenticator-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
@@ -41,12 +40,13 @@ export default async function Page({
   const t = await getTranslations({ locale, namespace: "authenticator" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, checkAfter, authRequestId, organization, sessionId } =
-    searchParams;
+  const { loginName, authRequestId, organization, sessionId } = searchParams;
 
   const sessionWithData = sessionId
     ? await loadSessionById(sessionId, organization)
     : await loadSessionByLoginname(loginName, organization);
+
+  console.log("sessionWithData", sessionWithData);
 
   async function getAuthMethodsAndUser(session?: Session) {
     const userId = session?.factors?.user?.id;
@@ -93,7 +93,9 @@ export default async function Page({
     });
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings(
+    sessionWithData.factors?.user?.organizationId,
+  );
 
   const loginSettings = await getLoginSettings(
     sessionWithData.factors?.user?.organizationId,
@@ -141,14 +143,14 @@ export default async function Page({
 
         {!valid && <Alert>{tError("sessionExpired")}</Alert>}
 
-        {loginSettings && sessionWithData && (
+        {/* {loginSettings && sessionWithData && (
           <ChooseAuthenticatorToSetup
             authMethods={sessionWithData.authMethods}
             sessionFactors={sessionWithData.factors}
             loginSettings={loginSettings}
             params={params}
           ></ChooseAuthenticatorToSetup>
-        )}
+        )} */}
 
         <div className="mt-8 flex w-full flex-row items-center">
           <BackButton />

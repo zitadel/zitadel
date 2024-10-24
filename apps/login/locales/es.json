@@ -155,6 +155,7 @@
   },
   "verify": {
     "userIdMissing": "¡No se proporcionó userId!",
+    "success": "¡Verificación exitosa!",
     "verify": {
       "title": "Verificar usuario",
       "description": "Introduce el código proporcionado en el correo electrónico de verificación.",

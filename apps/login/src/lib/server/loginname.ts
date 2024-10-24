@@ -7,6 +7,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
+
 import {
   getActiveIdentityProviders,
   getIDPByID,
@@ -161,6 +162,29 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     );
 
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
+      if (
+        users.result[0].type.case === "human" &&
+        users.result[0].type.value.email &&
+        !users.result[0].type.value.email.isVerified
+      ) {
+        const paramsVerify = new URLSearchParams({
+          loginName: session.factors?.user?.loginName,
+          userId: session.factors?.user?.id, // verify needs user id
+        });
+
+        if (command.organization || session.factors?.user?.organizationId) {
+          paramsVerify.append(
+            "organization",
+            command.organization ?? session.factors?.user?.organizationId,
+          );
+        }
+
+        if (command.authRequestId) {
+          paramsVerify.append("authRequestId", command.authRequestId);
+        }
+
+        redirect("/verify?" + paramsVerify);
+      }
       return {
         error:
           "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",

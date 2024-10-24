@@ -1,5 +1,6 @@
-import { Alert } from "@/components/alert";
+import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
@@ -47,6 +48,9 @@ export default async function Page({ searchParams }: { searchParams: any }) {
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
+        <h1>{t("verify.title")}</h1>
+        <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
+
         {!userId && (
           <>
             <h1>{t("verify.title")}</h1>
@@ -58,12 +62,24 @@ export default async function Page({ searchParams }: { searchParams: any }) {
           </>
         )}
 
-        <VerifyForm
-          userId={userId}
-          code={code}
-          isInvite={invite === "true"}
-          params={params}
-        />
+        {user && (
+          <UserAvatar
+            loginName={user.preferredLoginName}
+            displayName={human?.profile?.displayName}
+            showDropdown={false}
+          />
+        )}
+        {human?.email?.isVerified ? (
+          <Alert type={AlertType.INFO}>{t("success")}</Alert>
+        ) : (
+          // check if auth methods are set
+          <VerifyForm
+            userId={userId}
+            code={code}
+            isInvite={invite === "true"}
+            params={params}
+          />
+        )}
       </div>
     </DynamicTheme>
   );

@@ -20,9 +20,7 @@ type VerifyUserByEmailCommand = {
   authRequestId?: string;
 };
 
-export async function verifyUserAndCreateSession(
-  command: VerifyUserByEmailCommand,
-) {
+export async function sendVerification(command: VerifyUserByEmailCommand) {
   const verifyResponse = command.isInvite
     ? await verifyInviteCode(command.userId, command.code).catch((error) => {
         return { error: "Could not verify invite" };
