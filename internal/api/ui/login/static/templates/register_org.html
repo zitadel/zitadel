@@ -11,6 +11,11 @@
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}"/>
 
+    <div class="lgn-actions">
+        <a class="lgn-icon-button lgn-left-action" href="{{ if .AuthReqID }}{{ loginNameChangeUrl .AuthReqID }}{{ else }}{{ loginUrl }}{{ end }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </a>
+    </div>
     <div class="lgn-register">
         <div class="lgn-field">
             <label class="lgn-label" for="orgname">{{t "RegistrationOrg.OrgNameLabel"}}</label>
