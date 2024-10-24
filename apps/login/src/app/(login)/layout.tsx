@@ -35,7 +35,7 @@ export default async function RootLayout({
         <ThemeProvider>
           <NextIntlClientProvider messages={messages}>
             <div
-              className={`h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600`}
+              className={`relative min-h-screen bg-background-light-600 dark:bg-background-dark-600`}
             >
               <div className="absolute bottom-0 right-0 flex flex-row p-4 items-center space-x-4">
                 <LanguageSwitcher />
