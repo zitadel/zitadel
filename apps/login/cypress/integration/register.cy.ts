@@ -9,7 +9,7 @@ describe("register", () => {
     });
   });
 
-  it("should redirect a user who selects passwordless on register to /passkeys/add", () => {
+  it("should redirect a user who selects passwordless on register to /passkey/set", () => {
     cy.visit("/register");
     cy.get('input[autocomplete="firstname"]').focus().type("John");
     cy.get('input[autocomplete="lastname"]').focus().type("Doe");

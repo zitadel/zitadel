@@ -69,6 +69,7 @@ export function RegisterFormWithoutPassword({
     }).catch((error) => {
       setError("Could not register user");
       setLoading(false);
+      return;
     });
 
     if (response && "error" in response) {

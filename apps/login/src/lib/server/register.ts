@@ -4,7 +4,10 @@ import { createSessionAndUpdateCookie } from "@/lib/server/cookie";
 import { addHumanUser } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import {
+  ChecksJson,
+  ChecksSchema,
+} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 
 type RegisterUserCommand = {
   email: string;
@@ -34,10 +37,18 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: "Could not create user" };
   }
 
-  const checks = create(ChecksSchema, {
+  let checkPayload: any = {
     user: { search: { case: "userId", value: human.userId } },
-    password: { password: command.password },
-  });
+  };
+
+  if (command.password) {
+    checkPayload = {
+      ...checkPayload,
+      password: { password: command.password },
+    } as ChecksJson;
+  }
+
+  const checks = create(ChecksSchema, checkPayload);
 
   return createSessionAndUpdateCookie(
     checks,
