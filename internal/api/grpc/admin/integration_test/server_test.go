@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -32,23 +31,6 @@ func TestMain(m *testing.M) {
 		Client = Instance.Client.Admin
 		return m.Run()
 	}())
-}
-
-func await(t *testing.T, ctx context.Context, cb func(*assert.CollectT)) {
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
-	require.EventuallyWithT(
-		t,
-		func(tt *assert.CollectT) {
-			defer func() {
-				// Panics are not recovered and don't mark the test as failed, so we need to do that ourselves
-				assert.Nil(tt, recover(), "panic in await callback")
-			}()
-			cb(tt)
-		},
-		retryDuration,
-		tick,
-		"awaiting successful callback failed",
-	)
 }
 
 var _ assert.TestingT = (*noopAssertionT)(nil)

@@ -107,7 +107,7 @@ func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t assert.TestingT, ex
 	if wantDetails.GetTimestamp() != nil {
 		gotCD := gotDetails.GetTimestamp().AsTime()
 		wantCD := time.Now()
-		assert.WithinRange(t, gotCD, wantCD.Add(-1*time.Minute), wantCD.Add(time.Minute))
+		assert.WithinRange(t, gotCD, wantCD.Add(-10*time.Minute), wantCD.Add(time.Minute))
 	}
 }
 

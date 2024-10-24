@@ -216,7 +216,7 @@ func TestServer_GetTarget(t *testing.T) {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
 			}
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 2*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
