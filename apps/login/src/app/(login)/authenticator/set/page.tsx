@@ -1,5 +1,6 @@
 import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
+import { ChooseAuthenticatorToSetup } from "@/components/choose-authenticator-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
@@ -11,25 +12,8 @@ import {
   getUserByID,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
-import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { getLocale, getTranslations } from "next-intl/server";
-
-function isSessionValid(session: Partial<Session>): {
-  valid: boolean;
-  verifiedAt?: Timestamp;
-} {
-  const validPassword = session?.factors?.password?.verifiedAt;
-  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
-  const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
-    : true;
-
-  const verifiedAt = validPassword || validPasskey;
-  const valid = !!((validPassword || validPasskey) && stillValid);
-
-  return { valid, verifiedAt };
-}
 
 export default async function Page({
   searchParams,
@@ -45,8 +29,6 @@ export default async function Page({
   const sessionWithData = sessionId
     ? await loadSessionById(sessionId, organization)
     : await loadSessionByLoginname(loginName, organization);
-
-  console.log("sessionWithData", sessionWithData);
 
   async function getAuthMethodsAndUser(session?: Session) {
     const userId = session?.factors?.user?.id;
@@ -101,15 +83,9 @@ export default async function Page({
     sessionWithData.factors?.user?.organizationId,
   );
 
-  const { valid } = isSessionValid(sessionWithData);
-
   const params = new URLSearchParams({
     initial: "true", // defines that a code is not required and is therefore not shown in the UI
   });
-
-  // if (sessionWithData?.factors?.user?.id) {
-  //   params.set("userId", sessionWithData.factors.user.id);
-  // }
 
   if (loginName) {
     params.set("loginName", loginName);
@@ -126,9 +102,9 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("set.title")}</h1>
+        <h1>{t("title")}</h1>
 
-        <p className="ztdl-p">{t("set.description")}</p>
+        <p className="ztdl-p">{t("description")}</p>
 
         {sessionWithData && (
           <UserAvatar
@@ -141,16 +117,14 @@ export default async function Page({
 
         {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
 
-        {!valid && <Alert>{tError("sessionExpired")}</Alert>}
-
-        {/* {loginSettings && sessionWithData && (
+        {loginSettings && sessionWithData && (
           <ChooseAuthenticatorToSetup
             authMethods={sessionWithData.authMethods}
             sessionFactors={sessionWithData.factors}
             loginSettings={loginSettings}
             params={params}
           ></ChooseAuthenticatorToSetup>
-        )} */}
+        )}
 
         <div className="mt-8 flex w-full flex-row items-center">
           <BackButton />

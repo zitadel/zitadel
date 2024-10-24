@@ -7,7 +7,6 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { useTranslations } from "next-intl";
 import { Alert, AlertType } from "./alert";
 import { PASSKEYS, PASSWORD } from "./auth-methods";
-import { UserAvatar } from "./user-avatar";
 
 type Props = {
   authMethods: AuthenticationMethodType[];
@@ -26,14 +25,6 @@ export function ChooseAuthenticatorToSetup({
 
   return (
     <>
-      {sessionFactors && (
-        <UserAvatar
-          loginName={sessionFactors.user?.loginName}
-          displayName={sessionFactors.user?.displayName}
-          showDropdown
-        ></UserAvatar>
-      )}
-
       {loginSettings.passkeysType === PasskeysType.ALLOWED &&
         !loginSettings.allowUsernamePassword && (
           <Alert type={AlertType.ALERT}>{t("noMethodsAvailable")}</Alert>
@@ -45,7 +36,7 @@ export function ChooseAuthenticatorToSetup({
           PASSWORD(false, "/password/set?" + params)}
         {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
           loginSettings.passkeysType === PasskeysType.ALLOWED &&
-          PASSKEYS(false, "/passkeys/set?" + params)}
+          PASSKEYS(false, "/passkey/set?" + params)}
       </div>
     </>
   );
