@@ -411,17 +411,17 @@ func TestServer_ListOrganizations(t *testing.T) {
 				// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
 				tt.want.Details.TotalResult = got.Details.TotalResult
 				// always first check length, otherwise its failed anyway
-				require.Len(ttt, got.Result, len(tt.want.Result))
+				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
+					for i := range tt.want.Result {
+						// domain from result, as it is generated though the create
+						tt.want.Result[i].PrimaryDomain = got.Result[i].PrimaryDomain
+						// sequence from result, as it can be with different sequence from create
+						tt.want.Result[i].Details.Sequence = got.Result[i].Details.Sequence
+					}
 
-				for i := range tt.want.Result {
-					// domain from result, as it is generated though the create
-					tt.want.Result[i].PrimaryDomain = got.Result[i].PrimaryDomain
-					// sequence from result, as it can be with different sequence from create
-					tt.want.Result[i].Details.Sequence = got.Result[i].Details.Sequence
-				}
-
-				for i := range tt.want.Result {
-					assert.Contains(ttt, got.Result, tt.want.Result[i])
+					for i := range tt.want.Result {
+						assert.Contains(ttt, got.Result, tt.want.Result[i])
+					}
 				}
 				integration.AssertListDetails(t, tt.want, got)
 			}, retryDuration, tick, "timeout waiting for expected user result")

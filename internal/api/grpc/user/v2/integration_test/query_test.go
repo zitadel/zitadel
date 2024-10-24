@@ -162,10 +162,12 @@ func TestServer_GetUserByID(t *testing.T) {
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					require.Error(ttt, err)
+					assert.Error(ttt, err)
 					return
 				}
-				require.NoError(ttt, err)
+				if !assert.NoError(ttt, err) {
+					return
+				}
 
 				tt.want.User.Details = userAttr.Details
 				tt.want.User.UserId = userAttr.UserID
@@ -188,7 +190,6 @@ func TestServer_GetUserByID(t *testing.T) {
 func TestServer_GetUserByID_Permission(t *testing.T) {
 	t.Parallel()
 
-	timeNow := time.Now().UTC()
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
@@ -235,7 +236,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 					},
 				},
 				Details: &object.Details{
-					ChangeDate:    timestamppb.New(timeNow),
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -273,7 +274,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 					},
 				},
 				Details: &object.Details{
-					ChangeDate:    timestamppb.New(timeNow),
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -301,24 +302,29 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ttt, err)
+					return
+				}
+				if !assert.NoError(ttt, err) {
+					return
+				}
 
-			tt.want.User.UserId = tt.args.req.GetUserId()
-			tt.want.User.Username = newOrgOwnerEmail
-			tt.want.User.PreferredLoginName = newOrgOwnerEmail
-			tt.want.User.LoginNames = []string{newOrgOwnerEmail}
-			if human := tt.want.User.GetHuman(); human != nil {
-				human.Email.Email = newOrgOwnerEmail
-			}
-			// details tested in GetUserByID
-			tt.want.User.Details = got.User.GetDetails()
+				tt.want.User.UserId = tt.args.req.GetUserId()
+				tt.want.User.Username = newOrgOwnerEmail
+				tt.want.User.PreferredLoginName = newOrgOwnerEmail
+				tt.want.User.LoginNames = []string{newOrgOwnerEmail}
+				if human := tt.want.User.GetHuman(); human != nil {
+					human.Email.Email = newOrgOwnerEmail
+				}
+				// details tested in GetUserByID
+				tt.want.User.Details = got.User.GetDetails()
 
-			assert.Equal(t, tt.want.User, got.User)
+				assert.Equal(ttt, tt.want.User, got.User)
+			}, retryDuration, tick, "timeout waiting for expected user result")
 		})
 	}
 }
@@ -912,27 +918,27 @@ func TestServer_ListUsers(t *testing.T) {
 				// always only give back dependency infos which are required for the response
 				require.Len(ttt, tt.want.Result, len(infos))
 				// always first check length, otherwise its failed anyway
-				require.Len(ttt, got.Result, len(tt.want.Result))
+				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
+					// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
+					tt.want.Details.TotalResult = got.Details.TotalResult
 
-				// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
-				tt.want.Details.TotalResult = got.Details.TotalResult
-
-				// fill in userid and username as it is generated
-				for i := range infos {
-					tt.want.Result[i].UserId = infos[i].UserID
-					tt.want.Result[i].Username = infos[i].Username
-					tt.want.Result[i].PreferredLoginName = infos[i].Username
-					tt.want.Result[i].LoginNames = []string{infos[i].Username}
-					if human := tt.want.Result[i].GetHuman(); human != nil {
-						human.Email.Email = infos[i].Username
-						if tt.want.Result[i].GetHuman().GetPasswordChanged() != nil {
-							human.PasswordChanged = infos[i].Changed
+					// fill in userid and username as it is generated
+					for i := range infos {
+						tt.want.Result[i].UserId = infos[i].UserID
+						tt.want.Result[i].Username = infos[i].Username
+						tt.want.Result[i].PreferredLoginName = infos[i].Username
+						tt.want.Result[i].LoginNames = []string{infos[i].Username}
+						if human := tt.want.Result[i].GetHuman(); human != nil {
+							human.Email.Email = infos[i].Username
+							if tt.want.Result[i].GetHuman().GetPasswordChanged() != nil {
+								human.PasswordChanged = infos[i].Changed
+							}
 						}
+						tt.want.Result[i].Details = infos[i].Details
 					}
-					tt.want.Result[i].Details = infos[i].Details
-				}
-				for i := range tt.want.Result {
-					assert.Contains(ttt, got.Result, tt.want.Result[i])
+					for i := range tt.want.Result {
+						assert.Contains(ttt, got.Result, tt.want.Result[i])
+					}
 				}
 				integration.AssertListDetails(ttt, tt.want, got)
 			}, retryDuration, tick, "timeout waiting for expected user result")
