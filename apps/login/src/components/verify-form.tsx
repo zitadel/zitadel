@@ -44,6 +44,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
   }, []);
 
   async function resendCode() {
+    setError("");
     setLoading(true);
 
     const response = await resendVerification({
