@@ -108,7 +108,6 @@ export function SetPasswordForm({
       }),
       authRequestId,
     }).catch((error) => {
-      console.error("verifyerror", error);
       setLoading(false);
       setError("Could not verify password");
       return;
