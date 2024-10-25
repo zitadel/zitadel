@@ -26,6 +26,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4.1.6
 
+      - name: Setup Buf
+        uses: bufbuild/buf-setup-action@v1.45.0
+
       - name: Setup Node.js 20.x
         uses: actions/setup-node@v4.0.2
         with:
