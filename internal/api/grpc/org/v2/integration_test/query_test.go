@@ -230,7 +230,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 						Details: orgResp.GetDetails(),
 					}
 					domain := gofakeit.DomainName()
-					_, err := Instance.Client.Mgmt.AddOrgDomain(ctx, &management.AddOrgDomainRequest{
+					_, err := Instance.Client.Mgmt.AddOrgDomain(integration.SetOrgID(ctx, orgResp.GetOrganizationId()), &management.AddOrgDomainRequest{
 						Domain: domain,
 					})
 					if err != nil {
