@@ -120,7 +120,6 @@ export default async function Page({
         {loginSettings && sessionWithData && (
           <ChooseAuthenticatorToSetup
             authMethods={sessionWithData.authMethods}
-            sessionFactors={sessionWithData.factors}
             loginSettings={loginSettings}
             params={params}
           ></ChooseAuthenticatorToSetup>

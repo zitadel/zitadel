@@ -1,10 +1,18 @@
 import { Alert, AlertType } from "@/components/alert";
+import { BackButton } from "@/components/back-button";
+import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
-import { getBrandingSettings, getUserByID } from "@/lib/zitadel";
+import {
+  getBrandingSettings,
+  getUserByID,
+  listAuthenticationMethodTypes,
+} from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import Link from "next/link";
 
 export default async function Page({ searchParams }: { searchParams: any }) {
   const locale = getLocale();
@@ -25,6 +33,14 @@ export default async function Page({ searchParams }: { searchParams: any }) {
       if (user?.type.case === "human") {
         human = user.type.value as HumanUser;
       }
+    }
+  }
+
+  let authMethods: AuthenticationMethodType[] | null = null;
+  if (human?.email?.isVerified) {
+    const authMethodsResponse = await listAuthenticationMethodTypes(userId);
+    if (authMethodsResponse.authMethodTypes) {
+      authMethods = authMethodsResponse.authMethodTypes;
     }
   }
 
@@ -70,7 +86,25 @@ export default async function Page({ searchParams }: { searchParams: any }) {
           />
         )}
         {human?.email?.isVerified ? (
-          <Alert type={AlertType.INFO}>{t("success")}</Alert>
+          <>
+            <Alert type={AlertType.INFO}>{t("success")}</Alert>
+
+            <div className="mt-8 flex w-full flex-row items-center">
+              <BackButton />
+              <span className="flex-grow"></span>
+              {authMethods?.length !== 0 && (
+                <Link href={`/authenticator/set?+${params}`}>
+                  <Button
+                    type="submit"
+                    className="self-end"
+                    variant={ButtonVariants.Primary}
+                  >
+                    {t("setupAuthenticator")}
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </>
         ) : (
           // check if auth methods are set
           <VerifyForm

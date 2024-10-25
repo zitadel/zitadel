@@ -156,6 +156,7 @@
   "verify": {
     "userIdMissing": "Nessun userId fornito!",
     "success": "Verifica effettuata con successo!",
+    "setupAuthenticator": "Configura autenticatore",
     "verify": {
       "title": "Verifica utente",
       "description": "Inserisci il codice fornito nell'email di verifica.",
