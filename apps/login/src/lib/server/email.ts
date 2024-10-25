@@ -76,12 +76,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
     return redirect("/authenticator/set?" + params);
   }
-
-  // return {
-  //   authMethodTypes: authMethodResponse.authMethodTypes,
-  //   sessionId: session.id,
-  //   factors: session.factors,
-  // };
 }
 
 type resendVerifyEmailCommand = {
@@ -93,4 +87,53 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
   return command.isInvite
     ? resendEmailCode(command.userId)
     : resendInviteCode(command.userId);
+}
+
+export async function sendVerificationRedirectWithoutCheck(command: {
+  userId: string;
+  authRequestId?: string;
+}) {
+  const userResponse = await getUserByID(command.userId);
+
+  if (!userResponse || !userResponse.user) {
+    return { error: "Could not load user" };
+  }
+
+  const checks = create(ChecksSchema, {
+    user: {
+      search: {
+        case: "loginName",
+        value: userResponse.user.preferredLoginName,
+      },
+    },
+  });
+
+  const session = await createSessionAndUpdateCookie(
+    checks,
+    undefined,
+    command.authRequestId,
+  );
+
+  const authMethodResponse = await listAuthenticationMethodTypes(
+    command.userId,
+  );
+
+  if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
+    return { error: "Could not load possible authenticators" };
+  }
+  // if no authmethods are found on the user, redirect to set one up
+  if (
+    authMethodResponse &&
+    authMethodResponse.authMethodTypes &&
+    authMethodResponse.authMethodTypes.length == 0
+  ) {
+    const params = new URLSearchParams({
+      sessionId: session.id,
+    });
+
+    if (session.factors?.user?.loginName) {
+      params.set("loginName", session.factors?.user?.loginName);
+    }
+    return redirect("/authenticator/set?" + params);
+  }
 }

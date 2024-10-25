@@ -4,7 +4,7 @@ import { Alert } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/email";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -37,12 +37,6 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
 
   const router = useRouter();
 
-  useEffect(() => {
-    if (code) {
-      submitCodeAndContinue({ code });
-    }
-  }, []);
-
   async function resendCode() {
     setError("");
     setLoading(true);
@@ -60,29 +54,32 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
     return response;
   }
 
-  async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
-    setLoading(true);
+  const fcn = useCallback(
+    async function submitCodeAndContinue(
+      value: Inputs,
+    ): Promise<boolean | void> {
+      setLoading(true);
 
-    const verifyResponse = await sendVerification({
-      code: value.code,
-      userId,
-      isInvite: isInvite,
-    }).catch(() => {
-      setError("Could not verify user");
+      await sendVerification({
+        code: value.code,
+        userId,
+        isInvite: isInvite,
+      }).catch((error) => {
+        setError("Could not verify user");
+        setLoading(false);
+        return;
+      });
+
       setLoading(false);
-      return;
-    });
+    },
+    [isInvite, userId],
+  );
 
-    setLoading(false);
-
-    if (!verifyResponse) {
-      setError("Could not verify user");
-      return;
-    } else {
-      setError("");
-      return router.push("/authenticator/set?" + params);
+  useEffect(() => {
+    if (code) {
+      fcn({ code });
     }
-  }
+  }, [code, fcn]);
 
   return (
     <>
@@ -116,7 +113,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
             className="self-end"
             variant={ButtonVariants.Primary}
             disabled={loading || !formState.isValid}
-            onClick={handleSubmit(submitCodeAndContinue)}
+            onClick={handleSubmit(fcn)}
           >
             {loading && <Spinner className="h-5 w-5 mr-2" />}
             {t("verify.submit")}

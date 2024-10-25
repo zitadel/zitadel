@@ -1,6 +1,6 @@
 "use client";
 
-import { createNewSession } from "@/lib/server/session";
+import { createNewSessionForIdp } from "@/lib/server/session";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Alert } from "./alert";
@@ -27,7 +27,7 @@ export function IdpSignin({
   const router = useRouter();
 
   useEffect(() => {
-    createNewSession({
+    createNewSessionForIdp({
       userId,
       idpIntent: {
         idpIntentId,
