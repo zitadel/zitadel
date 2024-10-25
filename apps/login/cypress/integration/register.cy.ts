@@ -2,7 +2,7 @@ import { stub } from "../support/mock";
 
 describe("register", () => {
   beforeEach(() => {
-    stub("zitadel.user.v2.OrganizationService", "ListOrganizations", {
+    stub("zitadel.org.v2.OrganizationService", "ListOrganizations", {
       data: {
         result: [{ id: "123" }],
       },
