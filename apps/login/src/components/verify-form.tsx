@@ -23,7 +23,6 @@ type Props = {
 
 export function VerifyForm({ userId, code, isInvite, params }: Props) {
   const t = useTranslations("verify");
-  const tError = useTranslations("error");
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -79,7 +78,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
       setError("Could not verify user");
       return;
     } else {
-      router.push("/authenticator/set?" + params);
+      return router.push("/authenticator/set?" + params);
     }
   }
 

@@ -22,10 +22,10 @@ type VerifyUserByEmailCommand = {
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
   const verifyResponse = command.isInvite
-    ? await verifyInviteCode(command.userId, command.code).catch((error) => {
+    ? await verifyInviteCode(command.userId, command.code).catch(() => {
         return { error: "Could not verify invite" };
       })
-    : await verifyEmail(command.userId, command.code).catch((error) => {
+    : await verifyEmail(command.userId, command.code).catch(() => {
         return { error: "Could not verify email" };
       });
 

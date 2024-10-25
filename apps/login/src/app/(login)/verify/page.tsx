@@ -39,7 +39,6 @@ export default async function Page({ searchParams }: { searchParams: any }) {
   let authMethods: AuthenticationMethodType[] | null = null;
   if (human?.email?.isVerified) {
     const authMethodsResponse = await listAuthenticationMethodTypes(userId);
-    console.log(authMethodsResponse);
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
     }
