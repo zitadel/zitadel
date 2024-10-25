@@ -15,6 +15,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
@@ -210,6 +211,46 @@ func TestServer_ListOrganizations(t *testing.T) {
 						},
 						Id:            Instance.DefaultOrg.Id,
 						PrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
+					},
+				},
+			},
+		},
+		{
+			name: "list org by domain (non primary), ok",
+			args: args{
+				CTX,
+				&org.ListOrganizationsRequest{},
+				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
+					orgs := make([]orgAttr, 1)
+					name := fmt.Sprintf("ListOrgs-%s", gofakeit.AppName())
+					orgResp := Instance.CreateOrganization(ctx, name, gofakeit.Email())
+					orgs[0] = orgAttr{
+						ID:      orgResp.GetOrganizationId(),
+						Name:    name,
+						Details: orgResp.GetDetails(),
+					}
+					domain := gofakeit.DomainName()
+					_, err := Instance.Client.Mgmt.AddOrgDomain(ctx, &management.AddOrgDomainRequest{
+						Domain: domain,
+					})
+					if err != nil {
+						return nil, err
+					}
+					request.Queries = []*org.SearchQuery{
+						OrganizationDomainQuery(domain),
+					}
+					return orgs, nil
+				},
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*org.Organization{
+					{
+						State: org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
 					},
 				},
 			},
