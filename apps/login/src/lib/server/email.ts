@@ -61,7 +61,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
     return { error: "Could not load possible authenticators" };
   }
-  console.log("xs");
   // if no authmethods are found on the user, redirect to set one up
   if (
     authMethodResponse &&
@@ -75,8 +74,6 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     if (session.factors?.user?.loginName) {
       params.set("loginName", session.factors?.user?.loginName);
     }
-
-    console.log("/authenticator/set?" + params);
     return redirect("/authenticator/set?" + params);
   }
 

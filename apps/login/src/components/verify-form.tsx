@@ -68,7 +68,6 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
       userId,
       isInvite: isInvite,
     }).catch(() => {
-      console.log(error);
       setError("Could not verify email");
       setLoading(false);
       return;
