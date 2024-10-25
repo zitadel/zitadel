@@ -135,16 +135,40 @@
       "submit": "Continue"
     }
   },
+  "invite": {
+    "title": "Invite User",
+    "description": "Provide the email address and the name of the user you want to invite.",
+    "info": "The user will receive an email with further instructions.",
+    "notAllowed": "Your settings do not allow you to invite users.",
+    "submit": "Continue",
+    "success": {
+      "title": "User invited",
+      "description": "The email has successfully been sent.",
+      "verified": "The user has been invited and has already verified his email.",
+      "notVerifiedYet": "The user has been invited. They will receive an email with further instructions.",
+      "submit": "Invite another user"
+    }
+  },
   "signedin": {
     "title": "Welcome {user}!",
     "description": "You are signed in."
   },
   "verify": {
-    "title": "Verify user",
-    "description": "Enter the Code provided in the verification email.",
     "userIdMissing": "No userId provided!",
-    "resendCode": "Resend code",
-    "submit": "Continue"
+    "success": "The user has been verified successfully.",
+    "setupAuthenticator": "Setup authenticator",
+    "verify": {
+      "title": "Verify user",
+      "description": "Enter the Code provided in the verification email.",
+      "resendCode": "Resend code",
+      "submit": "Continue"
+    }
+  },
+  "authenticator": {
+    "title": "Choose authentication method",
+    "description": "Select the method you would like to authenticate",
+    "noMethodsAvailable": "No authentication methods available",
+    "allSetup": "You have already setup an authenticator!"
   },
   "error": {
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",

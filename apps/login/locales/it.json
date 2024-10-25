@@ -135,16 +135,40 @@
       "submit": "Continua"
     }
   },
+  "invite": {
+    "title": "Invita Utente",
+    "description": "Inserisci l'indirizzo email dell'utente che desideri invitare.",
+    "info": "L'utente riceverà un'email con ulteriori istruzioni.",
+    "notAllowed": "Non hai i permessi per invitare un utente.",
+    "submit": "Invita Utente",
+    "success": {
+      "title": "Invito inviato",
+      "description": "L'utente è stato invitato con successo.",
+      "verified": "L'utente è stato invitato e ha già verificato la sua email.",
+      "notVerifiedYet": "L'utente è stato invitato. Riceverà un'email con ulteriori istruzioni.",
+      "submit": "Invita un altro utente"
+    }
+  },
   "signedin": {
     "title": "Benvenuto {user}!",
     "description": "Sei connesso."
   },
   "verify": {
-    "title": "Verifica utente",
-    "description": "Inserisci il codice fornito nell'email di verifica.",
     "userIdMissing": "Nessun userId fornito!",
-    "resendCode": "Invia di nuovo il codice",
-    "submit": "Continua"
+    "success": "Verifica effettuata con successo!",
+    "setupAuthenticator": "Configura autenticatore",
+    "verify": {
+      "title": "Verifica utente",
+      "description": "Inserisci il codice fornito nell'email di verifica.",
+      "resendCode": "Invia di nuovo il codice",
+      "submit": "Continua"
+    }
+  },
+  "authenticator": {
+    "title": "Seleziona metodo di autenticazione",
+    "description": "Seleziona il metodo con cui desideri autenticarti",
+    "noMethodsAvailable": "Nessun metodo di autenticazione disponibile",
+    "allSetup": "Hai già configurato un autenticatore!"
   },
   "error": {
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",

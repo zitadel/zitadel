@@ -71,8 +71,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
       organizationId: command.organization,
     });
 
-    console.log(users);
-
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
       user = users.result[0];
 
@@ -89,7 +87,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
 
     // this is a fake error message to hide that the user does not even exist
-    return { error: "Could not verify password!" };
+    return { error: "Could not verify password" };
   } else {
     session = await setSessionAndUpdateCookie(
       sessionCookie,
@@ -274,7 +272,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
 }
 
 export async function changePassword(command: {
-  code: string;
+  code?: string;
   userId: string;
   password: string;
 }) {
@@ -286,5 +284,5 @@ export async function changePassword(command: {
   }
   const userId = user.userId;
 
-  return setPassword(userId, command.password, command.code);
+  return setPassword(userId, command.password, user, command.code);
 }

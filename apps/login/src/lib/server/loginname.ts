@@ -7,6 +7,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
+
 import {
   getActiveIdentityProviders,
   getIDPByID,
@@ -139,6 +140,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (users.result[0].state === UserState.INITIAL) {
       const params = new URLSearchParams({
         loginName: session.factors?.user?.loginName,
+        initial: "true", // this does not require a code to be set
       });
 
       if (command.organization || session.factors?.user?.organizationId) {
@@ -160,10 +162,52 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     );
 
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      return {
-        error:
-          "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",
-      };
+      if (
+        users.result[0].type.case === "human" &&
+        users.result[0].type.value.email &&
+        !users.result[0].type.value.email.isVerified
+      ) {
+        const paramsVerify = new URLSearchParams({
+          loginName: session.factors?.user?.loginName,
+          userId: session.factors?.user?.id, // verify needs user id
+        });
+
+        if (command.organization || session.factors?.user?.organizationId) {
+          paramsVerify.append(
+            "organization",
+            command.organization ?? session.factors?.user?.organizationId,
+          );
+        }
+
+        if (command.authRequestId) {
+          paramsVerify.append("authRequestId", command.authRequestId);
+        }
+
+        redirect("/verify?" + paramsVerify);
+      }
+      // what to do with users with valid email but no auth methods? redirect to /authenticator/set?
+      // return {
+      //   error:
+      //     "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",
+      // };
+
+      const paramsAuthenticatorSetup = new URLSearchParams({
+        loginName: session.factors?.user?.loginName,
+        userId: session.factors?.user?.id, // verify needs user id
+      });
+
+      if (command.organization || session.factors?.user?.organizationId) {
+        paramsAuthenticatorSetup.append(
+          "organization",
+          command.organization ?? session.factors?.user?.organizationId,
+        );
+      }
+
+      if (command.authRequestId) {
+        paramsAuthenticatorSetup.append("authRequestId", command.authRequestId);
+      }
+
+      redirect("/authenticator/set?" + paramsAuthenticatorSetup);
     }
 
     if (methods.authMethodTypes.length == 1) {

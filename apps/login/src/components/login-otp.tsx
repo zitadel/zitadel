@@ -225,6 +225,7 @@ export function LoginOTP({
           type="text"
           {...register("code", { required: "This field is required" })}
           label="Code"
+          autoComplete="one-time-code"
         />
       </div>
 

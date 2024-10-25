@@ -135,16 +135,40 @@
       "submit": "Weiter"
     }
   },
+  "invite": {
+    "title": "Benutzer einladen",
+    "description": "Geben Sie die E-Mail-Adresse des Benutzers ein, den Sie einladen möchten.",
+    "info": "Der Benutzer erhält eine E-Mail mit einem Link, um sich zu registrieren.",
+    "notAllowed": "Sie haben keine Berechtigung, Benutzer einzuladen.",
+    "submit": "Einladen",
+    "success": {
+      "title": "Einladung erfolgreich",
+      "description": "Der Benutzer wurde erfolgreich eingeladen.",
+      "verified": "Der Benutzer wurde eingeladen und hat seine E-Mail bereits verifiziert.",
+      "notVerifiedYet": "Der Benutzer wurde eingeladen. Er erhält eine E-Mail mit weiteren Anweisungen.",
+      "submit": "Weiteren Benutzer einladen"
+    }
+  },
   "signedin": {
     "title": "Willkommen {user}!",
     "description": "Sie sind angemeldet."
   },
   "verify": {
-    "title": "Benutzer verifizieren",
-    "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
     "userIdMissing": "Keine Benutzer-ID angegeben!",
-    "resendCode": "Code erneut senden",
-    "submit": "Weiter"
+    "success": "Erfolgreich verifiziert",
+    "setupAuthenticator": "Authentifikator einrichten",
+    "verify": {
+      "title": "Benutzer verifizieren",
+      "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
+      "resendCode": "Code erneut senden",
+      "submit": "Weiter"
+    }
+  },
+  "authenticator": {
+    "title": "Authentifizierungsmethode auswählen",
+    "description": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten.",
+    "noMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar",
+    "allSetup": "Sie haben bereits einen Authentifikator eingerichtet!"
   },
   "error": {
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",

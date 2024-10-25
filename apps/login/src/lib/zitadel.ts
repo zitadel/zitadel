@@ -13,6 +13,7 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
+  SetPasswordRequestSchema,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -36,6 +37,11 @@ import {
   SearchQuery,
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
+import {
+  SendInviteCodeSchema,
+  User,
+  UserState,
+} from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { unstable_cache } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
@@ -280,7 +286,13 @@ export async function addHumanUser({
   organization,
 }: AddHumanUserData) {
   return userService.addHumanUser({
-    email: { email },
+    email: {
+      email,
+      verification: {
+        case: "isVerified",
+        value: false,
+      },
+    },
     username: email,
     profile: { givenName: firstName, familyName: lastName },
     organization: organization
@@ -298,6 +310,41 @@ export async function verifyTOTPRegistration(code: string, userId: string) {
 
 export async function getUserByID(userId: string) {
   return userService.getUserByID({ userId }, {});
+}
+
+export async function verifyInviteCode(
+  userId: string,
+  verificationCode: string,
+) {
+  return userService.verifyInviteCode({ userId, verificationCode }, {});
+}
+
+export async function resendInviteCode(userId: string) {
+  return userService.resendInviteCode({ userId }, {});
+}
+
+export async function createInviteCode(userId: string, host: string | null) {
+  let medium = create(SendInviteCodeSchema, {
+    applicationName: "Typescript Login",
+  });
+
+  if (host) {
+    medium = {
+      ...medium,
+      urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
+    };
+  }
+
+  return userService.createInviteCode(
+    {
+      userId,
+      verification: {
+        case: "sendCode",
+        value: medium,
+      },
+    },
+    {},
+  );
 }
 
 export async function listUsers({
@@ -368,6 +415,24 @@ export async function listUsers({
   }
 
   return userService.listUsers({ queries: queries });
+}
+
+export async function getDefaultOrg() {
+  return orgService
+    .listOrganizations(
+      {
+        queries: [
+          {
+            query: {
+              case: "defaultQuery",
+              value: {},
+            },
+          },
+        ],
+      },
+      {},
+    )
+    .then((resp) => resp.result[0]);
 }
 
 export async function getOrgsByDomain(domain: string) {
@@ -503,7 +568,7 @@ export async function passwordReset(userId: string, host: string | null) {
   if (host) {
     medium = {
       ...medium,
-      urlTemplate: `https://${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
+      urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
     };
   }
 
@@ -519,24 +584,57 @@ export async function passwordReset(userId: string, host: string | null) {
   );
 }
 
+/**
+ *
+ * @param userId userId of the user to set the password for
+ * @param password the new password
+ * @param code optional if the password should be set with a code (reset), no code for initial setup of password
+ * @returns
+ */
 export async function setPassword(
   userId: string,
   password: string,
-  code: string,
+  user: User,
+  code?: string,
 ) {
-  return userService.setPassword(
-    {
-      userId,
-      newPassword: {
-        password,
-      },
+  let payload = create(SetPasswordRequestSchema, {
+    userId,
+    newPassword: {
+      password,
+    },
+  });
+
+  // check if the user has no password set in order to set a password
+  if (!code) {
+    const authmethods = await listAuthenticationMethodTypes(userId);
+
+    // if the user has no authmethods set, we can set a password otherwise we need a code
+    if (
+      !(authmethods.authMethodTypes.length === 0) &&
+      user.state !== UserState.INITIAL
+    ) {
+      return { error: "Provide a code to set a password" };
+    }
+  }
+
+  if (code) {
+    payload = {
+      ...payload,
       verification: {
         case: "verificationCode",
         value: code,
       },
-    },
-    {},
-  );
+    };
+  }
+
+  return userService.setPassword(payload, {}).catch((error) => {
+    // throw error if failed precondition (ex. User is not yet initialized)
+    if (error.code === 9 && error.message) {
+      return { error: error.message };
+    } else {
+      throw error;
+    }
+  });
 }
 
 /**

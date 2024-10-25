@@ -5,11 +5,18 @@ describe("register", () => {
     stub("zitadel.user.v2.UserService", "AddHumanUser", {
       data: {
         userId: "123",
+        email: {
+          email: "john@zitadel.com",
+        },
+        profile: {
+          givenName: "John",
+          familyName: "Doe",
+        },
       },
     });
   });
 
-  it("should redirect a user who selects passwordless on register to /passkeys/add", () => {
+  it("should redirect a user who selects passwordless on register to /passkey/set", () => {
     cy.visit("/register");
     cy.get('input[autocomplete="firstname"]').focus().type("John");
     cy.get('input[autocomplete="lastname"]').focus().type("Doe");

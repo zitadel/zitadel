@@ -14,7 +14,7 @@ export const ThemeWrapper = ({ children, branding }: Props) => {
     setTheme(document, branding);
   }, []);
 
-  const defaultClasses = "bg-background-light-600 dark:bg-background-dark-600";
+  const defaultClasses = "";
 
   return <div className={defaultClasses}>{children}</div>;
 };
