@@ -166,7 +166,8 @@
   "authenticator": {
     "title": "Choose authentication method",
     "description": "Select the method you would like to authenticate",
-    "noMethodsAvailable": "No authentication methods available"
+    "noMethodsAvailable": "No authentication methods available",
+    "allSetup": "You have already setup an authenticator!"
   },
   "error": {
     "unknownContext": "Could not get the context of the user. Make sure to enter the username first or provide a loginName as searchParam.",

@@ -166,7 +166,8 @@
   "authenticator": {
     "title": "Authentifizierungsmethode auswählen",
     "description": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten.",
-    "noMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar"
+    "noMethodsAvailable": "Keine Authentifizierungsmethoden verfügbar",
+    "allSetup": "Sie haben bereits einen Authentifikator eingerichtet!"
   },
   "error": {
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",

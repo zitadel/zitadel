@@ -166,7 +166,8 @@
   "authenticator": {
     "title": "Seleziona metodo di autenticazione",
     "description": "Seleziona il metodo con cui desideri autenticarti",
-    "noMethodsAvailable": "Nessun metodo di autenticazione disponibile"
+    "noMethodsAvailable": "Nessun metodo di autenticazione disponibile",
+    "allSetup": "Hai già configurato un autenticatore!"
   },
   "error": {
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",

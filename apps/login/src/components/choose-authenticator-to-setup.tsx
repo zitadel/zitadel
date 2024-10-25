@@ -1,4 +1,3 @@
-import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
   LoginSettings,
   PasskeysType,
@@ -11,33 +10,35 @@ import { PASSKEYS, PASSWORD } from "./auth-methods";
 type Props = {
   authMethods: AuthenticationMethodType[];
   params: URLSearchParams;
-  sessionFactors?: Factors;
   loginSettings: LoginSettings;
 };
 
 export function ChooseAuthenticatorToSetup({
   authMethods,
   params,
-  sessionFactors,
   loginSettings,
 }: Props) {
   const t = useTranslations("authenticator");
 
-  return (
-    <>
-      {loginSettings.passkeysType === PasskeysType.ALLOWED &&
-        !loginSettings.allowUsernamePassword && (
-          <Alert type={AlertType.ALERT}>{t("noMethodsAvailable")}</Alert>
-        )}
+  if (authMethods.length !== 0) {
+    return <Alert type={AlertType.ALERT}>{t("allSetup")}</Alert>;
+  } else {
+    return (
+      <>
+        {loginSettings.passkeysType === PasskeysType.ALLOWED &&
+          !loginSettings.allowUsernamePassword && (
+            <Alert type={AlertType.ALERT}>{t("noMethodsAvailable")}</Alert>
+          )}
 
-      <div className="grid grid-cols-1 gap-5 w-full pt-4">
-        {!authMethods.includes(AuthenticationMethodType.PASSWORD) &&
-          loginSettings.allowUsernamePassword &&
-          PASSWORD(false, "/password/set?" + params)}
-        {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
-          loginSettings.passkeysType === PasskeysType.ALLOWED &&
-          PASSKEYS(false, "/passkey/set?" + params)}
-      </div>
-    </>
-  );
+        <div className="grid grid-cols-1 gap-5 w-full pt-4">
+          {!authMethods.includes(AuthenticationMethodType.PASSWORD) &&
+            loginSettings.allowUsernamePassword &&
+            PASSWORD(false, "/password/set?" + params)}
+          {!authMethods.includes(AuthenticationMethodType.PASSKEY) &&
+            loginSettings.passkeysType === PasskeysType.ALLOWED &&
+            PASSKEYS(false, "/passkey/set?" + params)}
+        </div>
+      </>
+    );
+  }
 }
