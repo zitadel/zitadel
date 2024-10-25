@@ -2,6 +2,11 @@ import { stub } from "../support/mock";
 
 describe("register", () => {
   beforeEach(() => {
+    stub("zitadel.user.v2.OrganizationService", "ListOrganizations", {
+      data: {
+        result: [{ id: "123" }],
+      },
+    });
     stub("zitadel.user.v2.UserService", "AddHumanUser", {
       data: {
         userId: "123",
