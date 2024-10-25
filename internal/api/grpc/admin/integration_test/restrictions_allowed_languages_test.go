@@ -51,7 +51,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 			require.Equal(ttt, language.Make(defaultLang.Language), language.English)
 		})
 		tt.Run("the discovery endpoint returns all supported languages", func(ttt *testing.T) {
-			awaitDiscoveryEndpoint(ttt, iamOwnerCtx, instance.Domain, supportedLanguagesStr, nil)
+			awaitDiscoveryEndpoint(ttt, context.Background(), instance.Domain, supportedLanguagesStr, nil)
 		})
 	})
 	t.Run("restricting the default language fails", func(tt *testing.T) {
@@ -92,10 +92,10 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		require.Condition(tt, contains(supported.GetLanguages(), supportedLanguagesStr))
 	})
 	t.Run("the disallowed language is not listed in the discovery endpoint", func(tt *testing.T) {
-		awaitDiscoveryEndpoint(tt, iamOwnerCtx, instance.Domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		awaitDiscoveryEndpoint(tt, context.Background(), instance.Domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
 	})
 	t.Run("the login ui is rendered in the default language", func(tt *testing.T) {
-		awaitLoginUILanguage(tt, iamOwnerCtx, instance.Domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
+		awaitLoginUILanguage(tt, context.Background(), instance.Domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
 	})
 	t.Run("preferred languages are not restricted by the supported languages", func(tt *testing.T) {
 		tt.Run("change user profile", func(ttt *testing.T) {
@@ -174,7 +174,7 @@ func setAndAwaitAllowedLanguages(ctx context.Context, cc *integration.Client, t 
 			}
 			assert.NoError(tt, getErr)
 			assert.Equal(tt, expectLanguages, restrictions.GetAllowedLanguages())
-		}, retryDuration, tick, "awaiting successful callback failed",
+		}, retryDuration, tick, "awaiting successful GetAllowedLanguages failed",
 	)
 }
 
@@ -186,7 +186,7 @@ func setAndAwaitDefaultLanguage(ctx context.Context, cc *integration.Client, t *
 		defaultLang, getErr := cc.Admin.GetDefaultLanguage(ctx, &admin.GetDefaultLanguageRequest{})
 		assert.NoError(tt, getErr)
 		assert.Equal(tt, lang.String(), defaultLang.GetLanguage())
-	}, retryDuration, tick, "awaiting successful callback failed",
+	}, retryDuration, tick, "awaiting successful GetDefaultLanguage failed",
 	)
 }
 
@@ -213,7 +213,7 @@ func awaitDiscoveryEndpoint(t *testing.T, ctx context.Context, domain string, co
 		if notContainsUILocales != nil {
 			assert.Condition(tt, not(contains(doc.UILocalesSupported, notContainsUILocales)))
 		}
-	}, retryDuration, tick, "awaiting successful callback failed",
+	}, retryDuration, tick, "awaiting successful call to Discovery endpoint failed",
 	)
 }
 
@@ -232,7 +232,7 @@ func awaitLoginUILanguage(t *testing.T, ctx context.Context, domain string, acce
 		}()
 		require.NoError(tt, err)
 		assert.Containsf(tt, string(body), containsText, "login ui language is in "+expectLang.String())
-	}, retryDuration, tick, "awaiting successful callback failed",
+	}, retryDuration, tick, "awaiting successful LoginUI in specific language failed",
 	)
 }
 

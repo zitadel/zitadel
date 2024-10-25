@@ -84,7 +84,7 @@ func awaitGetSSRGetResponse(t *testing.T, ctx context.Context, client *http.Clie
 				csrfToken, _, _ = bytes.Cut(after, []byte(`">`))
 			}
 			assert.Equal(tt, resp.StatusCode, expectCode)
-		}, retryDuration, tick, "awaiting successful callback failed",
+		}, retryDuration, tick, "awaiting successful get SSR get response failed",
 	)
 	return string(csrfToken)
 }
@@ -99,6 +99,6 @@ func awaitPostFormResponse(t *testing.T, ctx context.Context, client *http.Clien
 			})
 			require.NoError(tt, err)
 			assert.Equal(tt, resp.StatusCode, expectCode)
-		}, retryDuration, tick, "awaiting successful callback failed",
+		}, retryDuration, tick, "awaiting successful Post Form failed",
 	)
 }
