@@ -68,7 +68,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
       userId,
       isInvite: isInvite,
     }).catch(() => {
-      setError("Could not verify email");
+      setError("Could not verify user");
       setLoading(false);
       return;
     });
@@ -76,7 +76,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
     setLoading(false);
 
     if (!verifyResponse) {
-      setError("Could not verify email");
+      setError("Could not verify user");
       return;
     } else {
       router.push("/authenticator/set?" + params);

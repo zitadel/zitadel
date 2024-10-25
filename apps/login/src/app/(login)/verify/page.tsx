@@ -39,6 +39,7 @@ export default async function Page({ searchParams }: { searchParams: any }) {
   let authMethods: AuthenticationMethodType[] | null = null;
   if (human?.email?.isVerified) {
     const authMethodsResponse = await listAuthenticationMethodTypes(userId);
+    console.log(authMethodsResponse);
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
     }
@@ -92,7 +93,7 @@ export default async function Page({ searchParams }: { searchParams: any }) {
             <div className="mt-8 flex w-full flex-row items-center">
               <BackButton />
               <span className="flex-grow"></span>
-              {authMethods?.length !== 0 && (
+              {authMethods?.length === 0 && (
                 <Link href={`/authenticator/set?+${params}`}>
                   <Button
                     type="submit"
