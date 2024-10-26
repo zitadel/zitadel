@@ -34,6 +34,7 @@ services:
     restart: 'always'
     image: postgres:16-alpine
     environment:
+      - PGUSER=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     networks:
