@@ -21,6 +21,7 @@ import {
 import { create, fromJson, toJson } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { BrandingSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { LegalAndSupportSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import {
@@ -417,7 +418,7 @@ export async function listUsers({
   return userService.listUsers({ queries: queries });
 }
 
-export async function getDefaultOrg() {
+export async function getDefaultOrg(): Promise<Organization | null> {
   return orgService
     .listOrganizations(
       {
@@ -432,7 +433,7 @@ export async function getDefaultOrg() {
       },
       {},
     )
-    .then((resp) => resp.result[0]);
+    .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
 }
 
 export async function getOrgsByDomain(domain: string) {

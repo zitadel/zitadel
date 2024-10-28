@@ -22,8 +22,9 @@ export default async function Page({
     searchParams;
 
   if (!organization) {
-    const org: Organization | void = await getDefaultOrg().catch((error) => {
-      console.log("getDefaultOrgError", error);
+    const org: Organization | null = await getDefaultOrg().catch((error) => {
+      console.warn(error);
+      return null;
     });
     if (!org) {
       console.warn("No default organization found");
