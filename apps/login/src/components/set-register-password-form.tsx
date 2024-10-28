@@ -6,10 +6,9 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { registerUser, RegisterUserResponse } from "@/lib/server/register";
+import { registerUser } from "@/lib/server/register";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
@@ -57,8 +56,6 @@ export function SetRegisterPasswordForm({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const router = useRouter();
-
   async function submitRegister(values: Inputs) {
     setLoading(true);
     const response = await registerUser({
@@ -72,46 +69,11 @@ export function SetRegisterPasswordForm({
       setError("Could not register user");
     });
 
-    if (response && "error" in response) {
-      setError(response.error);
-    }
-
     setLoading(false);
 
-    if (!response) {
-      setError("Could not register user");
+    if (response && "error" in response) {
+      setError(response.error);
       return;
-    }
-
-    const userResponse = response as RegisterUserResponse;
-
-    const params = new URLSearchParams({ userId: userResponse.userId });
-
-    if (userResponse.factors?.user?.loginName) {
-      params.append("loginName", userResponse.factors.user.loginName);
-    }
-    if (organization) {
-      params.append("organization", organization);
-    }
-    if (userResponse && userResponse.sessionId) {
-      params.append("sessionId", userResponse.sessionId);
-    }
-
-    // skip verification for now as it is an app based flow
-    // return router.push(`/verify?` + params);
-
-    // check for mfa force to continue with mfa setup
-
-    if (authRequestId && userResponse.sessionId) {
-      if (authRequestId) {
-        params.append("authRequest", authRequestId);
-      }
-      return router.push(`/login?` + params);
-    } else {
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-      return router.push(`/signedin?` + params);
     }
   }
 
