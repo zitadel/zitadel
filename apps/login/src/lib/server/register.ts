@@ -66,14 +66,30 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: "Could not create session" };
   }
 
-  const params = new URLSearchParams({
-    loginName: session.factors.user.loginName,
-    organization: session.factors.user.organizationId,
-  });
+  if (!command.password) {
+    const params = new URLSearchParams({
+      loginName: session.factors.user.loginName,
+      organization: session.factors.user.organizationId,
+    });
 
-  if (command.authRequestId) {
-    params.append("authRequestId", command.authRequestId);
+    if (command.authRequestId) {
+      params.append("authRequestId", command.authRequestId);
+    }
+
+    return redirect("/passkey/set?" + params);
+  } else {
+    const params = new URLSearchParams({
+      loginName: session.factors.user.loginName,
+      organization: session.factors.user.organizationId,
+    });
+
+    if (command.authRequestId && session.userId) {
+      params.append("authRequest", command.authRequestId);
+      params.append("userId", session.userId);
+
+      return redirect("/login?" + params);
+    } else {
+      return redirect("/signedin?" + params);
+    }
   }
-
-  return redirect("/passkey/set?" + params);
 }
