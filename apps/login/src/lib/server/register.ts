@@ -8,6 +8,7 @@ import {
   ChecksJson,
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { redirect } from "next/navigation";
 
 type RegisterUserCommand = {
   email: string;
@@ -23,7 +24,6 @@ export type RegisterUserResponse = {
   sessionId: string;
   factors: Factors | undefined;
 };
-
 export async function registerUser(command: RegisterUserCommand) {
   const human = await addHumanUser({
     email: command.email,
@@ -50,7 +50,7 @@ export async function registerUser(command: RegisterUserCommand) {
 
   const checks = create(ChecksSchema, checkPayload);
 
-  return createSessionAndUpdateCookie(
+  const session = await createSessionAndUpdateCookie(
     checks,
     undefined,
     command.authRequestId,
@@ -61,4 +61,19 @@ export async function registerUser(command: RegisterUserCommand) {
       factors: session.factors,
     };
   });
+
+  if (!session || !session.factors?.user) {
+    return { error: "Could not create session" };
+  }
+
+  const params = new URLSearchParams({
+    loginName: session.factors.user.loginName,
+    organization: session.factors.user.organizationId,
+  });
+
+  if (command.authRequestId) {
+    params.append("authRequestId", command.authRequestId);
+  }
+
+  return redirect("/passkey/set?" + params);
 }
