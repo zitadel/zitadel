@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
 	"strings"
 	"time"
 
@@ -43,10 +44,21 @@ type redisCache[I, K comparable, V cache.Entry[I, K]] struct {
 }
 
 // NewCache returns a cache that does nothing
-func NewCache[I, K comparable, V cache.Entry[I, K]]() cache.Cache[I, K, V] {
+func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.CacheConfig, client *redis.Client, name string, indices []I) cache.Cache[I, K, V] {
 	return &redisCache[I, K, V]{
-		client: redis.NewClient(nil),
+		config:  &config,
+		name:    name,
+		indices: indices,
+		client:  client,
+		logger: slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+			AddSource: true,
+			Level:     slog.LevelError,
+		})),
 	}
+}
+
+func (c *redisCache[I, K, V]) Close() error {
+	return c.client.Close()
 }
 
 func (c *redisCache[I, K, V]) Set(ctx context.Context, value V) {
