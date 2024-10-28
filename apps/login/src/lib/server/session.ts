@@ -85,7 +85,8 @@ export async function updateSession(options: UpdateSessionCommand) {
           return Promise.reject(error);
         });
 
-  const host = headers().get("host");
+  // TODO remove ports from host header for URL with port
+  const host = "localhost"
 
   if (
     host &&

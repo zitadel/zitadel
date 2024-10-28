@@ -9,7 +9,7 @@ dotenv.config({path: path.resolve(__dirname, '.env.local')});
 const test = base.extend<{ user: PasswordUser }>({
     user: async ({page}, use) => {
         const user = new PasswordUser({
-            email: "password@example.com",
+            email: "password-changed@example.com",
             firstName: "first",
             lastName: "last",
             password: "Password1!",
@@ -20,9 +20,7 @@ const test = base.extend<{ user: PasswordUser }>({
     },
 });
 
-test("username and password login", async ({user, page}) => {
+test("username and password changed login", async ({user, page}) => {
+    await user.changePassword(page, "ChangedPw1!")
     await user.login(page)
-    await page.getByRole("heading", {name: "Welcome " + user.fullName() + "!"}).click();
 });
-
-

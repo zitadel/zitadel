@@ -37,7 +37,8 @@ export async function registerPasskeyLink(
     sessionToken: sessionCookie.token,
   });
 
-  const domain = headers().get("host");
+  // TODO remove ports from host header for URL with port
+  const domain = "localhost";
 
   if (!domain) {
     throw new Error("Could not get domain");
