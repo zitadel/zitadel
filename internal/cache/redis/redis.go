@@ -18,6 +18,8 @@ import (
 )
 
 var (
+	//go:embed _select.lua
+	selectComponent string
 	//go:embed _util.lua
 	utilComponent string
 	//go:embed _remove.lua
@@ -30,13 +32,13 @@ var (
 	invalidateScript string
 
 	// Don't mind the creative "import"
-	setParsed        = redis.NewScript(strings.Join([]string{utilComponent, setScript}, "\n"))
-	getParsed        = redis.NewScript(strings.Join([]string{utilComponent, removeComponent, getScript}, "\n"))
-	invalidateParsed = redis.NewScript(strings.Join([]string{utilComponent, removeComponent, invalidateScript}, "\n"))
+	setParsed        = redis.NewScript(strings.Join([]string{selectComponent, utilComponent, setScript}, "\n"))
+	getParsed        = redis.NewScript(strings.Join([]string{selectComponent, utilComponent, removeComponent, getScript}, "\n"))
+	invalidateParsed = redis.NewScript(strings.Join([]string{selectComponent, utilComponent, removeComponent, invalidateScript}, "\n"))
 )
 
 type redisCache[I, K comparable, V cache.Entry[I, K]] struct {
-	name    string
+	db      int
 	config  *cache.CacheConfig
 	indices []I
 	client  *redis.Client
@@ -44,10 +46,10 @@ type redisCache[I, K comparable, V cache.Entry[I, K]] struct {
 }
 
 // NewCache returns a cache that does nothing
-func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.CacheConfig, client *redis.Client, name string, indices []I) cache.Cache[I, K, V] {
+func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.CacheConfig, client *redis.Client, db int, indices []I) cache.Cache[I, K, V] {
 	return &redisCache[I, K, V]{
 		config:  &config,
-		name:    name,
+		db:      db,
 		indices: indices,
 		client:  client,
 		logger: slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
@@ -80,12 +82,12 @@ func (c *redisCache[I, K, V]) set(ctx context.Context, value V) (objectID string
 	if err != nil {
 		return "", err
 	}
-	argv := []any{
-		buf.String(),                             // object
-		int64(c.config.LastUseAge / time.Second), // usage_lifetime
-		int64(c.config.MaxAge / time.Second),     // max_age
-	}
-	err = setParsed.Run(ctx, c.client, keys, argv...).Err()
+	err = setParsed.Run(ctx, c.client, keys,
+		c.db,                                   // DB namespace
+		buf.String(),                           // object
+		int64(c.config.LastUseAge/time.Second), // usage_lifetime
+		int64(c.config.MaxAge/time.Second),     // max_age,
+	).Err()
 	// redis.Nil is always returned because the script doesn't have a return value.
 	if err != nil && !errors.Is(err, redis.Nil) {
 		return "", err
@@ -95,7 +97,7 @@ func (c *redisCache[I, K, V]) set(ctx context.Context, value V) (objectID string
 
 func (c *redisCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, ok bool) {
 	logger := c.logger.With("index", index, "key", key)
-	obj, err := getParsed.Run(ctx, c.client, c.redisIndexKeys(index, key)).Result()
+	obj, err := getParsed.Run(ctx, c.client, c.redisIndexKeys(index, key), c.db).Result()
 	if err != nil && !errors.Is(err, redis.Nil) {
 		logger.ErrorContext(ctx, "redis cache get", "err", err)
 		return value, false
@@ -118,7 +120,7 @@ func (c *redisCache[I, K, V]) Invalidate(ctx context.Context, index I, key ...K)
 	if len(key) == 0 {
 		return nil
 	}
-	err = invalidateParsed.Run(ctx, c.client, c.redisIndexKeys(index, key...)).Err()
+	err = invalidateParsed.Run(ctx, c.client, c.redisIndexKeys(index, key...), c.db).Err()
 	// redis.Nil is always returned because the script doesn't have a return value.
 	if err != nil && !errors.Is(err, redis.Nil) {
 		return err
@@ -130,16 +132,25 @@ func (c *redisCache[I, K, V]) Delete(ctx context.Context, index I, key ...K) (er
 	if len(key) == 0 {
 		return nil
 	}
-	return c.client.Del(ctx, c.redisIndexKeys(index, key...)...).Err()
+	pipe := c.client.Pipeline()
+	pipe.Select(ctx, c.db)
+	pipe.Del(ctx, c.redisIndexKeys(index, key...)...)
+	_, err = pipe.Exec(ctx)
+	return err
 }
+
 func (c *redisCache[I, K, V]) Truncate(ctx context.Context) (err error) {
-	return c.client.FlushDB(ctx).Err()
+	pipe := c.client.Pipeline()
+	pipe.Select(ctx, c.db)
+	pipe.FlushDB(ctx)
+	_, err = pipe.Exec(ctx)
+	return err
 }
 
 func (c *redisCache[I, K, V]) redisIndexKeys(index I, keys ...K) []string {
 	out := make([]string, len(keys))
 	for i, k := range keys {
-		out[i] = fmt.Sprintf("%s:%v:%v", c.name, index, k)
+		out[i] = fmt.Sprintf("%v:%v", index, k)
 	}
 	return out
 }

@@ -1,8 +1,8 @@
 -- KEYS: [1]: object_id; [>1]: index keys.
 local object_id = KEYS[1]
-local object = ARGV[1]
-local usage_lifetime = tonumber(ARGV[2]) -- usage based lifetime in seconds
-local max_age = tonumber(ARGV[3]) -- max age liftime in seconds
+local object = ARGV[2]
+local usage_lifetime = tonumber(ARGV[3]) -- usage based lifetime in seconds
+local max_age = tonumber(ARGV[4]) -- max age liftime in seconds
 
 redis.call("HSET", object_id,"object", object, "usage_lifetime", usage_lifetime)
 if usage_lifetime > 0 then

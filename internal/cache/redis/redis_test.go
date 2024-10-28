@@ -21,7 +21,7 @@ const (
 )
 
 const (
-	cacheName = "test"
+	testDB = 99
 )
 
 var testIndices = []testIndex{
@@ -75,9 +75,9 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
-				s.CheckGet(t, cacheName+":0:one", objectID)
-				s.CheckGet(t, cacheName+":1:foo", objectID)
-				s.CheckGet(t, cacheName+":1:bar", objectID)
+				s.CheckGet(t, "0:one", objectID)
+				s.CheckGet(t, "1:foo", objectID)
+				s.CheckGet(t, "1:bar", objectID)
 				assert.Empty(t, s.HGet(objectID, "expiry"))
 				assert.JSONEq(t, `{"ID":"one","Name":["foo","bar"]}`, s.HGet(objectID, "object"))
 			},
@@ -95,9 +95,9 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
-				s.CheckGet(t, cacheName+":0:one", objectID)
-				s.CheckGet(t, cacheName+":1:foo", objectID)
-				s.CheckGet(t, cacheName+":1:bar", objectID)
+				s.CheckGet(t, "0:one", objectID)
+				s.CheckGet(t, "1:foo", objectID)
+				s.CheckGet(t, "1:bar", objectID)
 				assert.Empty(t, s.HGet(objectID, "expiry"))
 				assert.JSONEq(t, `{"ID":"one","Name":["foo","bar"]}`, s.HGet(objectID, "object"))
 				assert.Positive(t, s.TTL(objectID))
@@ -122,9 +122,9 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
-				s.CheckGet(t, cacheName+":0:one", objectID)
-				s.CheckGet(t, cacheName+":1:foo", objectID)
-				s.CheckGet(t, cacheName+":1:bar", objectID)
+				s.CheckGet(t, "0:one", objectID)
+				s.CheckGet(t, "1:foo", objectID)
+				s.CheckGet(t, "1:bar", objectID)
 				assert.NotEmpty(t, s.HGet(objectID, "expiry"))
 				assert.JSONEq(t, `{"ID":"one","Name":["foo","bar"]}`, s.HGet(objectID, "object"))
 				assert.Positive(t, s.TTL(objectID))
@@ -148,9 +148,9 @@ func Test_redisCache_set(t *testing.T) {
 				},
 			},
 			assertions: func(t *testing.T, s *miniredis.Miniredis, objectID string) {
-				s.CheckGet(t, cacheName+":0:one", objectID)
-				s.CheckGet(t, cacheName+":1:foo", objectID)
-				s.CheckGet(t, cacheName+":1:bar", objectID)
+				s.CheckGet(t, "0:one", objectID)
+				s.CheckGet(t, "1:foo", objectID)
+				s.CheckGet(t, "1:bar", objectID)
 				assert.Empty(t, s.HGet(objectID, "expiry"))
 				assert.JSONEq(t, `{"ID":"one","Name":["foo","bar"]}`, s.HGet(objectID, "object"))
 				assert.Positive(t, s.TTL(objectID))
@@ -166,10 +166,11 @@ func Test_redisCache_set(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := miniredis.RunT(t)
 			defer server.Close()
+			server.Select(testDB)
 			c := NewCache[testIndex, string, *testObject](
 				tt.config,
 				newTestClient(server.Addr()),
-				cacheName,
+				testDB,
 				testIndices,
 			).(*redisCache[testIndex, string, *testObject])
 			defer c.Close()
@@ -332,10 +333,11 @@ func Test_redisCache_get(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := miniredis.RunT(t)
 			defer server.Close()
+			server.Select(testDB)
 			c := NewCache[testIndex, string, *testObject](
 				tt.config,
 				newTestClient(server.Addr()),
-				cacheName,
+				testDB,
 				testIndices,
 			).(*redisCache[testIndex, string, *testObject])
 			defer c.Close()
@@ -498,10 +500,11 @@ func Test_redisCache_Invalidate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := miniredis.RunT(t)
 			defer server.Close()
+			server.Select(testDB)
 			c := NewCache[testIndex, string, *testObject](
 				tt.config,
 				newTestClient(server.Addr()),
-				cacheName,
+				testDB,
 				testIndices,
 			).(*redisCache[testIndex, string, *testObject])
 			defer c.Close()
@@ -640,10 +643,11 @@ func Test_redisCache_Delete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := miniredis.RunT(t)
 			defer server.Close()
+			server.Select(testDB)
 			c := NewCache[testIndex, string, *testObject](
 				tt.config,
 				newTestClient(server.Addr()),
-				cacheName,
+				testDB,
 				testIndices,
 			).(*redisCache[testIndex, string, *testObject])
 			defer c.Close()
@@ -714,10 +718,11 @@ func Test_redisCache_Truncate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			server := miniredis.RunT(t)
 			defer server.Close()
+			server.Select(testDB)
 			c := NewCache[testIndex, string, *testObject](
 				tt.config,
 				newTestClient(server.Addr()),
-				cacheName,
+				testDB,
 				testIndices,
 			).(*redisCache[testIndex, string, *testObject])
 			defer c.Close()
