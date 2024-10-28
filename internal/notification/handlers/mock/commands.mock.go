@@ -141,7 +141,7 @@ func (mr *MockCommandsMockRecorder) InviteCodeSent(arg0, arg1, arg2 any) *gomock
 }
 
 // MilestonePushed mocks base method.
-func (m *MockCommands) MilestonePushed(arg0 context.Context, arg1 milestone.Type, arg2 []string, arg3 string) error {
+func (m *MockCommands) MilestonePushed(arg0 context.Context, arg1 string, arg2 milestone.Type, arg3 []string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MilestonePushed", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(error)

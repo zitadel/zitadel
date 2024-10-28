@@ -1345,7 +1345,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Authentication Factors (2FA/MFA)";
-            description: "Get a list of authentication factors the user has set. Including Second-Factors (2FA) and Multi-Factors (MFA).\n\nDeprecated: please use user service v2 ListAuthenticationMethodTypes"
+            description: "Get a list of authentication factors the user has set. Including Second Factors (2FA) and Multi-Factors (MFA).\n\nDeprecated: please use user service v2 ListAuthenticationMethodTypes"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1378,7 +1378,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP";
-            description: "Remove the configured One-Time-Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.\n\nDeprecated: please use user service v2 RemoveTOTP"
+            description: "Remove the configured One-Time Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.\n\nDeprecated: please use user service v2 RemoveTOTP"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1412,7 +1412,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor U2F";
             deprecated: true;
-            description: "Remove the configured Universal-Second-Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.\n\nDeprecated: please use user service v2 RemoveU2F"
+            description: "Remove the configured Universal Second Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.\n\nDeprecated: please use user service v2 RemoveU2F"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1444,7 +1444,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP SMS";
-            description: "Remove the configured One-Time-Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPSMS"
+            description: "Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPSMS"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -1477,7 +1477,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP SMS";
-            description: "Remove the configured One-Time-Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPEmail"
+            description: "Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPEmail"
             tags: "Users";
             tags: "User Human";
             deprecated: true;
@@ -4618,8 +4618,8 @@ service ManagementService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Authentication Methods"
-            summary: "List Multi Factors (MFA)";
-            description: "Returns a list of multi factors (MFA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            summary: "List Multi-factors (MFA)";
+            description: "Returns a list of multi-factors (MFA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4671,7 +4671,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Authentication Methods"
-            summary: "Remove Multi Factor (MFA)";
+            summary: "Remove Multi-factor (MFA)";
             description: "Remove a multi-factor (MFA) from the login settings of the organization. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             parameters: {
                 headers: {
@@ -9208,7 +9208,7 @@ message AddOrgMemberRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 2  [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"IAM_OWNER\"]";
+            example: "[\"ORG_OWNER\"]";
             description: "If no roles are provided the user won't have any rights"
         }
     ];

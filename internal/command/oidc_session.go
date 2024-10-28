@@ -71,7 +71,8 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Iung5", "Errors.AuthRequest.NoCode")
 	}
 
-	sessionModel := NewSessionWriteModel(authReqModel.SessionID, authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	sessionModel := NewSessionWriteModel(authReqModel.SessionID, instanceID)
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionModel)
 	if err != nil {
 		return nil, "", err
@@ -118,8 +119,15 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		}
 	}
 	cmd.SetAuthRequestSuccessful(ctx, authReqModel.aggregate)
-	session, err = cmd.PushEvents(ctx)
-	return session, authReqModel.State, err
+	postCommit, err := cmd.SetMilestones(ctx, authReqModel.ClientID, true)
+	if err != nil {
+		return nil, "", err
+	}
+	if session, err = cmd.PushEvents(ctx); err != nil {
+		return nil, "", err
+	}
+	postCommit(ctx)
+	return session, authReqModel.State, nil
 }
 
 func (c *Commands) CreateOIDCSession(ctx context.Context,
@@ -161,7 +169,15 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 			return nil, err
 		}
 	}
-	return cmd.PushEvents(ctx)
+	postCommit, err := cmd.SetMilestones(ctx, clientID, sessionID != "")
+	if err != nil {
+		return nil, err
+	}
+	if session, err = cmd.PushEvents(ctx); err != nil {
+		return nil, err
+	}
+	postCommit(ctx)
+	return session, nil
 }
 
 type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string) (scope []string, err error)
@@ -283,7 +299,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resource
 	}
 	sessionID = IDPrefixV2 + sessionID
 	return &OIDCSessionEvents{
-		eventstore:               c.eventstore,
+		commands:                 c,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
 		events:                   pending,
@@ -341,7 +357,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 		return nil, err
 	}
 	return &OIDCSessionEvents{
-		eventstore:               c.eventstore,
+		commands:                 c,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
 		oidcSessionWriteModel:    sessionWriteModel,
@@ -352,7 +368,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 }
 
 type OIDCSessionEvents struct {
-	eventstore            *eventstore.Eventstore
+	commands              *Commands
 	idGenerator           id.Generator
 	encryptionAlg         crypto.EncryptionAlgorithm
 	events                []eventstore.Command
@@ -467,7 +483,7 @@ func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID,
 }
 
 func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error) {
-	pushedEvents, err := c.eventstore.Push(ctx, c.events...)
+	pushedEvents, err := c.commands.eventstore.Push(ctx, c.events...)
 	if err != nil {
 		return nil, err
 	}
@@ -496,7 +512,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
 		session.TokenID = c.oidcSessionWriteModel.AggregateID + TokenDelimiter + c.accessTokenID
 	}
-	activity.Trigger(ctx, c.oidcSessionWriteModel.UserResourceOwner, c.oidcSessionWriteModel.UserID, tokenReasonToActivityMethodType(c.oidcSessionWriteModel.AccessTokenReason), c.eventstore.FilterToQueryReducer)
+	activity.Trigger(ctx, c.oidcSessionWriteModel.UserResourceOwner, c.oidcSessionWriteModel.UserID, tokenReasonToActivityMethodType(c.oidcSessionWriteModel.AccessTokenReason), c.commands.eventstore.FilterToQueryReducer)
 	return session, nil
 }
 

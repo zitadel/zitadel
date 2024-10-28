@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/database/postgres"
 )
 
@@ -77,7 +78,8 @@ type CachesConfig struct {
 		Postgres PostgresConnectorConfig
 		// Redis redis.Config?
 	}
-	Instance *CacheConfig
+	Instance   *CacheConfig
+	Milestones *CacheConfig
 }
 
 type CacheConfig struct {

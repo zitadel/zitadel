@@ -12,6 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -435,6 +436,10 @@ func (repo *testQuerier) InstanceIDs(ctx context.Context, queryFactory *SearchQu
 		return nil, repo.err
 	}
 	return repo.instances, nil
+}
+
+func (*testQuerier) Client() *database.DB {
+	return nil
 }
 
 func TestEventstore_Push(t *testing.T) {
