@@ -85,7 +85,7 @@ export async function registerUser(command: RegisterUserCommand) {
 
     if (command.authRequestId && session.userId) {
       params.append("authRequest", command.authRequestId);
-      params.append("userId", session.userId);
+      params.append("sessionId", session.sessionId);
 
       return redirect("/login?" + params);
     } else {
