@@ -75,6 +75,8 @@ export function RegisterFormWithoutPassword({
 
     if (response && "error" in response) {
       setError(response.error);
+      setLoading(false);
+      return;
     }
 
     setLoading(false);
