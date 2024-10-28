@@ -18,6 +18,11 @@ const (
 	RefreshTokenAddedType   = oidcSessionEventPrefix + "refresh_token.added"
 	RefreshTokenRenewedType = oidcSessionEventPrefix + "refresh_token.renewed"
 	RefreshTokenRevokedType = oidcSessionEventPrefix + "refresh_token.revoked"
+
+	//SearchType           = "oidc_session"
+	//ObjectRevision       = uint8(1)
+	//SearchFieldSessionID = "sessionID"
+	SearchFieldClientID = "clientID"
 )
 
 type AddedEvent struct {
@@ -47,6 +52,46 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 func (e *AddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = *event
 }
+
+//
+//func (e *AddedEvent) Fields() []*eventstore.FieldOperation {
+//	return []*eventstore.FieldOperation{
+//		eventstore.SetField(
+//			e.Aggregate(),
+//			oidcSessionSearchObject(e.Aggregate().ID),
+//			SearchFieldSessionID,
+//			&eventstore.Value{
+//				Value:       e.SessionID,
+//				ShouldIndex: true,
+//			},
+//			eventstore.FieldTypeInstanceID,
+//			eventstore.FieldTypeResourceOwner,
+//			eventstore.FieldTypeAggregateID,
+//			eventstore.FieldTypeAggregateType,
+//			eventstore.FieldTypeObjectType,
+//			eventstore.FieldTypeObjectID,
+//			eventstore.FieldTypeObjectRevision,
+//			eventstore.FieldTypeFieldName,
+//		),
+//		eventstore.SetField(
+//			e.Aggregate(),
+//			oidcSessionSearchObject(e.Aggregate().ID),
+//			SearchFieldClientID,
+//			&eventstore.Value{
+//				Value:       e.ClientID,
+//				ShouldIndex: false,
+//			},
+//			eventstore.FieldTypeInstanceID,
+//			eventstore.FieldTypeResourceOwner,
+//			eventstore.FieldTypeAggregateID,
+//			eventstore.FieldTypeAggregateType,
+//			eventstore.FieldTypeObjectType,
+//			eventstore.FieldTypeObjectID,
+//			eventstore.FieldTypeObjectRevision,
+//			eventstore.FieldTypeFieldName,
+//		),
+//	}
+//}
 
 func NewAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -259,3 +304,12 @@ func NewRefreshTokenRevokedEvent(
 		),
 	}
 }
+
+//
+//func oidcSessionSearchObject(id string) eventstore.Object {
+//	return eventstore.Object{
+//		Type:     SearchType,
+//		Revision: ObjectRevision,
+//		ID:       id,
+//	}
+//}
