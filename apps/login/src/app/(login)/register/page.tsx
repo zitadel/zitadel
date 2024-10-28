@@ -7,6 +7,7 @@ import {
   getLegalAndSupportSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
@@ -21,10 +22,15 @@ export default async function Page({
     searchParams;
 
   if (!organization) {
-    const org = await getDefaultOrg();
+    const org: Organization | void = await getDefaultOrg().catch((error) => {
+      console.log("err");
+    });
     if (!org) {
+      console.log("no default organization");
       throw new Error("No default organization found");
     }
+
+    console.log("org", org);
 
     organization = org.id;
   }

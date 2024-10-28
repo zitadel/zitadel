@@ -4,7 +4,10 @@ describe("register", () => {
   beforeEach(() => {
     stub("zitadel.org.v2.OrganizationService", "ListOrganizations", {
       data: {
-        result: [{ id: "123" }],
+        details: {
+          totalResult: 1,
+        },
+        result: [{ id: "256088834543534543" }],
       },
     });
     stub("zitadel.user.v2.UserService", "AddHumanUser", {
