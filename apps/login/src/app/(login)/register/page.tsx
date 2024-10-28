@@ -23,16 +23,13 @@ export default async function Page({
 
   if (!organization) {
     const org: Organization | void = await getDefaultOrg().catch((error) => {
-      console.log("err");
+      console.log("getDefaultOrgError", error);
     });
     if (!org) {
-      console.log("no default organization");
-      throw new Error("No default organization found");
+      console.warn("No default organization found");
+    } else {
+      organization = org.id;
     }
-
-    console.log("org", org);
-
-    organization = org.id;
   }
 
   const setPassword = !!(firstname && lastname && email);
