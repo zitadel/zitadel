@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -17,13 +18,17 @@ var projections []*handler.Handler
 
 func Register(
 	ctx context.Context,
-	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig projection.CustomConfig,
+	userHandlerCustomConfig,
+	quotaHandlerCustomConfig,
+	telemetryHandlerCustomConfig,
+	backChannelLogoutHandlerCustomConfig projection.CustomConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
 	externalSecure bool,
 	commands *command.Commands,
 	queries *query.Queries,
+	authClient *database.DB,
 	es *eventstore.Eventstore,
 	otpEmailTmpl string,
 	fileSystemPath string,
@@ -33,6 +38,7 @@ func Register(
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))
+	projections = append(projections, handlers.NewBackChannelLogoutNotifier(ctx, projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig), commands, q, authClient, c, externalSecure, externalPort))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}

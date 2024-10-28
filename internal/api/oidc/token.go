@@ -33,7 +33,7 @@ for example the v2 code exchange and refresh token.
 
 func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion, accessTokenRoleAssertion, idTokenRoleAssertion, userInfoAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
 	getUserInfo := s.getUserInfo(session.UserID, projectID, projectRoleAssertion, userInfoAssertion, session.Scope)
-	getSigner := s.getSignerOnce()
+	getSigner := s.getSignerOnce(ctx)
 
 	resp := &oidc.AccessTokenResponse{
 		TokenType:    oidc.BearerToken,
@@ -60,12 +60,20 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 	return resp, err
 }
 
-// signerFunc is a getter function that allows add-hoc retrieval of the instance's signer.
-type signerFunc func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error)
+// SignerFunc is a getter function that allows add-hoc retrieval of the instance's signer.
+type SignerFunc func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error)
 
 // getSignerOnce returns a function which retrieves the instance's signer from the database once.
 // Repeated calls of the returned function return the same results.
-func (s *Server) getSignerOnce() signerFunc {
+func (s *Server) getSignerOnce(ctx context.Context) SignerFunc {
+	return GetSignerOnce(s.query.GetActiveSigningWebKey, s.Provider().Storage().SigningKey, authz.GetFeatures(ctx).WebKey)
+}
+
+func GetSignerOnce(
+	getActiveSigningWebKey func(ctx context.Context) (*jose.JSONWebKey, error),
+	getSigningKey func(ctx context.Context) (op.SigningKey, error),
+	webKeyFeature bool,
+) SignerFunc {
 	var (
 		once    sync.Once
 		signer  jose.Signer
@@ -77,9 +85,9 @@ func (s *Server) getSignerOnce() signerFunc {
 			ctx, span := tracing.NewSpan(ctx)
 			defer func() { span.EndWithError(err) }()
 
-			if authz.GetFeatures(ctx).WebKey {
+			if webKeyFeature {
 				var webKey *jose.JSONWebKey
-				webKey, err = s.query.GetActiveSigningWebKey(ctx)
+				webKey, err = getActiveSigningWebKey(ctx)
 				if err != nil {
 					return
 				}
@@ -88,7 +96,7 @@ func (s *Server) getSignerOnce() signerFunc {
 			}
 
 			var signingKey op.SigningKey
-			signingKey, err = s.Provider().Storage().SigningKey(ctx)
+			signingKey, err = getSigningKey(ctx)
 			if err != nil {
 				return
 			}
@@ -126,7 +134,7 @@ func (s *Server) getUserInfo(userID, projectID string, projectRoleAssertion, use
 	}
 }
 
-func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, roleAssertion bool, getSigningKey signerFunc, sessionID, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
+func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, roleAssertion bool, getSigningKey SignerFunc, sessionID, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -170,7 +178,7 @@ func timeToOIDCExpiresIn(exp time.Time) uint64 {
 	return uint64(time.Until(exp) / time.Second)
 }
 
-func (s *Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfo userInfoFunc, assertRoles bool, getSigner signerFunc) (_ string, err error) {
+func (s *Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfo userInfoFunc, assertRoles bool, getSigner SignerFunc) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
