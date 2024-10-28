@@ -65,6 +65,7 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 	}
 
 	cmd, err := command.StartCommands(mig.es,
+		nil,
 		mig.defaults,
 		mig.zitadelRoles,
 		nil,

@@ -202,10 +202,15 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	))
 
 	addedApplication.AppID = oidcApp.AppID
+	postCommit, err := c.applicationCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedApplication, pushedEvents...)
 	if err != nil {
 		return nil, err
