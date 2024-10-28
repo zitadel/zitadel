@@ -4,14 +4,14 @@
         {{ $logoDark := customLogoResource .PrivateLabelingOrgID .LabelPolicy true }}
         {{ $logoLight := customLogoResource .PrivateLabelingOrgID .LabelPolicy false }}
         {{if $logoDark}}
-            <img class="lgn-logo lgn-logo-dark" src="{{$logoDark}}" alt="Logo">
+            <img class="lgn-logo lgn-logo-dark hideonlight" src="{{$logoDark}}" alt="Dark Mode Logo">
         {{end}}
         {{if $logoLight}}
-        <img class="lgn-logo lgn-logo-light" src="{{$logoLight}}" alt="Logo">
+        <img class="lgn-logo lgn-logo-light hideondark" src="{{$logoLight}}" alt="Light Mode Logo">
         {{end}}
     {{ else }}
-        <img class="lgn-logo lgn-logo-dark" src="{{ resourceThemeUrl "logo-light.svg" .Theme }}" alt="Logo">
-        <img class="lgn-logo lgn-logo-light" src="{{ resourceThemeUrl "logo-dark.svg" .Theme }}" alt="Logo">
+        <img class="lgn-logo lgn-logo-dark hideonlight" src="{{ resourceThemeUrl "logo-light.svg" .Theme }}" alt="Dark Mode Logo">
+        <img class="lgn-logo lgn-logo-light hideondark" src="{{ resourceThemeUrl "logo-dark.svg" .Theme }}" alt="Light Mode Logo">
     {{end}}
 </header>
 {{end}}
