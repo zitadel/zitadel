@@ -75,7 +75,8 @@ export async function updateSession(options: UpdateSessionCommand) {
     challenges.webAuthN &&
     !challenges.webAuthN.domain
   ) {
-    challenges.webAuthN.domain = host;
+    const [hostname, port] = host.split(":");
+    challenges.webAuthN.domain = hostname;
   }
 
   const recent = await sessionPromise;
