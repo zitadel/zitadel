@@ -31,7 +31,6 @@ type Queries interface {
 	GetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error)
 	//ActivePrivateSigningKey(ctx context.Context) (op.SigningKey, error)
 	ActivePrivateSigningKey(ctx context.Context, t time.Time) (keys *query.PrivateKeys, err error)
-	NotificationOIDCSessions(ctx context.Context, sessionID string, triggerBulk bool) ([]query.NotificationOIDCSession, error)
 }
 
 type NotificationQueries struct {

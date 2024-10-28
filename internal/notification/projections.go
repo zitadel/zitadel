@@ -38,7 +38,7 @@ func Register(
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))
-	projections = append(projections, handlers.NewBackChannelLogoutNotifier(ctx, projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig), commands, q, authClient, c, externalSecure, externalPort))
+	projections = append(projections, handlers.NewBackChannelLogoutNotifier(ctx, projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig), commands, q, es, authClient, c, externalSecure, externalPort))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}

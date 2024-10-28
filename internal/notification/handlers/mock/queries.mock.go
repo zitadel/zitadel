@@ -179,21 +179,6 @@ func (mr *MockQueriesMockRecorder) MailTemplateByOrg(ctx, orgID, withOwnerRemove
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTemplateByOrg", reflect.TypeOf((*MockQueries)(nil).MailTemplateByOrg), ctx, orgID, withOwnerRemoved)
 }
 
-// NotificationOIDCSessions mocks base method.
-func (m *MockQueries) NotificationOIDCSessions(ctx context.Context, sessionID string, triggerBulk bool) ([]query.NotificationOIDCSession, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NotificationOIDCSessions", ctx, sessionID, triggerBulk)
-	ret0, _ := ret[0].([]query.NotificationOIDCSession)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// NotificationOIDCSessions indicates an expected call of NotificationOIDCSessions.
-func (mr *MockQueriesMockRecorder) NotificationOIDCSessions(ctx, sessionID, triggerBulk any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationOIDCSessions", reflect.TypeOf((*MockQueries)(nil).NotificationOIDCSessions), ctx, sessionID, triggerBulk)
-}
-
 // NotificationPolicyByOrg mocks base method.
 func (m *MockQueries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*query.NotificationPolicy, error) {
 	m.ctrl.T.Helper()

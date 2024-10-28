@@ -18,11 +18,6 @@ const (
 	RefreshTokenAddedType   = oidcSessionEventPrefix + "refresh_token.added"
 	RefreshTokenRenewedType = oidcSessionEventPrefix + "refresh_token.renewed"
 	RefreshTokenRevokedType = oidcSessionEventPrefix + "refresh_token.revoked"
-
-	//SearchType           = "oidc_session"
-	//ObjectRevision       = uint8(1)
-	//SearchFieldSessionID = "sessionID"
-	SearchFieldClientID = "clientID"
 )
 
 type AddedEvent struct {

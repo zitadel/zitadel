@@ -588,6 +588,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		authReq.UserID,
 		authReq.UserOrgID,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		authReq.Audience,
 		authReq.AuthMethods(),

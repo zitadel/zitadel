@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"slices"
 	"sync"
 	"time"
 
@@ -20,8 +21,8 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/notification/types"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -34,6 +35,7 @@ const (
 type backChannelLogoutNotifier struct {
 	commands       *command.Commands
 	queries        *NotificationQueries
+	eventstore     *eventstore.Eventstore
 	authClient     *database.DB
 	channels       types.ChannelChains
 	externalSecure bool
@@ -46,6 +48,7 @@ func NewBackChannelLogoutNotifier(
 	config handler.Config,
 	commands *command.Commands,
 	queries *NotificationQueries,
+	es *eventstore.Eventstore,
 	authClient *database.DB,
 	channels types.ChannelChains,
 	externalSecure bool,
@@ -54,6 +57,7 @@ func NewBackChannelLogoutNotifier(
 	return handler.NewHandler(ctx, &config, &backChannelLogoutNotifier{
 		commands:       commands,
 		queries:        queries,
+		eventstore:     es,
 		authClient:     authClient,
 		channels:       channels,
 		externalSecure: externalSecure,
@@ -167,24 +171,74 @@ func (u *backChannelLogoutNotifier) reduceSessionTerminated(event eventstore.Eve
 	}), nil
 }
 
+type backChannelLogoutSession struct {
+	sessionID string
+
+	// sessions contain a map of oidc session IDs and their corresponding clientID
+	sessions []backChannelLogoutOIDCSessions
+}
+
+type backChannelLogoutOIDCSessions struct {
+	SessionID            string
+	OIDCSessionID        string
+	UserID               string
+	ClientID             string
+	BackChannelLogoutURI string
+}
+
+func (b *backChannelLogoutSession) Reduce() error {
+	return nil
+}
+
+func (b *backChannelLogoutSession) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch e := event.(type) {
+		case *sessionlogout.BackChannelLogoutRegisteredEvent:
+			b.sessions = append(b.sessions, backChannelLogoutOIDCSessions{
+				SessionID:            b.sessionID,
+				OIDCSessionID:        e.OIDCSessionID,
+				UserID:               e.UserID,
+				ClientID:             e.ClientID,
+				BackChannelLogoutURI: e.BackChannelLogoutURI,
+			})
+		case *sessionlogout.BackChannelLogoutSentEvent:
+			slices.DeleteFunc(b.sessions, func(session backChannelLogoutOIDCSessions) bool {
+				return session.OIDCSessionID == e.OIDCSessionID
+			})
+		}
+	}
+}
+
+func (b *backChannelLogoutSession) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(sessionlogout.AggregateType).
+		AggregateIDs(b.sessionID).
+		EventTypes(
+			sessionlogout.BackChannelLogoutRegisteredType,
+			sessionlogout.BackChannelLogoutSentType).
+		Builder()
+}
+
 func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id string, e eventstore.Event, getSigner zoidc.SignerFunc) error {
-	sessions, err := u.queries.NotificationOIDCSessions(ctx, id, false)
+	sessions := &backChannelLogoutSession{sessionID: id}
+	err := u.eventstore.FilterToQueryReducer(ctx, sessions)
 	if err != nil {
 		return err
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(len(sessions))
-	errs := make([]error, 0, len(sessions))
-	for _, oidcSession := range sessions {
-		go func(oidcSession *query.NotificationOIDCSession) {
+	wg.Add(len(sessions.sessions))
+	errs := make([]error, 0, len(sessions.sessions))
+	for _, oidcSession := range sessions.sessions {
+		go func(oidcSession *backChannelLogoutOIDCSessions) {
 			defer wg.Done()
 			err := u.sendLogoutToken(ctx, oidcSession, e, getSigner)
 			if err != nil {
 				errs = append(errs, err)
 				return
 			}
-			err = u.commands.BackChannelLogoutSent(ctx, oidcSession.ID)
+			err = u.commands.BackChannelLogoutSent(ctx, oidcSession.SessionID, oidcSession.OIDCSessionID, e.Aggregate().InstanceID)
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -194,7 +248,7 @@ func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id str
 	return errors.Join(errs...)
 }
 
-func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSession *query.NotificationOIDCSession, e eventstore.Event, getSigner zoidc.SignerFunc) error {
+func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, e eventstore.Event, getSigner zoidc.SignerFunc) error {
 	token, err := u.logoutToken(ctx, oidcSession, getSigner)
 	if err != nil {
 		return err
@@ -206,7 +260,7 @@ func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSes
 	return nil
 }
 
-func (u *backChannelLogoutNotifier) logoutToken(ctx context.Context, oidcSession *query.NotificationOIDCSession, getSigner zoidc.SignerFunc) (string, error) {
+func (u *backChannelLogoutNotifier) logoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, getSigner zoidc.SignerFunc) (string, error) {
 	jwtID, err := u.idGenerator.Next()
 	if err != nil {
 		return "", err

@@ -142,17 +142,17 @@ func (mr *MockCommandsMockRecorder) InviteCodeSent(ctx, orgID, userID any) *gomo
 }
 
 // MilestonePushed mocks base method.
-func (m *MockCommands) MilestonePushed(arg0 context.Context, arg1 string, arg2 milestone.Type, arg3 []string) error {
+func (m *MockCommands) MilestonePushed(ctx context.Context, instanceID string, msType milestone.Type, endpoints []string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MilestonePushed", ctx, msType, endpoints, primaryDomain)
+	ret := m.ctrl.Call(m, "MilestonePushed", ctx, instanceID, msType, endpoints)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // MilestonePushed indicates an expected call of MilestonePushed.
-func (mr *MockCommandsMockRecorder) MilestonePushed(ctx, msType, endpoints, primaryDomain any) *gomock.Call {
+func (mr *MockCommandsMockRecorder) MilestonePushed(ctx, instanceID, msType, endpoints any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MilestonePushed", reflect.TypeOf((*MockCommands)(nil).MilestonePushed), ctx, msType, endpoints, primaryDomain)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MilestonePushed", reflect.TypeOf((*MockCommands)(nil).MilestonePushed), ctx, instanceID, msType, endpoints)
 }
 
 // OTPEmailSent mocks base method.
