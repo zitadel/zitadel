@@ -224,6 +224,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}
 	commands, err := command.StartCommands(
 		eventstoreClient,
+		config.Caches,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		storage,
