@@ -7,19 +7,19 @@ services:
       service: zitadel-init
     command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     environment:
-      - ZITADEL_EXTERNALPORT=80
-      - ZITADEL_EXTERNALSECURE=false
-      - ZITADEL_TLS_ENABLED=false
+      ZITADEL_EXTERNALPORT: 80
+      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_TLS_ENABLED: false
       # database configuration
-      - ZITADEL_DATABASE_POSTGRES_HOST=db
-      - ZITADEL_DATABASE_POSTGRES_PORT=5432
-      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
-      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
-      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
-      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     networks:
       - 'zitadel'
     depends_on:
@@ -33,19 +33,19 @@ services:
       service: zitadel-init
     command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     environment:
-      - ZITADEL_EXTERNALPORT=443
-      - ZITADEL_EXTERNALSECURE=true
-      - ZITADEL_TLS_ENABLED=false
+      ZITADEL_EXTERNALPORT: 443
+      ZITADEL_EXTERNALSECURE: true
+      ZITADEL_TLS_ENABLED: false
       # database configuration
-      - ZITADEL_DATABASE_POSTGRES_HOST=db
-      - ZITADEL_DATABASE_POSTGRES_PORT=5432
-      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
-      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
-      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
-      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     networks:
       - 'zitadel'
     depends_on:
@@ -59,21 +59,21 @@ services:
       service: zitadel-init
     command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     environment:
-      - ZITADEL_EXTERNALPORT=443
-      - ZITADEL_EXTERNALSECURE=true
-      - ZITADEL_TLS_ENABLED=true
-      - ZITADEL_TLS_CERTPATH=/etc/certs/selfsigned.crt
-      - ZITADEL_TLS_KEYPATH=/etc/certs/selfsigned.key
+      ZITADEL_EXTERNALPORT: 443
+      ZITADEL_EXTERNALSECURE: true
+      ZITADEL_TLS_ENABLED: true
+      ZITADEL_TLS_CERTPATH: /etc/certs/selfsigned.crt
+      ZITADEL_TLS_KEYPATH: /etc/certs/selfsigned.key
       # database configuration
-      - ZITADEL_DATABASE_POSTGRES_HOST=db
-      - ZITADEL_DATABASE_POSTGRES_PORT=5432
-      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
-      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
-      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
-      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     volumes:
       - ./selfsigned.crt:/etc/certs/selfsigned.crt
       - ./selfsigned.key:/etc/certs/selfsigned.key
@@ -96,22 +96,22 @@ services:
       # Using an external domain other than localhost proofs, that the proxy configuration works.
       # If ZITADEL can't resolve a requests original host to this domain,
       # it will return a 404 Instance not found error.
-      - ZITADEL_EXTERNALDOMAIN=127.0.0.1.sslip.io
+      ZITADEL_EXTERNALDOMAIN: 127.0.0.1.sslip.io
       # In case something doesn't work as expected,
       # it can be handy to be able to read the access logs.
-      - ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
+      ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED: true
       # For convenience, ZITADEL should not ask to change the initial admin users password.
-      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED=false
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
       # database configuration
-      - ZITADEL_DATABASE_POSTGRES_HOST=db
-      - ZITADEL_DATABASE_POSTGRES_PORT=5432
-      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
-      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
-      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
-      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
-      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     networks:
       - 'zitadel'
     healthcheck:
@@ -125,8 +125,8 @@ services:
     restart: 'always'
     image: postgres:16-alpine
     environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=postgres
+      PGUSER: root
+      POSTGRES_PASSWORD: postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
       interval: 5s
