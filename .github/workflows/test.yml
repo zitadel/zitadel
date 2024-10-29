@@ -57,23 +57,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install Dependencies
-        run: CYPRESS_INSTALL_BINARY=0 pnpm install
-
-      - run: echo "CYPRESS_VERSION=$(pnpm list -r | grep cypress | cut -d ' ' -f 2)" >> $GITHUB_ENV
-        if: ${{ matrix.command == 'test:integration' }}
-
-      - uses: actions/cache@v4.0.2
-        name: Setup Cypress binary cache
-        with:
-          path: ~/.cache/Cypress
-          key: ${{ runner.os }}-cypress-binary-${{ env.CYPRESS_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-cypress-binary-
-        if: ${{ matrix.command == 'test:integration' }}
-
-      - name: Install Cypress Browsers
-        run: pnpm install
-        if: ${{ matrix.command == 'test:integration' }}
+        run: CYPRESS_INSTALL_BINARY=${{ matrix.command == 'test:integration' }} pnpm install --frozen-lockfile
 
       - run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
         if: ${{ matrix.command == 'test:acceptance' }}
@@ -99,7 +83,7 @@ jobs:
         run: ZITADEL_DEV_UID=root pnpm run-zitadel
         if: ${{ matrix.command == 'test:acceptance' }}
 
-      - name: Install Playwright Browsers
+      - name: Create Production Build
         run: pnpm build
         if: ${{ matrix.command == 'test:acceptance' }}
 
