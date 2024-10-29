@@ -562,7 +562,13 @@ module.exports = {
                     "\n" +
                     "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
-              items: require("./docs/apis/resources/action_service_v3/sidebar.ts"),
+              items: [{
+                type: "doc",
+                id: "apis/actions/v3/usage",
+              }, {
+                type: "doc",
+                id: "apis/actions/v3/testing-locally",
+              }].concat(require("./docs/apis/resources/action_service_v3/sidebar.ts")),
             },
           ],
         },
