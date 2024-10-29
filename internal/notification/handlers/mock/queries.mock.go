@@ -15,6 +15,7 @@ import (
 	time "time"
 
 	jose "github.com/go-jose/go-jose/v4"
+	authz "github.com/zitadel/zitadel/internal/api/authz"
 	domain "github.com/zitadel/zitadel/internal/domain"
 	query "github.com/zitadel/zitadel/internal/query"
 	gomock "go.uber.org/mock/gomock"
@@ -119,21 +120,6 @@ func (mr *MockQueriesMockRecorder) GetDefaultLanguage(ctx any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLanguage", reflect.TypeOf((*MockQueries)(nil).GetDefaultLanguage), ctx)
 }
 
-// GetInstanceFeatures mocks base method.
-func (m *MockQueries) GetInstanceFeatures(ctx context.Context, cascade bool) (*query.InstanceFeatures, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetInstanceFeatures", ctx, cascade)
-	ret0, _ := ret[0].(*query.InstanceFeatures)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetInstanceFeatures indicates an expected call of GetInstanceFeatures.
-func (mr *MockQueriesMockRecorder) GetInstanceFeatures(ctx, cascade any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInstanceFeatures", reflect.TypeOf((*MockQueries)(nil).GetInstanceFeatures), ctx, cascade)
-}
-
 // GetInstanceRestrictions mocks base method.
 func (m *MockQueries) GetInstanceRestrictions(ctx context.Context) (query.Restrictions, error) {
 	m.ctrl.T.Helper()
@@ -162,6 +148,21 @@ func (m *MockQueries) GetNotifyUserByID(ctx context.Context, shouldTriggered boo
 func (mr *MockQueriesMockRecorder) GetNotifyUserByID(ctx, shouldTriggered, userID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifyUserByID", reflect.TypeOf((*MockQueries)(nil).GetNotifyUserByID), ctx, shouldTriggered, userID)
+}
+
+// InstanceByID mocks base method.
+func (m *MockQueries) InstanceByID(ctx context.Context, id string) (authz.Instance, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstanceByID", ctx, id)
+	ret0, _ := ret[0].(authz.Instance)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InstanceByID indicates an expected call of InstanceByID.
+func (mr *MockQueriesMockRecorder) InstanceByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceByID", reflect.TypeOf((*MockQueries)(nil).InstanceByID), ctx, id)
 }
 
 // MailTemplateByOrg mocks base method.

@@ -215,6 +215,7 @@ func projections(
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
+		keys.OIDC,
 	)
 
 	config.Auth.Spooler.Client = client

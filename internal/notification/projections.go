@@ -18,10 +18,7 @@ var projections []*handler.Handler
 
 func Register(
 	ctx context.Context,
-	userHandlerCustomConfig,
-	quotaHandlerCustomConfig,
-	telemetryHandlerCustomConfig,
-	backChannelLogoutHandlerCustomConfig projection.CustomConfig,
+	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig, backChannelLogoutHandlerCustomConfig projection.CustomConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
@@ -30,15 +27,25 @@ func Register(
 	queries *query.Queries,
 	authClient *database.DB,
 	es *eventstore.Eventstore,
-	otpEmailTmpl string,
-	fileSystemPath string,
-	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
+	otpEmailTmpl, fileSystemPath string,
+	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
 ) {
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
 	projections = append(projections, handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl))
 	projections = append(projections, handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c))
-	projections = append(projections, handlers.NewBackChannelLogoutNotifier(ctx, projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig), commands, q, es, authClient, c, externalSecure, externalPort))
+	projections = append(projections, handlers.NewBackChannelLogoutNotifier(
+		ctx,
+		projection.ApplyCustomConfig(backChannelLogoutHandlerCustomConfig),
+		commands,
+		q,
+		es,
+		authClient,
+		keysEncryptionAlg,
+		c,
+		externalSecure,
+		externalPort,
+	))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}

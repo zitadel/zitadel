@@ -7,13 +7,16 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	zoidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
+	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -33,14 +36,15 @@ const (
 )
 
 type backChannelLogoutNotifier struct {
-	commands       *command.Commands
-	queries        *NotificationQueries
-	eventstore     *eventstore.Eventstore
-	authClient     *database.DB
-	channels       types.ChannelChains
-	externalSecure bool
-	externalPort   uint16
-	idGenerator    id.Generator
+	commands         *command.Commands
+	queries          *NotificationQueries
+	eventstore       *eventstore.Eventstore
+	authClient       *database.DB
+	keyEncryptionAlg zcrypto.EncryptionAlgorithm
+	channels         types.ChannelChains
+	externalSecure   bool
+	externalPort     uint16
+	idGenerator      id.Generator
 }
 
 func NewBackChannelLogoutNotifier(
@@ -50,19 +54,21 @@ func NewBackChannelLogoutNotifier(
 	queries *NotificationQueries,
 	es *eventstore.Eventstore,
 	authClient *database.DB,
+	keyEncryptionAlg zcrypto.EncryptionAlgorithm,
 	channels types.ChannelChains,
 	externalSecure bool,
 	externalPort uint16,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &backChannelLogoutNotifier{
-		commands:       commands,
-		queries:        queries,
-		eventstore:     es,
-		authClient:     authClient,
-		channels:       channels,
-		externalSecure: externalSecure,
-		externalPort:   externalPort,
-		idGenerator:    id.SonyFlakeGenerator(),
+		commands:         commands,
+		queries:          queries,
+		eventstore:       es,
+		authClient:       authClient,
+		keyEncryptionAlg: keyEncryptionAlg,
+		channels:         channels,
+		externalSecure:   externalSecure,
+		externalPort:     externalPort,
+		idGenerator:      id.SonyFlakeGenerator(),
 	})
 
 }
@@ -100,42 +106,21 @@ func (u *backChannelLogoutNotifier) reduceUserSignedOut(event eventstore.Event) 
 	}
 
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
-		feature, err := u.queries.GetInstanceFeatures(ctx, true)
+		ctx, err := u.queries.HandlerContext(event.Aggregate())
 		if err != nil {
 			return err
 		}
-		if !feature.EnableBackChannelLogout.Value {
+		if !authz.GetFeatures(ctx).EnableBackChannelLogout {
 			return nil
 		}
-		userSessions, err := view.UserSessionsByAgentID(ctx, u.authClient, e.UserAgentID, e.Aggregate().InstanceID)
+		userSession, err := view.UserSessionByIDs(ctx, u.authClient, e.UserAgentID, e.Aggregate().ID, e.Aggregate().InstanceID)
 		if err != nil {
 			return err
 		}
-		if len(userSessions) == 0 {
+		if !userSession.ID.Valid {
 			return nil
 		}
-		ctx, err = u.queries.Origin(ctx, e)
-		if err != nil {
-			return err
-		}
-
-		getSigningKey := func(ctx context.Context) (op.SigningKey, error) {
-			return nil, zerrors.ThrowPreconditionFailed(nil, "HANDL-DF3nf", "?") //TODO: !
-		}
-		getSigner := zoidc.GetSignerOnce(u.queries.GetActiveSigningWebKey, getSigningKey, feature.WebKey.Value)
-
-		errs := make([]error, 0, len(userSessions))
-		for _, userSession := range userSessions {
-			if !userSession.ID.Valid {
-				continue
-			}
-			err := u.terminateSession(ctx, userSession.ID.String, e, getSigner)
-			if err != nil {
-				errs = append(errs, err)
-			}
-		}
-		return errors.Join(errs...)
+		return u.terminateSession(ctx, userSession.ID.String, e)
 	}), nil
 }
 
@@ -146,28 +131,14 @@ func (u *backChannelLogoutNotifier) reduceSessionTerminated(event eventstore.Eve
 	}
 
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		ctx := HandlerContext(event.Aggregate())
-		feature, err := u.queries.GetInstanceFeatures(ctx, true)
+		ctx, err := u.queries.HandlerContext(event.Aggregate())
 		if err != nil {
 			return err
 		}
-		if !feature.EnableBackChannelLogout.Value {
+		if !authz.GetFeatures(ctx).EnableBackChannelLogout {
 			return nil
 		}
-		ctx, err = u.queries.Origin(ctx, e)
-		if err != nil {
-			return err
-		}
-		getSigningKey := func(ctx context.Context) (op.SigningKey, error) { //TODO: !
-			//keys, err := u.queries.ActivePrivateSigningKey(ctx, time.Now())
-			//if err != nil {
-			//	return nil, err
-			//}
-			//return nil, err
-			return nil, zerrors.ThrowPreconditionFailed(nil, "HANDL-DF3nf", "?")
-		}
-		getSigner := zoidc.GetSignerOnce(u.queries.GetActiveSigningWebKey, getSigningKey, feature.WebKey.Value)
-		return u.terminateSession(ctx, e.Aggregate().ID, e, getSigner)
+		return u.terminateSession(ctx, e.Aggregate().ID, e)
 	}), nil
 }
 
@@ -176,6 +147,92 @@ type backChannelLogoutSession struct {
 
 	// sessions contain a map of oidc session IDs and their corresponding clientID
 	sessions []backChannelLogoutOIDCSessions
+}
+
+func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id string, e eventstore.Event) error {
+	sessions := &backChannelLogoutSession{sessionID: id}
+	err := u.eventstore.FilterToQueryReducer(ctx, sessions)
+	if err != nil {
+		return err
+	}
+
+	ctx, err = u.queries.Origin(ctx, e)
+	if err != nil {
+		return err
+	}
+
+	getSigner := zoidc.GetSignerOnce(u.queries.GetActiveSigningWebKey, u.signingKey)
+
+	var wg sync.WaitGroup
+	wg.Add(len(sessions.sessions))
+	errs := make([]error, 0, len(sessions.sessions))
+	for _, oidcSession := range sessions.sessions {
+		go func(oidcSession *backChannelLogoutOIDCSessions) {
+			defer wg.Done()
+			err := u.sendLogoutToken(ctx, oidcSession, e, getSigner)
+			if err != nil {
+				errs = append(errs, err)
+				return
+			}
+			err = u.commands.BackChannelLogoutSent(ctx, oidcSession.SessionID, oidcSession.OIDCSessionID, e.Aggregate().InstanceID)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}(&oidcSession)
+	}
+	wg.Wait()
+	return errors.Join(errs...)
+}
+
+func (u *backChannelLogoutNotifier) signingKey(ctx context.Context) (op.SigningKey, error) {
+	keys, err := u.queries.ActivePrivateSigningKey(ctx, time.Now())
+	if err != nil {
+		return nil, err
+	}
+	if len(keys.Keys) == 0 {
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID()).
+			Info("There's no active signing key and automatic rotation is not supported for back channel logout." +
+				"Please enable the webkey management feature on your instance")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "HANDL-DF3nf", "no active signing key")
+	}
+	return zoidc.PrivateKeyToSigningKey(zoidc.SelectSigningKey(keys.Keys), u.keyEncryptionAlg)
+}
+
+func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, e eventstore.Event, getSigner zoidc.SignerFunc) error {
+	token, err := u.logoutToken(ctx, oidcSession, getSigner)
+	if err != nil {
+		return err
+	}
+	err = types.SendSecurityTokenEvent(ctx, set.Config{CallURL: oidcSession.BackChannelLogoutURI}, u.channels, &LogoutTokenMessage{LogoutToken: token}, e).WithoutTemplate()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *backChannelLogoutNotifier) logoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, getSigner zoidc.SignerFunc) (string, error) {
+	jwtID, err := u.idGenerator.Next()
+	if err != nil {
+		return "", err
+	}
+	token := oidc.NewLogoutTokenClaims(
+		http_utils.DomainContext(ctx).Origin(),
+		oidcSession.UserID,
+		oidc.Audience{oidcSession.ClientID},
+		time.Now().Add(15*time.Minute),
+		jwtID,
+		oidcSession.SessionID,
+		time.Second,
+	)
+	signer, _, err := getSigner(ctx)
+	if err != nil {
+		return "", err
+	}
+	return crypto.Sign(token, signer)
+}
+
+type LogoutTokenMessage struct {
+	LogoutToken string `schema:"logout_token"`
 }
 
 type backChannelLogoutOIDCSessions struct {
@@ -218,69 +275,4 @@ func (b *backChannelLogoutSession) Query() *eventstore.SearchQueryBuilder {
 			sessionlogout.BackChannelLogoutRegisteredType,
 			sessionlogout.BackChannelLogoutSentType).
 		Builder()
-}
-
-func (u *backChannelLogoutNotifier) terminateSession(ctx context.Context, id string, e eventstore.Event, getSigner zoidc.SignerFunc) error {
-	sessions := &backChannelLogoutSession{sessionID: id}
-	err := u.eventstore.FilterToQueryReducer(ctx, sessions)
-	if err != nil {
-		return err
-	}
-
-	var wg sync.WaitGroup
-	wg.Add(len(sessions.sessions))
-	errs := make([]error, 0, len(sessions.sessions))
-	for _, oidcSession := range sessions.sessions {
-		go func(oidcSession *backChannelLogoutOIDCSessions) {
-			defer wg.Done()
-			err := u.sendLogoutToken(ctx, oidcSession, e, getSigner)
-			if err != nil {
-				errs = append(errs, err)
-				return
-			}
-			err = u.commands.BackChannelLogoutSent(ctx, oidcSession.SessionID, oidcSession.OIDCSessionID, e.Aggregate().InstanceID)
-			if err != nil {
-				errs = append(errs, err)
-			}
-		}(&oidcSession)
-	}
-	wg.Wait()
-	return errors.Join(errs...)
-}
-
-func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, e eventstore.Event, getSigner zoidc.SignerFunc) error {
-	token, err := u.logoutToken(ctx, oidcSession, getSigner)
-	if err != nil {
-		return err
-	}
-	err = types.SendSecurityTokenEvent(ctx, set.Config{CallURL: oidcSession.BackChannelLogoutURI}, u.channels, &LogoutTokenMessage{LogoutToken: token}, e).WithoutTemplate()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *backChannelLogoutNotifier) logoutToken(ctx context.Context, oidcSession *backChannelLogoutOIDCSessions, getSigner zoidc.SignerFunc) (string, error) {
-	jwtID, err := u.idGenerator.Next()
-	if err != nil {
-		return "", err
-	}
-	token := oidc.NewLogoutTokenClaims(
-		http_utils.DomainContext(ctx).Origin(),
-		oidcSession.UserID,
-		oidc.Audience{oidcSession.ClientID},
-		time.Now().Add(5*time.Minute), // TODO: configurable?
-		jwtID,
-		oidcSession.SessionID,
-		time.Second,
-	)
-	signer, _, err := getSigner(ctx)
-	if err != nil {
-		return "", err
-	}
-	return crypto.Sign(token, signer)
-}
-
-type LogoutTokenMessage struct {
-	LogoutToken string `schema:"logout_token"`
 }

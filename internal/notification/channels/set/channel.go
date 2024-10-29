@@ -10,6 +10,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -41,15 +42,18 @@ func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel,
 		if err != nil {
 			return err
 		}
-		logging.WithFields("calling_url", cfg.CallURL).Debug("security event token called")
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "calling_url", cfg.CallURL).Debug("security event token called")
 		if resp.StatusCode == http.StatusOK ||
 			resp.StatusCode == http.StatusAccepted ||
 			resp.StatusCode == http.StatusNoContent {
 			return nil
 		}
 		body, err := mapResponse(resp)
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "callURL", cfg.CallURL).
+			OnError(err).Debug("error mapping response")
 		if resp.StatusCode == http.StatusBadRequest {
-			logging.WithFields("callURL", cfg.CallURL, "status", resp.Status, "body", body).Error("security event token didn't return a success status")
+			logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "callURL", cfg.CallURL, "status", resp.Status, "body", body).
+				Error("security event token didn't return a success status")
 			return nil
 		}
 		return zerrors.ThrowInternalf(err, "SET-DF3dq", "security event token to %s didn't return a success status: %s (%v)", cfg.CallURL, resp.Status, body)

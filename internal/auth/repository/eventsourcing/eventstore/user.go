@@ -49,20 +49,6 @@ func (repo *UserRepo) ActiveUserIDsBySessionID(ctx context.Context, sessionID st
 	return repo.View.ActiveUserIDsBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
 }
 
-func (repo *UserRepo) UserSessionsByAgentID(ctx context.Context, agentID string) ([]string, error) {
-	userSessions, err := repo.View.UserSessionsByAgentID(ctx, agentID, authz.GetInstance(ctx).InstanceID())
-	if err != nil {
-		return nil, err
-	}
-	sessionIDs := make([]string, 0, len(userSessions))
-	for _, session := range userSessions {
-		if session.ID.Valid {
-			sessionIDs = append(sessionIDs, session.ID.String)
-		}
-	}
-	return sessionIDs, nil
-}
-
 func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
 	query, err := usr_view.UserByIDQuery(id, authz.GetInstance(ctx).InstanceID(), changeDate, eventTypes)
 	if err != nil {

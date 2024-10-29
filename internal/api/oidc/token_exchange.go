@@ -219,7 +219,7 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 // When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
 func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client *Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
 	getUserInfo := s.getUserInfo(subjectToken.userID, client.client.ProjectID, client.client.ProjectRoleAssertion, client.IDTokenUserinfoClaimsAssertion(), scopes)
-	getSigner := s.getSignerOnce(ctx)
+	getSigner := s.getSignerOnce()
 
 	resp := &oidc.TokenExchangeResponse{
 		Scopes: scopes,

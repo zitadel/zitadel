@@ -441,6 +441,7 @@ func initProjections(
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
+		keys.OIDC,
 	)
 	for _, p := range notify_handler.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)

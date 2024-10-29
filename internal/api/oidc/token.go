@@ -33,7 +33,7 @@ for example the v2 code exchange and refresh token.
 
 func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion, accessTokenRoleAssertion, idTokenRoleAssertion, userInfoAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
 	getUserInfo := s.getUserInfo(session.UserID, projectID, projectRoleAssertion, userInfoAssertion, session.Scope)
-	getSigner := s.getSignerOnce(ctx)
+	getSigner := s.getSignerOnce()
 
 	resp := &oidc.AccessTokenResponse{
 		TokenType:    oidc.BearerToken,
@@ -63,16 +63,15 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 // SignerFunc is a getter function that allows add-hoc retrieval of the instance's signer.
 type SignerFunc func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error)
 
-// getSignerOnce returns a function which retrieves the instance's signer from the database once.
-// Repeated calls of the returned function return the same results.
-func (s *Server) getSignerOnce(ctx context.Context) SignerFunc {
-	return GetSignerOnce(s.query.GetActiveSigningWebKey, s.Provider().Storage().SigningKey, authz.GetFeatures(ctx).WebKey)
+func (s *Server) getSignerOnce() SignerFunc {
+	return GetSignerOnce(s.query.GetActiveSigningWebKey, s.Provider().Storage().SigningKey)
 }
 
+// GetSignerOnce returns a function which retrieves the instance's signer from the database once.
+// Repeated calls of the returned function return the same results.
 func GetSignerOnce(
 	getActiveSigningWebKey func(ctx context.Context) (*jose.JSONWebKey, error),
 	getSigningKey func(ctx context.Context) (op.SigningKey, error),
-	webKeyFeature bool,
 ) SignerFunc {
 	var (
 		once    sync.Once
@@ -85,7 +84,7 @@ func GetSignerOnce(
 			ctx, span := tracing.NewSpan(ctx)
 			defer func() { span.EndWithError(err) }()
 
-			if webKeyFeature {
+			if authz.GetFeatures(ctx).WebKey {
 				var webKey *jose.JSONWebKey
 				webKey, err = getActiveSigningWebKey(ctx)
 				if err != nil {

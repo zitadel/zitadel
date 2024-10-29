@@ -7,6 +7,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -27,9 +28,8 @@ type Queries interface {
 	SMTPConfigActive(ctx context.Context, resourceOwner string) (*query.SMTPConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
 	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
-	GetInstanceFeatures(ctx context.Context, cascade bool) (_ *query.InstanceFeatures, err error)
+	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
 	GetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error)
-	//ActivePrivateSigningKey(ctx context.Context) (op.SigningKey, error)
 	ActivePrivateSigningKey(ctx context.Context, t time.Time) (keys *query.PrivateKeys, err error)
 }
 
