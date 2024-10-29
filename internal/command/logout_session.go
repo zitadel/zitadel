@@ -15,9 +15,6 @@ func (c *Commands) BackChannelLogoutSent(ctx context.Context, id, oidcSessionID,
 	if err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return err
 	}
-	if sessionWriteModel.BackChannelLogoutSent {
-		return nil
-	}
 
 	return c.pushAppendAndReduce(
 		ctx,
