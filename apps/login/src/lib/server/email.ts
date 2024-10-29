@@ -74,7 +74,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     if (session.factors?.user?.loginName) {
       params.set("loginName", session.factors?.user?.loginName);
     }
-    return redirect("/authenticator/set?" + params);
+    return redirect(`/authenticator/set?${params}`);
   }
 }
 
@@ -134,6 +134,6 @@ export async function sendVerificationRedirectWithoutCheck(command: {
     if (session.factors?.user?.loginName) {
       params.set("loginName", session.factors?.user?.loginName);
     }
-    return redirect("/authenticator/set?" + params);
+    return redirect(`/authenticator/set?${params}`);
   }
 }

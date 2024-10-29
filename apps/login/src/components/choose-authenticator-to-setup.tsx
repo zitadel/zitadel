@@ -25,7 +25,7 @@ export function ChooseAuthenticatorToSetup({
   } else {
     return (
       <>
-        {loginSettings.passkeysType === PasskeysType.ALLOWED &&
+        {loginSettings.passkeysType === PasskeysType.NOT_ALLOWED &&
           !loginSettings.allowUsernamePassword && (
             <Alert type={AlertType.ALERT}>{t("noMethodsAvailable")}</Alert>
           )}

@@ -3,7 +3,6 @@
 import { Alert } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/email";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariants } from "./button";
@@ -34,8 +33,6 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
   const [error, setError] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(false);
-
-  const router = useRouter();
 
   async function resendCode() {
     setError("");

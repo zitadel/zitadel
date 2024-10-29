@@ -12,13 +12,40 @@ describe("register", () => {
     });
     stub("zitadel.user.v2.UserService", "AddHumanUser", {
       data: {
-        userId: "123",
-        email: {
-          email: "john@zitadel.com",
+        userId: "221394658884845598",
+      },
+    });
+    stub("zitadel.session.v2.SessionService", "CreateSession", {
+      data: {
+        details: {
+          sequence: 859,
+          changeDate: new Date("2024-04-04T09:40:55.577Z"),
+          resourceOwner: "220516472055706145",
         },
-        profile: {
-          givenName: "John",
-          familyName: "Doe",
+        sessionId: "221394658884845598",
+        sessionToken:
+          "SDMc7DlYXPgwRJ-Tb5NlLqynysHjEae3csWsKzoZWLplRji0AYY3HgAkrUEBqtLCvOayLJPMd0ax4Q",
+        challenges: undefined,
+      },
+    });
+
+    stub("zitadel.session.v2.SessionService", "GetSession", {
+      data: {
+        session: {
+          id: "221394658884845598",
+          creationDate: new Date("2024-04-04T09:40:55.577Z"),
+          changeDate: new Date("2024-04-04T09:40:55.577Z"),
+          sequence: 859,
+          factors: {
+            user: {
+              id: "221394658884845598",
+              loginName: "john@zitadel.com",
+            },
+            password: undefined,
+            webAuthN: undefined,
+            intent: undefined,
+          },
+          metadata: {},
         },
       },
     });

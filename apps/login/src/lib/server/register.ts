@@ -54,13 +54,7 @@ export async function registerUser(command: RegisterUserCommand) {
     checks,
     undefined,
     command.authRequestId,
-  ).then((session) => {
-    return {
-      userId: human.userId,
-      sessionId: session.id,
-      factors: session.factors,
-    };
-  });
+  );
 
   if (!session || !session.factors?.user) {
     return { error: "Could not create session" };
@@ -83,9 +77,9 @@ export async function registerUser(command: RegisterUserCommand) {
       organization: session.factors.user.organizationId,
     });
 
-    if (command.authRequestId && session.userId) {
+    if (command.authRequestId && session.factors.user.id) {
       params.append("authRequest", command.authRequestId);
-      params.append("sessionId", session.sessionId);
+      params.append("sessionId", session.id);
 
       return redirect("/login?" + params);
     } else {
