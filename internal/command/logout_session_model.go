@@ -1,9 +1,8 @@
 package command
 
 import (
-	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 )
 
 type SessionLogoutWriteModel struct {
