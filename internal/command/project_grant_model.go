@@ -114,7 +114,6 @@ func (wm *ProjectGrantWriteModel) Query() *eventstore.SearchQueryBuilder {
 type ProjectGrantPreConditionReadModel struct {
 	eventstore.WriteModel
 
-	ResourceOwner    string
 	ProjectID        string
 	GrantedOrgID     string
 	ProjectExists    bool
@@ -124,9 +123,9 @@ type ProjectGrantPreConditionReadModel struct {
 
 func NewProjectGrantPreConditionReadModel(projectID, grantedOrgID, resourceOwner string) *ProjectGrantPreConditionReadModel {
 	return &ProjectGrantPreConditionReadModel{
-		ResourceOwner: resourceOwner,
-		ProjectID:     projectID,
-		GrantedOrgID:  grantedOrgID,
+		WriteModel:   eventstore.WriteModel{ResourceOwner: resourceOwner},
+		ProjectID:    projectID,
+		GrantedOrgID: grantedOrgID,
 	}
 }
 
