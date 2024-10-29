@@ -146,10 +146,8 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, 
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err = c.checkPermission(ctx, domain.PermissionUserCredentialWrite, user.ResourceOwner, userID); err != nil {
-			return nil, nil, nil, err
-		}
+	if err := c.checkPermissionUpdateUserCredentials(ctx, user.ResourceOwner, userID); err != nil {
+		return nil, nil, nil, err
 	}
 	org, err := c.getOrg(ctx, user.ResourceOwner)
 	if err != nil {

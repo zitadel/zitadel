@@ -17,7 +17,7 @@ import (
 // RegisterUserPasskey creates a passkey registration for the current authenticated user.
 // UserID, usually taken from the request is compared against the user ID in the context.
 func (c *Commands) RegisterUserPasskey(ctx context.Context, userID, resourceOwner, rpID string, authenticator domain.AuthenticatorAttachment) (*domain.WebAuthNRegistrationDetails, error) {
-	if err := c.checkPermissionUpdateUser(ctx, resourceOwner, userID); err != nil {
+	if err := c.checkPermissionUpdateUserCredentials(ctx, resourceOwner, userID); err != nil {
 		return nil, err
 	}
 	return c.registerUserPasskey(ctx, userID, resourceOwner, rpID, authenticator)
