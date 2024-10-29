@@ -197,7 +197,8 @@
           "VE": "Wanneer een gebruiker zijn e-mailadres wijzigt, ontvangt hij een e-mail met een link om het nieuwe adres te verifiëren.",
           "VP": "Wanneer een gebruiker zijn telefoonnummer wijzigt, ontvangt hij een SMS met een code om het nieuwe nummer te verifiëren.",
           "VEO": "Wanneer een gebruiker een eenmalig wachtwoord via e-mailmethode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun e-mailadres is verzonden.",
-          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden."
+          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden.",
+          "IU": "Wanneer een uitnodigingscode voor gebruikers wordt gemaakt, ontvangt de gebruiker een e-mail met een link om zijn verificatiemethode in te stellen."
         }
       },
       "LOGIN_TEXTS": {
@@ -1381,7 +1382,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1418,6 +1420,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Verzender Nummer",
+        "VERIFYSERVICESID": "Verificatieservice-SID",
+        "VERIFYSERVICESID_DESCRIPTION": "Het instellen van een Verificatieservice-SID maakt het mogelijk om de Twilio Verify-service te gebruiken in plaats van de Berichten-service voor het verifiëren van telefoonnummers en OTP-SMS.",
         "ADDED": "Twilio succesvol toegevoegd.",
         "UPDATED": "Twilio succesvol bijgewerkt.",
         "REMOVED": "Twilio verwijderd",
@@ -1468,6 +1472,8 @@
       "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "ACTIONS": "Acties",
       "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sessiebeëindiging",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
@@ -1613,7 +1619,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -1628,7 +1635,6 @@
         "initPasswordText": "Initialiseer wachtwoord",
         "initializeDoneText": "Gebruiker initialisatie voltooid",
         "initializeUserText": "Initialiseer gebruiker",
-        "linkingUserPromptText": "Gebruiker koppelingsprompt",
         "linkingUserDoneText": "Gebruiker koppeling voltooid",
         "loginText": "Login",
         "logoutText": "Uitloggen",
@@ -1664,7 +1670,8 @@
         "PR": "Wachtwoord Reset",
         "DC": "Domein Claim",
         "PL": "Wachtwoordloos",
-        "PC": "Wachtwoord Verandering"
+        "PC": "Wachtwoord Verandering",
+        "IU": "Gebruiker uitnodigen"
       },
       "CHIPS": {
         "firstname": "Voornaam",
@@ -1684,7 +1691,8 @@
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
         "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
-        "expiry": "Vervaldatum"
+        "expiry": "Vervaldatum",
+        "applicationName": "Toepassingsnaam"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."
@@ -2571,7 +2579,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

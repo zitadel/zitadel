@@ -3,6 +3,7 @@ package org
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -11,7 +12,7 @@ import (
 )
 
 func (s *Server) ListOrganizations(ctx context.Context, req *org.ListOrganizationsRequest) (*org.ListOrganizationsResponse, error) {
-	queries, err := listOrgRequestToModel(req)
+	queries, err := listOrgRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -25,9 +26,9 @@ func (s *Server) ListOrganizations(ctx context.Context, req *org.ListOrganizatio
 	}, nil
 }
 
-func listOrgRequestToModel(req *org.ListOrganizationsRequest) (*query.OrgSearchQueries, error) {
+func listOrgRequestToModel(ctx context.Context, req *org.ListOrganizationsRequest) (*query.OrgSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToQuery(req.Query)
-	queries, err := orgQueriesToQuery(req.Queries)
+	queries, err := orgQueriesToQuery(ctx, req.Queries)
 	if err != nil {
 		return nil, err
 	}
@@ -42,10 +43,10 @@ func listOrgRequestToModel(req *org.ListOrganizationsRequest) (*query.OrgSearchQ
 	}, nil
 }
 
-func orgQueriesToQuery(queries []*org.SearchQuery) (_ []query.SearchQuery, err error) {
+func orgQueriesToQuery(ctx context.Context, queries []*org.SearchQuery) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i], err = orgQueryToQuery(query)
+		q[i], err = orgQueryToQuery(ctx, query)
 		if err != nil {
 			return nil, err
 		}
@@ -53,16 +54,18 @@ func orgQueriesToQuery(queries []*org.SearchQuery) (_ []query.SearchQuery, err e
 	return q, nil
 }
 
-func orgQueryToQuery(orgQuery *org.SearchQuery) (query.SearchQuery, error) {
+func orgQueryToQuery(ctx context.Context, orgQuery *org.SearchQuery) (query.SearchQuery, error) {
 	switch q := orgQuery.Query.(type) {
 	case *org.SearchQuery_DomainQuery:
-		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
+		return query.NewOrgVerifiedDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
 	case *org.SearchQuery_NameQuery:
 		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	case *org.SearchQuery_StateQuery:
 		return query.NewOrgStateSearchQuery(orgStateToDomain(q.StateQuery.State))
 	case *org.SearchQuery_IdQuery:
 		return query.NewOrgIDSearchQuery(q.IdQuery.Id)
+	case *org.SearchQuery_DefaultQuery:
+		return query.NewOrgIDSearchQuery(authz.GetInstance(ctx).DefaultOrganisationID())
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}

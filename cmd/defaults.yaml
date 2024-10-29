@@ -183,6 +183,37 @@ Database:
         Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
         Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
+# Caches are EXPERIMENTAL. The following config may have breaking changes in the future.
+# If no config is provided, caching is disabled by default.
+# Caches:
+  # Connectors are reused by caches.
+#  Connectors:
+    # Memory connector works with local server memory.
+    # It is the simplest (and probably fastest) cache implementation.
+    # Unsuitable for deployments with multiple containers,
+    # as each container's cache may hold a different state of the same object.
+#    Memory:
+#      Enabled: true
+      # AutoPrune removes invalidated or expired object from the cache.
+#      AutoPrune:
+#        Interval: 15m
+#        TimeOut: 30s
+
+  # Instance caches auth middleware instances, gettable by domain or ID.
+#  Instance:
+    # Connector must be enabled above.
+    # When connector is empty, this cache will be disabled.
+#    Connector: "memory"
+#    MaxAge: 1h
+#    LastUsage: 10m
+#
+    # Log enables cache-specific logging. Default to error log to stdout when omitted.
+#    Log:
+#      Level: debug
+#      AddSource: true
+#      Formatter:
+#        Format: text
+
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
   Identification:
@@ -231,7 +262,7 @@ Projections:
   # The maximum duration a transaction remains open
   # before it spots left folding additional events
   # and updates the table.
-  TransactionDuration: 500ms # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
+  TransactionDuration: 1m # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
@@ -246,10 +277,7 @@ Projections:
   HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
-    Projects:
-      TransactionDuration: 2s
     custom_texts:
-      TransactionDuration: 2s
       BulkLimit: 400
     project_grant_fields:
       TransactionDuration: 0s
@@ -339,6 +367,9 @@ OIDC:
   AuthMethodPrivateKeyJWT: true # ZITADEL_OIDC_AUTHMETHODPRIVATEKEYJWT
   GrantTypeRefreshToken: true # ZITADEL_OIDC_GRANTTYPEREFRESHTOKEN
   RequestObjectSupported: true # ZITADEL_OIDC_REQUESTOBJECTSUPPORTED
+  
+  # Deprecated: The signing algorithm is determined by the generated keys.
+  # Use the web keys resource to generate keys with different algorithms.
   SigningKeyAlgorithm: RS256 # ZITADEL_OIDC_SIGNINGKEYALGORITHM
   # Sets the default values for lifetime and expiration for OIDC
   # This default can be overwritten in the default instance configuration and for each instance during runtime
@@ -349,10 +380,10 @@ OIDC:
   DefaultRefreshTokenIdleExpiration: 720h # ZITADEL_OIDC_DEFAULTREFRESHTOKENIDLEEXPIRATION
   # 2160h are 90 days, three months
   DefaultRefreshTokenExpiration: 2160h # ZITADEL_OIDC_DEFAULTREFRESHTOKENEXPIRATION
-  Cache:
-    MaxAge: 12h # ZITADEL_OIDC_CACHE_MAXAGE
-    # 168h is 7 days, one week
-    SharedMaxAge: 168h # ZITADEL_OIDC_CACHE_SHAREDMAXAGE
+  
+  # HTTP Cache-Control max-age header value to set on the jwks endpoint.
+  # Only used when the web keys feature is enabled.  0 sets a no-store value.
+  JWKSCacheControlMaxAge: 5m # ZITADEL_OIDC_JWKSCACHECONTROLMAXAGE
   CustomEndpoints:
     Auth:
       Path: /oauth/v2/authorize # ZITADEL_OIDC_CUSTOMENDPOINTS_AUTH_PATH
@@ -569,7 +600,10 @@ Actions:
     # Wildcard sub domains are currently unsupported
     DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
       - localhost
-      - "127.0.0.1"
+      - "127.0.0.0/8"
+      - "::1"
+      - "0.0.0.0"
+      - "::"
 
 LogStore:
   Access:
@@ -709,6 +743,13 @@ DefaultInstance:
       IncludeUpperLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDEUPPERLETTERS
       IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDEDIGITS
       IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_OTPEMAIL_INCLUDESYMBOLS
+    InviteCode:
+      Length: 6 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_LENGTH
+      Expiry: "72h" # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_EXPIRY
+      IncludeLowerLetters: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDELOWERLETTERS
+      IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEUPPERLETTERS
+      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEDIGITS
+      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDESYMBOLS
   PasswordComplexityPolicy:
     MinLength: 8 # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_MINLENGTH
     HasLowercase: true # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_HASLOWERCASE
@@ -816,7 +857,7 @@ DefaultInstance:
       PreHeader: User initialisieren
       Subject: User initialisieren
       Greeting: Hallo {{.DisplayName}},
-      Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
+      Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen <br><strong>{{.PreferredLoginName}}</strong><br> kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
       ButtonText: Initialisierung abschliessen
     - MessageTextType: PasswordReset
       Language: de
@@ -824,7 +865,7 @@ DefaultInstance:
       PreHeader: Passwort zurücksetzen
       Subject: Passwort zurücksetzen
       Greeting: Hallo {{.DisplayName}},
-      Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
+      Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen <br>(Code <strong>{{.Code}}</strong>).<br> Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
       ButtonText: Passwort zurücksetzen
     - MessageTextType: VerifyEmail
       Language: de
@@ -832,7 +873,7 @@ DefaultInstance:
       PreHeader: Email verifizieren
       Subject: Email verifizieren
       Greeting: Hallo {{.DisplayName}},
-      Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
+      Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren <br>(Code <strong>{{.Code}}</strong>).<br> Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
       ButtonText: Email verifizieren
     - MessageTextType: VerifyPhone
       Language: de
@@ -1030,6 +1071,8 @@ InternalAuthZ:
         - "iam.web_key.write"
         - "iam.web_key.delete"
         - "iam.web_key.read"
+        - "iam.debug.write"
+        - "iam.debug.read"
         - "org.read"
         - "org.global.read"
         - "org.create"
@@ -1107,6 +1150,7 @@ InternalAuthZ:
         - "iam.restrictions.read"
         - "iam.feature.read"
         - "iam.web_key.read"
+        - "iam.debug.read"
         - "org.read"
         - "org.member.read"
         - "org.idp.read"

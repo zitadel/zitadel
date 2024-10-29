@@ -18,6 +18,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/notification/senders/mock"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -1439,9 +1441,9 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 		},
 	}
 	type fields struct {
-		eventstore              func(*testing.T) *eventstore.Eventstore
-		userEncryption          crypto.EncryptionAlgorithm
-		defaultSecretGenerators *SecretGenerators
+		eventstore                  func(*testing.T) *eventstore.Eventstore
+		defaultSecretGenerators     *SecretGenerators
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 	}
 	type (
 		args struct {
@@ -1506,16 +1508,33 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
 								&instance.NewAggregate("instanceID").Aggregate,
-								domain.SecretGeneratorTypeOTPSMS,
-								8,
-								time.Hour,
-								true,
-								true,
-								true,
-								true,
-							)),
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
 					),
 					expectPush(
 						user.NewHumanOTPSMSCodeAddedEvent(ctx,
@@ -1528,11 +1547,77 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 							},
 							time.Hour,
 							nil,
+							"",
 						),
 					),
 				),
-				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
-				defaultSecretGenerators: defaultGenerators,
+				defaultSecretGenerators:     defaultGenerators,
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add (external code)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"verifyServiceSID",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSCodeAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							nil,
+							0,
+							nil,
+							"id",
+						),
+					),
+				),
+				defaultSecretGenerators:     defaultGenerators,
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 			},
 			args: args{
 				ctx:           ctx,
@@ -1556,7 +1641,36 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
+					),
 					expectPush(
 						user.NewHumanOTPSMSCodeAddedEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1568,11 +1682,12 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 							},
 							time.Hour,
 							nil,
+							"",
 						),
 					),
 				),
-				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
-				defaultSecretGenerators: defaultGenerators,
+				defaultSecretGenerators:     defaultGenerators,
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 			},
 			args: args{
 				ctx:           ctx,
@@ -1598,16 +1713,33 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
 								&instance.NewAggregate("instanceID").Aggregate,
-								domain.SecretGeneratorTypeOTPSMS,
-								8,
-								time.Hour,
-								true,
-								true,
-								true,
-								true,
-							)),
+								"id",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigTwilioAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+								"",
+								"sid",
+								"senderNumber",
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "id", Crypted: []byte("crypted")},
+								"",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								"id",
+							),
+						),
 					),
 					expectPush(
 						user.NewHumanOTPSMSCodeAddedEvent(ctx,
@@ -1628,11 +1760,12 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 									RemoteIP:       net.IP{192, 0, 2, 1},
 								},
 							},
+							"",
 						),
 					),
 				),
-				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
-				defaultSecretGenerators: defaultGenerators,
+				defaultSecretGenerators:     defaultGenerators,
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
 			},
 			args: args{
 				ctx:           ctx,
@@ -1658,9 +1791,9 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:              tt.fields.eventstore(t),
-				userEncryption:          tt.fields.userEncryption,
-				defaultSecretGenerators: tt.fields.defaultSecretGenerators,
+				eventstore:                  tt.fields.eventstore(t),
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 			}
 			err := r.HumanSendOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
@@ -1678,6 +1811,7 @@ func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
 			ctx           context.Context
 			userID        string
 			resourceOwner string
+			generatorInfo *senders.CodeGeneratorInfo
 		}
 	)
 	type res struct {
@@ -1734,6 +1868,7 @@ func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
 					expectPush(
 						user.NewHumanOTPSMSCodeSentEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
+							&senders.CodeGeneratorInfo{},
 						),
 					),
 				),
@@ -1742,6 +1877,44 @@ func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
 				ctx:           ctx,
 				userID:        "user1",
 				resourceOwner: "org1",
+				generatorInfo: &senders.CodeGeneratorInfo{},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add (external code)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSCodeSentEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&senders.CodeGeneratorInfo{
+								ID:             "generatorID",
+								VerificationID: "verificationID",
+							},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+				generatorInfo: &senders.CodeGeneratorInfo{
+					ID:             "generatorID",
+					VerificationID: "verificationID",
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1755,7 +1928,7 @@ func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.HumanOTPSMSCodeSent(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			err := r.HumanOTPSMSCodeSent(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.generatorInfo)
 			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
@@ -1764,8 +1937,9 @@ func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
 func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	type fields struct {
-		eventstore     func(*testing.T) *eventstore.Eventstore
-		userEncryption crypto.EncryptionAlgorithm
+		eventstore        func(*testing.T) *eventstore.Eventstore
+		userEncryption    crypto.EncryptionAlgorithm
+		phoneCodeVerifier func(ctx context.Context, id string) (senders.CodeGenerator, error)
 	}
 	type (
 		args struct {
@@ -1885,6 +2059,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 										RemoteIP:       net.IP{192, 0, 2, 1},
 									},
 								},
+								"",
 							),
 						),
 					),
@@ -1962,6 +2137,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 										RemoteIP:       net.IP{192, 0, 2, 1},
 									},
 								},
+								"",
 							),
 						),
 					),
@@ -2042,6 +2218,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 										RemoteIP:       net.IP{192, 0, 2, 1},
 									},
 								},
+								"",
 							),
 						),
 					),
@@ -2113,6 +2290,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 										RemoteIP:       net.IP{192, 0, 2, 1},
 									},
 								},
+								"",
 							),
 						),
 					),
@@ -2143,12 +2321,94 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked"),
 			},
 		},
+		{
+			name: "code ok (external)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPSMSCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil,
+								0,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+								"id",
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPSMSCodeSentEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&senders.CodeGeneratorInfo{
+									ID:             "id",
+									VerificationID: "verificationID",
+								},
+							),
+						),
+					),
+					expectFilter(), // recheck
+					expectPush(
+						user.NewHumanOTPSMSCheckSucceededEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				phoneCodeVerifier: func(ctx context.Context, id string) (senders.CodeGenerator, error) {
+					sender := mock.NewMockCodeGenerator(gomock.NewController(t))
+					sender.EXPECT().VerifyCode("verificationID", "code").Return(nil)
+					return sender, nil
+				},
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore(t),
-				userEncryption: tt.fields.userEncryption,
+				eventstore:        tt.fields.eventstore(t),
+				userEncryption:    tt.fields.userEncryption,
+				phoneCodeVerifier: tt.fields.phoneCodeVerifier,
 			}
 			err := r.HumanCheckOTPSMS(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
@@ -2594,9 +2854,9 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 		},
 	}
 	type fields struct {
-		eventstore              func(*testing.T) *eventstore.Eventstore
-		userEncryption          crypto.EncryptionAlgorithm
-		defaultSecretGenerators *SecretGenerators
+		eventstore                  func(*testing.T) *eventstore.Eventstore
+		defaultSecretGenerators     *SecretGenerators
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
 	}
 	type (
 		args struct {
@@ -2659,19 +2919,6 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								domain.SecretGeneratorTypeOTPEmail,
-								8,
-								time.Hour,
-								true,
-								true,
-								true,
-								true,
-							)),
-					),
 					expectPush(
 						user.NewHumanOTPEmailCodeAddedEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -2686,48 +2933,8 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 						),
 					),
 				),
-				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
-				defaultSecretGenerators: defaultGenerators,
-			},
-			args: args{
-				ctx:           ctx,
-				userID:        "user1",
-				resourceOwner: "org1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "successful add (without secret config)",
-			fields: fields{
-				eventstore: expectEventstore(
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanOTPEmailAddedEvent(ctx,
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-					expectFilter(),
-					expectPush(
-						user.NewHumanOTPEmailCodeAddedEvent(ctx,
-							&user.NewAggregate("user1", "org1").Aggregate,
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("12345678"),
-							},
-							time.Hour,
-							nil,
-						),
-					),
-				),
-				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
-				defaultSecretGenerators: defaultGenerators,
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -2751,19 +2958,6 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("instanceID").Aggregate,
-								domain.SecretGeneratorTypeOTPEmail,
-								8,
-								time.Hour,
-								true,
-								true,
-								true,
-								true,
-							)),
-					),
 					expectPush(
 						user.NewHumanOTPEmailCodeAddedEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -2786,8 +2980,8 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 						),
 					),
 				),
-				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
-				defaultSecretGenerators: defaultGenerators,
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+				defaultSecretGenerators:     defaultGenerators,
 			},
 			args: args{
 				ctx:           ctx,
@@ -2813,9 +3007,9 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:              tt.fields.eventstore(t),
-				userEncryption:          tt.fields.userEncryption,
-				defaultSecretGenerators: tt.fields.defaultSecretGenerators,
+				eventstore:                  tt.fields.eventstore(t),
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
 			}
 			err := r.HumanSendOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)

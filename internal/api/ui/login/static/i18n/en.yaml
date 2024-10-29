@@ -86,6 +86,15 @@ InitUserDone:
   NextButtonText: Next
   CancelButtonText: Cancel
 
+InviteUser:
+  Title: Activate User
+  Description: Verify your e-mail with the code below and set your password.
+  CodeLabel: Code
+  NewPasswordLabel: New Password
+  NewPasswordConfirm: Confirm Password
+  NextButtonText: Next
+  ResendButtonText: Resend Code
+
 InitMFAPrompt:
   Title: 2-Factor Setup
   Description: 2-factor authentication gives you an additional security for your user account. This ensures that only you have access to your account.
@@ -253,6 +262,8 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -293,6 +304,8 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -344,7 +357,7 @@ LinkingUsersDone:
 
 ExternalNotFound:
   Title: External User Not Found
-  Description: External user not found. Do you want to link your user or auto register a new one.
+  Description: External user not found. Do you want to link your user or auto-register a new one?
   LinkButtonText: Link
   AutoRegisterButtonText: Register
   TosAndPrivacyLabel: Terms and conditions
@@ -367,6 +380,8 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
   Title: Device Authorization
   UserCode:

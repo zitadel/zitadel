@@ -576,6 +576,11 @@ Errors:
     NotActive: 用户架构未激活
     NotInactive: 用户架构未处于非活动状态
     NotExists: 用户架构不存在
+    ID:
+      Missing: 缺少用户架构 ID
+    Invalid: 用户架构无效
+    Data:
+      Invalid: 用户架构的数据无效
   TokenExchange:
     FeatureDisabled: 您的实例已禁用令牌交换功能。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -681,6 +686,13 @@ EventTypes:
         check:
           succeeded: 初始化检查成功
           failed: 初始化检查失败
+      invite:
+        code:
+          added: 生成了邀请码
+          sent: 发送了邀请码
+        check:
+          succeeded: 邀请检查成功
+          failed: 邀请检查失败
       username:
         reserved: 保留用户名
         released: 用户名已发布
@@ -1318,6 +1330,26 @@ EventTypes:
     deactivated: 用户架构已停用
     reactivated: 用户架构已重新激活
     deleted: 用户架构已删除
+    user:
+      created: 用户已创建
+      updated: 用户已更新
+      deleted: 用户已删除
+      email:
+        updated: 电子邮件地址已更改
+        verified: 电子邮件地址已验证
+        verification:
+          failed: 电子邮件地址验证失败
+        code:
+          added: 电子邮件地址验证码已生成
+          sent: 电子邮件地址验证码已发送
+      phone:
+        updated: 电话号码已更改
+        verified: 电话号码已验证
+        verification:
+          failed: 电话号码验证失败
+        code:
+          added: 电话号码验证码已生成
+          sent: 电话号码验证码已发送
   web_key:
     added: 已添加 Web Key
     activated: 已激活 Web Key

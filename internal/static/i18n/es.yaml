@@ -576,6 +576,11 @@ Errors:
     NotActive: Esquema de usuario no activo
     NotInactive: Esquema de usuario no inactivo
     NotExists: El esquema de usuario no existe
+    ID:
+      Missing: Falta el ID del esquema de usuario
+    Invalid: Esquema de usuario no válido
+    Data:
+      Invalid: Datos no válidos para el esquema de usuario
   TokenExchange:
     FeatureDisabled: La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -682,6 +687,13 @@ EventTypes:
         check:
           succeeded: Comprobación exitosa de la inicialización
           failed: Fallo en la comprobación de la inicialización
+      invite:
+        code:
+          added: Código de invitación generado
+          sent: Código de invitación enviado
+        check:
+          succeeded: Comprobación de invitación correcta
+          failed: Comprobación de invitación fallida
       username:
         reserved: Nombre de usuario reservado
         released: Nombre de usuario liberado
@@ -925,8 +937,8 @@ EventTypes:
           added: Doble factor añadido a la política de inicio de sesión
           removed: Doble factor eliminado de la política de inicio de sesión
         multifactor:
-          added: Multi factor añadido a la política de inicio de sesión
-          removed: Multi factor eliminado de la política de inicio de sesión
+          added: Multi-factor añadido a la política de inicio de sesión
+          removed: Multi-factor eliminado de la política de inicio de sesión
       password:
         complexity:
           added: Política de complejidad de la contraseña añadida
@@ -1319,6 +1331,26 @@ EventTypes:
     deactivated: Esquema de usuario desactivado
     reactivated: Esquema de usuario reactivado
     deleted: Esquema de usuario eliminado
+    user:
+      created: Usuario creado
+      updated: Usuario actualizado
+      deleted: Usuario eliminado
+      email:
+        updated:  Dirección de correo electrónico modificada
+        verified: Dirección de correo electrónico verificada
+        verification:
+          failed: Error en la verificación de la dirección de correo electrónico
+        code:
+          added: Código de verificación de la dirección de correo electrónico generado
+          sent: Código de verificación de la dirección de correo electrónico enviado
+      phone:
+        updated: Número de teléfono modificado
+        verified: Número de teléfono verificado
+        verification:
+          failed: Error en la verificación del número de teléfono
+        code:
+          added: Código de verificación del número de teléfono generado
+          sent: Código de verificación del número de teléfono enviado
   web_key:
     added: Clave web añadida
     activated: Clave web activada

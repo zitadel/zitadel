@@ -197,7 +197,8 @@
           "VE": "När en användare ändrar sin e-postadress, kommer de att få ett mail med en länk för att verifiera den nya adressen.",
           "VP": "När en användare ändrar sitt telefonnummer, kommer de att få ett SMS med en kod för att verifiera det nya numret.",
           "VEO": "När en användare lägger till en engångslösenord via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
-          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer."
+          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
+          "IU": "När en inbjudningskod för användare skapas, får de ett e-mail med en länk för att ställa in sin autentiseringsmetod."
         }
       },
       "LOGIN_TEXTS": {
@@ -1385,7 +1386,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1422,6 +1425,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Avsändarnummer",
+        "VERIFYSERVICESID": "Verifieringstjänst-SID",
+        "VERIFYSERVICESID_DESCRIPTION": "Inställning av en Verifieringstjänst-SID gör det möjligt att använda Twilio Verify-tjänsten istället för Meddelandetjänsten för verifiering av telefonnummer och OTP-SMS.",
         "ADDED": "Twilio tillagd framgångsrikt.",
         "UPDATED": "Twilio uppdaterad framgångsrikt.",
         "REMOVED": "Twilio borttagen",
@@ -1472,6 +1477,8 @@
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "STATES": {
         "INHERITED": "Ärv",
         "ENABLED": "Aktiverad",
@@ -1617,7 +1624,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -1632,7 +1640,6 @@
         "initPasswordText": "Initiera lösenord",
         "initializeDoneText": "Initiera användare klart",
         "initializeUserText": "Initiera användare",
-        "linkingUserPromptText": "Länka användarprompt",
         "linkingUserDoneText": "Länka användare klart",
         "loginText": "Inloggning",
         "logoutText": "Utloggning",
@@ -1668,7 +1675,8 @@
         "PR": "Återställ Lösenord",
         "DC": "Domänkrav",
         "PL": "lösenordsfri",
-        "PC": "Lösenordsändring"
+        "PC": "Lösenordsändring",
+        "IU": "Bjud in användare"
       },
       "CHIPS": {
         "firstname": "Förnamn",
@@ -1688,7 +1696,8 @@
         "tempUsername": "Tillfälligt användarnamn",
         "otp": "Engångslösenord",
         "verifyUrl": "Verifiera Engångslösenord URL",
-        "expiry": "Utgångsdatum"
+        "expiry": "Utgångsdatum",
+        "applicationName": "Applikationsnamn"
       },
       "TOAST": {
         "UPDATED": "Anpassade Texter sparade."
@@ -2577,12 +2586,13 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
-    "pt": "Português",
+    "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",

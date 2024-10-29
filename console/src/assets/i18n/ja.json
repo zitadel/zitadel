@@ -197,7 +197,8 @@
           "VE": "ユーザーがメールアドレスを変更すると、新しいアドレスを検証するリンクが記載されたメールを受け取ります。",
           "VP": "ユーザーが電話番号を変更すると、新しい番号を検証するコードが記載されたSMSを受け取ります。",
           "VEO": "ユーザーがメール経由でワンタイムパスワードの方法を追加すると、それをアクティブにするためにメールに送信されたコードを入力する必要があります。",
-          "VSO": "ユーザーがSMS経由でワンタイムパスワードの方法を追加すると、それをアクティブにするために電話番号に送信されたコードを入力する必要があります。"
+          "VSO": "ユーザーがSMS経由でワンタイムパスワードの方法を追加すると、それをアクティブにするために電話番号に送信されたコードを入力する必要があります。",
+          "IU": "ユーザー招待コードが作成されると、認証方法を設定するためのリンクを含むメールが送信されます。"
         }
       },
       "LOGIN_TEXTS": {
@@ -1381,7 +1382,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1418,6 +1421,8 @@
         "SID": "Sid",
         "TOKEN": "トークン",
         "SENDERNUMBER": "送信者番号",
+        "VERIFYSERVICESID": "検証サービス SID",
+        "VERIFYSERVICESID_DESCRIPTION": "検証サービス SID を設定すると、電話番号と OTP SMS の検証にメッセージサービスの代わりに Twilio Verify サービスを使用できるようになります。",
         "ADDED": "Twilioは正常に追加されました。",
         "UPDATED": "Twilio が正常に更新されました。",
         "REMOVED": "Twilioが削除されました",
@@ -1468,6 +1473,8 @@
       "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
       "ACTIONS": "アクション",
       "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 セッション終了",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "フラグが有効になっている場合、id_token を `sid` クレームと共に id_token_hint として end_session エンドポイントに提供することで、ログイン UI から単一のセッションを終了できるようになります。 現在、同じユーザー エージェント (ブラウザ) からのすべてのセッションがログイン UI で終了することに注意してください。 セッション API を通じて管理されるセッションは、すでに単一のセッションの終了を許可しています。",
       "STATES": {
         "INHERITED": "継承",
         "ENABLED": "有効",
@@ -1609,7 +1616,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1624,7 +1632,6 @@
         "initPasswordText": "パスワードを初期化する",
         "initializeDoneText": "ユーザーの初期化が完了しました",
         "initializeUserText": "ユーザーを初期化する",
-        "linkingUserPromptText": "ユーザーのリンクプロンプト",
         "linkingUserDoneText": "ユーザーのリンクが完了しました",
         "loginText": "ログイン",
         "logoutText": "ログアウト",
@@ -1680,7 +1687,8 @@
         "tempUsername": "一時ユーザー名",
         "otp": "ワンタイムパスワード",
         "verifyUrl": "ワンタイムパスワードを確認するURL",
-        "expiry": "有効期限"
+        "expiry": "有効期限",
+        "applicationName": "アプリケーション名"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
@@ -2545,7 +2553,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

@@ -420,7 +420,7 @@ func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID s
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}
-	links, err := h.queries.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	links, err := h.queries.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, nil)
 	if err != nil {
 		return "", err
 	}

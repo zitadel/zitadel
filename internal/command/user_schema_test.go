@@ -27,7 +27,6 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 		userSchema *CreateUserSchema
 	}
 	type res struct {
-		id      string
 		details *domain.ObjectDetails
 		err     error
 	}
@@ -107,6 +106,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			"empty user schema created",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectPush(
 						schema.NewCreatedEvent(
 							context.Background(),
@@ -131,8 +131,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
+					ID:            "id1",
 					ResourceOwner: "instanceID",
 				},
 			},
@@ -141,6 +141,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			"user schema created",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectPush(
 						schema.NewCreatedEvent(
 							context.Background(),
@@ -181,8 +182,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
+					ID:            "id1",
 					ResourceOwner: "instanceID",
 				},
 			},
@@ -220,6 +221,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			"user schema with permission created",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectPush(
 						schema.NewCreatedEvent(
 							context.Background(),
@@ -266,8 +268,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
+					ID:            "id1",
 					ResourceOwner: "instanceID",
 				},
 			},
@@ -279,21 +281,20 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			gotID, gotDetails, err := c.CreateUserSchema(tt.args.ctx, tt.args.userSchema)
-			assert.Equal(t, tt.res.id, gotID)
-			assertObjectDetails(t, tt.res.details, gotDetails)
+			err := c.CreateUserSchema(tt.args.ctx, tt.args.userSchema)
+			assertObjectDetails(t, tt.res.details, tt.args.userSchema.Details)
 			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
 }
 
-func TestCommands_UpdateUserSchema(t *testing.T) {
+func TestCommands_ChangeUserSchema(t *testing.T) {
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
-		userSchema *UpdateUserSchema
+		userSchema *ChangeUserSchema
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -312,7 +313,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx:        authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{},
+				userSchema: &ChangeUserSchema{},
 			},
 			res{
 				err: zerrors.ThrowInvalidArgument(nil, "COMMA-H5421", "Errors.IDMissing"),
@@ -325,7 +326,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:   "id1",
 					Type: gu.Ptr(""),
 				},
@@ -341,7 +342,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID: "id1",
 				},
 			},
@@ -356,7 +357,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID: "id1",
 					Schema: json.RawMessage(`{
 						"properties": {
@@ -379,7 +380,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
@@ -400,7 +401,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Type:   gu.Ptr("type"),
 					Schema: json.RawMessage(`{}`),
@@ -432,7 +433,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Type:   gu.Ptr("type"),
 					Schema: json.RawMessage(`{}`),
@@ -473,7 +474,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
 					Type:   gu.Ptr("newType"),
@@ -515,7 +516,9 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 						schema.NewUpdatedEvent(
 							context.Background(),
 							&schema.NewAggregate("id1", "instanceID").Aggregate,
-							[]schema.Changes{schema.ChangeSchema(json.RawMessage(`{
+							[]schema.Changes{
+								schema.IncreaseRevision(1),
+								schema.ChangeSchema(json.RawMessage(`{
 								"$schema": "urn:zitadel:schema:v1",
 								"type": "object",
 								"properties": {
@@ -539,7 +542,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID: "id1",
 					Schema: json.RawMessage(`{
 						"$schema": "urn:zitadel:schema:v1",
@@ -597,7 +600,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
@@ -618,9 +621,9 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := c.UpdateUserSchema(tt.args.ctx, tt.args.userSchema)
+			err := c.ChangeUserSchema(tt.args.ctx, tt.args.userSchema)
 			assert.ErrorIs(t, err, tt.res.err)
-			assertObjectDetails(t, tt.res.details, got)
+			assertObjectDetails(t, tt.res.details, tt.args.userSchema.Details)
 		})
 	}
 }

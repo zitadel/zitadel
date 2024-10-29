@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -172,7 +173,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 }
 
 // checkAuthentication ensures the session or token was authenticated (at least a single [domain.UserAuthMethodType]).
-// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any second factor
+// It will also check if there was a multi-factor authentication, if either MFA is forced by the login policy or if the user has set up any second factor
 func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID string) error {
 	if len(authMethods) == 0 {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
@@ -327,28 +328,39 @@ type openIDKeySet struct {
 
 // VerifySignature implements the oidc.KeySet interface
 // providing an implementation for the keys retrieved directly from Queries
-func (o *openIDKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) ([]byte, error) {
-	keySet, err := o.Queries.ActivePublicKeys(ctx, time.Now())
+func (o *openIDKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) (payload []byte, err error) {
+	keySet := new(jose.JSONWebKeySet)
+	if authz.GetFeatures(ctx).WebKey {
+		keySet, err = o.Queries.GetWebKeySet(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+	legacyKeySet, err := o.Queries.ActivePublicKeys(ctx, time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("error fetching keys: %w", err)
 	}
+	appendPublicKeysToWebKeySet(keySet, legacyKeySet)
 	keyID, alg := oidc.GetKeyIDAndAlg(jws)
-	key, err := oidc.FindMatchingKey(keyID, oidc.KeyUseSignature, alg, jsonWebKeys(keySet.Keys)...)
+	key, err := oidc.FindMatchingKey(keyID, oidc.KeyUseSignature, alg, keySet.Keys...)
 	if err != nil {
 		return nil, fmt.Errorf("invalid signature: %w", err)
 	}
 	return jws.Verify(&key)
 }
 
-func jsonWebKeys(keys []query.PublicKey) []jose.JSONWebKey {
-	webKeys := make([]jose.JSONWebKey, len(keys))
-	for i, key := range keys {
-		webKeys[i] = jose.JSONWebKey{
+func appendPublicKeysToWebKeySet(keyset *jose.JSONWebKeySet, pubkeys *query.PublicKeys) {
+	if pubkeys == nil || len(pubkeys.Keys) == 0 {
+		return
+	}
+	keyset.Keys = slices.Grow(keyset.Keys, len(pubkeys.Keys))
+
+	for _, key := range pubkeys.Keys {
+		keyset.Keys = append(keyset.Keys, jose.JSONWebKey{
+			Key:       key.Key(),
 			KeyID:     key.ID(),
 			Algorithm: key.Algorithm(),
 			Use:       key.Use().String(),
-			Key:       key.Key(),
-		}
+		})
 	}
-	return webKeys
 }

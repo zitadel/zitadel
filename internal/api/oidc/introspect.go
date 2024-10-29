@@ -156,18 +156,18 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 		if cc.ClientAssertion != "" {
 			verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, time.Second)
 			if _, err := op.VerifyJWTAssertion(ctx, cc.ClientAssertion, verifier); err != nil {
-				return "", "", false, oidc.ErrUnauthorizedClient().WithParent(err)
+				return "", "", false, oidc.ErrUnauthorizedClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 			}
 			return client.ClientID, client.ProjectID, client.ProjectRoleAssertion, nil
 
 		}
 		if client.HashedSecret != "" {
 			if err := s.introspectionClientSecretAuth(ctx, client, cc.ClientSecret); err != nil {
-				return "", "", false, oidc.ErrUnauthorizedClient().WithParent(err)
+				return "", "", false, oidc.ErrUnauthorizedClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 			}
 			return client.ClientID, client.ProjectID, client.ProjectRoleAssertion, nil
 		}
-		return "", "", false, oidc.ErrUnauthorizedClient().WithParent(errNoClientSecret)
+		return "", "", false, oidc.ErrUnauthorizedClient().WithParent(errNoClientSecret).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}()
 
 	span.EndWithError(err)
@@ -183,17 +183,13 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 var errNoAppType = errors.New("introspection client without app type")
 
 func (s *Server) introspectionClientSecretAuth(ctx context.Context, client *query.IntrospectionClient, secret string) error {
-	var (
-		successCommand func(ctx context.Context, appID, projectID, resourceOwner, updated string)
-		failedCommand  func(ctx context.Context, appID, projectID, resourceOwner string)
-	)
+	var updateCommand func(ctx context.Context, appID, projectID, resourceOwner, updated string)
+
 	switch client.AppType {
 	case query.AppTypeAPI:
-		successCommand = s.command.APISecretCheckSucceeded
-		failedCommand = s.command.APISecretCheckFailed
+		updateCommand = s.command.APIUpdateSecret
 	case query.AppTypeOIDC:
-		successCommand = s.command.OIDCSecretCheckSucceeded
-		failedCommand = s.command.OIDCSecretCheckFailed
+		updateCommand = s.command.OIDCUpdateSecret
 	default:
 		return zerrors.ThrowInternal(errNoAppType, "OIDC-ooD5Ot", "Errors.Internal")
 	}
@@ -202,23 +198,24 @@ func (s *Server) introspectionClientSecretAuth(ctx context.Context, client *quer
 	updated, err := s.hasher.Verify(client.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
-		failedCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner)
 		return err
 	}
-	successCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner, updated)
+	if updated != "" {
+		updateCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner, updated)
+	}
 	return nil
 }
 
 // clientFromCredentials parses the client ID early,
 // and makes a single query for the client for either auth methods.
 func (s *Server) clientFromCredentials(ctx context.Context, cc *op.ClientCredentials) (client *query.IntrospectionClient, err error) {
-	clientID, assertion, err := clientIDFromCredentials(cc)
+	clientID, assertion, err := clientIDFromCredentials(ctx, cc)
 	if err != nil {
 		return nil, err
 	}
-	client, err = s.query.GetIntrospectionClientByID(ctx, clientID, assertion)
+	client, err = s.query.ActiveIntrospectionClientByID(ctx, clientID, assertion)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, oidc.ErrUnauthorizedClient().WithParent(err)
+		return nil, oidc.ErrUnauthorizedClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
 	// any other error is regarded internal and should not be reported back to the client.
 	return client, err

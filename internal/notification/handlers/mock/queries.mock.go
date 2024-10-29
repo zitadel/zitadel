@@ -161,24 +161,19 @@ func (mr *MockQueriesMockRecorder) NotificationProviderByIDAndType(arg0, arg1, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationProviderByIDAndType", reflect.TypeOf((*MockQueries)(nil).NotificationProviderByIDAndType), arg0, arg1, arg2)
 }
 
-// SMSProviderConfig mocks base method.
-func (m *MockQueries) SMSProviderConfig(arg0 context.Context, arg1 ...query.SearchQuery) (*query.SMSConfig, error) {
+// SMSProviderConfigActive mocks base method.
+func (m *MockQueries) SMSProviderConfigActive(arg0 context.Context, arg1 string) (*query.SMSConfig, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0}
-	for _, a := range arg1 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "SMSProviderConfig", varargs...)
+	ret := m.ctrl.Call(m, "SMSProviderConfigActive", arg0, arg1)
 	ret0, _ := ret[0].(*query.SMSConfig)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SMSProviderConfig indicates an expected call of SMSProviderConfig.
-func (mr *MockQueriesMockRecorder) SMSProviderConfig(arg0 any, arg1 ...any) *gomock.Call {
+// SMSProviderConfigActive indicates an expected call of SMSProviderConfigActive.
+func (mr *MockQueriesMockRecorder) SMSProviderConfigActive(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMSProviderConfig", reflect.TypeOf((*MockQueries)(nil).SMSProviderConfig), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMSProviderConfigActive", reflect.TypeOf((*MockQueries)(nil).SMSProviderConfigActive), arg0, arg1)
 }
 
 // SMTPConfigActive mocks base method.

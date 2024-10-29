@@ -179,7 +179,7 @@ export class ProviderLDAPComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateLDAPProvider() : this.addLDAPProvider();
+    this.provider || this.justCreated$.value ? this.updateLDAPProvider() : this.addLDAPProvider();
   }
 
   public addLDAPProvider(): void {

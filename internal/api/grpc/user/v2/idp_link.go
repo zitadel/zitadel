@@ -30,11 +30,10 @@ func (s *Server) ListIDPLinks(ctx context.Context, req *user.ListIDPLinksRequest
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.IDPUserLinks(ctx, queries, false)
+	res, err := s.query.IDPUserLinks(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	res.RemoveNoPermission(ctx, s.checkPermission)
 	return &user.ListIDPLinksResponse{
 		Result:  IDPLinksToPb(res.Links),
 		Details: object.ToListDetails(res.SearchResponse),

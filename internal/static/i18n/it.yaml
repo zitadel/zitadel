@@ -576,6 +576,11 @@ Errors:
     NotActive: Schema utente non attivo
     NotInactive: Schema utente non inattivo
     NotExists: Lo schema utente non esiste
+    ID:
+      Missing: ID schema utente mancante
+    Invalid: Schema utente non valido
+    Data:
+      Invalid: Dati non validi per lo schema utente
   TokenExchange:
     FeatureDisabled: La funzionalità di scambio token è disabilitata per la tua istanza. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -681,6 +686,13 @@ EventTypes:
         check:
           succeeded: Controllo dell'inizializzazione riuscito
           failed: Controllo dell'inizializzazione fallito
+      invite:
+        code:
+          added: Codice invito generato
+          sent: Codice invito inviato
+        check:
+          succeeded: Controllo invito riuscito
+          failed: Controllo invito fallito
       username:
         reserved: Nome utente riservato
         released: Nome utente rilasciato
@@ -1315,6 +1327,26 @@ EventTypes:
     deactivated: Schema utente disattivato
     reactivated: Schema utente riattivato
     deleted: Schema utente eliminato
+    user:
+      created: Utente creato
+      updated: Utente aggiornato
+      deleted: Utente eliminato
+      email:
+        updated: Indirizzo email modificato
+        verified: Indirizzo email verificato
+        verification:
+          failed: Verifica indirizzo email non riuscita
+        code:
+          added: Codice di verifica indirizzo email generato
+          sent: Codice di verifica indirizzo email inviato
+      phone:
+        updated: Numero di telefono modificato
+        verified: Numero di telefono verificato
+        verification:
+          failed: Verifica numero di telefono non riuscita
+        code:
+          added: Codice di verifica numero di telefono generato
+          sent: Codice di verifica numero di telefono inviato
   web_key:
     added: Web Key aggiunto
     activated: Web Key attivato

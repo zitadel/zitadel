@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -33,6 +34,7 @@ type Server struct {
 	defaultLogoutURLV2         string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
+	jwksCacheControlMaxAge     time.Duration
 
 	fallbackLogger      *slog.Logger
 	hasher              *crypto.Hasher
@@ -44,7 +46,7 @@ type Server struct {
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
-	// some defaults. The new Server will disable enpoints that are nil.
+	// some defaults. The new Server will disable endpoints that are nil.
 	endpoints := op.Endpoints{
 		Authorization:       op.NewEndpoint("/oauth/v2/authorize"),
 		Token:               op.NewEndpoint("/oauth/v2/token"),
@@ -119,20 +121,13 @@ func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.
 	}()
 	restrictions, err := s.query.GetInstanceRestrictions(ctx)
 	if err != nil {
-		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithDescription("internal server error"), http.StatusInternalServerError)
+		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("internal server error"), http.StatusInternalServerError)
 	}
 	allowedLanguages := restrictions.AllowedLanguages
 	if len(allowedLanguages) == 0 {
 		allowedLanguages = i18n.SupportedLanguages()
 	}
 	return op.NewResponse(s.createDiscoveryConfig(ctx, allowedLanguages)), nil
-}
-
-func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.Keys(ctx, r)
 }
 
 func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthRequest]) (_ *op.ClientRequest[oidc.AuthRequest], err error) {
@@ -172,6 +167,7 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
+
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                      issuer,
 		AuthorizationEndpoint:       s.Endpoints().Authorization.Absolute(issuer),
@@ -191,7 +187,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		},
 		GrantTypesSupported:                                op.GrantTypes(s.Provider()),
 		SubjectTypesSupported:                              op.SubjectTypes(s.Provider()),
-		IDTokenSigningAlgValuesSupported:                   []string{s.signingKeyAlgorithm},
+		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(ctx),
 		RequestObjectSigningAlgValuesSupported:             op.RequestObjectSigAlgorithms(s.Provider()),
 		TokenEndpointAuthMethodsSupported:                  op.AuthMethodsTokenEndpoint(s.Provider()),
 		TokenEndpointAuthSigningAlgValuesSupported:         op.TokenSigAlgorithms(s.Provider()),

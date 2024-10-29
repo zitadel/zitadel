@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -62,8 +63,8 @@ var (
 		name:  projection.UserAuthMethodTypeCol,
 		table: userAuthMethodTable,
 	}
-	UserAuthMethodColumnOwnerRemoved = Column{
-		name:  projection.UserAuthMethodOwnerRemovedCol,
+	UserAuthMethodColumnDomain = Column{
+		name:  projection.UserAuthMethodDomainCol,
 		table: userAuthMethodTable,
 	}
 
@@ -71,11 +72,8 @@ var (
 	authMethodTypeUserID     = UserAuthMethodColumnUserID.setTable(authMethodTypeTable)
 	authMethodTypeInstanceID = UserAuthMethodColumnInstanceID.setTable(authMethodTypeTable)
 	authMethodTypeType       = UserAuthMethodColumnMethodType.setTable(authMethodTypeTable)
-	authMethodTypeTypes      = Column{
-		name:  "method_types",
-		table: authMethodTypeTable,
-	}
-	authMethodTypeState = UserAuthMethodColumnState.setTable(authMethodTypeTable)
+	authMethodTypeState      = UserAuthMethodColumnState.setTable(authMethodTypeTable)
+	authMethodTypeDomain     = UserAuthMethodColumnDomain.setTable(authMethodTypeTable)
 
 	userIDPsCountTable      = idpUserLinkTable.setAlias("user_idps_count")
 	userIDPsCountUserID     = IDPUserLinkUserIDCol.setTable(userIDPsCountTable)
@@ -98,27 +96,12 @@ type AuthMethods struct {
 	AuthMethods []*AuthMethod
 }
 
-func (l *AuthMethods) RemoveNoPermission(ctx context.Context, permissionCheck domain.PermissionCheck) {
-	removableIndexes := make([]int, 0)
-	for i := range l.AuthMethods {
-		ctxData := authz.GetCtxData(ctx)
-		if ctxData.UserID != l.AuthMethods[i].UserID {
-			if err := permissionCheck(ctx, domain.PermissionUserRead, l.AuthMethods[i].ResourceOwner, l.AuthMethods[i].UserID); err != nil {
-				removableIndexes = append(removableIndexes, i)
-			}
-		}
-	}
-	removed := 0
-	for _, removeIndex := range removableIndexes {
-		l.AuthMethods = removeAuthMethod(l.AuthMethods, removeIndex-removed)
-		removed++
-	}
-	// reset count as some users could be removed
-	l.SearchResponse.Count = uint64(len(l.AuthMethods))
-}
-
-func removeAuthMethod(slice []*AuthMethod, s int) []*AuthMethod {
-	return append(slice[:s], slice[s+1:]...)
+func authMethodsCheckPermission(ctx context.Context, methods *AuthMethods, permissionCheck domain.PermissionCheck) {
+	methods.AuthMethods = slices.DeleteFunc(methods.AuthMethods,
+		func(method *AuthMethod) bool {
+			return userCheckPermission(ctx, method.ResourceOwner, method.UserID, permissionCheck) != nil
+		},
+	)
 }
 
 type AuthMethod struct {
@@ -144,16 +127,39 @@ type UserAuthMethodSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, withOwnerRemoved bool) (userAuthMethods *AuthMethods, err error) {
+func (q *UserAuthMethodSearchQueries) hasUserID() bool {
+	for _, query := range q.Queries {
+		if query.Col() == UserAuthMethodColumnUserID {
+			return true
+		}
+	}
+	return false
+}
+
+func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, permissionCheck domain.PermissionCheck) (userAuthMethods *AuthMethods, err error) {
+	methods, err := q.searchUserAuthMethods(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && len(methods.AuthMethods) > 0 {
+		// when userID for query is provided, only one check has to be done
+		if queries.hasUserID() {
+			if err := userCheckPermission(ctx, methods.AuthMethods[0].ResourceOwner, methods.AuthMethods[0].UserID, permissionCheck); err != nil {
+				return nil, err
+			}
+		} else {
+			authMethodsCheckPermission(ctx, methods, permissionCheck)
+		}
+	}
+	return methods, nil
+}
+
+func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries) (userAuthMethods *AuthMethods, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUserAuthMethodsQuery(ctx, q.client)
-	eq := sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[UserAuthMethodColumnOwnerRemoved.identifier()] = false
-	}
-	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	stmt, args, err := queries.toQuery(query).Where(sq.Eq{UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
 	}
@@ -169,7 +175,7 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	return userAuthMethods, err
 }
 
-func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, activeOnly bool) (userAuthMethodTypes *AuthMethodTypes, err error) {
+func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, activeOnly bool, includeWithoutDomain bool, queryDomain string) (userAuthMethodTypes *AuthMethodTypes, err error) {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
 		if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, userID); err != nil {
@@ -179,7 +185,7 @@ func (q *Queries) ListUserAuthMethodTypes(ctx context.Context, userID string, ac
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	query, scan := prepareUserAuthMethodTypesQuery(ctx, q.client, activeOnly)
+	query, scan := prepareUserAuthMethodTypesQuery(ctx, q.client, activeOnly, includeWithoutDomain, queryDomain)
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
@@ -376,8 +382,8 @@ func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 		}
 }
 
-func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, activeOnly bool) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
-	authMethodsQuery, authMethodsArgs, err := prepareAuthMethodQuery(activeOnly)
+func prepareUserAuthMethodTypesQuery(ctx context.Context, db prepareDatabase, activeOnly bool, includeWithoutDomain bool, queryDomain string) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+	authMethodsQuery, authMethodsArgs, err := prepareAuthMethodQuery(activeOnly, includeWithoutDomain, queryDomain)
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -491,7 +497,7 @@ func prepareAuthMethodsIDPsQuery() (string, error) {
 	return idpsQuery, err
 }
 
-func prepareAuthMethodQuery(activeOnly bool) (string, []interface{}, error) {
+func prepareAuthMethodQuery(activeOnly bool, includeWithoutDomain bool, queryDomain string) (string, []interface{}, error) {
 	q := sq.Select(
 		"DISTINCT("+authMethodTypeType.identifier()+")",
 		authMethodTypeUserID.identifier(),
@@ -500,6 +506,17 @@ func prepareAuthMethodQuery(activeOnly bool) (string, []interface{}, error) {
 	if activeOnly {
 		q = q.Where(sq.Eq{authMethodTypeState.identifier(): domain.MFAStateReady})
 	}
+	if queryDomain != "" {
+		conditions := sq.Or{
+			sq.Eq{authMethodTypeDomain.identifier(): nil},
+			sq.Eq{authMethodTypeDomain.identifier(): queryDomain},
+		}
+		if includeWithoutDomain {
+			conditions = append(conditions, sq.Eq{authMethodTypeDomain.identifier(): ""})
+		}
+		q = q.Where(conditions)
+	}
+
 	return q.ToSql()
 }
 

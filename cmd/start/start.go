@@ -45,13 +45,15 @@ import (
 	org_v2 "github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/internal/api/grpc/org/v2beta"
 	action_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/action/v3alpha"
+	"github.com/zitadel/zitadel/internal/api/grpc/resources/debug_events/debug_events"
+	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
+	userschema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/userschema/v3alpha"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/webkey/v3"
 	session_v2 "github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
 	settings_v2 "github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	settings_v2beta "github.com/zitadel/zitadel/internal/api/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
-	user_schema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/user/schema/v3alpha"
 	user_v2 "github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -78,6 +80,7 @@ import (
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/execution"
@@ -137,6 +140,10 @@ type Server struct {
 func startZitadel(ctx context.Context, config *Config, masterKey string, server chan<- *Server) error {
 	showBasicInformation(config)
 
+	// sink Server is stubbed out in production builds, see function's godoc.
+	closeSink := sink.StartServer()
+	defer closeSink()
+
 	i18n.MustLoadSupportedLanguagesFromDir()
 
 	queryDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeQuery)
@@ -177,6 +184,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
+		config.Caches,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,
@@ -216,6 +224,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}
 	commands, err := command.StartCommands(
 		eventstoreClient,
+		config.Caches,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		storage,
@@ -444,10 +453,16 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(config.SystemDefaults, commands, queries, domain.AllFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, user_schema_v3_alpha.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, userschema_v3_alpha.CreateServer(config.SystemDefaults, commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, user_v3_alpha.CreateServer(commands)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, webkey.CreateServer(commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, debug_events.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, login.IgnoreInstanceEndpoints...)

@@ -1,0 +1,211 @@
+syntax = "proto3";
+
+package zitadel.resources.userschema.v3alpha;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha;userschema";
+
+message GetUserSchema {
+  // Details provide some base information (such as the last change date) of the schema.
+  zitadel.resources.object.v3alpha.Details details = 1;
+  UserSchema config = 2;
+  // Current state of the schema.
+  State state = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"STATE_ACTIVE\""
+    }
+  ];
+  // Revision is a read only version of the schema, each update of the `schema`-field increases the revision.
+  uint32 revision = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\""
+    }
+  ];
+}
+
+message UserSchema {
+  // Type is a human readable word describing the schema.
+  string type = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"employees\"";
+    }
+  ];
+  oneof data_type {
+    option (validate.required) = true;
+
+    // JSON schema representation defining the user.
+    google.protobuf.Struct schema = 2 [
+      (validate.rules).message = {required: true},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
+      }
+    ];
+
+    // (--In the future we will allow to use an external registry.--)
+  }
+  // Defines the possible types of authenticators.
+  repeated AuthenticatorType possible_authenticators = 3 [
+    (validate.rules).repeated = {unique: true, items: {enum: {defined_only: true, not_in: [0]}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"AUTHENTICATOR_TYPE_USERNAME\",\"AUTHENTICATOR_TYPE_PASSWORD\",\"AUTHENTICATOR_TYPE_WEBAUTHN\"]";
+    }
+  ];
+}
+
+message PatchUserSchema {
+  // Type is a human readable word describing the schema.
+  optional string type = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"employees\"";
+    }
+  ];
+  oneof data_type {
+    // JSON schema representation defining the user.
+    google.protobuf.Struct schema = 3 [
+      (validate.rules).message = {required: true},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
+      }
+    ];
+  }
+  // Defines the possible types of authenticators.
+  //
+  // Removal of an authenticator does not remove the authenticator on a user.
+  repeated AuthenticatorType possible_authenticators = 4 [
+    (validate.rules).repeated = {unique: true, items: {enum: {defined_only: true, not_in: [0]}}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"AUTHENTICATOR_TYPE_USERNAME\",\"AUTHENTICATOR_TYPE_PASSWORD\",\"AUTHENTICATOR_TYPE_WEBAUTHN\"]";
+    }
+  ];
+}
+
+enum FieldName {
+  FIELD_NAME_UNSPECIFIED = 0;
+  FIELD_NAME_TYPE = 1;
+  FIELD_NAME_STATE = 2;
+  FIELD_NAME_REVISION = 3;
+  FIELD_NAME_CHANGE_DATE = 4;
+  FIELD_NAME_CREATION_DATE = 5;
+}
+
+message SearchFilter {
+  oneof Filter {
+    option (validate.required) = true;
+
+    // Union the results of each sub filter ('OR').
+    OrFilter or_filter = 1;
+    // Limit the result to match all sub queries ('AND').
+    // Note that if you specify multiple queries, they will be implicitly used as andQueries.
+    // Use the andFilter in combination with orFilter and notFilter.
+    AndFilter and_filter = 2;
+    // Exclude / Negate the result of the sub filter ('NOT').
+    NotFilter not_filter = 3;
+
+    // Limit the result to a specific schema type.
+    TypeFilter type_filter = 5;
+    // Limit the result to a specific state of the schema.
+    StateFilter state_filter = 6;
+    // Limit the result to a specific schema ID.
+    IDFilter id_filter = 7;
+  }
+}
+
+message OrFilter {
+  repeated SearchFilter queries = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[{\"idFilter\": {\"id\": \"163840776835432705\",\"method\": \"TEXT_FILTER_METHOD_EQUALS\"}},{\"idFilter\": {\"id\": \"163840776835943483\",\"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]"
+    }
+  ];
+}
+message AndFilter {
+  repeated SearchFilter queries = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[{\"typeFilter\": {\"id\": \"employees\",\"method\": \"TEXT_FILTER_METHOD_STARTS_WITH\"}},{\"stateFilter\": {\"state\": \"STATE_ACTIVE\"}}]"
+    }
+  ];
+}
+
+message NotFilter {
+  SearchFilter filter = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"stateFilter\": {\"state\": \"STATE_ACTIVE\"}}"
+    }
+  ];
+}
+
+message IDFilter {
+  // Defines the ID of the user schema to filter for.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+  // Defines which text comparison method used for the id filter.
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message TypeFilter {
+  // Defines which type to filter for.
+  string type = 1 [
+    (validate.rules).string = {max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200,
+      example: "\"employees\"";
+    }
+  ];
+  // Defines which text comparison method used for the type filter.
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message StateFilter {
+  // Defines the state to filter for.
+  State state = 1 [
+    (validate.rules).enum.defined_only = true,
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"STATE_ACTIVE\""
+    }
+  ];
+}
+
+enum State {
+  STATE_UNSPECIFIED = 0;
+  STATE_ACTIVE = 1;
+  STATE_INACTIVE = 2;
+}
+
+enum AuthenticatorType {
+  AUTHENTICATOR_TYPE_UNSPECIFIED = 0;
+  AUTHENTICATOR_TYPE_USERNAME = 1;
+  AUTHENTICATOR_TYPE_PASSWORD = 2;
+  AUTHENTICATOR_TYPE_WEBAUTHN = 3;
+  AUTHENTICATOR_TYPE_TOTP = 4;
+  AUTHENTICATOR_TYPE_OTP_EMAIL = 5;
+  AUTHENTICATOR_TYPE_OTP_SMS = 6;
+  AUTHENTICATOR_TYPE_AUTHENTICATION_KEY = 7;
+  AUTHENTICATOR_TYPE_IDENTITY_PROVIDER = 8;
+}

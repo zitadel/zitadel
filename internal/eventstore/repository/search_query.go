@@ -156,6 +156,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 			aggregateIDFilter,
 			eventTypeFilter,
 			eventDataFilter,
+			eventPositionAfterFilter,
 		} {
 			filter := f(q)
 			if filter == nil {
@@ -274,4 +275,11 @@ func eventDataFilter(query *eventstore.SearchQuery) *Filter {
 		return nil
 	}
 	return NewFilter(FieldEventData, query.GetEventData(), OperationJSONContains)
+}
+
+func eventPositionAfterFilter(query *eventstore.SearchQuery) *Filter {
+	if pos := query.GetPositionAfter(); pos != 0 {
+		return NewFilter(FieldPosition, pos, OperationGreater)
+	}
+	return nil
 }

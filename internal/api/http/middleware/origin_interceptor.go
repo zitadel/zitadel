@@ -17,7 +17,7 @@ func WithOrigin(fallBackToHttps bool, http1Header, http2Header string, instanceH
 				r,
 				fallBackToHttps,
 				// to make sure we don't break existing configurations we append the existing checked headers as well
-				slices.Compact(append(instanceHostHeaders, http1Header, http2Header, http_util.Forwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto)),
+				slices.Compact(append(instanceHostHeaders, http1Header, http2Header, http_util.Forwarded, http_util.ZitadelForwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto)),
 				publicDomainHeaders,
 			)
 			next.ServeHTTP(w, r.WithContext(http_util.WithDomainContext(r.Context(), origin)))
@@ -52,7 +52,8 @@ func hostFromRequest(r *http.Request, headers []string) (host, proto string) {
 	for _, header := range headers {
 		switch http.CanonicalHeaderKey(header) {
 		case http.CanonicalHeaderKey(http_util.Forwarded),
-			http.CanonicalHeaderKey(http_util.ForwardedFor):
+			http.CanonicalHeaderKey(http_util.ForwardedFor),
+			http.CanonicalHeaderKey(http_util.ZitadelForwarded):
 			hostFromHeader, protoFromHeader = hostFromForwarded(r.Header.Values(header))
 		case http.CanonicalHeaderKey(http_util.ForwardedHost):
 			hostFromHeader = r.Header.Get(header)

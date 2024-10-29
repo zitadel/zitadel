@@ -81,6 +81,14 @@ InitUserDone:
   Description: Имейлът е потвърден и паролата е успешно зададена
   NextButtonText: следващия
   CancelButtonText: анулиране
+InviteUser:
+  Title: Активиране на потребителя
+  Description: Проверете своя имейл с кода по-долу и задайте паролата си.
+  CodeLabel: Код
+  NewPasswordLabel: Нова парола
+  NewPasswordConfirm: Потвърди парола
+  NextButtonText: Напред
+  ResendButtonText: Изпрати отново код
 InitMFAPrompt:
   Title: 2-факторна настройка
   Description: >-
@@ -250,6 +258,8 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -289,6 +299,8 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -357,6 +369,8 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:

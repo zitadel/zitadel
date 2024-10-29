@@ -576,6 +576,11 @@ Errors:
     NotActive: Användarschema inte aktivt
     NotInactive: Användarschema inte inaktivt
     NotExists: Användarschema existerar inte
+    ID:
+      Missing: Användarschema-ID saknas
+    Invalid: Ogiltigt användarschema
+    Data:
+      Invalid: Data ogiltig för användarschema
   TokenExchange:
     FeatureDisabled: Token Exchange-funktionen är inaktiverad för din instans. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -682,6 +687,13 @@ EventTypes:
         check:
           succeeded: Initialiseringskontroll lyckades
           failed: Initialiseringskontroll misslyckades
+      invite:
+        code:
+          added: Inbjudningskod genererad
+          sent: Inbjudningskod skickad
+        check:
+          succeeded: Inbjudningskontroll lyckad
+          failed: Inbjudningskontroll misslyckad
       username:
         reserved: Användarnamn reserverat
         released: Användarnamn släppt
@@ -1319,6 +1331,26 @@ EventTypes:
     deactivated: Användarschema avaktiverat
     reactivated: Användarschema återaktiverat
     deleted: Användarschema borttaget
+    user:
+      created: Användare skapad
+      updated: Användaren uppdaterad
+      deleted: Användare raderad
+      email:
+        updated: E-postadress ändrad
+        verified: E-postadress verifierad
+        verification:
+          failed: E-postadressverifiering misslyckades
+        code:
+          added: Verifieringskod för e-postadress genererad
+          sent: E-postadressens verifieringskod har skickats
+      phone:
+        updated: Telefonnummer ändrat
+        verified: Telefonnummer verifierat
+        verification:
+          failed: Verifiering av telefonnummer misslyckades
+        code:
+          added: Verifieringskod för telefonnummer genererad
+          sent: Verifieringskoden för telefonnummer har skickats
   web_key:
     added: Webbnyckel har lagts till
     activated: Webbnyckel aktiverad

@@ -68,6 +68,7 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		tmplInitPasswordDone:             "init_password_done.html",
 		tmplInitUser:                     "init_user.html",
 		tmplInitUserDone:                 "init_user_done.html",
+		tmplInviteUser:                   "invite_user.html",
 		tmplPasswordResetDone:            "password_reset_done.html",
 		tmplChangePassword:               "change_password.html",
 		tmplChangePasswordDone:           "change_password_done.html",
@@ -83,7 +84,6 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		tmplLDAPLogin:                    "ldap_login.html",
 		tmplDeviceAuthUserCode:           "device_usercode.html",
 		tmplDeviceAuthAction:             "device_action.html",
-		tmplLinkingUserPrompt:            "link_user_prompt.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -193,6 +193,9 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		},
 		"initUserUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointInitUser)
+		},
+		"inviteUserUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointInviteUser)
 		},
 		"changePasswordUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangePassword)
@@ -330,6 +333,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInternalError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
 	case *domain.ProjectRequiredStep:
 		l.renderInternalError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
+	case *domain.VerifyInviteStep:
+		l.renderInviteUser(w, r, authReq, "", "", "", "", nil)
 	default:
 		l.renderInternalError(w, r, authReq, zerrors.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}

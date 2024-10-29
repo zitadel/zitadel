@@ -352,11 +352,11 @@ func (c *Commands) changeUserPhone(ctx context.Context, cmds []eventstore.Comman
 		if phone.Verified {
 			return append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &wm.Aggregate().Aggregate)), code, nil
 		} else {
-			cryptoCode, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
+			cryptoCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 			if err != nil {
 				return cmds, code, err
 			}
-			cmds = append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, cryptoCode.Crypted, cryptoCode.Expiry, phone.ReturnCode))
+			cmds = append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, cryptoCode.CryptedCode(), cryptoCode.CodeExpiry(), phone.ReturnCode, generatorID))
 			if phone.ReturnCode {
 				code = &cryptoCode.Plain
 			}
@@ -389,7 +389,14 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	verification := c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner)
 	// otherwise check the password code...
 	if password.PasswordCode != "" {
-		verification = c.setPasswordWithVerifyCode(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, password.PasswordCode)
+		verification = c.setPasswordWithVerifyCode(
+			wm.PasswordCodeCreationDate,
+			wm.PasswordCodeExpiry,
+			wm.PasswordCode,
+			wm.PasswordCodeGeneratorID,
+			wm.PasswordCodeVerificationID,
+			password.PasswordCode,
+		)
 	}
 	// ...or old password
 	if password.OldPassword != "" {

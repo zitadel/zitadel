@@ -222,7 +222,7 @@
             <cnsl-user-grants
               [userId]="user.id"
               [context]="USERGRANTCONTEXT"
-              [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'roleNamesList', 'actions']"
+              [displayedColumns]="['select', 'projectId', 'creationDate', 'changeDate', 'state', 'roleNamesList', 'actions']"
               [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
               [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
             >

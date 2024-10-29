@@ -70,7 +70,7 @@ message LoginSettings {
   ];
   google.protobuf.Duration second_factor_check_lifetime = 12 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Defines after how long the second-factor check is valid.";
+      description: "Defines after how long the second factor check is valid.";
       example: "\"64800s\"";
     }
   ];
@@ -148,5 +148,6 @@ enum IdentityProviderType {
   IDENTITY_PROVIDER_TYPE_GITLAB = 8;
   IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED = 9;
   IDENTITY_PROVIDER_TYPE_GOOGLE = 10;
-  IDENTITY_PROVIDER_TYPE_SAML=11;
+  IDENTITY_PROVIDER_TYPE_SAML = 11;
+  IDENTITY_PROVIDER_TYPE_APPLE = 12;
 }

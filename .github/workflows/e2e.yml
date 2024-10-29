@@ -50,7 +50,6 @@ jobs:
         with:
           working-directory: e2e
           browser: ${{ matrix.browser }}
-          command: npm run e2e
           config-file: cypress.config.ts
       - 
         uses: actions/upload-artifact@v4

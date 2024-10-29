@@ -91,19 +91,28 @@ func conditionToInclude(cond *action.Condition) (string, error) {
 	}
 }
 
-func (s *Server) ListExecutionFunctions(_ context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
+func (s *Server) ListExecutionFunctions(ctx context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
+	if err := checkActionsEnabled(ctx); err != nil {
+		return nil, err
+	}
 	return &action.ListExecutionFunctionsResponse{
 		Functions: s.ListActionFunctions(),
 	}, nil
 }
 
-func (s *Server) ListExecutionMethods(_ context.Context, _ *action.ListExecutionMethodsRequest) (*action.ListExecutionMethodsResponse, error) {
+func (s *Server) ListExecutionMethods(ctx context.Context, _ *action.ListExecutionMethodsRequest) (*action.ListExecutionMethodsResponse, error) {
+	if err := checkActionsEnabled(ctx); err != nil {
+		return nil, err
+	}
 	return &action.ListExecutionMethodsResponse{
 		Methods: s.ListGRPCMethods(),
 	}, nil
 }
 
-func (s *Server) ListExecutionServices(_ context.Context, _ *action.ListExecutionServicesRequest) (*action.ListExecutionServicesResponse, error) {
+func (s *Server) ListExecutionServices(ctx context.Context, _ *action.ListExecutionServicesRequest) (*action.ListExecutionServicesResponse, error) {
+	if err := checkActionsEnabled(ctx); err != nil {
+		return nil, err
+	}
 	return &action.ListExecutionServicesResponse{
 		Services: s.ListGRPCServices(),
 	}, nil

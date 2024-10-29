@@ -6,7 +6,6 @@ sidebar_label: Pylon
 import AppJWT from "../imports/_app_jwt.mdx";
 import ServiceuserJWT from "../imports/_serviceuser_jwt.mdx";
 import ServiceuserRole from "../imports/_serviceuser_role.mdx";
-import SetupPylon from "../imports/_setup_pylon.mdx";
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your [Pylon](https://pylon.cronit.io) service.
 It explains how to check the token validity in the API and how to check for permissions.
@@ -43,26 +42,27 @@ And the following from the Serviceuser:
 
 ## Setup new Pylon service
 
-### Setup Pylon
+Pylon allows you to create a new service using the `npm create pylon` command. This command creates a new Pylon project with a basic project structure and configuration.
+During the setup process, you can choose your preferred runtime, such as Bun, Node.js, or Cloudflare Workers.
 
-<SetupPylon />
+**This guide uses the Bun runtime.**
 
 ### Creating a new project
 
 To create a new Pylon project, run the following command:
 
 ```bash
-pylon new my-pylon-project
+npm create pylon my-pylon@latest
 ```
 
-This will create a new directory called `my-pylon-project` with a basic Pylon project structure.
+This will create a new directory called `my-pylon` with a basic Pylon project structure.
 
 ### Project structure
 
 Pylon projects are structured as follows:
 
 ```
-my-pylon-project/
+my-pylon/
 ├── .pylon/
 ├── src/
 │   ├── index.ts
@@ -81,16 +81,18 @@ my-pylon-project/
 Here's an example of a basic Pylon service:
 
 ```ts
-import { defineService } from "@getcronit/pylon";
+import { app } from "@getcronit/pylon";
 
-export default defineService({
+export const graphql = {
   Query: {
     sum: (a: number, b: number) => a + b,
   },
   Mutation: {
     divide: (a: number, b: number) => a / b,
   },
-});
+};
+
+export default app;
 ```
 
 ## Secure the API
@@ -112,6 +114,8 @@ AUTH_PROJECT_ID='250719519163548112'
 ```
 
 2. Copy the `.json`-key-file that you downloaded from the ZITADEL Console into the root folder of your project and rename it to `key.json`.
+
+3. (Optional) For added convenience in production environments, you can include the content of the .json key file as `AUTH_KEY` in the .env file or as an environment variable.
 
 ### Auth
 
@@ -140,8 +144,7 @@ The following code demonstrates how to create a Pylon service with the required 
 
 ```ts
 import {
-  defineService,
-  PylonAPI,
+  app,
   auth,
   requireAuth,
   getContext,
@@ -208,7 +211,7 @@ class User {
   }
 }
 
-export default defineService({
+export const graphql = {
   Query: {
     me: User.me,
     info: () => "Public Data",
@@ -216,43 +219,43 @@ export default defineService({
   Mutation: {
     createUser: User.create,
   },
+};
+
+// Initialize the authentication middleware
+app.use("*", auth.initialize());
+
+// Automatically try to create a user for each request for demonstration purposes
+app.use(async (_, next) => {
+  try {
+    await User.create();
+  } catch {
+    // Ignore errors
+    // Fail silently if the user already exists
+  }
+
+  await next();
 });
 
-export const configureApp: PylonAPI["configureApp"] = (app) => {
-  // Initialize the authentication middleware
-  app.use("*", auth.initialize());
+app.get("/api/info", (c) => {
+  return new Response("Public Data");
+});
 
-  // Automatically try to create a user for each request for demonstration purposes
-  app.use(async (_, next) => {
-    try {
-      await User.create();
-    } catch {
-      // Ignore errors
-      // Fail silently if the user already exists
-    }
+// The `auth.require()` middleware is optional here, as the `User.me` method already checks for it.
+app.get("/api/me", auth.require(), async (c) => {
+  const user = await User.me();
 
-    await next();
-  });
+  return c.json(user);
+});
 
-  app.get("/api/info", (c) => {
-    return new Response("Public Data");
-  });
+// A role check for `read:messages` is not required here, as the `user.messages` method already checks for it.
+app.get("/api/me/messages", auth.require(), async (c) => {
+  const user = await User.me();
 
-  // The `auth.require()` middleware is optional here, as the `User.me` method already checks for it.
-  app.get("/api/me", auth.require(), async (c) => {
-    const user = await User.me();
+  // This will throw an error if the user does not have the `read:messages` role
+  return c.json(await user.messages());
+});
 
-    return c.json(user);
-  });
-
-  // A role check for `read:messages` is not required here, as the `user.messages` method already checks for it.
-  app.get("/api/me/messages", auth.require(), async (c) => {
-    const user = await User.me();
-
-    // This will throw an error if the user does not have the `read:messages` role
-    return c.json(await user.messages());
-  });
-};
+export default app;
 ```
 
 ### Call the API
@@ -273,7 +276,7 @@ export TOKEN='MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 Now you have to start the Pylon service:
 
 ```bash
-bun run develop
+bun run dev
 ```
 
 With the access token, you can then do the following calls:

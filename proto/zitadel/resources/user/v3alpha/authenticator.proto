@@ -1,0 +1,544 @@
+syntax = "proto3";
+
+package zitadel.resources.user.v3alpha;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
+
+message Authenticators {
+  // All of the user's usernames, which will be used for identification during authentication.
+  repeated Username usernames = 1;
+  // If the user has set a password, the time it was last changed will be returned.
+  Password password = 2;
+  // Meta information about the user's WebAuthN authenticators.
+  repeated WebAuthN web_auth_n = 3;
+  // A list of the user's time-based one-time password (TOTP) authenticators,
+  // incl. the name for identification.
+  repeated TOTP totps = 4;
+  // A list of the user's one-time password (OTP) SMS authenticators.
+  repeated OTPSMS otp_sms = 5;
+  // A list of the user's one-time password (OTP) Email authenticators.
+  repeated OTPEmail otp_email = 6;
+  // A list of the user's authentication keys. They can be used to authenticate e.g. by JWT Profile.
+  repeated AuthenticationKey authentication_keys = 7;
+  // A list of the user's linked identity providers (IDPs).
+  repeated IdentityProvider identity_providers = 8;
+}
+
+message Username {
+  // unique identifier of the username.
+  string username_id = 1;
+  // The user's unique username. It is used for identification during authentication.
+  string username = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"gigi-giraffe\"";
+    }
+  ];
+  // By default usernames must be unique across all organizations in an instance.
+  // This option allow to restrict the uniqueness to the user's own organization.
+  // As a result, this username can only be used if the authentication is limited
+  // to the corresponding organization.
+  //
+  // This can be useful if you provide multiple usernames for a single user, where one
+  // if specific to your organization, e.g.:
+  // - gigi-giraffe@zitadel.com (unique across organizations)
+  // - gigi-giraffe (unique only inside the ZITADEL organization)
+  bool is_organization_specific = 3;
+}
+
+message SetUsername {
+  // Set the user's username. This will be used for identification during authentication.
+  string username = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"gigi-giraffe\"";
+    }
+  ];
+  // By default username must be unique across all organizations in an instance.
+  // This option allow to restrict the uniqueness to the user's own organization.
+  // As a result, this username can only be used if the authentication is limited
+  // to the corresponding organization.
+  //
+  // This can be useful if you provide multiple usernames for a single user, where one
+  // if specific to your organization, e.g.:
+  // - gigi-giraffe@zitadel.com (unique across organizations)
+  // - gigi-giraffe (unique only inside the ZITADEL organization)
+  bool is_organization_specific = 2;
+}
+
+message Password {
+  // States the time the password was last changed.
+  google.protobuf.Timestamp last_changed = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2019-04-01T08:45:00.000000Z\"";
+    }
+  ];
+}
+
+message WebAuthN {
+  // unique identifier of the WebAuthN authenticator.
+  string web_auth_n_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  // Name of the WebAuthN authenticator. This is used for easier identification.
+  string name = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"fido key\""
+    }
+  ];
+  // State whether the WebAuthN registration has been completed.
+  bool is_verified = 3;
+  // States if the user has been verified during the registration. Authentication with this device
+  // will be considered as multi-factor authentication (MFA) without the need to check a password
+  // (typically known as Passkeys).
+  // Without user verification it will be a second factor authentication (2FA), typically done
+  // after a password check.
+  //
+  // More on WebAuthN User Verification: https://www.w3.org/TR/webauthn/#user-verification
+  bool user_verified = 4;
+}
+
+message StartWebAuthNRegistration {
+  // Domain on which the user currently is or will be authenticated.
+  string domain = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"my-domain.zitadel.cloud\"";
+    }
+  ];
+  // Optionally specify the authenticator type of the passkey device (platform or cross-platform).
+  // If none is provided, both values are allowed.
+  WebAuthNAuthenticatorType authenticator_type = 2;
+  // Optionally provide a one time code generated by ZITADEL.
+  // This is required to start the passkey registration without user authentication.
+  optional AuthenticatorRegistrationCode code = 3;
+}
+
+message VerifyWebAuthNRegistration {
+  // PublicKeyCredential Interface.
+  // Generated helper methods populate the field from JSON created by a WebAuthN client.
+  // See also:  https://www.w3.org/TR/webauthn/#publickeycredential
+  google.protobuf.Struct public_key_credential = 1 [
+    (validate.rules).message.required = true,
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"type\":\"public-key\",\"id\":\"pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00\",\"rawId\":\"pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00\",\"response\":{\"attestationObject\":\"o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ\"}}";
+      min_length: 55;
+      max_length: 1048576; //1 MB
+    }
+  ];
+  // Provide a name for the WebAuthN device. This will help identify it in the future.
+  string web_auth_n_name = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"fido key\""
+    }
+  ];
+}
+
+message OTPSMS {
+  // unique identifier of the one-time password (OTP) SMS authenticator.
+  string otp_sms_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  // The phone number used for the OTP SMS authenticator.
+  string phone = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"+41791234567\"";
+    }
+  ];
+  // State whether the OTP SMS registration has been completed.
+  bool is_verified = 3;
+}
+
+message OTPEmail {
+  // unique identifier of the one-time password (OTP) Email authenticator.
+  string otp_email_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  // The email address used for the OTP Email authenticator.
+  string address = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"mini@mouse.com\"";
+    }
+  ];
+  // State whether the OTP Email registration has been completed.
+  bool is_verified = 3;
+}
+
+message TOTP {
+  // unique identifier of the time-based one-time password (TOTP) authenticator.
+  string totp_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  // The name provided during registration. This is used for easier identification.
+  string name = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Google Authenticator\""
+    }
+  ];
+  // State whether the TOTP registration has been completed.
+  bool is_verified = 3;
+}
+
+message AuthenticationKey {
+  // ID is the read-only unique identifier of the authentication key.
+  string authentication_key_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+  zitadel.resources.object.v3alpha.Details details = 2;
+  // the file type of the key
+  AuthNKeyType type = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"KEY_TYPE_JSON\"";
+    }
+  ];
+  // After the expiration date, the key will no longer be usable for authentication.
+  google.protobuf.Timestamp expiration_date = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"3019-04-01T08:45:00.000000Z\"";
+    }
+  ];
+}
+
+enum AuthNKeyType {
+  AUTHN_KEY_TYPE_UNSPECIFIED = 0;
+  AUTHN_KEY_TYPE_JSON = 1;
+}
+
+message IdentityProvider {
+  // IDP ID is the read-only unique identifier of the identity provider in ZITADEL.
+  string idp_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+  // IDP name is the name of the identity provider in ZITADEL.
+  string idp_name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"google\"";
+    }
+  ];
+  // The user ID represents the ID provided by the identity provider.
+  // This ID is used to link the user in ZITADEL with the identity provider.
+  string user_id = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"as-12-df-89\"";
+    }
+  ];
+  // The username represents the username provided by the identity provider.
+  string username = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"gigi.long-neck@gmail.com\"";
+    }
+  ];
+}
+
+message SetAuthenticators {
+  repeated SetUsername usernames = 1;
+  SetPassword password = 2;
+}
+
+message SetPassword {
+  oneof type {
+    // Provide the plain text password. ZITADEL will take care to store it in a secure way (hash).
+    string password = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "\"Secr3tP4ssw0rd!\"";
+        min_length: 1,
+        max_length: 200;
+      }
+    ];
+    // Encoded hash of a password in Modular Crypt Format:
+    // https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets.
+    string hash = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 200;
+        example: "\"$2a$12$lJ08fqVr8bFJilRVnDT9QeULI7YW.nT3iwUv6dyg0aCrfm3UY8XR2\"";
+      }
+    ];
+  }
+  // Provide if the user needs to change the password on the next use.
+  bool change_required = 3;
+  // If neither, the current password nor a verification code generated by the PasswordReset is provided,
+  // the user must be granted permission to set a password.
+  oneof verification {
+    // Provide the current password to verify you're allowed to change the password.
+    string current_password = 4 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1;
+        max_length: 200;
+        example: "\"Secr3tP4ssw0rd!\"";
+      }
+    ];
+    // Or provider the verification code generated during password reset request.
+    string verification_code = 5 [
+      (validate.rules).string = {min_len: 1, max_len: 20},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1;
+        max_length: 20;
+        example: "\"SKJd342k\"";
+      }
+    ];
+  }
+}
+
+message SendPasswordResetEmail {
+  // Optionally set a url_template, which will be used in the password reset mail
+  // sent by ZITADEL to guide the user to your password change page.
+  // If no template is set, the default ZITADEL url will be used.
+  optional string url_template = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"";
+    }
+  ];
+}
+
+message SendPasswordResetSMS {}
+
+message ReturnPasswordResetCode {}
+
+enum WebAuthNAuthenticatorType {
+  WEB_AUTH_N_AUTHENTICATOR_UNSPECIFIED = 0;
+  WEB_AUTH_N_AUTHENTICATOR_PLATFORM = 1;
+  WEB_AUTH_N_AUTHENTICATOR_CROSS_PLATFORM = 2;
+}
+
+message AuthenticatorRegistrationCode {
+  // ID to the one time code generated by ZITADEL.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"e2a48d6a-362b-4db6-a1fb-34feab84dc62\"";
+    }
+  ];
+  // one time code generated by ZITADEL.
+  string code = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"SKJd342k\"";
+    }
+  ];
+}
+
+message SendWebAuthNRegistrationLink {
+  // Optionally set a url_template, which will be used in the mail sent by ZITADEL
+  // to guide the user to your passkey registration page.
+  // If no template is set, the default ZITADEL url will be used.
+  optional string url_template = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}\"";
+    }
+  ];
+}
+
+message ReturnWebAuthNRegistrationCode {}
+
+
+message RedirectURLs {
+  // URL to which the user will be redirected after a successful login.
+  string success_url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 2048, uri_ref: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 2048;
+      example: "\"https://custom.com/login/idp/success\"";
+    }
+  ];
+  // URL to which the user will be redirected after a failed login.
+  string failure_url = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 2048, uri_ref: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 2048;
+      example: "\"https://custom.com/login/idp/fail\"";
+    }
+  ];
+}
+
+message LDAPCredentials {
+  // Username used to login through LDAP.
+  string username = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"username\"";
+    }
+  ];
+  // Password used to login through LDAP.
+  string password = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Password1!\"";
+    }
+  ];
+}
+
+
+message IdentityProviderIntent {
+  // ID of the identity provider (IDP) intent.
+  string idp_intent_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432705\"";
+    }
+  ];
+  // Token of the identity provider (IDP) intent.
+  string idp_intent_token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
+  // If the user was already federated and linked to a ZITADEL user, it's id will be returned.
+  optional string user_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message IDPInformation{
+  // ID of the identity provider.
+  string idp_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // ID of the user provided by the identity provider.
+  string user_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  // Username of the user provided by the identity provider.
+  string user_name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"user@external.com\"";
+    }
+  ];
+  // Complete information returned by the identity provider.
+  google.protobuf.Struct raw_information = 4;
+  // additional access information returned by the identity provider.
+  oneof access{
+    // OAuth/OIDC access (and id_token) returned by the identity provider.
+    IDPOAuthAccessInformation oauth = 5;
+    // LDAP entity attributes returned by the identity provider
+    IDPLDAPAccessInformation ldap = 6;
+    // SAMLResponse returned by the identity provider
+    IDPSAMLAccessInformation saml = 7;
+  }
+}
+
+message IDPOAuthAccessInformation{
+  // The access_token returned by the identity provider.
+  string access_token = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"JWLKFSJlijorifjOJOIehjt8jOIEWJGh3tgiEN3WIUGH8Ehgiewhg\"";
+    }
+  ];
+  // In case the provider returned an id_token.
+  optional string id_token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"";
+    }
+  ];
+}
+
+message IDPLDAPAccessInformation{
+  // The attributes of the user returned by the identity provider.
+  google.protobuf.Struct attributes = 1;
+}
+
+message IDPSAMLAccessInformation{
+  // The SAML assertion returned by the identity provider.
+  bytes assertion = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"PEFzc2VydGlvbiB4bWxucz11cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIElEPV9mNjc5NDE5MjliZGY5MTcyOTMyMyBJc3N1ZUluc3RhbnQ9MjAyNC0wMi0wOFQxMzo1MTozNy45NDdaIFZlcnNpb249Mi4wPjxJc3N1ZXIgeG1sbnM9dXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiBOYW1lUXVhbGlmaWVyPSBTUE5hbWVRdWFsaWZpZXI9IEZvcm1hdD11cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6bmFtZWlkLWZvcm1hdDplbnRpdHkgU1BQcm92aWRlZElEPT5odHRwczovL3NhbWwuZXhhbXBsZS5jb20vZW50aXR5aWRcPC9Jc3N1ZXJcPlw8U2lnbmF0dXJlXD5cPFNwYWNlXD5cPC9TcGFjZVw+XDxUYWdcPlw8L1RhZ1w+XDwvU2lnbmF0dXJlXD5cPFN1YmplY3QgeG1sbnM9dXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbj48TmFtZUlEIE5hbWVRdWFsaWZpZXI9IFNQTmFtZVF1YWxpZmllcj0gRm9ybWF0PXVybjpvYXNpczpuYW1lczp0YzpTQU1MOjEuMTpuYW1laWQtZm9ybWF0OmVtYWlsQWRkcmVzcyBTUFByb3ZpZGVkSUQ9PmphY2tzb25AZXhhbXBsZS5jb208L05hbWVJRD48U3ViamVjdENvbmZpcm1hdGlvbiBNZXRob2Q9dXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmNtOmJlYXJlcj48U3ViamVjdENvbmZpcm1hdGlvbkRhdGEgTm90T25PckFmdGVyPTIwMjQtMDItMDhUMTM6NTY6MzcuOTQ3WiBOb3RCZWZvcmU9MDAwMS0wMS0wMVQwMDowMDowMFogUmVjaXBpZW50PWh0dHBzOi8vZGVtby56aXRhZGVsLmNsb3VkL2lkcHMvMjUyODM0OTQ3NjU4NzA5NzYyL3NhbWwvYWNzIEluUmVzcG9uc2VUbz1pZC0yMGIxZGEyNWUzNzVhYWQyYmZmNjIxOGY2ZmUzMWRmMzYzNTRjMmI2IEFkZHJlc3M9PjwvU3ViamVjdENvbmZpcm1hdGlvbkRhdGE+PC9TdWJqZWN0Q29uZmlybWF0aW9uPjwvU3ViamVjdD48Q29uZGl0aW9ucyBOb3RCZWZvcmU9MjAyNC0wMi0wOFQxMzo0NjozNy45NDdaIE5vdE9uT3JBZnRlcj0yMDI0LTAyLTA4VDEzOjU2OjM3Ljk0N1o+PEF1ZGllbmNlUmVzdHJpY3Rpb24+PEF1ZGllbmNlPmh0dHBzOi8vZGVtby56aXRhZGVsLmNsb3VkL2lkcHMvMjUyODM0OTQ3NjU4NzA5NzYyL3NhbWwvbWV0YWRhdGFcPC9BdWRpZW5jZVw+XDwvQXVkaWVuY2VSZXN0cmljdGlvblw+XDwvQ29uZGl0aW9uc1w+XDxBdXRoblN0YXRlbWVudCBBdXRobkluc3RhbnQ9MjAyNC0wMi0wOFQxMzo1MTozNy45NDdaIFNlc3Npb25JbmRleD1pZC0yMGIxZGEyNWUzNzVhYWQyYmZmNjIxOGY2ZmUzMWRmMzYzNTRjMmI2PjxBdXRobkNvbnRleHQ+PEF1dGhuQ29udGV4dENsYXNzUmVmPnVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDphYzpjbGFzc2VzOlBhc3N3b3JkUHJvdGVjdGVkVHJhbnNwb3J0PC9BdXRobkNvbnRleHRDbGFzc1JlZj48L0F1dGhuQ29udGV4dD48L0F1dGhuU3RhdGVtZW50PjxBdHRyaWJ1dGVTdGF0ZW1lbnQ+PEF0dHJpYnV0ZSBGcmllbmRseU5hbWU9IE5hbWU9aWQgTmFtZUZvcm1hdD11cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXR0cm5hbWUtZm9ybWF0OnVuc3BlY2lmaWVkPjxBdHRyaWJ1dGVWYWx1ZSB4bWxuczpfWE1MU2NoZW1hLWluc3RhbmNlPWh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIF9YTUxTY2hlbWEtaW5zdGFuY2U6dHlwZT14czpzdHJpbmc+MWRkYTlmYjQ5MWRjMDFiZDI0ZDI0MjNiYTJmMjJhZTU2MWY1NmRkZjIzNzZiMjlhMTFjODAyODFkMjEyMDFmOTwvQXR0cmlidXRlVmFsdWU+PC9BdHRyaWJ1dGU+PEF0dHJpYnV0ZSBGcmllbmRseU5hbWU9IE5hbWU9ZW1haWwgTmFtZUZvcm1hdD11cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXR0cm5hbWUtZm9ybWF0OnVuc3BlY2lmaWVkPjxBdHRyaWJ1dGVWYWx1ZSB4bWxuczpfWE1MU2NoZW1hLWluc3RhbmNlPWh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIF9YTUxTY2hlbWEtaW5zdGFuY2U6dHlwZT14czpzdHJpbmc+amFja3NvbkBleGFtcGxlLmNvbTwvQXR0cmlidXRlVmFsdWU+PC9BdHRyaWJ1dGU+PEF0dHJpYnV0ZSBGcmllbmRseU5hbWU9IE5hbWU9Zmlyc3ROYW1lIE5hbWVGb3JtYXQ9dXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmF0dHJuYW1lLWZvcm1hdDp1bnNwZWNpZmllZD48QXR0cmlidXRlVmFsdWUgeG1sbnM6X1hNTFNjaGVtYS1pbnN0YW5jZT1odHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSBfWE1MU2NoZW1hLWluc3RhbmNlOnR5cGU9eHM6c3RyaW5nPmphY2tzb248L0F0dHJpYnV0ZVZhbHVlPjwvQXR0cmlidXRlPjxBdHRyaWJ1dGUgRnJpZW5kbHlOYW1lPSBOYW1lPWxhc3ROYW1lIE5hbWVGb3JtYXQ9dXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmF0dHJuYW1lLWZvcm1hdDp1bnNwZWNpZmllZD48QXR0cmlidXRlVmFsdWUgeG1sbnM6X1hNTFNjaGVtYS1pbnN0YW5jZT1odHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSBfWE1MU2NoZW1hLWluc3RhbmNlOnR5cGU9eHM6c3RyaW5nPmphY2tzb248L0F0dHJpYnV0ZVZhbHVlPjwvQXR0cmlidXRlPjwvQXR0cmlidXRlU3RhdGVtZW50PjwvQXNzZXJ0aW9uPg==\""
+    }
+  ];
+}
+
+
+message IDPAuthenticator {
+  // ID of the identity provider
+  string idp_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // ID of the user provided by the identity provider
+  string user_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  // Username of the user provided by the identity provider.
+  string user_name = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"user@external.com\"";
+    }
+  ];
+}

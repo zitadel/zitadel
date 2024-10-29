@@ -17,7 +17,8 @@ SELECT s.creation_date,
        s.multi_factor_verification,
        s.multi_factor_verification_type,
        s.sequence,
-       s.instance_id
+       s.instance_id,
+       s.id
 FROM auth.user_sessions s
          LEFT JOIN projections.users13 u ON s.user_id = u.id AND s.instance_id = u.instance_id
          LEFT JOIN projections.users13_humans h ON s.user_id = h.user_id AND s.instance_id = h.instance_id

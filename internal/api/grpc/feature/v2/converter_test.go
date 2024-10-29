@@ -25,6 +25,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		Actions:                             gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:                 nil,
+		OidcSingleV1SessionTermination:      gu.Ptr(true),
 	}
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -34,6 +35,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		Actions:                         gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		ImprovedPerformance:             nil,
+		OIDCSingleV1SessionTermination:  gu.Ptr(true),
 	}
 	got := systemFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -74,6 +76,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgByID},
 		},
+		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetSystemFeaturesResponse{
 		Details: &object.Details{
@@ -109,6 +115,14 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
 			Source:         feature_pb.Source_SOURCE_SYSTEM,
 		},
+		OidcSingleV1SessionTermination: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		DisableUserTokenEvent: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
 	}
 	got := systemFeaturesToPb(arg)
 	assert.Equal(t, want, got)
@@ -124,6 +138,8 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		Actions:                             gu.Ptr(true),
 		ImprovedPerformance:                 nil,
 		WebKey:                              gu.Ptr(true),
+		DebugOidcParentError:                gu.Ptr(true),
+		OidcSingleV1SessionTermination:      gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -134,6 +150,8 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		Actions:                         gu.Ptr(true),
 		ImprovedPerformance:             nil,
 		WebKey:                          gu.Ptr(true),
+		DebugOIDCParentError:            gu.Ptr(true),
+		OIDCSingleV1SessionTermination:  gu.Ptr(true),
 	}
 	got := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -178,6 +196,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -216,6 +238,18 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		WebKey: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		DebugOidcParentError: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
+		OidcSingleV1SessionTermination: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		DisableUserTokenEvent: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
 	}
 	got := instanceFeaturesToPb(arg)

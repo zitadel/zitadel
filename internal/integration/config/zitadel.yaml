@@ -1,15 +1,36 @@
 Log:
-  Level: debug
+  Level: info
 
 ExternalSecure: false
 
 TLS:
   Enabled: false
 
+Caches:
+  Connectors:
+    Postgres:
+      Enabled: true
+      AutoPrune:
+        Interval: 30s
+        TimeOut: 1s
+  Instance:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUsage: 30m
+    Log:
+      Level: info
+      AddSource: true
+      Formatter:
+        Format: text
+
+Quotas:
+  Access:
+    Enabled: true
+
 Telemetry:
   Enabled: true
   Endpoints:
-  - http://localhost:8081
+  - http://localhost:8081/milestone
   Headers:
     single-value: "single-value"
     multi-value:
@@ -27,14 +48,14 @@ LogStore:
       Enabled: true
 
 Projections:
-  HandleActiveInstances: 60s
+  HandleActiveInstances: 30m
+  RequeueEvery: 5s
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
+    telemetry:
       HandleActiveInstances: 60s
-    Telemetry:
-      RequeueEvery: 5s
-      HandleActiveInstances: 60s
+      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:
@@ -54,3 +75,12 @@ SystemAPIUsers:
 
 InitProjections:
   Enabled: true
+
+# Extend key lifetimes so we do not see more legacy keys when
+# integration tests are rerun on the same DB with more than 6 hours apart.
+# The test counts the amount of keys returned from the JWKS endpoint and fails
+# with 2 or more legacy public keys,
+SystemDefaults:
+  KeyConfig:
+    PrivateKeyLifetime: 7200h
+    PublicKeyLifetime: 14400h

@@ -576,6 +576,11 @@ Errors:
     NotActive: Gebruikersschema niet actief
     NotInactive: Gebruikersschema niet inactief
     NotExists: Gebruikersschema bestaat niet
+    ID:
+      Missing: Недостасува ID на корисничка шема
+    Invalid: Корисничката шема е неважечка
+    Data:
+      Invalid: Податоците не се валидни за корисничка шема
   TokenExchange:
     FeatureDisabled: De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -682,6 +687,13 @@ EventTypes:
         check:
           succeeded: Initialisatiecontrole geslaagd
           failed: Initialisatiecontrole mislukt
+      invite:
+        code:
+          added: Uitnodigingscode gegenereerd
+          sent: Uitnodigingscode verzonden
+        check:
+          succeeded: Uitnodigingscontrole geslaagd
+          failed: Uitnodigingscontrole mislukt
       username:
         reserved: Gebruikersnaam gereserveerd
         released: Gebruikersnaam vrijgegeven
@@ -1314,6 +1326,26 @@ EventTypes:
     deactivated: Gebruikersschema gedeactiveerd
     reactivated: Gebruikersschema opnieuw geactiveerd
     deleted: Gebruikersschema verwijderd
+    user:
+      created: Gebruiker aangemaakt
+      updated: Gebruiker bijgewerkt
+      deleted: Gebruiker verwijderd
+      email:
+        updated: E-mailadres gewijzigd
+        verified: E-mailadres geverifieerd
+        verification:
+          failed: E-mailadres verificatie mislukt
+        code:
+          added: E-mailadres verificatiecode gegenereerd
+          sent: E-mailadres verificatiecode verzonden
+      phone:
+        updated: Telefoonnummer gewijzigd
+        verified: Telefoonnummer geverifieerd
+        verification:
+          failed: Telefoonnummer verificatie mislukt
+        code:
+          added: Telefoonnummer verificatiecode gegenereerd
+          sent: Telefoonnummer verificatiecode verzonden
   web_key:
     added: Web Key toegevoegd
     activated: Web Key geactiveerd

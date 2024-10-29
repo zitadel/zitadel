@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -79,7 +81,9 @@ type UpdatedEvent struct {
 	SchemaType             *string                    `json:"schemaType,omitempty"`
 	Schema                 json.RawMessage            `json:"schema,omitempty"`
 	PossibleAuthenticators []domain.AuthenticatorType `json:"possibleAuthenticators,omitempty"`
+	SchemaRevision         *uint64                    `json:"schemaRevision,omitempty"`
 	oldSchemaType          string
+	oldRevision            uint64
 }
 
 func (e *UpdatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -136,6 +140,13 @@ func ChangeSchema(schema json.RawMessage) func(event *UpdatedEvent) {
 func ChangePossibleAuthenticators(possibleAuthenticators []domain.AuthenticatorType) func(event *UpdatedEvent) {
 	return func(e *UpdatedEvent) {
 		e.PossibleAuthenticators = possibleAuthenticators
+	}
+}
+
+func IncreaseRevision(oldRevision uint64) func(event *UpdatedEvent) {
+	return func(e *UpdatedEvent) {
+		e.SchemaRevision = gu.Ptr(oldRevision + 1)
+		e.oldRevision = oldRevision
 	}
 }
 

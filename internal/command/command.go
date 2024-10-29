@@ -18,12 +18,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -64,6 +66,7 @@ type Commands struct {
 	defaultAccessTokenLifetime      time.Duration
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
+	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -86,10 +89,17 @@ type Commands struct {
 	EventGroupExisting     func(group string) bool
 
 	GenerateDomain func(instanceName, domain string) (string, error)
+
+	caches *Caches
+	// Store instance IDs where all milestones are reached (except InstanceDeleted).
+	// These instance's milestones never need to be invalidated,
+	// so the query and cache overhead can completely eliminated.
+	milestonesCompleted sync.Map
 }
 
 func StartCommands(
 	es *eventstore.Eventstore,
+	cachesConfig *cache.CachesConfig,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
@@ -120,6 +130,10 @@ func StartCommands(
 	userPasswordHasher, err := defaults.PasswordHasher.NewHasher()
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
+	}
+	caches, err := startCaches(context.TODO(), cachesConfig, es.Client())
+	if err != nil {
+		return nil, fmt.Errorf("caches: %w", err)
 	}
 	repo = &Commands{
 		eventstore:                      es,
@@ -174,11 +188,13 @@ func StartCommands(
 			},
 		},
 		GenerateDomain: domain.NewGeneratedInstanceDomain,
+		caches:         caches,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
 		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
+	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	return repo, nil
 }
 
@@ -189,11 +205,28 @@ type AppendReducer interface {
 }
 
 func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
+	if len(cmds) == 0 {
+		return nil
+	}
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return err
 	}
 	return AppendAndReduce(object, events...)
+}
+
+type AppendReducerDetails interface {
+	AppendEvents(...eventstore.Event)
+	// TODO: Why is it allowed to return an error here?
+	Reduce() error
+	GetWriteModel() *eventstore.WriteModel
+}
+
+func (c *Commands) pushAppendAndReduceDetails(ctx context.Context, object AppendReducerDetails, cmds ...eventstore.Command) (*domain.ObjectDetails, error) {
+	if err := c.pushAppendAndReduce(ctx, object, cmds...); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(object.GetWriteModel()), nil
 }
 
 func AppendAndReduce(object AppendReducer, events ...eventstore.Event) error {

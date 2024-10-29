@@ -197,7 +197,8 @@
           "VE": "Když uživatel změní svou e-mailovou adresu, obdrží e-mail s odkazem na ověření nové adresy.",
           "VP": "Když uživatel změní své telefonní číslo, obdrží SMS s kódem pro ověření nového čísla.",
           "VEO": "Když uživatel přidá metodu jednorázového hesla přes e-mail, musí ji aktivovat zadáním kódu poslaného na jeho e-mailovou adresu.",
-          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo."
+          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo.",
+          "IU": "Když se vytvoří pozvánka pro uživatele, obdrží e-mail s odkazem na nastavení své metody ověřování."
         }
       },
       "LOGIN_TEXTS": {
@@ -1381,7 +1382,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1418,6 +1421,8 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Číslo odesílatele",
+        "VERIFYSERVICESID": "ID služby ověření",
+        "VERIFYSERVICESID_DESCRIPTION": "Nastavení ID služby ověření umožňuje použití služby Twilio Verify místo služby Zprávy pro ověření telefonních čísel a SMS OTP.",
         "ADDED": "Twilio bylo úspěšně přidáno.",
         "UPDATED": "Twilio bylo úspěšně aktualizováno.",
         "REMOVED": "Twilio bylo odebráno",
@@ -1468,6 +1473,8 @@
       "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce.",
       "ACTIONS": "Akce",
       "ACTIONS_DESCRIPTION": "Akce v2 umožňují správu datových provedení a cílů. Pokud je tento příznak povolen, budete moci používat nové API a jeho funkce.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 ukončení relace",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Pokud je příznak aktivován, budete moci ukončit jedinou relaci z rozhraní pro přihlášení zadáním id_token s nárokem `sid` jako id_token_hint na koncovém bodu end_session. Poznamenejte si, že v současné době jsou v rozhraní pro přihlášení ukončeny všechny relace ze stejného uživatelského agenta (prohlížeče). Relace spravované prostřednictvím rozhraní API relace již umožňují ukončení jednotlivých relací.",
       "STATES": {
         "INHERITED": "Děděno",
         "ENABLED": "Povoleno",
@@ -1613,7 +1620,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -1628,7 +1636,6 @@
         "initPasswordText": "Inicializace hesla",
         "initializeDoneText": "Inicializace uživatele dokončena",
         "initializeUserText": "Inicializace uživatele",
-        "linkingUserPromptText": "Uživatelský propojovací text",
         "linkingUserDoneText": "Propojení uživatele dokončeno",
         "loginText": "Přihlášení",
         "logoutText": "Odhlášení",
@@ -1664,7 +1671,8 @@
         "PR": "Reset hesla",
         "DC": "Nárok na doménu",
         "PL": "Bezheslový",
-        "PC": "Změna hesla"
+        "PC": "Změna hesla",
+        "IU": "Pozvat uživatele"
       },
       "CHIPS": {
         "firstname": "Křestní jméno",
@@ -1684,7 +1692,8 @@
         "tempUsername": "Dočasné uživatelské jméno",
         "otp": "Jednorázové heslo",
         "verifyUrl": "Ověřovací URL jednorázového hesla",
-        "expiry": "Expirace"
+        "expiry": "Expirace",
+        "applicationName": "Název aplikace"
       },
       "TOAST": {
         "UPDATED": "Vlastní texty uloženy."
@@ -2562,7 +2571,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

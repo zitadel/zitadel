@@ -14,8 +14,9 @@ func testEvent(
 	eventType eventstore.EventType,
 	aggregateType eventstore.AggregateType,
 	data []byte,
+	opts ...eventOption,
 ) *repository.Event {
-	return timedTestEvent(eventType, aggregateType, data, time.Now())
+	return timedTestEvent(eventType, aggregateType, data, time.Now(), opts...)
 }
 
 func toSystemEvent(event *repository.Event) *repository.Event {
@@ -28,8 +29,9 @@ func timedTestEvent(
 	aggregateType eventstore.AggregateType,
 	data []byte,
 	creationDate time.Time,
+	opts ...eventOption,
 ) *repository.Event {
-	return &repository.Event{
+	e := &repository.Event{
 		Seq:           15,
 		CreationDate:  creationDate,
 		Typ:           eventType,
@@ -41,6 +43,18 @@ func timedTestEvent(
 		InstanceID:    "instance-id",
 		ID:            "event-id",
 		EditorUser:    "editor-user",
+	}
+	for _, opt := range opts {
+		opt(e)
+	}
+	return e
+}
+
+type eventOption func(e *repository.Event)
+
+func withVersion(v eventstore.Version) eventOption {
+	return func(e *repository.Event) {
+		e.Version = v
 	}
 }
 
@@ -74,8 +88,8 @@ func assertReduce(t *testing.T, stmt *handler.Statement, err error, projection s
 	if want.err != nil && want.err(err) {
 		return
 	}
-	if stmt.AggregateType != want.aggregateType {
-		t.Errorf("wrong aggregate type: want: %q got: %q", want.aggregateType, stmt.AggregateType)
+	if stmt.Aggregate.Type != want.aggregateType {
+		t.Errorf("wrong aggregate type: want: %q got: %q", want.aggregateType, stmt.Aggregate.Type)
 	}
 
 	if stmt.Sequence != want.sequence {

@@ -53,6 +53,7 @@ Errors:
     NotFound: SMS configuration not found
     AlreadyActive: SMS configuration already active
     AlreadyDeactivated: SMS configuration already deactivated
+    NotExternalVerification: SMS configuration does not support code verification
   SMTP:
     NotEmailMessage: message is not EmailMessage
     RequiredAttributes: subject, recipients and content must be set but some or all of them are empty
@@ -576,6 +577,11 @@ Errors:
     NotActive: User Schema not active
     NotInactive: User Schema not inactive
     NotExists: User Schema does not exist
+    ID:
+      Missing: User Schema ID missing
+    Invalid: User Schema invalid
+    Data:
+      Invalid: Data invalid for User Schema
   TokenExchange:
     FeatureDisabled: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -682,6 +688,13 @@ EventTypes:
         check:
           succeeded: Initialization check succeeded
           failed: Initialization check failed
+      invite:
+        code:
+          added: Invitation code generated
+          sent: Invitation code sent
+        check:
+          succeeded: Invitation check succeeded
+          failed: Invitation check failed
       username:
         reserved: Username reserved
         released: Username released
@@ -925,8 +938,8 @@ EventTypes:
           added: Second factor added to Login Policy
           removed: Second factor removed from Login Policy
         multifactor:
-          added: Multi factor added to Login Policy
-          removed: Multi factor removed from Login Policy
+          added: Multi-factor added to Login Policy
+          removed: Multi-factor removed from Login Policy
       password:
         complexity:
           added: Password complexity policy added
@@ -1319,6 +1332,28 @@ EventTypes:
     deactivated: User Schema deactivated
     reactivated: User Schema reactivated
     deleted: User Schema deleted
+    user:
+      created: User created
+      updated: User updated
+      deleted: User deleted
+      email:
+        updated: Email address changed
+        verified: Email address verified
+        verification:
+          failed: Email address verification failed
+        code:
+          added: Email address verification code generated
+          sent: Email address verification code sent
+      phone:
+        updated: Phone number changed
+        verified: Phone number verified
+        verification:
+          failed: Phone number verification failed
+        code:
+          added: Phone number verification code generated
+          sent: Phone number verification code sent
+
+
   web_key:
     added: Web Key added
     activated: Web Key activated

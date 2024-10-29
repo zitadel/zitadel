@@ -42,7 +42,7 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 
 	token, err := s.verifyAccessToken(ctx, r.Data.AccessToken)
 	if err != nil {
-		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err), http.StatusUnauthorized)
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)
 	}
 
 	var (
@@ -66,7 +66,10 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		false,
 	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
 	if err != nil {
-		return nil, err
+		if !zerrors.IsNotFound(err) {
+			return nil, err
+		}
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("no active user").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)
 	}
 	return op.NewResponse(userInfo), nil
 }
@@ -163,11 +166,11 @@ func prepareRoles(ctx context.Context, scope []string, projectID string, project
 }
 
 func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
-	out := new(oidc.UserInfo)
+	out := &oidc.UserInfo{
+		Subject: user.User.ID,
+	}
 	for _, s := range scope {
 		switch s {
-		case oidc.ScopeOpenID:
-			out.Subject = user.User.ID
 		case oidc.ScopeEmail:
 			if !userInfoAssertion {
 				continue

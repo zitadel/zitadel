@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -378,7 +377,6 @@ func Test_CallTargets(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			fmt.Println(respBody)
 			assert.Equal(t, tt.res.ret, respBody)
 		})
 	}

@@ -142,8 +142,7 @@ func (s *Server) ListPasskeys(ctx context.Context, req *user.ListPasskeysRequest
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
-	authMethods.RemoveNoPermission(ctx, s.checkPermission)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

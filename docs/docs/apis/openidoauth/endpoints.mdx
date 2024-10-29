@@ -219,10 +219,11 @@ Send your `client_id` and `client_secret` as parameters in the body:
 </TabItem>
 <TabItem value="none">
 
-Send your `code_verifier` for us to recompute the `code_challenge` of the authorization request.
+Send your `client_id` and `code_verifier` for us to recompute the `code_challenge` of the authorization request.
 
 | Parameter     | Description                                                  |
 | ------------- | ------------------------------------------------------------ |
+| client_id     | client_id of the application                                 |
 | code_verifier | code_verifier previously used to generate the code_challenge |
 
 </TabItem>
@@ -664,6 +665,8 @@ No parameters are needed apart from the user agent cookie, but you can provide t
 
 The `post_logout_redirect_uri` will be checked against the previously registered uris of the client provided by the `azp` claim of the `id_token_hint` or the `client_id` parameter.
 If both parameters are provided, they must be equal.
+
+If neither an `id_token_hint` nor a `client_id` parameter is provided, the `post_logout_redirect_uri` will be ignored.
 
 ## jwks_uri
 

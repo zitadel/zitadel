@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"strings"
+	"time"
 
 	"golang.org/x/text/language"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -284,6 +286,9 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 		}
 		return append(cmds, user.NewHumanInitialCodeAddedEvent(ctx, &a.Aggregate, initCode.Crypted, initCode.Expiry, human.AuthRequestID)), nil
 	}
+	if human.Email.NoEmailVerification {
+		return cmds, nil
+	}
 	if !human.Email.Verified {
 		emailCode, err := c.newEmailCode(ctx, filter, codeAlg)
 		if err != nil {
@@ -312,14 +317,14 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 	if human.Phone.Verified {
 		return append(cmds, user.NewHumanPhoneVerifiedEvent(ctx, &a.Aggregate)), nil
 	}
-	phoneCode, err := c.newPhoneCode(ctx, filter, codeAlg)
+	phoneCode, generatorID, err := c.newPhoneCode(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, codeAlg, c.defaultSecretGenerators.PhoneVerificationCode)
 	if err != nil {
 		return nil, err
 	}
 	if human.Phone.ReturnCode {
 		human.PhoneCode = &phoneCode.Plain
 	}
-	return append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry, human.Phone.ReturnCode)), nil
+	return append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &a.Aggregate, phoneCode.CryptedCode(), phoneCode.CodeExpiry(), human.Phone.ReturnCode, generatorID)), nil
 }
 
 // Deprecated: use commands.NewUserHumanWriteModel, to remove deprecated eventstore.Filter
@@ -558,11 +563,11 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
-		phoneCode, err := domain.NewPhoneCode(phoneCodeGenerator)
+		phoneCode, generatorID, err := c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode, c.userEncryption, c.defaultSecretGenerators.PhoneVerificationCode) //nolint:staticcheck
 		if err != nil {
 			return nil, nil, err
 		}
-		events = append(events, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.Code, phoneCode.Expiry))
+		events = append(events, user.NewHumanPhoneCodeAddedEvent(ctx, userAgg, phoneCode.CryptedCode(), phoneCode.CodeExpiry(), generatorID))
 	} else if human.Phone != nil && human.PhoneNumber != "" && human.IsPhoneVerified {
 		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 	}
@@ -729,4 +734,36 @@ func AddHumanFromDomain(user *domain.Human, metadataList []*domain.Metadata, aut
 		human.Username = string(human.Email.Address)
 	}
 	return human
+}
+
+func verifyCode(
+	ctx context.Context,
+	codeCreationDate time.Time,
+	codeExpiry time.Duration,
+	encryptedCode *crypto.CryptoValue,
+	codeProviderID string,
+	codeVerificationID string,
+	code string,
+	codeAlg crypto.EncryptionAlgorithm,
+	getCodeVerifier func(ctx context.Context, id string) (_ senders.CodeGenerator, err error),
+) (err error) {
+	if codeProviderID == "" {
+		if encryptedCode == nil {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
+		}
+		_, spanCrypto := tracing.NewNamedSpan(ctx, "crypto.VerifyCode")
+		defer func() {
+			spanCrypto.EndWithError(err)
+		}()
+		return crypto.VerifyCode(codeCreationDate, codeExpiry, encryptedCode, code, codeAlg)
+	}
+	if getCodeVerifier == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-M0g95", "Errors.User.Code.NotConfigured")
+	}
+	verifier, err := getCodeVerifier(ctx, codeProviderID)
+	if err != nil {
+		return err
+	}
+
+	return verifier.VerifyCode(codeVerificationID, code)
 }

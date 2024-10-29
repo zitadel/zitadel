@@ -50,6 +50,7 @@ func (c *Commands) ApproveDeviceAuth(
 	authTime time.Time,
 	preferredLanguage *language.Tag,
 	userAgent *domain.UserAgent,
+	sessionID string,
 ) (*domain.ObjectDetails, error) {
 	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
 	if err != nil {
@@ -58,7 +59,7 @@ func (c *Commands) ApproveDeviceAuth(
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime, preferredLanguage, userAgent))
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime, preferredLanguage, userAgent, sessionID))
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +144,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 		return nil, DeviceAuthStateError(deviceAuthModel.State)
 	}
 
-	cmd, err := c.newOIDCSessionAddEvents(ctx, deviceAuthModel.UserOrgID)
+	cmd, err := c.newOIDCSessionAddEvents(ctx, deviceAuthModel.UserID, deviceAuthModel.UserOrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +152,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 	cmd.AddSession(ctx,
 		deviceAuthModel.UserID,
 		deviceAuthModel.UserOrgID,
-		"",
+		deviceAuthModel.SessionID,
 		deviceAuthModel.ClientID,
 		deviceAuthModel.Audience,
 		deviceAuthModel.Scopes,

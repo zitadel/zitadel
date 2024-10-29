@@ -35,7 +35,7 @@ VerifyEmailOTP:
   ButtonText: Authenticate
 VerifySMSOTP:
   Text: >-
-    {{.OTP}} is your one-time-password for {{ .Domain }}. Use it within the next {{.Expiry}}.
+    {{.OTP}} is your one-time password for {{ .Domain }}. Use it within the next {{.Expiry}}.
     
     @{{.Domain}} #{{.OTP}}
 DomainClaimed:
@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Hello {{.DisplayName}},
   Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
   ButtonText: Login
+InviteUser:
+  Title: Invitation to {{.ApplicationName}}
+  PreHeader: Invitation to {{.ApplicationName}}
+  Subject: Invitation to {{.ApplicationName}}
+  Greeting: Hello {{.DisplayName}},
+  Text: Your user has been invited to {{.ApplicationName}}. Please click the button below to finish the invite process. If you didn't ask for this mail, please ignore it.
+  ButtonText: Accept invite

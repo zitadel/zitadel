@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"slices"
 	"strings"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -218,11 +220,11 @@ func removeScopeWithPrefix(scopes []string, scopePrefix ...string) []string {
 	return newScopeList
 }
 
-func clientIDFromCredentials(cc *op.ClientCredentials) (clientID string, assertion bool, err error) {
+func clientIDFromCredentials(ctx context.Context, cc *op.ClientCredentials) (clientID string, assertion bool, err error) {
 	if cc.ClientAssertion != "" {
 		claims := new(oidc.JWTTokenRequest)
 		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
-			return "", false, oidc.ErrInvalidClient().WithParent(err)
+			return "", false, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 		}
 		return claims.Issuer, true, nil
 	}

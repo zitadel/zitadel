@@ -85,6 +85,15 @@ InitUserDone:
   NextButtonText: далее
   CancelButtonText: отмена
 
+InviteUser:
+  Title: Активировать пользователя
+  Description: Проверьте свой адрес электронной почты с помощью кода ниже и установите свой пароль.
+  CodeLabel: Код
+  NewPasswordLabel: Новый пароль
+  NewPasswordConfirm: Подтвердить пароль
+  NextButtonText: Далее
+  ResendButtonText: Отправить код повторно
+
 InitMFAPrompt:
   Title: Установка двухфакторной аутентификации
   Description: Двухфакторная аутентификация обеспечивает дополнительную защиту вашей учётной записи.
@@ -252,6 +261,8 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Пол
   Female: Женский
   Male: Мужской
@@ -292,6 +303,8 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Условия использования
   TosConfirm: Я согласен с
   TosLinkText: Пользовательским соглашением
@@ -366,6 +379,8 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   
 DeviceAuth:
   Title: Авторизация устройства

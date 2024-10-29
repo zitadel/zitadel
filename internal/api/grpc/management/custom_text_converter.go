@@ -122,6 +122,21 @@ func SetPasswordChangeCustomTextToDomain(msg *mgmt_pb.SetCustomPasswordChangeMes
 	}
 }
 
+func SetInviteUserCustomTextToDomain(msg *mgmt_pb.SetCustomInviteUserMessageTextRequest) *domain.CustomMessageText {
+	langTag := language.Make(msg.Language)
+	return &domain.CustomMessageText{
+		MessageTextType: domain.InviteUserMessageType,
+		Language:        langTag,
+		Title:           msg.Title,
+		PreHeader:       msg.PreHeader,
+		Subject:         msg.Subject,
+		Greeting:        msg.Greeting,
+		Text:            msg.Text,
+		ButtonText:      msg.ButtonText,
+		FooterText:      msg.FooterText,
+	}
+}
+
 func SetPasswordlessRegistrationCustomTextToDomain(msg *mgmt_pb.SetCustomPasswordlessRegistrationMessageTextRequest) *domain.CustomMessageText {
 	langTag := language.Make(msg.Language)
 	return &domain.CustomMessageText{
@@ -171,7 +186,6 @@ func SetLoginCustomTextToDomain(req *mgmt_pb.SetCustomLoginTextsRequest) *domain
 	result.RegistrationUser = text.RegistrationUserScreenTextPbToDomain(req.RegistrationUserText)
 	result.ExternalRegistrationUserOverview = text.ExternalRegistrationUserOverviewScreenTextPbToDomain(req.ExternalRegistrationUserOverviewText)
 	result.RegistrationOrg = text.RegistrationOrgScreenTextPbToDomain(req.RegistrationOrgText)
-	result.LinkingUserPrompt = text.LinkingUserPromptScreenTextPbToDomain(req.LinkingUserPromptText)
 	result.LinkingUsersDone = text.LinkingUserDoneScreenTextPbToDomain(req.LinkingUserDoneText)
 	result.ExternalNotFound = text.ExternalUserNotFoundScreenTextPbToDomain(req.ExternalUserNotFoundText)
 	result.LoginSuccess = text.SuccessLoginScreenTextPbToDomain(req.SuccessLoginText)

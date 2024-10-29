@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -105,6 +106,10 @@ func (u *userNotifier) Reducers() []handler.AggregateReducer {
 				{
 					Event:  user.HumanOTPEmailCodeAddedType,
 					Reduce: u.reduceOTPEmailCodeAdded,
+				},
+				{
+					Event:  user.HumanInviteCodeAddedType,
+					Reduce: u.reduceInviteCodeAdded,
 				},
 			},
 		},
@@ -254,9 +259,12 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if alreadyHandled {
 			return nil
 		}
-		code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
-		if err != nil {
-			return err
+		var code string
+		if e.Code != nil {
+			code, err = crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+			if err != nil {
+				return err
+			}
 		}
 		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 		if err != nil {
@@ -281,15 +289,16 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if err != nil {
 			return err
 		}
+		generatorInfo := new(senders.CodeGeneratorInfo)
 		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
 		if e.NotificationType == domain.NotificationTypeSms {
-			notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
+			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo)
 		}
 		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
-		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
 	}), nil
 }
 
@@ -341,7 +350,7 @@ func (u *userNotifier) reduceOTPSMS(
 	expiry time.Duration,
 	userID,
 	resourceOwner string,
-	sentCommand func(ctx context.Context, userID string, resourceOwner string) (err error),
+	sentCommand func(ctx context.Context, userID, resourceOwner string, generatorInfo *senders.CodeGeneratorInfo) (err error),
 	eventTypes ...eventstore.EventType,
 ) (*handler.Statement, error) {
 	ctx := HandlerContext(event.Aggregate())
@@ -352,9 +361,12 @@ func (u *userNotifier) reduceOTPSMS(
 	if alreadyHandled {
 		return handler.NewNoOpStatement(event), nil
 	}
-	plainCode, err := crypto.DecryptString(code, u.queries.UserDataCrypto)
-	if err != nil {
-		return nil, err
+	var plainCode string
+	if code != nil {
+		plainCode, err = crypto.DecryptString(code, u.queries.UserDataCrypto)
+		if err != nil {
+			return nil, err
+		}
 	}
 	colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, resourceOwner, false)
 	if err != nil {
@@ -373,12 +385,13 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, event)
+	generatorInfo := new(senders.CodeGeneratorInfo)
+	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event, generatorInfo)
 	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
 	if err != nil {
 		return nil, err
 	}
-	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner)
+	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner, generatorInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -429,7 +442,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if e.URLTmpl != "" {
 			urlTmpl = e.URLTmpl
 		}
-		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, code, user.ID, user.PreferredLoginName, user.DisplayName, user.PreferredLanguage); err != nil {
+		if err := domain.RenderOTPEmailURLTemplate(&buf, urlTmpl, code, user.ID, user.PreferredLoginName, user.DisplayName, e.Aggregate().ID, user.PreferredLanguage); err != nil {
 			return "", err
 		}
 		return buf.String(), nil
@@ -687,9 +700,12 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if alreadyHandled {
 			return nil
 		}
-		code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
-		if err != nil {
-			return err
+		var code string
+		if e.Code != nil {
+			code, err = crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+			if err != nil {
+				return err
+			}
 		}
 		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
 		if err != nil {
@@ -709,17 +725,72 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if err != nil {
 			return err
 		}
-		err = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e).
-			SendPhoneVerificationCode(ctx, code)
+		generatorInfo := new(senders.CodeGeneratorInfo)
+		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo).
+			SendPhoneVerificationCode(ctx, code); err != nil {
+			return err
+		}
+		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
+	}), nil
+}
+
+func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanInviteCodeAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Eeg3s", "reduce.wrong.event.type %s", user.HumanInviteCodeAddedType)
+	}
+	if e.CodeReturned {
+		return handler.NewNoOpStatement(e), nil
+	}
+
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		ctx := HandlerContext(event.Aggregate())
+		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
+			user.HumanInviteCodeAddedType, user.HumanInviteCodeSentType)
 		if err != nil {
 			return err
 		}
-		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+		if alreadyHandled {
+			return nil
+		}
+		code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+		if err != nil {
+			return err
+		}
+		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
+		template, err := u.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+		if err != nil {
+			return err
+		}
+		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.InviteUserMessageType)
+		if err != nil {
+			return err
+		}
+
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+		err = notify.SendInviteCode(ctx, notifyUser, code, e.ApplicationName, e.URLTemplate, e.AuthRequestID)
+		if err != nil {
+			return err
+		}
+		return u.commands.InviteCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
 	}), nil
 }
 
 func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, event eventstore.Event, expiry time.Duration, data map[string]interface{}, eventTypes ...eventstore.EventType) (bool, error) {
-	if event.CreatedAt().Add(expiry).Before(time.Now().UTC()) {
+	if expiry > 0 && event.CreatedAt().Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
 	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)

@@ -576,6 +576,11 @@ Errors:
     NotActive: Schéma utilisateur non actif
     NotInactive: Le schéma utilisateur n'est pas inactif
     NotExists: Le schéma utilisateur n'existe pas
+    ID:
+      Missing: ID de schéma utilisateur manquant
+    Invalid: Schéma utilisateur non valide
+    Data:
+      Invalid: Données non valides pour le schéma utilisateur
   TokenExchange:
     FeatureDisabled: La fonctionnalité Token Exchange est désactivée pour votre instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -680,6 +685,13 @@ EventTypes:
         check:
           succeeded: Vérification de l'initialisation réussie
           failed: La vérification de l'initialisation a échoué
+      invite:
+        code:
+          added: Code d'invitation généré
+          sent: Code d'invitation envoyé
+        check:
+          succeeded: Vérification de l'invitation réussie
+          failed: Vérification de l'invitation échouée
       username:
         reserved: Nom d'utilisateur réservé
         released: Nom d'utilisateur libéré
@@ -1314,6 +1326,26 @@ EventTypes:
     deactivated: Schéma utilisateur désactivé
     reactivated: Schéma utilisateur réactivé
     deleted: Schéma utilisateur supprimé
+    user:
+      created: Utilisateur créé
+      updated: Utilisateur mis à jour
+      deleted: Utilisateur supprimé
+      email:
+        updated:  Adresse e-mail modifiée
+        verified: Adresse e-mail vérifiée
+        verification:
+          failed: Échec de la vérification de l'adresse e-mail
+        code:
+          added: Code de vérification de l'adresse e-mail généré
+          sent: Code de vérification de l'adresse e-mail envoyé
+      phone:
+        updated: Numéro de téléphone modifié
+        verified: Numéro de téléphone vérifié
+        verification:
+          failed: Échec de la vérification du numéro de téléphone
+        code:
+          added: Code de vérification du numéro de téléphone généré
+          sent: Code de vérification du numéro de téléphone envoyé
   web_key:
     added: Clé Web ajoutée
     activated: Clé Web activée

@@ -72,6 +72,7 @@ type ApprovedEvent struct {
 	AuthTime          time.Time
 	PreferredLanguage *language.Tag
 	UserAgent         *domain.UserAgent
+	SessionID         string
 }
 
 func (e *ApprovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -95,17 +96,19 @@ func NewApprovedEvent(
 	authTime time.Time,
 	preferredLanguage *language.Tag,
 	userAgent *domain.UserAgent,
+	sessionID string,
 ) *ApprovedEvent {
 	return &ApprovedEvent{
-		eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx, aggregate, ApprovedEventType,
 		),
-		userID,
-		userOrgID,
-		userAuthMethods,
-		authTime,
-		preferredLanguage,
-		userAgent,
+		UserID:            userID,
+		UserOrgID:         userOrgID,
+		UserAuthMethods:   userAuthMethods,
+		AuthTime:          authTime,
+		PreferredLanguage: preferredLanguage,
+		UserAgent:         userAgent,
+		SessionID:         sessionID,
 	}
 }
 

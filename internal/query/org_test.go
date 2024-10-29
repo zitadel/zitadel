@@ -439,11 +439,10 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 				t.Errorf("expectation was met: %v", err)
 			}
 		})
-
 	}
 }
 
-func TestOrg_RemoveNoPermission(t *testing.T) {
+func TestOrg_orgsCheckPermission(t *testing.T) {
 	type want struct {
 		orgs []*Org
 	}

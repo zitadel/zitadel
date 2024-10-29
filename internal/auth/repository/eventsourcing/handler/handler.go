@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/id"
 	query2 "github.com/zitadel/zitadel/internal/query"
 )
 
@@ -40,6 +41,7 @@ func Register(ctx context.Context, configs Config, view *view.View, queries *que
 		configs.overwrite("UserSession"),
 		view,
 		queries,
+		id.SonyFlakeGenerator(),
 	))
 
 	projections = append(projections, newToken(ctx,

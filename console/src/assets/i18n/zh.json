@@ -197,7 +197,8 @@
           "VE": "当用户更改其电子邮件地址时，他们将收到一封带有验证新地址链接的电子邮件。",
           "VP": "当用户更改其电话号码时，他们将收到一条带有验证新号码的代码的短信。",
           "VEO": "当用户通过电子邮件方式添加一次性密码时，他们需要通过输入发送到其电子邮件地址的代码来激活它。",
-          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。"
+          "VSO": "当用户通过短信方式添加一次性密码时，他们需要通过输入发送到其电话号码的代码来激活它。",
+          "IU": "当创建用户邀请代码时，他们将收到一封包含设置其身份验证方法的链接的电子邮件。"
         }
       },
       "LOGIN_TEXTS": {
@@ -1381,7 +1382,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1418,6 +1421,8 @@
         "SID": "Sid",
         "TOKEN": "令牌",
         "SENDERNUMBER": "发件人号码",
+        "VERIFYSERVICESID": "验证服务 SID",
+        "VERIFYSERVICESID_DESCRIPTION": "设置验证服务 SID，允许使用 Twilio 验证服务而不是消息服务来验证电话号码和 OTP SMS。",
         "ADDED": "Twilio 添加成功。",
         "UPDATED": "Twilio 更新成功。",
         "REMOVED": "Twilio 已删除",
@@ -1468,6 +1473,8 @@
       "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
       "ACTIONS": "操作",
       "ACTIONS_DESCRIPTION": "Actions v2 可以管理数据执行和目标。如果启用此标志，您将可以使用新的 API 及其功能。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 终止会话",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "STATES": {
         "INHERITED": "继承",
         "ENABLED": "已启用",
@@ -1612,7 +1619,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1627,7 +1635,6 @@
         "initPasswordText": "初始化密码",
         "initializeDoneText": "初始化用户完成",
         "initializeUserText": "初始化用户",
-        "linkingUserPromptText": "用户链接提示",
         "linkingUserDoneText": "链接用户完成",
         "loginText": "登录",
         "logoutText": "登出",
@@ -1663,7 +1670,8 @@
         "PR": "重置密码",
         "DC": "域名声明",
         "PL": "无密码身份验证",
-        "PC": "修改密码"
+        "PC": "修改密码",
+        "IU": "邀请用户"
       },
       "CHIPS": {
         "firstname": "名",
@@ -1683,7 +1691,8 @@
         "tempUsername": "临时用户名",
         "otp": "一次性密码",
         "verifyUrl": "验证一次性密码的URL",
-        "expiry": "过期时间"
+        "expiry": "过期时间",
+        "applicationName": "应用程序名称"
       },
       "TOAST": {
         "UPDATED": "自定义文本已保存。"
@@ -2553,7 +2562,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "添加管理者",

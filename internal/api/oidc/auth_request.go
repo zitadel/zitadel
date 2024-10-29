@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -245,9 +246,18 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	}
 
 	// If there is no login client header and no id_token_hint or the id_token_hint does not have a session ID,
-	// do a v1 Terminate session.
+	// do a v1 Terminate session (which terminates all sessions of the user agent, identified by cookie).
 	if endSessionRequest.IDTokenHintClaims == nil || endSessionRequest.IDTokenHintClaims.SessionID == "" {
 		return endSessionRequest.RedirectURI, o.TerminateSession(ctx, endSessionRequest.UserID, endSessionRequest.ClientID)
+	}
+
+	// If the sessionID is prefixed by V1, we also terminate a v1 session.
+	if strings.HasPrefix(endSessionRequest.IDTokenHintClaims.SessionID, handler.IDPrefixV1) {
+		err = o.terminateV1Session(ctx, endSessionRequest.UserID, endSessionRequest.IDTokenHintClaims.SessionID)
+		if err != nil {
+			return "", err
+		}
+		return endSessionRequest.RedirectURI, nil
 	}
 
 	// terminate the v2 session of the id_token_hint
@@ -256,6 +266,30 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		return "", err
 	}
 	return endSessionRequest.RedirectURI, nil
+}
+
+// terminateV1Session terminates "v1" sessions created through the login UI.
+// Depending on the flag, we either terminate a single session or all of the user agent
+func (o *OPStorage) terminateV1Session(ctx context.Context, userID, sessionID string) error {
+	ctx = authz.SetCtxData(ctx, authz.CtxData{UserID: userID})
+	// if the flag is active we only terminate the specific session
+	if authz.GetFeatures(ctx).OIDCSingleV1SessionTermination {
+		userAgentID, err := o.repo.UserAgentIDBySessionID(ctx, sessionID)
+		if err != nil {
+			return err
+		}
+		return o.command.HumansSignOut(ctx, userAgentID, []string{userID})
+	}
+	// otherwise we search for all active sessions within the same user agent of the current session id
+	userAgentID, userIDs, err := o.repo.ActiveUserIDsBySessionID(ctx, sessionID)
+	if err != nil {
+		logging.WithError(err).Error("error retrieving user sessions")
+		return err
+	}
+	if len(userIDs) == 0 {
+		return nil
+	}
+	return o.command.HumansSignOut(ctx, userAgentID, userIDs)
 }
 
 func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) (err *oidc.Error) {
@@ -277,7 +311,7 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 		if zerrors.IsPreconditionFailed(err) {
 			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 		}
-		return oidc.ErrServerError().WithParent(err)
+		return oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
 
 	return o.revokeTokenV1(ctx, token, userID, clientID)
@@ -293,14 +327,14 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 		if err == nil || zerrors.IsNotFound(err) {
 			return nil
 		}
-		return oidc.ErrServerError().WithParent(err)
+		return oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
 	accessToken, err := o.repo.TokenByIDs(ctx, userID, token)
 	if err != nil {
 		if zerrors.IsNotFound(err) {
 			return nil
 		}
-		return oidc.ErrServerError().WithParent(err)
+		return oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
 	if accessToken.ApplicationID != clientID {
 		return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
@@ -309,7 +343,7 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 	if err == nil || zerrors.IsNotFound(err) {
 		return nil
 	}
-	return oidc.ErrServerError().WithParent(err)
+	return oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 }
 
 func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
@@ -564,6 +598,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		domain.TokenReasonAuthRequest,
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
+		authReq.SessionID,
 	)
 	if err != nil {
 		op.AuthRequestError(w, r, authReq, err, authorizer)

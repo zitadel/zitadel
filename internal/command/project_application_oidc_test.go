@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/passwap"
 	"github.com/zitadel/passwap/bcrypt"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -418,7 +419,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp:       &domain.OIDCApp{},
 				resourceOwner: "org1",
 			},
@@ -434,7 +435,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp: &domain.OIDCApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -463,7 +464,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp: &domain.OIDCApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -521,7 +522,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp: &domain.OIDCApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -619,7 +620,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp: &domain.OIDCApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -676,7 +677,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				idGenerator:     tt.fields.idGenerator,
 				newHashedSecret: mockHashedSecret("secret"),
@@ -684,7 +685,8 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					ClientSecret: emptyConfig,
 				},
 			}
-			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
+			c.setMilestonesCompletedForTest("instanceID")
+			got, err := c.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1363,9 +1365,6 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 						),
 					),
 				),
-				expectPush(
-					project.NewOIDCConfigSecretCheckSucceededEvent(context.Background(), &agg.Aggregate, "appID"),
-				),
 			),
 		},
 		{
@@ -1399,9 +1398,6 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 							false,
 						),
 					),
-				),
-				expectPush(
-					project.NewOIDCConfigSecretCheckFailedEvent(context.Background(), &agg.Aggregate, "appID"),
 				),
 			),
 			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid"),

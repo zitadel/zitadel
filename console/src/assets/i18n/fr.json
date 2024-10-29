@@ -197,7 +197,8 @@
           "VE": "Lorsqu'un utilisateur change son adresse e-mail, il recevra un e-mail avec un lien pour vérifier la nouvelle adresse.",
           "VP": "Lorsqu'un utilisateur change son numéro de téléphone, il recevra un SMS avec un code pour vérifier le nouveau numéro.",
           "VEO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via e-mail, il doit l'activer en entrant un code envoyé à son adresse e-mail.",
-          "VSO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone."
+          "VSO": "Lorsqu'un utilisateur ajoute un Mot de Passe à Usage Unique via SMS, il doit l'activer en entrant un code envoyé à son numéro de téléphone.",
+          "IU": "Lorsqu'un code d'invitation d'utilisateur est créé, il recevra un e-mail avec un lien pour configurer sa méthode d'authentification."
         }
       },
       "LOGIN_TEXTS": {
@@ -1381,7 +1382,9 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
       }
     },
     "SMTP": {
@@ -1418,6 +1421,8 @@
         "SID": "Sid",
         "TOKEN": "Jeton",
         "SENDERNUMBER": "Numéro d'expéditeur",
+        "VERIFYSERVICESID": "SID du service de vérification",
+        "VERIFYSERVICESID_DESCRIPTION": "Le réglage d'un SID du service de vérification permet d'utiliser le service Twilio Verify au lieu du service de messagerie pour la vérification des numéros de téléphone et des SMS OTP.",
         "ADDED": "Twilio a été ajouté avec succès.",
         "UPDATED": "Twilio a été mis à jour avec succès.",
         "REMOVED": "Twilio a été supprimé avec succès",
@@ -1468,6 +1473,8 @@
       "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "ACTIONS": "Actions",
       "ACTIONS_DESCRIPTION": "Les actions v2 permettent de gérer les exécutions et les cibles de données. Si l'indicateur est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Fin de session",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si l'indicateur est activé, vous pourrez terminer une seule session à partir de l'interface utilisateur de connexion en fournissant un id_token avec une revendication `sid` en tant que id_token_hint sur le point de terminaison end_session. Notez que toutes les sessions du même agent utilisateur (navigateur) sont actuellement terminées dans l'interface utilisateur de connexion. Les sessions gérées via l'API de session permettent déjà la terminaison de sessions individuelles.",
       "STATES": {
         "INHERITED": "Hérité",
         "ENABLED": "Activé",
@@ -1613,7 +1620,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'e-mail effectuée",
@@ -1628,7 +1636,6 @@
         "initPasswordText": "Initialiser le mot de passe",
         "initializeDoneText": "Initialiser l'utilisateur terminé",
         "initializeUserText": "Initialiser l'utilisateur",
-        "linkingUserPromptText": "Message de liaison utilisateur",
         "linkingUserDoneText": "Lier l'utilisateur fait",
         "loginText": "Connexion",
         "logoutText": "Déconnexion",
@@ -1664,7 +1671,8 @@
         "PR": "Réinitialisation du mot de passe",
         "DC": "Réclamation de domaine",
         "PL": "Sans mot de passe",
-        "PC": "Modification du mot de passe"
+        "PC": "Modification du mot de passe",
+        "IU": "Inviter un utilisateur"
       },
       "CHIPS": {
         "firstname": "Prénom",
@@ -1684,7 +1692,8 @@
         "tempUsername": "Nom d'utilisateur temporaire",
         "otp": "Mot de passe à usage unique",
         "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
-        "expiry": "Expiration"
+        "expiry": "Expiration",
+        "applicationName": "Nom de l'application"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."
@@ -2554,7 +2563,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Ajouter un responsable",

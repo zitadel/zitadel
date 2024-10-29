@@ -565,6 +565,11 @@ Errors:
     NotActive: ユーザースキーマがアクティブではありません
     NotInactive: ユーザースキーマが非アクティブではありません
     NotExists: ユーザースキーマが存在しません
+    ID:
+      Missing: ユーザー スキーマ ID がありません
+    Invalid: ユーザー スキーマが無効です
+    Data:
+      Invalid: ユーザー スキーマのデータが無効です
   TokenExchange:
     FeatureDisabled: インスタンスではトークン交換機能が無効になっています。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -671,6 +676,13 @@ EventTypes:
         check:
           succeeded: 初期化チェックの成功
           failed: 初期化チェックの失敗
+      invite:
+        code:
+          added: 招待コードが生成されました
+          sent: 招待コードが送信されました
+        check:
+          succeeded: 招待のチェックが成功しました
+          failed: 招待のチェックが失敗しました
       username:
         reserved: ユーザー名の予約
         released: ユーザー名の解放
@@ -1305,6 +1317,26 @@ EventTypes:
     deactivated: ユーザースキーマが非アクティブ化されました
     reactivated: ユーザースキーマが再アクティブ化されました
     deleted: ユーザースキーマが削除されました
+    user:
+      created: ユーザーが作成されました
+      updated: ユーザーが更新されました
+      deleted: ユーザーが削除されました
+      email:
+        updated: メールアドレスが変更されました
+        verified: メールアドレスが確認されました
+        verification:
+          failed: メールアドレスの確認に失敗しました
+        code:
+          added: メールアドレスの確認コードが生成されました
+          sent: メールアドレスの確認コードが送信されました
+      phone:
+        updated: 電話番号が変更されました
+        verified: 電話番号が確認されました
+        verification:
+          failed: 電話番号の確認に失敗しました
+        code:
+          added: 電話番号の確認コードが生成されました
+          sent: 電話番号の確認コードが送信されました
   web_key:
     added: Web キーが追加されました
     activated: Web キーが有効化されました
