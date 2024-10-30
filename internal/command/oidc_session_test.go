@@ -70,7 +70,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx:             context.Background(),
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
 				authRequestID:   "",
 				complianceCheck: mockAuthRequestComplianceChecker(nil),
 			},
@@ -86,7 +86,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				),
 			},
 			args{
-				ctx:             context.Background(),
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
 				authRequestID:   "V2_authRequestID",
 				complianceCheck: mockAuthRequestComplianceChecker(nil),
 			},
@@ -102,7 +102,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				),
 			},
 			args{
-				ctx:             context.Background(),
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
 				authRequestID:   "V2_authRequestID",
 				complianceCheck: mockAuthRequestComplianceChecker(nil),
 			},
@@ -706,6 +706,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
+			c.setMilestonesCompletedForTest("instanceID")
 			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck, tt.args.needRefreshToken)
 			require.ErrorIs(t, err, tt.res.err)
 
@@ -762,7 +763,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "orgID",
 				clientID:          "clientID",
@@ -818,7 +819,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -892,7 +893,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1089,7 +1090,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1186,7 +1187,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1266,7 +1267,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				}),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1347,7 +1348,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				}),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1406,6 +1407,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 				checkPermission:                 tt.fields.checkPermission,
 			}
+			c.setMilestonesCompletedForTest("instanceID")
 			got, err := c.CreateOIDCSession(tt.args.ctx,
 				tt.args.userID,
 				tt.args.resourceOwner,

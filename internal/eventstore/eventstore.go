@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -247,6 +248,10 @@ func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, for
 	return instances, nil
 }
 
+func (es *Eventstore) Client() *database.DB {
+	return es.querier.Client()
+}
+
 type QueryReducer interface {
 	reducer
 	//Query returns the SearchQueryFactory for the events needed in reducer
@@ -270,6 +275,8 @@ type Querier interface {
 	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error)
 	// InstanceIDs returns the instance ids found by the search query
 	InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error)
+	// Client returns the underlying database connection
+	Client() *database.DB
 }
 
 type Pusher interface {
