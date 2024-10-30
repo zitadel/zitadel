@@ -9,6 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/cache"
 )
@@ -45,13 +46,6 @@ func (o *testObject) Keys(index testIndex) []string {
 	}
 }
 
-func newTestClient(addr string) *redis.Client {
-	return redis.NewClient(&redis.Options{
-		Network: "tcp",
-		Addr:    addr,
-	})
-}
-
 func Test_redisCache_set(t *testing.T) {
 	type args struct {
 		ctx   context.Context
@@ -59,14 +53,14 @@ func Test_redisCache_set(t *testing.T) {
 	}
 	tests := []struct {
 		name       string
-		config     cache.CacheConfig
+		config     cache.Config
 		args       args
 		assertions func(t *testing.T, s *miniredis.Miniredis, objectID string)
 		wantErr    error
 	}{
 		{
 			name:   "ok",
-			config: cache.CacheConfig{},
+			config: cache.Config{},
 			args: args{
 				ctx: context.Background(),
 				value: &testObject{
@@ -84,7 +78,7 @@ func Test_redisCache_set(t *testing.T) {
 		},
 		{
 			name: "with last use TTL",
-			config: cache.CacheConfig{
+			config: cache.Config{
 				LastUseAge: time.Second,
 			},
 			args: args{
@@ -110,7 +104,7 @@ func Test_redisCache_set(t *testing.T) {
 		},
 		{
 			name: "with last use TTL and max age",
-			config: cache.CacheConfig{
+			config: cache.Config{
 				MaxAge:     time.Minute,
 				LastUseAge: time.Second,
 			},
@@ -137,7 +131,7 @@ func Test_redisCache_set(t *testing.T) {
 		},
 		{
 			name: "with max age TTL",
-			config: cache.CacheConfig{
+			config: cache.Config{
 				MaxAge: time.Minute,
 			},
 			args: args{
@@ -164,25 +158,17 @@ func Test_redisCache_set(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := miniredis.RunT(t)
-			defer server.Close()
-			server.Select(testDB)
-			c := NewCache[testIndex, string, *testObject](
-				tt.config,
-				newTestClient(server.Addr()),
-				testDB,
-				testIndices,
-			).(*redisCache[testIndex, string, *testObject])
-			defer c.Close()
-			objectID, err := c.set(tt.args.ctx, tt.args.value)
+			c, server := prepareCache(t, tt.config)
+			rc := c.(*redisCache[testIndex, string, *testObject])
+			objectID, err := rc.set(tt.args.ctx, tt.args.value)
 			require.ErrorIs(t, err, tt.wantErr)
-			t.Log(c.client.HGetAll(context.Background(), objectID))
+			t.Log(rc.connector.HGetAll(context.Background(), objectID))
 			tt.assertions(t, server, objectID)
 		})
 	}
 }
 
-func Test_redisCache_get(t *testing.T) {
+func Test_redisCache_Get(t *testing.T) {
 	type args struct {
 		ctx   context.Context
 		index testIndex
@@ -190,16 +176,16 @@ func Test_redisCache_get(t *testing.T) {
 	}
 	tests := []struct {
 		name        string
-		config      cache.CacheConfig
-		preparation func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis)
+		config      cache.Config
+		preparation func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis)
 		args        args
 		want        *testObject
 		wantOK      bool
 	}{
 		{
 			name:   "connection error",
-			config: cache.CacheConfig{},
-			preparation: func(_ *testing.T, _ *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(_ *testing.T, _ cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				s.RequireAuth("foobar")
 			},
 			args: args{
@@ -211,8 +197,8 @@ func Test_redisCache_get(t *testing.T) {
 		},
 		{
 			name:   "get by ID",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -231,8 +217,8 @@ func Test_redisCache_get(t *testing.T) {
 		},
 		{
 			name:   "get by name",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -251,10 +237,10 @@ func Test_redisCache_get(t *testing.T) {
 		},
 		{
 			name: "usage timeout",
-			config: cache.CacheConfig{
+			config: cache.Config{
 				LastUseAge: time.Minute,
 			},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -273,10 +259,10 @@ func Test_redisCache_get(t *testing.T) {
 		},
 		{
 			name: "max age timeout",
-			config: cache.CacheConfig{
+			config: cache.Config{
 				MaxAge: time.Minute,
 			},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -295,8 +281,8 @@ func Test_redisCache_get(t *testing.T) {
 		},
 		{
 			name:   "not found",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -311,13 +297,13 @@ func Test_redisCache_get(t *testing.T) {
 		},
 		{
 			name:   "json decode error",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
-				objectID, err := s.Get(c.redisIndexKeys(testIndexID, "one")[0])
+				objectID, err := s.Get(c.(*redisCache[testIndex, string, *testObject]).redisIndexKeys(testIndexID, "one")[0])
 				require.NoError(t, err)
 				s.HSet(objectID, "object", "~~~")
 			},
@@ -331,16 +317,7 @@ func Test_redisCache_get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := miniredis.RunT(t)
-			defer server.Close()
-			server.Select(testDB)
-			c := NewCache[testIndex, string, *testObject](
-				tt.config,
-				newTestClient(server.Addr()),
-				testDB,
-				testIndices,
-			).(*redisCache[testIndex, string, *testObject])
-			defer c.Close()
+			c, server := prepareCache(t, tt.config)
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -359,16 +336,16 @@ func Test_redisCache_Invalidate(t *testing.T) {
 	}
 	tests := []struct {
 		name        string
-		config      cache.CacheConfig
-		preparation func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis)
-		assertions  func(t *testing.T, c *redisCache[testIndex, string, *testObject])
+		config      cache.Config
+		preparation func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis)
+		assertions  func(t *testing.T, c cache.Cache[testIndex, string, *testObject])
 		args        args
 		wantErr     bool
 	}{
 		{
 			name:   "connection error",
-			config: cache.CacheConfig{},
-			preparation: func(_ *testing.T, _ *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(_ *testing.T, _ cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				s.RequireAuth("foobar")
 			},
 			args: args{
@@ -380,8 +357,8 @@ func Test_redisCache_Invalidate(t *testing.T) {
 		},
 		{
 			name:   "no keys, noop",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -396,14 +373,14 @@ func Test_redisCache_Invalidate(t *testing.T) {
 		},
 		{
 			name:   "invalidate by ID",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
-			assertions: func(t *testing.T, c *redisCache[testIndex, string, *testObject]) {
+			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -420,14 +397,14 @@ func Test_redisCache_Invalidate(t *testing.T) {
 		},
 		{
 			name:   "invalidate by name",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
-			assertions: func(t *testing.T, c *redisCache[testIndex, string, *testObject]) {
+			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -444,10 +421,10 @@ func Test_redisCache_Invalidate(t *testing.T) {
 		},
 		{
 			name: "invalidate after timeout",
-			config: cache.CacheConfig{
+			config: cache.Config{
 				LastUseAge: time.Minute,
 			},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -456,7 +433,7 @@ func Test_redisCache_Invalidate(t *testing.T) {
 				require.True(t, ok)
 				s.FastForward(2 * time.Minute)
 			},
-			assertions: func(t *testing.T, c *redisCache[testIndex, string, *testObject]) {
+			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -473,14 +450,14 @@ func Test_redisCache_Invalidate(t *testing.T) {
 		},
 		{
 			name:   "not found",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
-			assertions: func(t *testing.T, c *redisCache[testIndex, string, *testObject]) {
+			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.True(t, ok)
 				assert.NotNil(t, obj)
@@ -498,16 +475,7 @@ func Test_redisCache_Invalidate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := miniredis.RunT(t)
-			defer server.Close()
-			server.Select(testDB)
-			c := NewCache[testIndex, string, *testObject](
-				tt.config,
-				newTestClient(server.Addr()),
-				testDB,
-				testIndices,
-			).(*redisCache[testIndex, string, *testObject])
-			defer c.Close()
+			c, server := prepareCache(t, tt.config)
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -529,16 +497,16 @@ func Test_redisCache_Delete(t *testing.T) {
 	}
 	tests := []struct {
 		name        string
-		config      cache.CacheConfig
-		preparation func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis)
-		assertions  func(t *testing.T, c *redisCache[testIndex, string, *testObject])
+		config      cache.Config
+		preparation func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis)
+		assertions  func(t *testing.T, c cache.Cache[testIndex, string, *testObject])
 		args        args
 		wantErr     bool
 	}{
 		{
 			name:   "connection error",
-			config: cache.CacheConfig{},
-			preparation: func(_ *testing.T, _ *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(_ *testing.T, _ cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				s.RequireAuth("foobar")
 			},
 			args: args{
@@ -550,8 +518,8 @@ func Test_redisCache_Delete(t *testing.T) {
 		},
 		{
 			name:   "no keys, noop",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -566,14 +534,14 @@ func Test_redisCache_Delete(t *testing.T) {
 		},
 		{
 			name:   "delete ID",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
-			assertions: func(t *testing.T, c *redisCache[testIndex, string, *testObject]) {
+			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -591,14 +559,14 @@ func Test_redisCache_Delete(t *testing.T) {
 		},
 		{
 			name:   "delete name",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
-			assertions: func(t *testing.T, c *redisCache[testIndex, string, *testObject]) {
+			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
 				// get by ID should still work
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.True(t, ok)
@@ -616,14 +584,14 @@ func Test_redisCache_Delete(t *testing.T) {
 		},
 		{
 			name:   "not found",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
 				})
 			},
-			assertions: func(t *testing.T, c *redisCache[testIndex, string, *testObject]) {
+			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.True(t, ok)
 				assert.NotNil(t, obj)
@@ -641,16 +609,7 @@ func Test_redisCache_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := miniredis.RunT(t)
-			defer server.Close()
-			server.Select(testDB)
-			c := NewCache[testIndex, string, *testObject](
-				tt.config,
-				newTestClient(server.Addr()),
-				testDB,
-				testIndices,
-			).(*redisCache[testIndex, string, *testObject])
-			defer c.Close()
+			c, server := prepareCache(t, tt.config)
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -670,16 +629,16 @@ func Test_redisCache_Truncate(t *testing.T) {
 	}
 	tests := []struct {
 		name        string
-		config      cache.CacheConfig
-		preparation func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis)
-		assertions  func(t *testing.T, c *redisCache[testIndex, string, *testObject])
+		config      cache.Config
+		preparation func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis)
+		assertions  func(t *testing.T, c cache.Cache[testIndex, string, *testObject])
 		args        args
 		wantErr     bool
 	}{
 		{
 			name:   "connection error",
-			config: cache.CacheConfig{},
-			preparation: func(_ *testing.T, _ *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(_ *testing.T, _ cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				s.RequireAuth("foobar")
 			},
 			args: args{
@@ -689,8 +648,8 @@ func Test_redisCache_Truncate(t *testing.T) {
 		},
 		{
 			name:   "ok",
-			config: cache.CacheConfig{},
-			preparation: func(t *testing.T, c *redisCache[testIndex, string, *testObject], s *miniredis.Miniredis) {
+			config: cache.Config{},
+			preparation: func(t *testing.T, c cache.Cache[testIndex, string, *testObject], s *miniredis.Miniredis) {
 				c.Set(context.Background(), &testObject{
 					ID:   "one",
 					Name: []string{"foo", "bar"},
@@ -700,7 +659,7 @@ func Test_redisCache_Truncate(t *testing.T) {
 					Name: []string{"Hello", "World"},
 				})
 			},
-			assertions: func(t *testing.T, c *redisCache[testIndex, string, *testObject]) {
+			assertions: func(t *testing.T, c cache.Cache[testIndex, string, *testObject]) {
 				obj, ok := c.Get(context.Background(), testIndexID, "one")
 				assert.False(t, ok)
 				assert.Nil(t, obj)
@@ -716,16 +675,7 @@ func Test_redisCache_Truncate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			server := miniredis.RunT(t)
-			defer server.Close()
-			server.Select(testDB)
-			c := NewCache[testIndex, string, *testObject](
-				tt.config,
-				newTestClient(server.Addr()),
-				testDB,
-				testIndices,
-			).(*redisCache[testIndex, string, *testObject])
-			defer c.Close()
+			c, server := prepareCache(t, tt.config)
 			tt.preparation(t, c, server)
 			t.Log(server.Keys())
 
@@ -737,4 +687,28 @@ func Test_redisCache_Truncate(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
+}
+
+func prepareCache(t *testing.T, conf cache.Config) (cache.Cache[testIndex, string, *testObject], *miniredis.Miniredis) {
+	conf.Log = &logging.Config{
+		Level:     "debug",
+		AddSource: true,
+	}
+	server := miniredis.RunT(t)
+	server.Select(testDB)
+	client := redis.NewClient(&redis.Options{
+		Network: "tcp",
+		Addr:    server.Addr(),
+	})
+	t.Cleanup(func() {
+		client.Close()
+		server.Close()
+	})
+	connector := NewConnector(Config{
+		Enabled: true,
+		Network: "tcp",
+		Addr:    server.Addr(),
+	})
+	c := NewCache[testIndex, string, *testObject](conf, connector, testDB, testIndices)
+	return c, server
 }

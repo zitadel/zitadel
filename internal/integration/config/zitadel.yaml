@@ -22,6 +22,15 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  Milestones:
+    Connector: ""
+    MaxAge: 1h
+    LastUsage: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Quotas:
   Access:

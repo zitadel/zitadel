@@ -38,29 +38,25 @@ var (
 )
 
 type redisCache[I, K comparable, V cache.Entry[I, K]] struct {
-	db      int
-	config  *cache.CacheConfig
-	indices []I
-	client  *redis.Client
-	logger  *slog.Logger
+	db        int
+	config    *cache.Config
+	indices   []I
+	connector *Connector
+	logger    *slog.Logger
 }
 
 // NewCache returns a cache that does nothing
-func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.CacheConfig, client *redis.Client, db int, indices []I) cache.Cache[I, K, V] {
+func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.Config, client *Connector, db int, indices []I) cache.Cache[I, K, V] {
 	return &redisCache[I, K, V]{
-		config:  &config,
-		db:      db,
-		indices: indices,
-		client:  client,
+		config:    &config,
+		db:        db,
+		indices:   indices,
+		connector: client,
 		logger: slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 			AddSource: true,
 			Level:     slog.LevelError,
 		})),
 	}
-}
-
-func (c *redisCache[I, K, V]) Close() error {
-	return c.client.Close()
 }
 
 func (c *redisCache[I, K, V]) Set(ctx context.Context, value V) {
@@ -82,7 +78,7 @@ func (c *redisCache[I, K, V]) set(ctx context.Context, value V) (objectID string
 	if err != nil {
 		return "", err
 	}
-	err = setParsed.Run(ctx, c.client, keys,
+	err = setParsed.Run(ctx, c.connector, keys,
 		c.db,                                   // DB namespace
 		buf.String(),                           // object
 		int64(c.config.LastUseAge/time.Second), // usage_lifetime
@@ -97,7 +93,7 @@ func (c *redisCache[I, K, V]) set(ctx context.Context, value V) (objectID string
 
 func (c *redisCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, ok bool) {
 	logger := c.logger.With("index", index, "key", key)
-	obj, err := getParsed.Run(ctx, c.client, c.redisIndexKeys(index, key), c.db).Result()
+	obj, err := getParsed.Run(ctx, c.connector, c.redisIndexKeys(index, key), c.db).Result()
 	if err != nil && !errors.Is(err, redis.Nil) {
 		logger.ErrorContext(ctx, "redis cache get", "err", err)
 		return value, false
@@ -120,7 +116,7 @@ func (c *redisCache[I, K, V]) Invalidate(ctx context.Context, index I, key ...K)
 	if len(key) == 0 {
 		return nil
 	}
-	err = invalidateParsed.Run(ctx, c.client, c.redisIndexKeys(index, key...), c.db).Err()
+	err = invalidateParsed.Run(ctx, c.connector, c.redisIndexKeys(index, key...), c.db).Err()
 	// redis.Nil is always returned because the script doesn't have a return value.
 	if err != nil && !errors.Is(err, redis.Nil) {
 		return err
@@ -132,7 +128,7 @@ func (c *redisCache[I, K, V]) Delete(ctx context.Context, index I, key ...K) (er
 	if len(key) == 0 {
 		return nil
 	}
-	pipe := c.client.Pipeline()
+	pipe := c.connector.Pipeline()
 	pipe.Select(ctx, c.db)
 	pipe.Del(ctx, c.redisIndexKeys(index, key...)...)
 	_, err = pipe.Exec(ctx)
@@ -140,7 +136,7 @@ func (c *redisCache[I, K, V]) Delete(ctx context.Context, index I, key ...K) (er
 }
 
 func (c *redisCache[I, K, V]) Truncate(ctx context.Context) (err error) {
-	pipe := c.client.Pipeline()
+	pipe := c.connector.Pipeline()
 	pipe.Select(ctx, c.db)
 	pipe.FlushDB(ctx)
 	_, err = pipe.Exec(ctx)

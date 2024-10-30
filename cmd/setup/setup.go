@@ -22,6 +22,7 @@ import (
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
@@ -342,13 +343,17 @@ func initProjections(
 	}
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+
+	cacheConnectors, err := connector.StartConnectors(config.Caches, queryDBClient)
+	logging.OnError(err).Fatal("unable to start caches")
+
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
 		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
-		config.Caches,
+		cacheConnectors,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,
@@ -392,7 +397,7 @@ func initProjections(
 	}
 	commands, err := command.StartCommands(
 		eventstoreClient,
-		config.Caches,
+		cacheConnectors,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		staticStorage,
