@@ -4,28 +4,25 @@ if result == false then
 end
 local object_id = tostring(result)
 
-local entries = redis.call("HGETALL", object_id)
-if entries == nil then
+local object = getCall("HGET", object_id, "object")
+if object == nil then
     -- object expired, but there are keys that need to be cleaned up
     remove(object_id)
     return nil
 end
 
--- entries is a key-value paired string array.
--- Extract the values into variables we understand.
-local object = entries[2]
-local usage_lifetime = tonumber(entries[4])
-local expiry = tonumber(entries[6])
-
 -- max-age must be checked manually
+local expiry = getCall("HGET", object_id, "expiry")
 if not (expiry == nil) and expiry > 0 then
     if getTime() > expiry then
         remove(object_id)
         return nil
     end
 end
+
+local usage_lifetime = getCall("HGET", object_id, "usage_lifetime")
 -- reset usage based TTL
-if not (usage_lifetime == nil) and usage_lifetime > 0 then
+if not (usage_lifetime == nil) and tonumber(usage_lifetime) > 0 then
     redis.call('EXPIRE', object_id, usage_lifetime)
 end
 

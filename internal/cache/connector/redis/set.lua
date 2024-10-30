@@ -4,7 +4,7 @@ local object = ARGV[2]
 local usage_lifetime = tonumber(ARGV[3]) -- usage based lifetime in seconds
 local max_age = tonumber(ARGV[4]) -- max age liftime in seconds
 
-redis.call("HSET", object_id,"object", object, "usage_lifetime", usage_lifetime)
+redis.call("HSET", object_id,"object", object)
 if usage_lifetime > 0 then
     redis.call("HSET", object_id, "usage_lifetime", usage_lifetime)
     -- enable usage based TTL

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
 	"strings"
 	"time"
 
@@ -52,10 +51,7 @@ func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.Config, client 
 		db:        db,
 		indices:   indices,
 		connector: client,
-		logger: slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-			AddSource: true,
-			Level:     slog.LevelError,
-		})),
+		logger:    config.Log.Slog(),
 	}
 }
 
@@ -105,11 +101,10 @@ func (c *redisCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V,
 	}
 	err = json.NewDecoder(strings.NewReader(data)).Decode(&value)
 	if err != nil {
-		c.logger.ErrorContext(ctx, "redis cache get", "err", fmt.Errorf("decode: %w", err))
+		logger.ErrorContext(ctx, "redis cache get", "err", fmt.Errorf("decode: %w", err))
 		return value, false
 	}
 	return value, true
-
 }
 
 func (c *redisCache[I, K, V]) Invalidate(ctx context.Context, index I, key ...K) (err error) {

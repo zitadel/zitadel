@@ -31,20 +31,19 @@ type Connectors struct {
 	Redis    *redis.Connector
 }
 
-func StartConnectors(conf *CachesConfig, client *database.DB) (_ *Connectors, err error) {
+func StartConnectors(conf *CachesConfig, client *database.DB) (Connectors, error) {
 	if conf == nil {
-		return &Connectors{}, nil
+		return Connectors{}, nil
 	}
-	connectors := &Connectors{
+	return Connectors{
 		Config:   *conf,
 		Memory:   gomap.NewConnector(conf.Connectors.Memory),
 		Postgres: pg.NewConnector(conf.Connectors.Postgres, client),
 		Redis:    redis.NewConnector(conf.Connectors.Redis),
-	}
-	return connectors, nil
+	}, nil
 }
 
-func StartCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Context, indices []I, purpose cache.Purpose, conf *cache.Config, connectors *Connectors) (cache.Cache[I, K, V], error) {
+func StartCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Context, indices []I, purpose cache.Purpose, conf *cache.Config, connectors Connectors) (cache.Cache[I, K, V], error) {
 	if conf == nil || conf.Connector == "" {
 		return noop.NewCache[I, K, V](), nil
 	}

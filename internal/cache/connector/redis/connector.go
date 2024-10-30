@@ -113,6 +113,9 @@ type Connector struct {
 }
 
 func NewConnector(config Config) *Connector {
+	if !config.Enabled {
+		return nil
+	}
 	return &Connector{
 		Client: redis.NewClient(optionsFromConfig(config)),
 		Config: config,

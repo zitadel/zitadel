@@ -14,7 +14,7 @@ type Caches struct {
 	instance cache.Cache[instanceIndex, string, *authzInstance]
 }
 
-func startCaches(background context.Context, connectors *connector.Connectors) (_ *Caches, err error) {
+func startCaches(background context.Context, connectors connector.Connectors) (_ *Caches, err error) {
 	caches := new(Caches)
 	caches.instance, err = connector.StartCache[instanceIndex, string, *authzInstance](background, instanceIndexValues(), cache.PurposeAuthzInstance, connectors.Config.Instance, connectors)
 	if err != nil {

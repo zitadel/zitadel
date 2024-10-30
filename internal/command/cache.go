@@ -8,13 +8,12 @@ import (
 )
 
 type Caches struct {
-	connectors *connector.Connectors
 	milestones cache.Cache[milestoneIndex, string, *MilestonesReached]
 }
 
-func startCaches(background context.Context, connectors *connector.Connectors) (_ *Caches, err error) {
+func startCaches(background context.Context, connectors connector.Connectors) (_ *Caches, err error) {
 	caches := new(Caches)
-	caches.milestones, err = connector.StartCache[milestoneIndex, string, *MilestonesReached](background, []milestoneIndex{milestoneIndexInstanceID}, cache.PurposeAuthzInstance, connectors.Config.Milestones, connectors)
+	caches.milestones, err = connector.StartCache[milestoneIndex, string, *MilestonesReached](background, []milestoneIndex{milestoneIndexInstanceID}, cache.PurposeMilestones, connectors.Config.Milestones, connectors)
 	if err != nil {
 		return nil, err
 	}

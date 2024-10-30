@@ -99,7 +99,7 @@ type Commands struct {
 
 func StartCommands(
 	es *eventstore.Eventstore,
-	cacheConnectors *connector.Connectors,
+	cacheConnectors connector.Connectors,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,

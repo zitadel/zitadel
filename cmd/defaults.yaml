@@ -225,7 +225,7 @@ Caches:
       # This option offsets the first DB so it doesn't conflict with other databases on the same server.
       # Note that ZITADEL uses FLUSHDB command to truncate a cache.
       # This can have destructive consequences when overlapping DB namespaces are used.
-      DBOffset: 42
+      DBOffset: 10
       # Maximum number of retries before giving up.
       # Default is 3 retries; -1 (not 0) disables retries.
       MaxRetries: 3

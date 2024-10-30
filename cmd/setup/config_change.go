@@ -3,6 +3,7 @@ package setup
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -33,7 +34,7 @@ func (mig *externalConfigChange) Check(lastRun map[string]interface{}) bool {
 func (mig *externalConfigChange) Execute(ctx context.Context, _ eventstore.Event) error {
 	cmd, err := command.StartCommands(
 		mig.es,
-		nil,
+		connector.Connectors{},
 		mig.defaults,
 		nil,
 		nil,

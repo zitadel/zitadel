@@ -49,7 +49,7 @@ func StartQueries(
 	es *eventstore.Eventstore,
 	esV4 es_v4.Querier,
 	querySqlClient, projectionSqlClient *database.DB,
-	cacheConnectors *connector.Connectors,
+	cacheConnectors connector.Connectors,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
