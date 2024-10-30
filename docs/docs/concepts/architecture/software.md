@@ -144,4 +144,4 @@ The storage layer of ZITADEL is responsible for multiple tasks. For example:
 - Backup and restore operation for disaster recovery purpose
 
 ZITADEL currently supports PostgreSQL and CockroachDB..
-Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-cockroachdb) before you decide on using one of them.
+Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-postgresql) before you decide on using one of them.
