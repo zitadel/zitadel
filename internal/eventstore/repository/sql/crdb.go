@@ -282,7 +282,7 @@ func (db *CRDB) InstanceIDs(ctx context.Context, searchQuery *eventstore.SearchQ
 	return ids, nil
 }
 
-func (db *CRDB) db() *database.DB {
+func (db *CRDB) Client() *database.DB {
 	return db.DB
 }
 

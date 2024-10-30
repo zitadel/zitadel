@@ -12,7 +12,7 @@ You need to give a user the [manager role](/docs/guides/manage/console/managers)
 If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](/docs/concepts/eventstore/overview).
 ## Request Events
 
-Call the [ListEvents](/apis/resources/admin) enpoint in the Administration API to get all the events you need.
+Call the [ListEvents](/apis/resources/admin) endpoint in the Administration API to get all the events you need.
 To further restrict your result you can add the following filters:
 - sequence
 - editor user id
@@ -139,10 +139,10 @@ curl --request POST \
 
 The following example shows you how you could use the events search to find out the failed login attempts of your users.
 You have to include all the event types that tell you that a login attempt has failed.
-In this case this are the following events:
+In this case these are the following events:
 - Password verification failed
-- One-time-password (OTP) check failed (Authenticator Apps like Authy, Google Authenticator, etc)
-- Universal-Second-Factor (U2F) check failed (FaceID, WindowsHello, FingerPrint, etc)
+- One-time password (OTP) check failed (Authenticator Apps like Authy, Google Authenticator, etc)
+- Universal Second Factor (U2F) check failed (FaceID, WindowsHello, FingerPrint, etc)
 - Passwordless/Passkey check failed (FaceID, WindowsHello, FingerPrint, etc)
 
 ```bash

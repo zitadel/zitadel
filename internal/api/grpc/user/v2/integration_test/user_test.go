@@ -2447,7 +2447,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 	})
 	require.NoError(t, err)
-	idpLink, err := Instance.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
+	_, err = Instance.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
 		IdpId:    provider.GetId(),
 		UserId:   "external-id",
 		UserName: "displayName",
@@ -2639,25 +2639,16 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var got *user.ListAuthenticationMethodTypesResponse
-			var err error
-
-			for {
-				got, err = Client.ListAuthenticationMethodTypes(tt.args.ctx, tt.args.req)
-				if err == nil && !got.GetDetails().GetTimestamp().AsTime().Before(idpLink.GetDetails().GetChangeDate().AsTime()) {
-					break
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.ListAuthenticationMethodTypes(tt.args.ctx, tt.args.req)
+				require.NoError(ttt, err)
+				if !assert.Equal(ttt, tt.want.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult()) {
+					return
 				}
-				select {
-				case <-CTX.Done():
-					t.Fatal(CTX.Err(), err)
-				case <-time.After(time.Second):
-					t.Log("retrying ListAuthenticationMethodTypes")
-					continue
-				}
-			}
-			require.NoError(t, err)
-			assert.Equal(t, tt.want.GetDetails().GetTotalResult(), got.GetDetails().GetTotalResult())
-			require.Equal(t, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
+				assert.Equal(ttt, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
+				integration.AssertListDetails(ttt, tt.want, got)
+			}, retryDuration, tick, "timeout waiting for expected auth methods result")
 		})
 	}
 }
