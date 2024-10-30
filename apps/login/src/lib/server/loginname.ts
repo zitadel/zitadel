@@ -170,6 +170,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         const paramsVerify = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
           userId: session.factors?.user?.id, // verify needs user id
+          invite: "true", // TODO: check - set this to true as we dont expect old email verification method here
         });
 
         if (command.organization || session.factors?.user?.organizationId) {
