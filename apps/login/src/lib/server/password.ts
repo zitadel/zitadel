@@ -21,6 +21,7 @@ import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_se
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getSessionCookieByLoginName } from "../cookies";
+import { finishFlow } from "../login";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -239,36 +240,19 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   //   return router.push(`/passkey/set?` + params);
   // }
-  else if (command.authRequestId && submitted.sessionId) {
-    const params = new URLSearchParams({
-      sessionId: submitted.sessionId,
-      authRequest: command.authRequestId,
-    });
 
-    if (command.organization) {
-      params.append("organization", command.organization);
-    }
-
-    return redirect(`/login?` + params);
-  }
-
-  // without OIDC flow
-  const params = new URLSearchParams(
-    command.authRequestId
+  return finishFlow(
+    command.authRequestId && submitted.sessionId
       ? {
-          loginName: submitted.factors.user.loginName,
+          sessionId: submitted.sessionId,
           authRequestId: command.authRequestId,
+          organization: submitted.factors.user.organizationId,
         }
       : {
           loginName: submitted.factors.user.loginName,
+          organization: submitted.factors.user.organizationId,
         },
   );
-
-  if (command.organization) {
-    params.append("organization", command.organization);
-  }
-
-  return redirect(`/signedin?` + params);
 }
 
 export async function changePassword(command: {

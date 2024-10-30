@@ -6,6 +6,7 @@ import {
 } from "@/lib/server/cookie";
 import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import {
@@ -14,6 +15,7 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
+import { finishFlow } from "../login";
 
 type CreateNewSessionCommand = {
   userId: string;
@@ -32,7 +34,46 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
   if (!userId || !idpIntent) {
     throw new Error("No userId or loginName provided");
   }
-  return createSessionForIdpAndUpdateCookie(userId, idpIntent, authRequestId);
+  const session = await createSessionForIdpAndUpdateCookie(
+    userId,
+    idpIntent,
+    authRequestId,
+  );
+
+  if (!session || !session.factors?.user) {
+    return { error: "Could not create session" };
+  }
+
+  return finishFlow(
+    authRequestId && session.id
+      ? {
+          sessionId: session.id,
+          authRequestId: authRequestId,
+          organization: session.factors.user.organizationId,
+        }
+      : {
+          loginName: session.factors.user.loginName,
+          organization: session.factors.user.organizationId,
+        },
+  );
+}
+
+export async function continueWithSession({
+  authRequestId,
+  ...session
+}: Session & { authRequestId?: string }) {
+  return authRequestId && session.id && session.factors?.user
+    ? finishFlow({
+        sessionId: session.id,
+        authRequestId: authRequestId,
+        organization: session.factors.user.organizationId,
+      })
+    : session.factors?.user
+      ? finishFlow({
+          loginName: session.factors.user.loginName,
+          organization: session.factors.user.organizationId,
+        })
+      : null;
 }
 
 export type UpdateSessionCommand = {
