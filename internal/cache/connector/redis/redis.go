@@ -45,7 +45,7 @@ type redisCache[I, K comparable, V cache.Entry[I, K]] struct {
 	logger    *slog.Logger
 }
 
-// NewCache returns a cache that does nothing
+// NewCache returns a cache that stores and retrieves object using single Redis.
 func NewCache[I, K comparable, V cache.Entry[I, K]](config cache.Config, client *Connector, db int, indices []I) cache.Cache[I, K, V] {
 	return &redisCache[I, K, V]{
 		config:    &config,
