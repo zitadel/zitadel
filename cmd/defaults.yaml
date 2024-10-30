@@ -188,10 +188,10 @@ Database:
 Caches:
   # Connectors are reused by caches.
   Connectors:
-      # Memory connector works with local server memory.
-      # It is the simplest (and probably fastest) cache implementation.
-      # Unsuitable for deployments with multiple containers,
-      # as each container's cache may hold a different state of the same object.
+    # Memory connector works with local server memory.
+    # It is the simplest (and probably fastest) cache implementation.
+    # Unsuitable for deployments with multiple containers,
+    # as each container's cache may hold a different state of the same object.
     Memory:
       Enabled: false
       # AutoPrune removes invalidated or expired object from the cache.
