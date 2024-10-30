@@ -15,7 +15,7 @@ const test = base.extend<{ user: PasswordUser }>({
             password: "Password1!",
             organization: "",
         });
-        await user.ensure();
+        await user.ensure(page);
         await use(user);
     },
 });

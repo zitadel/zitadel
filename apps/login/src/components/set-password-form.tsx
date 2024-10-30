@@ -207,7 +207,7 @@ export function SetPasswordForm({
       {error && <Alert>{error}</Alert>}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton />
+        <BackButton data-testid="back-button" />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
@@ -218,6 +218,7 @@ export function SetPasswordForm({
             watchPassword !== watchConfirmPassword
           }
           onClick={handleSubmit(submitRegister)}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("set.submit")}

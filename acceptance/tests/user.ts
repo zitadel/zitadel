@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 import {Page} from "@playwright/test";
 import {registerWithPasskey} from "./register";
 import {loginWithPasskey, loginWithPassword} from "./login";
@@ -20,7 +20,7 @@ class User {
         this.props = userProps;
     }
 
-    async ensure() {
+    async ensure(page: Page) {
         await this.remove()
 
         const body = {
@@ -72,6 +72,10 @@ class User {
         return
     }
 
+    public setUserId(userId: string) {
+        this.user = userId
+    }
+
     public userId() {
         return this.user;
     }
@@ -82,6 +86,14 @@ class User {
 
     public password() {
         return this.props.password;
+    }
+
+    public firstname() {
+        return this.props.firstName
+    }
+
+    public lastname() {
+        return this.props.lastName
     }
 
     public fullName() {
@@ -102,6 +114,73 @@ class User {
 export class PasswordUser extends User {
 }
 
+enum OtpType {
+    time = "time-based",
+    sms = "sms",
+    email = "email",
+}
+
+export interface otpUserProps {
+    email: string;
+    firstName: string;
+    lastName: string;
+    organization: string;
+    type: OtpType,
+}
+
+export class PasswordUserWithOTP extends User {
+    private type: OtpType
+    private code: string
+
+    constructor(props: otpUserProps) {
+        super({
+            email: props.email,
+            firstName: props.firstName,
+            lastName: props.lastName,
+            organization: props.organization,
+            password: ""
+        })
+        this.type = props.type
+    }
+
+    async ensure(page: Page) {
+        await super.ensure(page)
+
+        const body = {
+            username: this.props.email,
+            organization: {
+                orgId: this.props.organization
+            },
+            profile: {
+                givenName: this.props.firstName,
+                familyName: this.props.lastName,
+            },
+            email: {
+                email: this.props.email,
+                isVerified: true,
+            },
+            password: {
+                password: this.props.password!,
+            }
+        }
+
+        const response = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/human", {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
+            }
+        });
+        if (response.statusCode >= 400 && response.statusCode != 409) {
+            const error = 'HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage;
+            console.error(error);
+            throw new Error(error);
+        }
+        return
+    }
+}
+
 export interface passkeyUserProps {
     email: string;
     firstName: string;
@@ -109,67 +188,58 @@ export interface passkeyUserProps {
     organization: string;
 }
 
-export class PasskeyUser {
-    private props: passkeyUserProps
-
+export class PasskeyUser extends User {
     constructor(props: passkeyUserProps) {
-        this.props = props
+        super({
+            email: props.email,
+            firstName: props.firstName,
+            lastName: props.lastName,
+            organization: props.organization,
+            password: ""
+        })
     }
 
-    async ensurePasskey(page: Page) {
-        await registerWithPasskey(page, this.props.firstName, this.props.lastName, this.props.email)
+    public async ensure(page: Page) {
+        await this.remove()
+        await registerWithPasskey(page, this.firstname(), this.lastname(), this.username())
     }
 
     public async login(page: Page) {
-        await loginWithPasskey(page, this.props.email)
+        await loginWithPasskey(page, this.username())
     }
 
-    public fullName() {
-        return this.props.firstName + " " + this.props.lastName
-    }
-
-    async ensurePasskeyRegister() {
-        const url = new URL(process.env.ZITADEL_API_URL!)
-        const registerBody = {
-            domain: url.hostname,
+    public async remove() {
+        const resp = await getUserByUsername(this.username())
+        if (!resp || !resp.result || !resp.result[0]) {
+            return
         }
-        const userId = ""
-        const registerResponse = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/" + userId + "/passkeys", {
-            method: 'POST',
-            body: JSON.stringify(registerBody),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
+        this.setUserId(resp.result[0].userId)
+        await super.remove()
+    }
+}
+
+async function getUserByUsername(username: string) {
+    const listUsersBody = {
+        queries: [{
+            userNameQuery: {
+                userName: username,
             }
-        });
-        if (registerResponse.statusCode >= 400 && registerResponse.statusCode != 409) {
-            const error = 'HTTP Error: ' + registerResponse.statusCode + ' - ' + registerResponse.statusMessage;
-            console.error(error);
-            throw new Error(error);
-        }
-        const respJson = await registerResponse.json()
-        return respJson
+        }]
     }
-
-    async ensurePasskeyVerify(passkeyId: string, credential: Credential) {
-        const verifyBody = {
-            publicKeyCredential: credential,
-            passkeyName: "passkey",
+    const jsonBody = JSON.stringify(listUsersBody)
+    const registerResponse = await fetch(process.env.ZITADEL_API_URL! + "/v2/users", {
+        method: 'POST',
+        body: jsonBody,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
         }
-        const userId = ""
-        const verifyResponse = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/" + userId + "/passkeys/" + passkeyId, {
-            method: 'POST',
-            body: JSON.stringify(verifyBody),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
-            }
-        });
-        if (verifyResponse.statusCode >= 400 && verifyResponse.statusCode != 409) {
-            const error = 'HTTP Error: ' + verifyResponse.statusCode + ' - ' + verifyResponse.statusMessage;
-            console.error(error);
-            throw new Error(error);
-        }
-        return
+    });
+    if (registerResponse.statusCode >= 400) {
+        const error = 'HTTP Error: ' + registerResponse.statusCode + ' - ' + registerResponse.statusMessage;
+        console.error(error);
+        throw new Error(error);
     }
+    const respJson = await registerResponse.json()
+    return respJson
 }

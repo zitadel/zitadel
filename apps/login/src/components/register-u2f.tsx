@@ -190,7 +190,7 @@ export function RegisterU2f({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        <BackButton />
+        <BackButton data-testid="back-button" />
 
         <span className="flex-grow"></span>
         <Button
@@ -199,6 +199,7 @@ export function RegisterU2f({
           variant={ButtonVariants.Primary}
           disabled={loading}
           onClick={submitRegisterAndContinue}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("set.submit")}

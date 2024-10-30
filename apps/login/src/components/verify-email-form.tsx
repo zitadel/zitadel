@@ -110,6 +110,7 @@ export function VerifyEmailForm({
           autoComplete="one-time-code"
           {...register("code", { required: "This field is required" })}
           label="Code"
+          data-testid="code-text-input"
           //   error={errors.username?.message as string}
         />
       </div>
@@ -125,6 +126,7 @@ export function VerifyEmailForm({
           type="button"
           onClick={() => resendCode()}
           variant={ButtonVariants.Secondary}
+          data-testid="resend-button"
         >
           {t("resendCode")}
         </Button>
@@ -135,6 +137,7 @@ export function VerifyEmailForm({
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
           onClick={handleSubmit(submitCodeAndContinue)}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("submit")}

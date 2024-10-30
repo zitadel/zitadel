@@ -1,5 +1,7 @@
+import {test as base} from "@playwright/test";
 import path from 'path';
 import dotenv from 'dotenv';
+import {PasskeyUser} from "./user";
 
 // Read from ".env" file.
 dotenv.config({path: path.resolve(__dirname, '.env.local')});
@@ -86,7 +88,7 @@ const test = base.extend<{ user: PasskeyUser }>({
             enabled: false,
         });
     },
-});
+});*/
 
 const test = base.extend<{ user: PasskeyUser }>({
     user: async ({page}, use) => {
@@ -96,7 +98,7 @@ const test = base.extend<{ user: PasskeyUser }>({
             lastName: "last",
             organization: "",
         });
-        await user.ensurePasskey(page);
+        await user.ensure(page);
         await use(user)
     },
 });
@@ -105,4 +107,3 @@ test("username and passkey login", async ({user, page}) => {
     await user.login(page)
     await page.getByRole("heading", {name: "Welcome " + user.fullName() + "!"}).click();
 });
-*/

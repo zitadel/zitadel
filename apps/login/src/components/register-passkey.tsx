@@ -189,6 +189,7 @@ export function RegisterPasskey({
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
           onClick={handleSubmit(submitRegisterAndContinue)}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("set.submit")}

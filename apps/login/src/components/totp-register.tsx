@@ -122,6 +122,7 @@ export function TotpRegister({
                 type="text"
                 {...register("code", { required: "This field is required" })}
                 label="Code"
+                data-testid="code-text-input"
               />
             </div>
 
@@ -139,6 +140,7 @@ export function TotpRegister({
                 variant={ButtonVariants.Primary}
                 disabled={loading || !formState.isValid}
                 onClick={handleSubmit(continueWithCode)}
+                data-testid="submit-button"
               >
                 {loading && <Spinner className="h-5 w-5 mr-2" />}
                 {t("set.submit")}

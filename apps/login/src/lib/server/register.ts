@@ -34,20 +34,25 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: "Could not create user" };
   }
 
-  const checks = create(ChecksSchema, {
-    user: { search: { case: "userId", value: human.userId } },
-    password: { password: command.password },
-  });
-
-  return createSessionAndUpdateCookie(
-    checks,
-    undefined,
-    command.authRequestId,
-  ).then((session) => {
-    return {
-      userId: human.userId,
-      sessionId: session.id,
-      factors: session.factors,
-    };
-  });
+    let checks = create(ChecksSchema, {
+        user: {search: {case: "userId", value: human.userId}},
+    });
+    if (command.password) {
+        checks = create(ChecksSchema, {
+            user: {search: {case: "userId", value: human.userId}},
+            password: {password: command.password}
+        });
+    }
+    console.log(checks)
+    return createSessionAndUpdateCookie(
+        checks,
+        undefined,
+        command.authRequestId,
+    ).then((session) => {
+        return {
+            userId: human.userId,
+            sessionId: session.id,
+            factors: session.factors,
+        };
+    });
 }

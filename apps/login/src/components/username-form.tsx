@@ -80,6 +80,7 @@ export function UsernameForm({
           autoComplete="username"
           {...register("loginName", { required: "This field is required" })}
           label="Loginname"
+          data-testid="username-text-input"
         />
         {allowRegister && (
           <button
@@ -97,6 +98,7 @@ export function UsernameForm({
             }}
             type="button"
             disabled={loading}
+            data-testid="register-button"
           >
             {t("register")}
           </button>
@@ -112,9 +114,10 @@ export function UsernameForm({
       <div className="pt-6 pb-4">{children}</div>
 
       <div className="mt-4 flex w-full flex-row items-center">
-        <BackButton />
+        <BackButton data-testid="back-button" />
         <span className="flex-grow"></span>
         <Button
+          data-testid="submit-button"
           type="submit"
           className="self-end"
           variant={ButtonVariants.Primary}
