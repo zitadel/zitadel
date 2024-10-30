@@ -14,6 +14,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 var (
@@ -62,6 +63,9 @@ func (c *redisCache[I, K, V]) Set(ctx context.Context, value V) {
 }
 
 func (c *redisCache[I, K, V]) set(ctx context.Context, value V) (objectID string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	// Internal ID used for the object
 	objectID = uuid.NewString()
 	keys := []string{objectID}
@@ -88,8 +92,20 @@ func (c *redisCache[I, K, V]) set(ctx context.Context, value V) (objectID string
 }
 
 func (c *redisCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V, ok bool) {
+	var (
+		obj any
+		err error
+	)
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		if errors.Is(err, redis.Nil) {
+			err = nil
+		}
+		span.EndWithError(err)
+	}()
+
 	logger := c.logger.With("index", index, "key", key)
-	obj, err := getParsed.Run(ctx, c.connector, c.redisIndexKeys(index, key), c.db).Result()
+	obj, err = getParsed.Run(ctx, c.connector, c.redisIndexKeys(index, key), c.db).Result()
 	if err != nil && !errors.Is(err, redis.Nil) {
 		logger.ErrorContext(ctx, "redis cache get", "err", err)
 		return value, false
@@ -108,6 +124,9 @@ func (c *redisCache[I, K, V]) Get(ctx context.Context, index I, key K) (value V,
 }
 
 func (c *redisCache[I, K, V]) Invalidate(ctx context.Context, index I, key ...K) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if len(key) == 0 {
 		return nil
 	}
@@ -120,6 +139,9 @@ func (c *redisCache[I, K, V]) Invalidate(ctx context.Context, index I, key ...K)
 }
 
 func (c *redisCache[I, K, V]) Delete(ctx context.Context, index I, key ...K) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if len(key) == 0 {
 		return nil
 	}
@@ -131,6 +153,9 @@ func (c *redisCache[I, K, V]) Delete(ctx context.Context, index I, key ...K) (er
 }
 
 func (c *redisCache[I, K, V]) Truncate(ctx context.Context) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	pipe := c.connector.Pipeline()
 	pipe.Select(ctx, c.db)
 	pipe.FlushDB(ctx)
