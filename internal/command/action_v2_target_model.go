@@ -110,7 +110,7 @@ func (wm *TargetWriteModel) NewChangedEvent(
 	}
 	// if signingkey is set, update it as it is encrypted
 	if signingKey != nil {
-		changes = append(changes, target.ChangeSingingKey(signingKey))
+		changes = append(changes, target.ChangeSigningKey(signingKey))
 	}
 	if len(changes) == 0 {
 		return nil

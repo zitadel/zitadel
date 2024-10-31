@@ -411,7 +411,7 @@ message CreateTargetResponse {
   // Key used to sign and check payload sent to the target.
   string signing_key = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"\""
+      example: "\"98KmsU67\""
     }
   ];
 }
@@ -442,7 +442,7 @@ message PatchTargetResponse {
   // Key used to sign and check payload sent to the target.
   optional string signing_key = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"\""
+      example: "\"98KmsU67\""
     }
   ];
 }

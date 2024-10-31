@@ -281,7 +281,9 @@ func TestCommands_AddTarget(t *testing.T) {
 
 func TestCommands_ChangeTarget(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore                  func(t *testing.T) *eventstore.Eventstore
+		newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+		defaultSecretGenerators     *SecretGenerators
 	}
 	type args struct {
 		ctx           context.Context
@@ -527,10 +529,18 @@ func TestCommands_ChangeTarget(t *testing.T) {
 								target.ChangeTargetType(domain.TargetTypeCall),
 								target.ChangeTimeout(10 * time.Second),
 								target.ChangeInterruptOnError(true),
+								target.ChangeSigningKey(&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								}),
 							},
 						),
 					),
 				),
+				newEncryptedCodeWithDefault: mockEncryptedCodeWithDefault("12345678", time.Hour),
+				defaultSecretGenerators:     &SecretGenerators{},
 			},
 			args{
 				ctx: context.Background(),
@@ -538,11 +548,12 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					Name:             gu.Ptr("name2"),
-					Endpoint:         gu.Ptr("https://example2.com"),
-					TargetType:       gu.Ptr(domain.TargetTypeCall),
-					Timeout:          gu.Ptr(10 * time.Second),
-					InterruptOnError: gu.Ptr(true),
+					Name:                 gu.Ptr("name2"),
+					Endpoint:             gu.Ptr("https://example2.com"),
+					TargetType:           gu.Ptr(domain.TargetTypeCall),
+					Timeout:              gu.Ptr(10 * time.Second),
+					InterruptOnError:     gu.Ptr(true),
+					ExpirationSigningKey: true,
 				},
 				resourceOwner: "instance",
 			},
@@ -557,7 +568,9 @@ func TestCommands_ChangeTarget(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:                  tt.fields.eventstore(t),
+				newEncryptedCodeWithDefault: tt.fields.newEncryptedCodeWithDefault,
+				defaultSecretGenerators:     tt.fields.defaultSecretGenerators,
 			}
 			details, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
 			if tt.res.err == nil {

@@ -138,7 +138,7 @@ func ChangeInterruptOnError(interruptOnError bool) func(event *ChangedEvent) {
 	}
 }
 
-func ChangeSingingKey(signingKey *crypto.CryptoValue) func(event *ChangedEvent) {
+func ChangeSigningKey(signingKey *crypto.CryptoValue) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
 		e.SigningKey = signingKey
 	}

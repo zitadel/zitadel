@@ -89,14 +89,14 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 type ChangeTarget struct {
 	models.ObjectRoot
 
-	Name                 *string
-	TargetType           *domain.TargetType
-	Endpoint             *string
-	Timeout              *time.Duration
-	InterruptOnError     *bool
-	RegenerateSigningKey *bool
+	Name             *string
+	TargetType       *domain.TargetType
+	Endpoint         *string
+	Timeout          *time.Duration
+	InterruptOnError *bool
 
-	SigningKey *string
+	ExpirationSigningKey bool
+	SigningKey           *string
 }
 
 func (a *ChangeTarget) IsValid() error {
@@ -132,8 +132,9 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 	if !existing.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-xj14f2cccn", "Errors.Target.NotFound")
 	}
+
 	var changedSigningKey *crypto.CryptoValue
-	if change.RegenerateSigningKey != nil && *change.RegenerateSigningKey {
+	if change.ExpirationSigningKey {
 		code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.targetEncryption) //nolint
 		if err != nil {
 			return nil, err

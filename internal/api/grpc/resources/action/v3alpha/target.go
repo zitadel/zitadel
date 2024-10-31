@@ -86,6 +86,12 @@ func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 }
 
 func patchTargetToCommand(req *action.PatchTargetRequest) *command.ChangeTarget {
+	expirationSigningKey := false
+	// TODO handle expiration, currently only immediate expiration is supported
+	if req.GetTarget().GetExpirationSigningKey() != nil {
+		expirationSigningKey = true
+	}
+
 	reqTarget := req.GetTarget()
 	if reqTarget == nil {
 		return nil
@@ -96,7 +102,7 @@ func patchTargetToCommand(req *action.PatchTargetRequest) *command.ChangeTarget 
 		},
 		Name:                 reqTarget.Name,
 		Endpoint:             reqTarget.Endpoint,
-		RegenerateSigningKey: reqTarget.RegenerateSigningKey,
+		ExpirationSigningKey: expirationSigningKey,
 	}
 	if reqTarget.TargetType != nil {
 		switch t := reqTarget.GetTargetType().(type) {
