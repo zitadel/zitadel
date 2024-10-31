@@ -216,6 +216,7 @@ func projections(
 		keys.SMTP,
 		keys.SMS,
 		keys.OIDC,
+		config.OIDC.DefaultBackChannelLogoutLifetime,
 	)
 
 	config.Auth.Spooler.Client = client

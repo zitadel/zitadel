@@ -286,6 +286,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMTP,
 		keys.SMS,
 		keys.OIDC,
+		config.OIDC.DefaultBackChannelLogoutLifetime,
 	)
 	notification.Start(ctx)
 

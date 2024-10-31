@@ -444,6 +444,7 @@ func initProjections(
 		keys.SMTP,
 		keys.SMS,
 		keys.OIDC,
+		config.OIDC.DefaultBackChannelLogoutLifetime,
 	)
 	for _, p := range notify_handler.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)

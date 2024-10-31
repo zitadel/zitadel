@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -29,6 +30,7 @@ func Register(
 	es *eventstore.Eventstore,
 	otpEmailTmpl, fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
+	tokenLifetime time.Duration,
 ) {
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
@@ -43,8 +45,7 @@ func Register(
 		authClient,
 		keysEncryptionAlg,
 		c,
-		externalSecure,
-		externalPort,
+		tokenLifetime,
 	))
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))

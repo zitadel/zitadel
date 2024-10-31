@@ -42,9 +42,8 @@ type backChannelLogoutNotifier struct {
 	authClient       *database.DB
 	keyEncryptionAlg zcrypto.EncryptionAlgorithm
 	channels         types.ChannelChains
-	externalSecure   bool
-	externalPort     uint16
 	idGenerator      id.Generator
+	tokenLifetime    time.Duration
 }
 
 func NewBackChannelLogoutNotifier(
@@ -56,8 +55,7 @@ func NewBackChannelLogoutNotifier(
 	authClient *database.DB,
 	keyEncryptionAlg zcrypto.EncryptionAlgorithm,
 	channels types.ChannelChains,
-	externalSecure bool,
-	externalPort uint16,
+	tokenLifetime time.Duration,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &backChannelLogoutNotifier{
 		commands:         commands,
@@ -66,8 +64,7 @@ func NewBackChannelLogoutNotifier(
 		authClient:       authClient,
 		keyEncryptionAlg: keyEncryptionAlg,
 		channels:         channels,
-		externalSecure:   externalSecure,
-		externalPort:     externalPort,
+		tokenLifetime:    tokenLifetime,
 		idGenerator:      id.SonyFlakeGenerator(),
 	})
 
@@ -219,7 +216,7 @@ func (u *backChannelLogoutNotifier) logoutToken(ctx context.Context, oidcSession
 		http_utils.DomainContext(ctx).Origin(),
 		oidcSession.UserID,
 		oidc.Audience{oidcSession.ClientID},
-		time.Now().Add(15*time.Minute),
+		time.Now().Add(u.tokenLifetime),
 		jwtID,
 		oidcSession.SessionID,
 		time.Second,
