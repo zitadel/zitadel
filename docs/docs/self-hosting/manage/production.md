@@ -109,17 +109,16 @@ but in the Projections.Customizations.Telemetry section
 
 ## Database
 
-### Prefer CockroachDB
+### Prefer PostgreSQL
 
 ZITADEL supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/).
-We recommend using CockroachDB,
-as horizontal scaling is much easier than with PostgreSQL.
-Also, if you are concerned about multi-regional data locality,
-[the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
+We recommend using PostgreSQL, as it is the better choice when you want to prioritize performance and latency.
+
+However, if [multi-regional data locality](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html) is a critical requirement, CockroachDB might be a suitable option.
 
 The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
-which runs with CockroachDB.
-If you identify problems with your Postgresql during load tests that indicate that the indexes are not optimized,
+which runs with PostgreSQL.
+If you identify problems with your CockroachDB during load tests that indicate that the indexes are not optimized,
 please create an issue in our [github repository](https://github.com/zitadel/zitadel).
 
 ### Configure ZITADEL
@@ -128,7 +127,7 @@ Depending on your environment, you maybe would want to tweak some settings about
 
 ```yaml
 Database:
-  cockroach:
+  postgres:
     Host: localhost
     Port: 26257
     Database: zitadel
@@ -139,6 +138,7 @@ Database:
     //highlight-end
     Options: ""
 ```
+
 
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
