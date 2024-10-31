@@ -17,7 +17,6 @@ import (
 	zoidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	zcrypto "github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/id"
@@ -38,7 +37,6 @@ type backChannelLogoutNotifier struct {
 	commands         *command.Commands
 	queries          *NotificationQueries
 	eventstore       *eventstore.Eventstore
-	authClient       *database.DB
 	keyEncryptionAlg zcrypto.EncryptionAlgorithm
 	channels         types.ChannelChains
 	idGenerator      id.Generator
