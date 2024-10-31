@@ -42,6 +42,7 @@ type Config struct {
 	DefaultLoginURLV2                 string
 	DefaultLogoutURLV2                string
 	PublicKeyCacheMaxAge              time.Duration
+	DefaultBackChannelLogoutLifetime  time.Duration
 }
 
 type EndpointConfig struct {

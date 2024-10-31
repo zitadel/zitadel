@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
+	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -96,6 +97,17 @@ func (c *channels) SMS(ctx context.Context) (*senders.Chain, *sms.Config, error)
 
 func (c *channels) Webhook(ctx context.Context, cfg webhook.Config) (*senders.Chain, error) {
 	return senders.WebhookChannels(
+		ctx,
+		cfg,
+		c.q.GetFileSystemProvider,
+		c.q.GetLogProvider,
+		c.counters.success.json,
+		c.counters.failed.json,
+	)
+}
+
+func (c *channels) SecurityTokenEvent(ctx context.Context, cfg set.Config) (*senders.Chain, error) {
+	return senders.SecurityEventTokenChannels(
 		ctx,
 		cfg,
 		c.q.GetFileSystemProvider,

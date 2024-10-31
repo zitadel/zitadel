@@ -200,6 +200,7 @@ func projections(
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
+		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		*config.Telemetry,
 		config.ExternalDomain,
@@ -213,6 +214,8 @@ func projections(
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
+		keys.OIDC,
+		config.OIDC.DefaultBackChannelLogoutLifetime,
 	)
 
 	config.Auth.Spooler.Client = client
