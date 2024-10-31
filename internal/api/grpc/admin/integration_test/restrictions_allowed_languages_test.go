@@ -51,7 +51,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 			require.Equal(ttt, language.Make(defaultLang.Language), language.English)
 		})
 		tt.Run("the discovery endpoint returns all supported languages", func(ttt *testing.T) {
-			awaitDiscoveryEndpoint(ttt, context.Background(), instance.Domain, supportedLanguagesStr, nil)
+			awaitDiscoveryEndpoint(ttt, ctx, instance.Domain, supportedLanguagesStr, nil)
 		})
 	})
 	t.Run("restricting the default language fails", func(tt *testing.T) {
@@ -92,10 +92,10 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		require.Condition(tt, contains(supported.GetLanguages(), supportedLanguagesStr))
 	})
 	t.Run("the disallowed language is not listed in the discovery endpoint", func(tt *testing.T) {
-		awaitDiscoveryEndpoint(tt, context.Background(), instance.Domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		awaitDiscoveryEndpoint(tt, ctx, instance.Domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
 	})
 	t.Run("the login ui is rendered in the default language", func(tt *testing.T) {
-		awaitLoginUILanguage(tt, context.Background(), instance.Domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
+		awaitLoginUILanguage(tt, ctx, instance.Domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
 	})
 	t.Run("preferred languages are not restricted by the supported languages", func(tt *testing.T) {
 		tt.Run("change user profile", func(ttt *testing.T) {
@@ -153,10 +153,10 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 
 	t.Run("allowing the language makes it usable again", func(tt *testing.T) {
 		tt.Run("the previously disallowed language is listed in the discovery endpoint again", func(ttt *testing.T) {
-			awaitDiscoveryEndpoint(ttt, iamOwnerCtx, instance.Domain, []string{disallowedLanguage.String()}, nil)
+			awaitDiscoveryEndpoint(ttt, ctx, instance.Domain, []string{disallowedLanguage.String()}, nil)
 		})
 		tt.Run("the login ui is rendered in the previously disallowed language", func(ttt *testing.T) {
-			awaitLoginUILanguage(ttt, iamOwnerCtx, instance.Domain, disallowedLanguage, disallowedLanguage, "Contraseña")
+			awaitLoginUILanguage(ttt, ctx, instance.Domain, disallowedLanguage, disallowedLanguage, "Contraseña")
 		})
 	})
 }
