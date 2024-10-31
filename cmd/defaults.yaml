@@ -199,7 +199,7 @@ Database:
 #        Interval: 15m
 #        TimeOut: 30s
 
-    # Instance caches auth middleware instances, gettable by domain or ID.
+  # Instance caches auth middleware instances, gettable by domain or ID.
 #  Instance:
     # Connector must be enabled above.
     # When connector is empty, this cache will be disabled.
