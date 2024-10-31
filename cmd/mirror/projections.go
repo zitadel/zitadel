@@ -208,7 +208,6 @@ func projections(
 		config.ExternalSecure,
 		commands,
 		queries,
-		config.Auth.Spooler.Client,
 		es,
 		config.Login.DefaultOTPEmailURLV2,
 		config.SystemDefaults.Notifications.FileSystemPath,

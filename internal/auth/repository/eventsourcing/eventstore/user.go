@@ -27,25 +27,25 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.Eventstore.Health(ctx)
 }
 
-func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {
+func (repo *UserRepo) UserSessionsByAgentID(ctx context.Context, agentID string) (sessions map[string]string, err error) {
 	userSessions, err := repo.View.UserSessionsByAgentID(ctx, agentID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, 0, len(userSessions))
+	sessions = make(map[string]string)
 	for _, session := range userSessions {
-		if session.State.V == domain.UserSessionStateActive {
-			userIDs = append(userIDs, session.UserID)
+		if session.State.V == domain.UserSessionStateActive && session.ID.Valid {
+			sessions[session.ID.String] = session.UserID
 		}
 	}
-	return userIDs, nil
+	return sessions, nil
 }
 
 func (repo *UserRepo) UserAgentIDBySessionID(ctx context.Context, sessionID string) (string, error) {
 	return repo.View.UserAgentIDBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
 }
 
-func (repo *UserRepo) ActiveUserIDsBySessionID(ctx context.Context, sessionID string) (userAgentID string, userIDs []string, err error) {
+func (repo *UserRepo) ActiveUserIDsBySessionID(ctx context.Context, sessionID string) (userAgentID string, sessions map[string]string, err error) {
 	return repo.View.ActiveUserIDsBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
 }
 

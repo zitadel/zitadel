@@ -518,6 +518,7 @@ type HumanSignedOutEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserAgentID       string `json:"userAgentID"`
+	SessionID         string `json:"sessionID,omitempty"`
 	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
 }
 
@@ -536,7 +537,8 @@ func (e *HumanSignedOutEvent) TriggerOrigin() string {
 func NewHumanSignedOutEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userAgentID string,
+	userAgentID,
+	sessionID string,
 ) *HumanSignedOutEvent {
 	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -545,6 +547,7 @@ func NewHumanSignedOutEvent(
 			HumanSignedOutType,
 		),
 		UserAgentID:       userAgentID,
+		SessionID:         sessionID,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }

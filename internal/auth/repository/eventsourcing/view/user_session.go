@@ -24,7 +24,7 @@ func (v *View) UserAgentIDBySessionID(ctx context.Context, sessionID, instanceID
 	return view.UserAgentIDBySessionID(ctx, v.client, sessionID, instanceID)
 }
 
-func (v *View) ActiveUserIDsBySessionID(ctx context.Context, sessionID, instanceID string) (userAgentID string, userIDs []string, err error) {
+func (v *View) ActiveUserIDsBySessionID(ctx context.Context, sessionID, instanceID string) (userAgentID string, sessions map[string]string, err error) {
 	return view.ActiveUserIDsBySessionID(ctx, v.client, sessionID, instanceID)
 }
 

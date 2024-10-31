@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -26,7 +25,6 @@ func Register(
 	externalSecure bool,
 	commands *command.Commands,
 	queries *query.Queries,
-	authClient *database.DB,
 	es *eventstore.Eventstore,
 	otpEmailTmpl, fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
@@ -42,7 +40,6 @@ func Register(
 		commands,
 		q,
 		es,
-		authClient,
 		keysEncryptionAlg,
 		c,
 		tokenLifetime,

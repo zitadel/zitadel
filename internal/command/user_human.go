@@ -628,15 +628,15 @@ func createAddHumanEvent(ctx context.Context, aggregate *eventstore.Aggregate, h
 	return addEvent
 }
 
-func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []string) error {
+func (c *Commands) HumansSignOut(ctx context.Context, agentID string, sessions map[string]string) error {
 	if agentID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
-	if len(userIDs) == 0 {
+	if len(sessions) == 0 {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-M0od3", "Errors.User.UserIDMissing")
 	}
 	events := make([]eventstore.Command, 0)
-	for _, userID := range userIDs {
+	for sessionID, userID := range sessions {
 		existingUser, err := c.getHumanWriteModelByID(ctx, userID, "")
 		if err != nil {
 			return err
@@ -647,7 +647,9 @@ func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []
 		events = append(events, user.NewHumanSignedOutEvent(
 			ctx,
 			UserAggregateFromWriteModel(&existingUser.WriteModel),
-			agentID))
+			agentID,
+			sessionID,
+		))
 	}
 	if len(events) == 0 {
 		return nil

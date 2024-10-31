@@ -27,7 +27,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 	"github.com/zitadel/zitadel/internal/repository/user"
-	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -52,7 +51,6 @@ func NewBackChannelLogoutNotifier(
 	commands *command.Commands,
 	queries *NotificationQueries,
 	es *eventstore.Eventstore,
-	authClient *database.DB,
 	keyEncryptionAlg zcrypto.EncryptionAlgorithm,
 	channels types.ChannelChains,
 	tokenLifetime time.Duration,
@@ -61,7 +59,6 @@ func NewBackChannelLogoutNotifier(
 		commands:         commands,
 		queries:          queries,
 		eventstore:       es,
-		authClient:       authClient,
 		keyEncryptionAlg: keyEncryptionAlg,
 		channels:         channels,
 		tokenLifetime:    tokenLifetime,
@@ -110,14 +107,10 @@ func (u *backChannelLogoutNotifier) reduceUserSignedOut(event eventstore.Event) 
 		if !authz.GetFeatures(ctx).EnableBackChannelLogout {
 			return nil
 		}
-		userSession, err := view.UserSessionByIDs(ctx, u.authClient, e.UserAgentID, e.Aggregate().ID, e.Aggregate().InstanceID)
-		if err != nil {
-			return err
-		}
-		if !userSession.ID.Valid {
+		if e.SessionID == "" {
 			return nil
 		}
-		return u.terminateSession(ctx, userSession.ID.String, e)
+		return u.terminateSession(ctx, e.SessionID, e)
 	}), nil
 }
 
