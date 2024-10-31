@@ -3125,7 +3125,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 		args struct {
 			ctx      context.Context
 			agentID  string
-			sessions map[string]string
+			sessions []HumanSignOutSession
 		}
 	)
 	type res struct {
@@ -3146,7 +3146,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				agentID:  "",
-				sessions: map[string]string{"session1": "user1"},
+				sessions: []HumanSignOutSession{{ID: "session1", UserID: "user1"}},
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -3160,7 +3160,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				agentID:  "agent1",
-				sessions: map[string]string{},
+				sessions: []HumanSignOutSession{},
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -3176,7 +3176,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				agentID:  "agent1",
-				sessions: map[string]string{"session1": "user1"},
+				sessions: []HumanSignOutSession{{ID: "session1", UserID: "user1"}},
 			},
 			res: res{},
 		},
@@ -3212,7 +3212,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				agentID:  "agent1",
-				sessions: map[string]string{"session1": "user1"},
+				sessions: []HumanSignOutSession{{ID: "session1", UserID: "user1"}},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -3273,7 +3273,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 			args: args{
 				ctx:      context.Background(),
 				agentID:  "agent1",
-				sessions: map[string]string{"session1": "user1", "session2": "user2"},
+				sessions: []HumanSignOutSession{{ID: "session1", UserID: "user1"}, {ID: "session2", UserID: "user2"}},
 			},
 			res: res{
 				want: &domain.ObjectDetails{

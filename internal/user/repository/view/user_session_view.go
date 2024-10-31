@@ -65,8 +65,8 @@ func UserAgentIDBySessionID(ctx context.Context, db *database.DB, sessionID, ins
 	return userAgentID, err
 }
 
-// ActiveUserIDsBySessionID returns all sessions (sessionID:userID map) with an active session on the same user agent (its id is also returned) based on a sessionID
-func ActiveUserIDsBySessionID(ctx context.Context, db *database.DB, sessionID, instanceID string) (userAgentID string, sessions map[string]string, err error) {
+// ActiveUserSessionsBySessionID returns all sessions (sessionID:userID map) with an active session on the same user agent (its id is also returned) based on a sessionID
+func ActiveUserSessionsBySessionID(ctx context.Context, db *database.DB, sessionID, instanceID string) (userAgentID string, sessions map[string]string, err error) {
 	err = db.QueryContext(
 		ctx,
 		func(rows *sql.Rows) error {

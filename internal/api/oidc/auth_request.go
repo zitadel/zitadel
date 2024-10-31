@@ -278,10 +278,10 @@ func (o *OPStorage) terminateV1Session(ctx context.Context, userID, sessionID st
 		if err != nil {
 			return err
 		}
-		return o.command.HumansSignOut(ctx, userAgentID, map[string]string{sessionID: userID})
+		return o.command.HumansSignOut(ctx, userAgentID, []command.HumanSignOutSession{{ID: sessionID, UserID: userID}})
 	}
 	// otherwise we search for all active sessions within the same user agent of the current session id
-	userAgentID, sessions, err := o.repo.ActiveUserIDsBySessionID(ctx, sessionID)
+	userAgentID, sessions, err := o.repo.ActiveUserSessionsBySessionID(ctx, sessionID)
 	if err != nil {
 		logging.WithError(err).Error("error retrieving user sessions")
 		return err

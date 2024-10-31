@@ -11,7 +11,7 @@ import (
 type Type int
 
 const (
-	InstanceCreated Type = iota
+	InstanceCreated Type = iota // previously there was an "unknown"
 	AuthenticationSucceededOnInstance
 	ProjectCreated
 	ApplicationCreated
