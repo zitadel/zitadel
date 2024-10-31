@@ -122,6 +122,7 @@ type Steps struct {
 	s33SMSConfigs3TwilioAddVerifyServiceSid *SMSConfigs3TwilioAddVerifyServiceSid
 	s34AddCacheSchema                       *AddCacheSchema
 	s35AddPositionToIndexEsWm               *AddPositionToIndexEsWm
+	s36FillV2Milestones                     *FillV2Milestones
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

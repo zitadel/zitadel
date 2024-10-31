@@ -1469,7 +1469,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 			givenTemplate := "{{.LogoURL}}"
 			testCode := ""
 			expiry := 0 * time.Hour
-			expectContent := fmt.Sprintf(`%[1]s is your one-time-password for %[2]s. Use it within the next %[3]s.
+			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, eventOriginDomain, expiry)
 			w.messageSMS = &messages.SMS{
 				SenderPhoneNumber:    "senderNumber",
@@ -1506,7 +1506,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 			givenTemplate := "{{.LogoURL}}"
 			testCode := ""
 			expiry := 0 * time.Hour
-			expectContent := fmt.Sprintf(`%[1]s is your one-time-password for %[2]s. Use it within the next %[3]s.
+			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
 			w.messageSMS = &messages.SMS{
 				SenderPhoneNumber:    "senderNumber",
