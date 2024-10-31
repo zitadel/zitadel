@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+
+	"github.com/zitadel/zitadel/internal/command"
 )
 
 type UserRepository interface {
-	UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error)
+	UserSessionsByAgentID(ctx context.Context, agentID string) (sessions []command.HumanSignOutSession, err error)
 	UserAgentIDBySessionID(ctx context.Context, sessionID string) (string, error)
-	ActiveUserIDsBySessionID(ctx context.Context, sessionID string) (userAgentID string, userIDs []string, err error)
+	ActiveUserSessionsBySessionID(ctx context.Context, sessionID string) (userAgentID string, sessions []command.HumanSignOutSession, err error)
 }

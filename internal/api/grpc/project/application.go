@@ -61,6 +61,7 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			AdditionalOrigins:        app.AdditionalOrigins,
 			AllowedOrigins:           app.AllowedOrigins,
 			SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
+			BackChannelLogoutUri:     app.BackChannelLogoutURI,
 		},
 	}
 }

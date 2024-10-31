@@ -15,8 +15,9 @@ var _TypeIndex = [...]uint8{0, 16, 52, 67, 86, 125, 141}
 const _TypeLowerName = "instance_createdauthentication_succeeded_on_instanceproject_createdapplication_createdauthentication_succeeded_on_applicationinstance_deleted"
 
 func (i Type) String() string {
+	i -= 1
 	if i < 0 || i >= Type(len(_TypeIndex)-1) {
-		return fmt.Sprintf("Type(%d)", i)
+		return fmt.Sprintf("Type(%d)", i+1)
 	}
 	return _TypeName[_TypeIndex[i]:_TypeIndex[i+1]]
 }
@@ -25,12 +26,12 @@ func (i Type) String() string {
 // Re-run the stringer command to generate them again.
 func _TypeNoOp() {
 	var x [1]struct{}
-	_ = x[InstanceCreated-(0)]
-	_ = x[AuthenticationSucceededOnInstance-(1)]
-	_ = x[ProjectCreated-(2)]
-	_ = x[ApplicationCreated-(3)]
-	_ = x[AuthenticationSucceededOnApplication-(4)]
-	_ = x[InstanceDeleted-(5)]
+	_ = x[InstanceCreated-(1)]
+	_ = x[AuthenticationSucceededOnInstance-(2)]
+	_ = x[ProjectCreated-(3)]
+	_ = x[ApplicationCreated-(4)]
+	_ = x[AuthenticationSucceededOnApplication-(5)]
+	_ = x[InstanceDeleted-(6)]
 }
 
 var _TypeValues = []Type{InstanceCreated, AuthenticationSucceededOnInstance, ProjectCreated, ApplicationCreated, AuthenticationSucceededOnApplication, InstanceDeleted}
