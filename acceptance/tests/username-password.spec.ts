@@ -2,6 +2,7 @@ import {test as base} from "@playwright/test";
 import {PasswordUser} from './user';
 import path from 'path';
 import dotenv from 'dotenv';
+import {checkLogin} from "./login";
 
 // Read from ".env" file.
 dotenv.config({path: path.resolve(__dirname, '.env.local')});
@@ -22,7 +23,7 @@ const test = base.extend<{ user: PasswordUser }>({
 
 test("username and password login", async ({user, page}) => {
     await user.login(page)
-    await page.getByRole("heading", {name: "Welcome " + user.fullName() + "!"}).click();
+    await checkLogin(page, user.fullName());
 });
 
 

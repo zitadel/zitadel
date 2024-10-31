@@ -178,7 +178,7 @@ export function SetRegisterPasswordForm({
       {error && <Alert>{error}</Alert>}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton />
+        <BackButton data-testid="back-button" />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}

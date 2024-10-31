@@ -3,6 +3,7 @@ import {Page} from "@playwright/test";
 import {registerWithPasskey} from "./register";
 import {loginWithPasskey, loginWithPassword} from "./login";
 import {changePassword} from "./password";
+import {removeUser, getUserByUsername} from './zitadel';
 
 export interface userProps {
     email: string;
@@ -58,17 +59,7 @@ class User {
     }
 
     async remove() {
-        const response = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/" + this.userId(), {
-            method: 'DELETE',
-            headers: {
-                'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
-            }
-        });
-        if (response.statusCode >= 400 && response.statusCode != 404) {
-            const error = 'HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage;
-            console.error(error);
-            throw new Error(error);
-        }
+        await removeUser(this.userId())
         return
     }
 
@@ -216,30 +207,4 @@ export class PasskeyUser extends User {
         this.setUserId(resp.result[0].userId)
         await super.remove()
     }
-}
-
-async function getUserByUsername(username: string) {
-    const listUsersBody = {
-        queries: [{
-            userNameQuery: {
-                userName: username,
-            }
-        }]
-    }
-    const jsonBody = JSON.stringify(listUsersBody)
-    const registerResponse = await fetch(process.env.ZITADEL_API_URL! + "/v2/users", {
-        method: 'POST',
-        body: jsonBody,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
-        }
-    });
-    if (registerResponse.statusCode >= 400) {
-        const error = 'HTTP Error: ' + registerResponse.statusCode + ' - ' + registerResponse.statusMessage;
-        console.error(error);
-        throw new Error(error);
-    }
-    const respJson = await registerResponse.json()
-    return respJson
 }

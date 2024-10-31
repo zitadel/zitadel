@@ -71,8 +71,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
       organizationId: command.organization,
     });
 
-    console.log(users);
-
     if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
       user = users.result[0];
 

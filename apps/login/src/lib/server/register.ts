@@ -43,7 +43,6 @@ export async function registerUser(command: RegisterUserCommand) {
             password: {password: command.password}
         });
     }
-    console.log(checks)
     return createSessionAndUpdateCookie(
         checks,
         undefined,
