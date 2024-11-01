@@ -98,6 +98,7 @@ type Commands struct {
 }
 
 func StartCommands(
+	ctx context.Context,
 	es *eventstore.Eventstore,
 	cacheConnectors connector.Connectors,
 	defaults sd.SystemDefaults,
@@ -131,7 +132,7 @@ func StartCommands(
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
 	}
-	caches, err := startCaches(context.TODO(), cacheConnectors)
+	caches, err := startCaches(ctx, cacheConnectors)
 	if err != nil {
 		return nil, fmt.Errorf("caches: %w", err)
 	}

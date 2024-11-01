@@ -164,7 +164,7 @@ func projections(
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
-	commands, err := command.StartCommands(
+	commands, err := command.StartCommands(ctx,
 		es,
 		cacheConnectors,
 		config.SystemDefaults,

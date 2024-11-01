@@ -395,7 +395,7 @@ func initProjections(
 	permissionCheck := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
-	commands, err := command.StartCommands(
+	commands, err := command.StartCommands(ctx,
 		eventstoreClient,
 		cacheConnectors,
 		config.SystemDefaults,
