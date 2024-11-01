@@ -80,8 +80,19 @@ type Entry[I, K comparable] interface {
 	Keys(index I) (key []K)
 }
 
+type Connector int
+
+//go:generate enumer -type Connector -transform snake -trimprefix Connector -linecomment -text
+const (
+	// Empty line comment ensures empty string for unspecified value
+	ConnectorUnspecified Connector = iota //
+	ConnectorMemory
+	ConnectorPostgres
+	ConnectorRedis
+)
+
 type Config struct {
-	Connector string
+	Connector Connector
 
 	// Age since an object was added to the cache,
 	// after which the object is considered invalid.

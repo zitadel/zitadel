@@ -4,7 +4,6 @@ package connector
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/cache/connector/gomap"
@@ -44,15 +43,15 @@ func StartConnectors(conf *CachesConfig, client *database.DB) (Connectors, error
 }
 
 func StartCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Context, indices []I, purpose cache.Purpose, conf *cache.Config, connectors Connectors) (cache.Cache[I, K, V], error) {
-	if conf == nil || conf.Connector == "" {
+	if conf == nil || conf.Connector == cache.ConnectorUnspecified {
 		return noop.NewCache[I, K, V](), nil
 	}
-	if strings.EqualFold(conf.Connector, "memory") && connectors.Memory != nil {
+	if conf.Connector == cache.ConnectorMemory && connectors.Memory != nil {
 		c := gomap.NewCache[I, K, V](background, indices, *conf)
 		connectors.Memory.Config.StartAutoPrune(background, c, purpose)
 		return c, nil
 	}
-	if strings.EqualFold(conf.Connector, "postgres") && connectors.Postgres != nil {
+	if conf.Connector == cache.ConnectorPostgres && connectors.Postgres != nil {
 		c, err := pg.NewCache[I, K, V](background, purpose, *conf, indices, connectors.Postgres)
 		if err != nil {
 			return nil, fmt.Errorf("start cache: %w", err)
@@ -60,7 +59,7 @@ func StartCache[I ~int, K ~string, V cache.Entry[I, K]](background context.Conte
 		connectors.Postgres.Config.AutoPrune.StartAutoPrune(background, c, purpose)
 		return c, nil
 	}
-	if strings.EqualFold(conf.Connector, "redis") && connectors.Redis != nil {
+	if conf.Connector == cache.ConnectorRedis && connectors.Redis != nil {
 		db := connectors.Redis.Config.DBOffset + int(purpose)
 		c := redis.NewCache[I, K, V](*conf, connectors.Redis, db, indices)
 		return c, nil

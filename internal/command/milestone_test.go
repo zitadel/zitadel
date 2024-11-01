@@ -183,7 +183,7 @@ func TestCommands_GetMilestonesReached(t *testing.T) {
 			cache := gomap.NewCache[milestoneIndex, string, *MilestonesReached](
 				context.Background(),
 				[]milestoneIndex{milestoneIndexInstanceID},
-				cache.Config{Connector: "memory"},
+				cache.Config{Connector: cache.ConnectorMemory},
 			)
 			cache.Set(context.Background(), cached)
 
