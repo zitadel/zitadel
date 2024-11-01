@@ -659,6 +659,8 @@ func NewLifetimeSetEvent(
 
 type TerminateEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	TriggerOrigin string `json:"triggerOrigin,omitempty"`
 }
 
 func (e *TerminateEvent) Payload() interface{} {
