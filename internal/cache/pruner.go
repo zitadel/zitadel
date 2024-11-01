@@ -58,9 +58,9 @@ func (c *AutoPruneConfig) pruneTimer(background context.Context, pruner Pruner, 
 		case <-background.Done():
 			return
 		case <-timer.Chan():
-			timer.Reset(c.Interval)
 			err := c.doPrune(background, pruner)
 			logging.OnError(err).WithField("purpose", purpose).Error("cache auto prune")
+			timer.Reset(c.Interval)
 		}
 	}
 }
