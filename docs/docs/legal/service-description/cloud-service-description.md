@@ -77,10 +77,10 @@ We can not guarantee that during transit the data will only remain within this r
 
 The following regions will be available when using our cloud service. This list is for informational purposes and will be updated in due course, please refer to our website for all available regions at this time.
 
-- **Global**: All available cloud regions offered by our cloud provider
+- **United States**: Exclusively hosted on regions in the United States
+- **European Union**: Exclusively hosted on regions in the European Union
 - **Switzerland**: Exclusively on Swiss region
-- **US-1**: Exclusively hosted on regions in the United States
-- **GDPR safe countries**: Hosting location is within any of the EU member states and [Adequate Countries](https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en) as recognized by the European Commission under the GDPR
+- **Australia**: Exclusively hosted on regions in the Australia
 
 ## Backup
 
