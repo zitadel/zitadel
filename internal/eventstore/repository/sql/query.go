@@ -27,7 +27,7 @@ type querier interface {
 	eventQuery(useV1 bool) string
 	maxSequenceQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
-	db() *database.DB
+	Client() *database.DB
 	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
 	dialect.Database
 }
@@ -110,7 +110,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	var contextQuerier interface {
 		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
 	}
-	contextQuerier = criteria.db()
+	contextQuerier = criteria.Client()
 	if q.Tx != nil {
 		contextQuerier = &tx{Tx: q.Tx}
 	}

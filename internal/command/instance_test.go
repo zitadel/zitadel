@@ -13,6 +13,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/cache/noop"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -20,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -125,6 +127,7 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 			0,
 			nil,
 			false,
+			"",
 		),
 	}
 }
@@ -372,6 +375,7 @@ func setupInstanceEvents(ctx context.Context, instanceID, orgID, projectID, appI
 		setupInstanceElementsEvents(ctx, instanceID, instanceName, defaultLanguage),
 		orgEvents(ctx, instanceID, orgID, orgName, projectID, domain, externalSecure, true, true),
 		generatedDomainEvents(ctx, instanceID, orgID, projectID, appID, domain),
+		instanceCreatedMilestoneEvent(ctx, instanceID),
 	)
 }
 
@@ -398,6 +402,12 @@ func generatedDomainEvents(ctx context.Context, instanceID, orgID, projectID, ap
 		instance.NewDomainAddedEvent(ctx, &instanceAgg.Aggregate, defaultDomain, true),
 		changed,
 		instance.NewDomainPrimarySetEvent(ctx, &instanceAgg.Aggregate, defaultDomain),
+	}
+}
+
+func instanceCreatedMilestoneEvent(ctx context.Context, instanceID string) []eventstore.Command {
+	return []eventstore.Command{
+		milestone.NewReachedEvent(ctx, milestone.NewInstanceAggregate(instanceID), milestone.InstanceCreated),
 	}
 }
 
@@ -430,6 +440,7 @@ func generatedDomainFilters(instanceID, orgID, projectID, appID, generatedDomain
 				0,
 				nil,
 				false,
+				"",
 			),
 		),
 		expectFilter(
@@ -1378,7 +1389,7 @@ func TestCommandSide_UpdateInstance(t *testing.T) {
 
 func TestCommandSide_RemoveInstance(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
@@ -1397,8 +1408,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 		{
 			name: "instance not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1413,8 +1423,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 		{
 			name: "instance removed, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewInstanceAddedEvent(
@@ -1444,8 +1453,7 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 		{
 			name: "instance remove, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
@@ -1480,6 +1488,10 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 								"custom.domain",
 							},
 						),
+						milestone.NewReachedEvent(context.Background(),
+							milestone.NewInstanceAggregate("INSTANCE"),
+							milestone.InstanceDeleted,
+						),
 					),
 				),
 			},
@@ -1497,7 +1509,10 @@ func TestCommandSide_RemoveInstance(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
+				caches: &Caches{
+					milestones: noop.NewCache[milestoneIndex, string, *MilestonesReached](),
+				},
 			}
 			got, err := r.RemoveInstance(tt.args.ctx, tt.args.instanceID)
 			if tt.res.err == nil {
