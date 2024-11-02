@@ -44,7 +44,7 @@ jobs:
           cache: 'pnpm'
 
       - uses: actions/cache@v4.0.2
-        name: Setup Cypress cache
+        name: Setup Cypress binary cache
         with:
           path: ~/.cache/Cypress
           key: ${{ runner.os }}-cypress-binary-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -56,7 +56,7 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-        # We can cache the Playwright binary cache independently from the pnpm cache, because we install it separately.
+        # We can cache the Playwright binary independently from the pnpm cache, because we install it separately.
         # After pnpm install --frozen-lockfile, we can get the version so we only have to download the binary once per version.
       - run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
         if: ${{ matrix.command == 'test:acceptance' }}
