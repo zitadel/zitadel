@@ -168,6 +168,12 @@ message OIDCConfig {
             description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
         }
     ];
+    string back_channel_logout_uri = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://example.com/auth/backchannel\"]";
+            description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
+        }
+    ];
 }
 
 enum OIDCResponseType {

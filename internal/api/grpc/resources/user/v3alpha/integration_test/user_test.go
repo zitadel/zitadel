@@ -224,6 +224,7 @@ func TestServer_CreateUser(t *testing.T) {
 			if tt.res.returnCodePhone {
 				require.NotNil(t, got.PhoneCode)
 			}
+
 		})
 	}
 }
@@ -629,10 +630,10 @@ func TestServer_PatchUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.PatchUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCodeEmail {
 				assert.NotNil(t, got.EmailCode)
@@ -848,10 +849,10 @@ func TestServer_DeleteUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.DeleteUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
@@ -1059,10 +1060,10 @@ func TestServer_LockUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.LockUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
@@ -1242,10 +1243,10 @@ func TestServer_UnlockUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.UnlockUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
@@ -1444,10 +1445,10 @@ func TestServer_DeactivateUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.DeactivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
@@ -1627,10 +1628,10 @@ func TestServer_ActivateUser(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.ActivateUser(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}

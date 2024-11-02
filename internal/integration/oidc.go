@@ -52,7 +52,13 @@ func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedi
 		return nil, err
 	}
 	return resp, await(func() error {
-		_, err := i.Client.Mgmt.GetAppByID(ctx, &management.GetAppByIDRequest{
+		_, err := i.Client.Mgmt.GetProjectByID(ctx, &management.GetProjectByIDRequest{
+			Id: projectID,
+		})
+		if err != nil {
+			return err
+		}
+		_, err = i.Client.Mgmt.GetAppByID(ctx, &management.GetAppByIDRequest{
 			ProjectId: projectID,
 			AppId:     resp.GetAppId(),
 		})
@@ -152,7 +158,13 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI
 		return nil, err
 	}
 	return resp, await(func() error {
-		_, err := i.Client.Mgmt.GetAppByID(ctx, &management.GetAppByIDRequest{
+		_, err := i.Client.Mgmt.GetProjectByID(ctx, &management.GetProjectByIDRequest{
+			Id: project.GetId(),
+		})
+		if err != nil {
+			return err
+		}
+		_, err = i.Client.Mgmt.GetAppByID(ctx, &management.GetAppByIDRequest{
 			ProjectId: project.GetId(),
 			AppId:     resp.GetAppId(),
 		})

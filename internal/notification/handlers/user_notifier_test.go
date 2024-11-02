@@ -19,6 +19,7 @@ import (
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
+	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
@@ -1469,7 +1470,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 			givenTemplate := "{{.LogoURL}}"
 			testCode := ""
 			expiry := 0 * time.Hour
-			expectContent := fmt.Sprintf(`%[1]s is your one-time-password for %[2]s. Use it within the next %[3]s.
+			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, eventOriginDomain, expiry)
 			w.messageSMS = &messages.SMS{
 				SenderPhoneNumber:    "senderNumber",
@@ -1506,7 +1507,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 			givenTemplate := "{{.LogoURL}}"
 			testCode := ""
 			expiry := 0 * time.Hour
-			expectContent := fmt.Sprintf(`%[1]s is your one-time-password for %[2]s. Use it within the next %[3]s.
+			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
 			w.messageSMS = &messages.SMS{
 				SenderPhoneNumber:    "senderNumber",
@@ -1660,6 +1661,10 @@ func (c *channels) SMS(context.Context) (*senders.Chain, *sms.Config, error) {
 }
 
 func (c *channels) Webhook(context.Context, webhook.Config) (*senders.Chain, error) {
+	return &c.Chain, nil
+}
+
+func (c *channels) SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error) {
 	return &c.Chain, nil
 }
 

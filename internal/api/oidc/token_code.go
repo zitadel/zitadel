@@ -75,6 +75,7 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		authReq.UserID,
 		authReq.UserOrgID,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		authReq.Audience,
 		authReq.AuthMethods(),

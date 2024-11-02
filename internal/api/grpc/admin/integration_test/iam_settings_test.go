@@ -5,6 +5,7 @@ package admin_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -53,16 +54,19 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := instance.Client.Admin.GetSecurityPolicy(tt.ctx, &admin_pb.GetSecurityPolicyRequest{})
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			got, want := resp.GetPolicy(), tt.want.GetPolicy()
-			assert.Equal(t, want.GetEnableIframeEmbedding(), got.GetEnableIframeEmbedding(), "enable iframe embedding")
-			assert.Equal(t, want.GetAllowedOrigins(), got.GetAllowedOrigins(), "allowed origins")
-			assert.Equal(t, want.GetEnableImpersonation(), got.GetEnableImpersonation(), "enable impersonation")
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				resp, err := instance.Client.Admin.GetSecurityPolicy(tt.ctx, &admin_pb.GetSecurityPolicyRequest{})
+				if tt.wantErr {
+					require.Error(ttt, err)
+					return
+				}
+				require.NoError(ttt, err)
+				got, want := resp.GetPolicy(), tt.want.GetPolicy()
+				assert.Equal(ttt, want.GetEnableIframeEmbedding(), got.GetEnableIframeEmbedding(), "enable iframe embedding")
+				assert.Equal(ttt, want.GetAllowedOrigins(), got.GetAllowedOrigins(), "allowed origins")
+				assert.Equal(ttt, want.GetEnableImpersonation(), got.GetEnableImpersonation(), "enable impersonation")
+			}, retryDuration, tick, "timeout waiting for expected target result")
 		})
 	}
 }
@@ -162,7 +166,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := instance.Client.Admin.SetSecurityPolicy(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)

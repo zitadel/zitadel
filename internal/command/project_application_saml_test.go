@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -76,7 +77,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp:       &domain.SAMLApp{},
 				resourceOwner: "org1",
 			},
@@ -93,7 +94,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -123,7 +124,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -154,7 +155,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -201,7 +202,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -260,7 +261,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				httpClient:  newTestClient(200, testMetadata),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -305,7 +306,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				httpClient:  newTestClient(http.StatusNotFound, nil),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				samlApp: &domain.SAMLApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -325,13 +326,13 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 				httpClient:  tt.fields.httpClient,
 			}
-
-			got, err := r.AddSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
+			c.setMilestonesCompletedForTest("instanceID")
+			got, err := c.AddSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -97,10 +97,11 @@ func TestServer_ListOrgMembers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
 			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
 				got, err := Client.ListOrgMembers(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assert.Error(ct, err)
+					require.Error(ct, err)
 					return
 				}
 				require.NoError(ct, err)
@@ -113,7 +114,7 @@ func TestServer_ListOrgMembers(t *testing.T) {
 						assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
 					}
 				}
-			}, time.Minute, time.Second)
+			}, retryDuration, tick)
 		})
 	}
 }
@@ -183,7 +184,7 @@ func TestServer_AddOrgMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.AddOrgMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -264,7 +265,7 @@ func TestServer_UpdateOrgMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.UpdateOrgMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
@@ -321,7 +322,7 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.RemoveOrgMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
