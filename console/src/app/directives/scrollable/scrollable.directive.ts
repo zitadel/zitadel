@@ -1,6 +1,7 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angular/core';
 
 @Directive({
+  standalone: true,
   selector: '[cnslScrollable]',
 })
 export class ScrollableDirective {
@@ -15,7 +16,6 @@ export class ScrollableDirective {
       const top = event.target.scrollTop;
       const height = this.el.nativeElement.scrollHeight;
       const offset = this.el.nativeElement.offsetHeight;
-
       // emit bottom event
       if (top > height - offset - 1) {
         this.scrollPosition.emit('bottom');

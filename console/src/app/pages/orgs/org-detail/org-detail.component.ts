@@ -15,6 +15,7 @@ import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -48,6 +49,7 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
     private auth: GrpcAuthService,
     private dialog: MatDialog,
     public mgmtService: ManagementService,
+    private adminService: AdminService,
     private toast: ToastService,
     private router: Router,
     breadcrumbService: BreadcrumbService,
@@ -146,15 +148,34 @@ export class OrgDetailComponent implements OnInit, OnDestroy {
         width: '400px',
       });
 
+      // Before we remove the org we get the current default org
+      // we have to query before the current org is removed
       dialogRef.afterClosed().subscribe((resp) => {
         if (resp) {
-          this.mgmtService
-            .removeOrg()
-            .then(() => {
-              setTimeout(() => {
-                this.router.navigate(['/orgs']);
-              }, 1000);
-              this.toast.showInfo('ORG.TOAST.DELETED', true);
+          this.adminService
+            .getDefaultOrg()
+            .then((response) => {
+              const org = response?.org;
+              if (org) {
+                // We now remove the org
+                this.mgmtService
+                  .removeOrg()
+                  .then(() => {
+                    setTimeout(() => {
+                      // We change active org to default org as
+                      // current org was deleted to avoid Organization doesn't exist
+                      this.auth.setActiveOrg(org);
+                      // Now we visit orgs
+                      this.router.navigate(['/orgs']);
+                    }, 1000);
+                    this.toast.showInfo('ORG.TOAST.DELETED', true);
+                  })
+                  .catch((error) => {
+                    this.toast.showError(error);
+                  });
+              } else {
+                this.toast.showError('ORG.TOAST.DEFAULTORGNOTFOUND', false, true);
+              }
             })
             .catch((error) => {
               this.toast.showError(error);

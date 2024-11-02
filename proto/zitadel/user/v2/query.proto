@@ -1,0 +1,268 @@
+syntax = "proto3";
+
+package zitadel.user.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/user/v2/user.proto";
+import "zitadel/object/v2/object.proto";
+
+message SearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        UserNameQuery user_name_query = 1;
+        FirstNameQuery first_name_query = 2;
+        LastNameQuery last_name_query = 3;
+        NickNameQuery nick_name_query = 4;
+        DisplayNameQuery display_name_query = 5;
+        EmailQuery email_query = 6;
+        StateQuery state_query = 7;
+        TypeQuery type_query = 8;
+        LoginNameQuery login_name_query = 9;
+        InUserIDQuery in_user_ids_query = 10;
+        OrQuery or_query = 11;
+        AndQuery and_query = 12;
+        NotQuery not_query = 13;
+        InUserEmailsQuery in_user_emails_query = 14;
+        OrganizationIdQuery organization_id_query = 15;
+    }
+}
+
+// Connect multiple sub-condition with and OR operator.
+message OrQuery {
+    repeated SearchQuery queries = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the sub queries to 'OR'"
+        }
+    ];
+}
+
+// Connect multiple sub-condition with and AND operator.
+message AndQuery {
+    repeated SearchQuery queries = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the sub queries to 'AND'"
+        }
+    ];
+}
+
+// Negate the sub-condition.
+message NotQuery {
+    SearchQuery query = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the sub query to negate (NOT)"
+        }
+    ];
+}
+
+// Query for users with ID in list of IDs.
+message InUserIDQuery {
+    repeated string user_ids = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the ids of the users to include"
+            example: "[\"69629023906488334\",\"69622366012355662\"]";
+        }
+    ];
+}
+
+// Query for users with a specific user name.
+message UserNameQuery {
+    string user_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"gigi-giraffe\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+// Query for users with a specific first name.
+message FirstNameQuery {
+    string first_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Gigi\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+// Query for users with a specific last name.
+message LastNameQuery {
+    string last_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Giraffe\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+// Query for users with a specific nickname.
+message NickNameQuery {
+    string nick_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Gigi\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+// Query for users with a specific display name.
+message DisplayNameQuery {
+    string display_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Gigi Giraffe\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+// Query for users with a specific email.
+message EmailQuery {
+    string email_address = 1 [
+        (validate.rules).string = {max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "email address of the user"
+            max_length: 200;
+            example: "\"gigi@zitadel.com\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+// Query for users with a specific state.
+message LoginNameQuery {
+    string login_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"gigi@zitadel.cloud\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+// Query for users with a specific state.
+message StateQuery {
+    UserState state = 1 [
+        (validate.rules).enum.defined_only = true,
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the user";
+        }
+    ];
+}
+
+// Query for users with a specific type.
+message TypeQuery {
+    Type type = 1 [
+        (validate.rules).enum.defined_only = true,
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the type of the user";
+        }
+    ];
+}
+
+// Query for users with email in list of emails.
+message InUserEmailsQuery {
+    repeated string user_emails = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the emails of the users to include"
+            example: "[\"test@example.com\",\"test@example.org\"]";
+        }
+    ];
+}
+
+// Query for users under a specific organization as resource owner.
+message OrganizationIdQuery {
+    string organization_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_HUMAN = 1;
+    TYPE_MACHINE = 2;
+}
+
+enum UserFieldName {
+    USER_FIELD_NAME_UNSPECIFIED = 0;
+    USER_FIELD_NAME_USER_NAME = 1;
+    USER_FIELD_NAME_FIRST_NAME = 2;
+    USER_FIELD_NAME_LAST_NAME = 3;
+    USER_FIELD_NAME_NICK_NAME = 4;
+    USER_FIELD_NAME_DISPLAY_NAME = 5;
+    USER_FIELD_NAME_EMAIL = 6;
+    USER_FIELD_NAME_STATE = 7;
+    USER_FIELD_NAME_TYPE = 8;
+    USER_FIELD_NAME_CREATION_DATE = 9;
+}

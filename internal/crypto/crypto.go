@@ -13,24 +13,16 @@ const (
 	TypeHash                  // Depcrecated: use [passwap.Swapper] instead
 )
 
-type Crypto interface {
-	Algorithm() string
-}
-
 type EncryptionAlgorithm interface {
-	Crypto
+	Algorithm() string
 	EncryptionKeyID() string
 	DecryptionKeyIDs() []string
 	Encrypt(value []byte) ([]byte, error)
 	Decrypt(hashed []byte, keyID string) ([]byte, error)
-	DecryptString(hashed []byte, keyID string) (string, error)
-}
 
-// Depcrecated: use [passwap.Swapper] instead
-type HashAlgorithm interface {
-	Crypto
-	Hash(value []byte) ([]byte, error)
-	CompareHash(hashed, comparer []byte) error
+	// DecryptString decrypts the value using the key identified by keyID.
+	// When the decrypted value contains non-UTF8 characters an error is returned.
+	DecryptString(hashed []byte, keyID string) (string, error)
 }
 
 type CryptoValue struct {
@@ -59,14 +51,8 @@ func (c *CryptoValue) Scan(src interface{}) error {
 
 type CryptoType int
 
-func Crypt(value []byte, c Crypto) (*CryptoValue, error) {
-	switch alg := c.(type) {
-	case EncryptionAlgorithm:
-		return Encrypt(value, alg)
-	case HashAlgorithm:
-		return Hash(value, alg)
-	}
-	return nil, zerrors.ThrowInternal(nil, "CRYPT-r4IaHZ", "algorithm not supported")
+func Crypt(value []byte, alg EncryptionAlgorithm) (*CryptoValue, error) {
+	return Encrypt(value, alg)
 }
 
 func Encrypt(value []byte, alg EncryptionAlgorithm) (*CryptoValue, error) {
@@ -82,6 +68,14 @@ func Encrypt(value []byte, alg EncryptionAlgorithm) (*CryptoValue, error) {
 	}, nil
 }
 
+func EncryptJSON(obj any, alg EncryptionAlgorithm) (*CryptoValue, error) {
+	data, err := json.Marshal(obj)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "CRYPT-Ei6doF", "error encrypting value")
+	}
+	return Encrypt(data, alg)
+}
+
 func Decrypt(value *CryptoValue, alg EncryptionAlgorithm) ([]byte, error) {
 	if err := checkEncryptionAlgorithm(value, alg); err != nil {
 		return nil, err
@@ -89,6 +83,19 @@ func Decrypt(value *CryptoValue, alg EncryptionAlgorithm) ([]byte, error) {
 	return alg.Decrypt(value.Crypted, value.KeyID)
 }
 
+func DecryptJSON(value *CryptoValue, dst any, alg EncryptionAlgorithm) error {
+	data, err := Decrypt(value, alg)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(data, dst); err != nil {
+		return zerrors.ThrowInternal(err, "CRYPT-Jaik2R", "error decrypting value")
+	}
+	return nil
+}
+
+// DecryptString decrypts the value using the key identified by keyID.
+// When the decrypted value contains non-UTF8 characters an error is returned.
 func DecryptString(value *CryptoValue, alg EncryptionAlgorithm) (string, error) {
 	if err := checkEncryptionAlgorithm(value, alg); err != nil {
 		return "", err
@@ -108,33 +115,6 @@ func checkEncryptionAlgorithm(value *CryptoValue, alg EncryptionAlgorithm) error
 	return zerrors.ThrowInvalidArgument(nil, "CRYPT-Kq12vn", "value was encrypted with a different key")
 }
 
-func Hash(value []byte, alg HashAlgorithm) (*CryptoValue, error) {
-	hashed, err := alg.Hash(value)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "CRYPT-rBVaJU", "error hashing value")
-	}
-	return &CryptoValue{
-		CryptoType: TypeHash,
-		Algorithm:  alg.Algorithm(),
-		Crypted:    hashed,
-	}, nil
-}
-
-func CompareHash(value *CryptoValue, comparer []byte, alg HashAlgorithm) error {
-	if value.Algorithm != alg.Algorithm() {
-		return zerrors.ThrowInvalidArgument(nil, "CRYPT-HF32f", "value was hashed with a different algorithm")
-	}
-	return alg.CompareHash(value.Crypted, comparer)
-}
-
-func FillHash(value []byte, alg HashAlgorithm) *CryptoValue {
-	return &CryptoValue{
-		CryptoType: TypeHash,
-		Algorithm:  alg.Algorithm(),
-		Crypted:    value,
-	}
-}
-
 func CheckToken(alg EncryptionAlgorithm, token string, content string) error {
 	if token == "" {
 		return zerrors.ThrowPermissionDenied(nil, "CRYPTO-Sfefs", "Errors.Intent.InvalidToken")
@@ -151,4 +131,13 @@ func CheckToken(alg EncryptionAlgorithm, token string, content string) error {
 		return zerrors.ThrowPermissionDenied(nil, "CRYPTO-CRYPTO", "Errors.Intent.InvalidToken")
 	}
 	return nil
+}
+
+// SecretOrEncodedHash returns the Crypted value from legacy [CryptoValue] if it is not nil.
+// otherwise it will returns the encoded hash string.
+func SecretOrEncodedHash(secret *CryptoValue, encoded string) string {
+	if secret != nil {
+		return string(secret.Crypted)
+	}
+	return encoded
 }

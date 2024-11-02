@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+message SecuritySettings {
+  EmbeddedIframeSettings embedded_iframe = 1;
+  bool enable_impersonation = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default language for the current context"
+      example: "\"en\""
+    }
+  ];
+}
+
+message EmbeddedIframeSettings{
+  bool enabled = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "states if iframe embedding is enabled or disabled"
+    }
+  ];
+  repeated string allowed_origins = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "origins allowed loading ZITADEL in an iframe if enabled."
+      example: "[\"foo.bar.com\", \"localhost:8080\"]"
+    }
+  ];
+}

@@ -1,0 +1,69 @@
+.tile {
+  position: relative;
+  margin: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 230px;
+  background: var(--card-background);
+  padding: 0.1rem;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid var(--card-border);
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.tile h4 {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  text-decoration: none;
+}
+
+.tile:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  text-decoration: none !important;
+  border-color: var(--card-border-hover);
+}
+
+.tile p {
+  font-size: 14px;
+  margin: 0;
+  color: var(--ifm-font-color-base);
+}
+
+.tile img {
+  display: block;
+  width: auto;
+  height: 60px;
+  background-size: cover;
+  object-fit: contain;
+  background-position: center;
+  pointer-events: none;
+  box-shadow: none !important;
+  margin: 0 auto;
+}
+
+.external {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  border-radius: 50vw;
+  padding: 1rem;
+  height: 4rem;
+  width: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--card-border);
+  background: #ffffff20;
+}
+
+.external i {
+  margin-bottom: -0.5rem;
+  margin-left: -0.5rem;
+}

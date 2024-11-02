@@ -3,17 +3,20 @@ package oidc
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/jonboulle/clockwork"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -22,31 +25,77 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// keySetCache implements oidc.KeySet for Access Token verification.
-// Public Keys are cached in a 2-dimensional map of Instance ID and Key ID.
-// When a key is not present the queryKey function is called to obtain the key
-// from the database.
-type keySetCache struct {
-	mtx          sync.RWMutex
-	instanceKeys map[string]map[string]query.PublicKey
-	queryKey     func(ctx context.Context, keyID string, current time.Time) (query.PublicKey, error)
-	clock        clockwork.Clock
+var supportedWebKeyAlgs = []string{
+	string(jose.EdDSA),
+	string(jose.RS256),
+	string(jose.RS384),
+	string(jose.RS512),
+	string(jose.ES256),
+	string(jose.ES384),
+	string(jose.ES512),
 }
 
-// newKeySet initializes a keySetCache and starts a purging Go routine,
-// which runs once every purgeInterval.
+func supportedSigningAlgs(ctx context.Context) []string {
+	if authz.GetFeatures(ctx).WebKey {
+		return supportedWebKeyAlgs
+	}
+	return []string{string(jose.RS256)}
+}
+
+type cachedPublicKey struct {
+	lastUse atomic.Int64 // unix micro time.
+	expiry  *time.Time   // expiry may be nil if the key does not expire.
+	webKey  *jose.JSONWebKey
+}
+
+func newCachedPublicKey(key *jose.JSONWebKey, expiry *time.Time, now time.Time) *cachedPublicKey {
+	cachedKey := &cachedPublicKey{
+		expiry: expiry,
+		webKey: key,
+	}
+	cachedKey.setLastUse(now)
+	return cachedKey
+}
+
+func (c *cachedPublicKey) setLastUse(now time.Time) {
+	c.lastUse.Store(now.UnixMicro())
+}
+
+func (c *cachedPublicKey) getLastUse() time.Time {
+	return time.UnixMicro(c.lastUse.Load())
+}
+
+func (c *cachedPublicKey) expired(now time.Time, validity time.Duration) bool {
+	return c.getLastUse().Add(validity).Before(now)
+}
+
+// publicKeyCache caches public keys in a 2-dimensional map of Instance ID and Key ID.
+// When a key is not present the queryKey function is called to obtain the key
+// from the database.
+type publicKeyCache struct {
+	mtx          sync.RWMutex
+	instanceKeys map[string]map[string]*cachedPublicKey
+
+	// queryKey returns a public web key.
+	// If the key does not have expiry, Time may be nil.
+	queryKey func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error)
+	clock    clockwork.Clock
+}
+
+// newPublicKeyCache initializes a keySetCache starts a purging Go routine.
+// The purge routine deletes all public keys that are older than maxAge.
 // When the passed context is done, the purge routine will terminate.
-func newKeySet(background context.Context, purgeInterval time.Duration, queryKey func(ctx context.Context, keyID string, current time.Time) (query.PublicKey, error)) *keySetCache {
-	k := &keySetCache{
-		instanceKeys: make(map[string]map[string]query.PublicKey),
+func newPublicKeyCache(background context.Context, maxAge time.Duration, queryKey func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error)) *publicKeyCache {
+	k := &publicKeyCache{
+		instanceKeys: make(map[string]map[string]*cachedPublicKey),
 		queryKey:     queryKey,
 		clock:        clockwork.FromContext(background), // defaults to real clock
 	}
-	go k.purgeOnInterval(background, k.clock.NewTicker(purgeInterval))
+	go k.purgeOnInterval(background, k.clock.NewTicker(maxAge/5), maxAge)
 	return k
 }
 
-func (k *keySetCache) purgeOnInterval(background context.Context, ticker clockwork.Ticker) {
+func (k *publicKeyCache) purgeOnInterval(background context.Context, ticker clockwork.Ticker, maxAge time.Duration) {
 	defer ticker.Stop()
 	for {
 		select {
@@ -59,7 +108,7 @@ func (k *keySetCache) purgeOnInterval(background context.Context, ticker clockwo
 		k.mtx.Lock()
 		for instanceID, keys := range k.instanceKeys {
 			for keyID, key := range keys {
-				if key.Expiry().Before(k.clock.Now()) {
+				if key.expired(k.clock.Now(), maxAge) {
 					delete(keys, keyID)
 				}
 			}
@@ -71,19 +120,18 @@ func (k *keySetCache) purgeOnInterval(background context.Context, ticker clockwo
 	}
 }
 
-func (k *keySetCache) setKey(instanceID, keyID string, key query.PublicKey) {
+func (k *publicKeyCache) setKey(instanceID, keyID string, cachedKey *cachedPublicKey) {
 	k.mtx.Lock()
 	defer k.mtx.Unlock()
 
 	if keys, ok := k.instanceKeys[instanceID]; ok {
-		keys[keyID] = key
+		keys[keyID] = cachedKey
 		return
 	}
-
-	k.instanceKeys[instanceID] = map[string]query.PublicKey{keyID: key}
+	k.instanceKeys[instanceID] = map[string]*cachedPublicKey{keyID: cachedKey}
 }
 
-func (k *keySetCache) getKey(ctx context.Context, keyID string) (_ *jose.JSONWebKey, err error) {
+func (k *publicKeyCache) getKey(ctx context.Context, keyID string) (_ *cachedPublicKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -94,24 +142,25 @@ func (k *keySetCache) getKey(ctx context.Context, keyID string) (_ *jose.JSONWeb
 	k.mtx.RUnlock()
 
 	if ok {
-		if key.Expiry().After(k.clock.Now()) {
-			return jsonWebkey(key), nil
+		key.setLastUse(k.clock.Now())
+	} else {
+		newKey, expiry, err := k.queryKey(ctx, keyID)
+		if err != nil {
+			return nil, err
 		}
-		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-Zoh9E", "Errors.Key.ExpireBeforeNow")
+		key = newCachedPublicKey(newKey, expiry, k.clock.Now())
+		k.setKey(instanceID, keyID, key)
 	}
 
-	key, err = k.queryKey(ctx, keyID, k.clock.Now())
-	if err != nil {
-		return nil, err
-	}
-	k.setKey(instanceID, keyID, key)
-	return jsonWebkey(key), nil
+	return key, nil
 }
 
-// VerifySignature implements the oidc.KeySet interface.
-func (k *keySetCache) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) (_ []byte, err error) {
+func (k *publicKeyCache) verifySignature(ctx context.Context, jws *jose.JSONWebSignature, checkKeyExpiry bool) (_ []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if len(jws.Signatures) != 1 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-Gid9s", "Errors.Token.Invalid")
@@ -120,7 +169,45 @@ func (k *keySetCache) VerifySignature(ctx context.Context, jws *jose.JSONWebSign
 	if err != nil {
 		return nil, err
 	}
-	return jws.Verify(key)
+	if checkKeyExpiry && key.expiry != nil && key.expiry.Before(k.clock.Now()) {
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow")
+	}
+	return jws.Verify(key.webKey)
+}
+
+type oidcKeySet struct {
+	*publicKeyCache
+
+	keyExpiryCheck bool
+}
+
+// newOidcKeySet returns an oidc.KeySet implementation around the passed cache.
+// It is advised to reuse the same cache if different key set configurations are required.
+func newOidcKeySet(cache *publicKeyCache, opts ...keySetOption) *oidcKeySet {
+	k := &oidcKeySet{
+		publicKeyCache: cache,
+	}
+	for _, opt := range opts {
+		opt(k)
+	}
+	return k
+}
+
+// VerifySignature implements the oidc.KeySet interface.
+func (k *oidcKeySet) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) (_ []byte, err error) {
+	return k.verifySignature(ctx, jws, k.keyExpiryCheck)
+}
+
+type keySetOption func(*oidcKeySet)
+
+// withKeyExpiryCheck forces VerifySignature to check the expiry of the public key.
+// Note that public key expiry is not part of the standard,
+// but is currently established behavior of zitadel.
+// We might want to remove this check in the future.
+func withKeyExpiryCheck(check bool) keySetOption {
+	return func(k *oidcKeySet) {
+		k.keyExpiryCheck = check
+	}
 }
 
 func jsonWebkey(key query.PublicKey) *jose.JSONWebKey {
@@ -145,7 +232,7 @@ func (k keySetMap) getKey(keyID string) (*jose.JSONWebKey, error) {
 	return &jose.JSONWebKey{
 		Key:   pubKey,
 		KeyID: keyID,
-		Use:   domain.KeyUsageSigning.String(),
+		Use:   crypto.KeyUsageSigning.String(),
 	}, nil
 }
 
@@ -248,7 +335,7 @@ func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err erro
 			return err
 		}
 		if key == nil {
-			return zerrors.ThrowInternal(nil, "test", "test")
+			return zerrors.ThrowNotFound(nil, "OIDC-ve4Qu", "Errors.Internal")
 		}
 		return nil
 	})
@@ -261,7 +348,7 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 		return nil, err
 	}
 	if len(keys.Keys) > 0 {
-		return o.privateKeyToSigningKey(selectSigningKey(keys.Keys))
+		return PrivateKeyToSigningKey(SelectSigningKey(keys.Keys), o.encAlg)
 	}
 	var position float64
 	if keys.State != nil {
@@ -290,8 +377,8 @@ func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bo
 	return position >= maxSequence, nil
 }
 
-func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
-	keyData, err := crypto.Decrypt(key.Key(), o.encAlg)
+func PrivateKeyToSigningKey(key query.PrivateKey, algorithm crypto.EncryptionAlgorithm) (_ op.SigningKey, err error) {
+	keyData, err := crypto.Decrypt(key.Key(), algorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -343,7 +430,7 @@ func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
 	)
 }
 
-func selectSigningKey(keys []query.PrivateKey) query.PrivateKey {
+func SelectSigningKey(keys []query.PrivateKey) query.PrivateKey {
 	return keys[len(keys)-1]
 }
 
@@ -360,4 +447,69 @@ func retry(retryable func() error) (err error) {
 		time.Sleep(retryBackoff)
 	}
 	return err
+}
+
+func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if !authz.GetFeatures(ctx).WebKey {
+		return s.LegacyServer.Keys(ctx, r)
+	}
+
+	keyset, err := s.query.GetWebKeySet(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return legacy keys, so we do not invalidate all tokens
+	// once the feature flag is enabled.
+	legacyKeys, err := s.query.ActivePublicKeys(ctx, time.Now())
+	logging.OnError(err).Error("oidc server: active public keys (legacy)")
+	appendPublicKeysToWebKeySet(keyset, legacyKeys)
+
+	resp := op.NewResponse(keyset)
+	if s.jwksCacheControlMaxAge != 0 {
+		resp.Header.Set(http_util.CacheControl,
+			fmt.Sprintf("max-age=%d, must-revalidate", int(s.jwksCacheControlMaxAge/time.Second)),
+		)
+	}
+
+	return resp, nil
+}
+
+func appendPublicKeysToWebKeySet(keyset *jose.JSONWebKeySet, pubkeys *query.PublicKeys) {
+	if pubkeys == nil || len(pubkeys.Keys) == 0 {
+		return
+	}
+	keyset.Keys = slices.Grow(keyset.Keys, len(pubkeys.Keys))
+
+	for _, key := range pubkeys.Keys {
+		keyset.Keys = append(keyset.Keys, jose.JSONWebKey{
+			Key:       key.Key(),
+			KeyID:     key.ID(),
+			Algorithm: key.Algorithm(),
+			Use:       key.Use().String(),
+		})
+	}
+}
+
+func queryKeyFunc(q *query.Queries) func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error) {
+	return func(ctx context.Context, keyID string) (*jose.JSONWebKey, *time.Time, error) {
+		if authz.GetFeatures(ctx).WebKey {
+			webKey, err := q.GetPublicWebKeyByID(ctx, keyID)
+			if err == nil {
+				return webKey, nil, nil
+			}
+			if !zerrors.IsNotFound(err) {
+				return nil, nil, err
+			}
+		}
+
+		pubKey, err := q.GetPublicKeyByID(ctx, keyID)
+		if err != nil {
+			return nil, nil, err
+		}
+		return jsonWebkey(pubKey), gu.Ptr(pubKey.Expiry()), nil
+	}
 }

@@ -1,15 +1,15 @@
 Login:
-  Title: С возвращением!
-  Description: Введите свои данные для входа.
-  TitleLinking: Логин для привязки пользователей
-  DescriptionLinking: Введите свои данные для входа, чтобы связать внешнего пользователя.
-  LoginNameLabel: Имя пользователя
-  UsernamePlaceHolder: Имя пользователя
+  Title: Добро пожаловать!
+  Description: Введите ваши данные.
+  TitleLinking: Вход для привязки пользователей
+  DescriptionLinking: Введите данные для входа, чтобы привязать внешнего пользователя к пользователю ZITADEL.
+  LoginNameLabel: Логин
+  UsernamePlaceHolder: логин
   LoginnamePlaceHolder: username@domain
-  ExternalUserDescription: Войдите в систему с внешним пользователем.
-  MustBeMemberOfOrg: Пользователь должен быть членом {{.OrgName}} организации.
-  RegisterButtonText: регистрировать
-  NextButtonText: следующий
+  ExternalUserDescription: Войти под внешним пользователем.
+  MustBeMemberOfOrg: Пользователь должен быть участником организации {{.OrgName}}.
+  RegisterButtonText: зарегистрироваться
+  NextButtonText: далее
 
 LDAP:
   Title: Войти
@@ -17,91 +17,101 @@ LDAP:
   LoginNameLabel: Имя пользователя
   PasswordLabel: Пароль
   NextButtonText: следующий
-
 SelectAccount:
-  Title: Выберите учетную запись
-  Description: Используйте свой аккаунт
-  TitleLinking: Выберите учетную запись для привязки пользователя
-  DescriptionLinking: Выберите свою учетную запись для связи с внешним пользователем.
+  Title: Выбор учётной записи
+  Description: Выберите вашу учётную запись.
+  TitleLinking: Выберите учётную запись для привязки пользователя
+  DescriptionLinking: Выберите свою учётную запись для связи с внешним пользователем.
   OtherUser: Другой пользователь
   SessionState0: активный
-  SessionState1: Вышел из системы
-  MustBeMemberOfOrg: Пользователь должен быть членом {{.OrgName}} организации.
+  SessionState1: неактивный
+  MustBeMemberOfOrg: Пользователь должен быть участником организации {{.OrgName}}.
 
 Password:
   Title: Пароль
   Description: Введите свои данные для входа.
   PasswordLabel: Пароль
-  MinLength: Минимальная длина
-  HasUppercase: Прописная буква
-  HasLowercase: Строчная буква
-  HasNumber: Число
-  HasSymbol: Символ
-  Confirmation: Подтверждающее совпадение
-  ResetLinkText: Сброс пароля
+  MinLength: Должно быть не менее
+  MinLengthp2: символов.
+  MaxLength: Должно быть меньше 70 символов.
+  HasUppercase: Должно содержать заглавную букву.
+  HasLowercase: Должно содержать строчную букву.
+  HasNumber: Должно содержать число.
+  HasSymbol: Должно содержать символ.
+  Confirmation: Подтверждение пароля совпадает.
+  ResetLinkText: Сбросить пароль
   BackButtonText: Назад
-  NextButtonText: следующий
+  NextButtonText: Вперед
 
 UsernameChange:
-  Title: Изменить имя пользователя
-  Description: Установите новое имя пользователя
-  UsernameLabel: Имя пользователя
-  CancelButtonText: Отмена
-  NextButtonText: следующий
+  Title: Изменение логина
+  Description: Установите новый логин.
+  UsernameLabel: Логин
+  CancelButtonText: отмена
+  NextButtonText: далее
 
 UsernameChangeDone:
-  Title: Имя пользователя изменено
-  Description: Ваше имя пользователя было успешно изменено.
-  NextButtonText: следующий
+  Title: Логин изменён
+  Description: Ваш логин был успешно изменён.
+  NextButtonText: далее
 
 InitPassword:
-  Title: Установить пароль
-  Description: Вы получили код, который необходимо ввести в форму ниже, чтобы установить новый пароль.
+  Title: Установка пароля
+  Description: Введите код из письма, отправленного на вашу электронную почту, чтобы установить пароль.
   CodeLabel: Код
   NewPasswordLabel: Новый пароль
-  NewPasswordConfirmLabel: Подтвердите пароль
-  ResendButtonText: Повторная отправка кода
-  NextButtonText: следующий
+  NewPasswordConfirmLabel: Подтверждение пароля
+  ResendButtonText: повторно отправить код
+  NextButtonText: далее
 
 InitPasswordDone:
-  Title: Установка пароля
-  Description: Пароль успешно установлен
-  NextButtonText: следующий
-  CancelButtonText: Отмена
+  Title: Пароль установлен
+  Description: Пароль успешно установлен.
+  NextButtonText: далее
+  CancelButtonText: отмена
 
 InitUser:
-  Title: Активировать пользователя
-  Description: Подтвердите свой адрес электронной почты с помощью приведенного ниже кода и установите пароль.
+  Title: Активация пользователя
+  Description: Подтвердите вашу электронную почту кодом из письма и установите пароль.
   CodeLabel: Код
   NewPasswordLabel: Новый пароль
-  NewPasswordConfirm: Подтвердите пароль
-  NextButtonText: следующий
-  ResendButtonText: Повторная отправка кода
+  NewPasswordConfirm: Подтверждение пароля
+  NextButtonText: далее
+  ResendButtonText: повторно отправить код
 
 InitUserDone:
   Title: Пользователь активирован
-  Description: Адрес электронной почты подтвержден и пароль успешно установлен
-  NextButtonText: следующий
-  CancelButtonText: Отмена
+  Description: Электронная почта подтверждена и пароль успешно установлен.
+  NextButtonText: далее
+  CancelButtonText: отмена
+
+InviteUser:
+  Title: Активировать пользователя
+  Description: Проверьте свой адрес электронной почты с помощью кода ниже и установите свой пароль.
+  CodeLabel: Код
+  NewPasswordLabel: Новый пароль
+  NewPasswordConfirm: Подтвердить пароль
+  NextButtonText: Далее
+  ResendButtonText: Отправить код повторно
 
 InitMFAPrompt:
-  Title: 2-факторная настройка
-  Description: 2-факторная аутентификация обеспечивает дополнительную безопасность вашей учетной записи пользователя. Это гарантирует, что только у вас есть доступ к вашей учетной записи.
-  Provider0: Приложение Authenticator (например, Google/Microsoft Authenticator, Authy)
-  Provider1: Зависит от устройства (например, FaceID, Windows Hello, отпечаток пальца)
+  Title: Установка двухфакторной аутентификации
+  Description: Двухфакторная аутентификация обеспечивает дополнительную защиту вашей учётной записи.
+  Provider0: Через приложение (например, Google/Microsoft Authenticator, Authy)
+  Provider1: Через устройство (например, FaceID, Windows Hello, Fingerprint)
   Provider3: OTP SMS
   Provider4: Электронная почта OTP
   NextButtonText: следующий
   SkipButtonText: скип
 
 InitMFAOTP:
-  Title: 2-факторная верификация
-  Description: Создайте свой 2-фактор. Загрузите приложение для проверки подлинности, если у вас его еще нет.
-  OTPDescription: Отсканируйте код с помощью приложения для аутентификации (например, Google/Microsoft Authenticator, Authy) или скопируйте секрет и вставьте сгенерированный код ниже.
-  SecretLabel: Секрет
+  Title: Подтверждение двухфакторной аутентификации
+  Description: Создайте двухфакторную аутентификацию. Загрузите приложение для проверки подлинности, если у вас его ещё нет.
+  OTPDescription: Отсканируйте код с помощью приложения для проверки подлинности (например, Google/Microsoft Authenticator, Authy) или сгенерируйте код указанного ключа и введите его в поле ниже.
+  SecretLabel: Ключ
   CodeLabel: Код
-  NextButtonText: следующий
-  CancelButtonText: Отмена
+  NextButtonText: далее
+  CancelButtonText: отмена
 
 InitMFAOTPSMS:
   Title: 2-факторная верификация
@@ -115,30 +125,30 @@ InitMFAOTPSMS:
 
 InitMFAU2F:
   Title: Добавление ключа безопасности
-  Description: Ключ безопасности — это метод проверки, который можно встроить в телефон, использовать Bluetooth или подключить непосредственно к USB-порту компьютера.
-  TokenNameLabel: Имя ключа безопасности / устройства
-  NotSupported: WebAuthN не поддерживается вашим браузером. Пожалуйста, убедитесь, что он обновлен или используйте другой (например, Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Добавление ключа безопасности
-  ErrorRetry: Повторите попытку, создайте новую задачу или выберите другой метод.
+  Description: Ключ безопасности — это метод проверки, который можно встроить в телефон, используя Bluetooth, или подключить непосредственно к USB-порту компьютера.
+  TokenNameLabel: Название ключа безопасности / устройства
+  NotSupported: WebAuthN не поддерживается вашим браузером. Пожалуйста, убедитесь, что он обновлён или используйте другой (например, Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Добавить ключ безопасности
+  ErrorRetry: Повторите попытку или выберите другой метод.
 
 InitMFADone:
-  Title: 2-факторная проверка
-  Description: Замечательно! Вы только что успешно настроили свой 2-фактор и сделали свою учетную запись более безопасной. Фактор должен быть введен при каждом входе в систему.
-  NextButtonText: следующий
-  CancelButtonText: Отмена
+  Title: Ключ безопасности подтверждён
+  Description: Поздравляю! Вы только что успешно настроили двухфакторную аутентификацию и сделали свою учётную запись более безопасной. Фактор необходимо вводить при каждом входе в систему.
+  NextButtonText: далее
+  CancelButtonText: отмена
 
 MFAProvider:
-  Provider0: Приложение Authenticator (например, Google/Microsoft Authenticator, Authy)
-  Provider1: Зависит от устройства (например, FaceID, Windows Hello, отпечаток пальца)
+  Provider0: Через приложение (например, Google/Microsoft Authenticator, Authy)
+  Provider1: Через устройство (например, FaceID, Windows Hello, Fingerprint)
   Provider3: OTP SMS
   Provider4: Электронная почта OTP
   ChooseOther: или выберите другой вариант
 
 VerifyMFAOTP:
-  Title: Проверка 2-фактора
-  Description: Проверьте свой второй фактор
+  Title: Подтверждение двухфакторной аутентификации
+  Description: Подтвердите двухфакторную аутентификацию.
   CodeLabel: Код
-  NextButtonText: следующий
+  NextButtonText: далее
 
 VerifyOTP:
   Title: Проверка 2-фактора
@@ -148,90 +158,91 @@ VerifyOTP:
   NextButtonText: следующий
 
 VerifyMFAU2F:
-  Title: 2-факторная верификация
-  Description: Подтвердите свой 2-фактор с зарегистрированным устройством (например, FaceID, Windows Hello, отпечаток пальца)
-  NotSupported: WebAuthN не поддерживается вашим браузером. Убедитесь, что вы используете последнюю версию или измените браузер на поддерживаемый (Chrome, Safari, Firefox)
-  ErrorRetry: Повторите попытку, создайте новый запрос или выберите другой метод.
-  ValidateTokenButtonText: Проверить второй фактор 
+  Title: Подтверждение двухфакторной аутентификации
+  Description: Подтвердите двухфакторную аутентификацию с помощью зарегистрированного устройства (например, FaceID, Windows Hello, Fingerprint).
+  NotSupported: WebAuthN не поддерживается вашим браузером. Убедитесь, что вы используете самую новую версию, или измените браузер на поддерживаемый (Chrome, Safari, Firefox)
+  ErrorRetry: Повторите попытку или выберите другой метод.
+  ValidateTokenButtonText: Подтвердить двухфакторную аутентификацию
 
 Passwordless:
   Title: Вход без пароля
-  Description: Войдите в систему с помощью методов аутентификации, предоставляемых вашим устройством, таких как FaceID, Windows Hello или отпечаток пальца.
-  NotSupported: WebAuthN не поддерживается вашим браузером. Пожалуйста, убедитесь, что он обновлен или используйте другой (например, Chrome, Safari, Firefox)
-  ErrorRetry: Повторите попытку, создайте новую задачу или выберите другой метод.
-  LoginWithPwButtonText: Вход с паролем
-  ValidateTokenButtonText: Вход без пароля
+  Description: Войдите в систему с помощью методов аутентификации, предоставляемых вашим устройством, таких как FaceID, Windows Hello или Fingerprint.
+  NotSupported: WebAuthN не поддерживается вашим браузером. Пожалуйста, убедитесь, что он обновлён или используйте другой (например, Chrome, Safari, Firefox)
+  ErrorRetry: Повторите попытку или выберите другой метод.
+  LoginWithPwButtonText: Войти по паролю
+  ValidateTokenButtonText: Войти без пароля
 
 PasswordlessPrompt:
-  Title: Настройка без пароля
-  Description: Хотите настроить вход без пароля? (Методы аутентификации вашего устройства, такие как FaceID, Windows Hello или отпечаток пальца)
-  DescriptionInit: Вам необходимо настроить вход без пароля. Используйте ссылку, которую вам дали, чтобы зарегистрировать свое устройство.
-  PasswordlessButtonText: Переход без пароля
-  NextButtonText: следующий
-  SkipButtonText: скип
+  Title: Установка входа без пароля
+  Description: Хотите настроить вход без пароля? (Например, используя методы аутентификации вашего устройства, такие как FaceID, Windows Hello или Fingerprint).
+  DescriptionInit: Вам необходимо настроить вход без пароля. Воспользуйтесь ссылкой, которую вы получили, чтобы зарегистрировать своё устройство.
+  PasswordlessButtonText: Перейти к входу без пароля
+  NextButtonText: далее
+  SkipButtonText: пропустить
 
 PasswordlessRegistration:
-  Title: Настройка без пароля
-  Description: Добавьте свою аутентификацию, указав имя (например, MyMobilePhone, MacBook и т. д.), а затем нажав кнопку «Зарегистрироваться без пароля» ниже.
-  TokenNameLabel: Имя устройства
-  NotSupported: WebAuthN не поддерживается вашим браузером. Пожалуйста, убедитесь, что он обновлен или используйте другой (например, Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Регистрация без пароля
-  ErrorRetry: Повторите попытку, создайте новую задачу или выберите другой метод.
+  Title: Установка входа без пароля
+  Description: Добавьте свою аутентификацию, указав имя (например, MyMobilePhone, MacBook и так далее), а затем нажмите кнопку «Зарегистрировать вход без пароля» ниже.
+  TokenNameLabel: Название устройства
+  NotSupported: WebAuthN не поддерживается вашим браузером. Пожалуйста, убедитесь, что он обновлён или используйте другой (например, Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Зарегистрировать вход без пароля
+  ErrorRetry: Повторите попытку или выберите другой метод.
 
 PasswordlessRegistrationDone:
-  Title: Настройка без пароля
-  Description: Устройство для работы без пароля успешно добавлено.
-  DescriptionClose: Теперь вы можете закрыть это окно.
-  NextButtonText: следующий
-  CancelButtonText: Отмена
+  Title: Установка входа без пароля
+  Description: Устройство для входа без пароля успешно добавлено.
+  DescriptionClose: Теперь вы можете закрыть данное окно.
+  NextButtonText: далее
+  CancelButtonText: отмена
 
 PasswordChange:
-  Title: Смена пароля
-  Description: Смените пароль. Введите свой старый и новый пароль.
+  Title: Изменение пароля
+  Description: Измените ваш пароль. Введите старый и новый пароли.
+  ExpiredDescription: Срок действия вашего пароля истек, и его необходимо изменить. Введите старый и новый пароль.
   OldPasswordLabel: Старый пароль
   NewPasswordLabel: Новый пароль
   NewPasswordConfirmLabel: Подтверждение пароля
-  CancelButtonText: Отмена
-  NextButtonText: следующий
+  CancelButtonText: отмена
+  NextButtonText: далее
   Footer: Нижний колонтитул
 
 PasswordChangeDone:
-  Title: Смена пароля
-  Description: Ваш пароль был успешно изменен.
-  NextButtonText: следующий
+  Title: Изменение пароля
+  Description: Ваш пароль был успешно изменён.
+  NextButtonText: далее
 
 PasswordResetDone:
   Title: Ссылка для сброса пароля отправлена
-  Description: Проверьте свою электронную почту, чтобы сбросить пароль.
-  NextButtonText: следующий
+  Description: Проверьте вашу электронную почту, чтобы сбросить пароль.
+  NextButtonText: далее
 
 EmailVerification:
-  Title: Проверка электронной почты
-  Description: Мы отправили вам электронное письмо для подтверждения вашего адреса. Пожалуйста, введите код в форму ниже.
+  Title: Подтверждение электронной почты
+  Description: Мы отправили вам письмо для подтверждения вашей электронной почты. Пожалуйста, введите полученный код в поле ниже.
   CodeLabel: Код
-  NextButtonText: следующий
-  ResendButtonText: Повторная отправка кода
+  NextButtonText: далее
+  ResendButtonText: повторно отправить код
 
 EmailVerificationDone:
-  Title: Проверка электронной почты
-  Description: Ваш адрес электронной почты успешно подтвержден.
-  NextButtonText: следующий
-  CancelButtonText: Отмена
-  LoginButtonText: логин
+  Title: Подтверждение электронной почты
+  Description: Ваша электронная почта была успешно подтверждена.
+  NextButtonText: далее
+  CancelButtonText: отмена
+  LoginButtonText: вход
 
 RegisterOption:
-  Title: Варианты регистрации
-  Description: Выберите, как вы хотите зарегистрироваться
-  RegisterUsernamePasswordButtonText: С именем пользователя, паролем
-  ExternalLoginDescription: или зарегистрироваться у внешнего пользователя
-  LoginButtonText: логин
+  Title: Способы регистрации
+  Description: Выберите способ регистрации.
+  RegisterUsernamePasswordButtonText: С паролем логина
+  ExternalLoginDescription: или зарегистрируйтесь внешним пользователем
+  LoginButtonText: вход
 
 RegistrationUser:
   Title: Регистрация
-  Description: Введите свои данные пользователя. Ваш адрес электронной почты будет использоваться в качестве имени пользователя.
-  DescriptionOrgRegister: Введите свои данные пользователя.
-  EmailLabel: Отправить по электронной почте
-  UsernameLabel: Имя пользователя
+  Description: Введите ваши данные. Электронная почта будет использоваться в качестве логина.
+  DescriptionOrgRegister: Введите ваши данные.
+  EmailLabel: Электронная почта
+  UsernameLabel: Логин
   FirstnameLabel: Имя
   LastnameLabel: Фамилия
   LanguageLabel: Язык
@@ -249,29 +260,32 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
-  GenderLabel: Род
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  GenderLabel: Пол
   Female: Женский
   Male: Мужской
-  Diverse: разное / X
+  Diverse: Другой / X
   PasswordLabel: Пароль
   PasswordConfirmLabel: Подтверждение пароля
-  TosAndPrivacyLabel: Правила и условия
-  TosConfirm: Я принимаю
-  TosLinkText: ТОТ
-  PrivacyConfirm: Я принимаю
-  PrivacyLinkText: политика конфиденциальности
-  ExternalLogin: или зарегистрироваться у внешнего пользователя
-  BackButtonText: логин
-  NextButtonText: следующий
+  TosAndPrivacyLabel: Условия использования
+  TosConfirm: Я согласен с
+  TosLinkText: Пользовательским соглашением
+  PrivacyConfirm: Я согласен с
+  PrivacyLinkText: Политикой конфиденциальности
+  ExternalLogin: или зарегистрируйтесь внешним пользователем
+  BackButtonText: вход
+  NextButtonText: далее
 
 ExternalRegistrationUserOverview:
   Title: Регистрация внешнего пользователя
-  Description: Мы взяли ваши пользовательские данные у выбранного провайдера. Теперь вы можете изменить или дополнить их.
-  EmailLabel: Отправить по электронной почте
-  UsernameLabel: Имя пользователя
+  Description: Мы получили ваши данные пользователя у выбранного провайдера. Теперь вы можете изменить или дополнить их.
+  EmailLabel: Электронная почта
+  UsernameLabel: Логин
   FirstnameLabel: Имя
   LastnameLabel: Фамилия
-  NicknameLabel: Прозвище
+  NicknameLabel: Псевдоним
   PhoneLabel: Номер телефона
   LanguageLabel: Язык
   German: Deutsch
@@ -288,59 +302,68 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
-  TosAndPrivacyLabel: Правила и условия
-  TosConfirm: Я принимаю
-  TosLinkText: ТОТ
-  PrivacyConfirm: Я принимаю
-  PrivacyLinkText: политика конфиденциальности
-  ExternalLogin: или зарегистрироваться у внешнего пользователя
-  BackButtonText: Назад
-  NextButtonText: спасать
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  TosAndPrivacyLabel: Условия использования
+  TosConfirm: Я согласен с
+  TosLinkText: Пользовательским соглашением
+  PrivacyConfirm: Я согласен с
+  PrivacyLinkText: Политикой конфиденциальности
+  ExternalLogin: или зарегистрируйтесь внешним пользователем
+  BackButtonText: назад
+  NextButtonText: сохранить
 
 RegistrationOrg:
   Title: Регистрация организации
-  Description: Введите название организации и данные пользователя.
+  Description: Введите название вашей организации и данные пользователя.
   OrgNameLabel: Название организации
-  EmailLabel: Отправить по электронной почте
-  UsernameLabel: Имя пользователя
+  EmailLabel: Электронная почта
+  UsernameLabel: Логин
   FirstnameLabel: Имя
   LastnameLabel: Фамилия
   PasswordLabel: Пароль
   PasswordConfirmLabel: Подтверждение пароля
-  TosAndPrivacyLabel: Правила и условия
-  TosConfirm: Я принимаю
-  TosLinkText: ТОТ
-  PrivacyConfirm: Я принимаю
-  PrivacyLinkText: политика конфиденциальности
+  TosAndPrivacyLabel: Условия использования
+  TosConfirm: Я согласен с
+  TosLinkText: Пользовательским соглашением
+  PrivacyConfirm: Я согласен с
+  PrivacyLinkText: Политикой конфиденциальности
   SaveButtonText: Создать организацию
 
 LoginSuccess:
-  Title: Вход в систему выполнен успешно
-  AutoRedirectDescription: Вы будете автоматически перенаправлены обратно к вашему приложению. Если нет, нажмите на кнопку ниже. После этого вы можете закрыть окно.
-  RedirectedDescription: Теперь вы можете закрыть это окно.
-  NextButtonText: следующий
+  Title: Успешный вход
+  AutoRedirectDescription: Вы будете автоматически перенаправлены в своё приложение. Если этого не произошло, нажмите кнопку ниже. После этого вы можете закрыть окно.
+  RedirectedDescription: Теперь вы можете закрыть данное окно.
+  NextButtonText: далее
 
 LogoutDone:
-  Title: Вышел из системы
+  Title: Выход из системы
   Description: Вы успешно вышли из системы.
-  LoginButtonText: логин
+  LoginButtonText: вход
+
+LinkingUserPrompt:
+  Title: Существующий пользователь найден
+  Description: "Хотите ли вы связать существующую учетную запись:"
+  LinkButtonText: Связь
+  OtherButtonText: Другие варианты
 
 LinkingUsersDone:
-  Title: Юзерлинкинг
-  Description: Пользовательские ссылки сделаны.
-  CancelButtonText: Отмена
-  NextButtonText: следующий
+  Title: Привязка пользователя
+  Description: Привязка пользователя выполнена.
+  CancelButtonText: отмена
+  NextButtonText: далее
 
 ExternalNotFound:
   Title: Внешний пользователь не найден
-  Description: Внешний пользователь не найден. Вы хотите связать своего пользователя или автоматически зарегистрировать нового.
-  LinkButtonText: Связь
-  AutoRegisterButtonText: регистрировать
-  TosAndPrivacyLabel: Правила и условия
-  TosConfirm: Я принимаю
-  TosLinkText: ТОТ
-  PrivacyConfirm: Я принимаю
-  PrivacyLinkText: политика конфиденциальности
+  Description: Внешний пользователь не найден. Вы можете привязать своего пользователя или автоматически зарегистрировать нового.
+  LinkButtonText: Привязать
+  AutoRegisterButtonText: зарегистрировать
+  TosAndPrivacyLabel: Условия использования
+  TosConfirm: Я согласен с
+  TosLinkText: Пользовательским соглашением
+  PrivacyConfirm: Я согласен с
+  PrivacyLinkText: Политикой конфиденциальности
   German: Deutsch
   English: English
   Italian: Italiano
@@ -355,6 +378,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   
 DeviceAuth:
   Title: Авторизация устройства
@@ -375,10 +401,10 @@ DeviceAuth:
     Denied: Отказано в авторизации устройства. Теперь вы можете вернуться к устройству.
 
 Footer:
-  PoweredBy: Руководствовался
-  Tos: ТОТ
+  PoweredBy: На базе
+  Tos: Пользовательское соглашение
   PrivacyPolicy: Политика конфиденциальности
-  Help: Справка
+  Help: Помощь
   SupportEmail: Электронная почта службы поддержки
 
 SignIn: Вход с помощью {{.Provider}}
@@ -386,23 +412,23 @@ SignIn: Вход с помощью {{.Provider}}
 Errors:
   Internal: Произошла внутренняя ошибка
   AuthRequest:
-    NotFound: Не удалось найти authrequest
+    NotFound: Не удалось обнаружить запрос авторизации
     UserAgentNotCorresponding: User Agent не соответствует
-    UserAgentNotFound: Идентификатор агента пользователя не найден
+    UserAgentNotFound: ID User Agent не найден
     TokenNotFound: Токен не найден
     RequestTypeNotSupported: Тип запроса не поддерживается
     MissingParameters: Отсутствуют обязательные параметры
   User:
-    NotFound: Не удалось найти пользователя
+    NotFound: Пользователь не может быть найден
     AlreadyExists: Пользователь уже существует
     Inactive: Пользователь неактивен
     NotFoundOnOrg: Не удалось найти пользователя в выбранной организации
-    NotAllowedOrg: Пользователь не является членом требуемой организации
-    NotMatchingUserID: Пользователь и пользователь в authrequest не совпадают
-    UserIDMissing: UserID пуст
-    Invalid: Неверные пользовательские данные
+    NotAllowedOrg: Пользователь не является участником требуемой организации
+    NotMatchingUserID: Пользователь не совпадает с пользователем в запросе авторизации
+    UserIDMissing: UserID пустой
+    Invalid: Неверные данные пользователя
     DomainNotAllowedAsUsername: Домен уже зарезервирован и не может быть использован
-    NotAllowedToLink: Пользователю не разрешается связываться с внешним провайдером входа в систему
+    NotAllowedToLink: Пользователя не разрешено привязывать к внешнему провайдеру входа
     Profile:
       NotFound: Профиль не найден
       NotChanged: Профиль не изменен
@@ -410,75 +436,76 @@ Errors:
       FirstNameEmpty: Имя в профиле пусто
       LastNameEmpty: Фамилия в профиле пуста
       IDMissing: Отсутствует идентификатор профиля
-    Email:
-      NotFound: Электронная почта не найдена
-      Invalid: Адрес электронной почты недействителен
-      AlreadyVerified: Электронная почта уже подтверждена
-      NotChanged: Адрес электронной почты не изменился
-      Empty: Электронная почта пуста
-      IDMissing: Отсутствует идентификатор электронной почты
-    Phone:
-      NotFound: Телефон не найден
-      Invalid: Телефон недействителен
-      AlreadyVerified: Телефон уже проверен
-      Empty: Телефон пуст
-      NotChanged: Телефон не менялся
-    Address:
-      NotFound: Адрес не найден
-      NotChanged: Адрес не изменился
-    Username:
-      AlreadyExists: Имя пользователя уже занято
-      Reserved: Имя пользователя уже занято
-      Empty: Имя пользователя пусто
+      Email:
+        NotFound: Электронная почта не найдена
+        Invalid: Адрес электронной почты недействителен
+        AlreadyVerified: Электронная почта уже подтверждена
+        NotChanged: Адрес электронной почты не изменился
+        Empty: Электронная почта пуста
+        IDMissing: Отсутствует идентификатор электронной почты
+      Phone:
+        NotFound: Телефон не найден
+        Invalid: Телефон недействителен
+        AlreadyVerified: Телефон уже проверен
+        Empty: Телефон пуст
+        NotChanged: Телефон не менялся
+      Address:
+        NotFound: Адрес не найден
+        NotChanged: Адрес не изменился
+      Username:
+        AlreadyExists: Имя пользователя уже занято
+        Reserved: Имя пользователя уже занято
+        Empty: Имя пользователя пусто
     Password:
       ConfirmationWrong: Неверное подтверждение пароля
-      Empty: Пароль пуст
-      Invalid: Пароль недействителен
-      InvalidAndLocked: Пароль недействителен и пользователь заблокирован, обратитесь к администратору.
+      Empty: Пароль пустой
+      Invalid: Неверный пароль
+      InvalidAndLocked: Неверный пароль, пользователь заблокирован. Обратитесь к администратору.
       NotChanged: Пароль не изменен
     UsernameOrPassword:
-      Invalid: Имя пользователя или пароль недействительны
+      Invalid: Логин или пароль недействительны
     PasswordComplexityPolicy:
       NotFound: Политика паролей не найдена
       MinLength: Пароль слишком короткий
       HasLower: Пароль должен содержать строчную букву
-      HasUpper: Пароль должен содержать верхнюю букву
+      HasUpper: Пароль должен содержать заглавную букву
       HasNumber: Пароль должен содержать цифру
       HasSymbol: Пароль должен содержать символ
     Code:
-      Expired: Срок действия кода истек
-      Invalid: Код недействителен
+      Expired: Код истёк
+      Invalid: Неверный код
       Empty: Код пустой
       CryptoCodeNil: Криптокод равен нулю
       NotFound: Не удалось найти код
       GeneratorAlgNotSupported: Неподдерживаемый алгоритм генератора
     EmailVerify:
-      UserIDEmpty: UserID пуст
+      UserIDEmpty: UserID пустой
     ExternalData:
-      CouldNotRead: Внешние данные не могут быть прочитаны правильно
+      CouldNotRead: Внешние данные не могут быть обработаны корректно
     MFA:
-      NoProviders: Нет доступных многофакторных провайдеров
+      NoProviders: Нет доступных многофакторных поставщиков
       OTP:
-        AlreadyReady: Одноразовый код-пароль уже настроен
-        NotExisting: Одноразовый код-пароль не настроен
-        InvalidCode: Неверный код-пароль
-        NotReady: Одноразовый код-пароль не готов
+        AlreadyReady: Мультифактор OTP (OneTimePassword) уже настроен
+        NotExisting: Мультифактор OTP (OneTimePassword) не существует
+        InvalidCode: Неверный код
+        NotReady: Мультифактор OTP (OneTimePassword) не готов
     Locked: Пользователь заблокирован
     SomethingWentWrong: Что-то пошло не так
-    NotActive: Пользователь не активен
+    NotActive: Пользователь неактивен
     ExternalIDP:
-      IDPTypeNotImplemented: Тип IDP не реализован
-      NotAllowed: Внешний поставщик входа в систему не допускается
-      IDPConfigIDEmpty: Идентификатор поставщика удостоверений пуст
-      ExternalUserIDEmpty: Идентификатор внешнего пользователя пуст
-      UserDisplayNameEmpty: Отображаемое имя пользователя пусто
-      NoExternalUserData: Внешние пользовательские данные не получены
-      CreationNotAllowed: Создание нового пользователя не допускается на этом провайдере
-      LinkingNotAllowed: Привязка пользователя к этому провайдеру запрещена
-    GrantRequired: Вход в систему невозможен. Пользователь должен иметь хотя бы одно разрешение в рамках приложения. Пожалуйста, свяжитесь с вашим администратором.
-    ProjectRequired: Вход в систему невозможен. Организация пользователя должна быть предоставлена проекту. Обратитесь к администратору.
+      IDPTypeNotImplemented: IDP тип не реализован
+      NotAllowed: Внешний провайдер входа запрещён
+      IDPConfigIDEmpty:  IDP ID пустой
+      ExternalUserIDEmpty: External User ID пустой
+      UserDisplayNameEmpty: Отображаемое имя пользователя пустое
+      NoExternalUserData: Данные внешнего пользователя не получены
+      CreationNotAllowed: Создание нового пользователя для данного провайдера не разрешено
+      LinkingNotAllowed: Привязка пользователя с данным провайдером запрещена
+      NoOptionAllowed: Ни создание, ни связывание не разрешены для этого провайдера. Пожалуйста, обратитесь к администратору.
+    GrantRequired: Вход невозможен. Пользователь должен иметь хотя бы один допуск в приложении. Пожалуйста, свяжитесь с вашим администратором.
+    ProjectRequired: Вход невозможен. Организация пользователя должна иметь допуск к проекту. Пожалуйста, свяжитесь с вашим администратором.
   IdentityProvider:
-    InvalidConfig: Недопустимая конфигурация поставщика удостоверений
+    InvalidConfig: Недопустимая конфигурация поставщика идентификационных данных
   IAM:
     LockoutPolicy:
       NotExisting: Политика блокировки не существует
@@ -488,4 +515,4 @@ Errors:
   DeviceAuth:
     NotExisting: Код пользователя не существует
 
-optional: (необязательно)
+optional: (optional)

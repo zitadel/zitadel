@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"

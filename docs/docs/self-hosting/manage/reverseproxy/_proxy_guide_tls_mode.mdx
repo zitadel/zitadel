@@ -64,7 +64,7 @@ export const LoginURL = ({mode}) => {
     if (mode === "disabled") {
         scheme = "http"
     }
-    const url = scheme + "://127.0.0.1.sslip.io/ui/console";
+    const url = scheme + "://127.0.0.1.sslip.io/ui/console/?login_hint=zitadel-admin@zitadel.127.0.0.1.sslip.io";
     return <a href={url}>{url}</a>
 }
 

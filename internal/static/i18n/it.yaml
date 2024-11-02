@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limite non trovato
     NoneSpecified: Nessun limite specificato
+    Instance:
+      Blocked: L'istanza è bloccata
   Restrictions:
     NoneSpecified: Nessuna restrizione specificata
     DefaultLanguageMustBeAllowed: La lingua predefinita deve essere consentita
@@ -51,14 +53,27 @@ Errors:
     NotFound: Configurazione SMS non trovata
     AlreadyActive: Configurazione SMS già attiva
     AlreadyDeactivated: Configurazione SMS già disattivata
+  SMTP:
+    NotEmailMessage: il messaggio non è EmailMessage
+    RequiredAttributes: oggetto, destinatari e contenuto devono essere impostati ma alcuni o tutti sono vuoti
+    CouldNotSplit: impossibile dividere l'host e la porta per la connessione a SMTP
+    CouldNotDial: impossibile contattare il server SMTP, controllare la porta, problemi con il firewall...
+    CouldNotDialTLS: Impossibile contattare con il server SMTP utilizzando TLS, controllare la porta, problemi di firewall ...
+    CouldNotCreateClient: impossibile creare il client SMTP
+    CouldNotStartTLS: impossibile avviare tls
+    CouldNotAuth: impossibile aggiungere l'autenticazione smtp, controlla se sia l'utente che la password sono corretti, se sono corretti forse il tuo provider richiede un metodo di autenticazione non supportato da ZITADEL
+    CouldNotSetSender: impossibile impostare il mittente
+    CouldNotSetRecipient: impossibile impostare il destinatario
   SMTPConfig:
+    TestPassword: Password per il test non trovata
     NotFound: Configurazione SMTP non trovata
     AlreadyExists: La configurazione SMTP esiste già
+    AlreadyDeactivated: Configurazione SMTP già disattivata
     SenderAdressNotCustomDomain: L'indirizzo del mittente deve essere configurato come dominio personalizzato sull'istanza.
+    TestEmailNotFound: Indirizzo email per il test non trovato
   Notification:
     NoDomain: Nessun dominio trovato per il messaggio
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: L'utente non è stato trovato
     AlreadyExists: L'utente già esistente
     NotFoundOnOrg: L'utente non è stato trovato nell'organizzazione scelta
@@ -107,6 +122,7 @@ Errors:
       Key:
         NotFound: Chiave macchina non trovato
         AlreadyExisting: Chiave macchina già esistente
+        Invalid: La chiave pubblica non è una chiave pubblica RSA valida in formato PKIX con codifica PEM
       Secret:
         NotExisting: Secret non esiste
         Invalid: Secret non è valido
@@ -126,13 +142,14 @@ Errors:
       NotFound: Codice non trovato
       Expired: Il codice è scaduto
       GeneratorAlgNotSupported: L'algoritmo del generatore non è supportato
+      Invalid: Il codice non è valido
     Password:
       NotFound: Password non trovato
       Empty: La password è vuota
       Invalid: La password non è valida
       NotSet: L'utente non ha impostato una password
       NotChanged: La nuova password non può essere uguale alla password attuale
-      NotSupported: Codifica hash password non supportata
+      NotSupported: Codifica hash password non supportata. Consulta https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Impostazioni di complessità password non trovati
       MinLength: La password è troppo corta
@@ -216,7 +233,6 @@ Errors:
       EmptyString: I caratteri non numerici e alfabetici non validi sono stati sostituiti con spazi vuoti e il dominio risultante è una stringa vuota
     IDP:
       InvalidSearchQuery: Parametro di ricerca non valido
-      InvalidCharacter: Per un dominio sono ammessi solo caratteri alfanumerici, . e -
       ClientIDMissing: ClientID mancante
       TeamIDMissing: TeamID mancante
       KeyIDMissing: ID chiave mancante
@@ -326,7 +342,7 @@ Errors:
       NotActive: Grant del progetto non è attivo
       NotInactive: Grant del progetto non è inattivo
   IAM:
-    NotFound: Istanza non trovata. Controlla https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM non trovato. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: I ruoli non sono stati cambiati
     MemberInvalid: Il membro non è valido
@@ -467,6 +483,7 @@ Errors:
     NotActive: L'azione non è attiva
     NotInactive: L'azione non è inattiva
     MaxAllowed: Non sono permesse altre azioni attive
+    NotEnabled: La funzione "Azione" non è abilitata
   Flow:
     FlowTypeMissing: FlowType mancante
     Empty: Flow è già vuoto
@@ -477,6 +494,8 @@ Errors:
     CloseRows: Lo statement SQL non può essere terminato
     SQLStatement: Lo statement SQL non può essere creato
     InvalidRequest: La richiesta non è valida
+    TooManyNestingLevels: Troppi livelli di nidificazione delle query (massimo 20)
+    LimitExceeded: Limite superato
   Quota:
     AlreadyExists: La quota esiste già per questa unità
     NotFound: Quota non trovata per questa unità
@@ -511,6 +530,7 @@ Errors:
     IDPMissing: IDP mancante nella richiesta
     IDPInvalid: IDP non valido per la richiesta
     ResponseInvalid: La risposta dell'IDP non è valida
+    MissingSingleMappingAttribute: Non contiene l'attributo di mapping o ha più di un valore
     SuccessURLMissing: URL di successo mancante nella richiesta
     FailureURLMissing: URL di errore mancante nella richiesta
     StateMissing: parametro di stato mancante nella richiesta
@@ -533,6 +553,52 @@ Errors:
     NotExisting: La funzionalità non esiste
     TypeNotSupported: Il tipo di funzionalità non è supportato
     InvalidValue: Valore non valido per questa funzionalità
+  Target:
+    Invalid: Il target non è valido
+    NoTimeout: Il target non ha timeout
+    InvalidURL: La destinazione ha un URL non valido
+    NotFound: Obiettivo non trovato
+  Execution:
+    ConditionInvalid: La condizione di esecuzione non è valida
+    Invalid: L'esecuzione non è valida
+    NotFound: Esecuzione non trovata
+    IncludeNotFound: Includi non trovato
+    NoTargets: Nessun obiettivo definito
+    Failed: Esecuzione fallita
+    ResponseIsNotValidJSON: La risposta non è un JSON valido
+  UserSchema:
+    NotEnabled: La funzionalità "Schema utente" non è abilitata
+    Type:
+      Missing: Tipo di schema utente mancante
+      AlreadyExists: Il tipo di schema utente esiste già
+    Authenticator:
+      Invalid: Tipo di autenticatore non valido
+    NotActive: Schema utente non attivo
+    NotInactive: Schema utente non inattivo
+    NotExists: Lo schema utente non esiste
+    ID:
+      Missing: ID schema utente mancante
+    Invalid: Schema utente non valido
+    Data:
+      Invalid: Dati non validi per lo schema utente
+  TokenExchange:
+    FeatureDisabled: La funzionalità di scambio token è disabilitata per la tua istanza. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Manca il gettone
+      Invalid: Il token non è valido
+      TypeMissing: Manca il tipo di token
+      TypeNotAllowed: Il tipo di token non è consentito
+      TypeNotSupported: Il tipo di token non è supportato
+      NotForAPI: Token rappresentati non consentiti per l'API
+    Impersonation:
+      PolicyDisabled: La rappresentazione è disabilitata nella policy di sicurezza dell'istanza
+  WebKey:
+    ActiveDelete: Impossibile eliminare la chiave Web attiva
+    Config: Configurazione chiave Web non valida
+    Duplicate: ID chiave Web non univoco
+    FeatureDisabled: Funzione chiave Web disabilitata
+    NoActive: Nessuna chiave Web attiva trovata
+    NotFound: Chiave Web non trovata
 
 AggregateTypes:
   action: Azione
@@ -544,8 +610,28 @@ AggregateTypes:
   usergrant: Sovvenzione utente
   quota: Quota
   feature: Funzionalità
+  target: Bersaglio
+  execution: Esecuzione
+  user_schema: Schema utente
+  auth_request: Richiesta di autenticazione
+  device_auth: Autenticazione su dispositivo
+  idpintent: IDP Intent
+  limits: Limiti
+  milestone: Milestone
+  oidc_session: OIDC Session
+  restrictions: Restrizioni
+  system: Sistema
+  session: Sessione
+  web_key: Chiave Web
 
 EventTypes:
+  execution:
+    set: Insieme di esecuzione
+    removed: Esecuzione cancellata
+  target:
+    added: Obiettivo creato
+    changed: Obiettivo cambiato
+    removed: Obiettivo eliminato
   user:
     added: Utente aggiunto
     selfregistered: L'utente si è registrato
@@ -558,9 +644,12 @@ EventTypes:
         failed: Controllo dell'inizializzazione fallito
     token:
       added: Access Token creato
+      v2.added: Access Token creato
+    impersonated: Utente impersonificato
     username:
       reserved: Nome utente riservato
       released: Nome utente rilasciato
+      changed: Nome utente cambiato
     email:
       reserved: Indirizzo e-mail riservato
       released: Indirizzo e-mail rilasciato
@@ -579,6 +668,7 @@ EventTypes:
         removed: Chiave rimossa
       secret:
         set: Secret set
+        updated: Hash segreto aggiornato
         removed: Secret rimosso
         check:
           succeeded: Controllo della Secret riuscito
@@ -596,6 +686,13 @@ EventTypes:
         check:
           succeeded: Controllo dell'inizializzazione riuscito
           failed: Controllo dell'inizializzazione fallito
+      invite:
+        code:
+          added: Codice invito generato
+          sent: Codice invito inviato
+        check:
+          succeeded: Controllo invito riuscito
+          failed: Controllo invito fallito
       username:
         reserved: Nome utente riservato
         released: Nome utente rilasciato
@@ -730,6 +827,7 @@ EventTypes:
       code:
         added: Codice del numero di telefono generato
         sent: Codice del numero di telefono inviato
+      removed: Codice del numero di telefono rimosso
     profile:
       changed: Profilo utente cambiato
     address:
@@ -743,7 +841,9 @@ EventTypes:
           succeeded: Controllo OTP riuscito
           failed: Controllo OTP fallito
       init:
-        skipped: Inizializzazione saltata
+        skipped: Inizializzazione OTP saltata
+    init:
+      skipped: Inizializzazione saltata
     signed:
       out: L'utente è uscito
     grant:
@@ -761,6 +861,12 @@ EventTypes:
       set: Set di metadati utente
       removed: Metadati utente rimossi
       removed.all: Tutti i metadati utente rimossi
+    domain:
+      claimed: Dominio rivendicato
+      claimed.sent: Notifica di rivendicazione del dominio inviata
+    pat:
+      added: Aggiunto token di accesso personale
+      removed: Token di accesso personale rimosso
   org:
     added: Organizzazione aggiunta
     changed: Organizzazione cambiata
@@ -807,6 +913,10 @@ EventTypes:
         config:
           added: Aggiunta la configurazione IDP SAML
           changed: Configurazione IDP SAML modificata
+      jwt:
+        config:
+          added: Aggiunta la configurazione IDP JWT
+          changed: La configurazione dell'IDP JWT è stata modificata
     customtext:
       set: Testo personalizzato salvato
       removed: Testo personalizzato rimosso
@@ -820,6 +930,8 @@ EventTypes:
         idpprovider:
           added: IDP aggiunto alle impostazioni di accesso
           removed: IDP rimosso dalle impostazioni di accesso
+          cascade:
+            removed: Cascata di provider di identità rimossa dalla policy di accesso
         secondfactor:
           added: Secondo fattore aggiunto alle impostazioni di accesso
           removed: Secondo fattore rimosso dalle impostazioni di accesso
@@ -865,6 +977,14 @@ EventTypes:
         added: Informativa sulla privacy e termini e condizioni aggiunti
         changed: Informativa sulla privacy e termini e condizioni cambiati
         removed: Informativa sulla privacy e termini e condizioni rimossi
+      domain:
+        added: Aggiunta politica di dominio
+        changed: La politica del dominio è cambiata
+        removed: Politica del dominio rimossa
+      lockout:
+        added: Lockout policy added
+        changed: Lockout policy changed
+        removed: Lockout policy removed
       notification:
         added: Impostazione di notifica creata
         changed: Impostazione di notifica cambiata
@@ -875,6 +995,20 @@ EventTypes:
         cascade:
           removed: Azioni a cascata rimosse
         removed: Azioni rimosse
+      cleared: Il flusso è stato eliminato
+    mail:
+      template:
+        added: Aggiunto modello di posta elettronica
+        changed: Il modello di posta elettronica è stato modificato
+        removed: Modello di posta elettronica rimosso
+      text:
+        added: Aggiunto il testo dell'e-mail
+        changed: Il testo dell'e-mail è stato modificato
+        removed: Testo dell'e-mail rimosso
+    metadata:
+      removed: Metadati rimossi
+      removed.all: Tutti i metadati rimossi
+      set: Insieme di metadati
   project:
     added: Progetto aggiunto
     changed: Progetto cambiato
@@ -919,6 +1053,11 @@ EventTypes:
         key:
           added: Chiave di applicazione aggiunta
           removed: Chiave di applicazione rimossa
+      api:
+        secret:
+          check:
+            succeeded: Il controllo del segreto API è riuscito
+            failed: Il controllo del segreto API non è riuscito
       config:
         saml:
           added: Configurazione SAML aggiunta
@@ -928,11 +1067,13 @@ EventTypes:
           changed: Configurazione OIDC modificata
           secret:
             changed: Segreto OIDC cambiato
+            updated: Hash segreto OIDC aggiornato
         api:
           added: Configurazione API aggiunta
           changed: Configurazione API modificata
           secret:
             changed: Segreto API cambiato
+            updated: Hash segreto API aggiornato
   policy:
     password:
       complexity:
@@ -974,7 +1115,11 @@ EventTypes:
       saml:
         config:
           added: Aggiunta la configurazione IDP SAML
-          changed: Configurazione IDP SAML modificata
+          changed: La configurazione dell'IDP SAML è stata modificata
+      jwt:
+        config:
+          added: Aggiunta la configurazione JWT al provider di identità
+          changed: Configurazione JWT dal provider di identità rimossa
     customtext:
       set: Il testo è stato impostato
       removed: Il testo è stato rimosso
@@ -1023,6 +1168,9 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: Configurazione SMTP attivata
+        deactivated: Configurazione SMTP disattivata
+        removed: Configurazione SMTP rimossa
         password:
           changed: SMTP configuration secret changed
     sms:
@@ -1037,12 +1185,173 @@ EventTypes:
           deactivated: Provider SMS Twilio disattivato
   key_pair:
     added: Keypair aggiunto
+    certificate:
+      added: Certificato aggiunto
   action:
     added: Azione aggiunta
     changed: Azione cambiata
     deactivated: Azione disattivata
     reactivated: Azione riattivata
     removed: Azione rimossa
+  instance:
+    added: Istanza aggiunta
+    changed: L'istanza è cambiata
+    customtext:
+      removed: Testo personalizzato rimosso
+      set: Set di testo personalizzato
+      template:
+        removed: Modello di testo personalizzato rimosso
+    default:
+      language:
+        set: Lingua predefinita impostata
+      org:
+        set: Insieme di organizzazioni predefinito
+    domain:
+      added: Dominio aggiunto
+      primary:
+        set: Insieme di domini primari
+      removed: Dominio rimosso
+    iam:
+      console:
+        set: Set di applicazioni per console ZITADEL
+      project:
+        set: Set progetto ZITADEL
+    mail:
+      template:
+        added: Aggiunto modello di posta elettronica
+        changed: Il modello di posta elettronica è stato modificato
+      text:
+        added: Aggiunto il testo dell'e-mail
+        changed: Il testo dell'e-mail è stato modificato
+    member:
+      added: Membro dell'istanza aggiunto
+      changed: Il membro dell'istanza è cambiato
+      removed: Membro dell'istanza rimosso
+      cascade:
+        removed: Cascata di membri dell'istanza rimossa
+    notification:
+      provider:
+        debug:
+          fileadded: Aggiunto provider di notifiche di debug dei file
+          filechanged: Il provider delle notifiche di debug dei file è stato modificato
+          fileremoved: Provider di notifiche di debug del file rimosso
+          logadded: Aggiunto provider di notifiche di debug del registro
+          logchanged: Il provider delle notifiche di debug del registro è stato modificato
+          logremoved: Provider di notifiche di debug del registro rimosso
+    oidc:
+      settings:
+        added: Aggiunte impostazioni OIDC
+        changed: Le impostazioni OIDC sono state modificate
+    policy:
+      domain:
+        added: Aggiunta politica di dominio
+        changed: Domain policy changed
+      label:
+        activated: Criterio etichetta attivato
+        added: Aggiunta la politica sull'etichetta
+        assets:
+          removed: Risorsa dalla norma sull'etichetta rimossa
+        changed: La politica sull'etichetta è cambiata
+        font:
+          added: Carattere aggiunto ai criteri di etichetta
+          removed: Carattere rimosso dai criteri di etichetta
+        icon:
+          added: Icona aggiunta al criterio dell'etichetta
+          removed: Icona rimossa dal criterio di etichetta
+          dark:
+            added: Icona aggiunta al criterio dell'etichetta oscura
+            removed: Icona rimossa dal criterio dell'etichetta oscura
+        logo:
+          added: Logo aggiunto alla politica sull'etichetta
+          removed: Logo rimosso dalla politica sull'etichetta
+          dark:
+            added: Logo aggiunto alla politica delle etichette scure
+            removed: Logo rimosso dalla politica delle etichette scure
+      lockout:
+        added: Aggiunta politica di blocco
+        changed: La politica di blocco è cambiata
+      login:
+        added: Criteri di accesso aggiunti
+        changed: La politica di accesso è cambiata
+        idpprovider:
+          added: Provider di identità aggiunto alla policy di accesso
+          cascade:
+            removed: Cascata di provider di identità rimossa dalla policy di accesso
+          removed: Provider di identità rimosso dalla policy di accesso
+        multifactor:
+          added: Multifattore aggiunto alla policy di accesso
+          removed: Multifattore rimosso dalla policy di accesso
+        secondfactor:
+          added: Secondo fattore aggiunto alla politica di accesso
+          removed: Secondo fattore rimosso dalla politica di accesso
+      password:
+        age:
+          added: Aggiunta politica sull'età della password
+          changed: La politica di validità della password è cambiata
+        complexity:
+          added: Aggiunta policy sulla complessità della password
+          changed: Criterio di complessità della password rimosso
+      privacy:
+        added: Aggiunta informativa sulla privacy
+        changed: L'informativa sulla privacy è cambiata
+      security:
+        set: Insieme di politiche di sicurezza
+
+    removed: Istanza rimossa
+    secret:
+      generator:
+        added: Aggiunto generatore segreto
+        changed: Il generatore segreto è cambiato
+        removed: Generatore segreto rimosso
+    sms:
+      configtwilio:
+        activated: Configurazione SMS Twilio attivata
+        added: Aggiunta la configurazione SMS di Twilio
+        changed: La configurazione SMS di Twilio è stata modificata
+        deactivated: Configurazione SMS Twilio disattivata
+        removed: Configurazione SMS di Twilio rimossa
+        token:
+          changed: La configurazione del token di Twilio SMS è stata modificata
+    smtp:
+      config:
+        added: Aggiunta configurazione SMTP
+        changed: La configurazione SMTP è stata modificata
+        activated: Configurazione SMTP attivata
+        deactivated: Configurazione SMTP disattivata
+        password:
+          changed: La password della configurazione SMTP è cambiata
+        removed: Configurazione SMTP rimossa
+  user_schema:
+    created: Schema utente creato
+    updated: Schema utente aggiornato
+    deactivated: Schema utente disattivato
+    reactivated: Schema utente riattivato
+    deleted: Schema utente eliminato
+    user:
+      created: Utente creato
+      updated: Utente aggiornato
+      deleted: Utente eliminato
+      email:
+        updated: Indirizzo email modificato
+        verified: Indirizzo email verificato
+        verification:
+          failed: Verifica indirizzo email non riuscita
+        code:
+          added: Codice di verifica indirizzo email generato
+          sent: Codice di verifica indirizzo email inviato
+      phone:
+        updated: Numero di telefono modificato
+        verified: Numero di telefono verificato
+        verification:
+          failed: Verifica numero di telefono non riuscita
+        code:
+          added: Codice di verifica numero di telefono generato
+          sent: Codice di verifica numero di telefono inviato
+  web_key:
+    added: Web Key aggiunto
+    activated: Web Key attivato
+    deactivated: Web Key disattivato
+    removed: Web Key rimosso
 
 Application:
   OIDC:

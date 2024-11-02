@@ -11,7 +11,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddOrgDomainPolicy(ctx context.Context, resourceOwner string, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) (*domain.ObjectDetails, error) {
+func (c *Commands) AddOrgDomainPolicy(ctx context.Context, resourceOwner string, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-4Jfsf", "Errors.ResourceOwnerMissing")
 	}
@@ -60,7 +63,10 @@ func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) (*do
 }
 
 // Deprecated: Use commands.domainPolicyWriteModel directly, to remove the domain.DomainPolicy struct
-func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (*domain.DomainPolicy, error) {
+func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (_ *domain.DomainPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	policy, err := c.orgDomainPolicyWriteModel(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -90,7 +96,10 @@ func prepareAddOrgDomainPolicy(
 	smtpSenderAddressMatchesInstanceDomain bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
+
 			writeModel, err := orgDomainPolicy(ctx, filter, a.ID)
 			if err != nil {
 				return nil, err

@@ -60,7 +60,7 @@ func (a *alg) Algorithm() string {
 func TestCrypt(t *testing.T) {
 	type args struct {
 		value []byte
-		c     Crypto
+		c     EncryptionAlgorithm
 	}
 	tests := []struct {
 		name    string
@@ -73,18 +73,6 @@ func TestCrypt(t *testing.T) {
 			args{[]byte("test"), &mockEncCrypto{}},
 			&CryptoValue{CryptoType: TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("test")},
 			false,
-		},
-		{
-			"hash",
-			args{[]byte("test"), &mockHashCrypto{}},
-			&CryptoValue{CryptoType: TypeHash, Algorithm: "hash", Crypted: []byte("test")},
-			false,
-		},
-		{
-			"wrong type",
-			args{[]byte("test"), &alg{}},
-			nil,
-			true,
 		},
 	}
 	for _, tt := range tests {
@@ -204,69 +192,6 @@ func TestDecryptString(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DecryptString() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestHash(t *testing.T) {
-	type args struct {
-		value []byte
-		c     HashAlgorithm
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *CryptoValue
-		wantErr bool
-	}{
-		{
-			"ok",
-			args{[]byte("test"), &mockHashCrypto{}},
-			&CryptoValue{CryptoType: TypeHash, Algorithm: "hash", Crypted: []byte("test")},
-			false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Hash(tt.args.value, tt.args.c)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Hash() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Hash() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestCompareHash(t *testing.T) {
-	type args struct {
-		value    *CryptoValue
-		comparer []byte
-		c        HashAlgorithm
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			"ok",
-			args{&CryptoValue{CryptoType: TypeHash, Algorithm: "hash", Crypted: []byte("test")}, []byte("test"), &mockHashCrypto{}},
-			false,
-		},
-		{
-			"wrong",
-			args{&CryptoValue{CryptoType: TypeHash, Algorithm: "hash", Crypted: []byte("test")}, []byte("test2"), &mockHashCrypto{}},
-			true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := CompareHash(tt.args.value, tt.args.comparer, tt.args.c); (err != nil) != tt.wantErr {
-				t.Errorf("CompareHash() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

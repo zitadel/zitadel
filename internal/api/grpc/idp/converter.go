@@ -2,6 +2,7 @@ package idp
 
 import (
 	"github.com/crewjam/saml"
+	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -274,6 +275,20 @@ func OptionsToCommand(options *idp_pb.Options) idp.Options {
 		IsLinkingAllowed:  options.IsLinkingAllowed,
 		IsAutoCreation:    options.IsAutoCreation,
 		IsAutoUpdate:      options.IsAutoUpdate,
+		AutoLinkingOption: autoLinkingOptionToCommand(options.AutoLinking),
+	}
+}
+
+func autoLinkingOptionToCommand(linking idp_pb.AutoLinkingOption) domain.AutoLinkingOption {
+	switch linking {
+	case idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME:
+		return domain.AutoLinkingOptionUsername
+	case idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL:
+		return domain.AutoLinkingOptionEmail
+	case idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED:
+		return domain.AutoLinkingOptionUnspecified
+	default:
+		return domain.AutoLinkingOptionUnspecified
 	}
 }
 
@@ -322,6 +337,21 @@ func azureADTenantTypeToCommand(tenantType idp_pb.AzureADTenantType) azuread.Ten
 		return azuread.ConsumersTenant
 	default:
 		return azuread.CommonTenant
+	}
+}
+
+func SAMLNameIDFormatToDomain(format idp_pb.SAMLNameIDFormat) domain.SAMLNameIDFormat {
+	switch format {
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED:
+		return domain.SAMLNameIDFormatUnspecified
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_EMAIL_ADDRESS:
+		return domain.SAMLNameIDFormatEmailAddress
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_PERSISTENT:
+		return domain.SAMLNameIDFormatPersistent
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT:
+		return domain.SAMLNameIDFormatTransient
+	default:
+		return domain.SAMLNameIDFormatUnspecified
 	}
 }
 
@@ -398,6 +428,7 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 			IsCreationAllowed: config.IsCreationAllowed,
 			IsAutoCreation:    config.IsAutoCreation,
 			IsAutoUpdate:      config.IsAutoUpdate,
+			AutoLinking:       autoLinkingOptionToPb(config.AutoLinking),
 		},
 	}
 	if config.OAuthIDPTemplate != nil {
@@ -449,6 +480,19 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		return providerConfig
 	}
 	return providerConfig
+}
+
+func autoLinkingOptionToPb(linking domain.AutoLinkingOption) idp_pb.AutoLinkingOption {
+	switch linking {
+	case domain.AutoLinkingOptionUnspecified:
+		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED
+	case domain.AutoLinkingOptionUsername:
+		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME
+	case domain.AutoLinkingOptionEmail:
+		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL
+	default:
+		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED
+	}
 }
 
 func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAuthIDPTemplate) {
@@ -611,11 +655,17 @@ func appleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.Appl
 }
 
 func samlConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.SAMLIDPTemplate) {
+	nameIDFormat := idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_PERSISTENT
+	if template.NameIDFormat.Valid {
+		nameIDFormat = nameIDToPb(template.NameIDFormat.V)
+	}
 	providerConfig.Config = &idp_pb.ProviderConfig_Saml{
 		Saml: &idp_pb.SAMLConfig{
-			MetadataXml:       template.Metadata,
-			Binding:           bindingToPb(template.Binding),
-			WithSignedRequest: template.WithSignedRequest,
+			MetadataXml:                   template.Metadata,
+			Binding:                       bindingToPb(template.Binding),
+			WithSignedRequest:             template.WithSignedRequest,
+			NameIdFormat:                  nameIDFormat,
+			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
 		},
 	}
 }
@@ -632,5 +682,20 @@ func bindingToPb(binding string) idp_pb.SAMLBinding {
 		return idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT
 	default:
 		return idp_pb.SAMLBinding_SAML_BINDING_UNSPECIFIED
+	}
+}
+
+func nameIDToPb(format domain.SAMLNameIDFormat) idp_pb.SAMLNameIDFormat {
+	switch format {
+	case domain.SAMLNameIDFormatUnspecified:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED
+	case domain.SAMLNameIDFormatEmailAddress:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_EMAIL_ADDRESS
+	case domain.SAMLNameIDFormatPersistent:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_PERSISTENT
+	case domain.SAMLNameIDFormatTransient:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT
+	default:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED
 	}
 }

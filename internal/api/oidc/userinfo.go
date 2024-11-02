@@ -5,75 +5,192 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"maps"
+	"net/http"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (s *Server) userInfo(ctx context.Context, userID, projectID string, scope, roleAudience []string) (_ *oidc.UserInfo, err error) {
-	roleAudience, requestedRoles := prepareRoles(ctx, projectID, scope, roleAudience)
-	qu, err := s.query.GetOIDCUserInfo(ctx, userID, roleAudience)
-	if err != nil {
-		return nil, err
+func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+
+	features := authz.GetFeatures(ctx)
+	if features.LegacyIntrospection {
+		return s.LegacyServer.UserInfo(ctx, r)
+	}
+	if features.TriggerIntrospectionProjections {
+		query.TriggerOIDCUserInfoProjections(ctx)
 	}
 
-	userInfo := userInfoToOIDC(projectID, qu, scope, roleAudience, requestedRoles, s.assetAPIPrefix(ctx))
-	return userInfo, s.userinfoFlows(ctx, qu, userInfo)
+	token, err := s.verifyAccessToken(ctx, r.Data.AccessToken)
+	if err != nil {
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)
+	}
+
+	var (
+		projectID string
+		assertion bool
+	)
+	if token.clientID != "" {
+		projectID, assertion, err = s.query.GetOIDCUserinfoClientByID(ctx, token.clientID)
+		// token.clientID might contain a username (e.g. client credentials) -> ignore the not found
+		if err != nil && !zerrors.IsNotFound(err) {
+			return nil, err
+		}
+	}
+
+	userInfo, err := s.userInfo(
+		token.userID,
+		token.scope,
+		projectID,
+		assertion,
+		true,
+		false,
+	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
+	if err != nil {
+		if !zerrors.IsNotFound(err) {
+			return nil, err
+		}
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("no active user").WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError), http.StatusUnauthorized)
+	}
+	return op.NewResponse(userInfo), nil
 }
 
-// prepareRoles scans the requested scopes, appends to roleAudiendce and returns the requestedRoles.
+// userInfo gets the user's data based on the scope.
+// The returned UserInfo contains standard and reserved claims, documented
+// here: https://zitadel.com/docs/apis/openidoauth/claims.
 //
-// When [ScopeProjectsRoles] is present and roleAudience was empty,
-// project IDs with the [domain.ProjectIDScope] prefix are added to the roleAudience.
+// User information is only retrieved once from the database.
+// However, each time, role claims are asserted and also action flows will trigger.
+//
+// projectID is an optional parameter which defines the default audience when there are any (or all) role claims requested.
+// projectRoleAssertion sets the default of returning all project roles, only if no specific roles were requested in the scope.
+// roleAssertion decides whether the roles will be returned (in the token or response)
+// userInfoAssertion decides whether the user information (profile data like name, email, ...) are returned
+//
+// currentProjectOnly can be set to use the current project ID only and ignore the audience from the scope.
+// It should be set in cases where the client doesn't need to know roles outside its own project,
+// for example an introspection client.
+func (s *Server) userInfo(
+	userID string,
+	scope []string,
+	projectID string,
+	projectRoleAssertion, userInfoAssertion, currentProjectOnly bool,
+) func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
+	var (
+		once                         sync.Once
+		rawUserInfo                  *oidc.UserInfo
+		qu                           *query.OIDCUserInfo
+		roleAudience, requestedRoles []string
+	)
+	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
+		once.Do(func() {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
+
+			roleAudience, requestedRoles = prepareRoles(ctx, scope, projectID, projectRoleAssertion, currentProjectOnly)
+			roleOrgIDs := domain.RoleOrgIDsFromScope(scope)
+			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience, roleOrgIDs...)
+			if err != nil {
+				return
+			}
+			rawUserInfo = userInfoToOIDC(qu, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
+		})
+		if err != nil {
+			return nil, err
+		}
+		// copy the userinfo to make sure the assert roles and actions use their own copy (e.g. map)
+		userInfo := &oidc.UserInfo{
+			Subject:         rawUserInfo.Subject,
+			UserInfoProfile: rawUserInfo.UserInfoProfile,
+			UserInfoEmail:   rawUserInfo.UserInfoEmail,
+			UserInfoPhone:   rawUserInfo.UserInfoPhone,
+			Address:         rawUserInfo.Address,
+			Claims:          maps.Clone(rawUserInfo.Claims),
+		}
+		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType)
+	}
+}
+
+// prepareRoles scans the requested scopes and builds the requested roles
+// and the audience for which roles need to be asserted.
 //
 // Scopes with [ScopeProjectRolePrefix] are added to requestedRoles.
+// When [ScopeProjectsRoles] is present project IDs with the [domain.ProjectIDScope]
+// prefix are added to the returned audience.
 //
-// If the resulting requestedRoles or roleAudience are not not empty,
-// the current projectID will always be parts or roleAudience.
-// Else nil, nil is returned.
-func prepareRoles(ctx context.Context, projectID string, scope, roleAudience []string) (ra, requestedRoles []string) {
-	// if all roles are requested take the audience for those from the scopes
-	if slices.Contains(scope, ScopeProjectsRoles) && len(roleAudience) == 0 {
-		roleAudience = domain.AddAudScopeToAudience(ctx, roleAudience, scope)
-	}
-	requestedRoles = make([]string, 0, len(scope))
+// If projectRoleAssertion is true and there were no specific roles requested,
+// the current projectID will always be parts of the returned audience.
+func prepareRoles(ctx context.Context, scope []string, projectID string, projectRoleAssertion, currentProjectOnly bool) (roleAudience, requestedRoles []string) {
 	for _, s := range scope {
 		if role, ok := strings.CutPrefix(s, ScopeProjectRolePrefix); ok {
 			requestedRoles = append(requestedRoles, role)
 		}
 	}
-	if len(requestedRoles) == 0 && len(roleAudience) == 0 {
-		return nil, nil
+
+	// If roles are requested take the audience for those from the scopes,
+	// when currentProjectOnly is not set.
+	if !currentProjectOnly && (len(requestedRoles) > 0 || slices.Contains(scope, ScopeProjectsRoles)) {
+		roleAudience = domain.AddAudScopeToAudience(ctx, roleAudience, scope)
 	}
 
-	if projectID != "" && !slices.Contains(roleAudience, projectID) {
+	// When either:
+	// - Project role assertion is set;
+	// - Roles for the current project (only) are requested;
+	// - There is already a roleAudience requested through scope;
+	// - There are requested roles through the scope;
+	// and the projectID is not empty, projectID must be part of the roleAudience.
+	if (projectRoleAssertion || currentProjectOnly || len(roleAudience) > 0 || len(requestedRoles) > 0) && projectID != "" && !slices.Contains(roleAudience, projectID) {
 		roleAudience = append(roleAudience, projectID)
 	}
 	return roleAudience, requestedRoles
 }
 
-func userInfoToOIDC(projectID string, user *query.OIDCUserInfo, scope, roleAudience, requestedRoles []string, assetPrefix string) *oidc.UserInfo {
-	out := new(oidc.UserInfo)
+func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []string, assetPrefix string) *oidc.UserInfo {
+	out := &oidc.UserInfo{
+		Subject: user.User.ID,
+	}
 	for _, s := range scope {
 		switch s {
-		case oidc.ScopeOpenID:
-			out.Subject = user.User.ID
 		case oidc.ScopeEmail:
+			if !userInfoAssertion {
+				continue
+			}
 			out.UserInfoEmail = userInfoEmailToOIDC(user.User)
 		case oidc.ScopeProfile:
+			if !userInfoAssertion {
+				continue
+			}
 			out.UserInfoProfile = userInfoProfileToOidc(user.User, assetPrefix)
 		case oidc.ScopePhone:
+			if !userInfoAssertion {
+				continue
+			}
 			out.UserInfoPhone = userInfoPhoneToOIDC(user.User)
 		case oidc.ScopeAddress:
-			//TODO: handle address for human users as soon as implemented
+			if !userInfoAssertion {
+				continue
+			}
+			// TODO: handle address for human users as soon as implemented
 		case ScopeUserMetaData:
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
@@ -88,12 +205,17 @@ func userInfoToOIDC(projectID string, user *query.OIDCUserInfo, scope, roleAudie
 			}
 		}
 	}
+	return out
+}
 
+func assertRoles(projectID string, user *query.OIDCUserInfo, roleAudience, requestedRoles []string, assertion bool, info *oidc.UserInfo) {
+	if !assertion {
+		return
+	}
 	// prevent returning obtained grants if none where requested
 	if (projectID != "" && len(requestedRoles) > 0) || len(roleAudience) > 0 {
-		setUserInfoRoleClaims(out, newProjectRoles(projectID, user.UserGrants, requestedRoles))
+		setUserInfoRoleClaims(info, newProjectRoles(projectID, user.UserGrants, requestedRoles))
 	}
-	return out
 }
 
 func userInfoEmailToOIDC(user *query.User) oidc.UserInfoEmail {
@@ -153,9 +275,9 @@ func setUserInfoMetadata(metadata []query.UserMetadata, out *oidc.UserInfo) {
 
 func setUserInfoOrgClaims(user *query.OIDCUserInfo, out *oidc.UserInfo) {
 	if org := user.Org; org != nil {
-		out.AppendClaims(ClaimResourceOwner+"id", org.ID)
-		out.AppendClaims(ClaimResourceOwner+"name", org.Name)
-		out.AppendClaims(ClaimResourceOwner+"primary_domain", org.PrimaryDomain)
+		out.AppendClaims(ClaimResourceOwnerID, org.ID)
+		out.AppendClaims(ClaimResourceOwnerName, org.Name)
+		out.AppendClaims(ClaimResourceOwnerPrimaryDomain, org.PrimaryDomain)
 	}
 }
 
@@ -170,8 +292,11 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	}
 }
 
-func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo) error {
-	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, qu.User.ResourceOwner)
+func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, triggerType, qu.User.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -191,7 +316,14 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 					}
 				}),
 				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
-					return object.UserGrantsFromSlice(c, qu.UserGrants)
+					return object.UserGrantsFromSlice(ctx, s.query, c, qu.UserGrants)
+				}),
+			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						return object.GetOrganizationMetadata(ctx, s.query, c, qu.User.ResourceOwner)
+					}
 				}),
 			),
 		),
@@ -205,6 +337,9 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 			actions.SetFields("v1",
 				actions.SetFields("userinfo",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return
@@ -217,6 +352,9 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 				),
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return

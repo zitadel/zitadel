@@ -25,7 +25,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID string, successURL, failureURL string) preparation.Validation {
+func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if idpID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing")
@@ -43,12 +43,17 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID st
 			if err != nil {
 				return nil, err
 			}
-			exists, err := ExistsIDP(ctx, filter, idpID, writeModel.ResourceOwner)
+			exists, err := ExistsIDP(ctx, filter, idpID)
 			if !exists || err != nil {
 				return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting")
 			}
 			return []eventstore.Command{
-				idpintent.NewStartedEvent(ctx, writeModel.aggregate, successURL, failureURL, idpID),
+				idpintent.NewStartedEvent(ctx,
+					IDPIntentAggregateFromWriteModel(&writeModel.WriteModel),
+					successURL,
+					failureURL,
+					idpID,
+				),
 			}, nil
 		}, nil
 	}
@@ -64,6 +69,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 		return nil, nil, err
 	}
 
+	//nolint: staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))
 	if err != nil {
 		return nil, nil, err
@@ -117,10 +123,11 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 		return nil, err
 	}
 	if intent.State == domain.IDPIntentStateUnspecified {
-		return nil, zerrors.ThrowNotFound(nil, "IDP-Hk38e", "Errors.Intent.NotStarted")
+		return nil, zerrors.ThrowNotFound(nil, "IDP-gy3ctgkqe7", "Errors.Intent.NotStarted")
 	}
 	if intent.State != domain.IDPIntentStateStarted {
-		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")
+		// we still need to return the intent to be able to redirect to the failure url
+		return intent, zerrors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")
 	}
 	return intent, nil
 }
@@ -166,7 +173,7 @@ func (c *Commands) SucceedIDPIntent(ctx context.Context, writeModel *IDPIntentWr
 	}
 	cmd := idpintent.NewSucceededEvent(
 		ctx,
-		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		IDPIntentAggregateFromWriteModel(&writeModel.WriteModel),
 		idpInfo,
 		idpUser.GetID(),
 		idpUser.GetPreferredUsername(),
@@ -200,7 +207,7 @@ func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPInte
 	}
 	cmd := idpintent.NewSAMLSucceededEvent(
 		ctx,
-		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		IDPIntentAggregateFromWriteModel(&writeModel.WriteModel),
 		idpInfo,
 		idpUser.GetID(),
 		idpUser.GetPreferredUsername(),
@@ -217,7 +224,7 @@ func (c *Commands) SucceedSAMLIDPIntent(ctx context.Context, writeModel *IDPInte
 func (c *Commands) RequestSAMLIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, requestID string) error {
 	return c.pushAppendAndReduce(ctx, writeModel, idpintent.NewSAMLRequestEvent(
 		ctx,
-		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		IDPIntentAggregateFromWriteModel(&writeModel.WriteModel),
 		requestID,
 	))
 }
@@ -241,7 +248,7 @@ func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPInte
 	}
 	cmd := idpintent.NewLDAPSucceededEvent(
 		ctx,
-		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		IDPIntentAggregateFromWriteModel(&writeModel.WriteModel),
 		idpInfo,
 		idpUser.GetID(),
 		idpUser.GetPreferredUsername(),
@@ -258,7 +265,7 @@ func (c *Commands) SucceedLDAPIDPIntent(ctx context.Context, writeModel *IDPInte
 func (c *Commands) FailIDPIntent(ctx context.Context, writeModel *IDPIntentWriteModel, reason string) error {
 	cmd := idpintent.NewFailedEvent(
 		ctx,
-		&idpintent.NewAggregate(writeModel.AggregateID, writeModel.ResourceOwner).Aggregate,
+		IDPIntentAggregateFromWriteModel(&writeModel.WriteModel),
 		reason,
 	)
 	_, err := c.eventstore.Push(ctx, cmd)

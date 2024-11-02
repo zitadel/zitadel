@@ -26,6 +26,8 @@ export enum UserTarget {
   EXTERNAL = 'external',
 }
 
+const USER_LIMIT = 25;
+
 @Component({
   selector: 'cnsl-search-user-autocomplete',
   templateUrl: './search-user-autocomplete.component.html',
@@ -67,9 +69,9 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
       // feat-3916 show users as soon as I am in the input field of the user
       const query = new SearchQuery();
       const lnQuery = new LoginNameQuery();
-      lnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+      lnQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE);
       query.setLoginNameQuery(lnQuery);
-      this.userService.listUsers(10, 0, [query]).then((users) => {
+      this.userService.listUsers(USER_LIMIT, 0, [query]).then((users) => {
         this.filteredUsers = users.resultList;
       });
 
@@ -97,7 +99,7 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
           query.setLoginNameQuery(lnQuery);
 
           if (this.target === UserTarget.SELF) {
-            return from(this.userService.listUsers(10, 0, [query]));
+            return from(this.userService.listUsers(USER_LIMIT, 0, [query]));
           } else {
             return of();
           }

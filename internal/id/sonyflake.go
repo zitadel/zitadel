@@ -89,6 +89,22 @@ func isPrivateIPv4(ip net.IP) bool {
 		(ip[0] == 10 || ip[0] == 172 && (ip[1] >= 16 && ip[1] < 32) || ip[0] == 192 && ip[1] == 168)
 }
 
+func MachineIdentificationMethod() string {
+	if GeneratorConfig.Identification.PrivateIp.Enabled {
+		return "Private Ip"
+	}
+
+	if GeneratorConfig.Identification.Hostname.Enabled {
+		return "Hostname"
+	}
+
+	if GeneratorConfig.Identification.Webhook.Enabled {
+		return "Webhook"
+	}
+
+	return "No machine identification method has been enabled"
+}
+
 func machineID() (uint16, error) {
 	if GeneratorConfig == nil {
 		logging.Panic("cannot create a unique id for the machine, generator has not been configured")

@@ -30,9 +30,10 @@ func (mig *externalConfigChange) Check(lastRun map[string]interface{}) bool {
 		mig.currentExternalDomain != mig.ExternalDomain
 }
 
-func (mig *externalConfigChange) Execute(ctx context.Context) error {
+func (mig *externalConfigChange) Execute(ctx context.Context, _ eventstore.Event) error {
 	cmd, err := command.StartCommands(
 		mig.es,
+		nil,
 		mig.defaults,
 		nil,
 		nil,

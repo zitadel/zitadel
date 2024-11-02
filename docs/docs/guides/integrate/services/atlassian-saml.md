@@ -36,9 +36,9 @@ For Identity Provider select "Other provider" and enter a Directory Name.
 Follow the wizard.
 Fill in the following information:
 
-- `Identity provider Entity ID`: {your_instance_domain}/saml/v2/metadata
-- `Identity provider SSO URL`: {your_instance_domain}/saml/v2/SSO
-- `Public x509 certificate`: You need to download and paste the value of the certificate from {your_instance_domain}/saml/v2/certificate
+- `Identity provider Entity ID`: \{your_instance_domain}/saml/v2/metadata
+- `Identity provider SSO URL`: \{your_instance_domain}/saml/v2/SSO
+- `Public x509 certificate`: You need to download and paste the value of the certificate from \{your_instance_domain}/saml/v2/certificate
 
 ![Add SAML details](/img/saml/atlassian/atlassian-03.png)
 

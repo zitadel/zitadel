@@ -43,6 +43,10 @@ import { AuthMethodDialogComponent } from './app-detail/auth-method-dialog/auth-
 import { AppSecretDialogComponent } from './app-secret-dialog/app-secret-dialog.component';
 import { AppsRoutingModule } from './apps-routing.module';
 import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
+import { IntegrateAppComponent } from './integrate/integrate.component';
+import { OIDCConfigurationComponent } from 'src/app/components/oidc-configuration/oidc-configuration.component';
+import { FrameworkChangeComponent } from 'src/app/components/framework-change/framework-change.component';
+import { CopyRowComponent } from '../../../components/copy-row/copy-row.component';
 
 @NgModule({
   declarations: [
@@ -50,12 +54,15 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     AppDetailComponent,
     AppSecretDialogComponent,
     RedirectUrisComponent,
+    IntegrateAppComponent,
     AdditionalOriginsComponent,
     AuthMethodDialogComponent,
   ],
   imports: [
+    FrameworkChangeComponent,
     CommonModule,
     A11yModule,
+    OIDCConfigurationComponent,
     RedirectPipeModule,
     NameDialogModule,
     AppRadioModule,
@@ -93,6 +100,7 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     CodemirrorModule,
     ChangesModule,
     InfoSectionModule,
+    CopyRowComponent,
   ],
   exports: [TranslateModule],
 })

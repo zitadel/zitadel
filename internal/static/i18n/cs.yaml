@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limity nebyly nalezeny
     NoneSpecified: Nebyly určeny žádné limity
+    Instance:
+      Blocked: Instance je blokována
   Restrictions:
     NoneSpecified: Nebyla určena žádná omezení
     DefaultLanguageMustBeAllowed: Výchozí jazyk musí být povolen
@@ -51,10 +53,24 @@ Errors:
     NotFound: Konfigurace SMS nebyla nalezena
     AlreadyActive: Konfigurace SMS je již aktivní
     AlreadyDeactivated: Konfigurace SMS je již deaktivovaná
+  SMTP:
+    NotEmailMessage: zpráva není EmailMessage
+    RequiredAttributes: předmět, příjemci a obsah musí být nastaveny, ale některé nebo všechny jsou prázdné
+    CouldNotSplit: nemohl rozdělit hostitele a port pro připojení k smtp
+    CouldNotDial: nelze se spojit se serverem SMTP, zkontrolovat port, problémy s firewallem...
+    CouldNotDialTLS: nelze se spojit se serverem SMTP pomocí TLS, zkontrolovat port, problémy s firewallem...
+    CouldNotCreateClient: nelze vytvořit smtp klienta
+    CouldNotStartTLS: nelze spustit tls
+    CouldNotAuth: nemohlo se přidat smtp auth, zkontrolujte, zda je váš uživatel i heslo správné, pokud jsou správné, možná váš poskytovatel vyžaduje metodu auth, kterou ZITADEL nepodporuje
+    CouldNotSetSender: nelze nastavit odesílatele
+    CouldNotSetRecipient: nelze nastavit příjemce
   SMTPConfig:
+    TestPassword: Heslo pro test nenalezeno
     NotFound: Konfigurace SMTP nebyla nalezena
     AlreadyExists: Konfigurace SMTP již existuje
+    AlreadyDeactivated: Konfigurace SMTP je již deaktivována
     SenderAdressNotCustomDomain: Adresa odesílatele musí být nakonfigurována jako vlastní doména na instanci.
+    TestEmailNotFound: E-mailová adresa pro test nebyla nalezena
   Notification:
     NoDomain: Pro zprávu nebyla nalezena žádná doména
   User:
@@ -106,6 +122,7 @@ Errors:
       Key:
         NotFound: Klíč stroje nenalezen
         AlreadyExisting: Klíč stroje již existuje
+        Invalid: Veřejný klíč není platný veřejný klíč RSA ve formátu PKIX s kódováním PEM
       Secret:
         NotExisting: Tajemství neexistuje
         Invalid: Tajemství je neplatné
@@ -125,13 +142,14 @@ Errors:
       NotFound: Kód nenalezen
       Expired: Kód vypršel
       GeneratorAlgNotSupported: Nepodporovaný algoritmus generátoru
+      Invalid: Kód je neplatný
     Password:
       NotFound: Heslo nenalezeno
       Empty: Heslo je prázdné
       Invalid: Heslo je neplatné
       NotSet: Uživatel nenastavil heslo
       NotChanged: Nové heslo nesmí být stejné jako současné heslo
-      NotSupported: Kódování hash hesla není podporováno
+      NotSupported: Kódování hash hesla není podporováno. Podívejte se na https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Politika složitosti hesla nenalezena
       MinLength: Heslo je příliš krátké
@@ -324,7 +342,7 @@ Errors:
       NotActive: Grant projektu není aktivní
       NotInactive: Grant projektu není neaktivní
   IAM:
-    NotFound: Instance nenalezena. Podívejte se na https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: Instance nebyla nalezena. Ujistěte se, že jste získali správnou doménu. Podívejte se na https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Role nebyly změněny
     MemberInvalid: Člen je neplatný
@@ -465,6 +483,7 @@ Errors:
     NotActive: Akce není aktivní
     NotInactive: Akce není neaktivní
     MaxAllowed: Není dovoleno více aktivních akcí
+    NotEnabled: Funkce "Akce" není povolena
   Flow:
     FlowTypeMissing: Chybí typ toku
     Empty: Tok je již prázdný
@@ -475,6 +494,8 @@ Errors:
     CloseRows: SQL příkaz nemohl být dokončen
     SQLStatement: SQL příkaz nemohl být vytvořen
     InvalidRequest: Požadavek je neplatný
+    TooManyNestingLevels: Příliš mnoho úrovní vnoření dotazů (max. 20)
+    LimitExceeded: Překročen limit výsledků
   Quota:
     AlreadyExists: Kvóta pro tuto jednotku již existuje
     NotFound: Kvóta pro tuto jednotku nenalezena
@@ -507,6 +528,7 @@ Errors:
     IDPMissing: V požadavku chybí IDP ID
     IDPInvalid: IDP je pro požadavek neplatné
     ResponseInvalid: Odpověď IDP je neplatná
+    MissingSingleMappingAttribute: Neobsahuje atribut mapování nebo má více než jednu hodnotu
     SuccessURLMissing: V požadavku chybí úspěšná URL
     FailureURLMissing: V požadavku chybí URL selhání
     StateMissing: V požadavku chybí parametr stavu
@@ -529,6 +551,52 @@ Errors:
     NotExisting: Funkce neexistuje
     TypeNotSupported: Typ funkce není podporován
     InvalidValue: Neplatná hodnota pro tuto funkci
+  Target:
+    Invalid: Cíl je neplatný
+    NoTimeout: Cíl nemá časový limit
+    InvalidURL: Cíl má neplatnou adresu URL
+    NotFound: Cíl nenalezen
+  Execution:
+    ConditionInvalid: Podmínka provedení je neplatná
+    Invalid: Provedení je neplatné
+    NotFound: Provedení nenalezeno
+    IncludeNotFound: Zahrnout nenalezeno
+    NoTargets: Nejsou definovány žádné cíle
+    Failed: Provedení se nezdařilo
+    ResponseIsNotValidJSON: Odpověď není platný JSON
+  UserSchema:
+    NotEnabled: Funkce "Uživatelské schéma" není povolena
+    Type:
+      Missing: Chybí typ uživatelského schématu
+      AlreadyExists: Typ uživatelského schématu již existuje
+    Authenticator:
+      Invalid: Neplatný typ ověřovače
+    NotActive: Uživatelské schéma není aktivní
+    NotInactive: Uživatelské schéma není neaktivní
+    NotExists: Uživatelské schéma neexistuje
+    ID:
+      Missing: Chybí ID schématu uživatele
+    Invalid: Uživatelské schéma je neplatné
+    Data:
+      Invalid: Data neplatná pro uživatelské schéma
+  TokenExchange:
+    FeatureDisabled: Funkce Token Exchange je pro vaši instanci zakázána. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token chybí
+      Invalid: Token je neplatný
+      TypeMissing: Chybí typ tokenu
+      TypeNotAllowed: Typ tokenu není povolen
+      TypeNotSupported: Typ tokenu není podporován
+      NotForAPI: Zosobněné tokeny nejsou pro API povoleny
+    Impersonation:
+      PolicyDisabled: Zosobnění je zakázáno v zásadách zabezpečení instance
+  WebKey:
+    ActiveDelete: Aktivní webový klíč nelze smazat
+    Config: Neplatná konfigurace webového klíče
+    Duplicate: ID webového klíče není jedinečné
+    FeatureDisabled: Funkce webového klíče je zakázána
+    NoActive: Nebyl nalezen žádný aktivní webový klíč
+    NotFound: Webový klíč nebyl nalezen
 
 AggregateTypes:
   action: Akce
@@ -540,8 +608,28 @@ AggregateTypes:
   usergrant: Uživatelský grant
   quota: Kvóta
   feature: Funkce
+  target: Cíl
+  execution: Provedení
+  user_schema: Uživatelské schéma
+  auth_request: Požadavek na autentizaci
+  device_auth: Ověření zařízení
+  idpintent: Záměr IDP
+  limits: Limit
+  milestone: Milník
+  oidc_session: OIDC sezení
+  restrictions: Omezení
+  system: Systém
+  session: Sezení
+  web_key: Webový klíč
 
 EventTypes:
+  execution:
+    set: Prováděcí sada
+    removed: Provedení smazáno
+  target:
+    added: Cíl vytvořen
+    changed: Cíl změněn
+    removed: Cíl smazán
   user:
     added: Uživatel přidán
     selfregistered: Uživatel se zaregistroval sám
@@ -554,7 +642,9 @@ EventTypes:
         failed: Kontrola inicializace selhala
     token:
       added: Přístupový token vytvořen
+      v2.added: Přístupový token vytvořen
       removed: Přístupový token odstraněn
+    impersonated: Usuario suplantado
     username:
       reserved: Uživatelské jméno rezervováno
       released: Uživatelské jméno uvolněno
@@ -577,6 +667,7 @@ EventTypes:
         removed: Klíč odstraněn
       secret:
         set: Tajemství nastaveno
+        updated: Tajný hash aktualizován
         removed: Tajemství odstraněno
         check:
           succeeded: Kontrola tajemství byla úspěšná
@@ -594,6 +685,13 @@ EventTypes:
         check:
           succeeded: Kontrola inicializace byla úspěšná
           failed: Kontrola inicializace selhala
+      invite:
+        code:
+          added: Vygenerován pozvánkový kód
+          sent: Pozvánkový kód byl odeslán
+        check:
+          succeeded: Kontrola pozvánky byla úspěšná
+          failed: Kontrola pozvánky selhala
       username:
         reserved: Uživatelské jméno rezervováno
         released: Uživatelské jméno uvolněno
@@ -952,6 +1050,14 @@ EventTypes:
             succeeded: Kontrola tajného klíče OIDC klienta byla úspěšná
             failed: Kontrola tajného klíče OIDC klienta selhala
         key:
+          added: Přidán klíč k aplikaci OIDC
+          removed: Odstranění klíče aplikace OIDC
+      api:
+        secret:
+          check:
+            succeeded: Tajná kontrola API byla úspěšná
+            failed: Tajná kontrola API se nezdařila
+        key:
           added: Klíč aplikace přidán
           removed: Klíč aplikace odstraněn
       config:
@@ -963,11 +1069,13 @@ EventTypes:
           changed: Konfigurace OIDC změněna
           secret:
             changed: Tajný klíč OIDC změněn
+            updated: Tajný hash OIDC byl aktualizován
         api:
           added: Konfigurace API přidána
           changed: Konfigurace API změněna
           secret:
             changed: Tajný klíč API změněn
+            updated: Tajný hash API byl aktualizován
   policy:
     password:
       complexity:
@@ -1062,6 +1170,9 @@ EventTypes:
       config:
         added: Konfigurace SMTP přidána
         changed: Konfigurace SMTP změněna
+        activated: Konfigurace SMTP aktivována
+        deactivated: Konfigurace SMTP deaktivována
+        removed: Konfigurace SMTP odstraněna
         password:
           changed: Tajemství konfigurace SMTP změněno
     sms:
@@ -1207,9 +1318,42 @@ EventTypes:
       config:
         added: Konfigurace SMTP přidána
         changed: Konfigurace SMTP změněna
+        activated: Konfigurace SMTP aktivována
+        deactivated: Konfigurace SMTP deaktivována
         password:
           changed: Heslo konfigurace SMTP změněno
         removed: Konfigurace SMTP odstraněna
+  user_schema:
+    created: Vytvořeno uživatelské schéma
+    updated: Uživatelské schéma bylo aktualizováno
+    deactivated: Uživatelské schéma deaktivováno
+    reactivated: Uživatelské schéma bylo znovu aktivováno
+    deleted: Uživatelské schéma bylo smazáno
+    user:
+      created: Uživatel vytvořen
+      updated: Uživatel aktualizován
+      deleted: Uživatel byl smazán
+      email:
+        updated: E-mailová adresa změněna
+        verified: E-mailová adresa ověřena
+        verification:
+          failed: Ověření e-mailové adresy se nezdařilo
+        code:
+          added: Vygenerován ověřovací kód e-mailové adresy
+          sent: Ověřovací kód e-mailové adresy odeslán
+      phone:
+        updated: Telefonní číslo změněno
+        verified: Telefonní číslo ověřeno
+        verification:
+          failed: Ověření telefonního čísla se nezdařilo
+        code:
+          added: Byl vygenerován ověřovací kód telefonního čísla
+          sent: Ověřovací kód telefonního čísla odeslán
+  web_key:
+    added: Přidán webový klíč
+    activated: Web Key aktivován
+    deactivated: Web Key deaktivován
+    removed: Odstraňte webový klíč
 
 Application:
   OIDC:

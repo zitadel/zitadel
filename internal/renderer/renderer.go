@@ -2,10 +2,10 @@ package renderer
 
 import (
 	"context"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"text/template"
 
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
@@ -123,7 +123,7 @@ func (r *Renderer) registerTranslateFn(req *http.Request, translator *i18n.Trans
 	if translator == nil {
 		return funcs
 	}
-	funcs[TranslateFn] = func(id string, args ...interface{}) string {
+	funcs[TranslateFn] = func(id string, args ...interface{}) template.HTML {
 		m := map[string]interface{}{}
 		var key string
 		for i, arg := range args {
@@ -134,9 +134,9 @@ func (r *Renderer) registerTranslateFn(req *http.Request, translator *i18n.Trans
 			m[key] = arg
 		}
 		if r == nil {
-			return r.Localize(translator, id, m)
+			return template.HTML(r.Localize(translator, id, m))
 		}
-		return r.LocalizeFromRequest(translator, req, id, m)
+		return template.HTML(r.LocalizeFromRequest(translator, req, id, m))
 	}
 	return funcs
 }

@@ -2,9 +2,7 @@
   title="{{ project?.projectName }}"
   [hasActions]="false"
   docLink="https://zitadel.com/docs/guides/manage/console/projects#what-is-a-granted-project"
-  sub="{{ 'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate }} {{ 'ACTIONS.OF' | translate }} <strong>{{
-    project?.projectOwnerName
-  }}</strong>"
+  sub="{{ 'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate: { name: project?.projectOwnerName } }}"
   [isActive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE"
   [isInactive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
   stateTooltip="{{ 'ORG.STATE.' + project?.state | translate }}"
@@ -44,7 +42,16 @@
           [context]="UserGrantContext.GRANTED_PROJECT"
           [projectId]="projectId"
           [grantId]="grantId"
-          [displayedColumns]="['select', 'user', 'projectId', 'creationDate', 'changeDate', 'roleNamesList', 'actions']"
+          [displayedColumns]="[
+            'select',
+            'user',
+            'projectId',
+            'creationDate',
+            'changeDate',
+            'state',
+            'roleNamesList',
+            'actions',
+          ]"
           [disableWrite]="(['user.grant.write$', 'user.grant.write:' + grantId] | hasRole | async) === false"
           [disableDelete]="(['user.grant.delete$', 'user.grant.delete:' + grantId] | hasRole | async) === false"
           [refreshOnPreviousRoutes]="['/grant-create/project/{{projectId}}/grant/{{grantId}}']"

@@ -22,20 +22,22 @@ const (
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	LoginClient   string                    `json:"login_client"`
-	ClientID      string                    `json:"client_id"`
-	RedirectURI   string                    `json:"redirect_uri"`
-	State         string                    `json:"state,omitempty"`
-	Nonce         string                    `json:"nonce,omitempty"`
-	Scope         []string                  `json:"scope,omitempty"`
-	Audience      []string                  `json:"audience,omitempty"`
-	ResponseType  domain.OIDCResponseType   `json:"response_type,omitempty"`
-	CodeChallenge *domain.OIDCCodeChallenge `json:"code_challenge,omitempty"`
-	Prompt        []domain.Prompt           `json:"prompt,omitempty"`
-	UILocales     []string                  `json:"ui_locales,omitempty"`
-	MaxAge        *time.Duration            `json:"max_age,omitempty"`
-	LoginHint     *string                   `json:"login_hint,omitempty"`
-	HintUserID    *string                   `json:"hint_user_id,omitempty"`
+	LoginClient      string                    `json:"login_client"`
+	ClientID         string                    `json:"client_id"`
+	RedirectURI      string                    `json:"redirect_uri"`
+	State            string                    `json:"state,omitempty"`
+	Nonce            string                    `json:"nonce,omitempty"`
+	Scope            []string                  `json:"scope,omitempty"`
+	Audience         []string                  `json:"audience,omitempty"`
+	ResponseType     domain.OIDCResponseType   `json:"response_type,omitempty"`
+	ResponseMode     domain.OIDCResponseMode   `json:"response_mode,omitempty"`
+	CodeChallenge    *domain.OIDCCodeChallenge `json:"code_challenge,omitempty"`
+	Prompt           []domain.Prompt           `json:"prompt,omitempty"`
+	UILocales        []string                  `json:"ui_locales,omitempty"`
+	MaxAge           *time.Duration            `json:"max_age,omitempty"`
+	LoginHint        *string                   `json:"login_hint,omitempty"`
+	HintUserID       *string                   `json:"hint_user_id,omitempty"`
+	NeedRefreshToken bool                      `json:"need_refresh_token,omitempty"`
 }
 
 func (e *AddedEvent) Payload() interface{} {
@@ -56,12 +58,14 @@ func NewAddedEvent(ctx context.Context,
 	scope,
 	audience []string,
 	responseType domain.OIDCResponseType,
+	responseMode domain.OIDCResponseMode,
 	codeChallenge *domain.OIDCCodeChallenge,
 	prompt []domain.Prompt,
 	uiLocales []string,
 	maxAge *time.Duration,
 	loginHint,
 	hintUserID *string,
+	needRefreshToken bool,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -69,20 +73,22 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
-		LoginClient:   loginClient,
-		ClientID:      clientID,
-		RedirectURI:   redirectURI,
-		State:         state,
-		Nonce:         nonce,
-		Scope:         scope,
-		Audience:      audience,
-		ResponseType:  responseType,
-		CodeChallenge: codeChallenge,
-		Prompt:        prompt,
-		UILocales:     uiLocales,
-		MaxAge:        maxAge,
-		LoginHint:     loginHint,
-		HintUserID:    hintUserID,
+		LoginClient:      loginClient,
+		ClientID:         clientID,
+		RedirectURI:      redirectURI,
+		State:            state,
+		Nonce:            nonce,
+		Scope:            scope,
+		Audience:         audience,
+		ResponseType:     responseType,
+		ResponseMode:     responseMode,
+		CodeChallenge:    codeChallenge,
+		Prompt:           prompt,
+		UILocales:        uiLocales,
+		MaxAge:           maxAge,
+		LoginHint:        loginHint,
+		HintUserID:       hintUserID,
+		NeedRefreshToken: needRefreshToken,
 	}
 }
 

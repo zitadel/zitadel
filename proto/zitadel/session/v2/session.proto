@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+package zitadel.session.v2;
+
+import "zitadel/object.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2;session";
+
+message Session {
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"id of the session\"";
+    }
+  ];
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the session was created\"";
+    }
+  ];
+  google.protobuf.Timestamp change_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the session was last updated\"";
+    }
+  ];
+  uint64 sequence = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"sequence of the session\"";
+    }
+  ];
+  Factors factors = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"checked factors of the session, e.g. the user, password and more\"";
+    }
+  ];
+  map<string, bytes> metadata = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"custom key value list\"";
+    }
+  ];
+  UserAgent user_agent = 7;
+  optional google.protobuf.Timestamp expiration_date = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time the session will be automatically invalidated\"";
+    }
+  ];
+}
+
+message Factors {
+  UserFactor user = 1;
+  PasswordFactor password = 2;
+  WebAuthNFactor web_auth_n = 3;
+  IntentFactor intent = 4;
+  TOTPFactor totp = 5;
+  OTPFactor otp_sms = 6;
+  OTPFactor otp_email = 7;
+}
+
+message UserFactor {
+  reserved 5;
+  reserved "organisation_id";
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the user was last checked\"";
+    }
+  ];
+  string id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"id of the checked user\"";
+    }
+  ];
+  string login_name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"login name of the checked user\"";
+    }
+  ];
+  string display_name = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"display name of the checked user\"";
+    }
+  ];
+  string organization_id = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"organization id of the checked user\"";
+    }
+  ];
+}
+
+message PasswordFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the password was last checked\"";
+    }
+  ];
+}
+
+message IntentFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when an intent was last checked\"";
+    }
+  ];
+}
+
+message WebAuthNFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the passkey challenge was last checked\"";
+    }
+  ];
+  bool user_verified = 2;
+}
+
+message TOTPFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the Time-based One-Time Password was last checked\"";
+    }
+  ];
+}
+
+message OTPFactor {
+  google.protobuf.Timestamp verified_at = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"time when the One-Time Password was last checked\"";
+    }
+  ];
+}
+
+message SearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    IDsQuery ids_query = 1;
+    UserIDQuery user_id_query = 2;
+    CreationDateQuery creation_date_query = 3;
+  }
+}
+
+message IDsQuery {
+  repeated string ids = 1;
+}
+
+message UserIDQuery {
+  string id = 1;
+}
+
+message CreationDateQuery {
+  google.protobuf.Timestamp creation_date = 1;
+  zitadel.v1.TimestampQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which timestamp comparison method is used";
+    }
+  ];
+}
+
+message UserAgent {
+  optional string fingerprint_id = 1;
+  optional string ip  = 2;
+  optional string description = 3;
+
+  // A header may have multiple values.
+  // In Go, headers are defined
+  // as map[string][]string, but protobuf
+  // doesn't allow this scheme.
+  message HeaderValues {
+    repeated string values = 1;
+  }
+  map<string,HeaderValues> header = 4;
+}
+
+enum SessionFieldName {
+  SESSION_FIELD_NAME_UNSPECIFIED = 0;
+  SESSION_FIELD_NAME_CREATION_DATE = 1;
+}

@@ -17,7 +17,7 @@ func newGrant() *cobra.Command {
 		Short: "set ALL grant to user",
 		Long: `Sets ALL grant to the database user.
 
-Prereqesits:
+Prerequisites:
 - cockroachDB or postgreSQL
 `,
 		Run: func(cmd *cobra.Command, args []string) {

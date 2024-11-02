@@ -8,7 +8,7 @@ issues:
 run:
   concurrency: 4
   timeout: 10m
-  go: '1.21'
+  go: '1.22'
   skip-dirs:
     - .artifacts
     - .backups

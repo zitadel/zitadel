@@ -3,15 +3,11 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-func (c *Commands) AddUserTOTP(ctx context.Context, userID, resourceowner string) (*domain.TOTP, error) {
-	if err := authz.UserIDInCTX(ctx, userID); err != nil {
-		return nil, err
-	}
-	prep, err := c.createHumanTOTP(ctx, userID, resourceowner)
+func (c *Commands) AddUserTOTP(ctx context.Context, userID, resourceOwner string) (*domain.TOTP, error) {
+	prep, err := c.createHumanTOTP(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -26,8 +22,5 @@ func (c *Commands) AddUserTOTP(ctx context.Context, userID, resourceowner string
 }
 
 func (c *Commands) CheckUserTOTP(ctx context.Context, userID, code, resourceOwner string) (*domain.ObjectDetails, error) {
-	if err := authz.UserIDInCTX(ctx, userID); err != nil {
-		return nil, err
-	}
 	return c.HumanCheckMFATOTPSetup(ctx, userID, code, "", resourceOwner)
 }

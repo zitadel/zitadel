@@ -23,7 +23,7 @@ func UserGrantToPb(assetPrefix string, grant *query.UserGrant) *user_pb.UserGran
 	return &user_pb.UserGrant{
 		Id:                 grant.ID,
 		UserId:             grant.UserID,
-		State:              user_pb.UserGrantState_USER_GRANT_STATE_ACTIVE,
+		State:              UserGrantStateToPb(grant.State),
 		RoleKeys:           grant.Roles,
 		ProjectId:          grant.ProjectID,
 		OrgId:              grant.ResourceOwner,
@@ -39,12 +39,30 @@ func UserGrantToPb(assetPrefix string, grant *query.UserGrant) *user_pb.UserGran
 		AvatarUrl:          domain.AvatarURL(assetPrefix, grant.UserResourceOwner, grant.AvatarURL),
 		PreferredLoginName: grant.PreferredLoginName,
 		UserType:           TypeToPb(grant.UserType),
+		GrantedOrgId:       grant.GrantedOrgID,
+		GrantedOrgName:     grant.GrantedOrgName,
+		GrantedOrgDomain:   grant.GrantedOrgDomain,
 		Details: object.ToViewDetailsPb(
 			grant.Sequence,
 			grant.CreationDate,
 			grant.ChangeDate,
 			grant.ResourceOwner,
 		),
+	}
+}
+
+func UserGrantStateToPb(state domain.UserGrantState) user_pb.UserGrantState {
+	switch state {
+	case domain.UserGrantStateActive:
+		return user_pb.UserGrantState_USER_GRANT_STATE_ACTIVE
+	case domain.UserGrantStateInactive:
+		return user_pb.UserGrantState_USER_GRANT_STATE_INACTIVE
+	case domain.UserGrantStateRemoved,
+		domain.UserGrantStateUnspecified:
+		// these states should never occur here and are mainly listed for linting purposes
+		fallthrough
+	default:
+		return user_pb.UserGrantState_USER_GRANT_STATE_UNSPECIFIED
 	}
 }
 

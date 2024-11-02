@@ -1,12 +1,14 @@
 package login
 
 import (
+	"context"
 	"net/http"
 
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -39,6 +41,13 @@ type registerData struct {
 	OrgRegister        bool
 }
 
+func determineResourceOwner(ctx context.Context, authRequest *domain.AuthRequest) string {
+	if authRequest != nil && authRequest.RequestedOrgID != "" {
+		return authRequest.RequestedOrgID
+	}
+	return authz.GetInstance(ctx).DefaultOrganisationID()
+}
+
 func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 	data := new(registerFormData)
 	authRequest, err := l.getAuthRequestAndParseData(r, data)
@@ -46,7 +55,28 @@ func (l *Login) handleRegister(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authRequest, err)
 		return
 	}
+	if err := l.checkRegistrationAllowed(r, determineResourceOwner(r.Context(), authRequest), authRequest); err != nil {
+		l.renderError(w, r, authRequest, err)
+		return
+	}
 	l.renderRegister(w, r, authRequest, data, nil)
+}
+
+func (l *Login) checkRegistrationAllowed(r *http.Request, orgID string, authReq *domain.AuthRequest) error {
+	if authReq != nil {
+		if registrationAllowed(authReq) {
+			return nil
+		}
+		return zerrors.ThrowPreconditionFailed(nil, "VIEW-RRGRXz4kGw", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
+	}
+	loginPolicy, err := l.getLoginPolicy(r, orgID)
+	if err != nil {
+		return err
+	}
+	if loginPolicy.AllowRegister && loginPolicy.AllowUsernamePassword {
+		return nil
+	}
+	return zerrors.ThrowPreconditionFailed(nil, "VIEW-Vq3bduAacD", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
 }
 
 func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
@@ -56,33 +86,16 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authRequest, err)
 		return
 	}
+	resourceOwner := determineResourceOwner(r.Context(), authRequest)
+	if err := l.checkRegistrationAllowed(r, resourceOwner, authRequest); err != nil {
+		l.renderError(w, r, authRequest, err)
+		return
+	}
 	if data.Password != data.Password2 {
 		err := zerrors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-
-	resourceOwner := authz.GetInstance(r.Context()).DefaultOrganisationID()
-
-	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != resourceOwner {
-		resourceOwner = authRequest.RequestedOrgID
-	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
-	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
-
 	// For consistency with the external authentication flow,
 	// the setMetadata() function is provided on the pre creation hook, for now,
 	// like for the ExternalAuthentication flow.
@@ -96,22 +109,14 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	user, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+
+	human := command.AddHumanFromDomain(user, metadatas, authRequest, nil)
+	err = l.command.AddUserHuman(setContext(r.Context(), resourceOwner), resourceOwner, human, true, l.userCodeAlg)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-
-	if len(metadatas) > 0 {
-		_, err = l.command.BulkSetUserMetadata(r.Context(), user.AggregateID, resourceOwner, metadatas...)
-		if err != nil {
-			// TODO: What if action is configured to be allowed to fail? Same question for external registration.
-			l.renderRegister(w, r, authRequest, data, err)
-			return
-		}
-	}
-
-	userGrants, err := l.runPostCreationActions(user.AggregateID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
+	userGrants, err := l.runPostCreationActions(human.ID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
 		return
@@ -128,7 +133,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID)
+	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, human.ID, userAgentID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -149,15 +154,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		formData.Language = l.renderer.ReqLang(translator, r).String()
 	}
 
-	var resourceOwner string
-	if authRequest != nil {
-		resourceOwner = authRequest.RequestedOrgID
-	}
-
-	if resourceOwner == "" {
-		resourceOwner = authz.GetInstance(r.Context()).DefaultOrganisationID()
-	}
-
+	resourceOwner := determineResourceOwner(r.Context(), authRequest)
 	data := registerData{
 		baseData:         l.getBaseData(r, authRequest, translator, "RegistrationUser.Title", "RegistrationUser.Description", errID, errMessage),
 		registerFormData: *formData,

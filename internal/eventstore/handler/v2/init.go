@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -264,11 +264,23 @@ func NewViewCheck(selectStmt string, secondaryTables ...*SuffixedTable) *handler
 }
 
 func execNextIfExists(config execConfig, q query, opts []execOption, executeNext bool) func(handler.Executer, string) (bool, error) {
-	return func(handler handler.Executer, name string) (bool, error) {
-		err := exec(config, q, opts)(handler, name)
-		if isErrAlreadyExists(err) {
-			return executeNext, nil
+	return func(handler handler.Executer, name string) (shouldExecuteNext bool, err error) {
+		_, err = handler.Exec("SAVEPOINT exec_stmt")
+		if err != nil {
+			return false, zerrors.ThrowInternal(err, "V2-U1wlz", "create savepoint failed")
 		}
+		defer func() {
+			if err == nil {
+				return
+			}
+
+			if isErrAlreadyExists(err) {
+				_, err = handler.Exec("ROLLBACK TO SAVEPOINT exec_stmt")
+				shouldExecuteNext = executeNext
+				return
+			}
+		}()
+		err = exec(config, q, opts)(handler, name)
 		return false, err
 	}
 }

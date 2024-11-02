@@ -7,7 +7,7 @@ By using ZITADEL actions, you can manipulate ZITADELs behavior on specific Event
 This is useful when you have special business requirements that ZITADEL doesn't support out-of-the-box.
 
 :::info
-We're working on Actions continuously. In the [roadmap](https://zitadel.com/roadmap), you see how we are planning to expand and improve it. Please tell us about your needs and help us prioritize further fixes and features.
+We're working on Actions continuously. In the [roadmap](https://zitadel.com/roadmap), you see how we are planning to expand and improve it. Please tell us about your needs and help us prioritize further fixes and features. 
 :::
 
 ## Why actions?
@@ -36,3 +36,4 @@ Within the JavaScript code, you can read and manipulate the state.
 - [Assign users a role after they register using an external identity provider](/guides/manage/customize/behavior)
 - [Actions reference](/apis/actions/introduction#action)
 - [Actions Marketplace: Find example actions to use in ZITADEL](https://github.com/zitadel/actions)
+- [Example use cases](/apis/actions/code-examples)

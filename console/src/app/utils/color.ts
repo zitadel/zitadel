@@ -87,6 +87,12 @@ export function getMembershipColor(role: string): Color {
     case 'IAM_USER_MANAGER':
       color = COLORS[8];
       break;
+    case 'IAM_ADMIN_IMPERSONATOR':
+      color = COLORS[17];
+      break;
+    case 'IAM_END_USER_IMPERSONATOR':
+      color = COLORS[9];
+      break;
 
     case 'ORG_OWNER':
       color = COLORS[16];
@@ -105,6 +111,12 @@ export function getMembershipColor(role: string): Color {
       break;
     case 'ORG_PROJECT_CREATOR':
       color = COLORS[12];
+      break;
+    case 'ORG_ADMIN_IMPERSONATOR':
+      color = COLORS[17];
+      break;
+    case 'ORG_END_USER_IMPERSONATOR':
+      color = COLORS[9];
       break;
 
     case 'PROJECT_OWNER':

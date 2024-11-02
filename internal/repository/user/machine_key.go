@@ -60,8 +60,9 @@ func MachineKeyAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 	}
 	err := event.Unmarshal(machineKeyAdded)
 	if err != nil {
-		//first events had wrong payload.
+		// first events had wrong payload.
 		// the keys were removed later, that's why we ignore them here.
+		//nolint:errorlint
 		if unwrapErr, ok := err.(*json.UnmarshalTypeError); ok && unwrapErr.Field == "publicKey" {
 			return machineKeyAdded, nil
 		}

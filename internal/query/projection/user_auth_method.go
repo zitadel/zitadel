@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	UserAuthMethodTable = "projections.user_auth_methods4"
+	UserAuthMethodTable = "projections.user_auth_methods5"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
@@ -26,7 +26,7 @@ const (
 	UserAuthMethodInstanceIDCol    = "instance_id"
 	UserAuthMethodStateCol         = "state"
 	UserAuthMethodNameCol          = "name"
-	UserAuthMethodOwnerRemovedCol  = "owner_removed"
+	UserAuthMethodDomainCol        = "domain"
 )
 
 type userAuthMethodProjection struct{}
@@ -52,11 +52,10 @@ func (*userAuthMethodProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserAuthMethodResourceOwnerCol, handler.ColumnTypeText),
 			handler.NewColumn(UserAuthMethodInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(UserAuthMethodNameCol, handler.ColumnTypeText),
-			handler.NewColumn(UserAuthMethodOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(UserAuthMethodDomainCol, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserAuthMethodResourceOwnerCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{UserAuthMethodOwnerRemovedCol})),
 		),
 	)
 }
@@ -151,20 +150,37 @@ func (p *userAuthMethodProjection) Reducers() []handler.AggregateReducer {
 
 func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) (*handler.Statement, error) {
 	tokenID := ""
+	var rpID *string
 	var methodType domain.UserAuthMethodType
 	switch e := event.(type) {
 	case *user.HumanPasswordlessAddedEvent:
 		methodType = domain.UserAuthMethodTypePasswordless
 		tokenID = e.WebAuthNTokenID
+		rpID = &e.RPID
 	case *user.HumanU2FAddedEvent:
 		methodType = domain.UserAuthMethodTypeU2F
 		tokenID = e.WebAuthNTokenID
+		rpID = &e.RPID
 	case *user.HumanOTPAddedEvent:
 		methodType = domain.UserAuthMethodTypeTOTP
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
 	}
-
+	cols := []handler.Column{
+		handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
+		handler.NewCol(UserAuthMethodCreationDateCol, handler.OnlySetValueOnInsert(UserAuthMethodTable, event.CreatedAt())),
+		handler.NewCol(UserAuthMethodChangeDateCol, event.CreatedAt()),
+		handler.NewCol(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+		handler.NewCol(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
+		handler.NewCol(UserAuthMethodUserIDCol, event.Aggregate().ID),
+		handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
+		handler.NewCol(UserAuthMethodStateCol, domain.MFAStateNotReady),
+		handler.NewCol(UserAuthMethodTypeCol, methodType),
+		handler.NewCol(UserAuthMethodNameCol, ""),
+	}
+	if rpID != nil {
+		cols = append(cols, handler.NewCol(UserAuthMethodDomainCol, rpID))
+	}
 	return handler.NewUpsertStatement(
 		event,
 		[]handler.Column{
@@ -173,18 +189,7 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 			handler.NewCol(UserAuthMethodTypeCol, nil),
 			handler.NewCol(UserAuthMethodTokenIDCol, nil),
 		},
-		[]handler.Column{
-			handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
-			handler.NewCol(UserAuthMethodCreationDateCol, event.CreatedAt()),
-			handler.NewCol(UserAuthMethodChangeDateCol, event.CreatedAt()),
-			handler.NewCol(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
-			handler.NewCol(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),
-			handler.NewCol(UserAuthMethodUserIDCol, event.Aggregate().ID),
-			handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
-			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateNotReady),
-			handler.NewCol(UserAuthMethodTypeCol, methodType),
-			handler.NewCol(UserAuthMethodNameCol, ""),
-		},
+		cols,
 	), nil
 }
 
@@ -204,7 +209,6 @@ func (p *userAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 		name = e.WebAuthNTokenName
 	case *user.HumanOTPVerifiedEvent:
 		methodType = domain.UserAuthMethodTypeTOTP
-
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
 	}

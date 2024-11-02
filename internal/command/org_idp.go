@@ -1746,6 +1746,8 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 					cert,
 					provider.Binding,
 					provider.WithSignedRequest,
+					provider.NameIDFormat,
+					provider.TransientMappingAttributeName,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -1794,6 +1796,8 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 				c.idpConfigEncryption,
 				provider.Binding,
 				provider.WithSignedRequest,
+				provider.NameIDFormat,
+				provider.TransientMappingAttributeName,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1837,6 +1841,8 @@ func (c *Commands) prepareRegenerateOrgSAMLProviderCertificate(a *org.Aggregate,
 				c.idpConfigEncryption,
 				writeModel.Binding,
 				writeModel.WithSignedRequest,
+				writeModel.NameIDFormat,
+				writeModel.TransientMappingAttributeName,
 				writeModel.Options,
 			)
 			if err != nil || event == nil {

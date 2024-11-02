@@ -2,6 +2,7 @@ package idp
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -9,13 +10,15 @@ import (
 type SAMLIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID                string              `json:"id"`
-	Name              string              `json:"name,omitempty"`
-	Metadata          []byte              `json:"metadata,omitempty"`
-	Key               *crypto.CryptoValue `json:"key,omitempty"`
-	Certificate       []byte              `json:"certificate,omitempty"`
-	Binding           string              `json:"binding,omitempty"`
-	WithSignedRequest bool                `json:"withSignedRequest,omitempty"`
+	ID                            string                   `json:"id"`
+	Name                          string                   `json:"name,omitempty"`
+	Metadata                      []byte                   `json:"metadata,omitempty"`
+	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
+	Certificate                   []byte                   `json:"certificate,omitempty"`
+	Binding                       string                   `json:"binding,omitempty"`
+	WithSignedRequest             bool                     `json:"withSignedRequest,omitempty"`
+	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
+	TransientMappingAttributeName string                   `json:"transientMappingAttributeName,omitempty"`
 	Options
 }
 
@@ -28,18 +31,22 @@ func NewSAMLIDPAddedEvent(
 	certificate []byte,
 	binding string,
 	withSignedRequest bool,
+	nameIDFormat *domain.SAMLNameIDFormat,
+	transientMappingAttributeName string,
 	options Options,
 ) *SAMLIDPAddedEvent {
 	return &SAMLIDPAddedEvent{
-		BaseEvent:         *base,
-		ID:                id,
-		Name:              name,
-		Metadata:          metadata,
-		Key:               key,
-		Certificate:       certificate,
-		Binding:           binding,
-		WithSignedRequest: withSignedRequest,
-		Options:           options,
+		BaseEvent:                     *base,
+		ID:                            id,
+		Name:                          name,
+		Metadata:                      metadata,
+		Key:                           key,
+		Certificate:                   certificate,
+		Binding:                       binding,
+		WithSignedRequest:             withSignedRequest,
+		NameIDFormat:                  nameIDFormat,
+		TransientMappingAttributeName: transientMappingAttributeName,
+		Options:                       options,
 	}
 }
 
@@ -67,13 +74,15 @@ func SAMLIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type SAMLIDPChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID                string              `json:"id"`
-	Name              *string             `json:"name,omitempty"`
-	Metadata          []byte              `json:"metadata,omitempty"`
-	Key               *crypto.CryptoValue `json:"key,omitempty"`
-	Certificate       []byte              `json:"certificate,omitempty"`
-	Binding           *string             `json:"binding,omitempty"`
-	WithSignedRequest *bool               `json:"withSignedRequest,omitempty"`
+	ID                            string                   `json:"id"`
+	Name                          *string                  `json:"name,omitempty"`
+	Metadata                      []byte                   `json:"metadata,omitempty"`
+	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
+	Certificate                   []byte                   `json:"certificate,omitempty"`
+	Binding                       *string                  `json:"binding,omitempty"`
+	WithSignedRequest             *bool                    `json:"withSignedRequest,omitempty"`
+	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
+	TransientMappingAttributeName *string                  `json:"transientMappingAttributeName,omitempty"`
 	OptionChanges
 }
 
@@ -130,6 +139,18 @@ func ChangeSAMLBinding(binding string) func(*SAMLIDPChangedEvent) {
 func ChangeSAMLWithSignedRequest(withSignedRequest bool) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
 		e.WithSignedRequest = &withSignedRequest
+	}
+}
+
+func ChangeSAMLNameIDFormat(nameIDFormat *domain.SAMLNameIDFormat) func(*SAMLIDPChangedEvent) {
+	return func(e *SAMLIDPChangedEvent) {
+		e.NameIDFormat = nameIDFormat
+	}
+}
+
+func ChangeSAMLTransientMappingAttributeName(name string) func(*SAMLIDPChangedEvent) {
+	return func(e *SAMLIDPChangedEvent) {
+		e.TransientMappingAttributeName = &name
 	}
 }
 

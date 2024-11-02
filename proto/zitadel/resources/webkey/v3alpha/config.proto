@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package zitadel.resources.webkey.v3alpha;
+
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha;webkey";
+
+message WebKeyRSAConfig {
+  enum RSABits {
+    RSA_BITS_UNSPECIFIED = 0;
+    RSA_BITS_2048 = 1;
+    RSA_BITS_3072 = 2;
+    RSA_BITS_4096 = 3;
+  }
+
+  enum RSAHasher {
+    RSA_HASHER_UNSPECIFIED = 0;
+    RSA_HASHER_SHA256 = 1;
+    RSA_HASHER_SHA384 = 2;
+    RSA_HASHER_SHA512 = 3;
+  }
+
+  // bit size of the RSA key
+  RSABits bits = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+  // signing algrithm used
+  RSAHasher hasher = 2 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message WebKeyECDSAConfig {
+  enum ECDSACurve {
+    ECDSA_CURVE_UNSPECIFIED = 0;
+    ECDSA_CURVE_P256 = 1;
+    ECDSA_CURVE_P384 = 2;
+    ECDSA_CURVE_P512 = 3;
+  }
+
+  ECDSACurve curve = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
+message WebKeyED25519Config {}

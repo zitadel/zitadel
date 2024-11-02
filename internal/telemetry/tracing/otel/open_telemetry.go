@@ -23,11 +23,10 @@ func NewTracer(sampler sdk_trace.Sampler, exporter sdk_trace.SpanExporter) (*Tra
 	if err != nil {
 		return nil, err
 	}
-	spanProcessor := sdk_trace.NewBatchSpanProcessor(exporter)
+
 	tp := sdk_trace.NewTracerProvider(
 		sdk_trace.WithSampler(sampler),
 		sdk_trace.WithBatcher(exporter),
-		sdk_trace.WithSpanProcessor(spanProcessor),
 		sdk_trace.WithResource(resource),
 	)
 

@@ -163,3 +163,20 @@ enum DomainFieldName {
     DOMAIN_FIELD_NAME_GENERATED = 3;
     DOMAIN_FIELD_NAME_CREATION_DATE = 4;
 }
+
+message TrustedDomain {
+    zitadel.v1.ObjectDetails details = 1;
+    string domain = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.com\""
+        }
+    ];
+}
+
+message TrustedDomainSearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        DomainQuery domain_query = 1;
+    }
+}

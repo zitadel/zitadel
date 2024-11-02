@@ -45,7 +45,7 @@ can connect to ZITADEL as a SAML2 IDP.
 4. Download the ZITADEL-used certificate to sign the responses, so that AWS can validation the signature.
 
    You can download the certificate from following
-   URL: {your_instance_domain}/saml/v2/certificate
+   URL: \{your_instance_domain}/saml/v2/certificate
 
 5. Then upload the ".crt"-file to AWS and click "next".
 

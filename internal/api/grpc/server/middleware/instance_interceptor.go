@@ -10,94 +10,102 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 )
 
 const (
 	HTTP1Host = "x-zitadel-http1-host"
 )
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
 	translator, err := i18n.NewZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return setInstance(ctx, req, info, handler, verifier, headerName, translator, explicitInstanceIdServices...)
+		return setInstance(ctx, req, info, handler, verifier, externalDomain, translator, explicitInstanceIdServices...)
 	}
 }
 
-func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
+func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
 	for _, service := range idFromRequestsServices {
 		if !strings.HasPrefix(service, "/") {
 			service = "/" + service
 		}
 		if strings.HasPrefix(info.FullMethod, service) {
-			withInstanceIDProperty, ok := req.(interface{ GetInstanceId() string })
+			withInstanceIDProperty, ok := req.(interface {
+				GetInstanceId() string
+			})
 			if !ok {
 				return handler(ctx, req)
 			}
-			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
-			instance, err := verifier.InstanceByID(ctx)
-			if err != nil {
-				notFoundErr := new(zerrors.NotFoundError)
-				if errors.As(err, &notFoundErr) {
-					notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
-				}
-				return nil, status.Error(codes.NotFound, err.Error())
-			}
-			return handler(authz.WithInstance(ctx, instance), req)
+			return addInstanceByID(interceptorCtx, req, handler, verifier, translator, withInstanceIDProperty.GetInstanceId())
 		}
 	}
-
-	host, err := hostFromContext(interceptorCtx, headerName)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, err.Error())
+	explicitInstanceRequest, ok := req.(interface {
+		GetInstance() *object_v3.Instance
+	})
+	if ok {
+		instance := explicitInstanceRequest.GetInstance()
+		if id := instance.GetId(); id != "" {
+			return addInstanceByID(interceptorCtx, req, handler, verifier, translator, id)
+		}
+		if domain := instance.GetDomain(); domain != "" {
+			return addInstanceByDomain(interceptorCtx, req, handler, verifier, translator, domain)
+		}
 	}
-	instance, err := verifier.InstanceByHost(interceptorCtx, host)
+	return addInstanceByRequestedHost(interceptorCtx, req, handler, verifier, translator, externalDomain)
+}
+
+func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (interface{}, error) {
+	instance, err := verifier.InstanceByID(ctx, id)
+	if err != nil {
+		notFoundErr := new(zerrors.ZitadelError)
+		if errors.As(err, &notFoundErr) {
+			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
+		}
+		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using id %s: %w", id, notFoundErr).Error())
+	}
+	return handler(authz.WithInstance(ctx, instance), req)
+}
+
+func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (interface{}, error) {
+	instance, err := verifier.InstanceByHost(ctx, domain, "")
 	if err != nil {
 		notFoundErr := new(zerrors.NotFoundError)
 		if errors.As(err, &notFoundErr) {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		return nil, status.Error(codes.NotFound, err.Error())
+		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr).Error())
 	}
-	span.End()
 	return handler(authz.WithInstance(ctx, instance), req)
 }
 
-func hostFromContext(ctx context.Context, headerName string) (string, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return "", fmt.Errorf("cannot read metadata")
+func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (interface{}, error) {
+	requestContext := zitadel_http.DomainContext(ctx)
+	if requestContext.InstanceHost == "" {
+		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).Error("unable to set instance")
+		return nil, status.Error(codes.NotFound, "no instanceHost specified")
 	}
-	host, ok := md[HTTP1Host]
-	if ok && len(host) == 1 {
-		if !isAllowedToSendHTTP1Header(md) {
-			return "", fmt.Errorf("no valid host header")
+	instance, err := verifier.InstanceByHost(ctx, requestContext.InstanceHost, requestContext.PublicHost)
+	if err != nil {
+		origin := zitadel_http.DomainContext(ctx)
+		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).WithError(err).Error("unable to set instance")
+		zErr := new(zerrors.ZitadelError)
+		if errors.As(err, &zErr) {
+			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
+			zErr.Parent = err
+			return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr))
 		}
-		return host[0], nil
+		return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
-	host, ok = md[headerName]
-	if !ok {
-		return "", fmt.Errorf("cannot find header: %v", headerName)
-	}
-	if len(host) != 1 {
-		return "", fmt.Errorf("invalid host header: %v", host)
-	}
-	return host[0], nil
-}
-
-// isAllowedToSendHTTP1Header check if the gRPC call was sent to `localhost`
-// this is only possible when calling the server directly running on localhost
-// or through the gRPC gateway
-func isAllowedToSendHTTP1Header(md metadata.MD) bool {
-	authority, ok := md[":authority"]
-	return ok && len(authority) == 1 && strings.Split(authority[0], ":")[0] == "localhost"
+	return handler(authz.WithInstance(ctx, instance), req)
 }

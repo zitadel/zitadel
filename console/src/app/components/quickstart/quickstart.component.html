@@ -1,0 +1,23 @@
+<div class="quickstart-header">
+  <div class="quickstart-left">
+    <h2>{{ 'QUICKSTART.TITLE' | translate }}</h2>
+    <p class="description">{{ 'QUICKSTART.DESCRIPTION' | translate }}</p>
+
+    <div class="btn-wrapper">
+      <a mat-raised-button color="primary" [routerLink]="['/projects', 'app-create']">{{
+        'QUICKSTART.BTN_START' | translate
+      }}</a>
+      <a mat-stroked-button color="primary" href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank">{{
+        'QUICKSTART.BTN_LEARNMORE' | translate
+      }}</a>
+    </div>
+  </div>
+  <div class="quickstart-card-wrapper">
+    <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
+      <a [routerLink]="['/projects', 'app-create']" [queryParams]="{ framework: framework.id }" class="quickstart-card card">
+        <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+        <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
+      </a>
+    </ng-container>
+  </div>
+</div>

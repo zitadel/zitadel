@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"time"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -35,7 +36,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		}
 		orgSearchQuery.Queries = []query.SearchQuery{orgIDsSearchQuery}
 	}
-	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery)
+	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -394,11 +395,11 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string, orgIDPs []str
 		return nil, err
 	}
 	if !queriedLogin.IsDefault {
-		pwCheck := durationpb.New(queriedLogin.PasswordCheckLifetime)
-		externalLogin := durationpb.New(queriedLogin.ExternalLoginCheckLifetime)
-		mfaInitSkip := durationpb.New(queriedLogin.MFAInitSkipLifetime)
-		secondFactor := durationpb.New(queriedLogin.SecondFactorCheckLifetime)
-		multiFactor := durationpb.New(queriedLogin.MultiFactorCheckLifetime)
+		pwCheck := durationpb.New(time.Duration(queriedLogin.PasswordCheckLifetime))
+		externalLogin := durationpb.New(time.Duration(queriedLogin.ExternalLoginCheckLifetime))
+		mfaInitSkip := durationpb.New(time.Duration(queriedLogin.MFAInitSkipLifetime))
+		secondFactor := durationpb.New(time.Duration(queriedLogin.SecondFactorCheckLifetime))
+		multiFactor := durationpb.New(time.Duration(queriedLogin.MultiFactorCheckLifetime))
 
 		secondFactors := []policy_pb.SecondFactorType{}
 		for _, factor := range queriedLogin.SecondFactors {
@@ -467,7 +468,7 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.ID
 	if err != nil {
 		return nil, err
 	}
-	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, false)
+	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -490,13 +491,14 @@ func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (_ *managem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID, false)
+	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}
 	if !queriedLockout.IsDefault {
 		return &management_pb.AddCustomLockoutPolicyRequest{
 			MaxPasswordAttempts: uint32(queriedLockout.MaxPasswordAttempts),
+			MaxOtpAttempts:      uint32(queriedLockout.MaxOTPAttempts),
 		}, nil
 	}
 	return nil, nil
@@ -532,10 +534,13 @@ func (s *Server) getPrivacyPolicy(ctx context.Context, orgID string) (_ *managem
 	}
 	if !queriedPrivacy.IsDefault {
 		return &management_pb.AddCustomPrivacyPolicyRequest{
-			TosLink:      queriedPrivacy.TOSLink,
-			PrivacyLink:  queriedPrivacy.PrivacyLink,
-			HelpLink:     queriedPrivacy.HelpLink,
-			SupportEmail: string(queriedPrivacy.SupportEmail),
+			TosLink:        queriedPrivacy.TOSLink,
+			PrivacyLink:    queriedPrivacy.PrivacyLink,
+			HelpLink:       queriedPrivacy.HelpLink,
+			SupportEmail:   string(queriedPrivacy.SupportEmail),
+			DocsLink:       queriedPrivacy.DocsLink,
+			CustomLink:     queriedPrivacy.CustomLink,
+			CustomLinkText: queriedPrivacy.CustomLinkText,
 		}, nil
 	}
 	return nil, nil
@@ -549,7 +554,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}})
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}}, nil)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}

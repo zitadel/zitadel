@@ -35,7 +35,7 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
@@ -63,7 +63,7 @@
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
             ? 'policy.write'
-            : ''
+            : '',
       ]
         | hasRole
         | async) === false
@@ -90,7 +90,7 @@
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
             ? 'policy.write'
-            : ''
+            : '',
       ]
         | hasRole
         | async) === false
@@ -112,7 +112,7 @@
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
             ? 'policy.write'
-            : ''
+            : '',
       ]
         | hasRole
         | async) === false
@@ -135,7 +135,7 @@
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
             ? 'policy.write'
-            : ''
+            : '',
       ]
         | hasRole
         | async) === false
@@ -146,63 +146,88 @@
 
 <br />
 
-<h3>{{ 'POLICY.LOGIN_POLICY.LIFETIMEDURATIONS' | translate }}</h3>
-
+<h3>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.TITLE' | translate }}</h3>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.DESCRIPTION' | translate }}</p>
 <form class="lifetime-form" (ngSubmit)="savePolicy()" [formGroup]="lifetimeForm" autocomplete="off">
-  <cnsl-form-field class="lifetime-form-field" label="Password Check Lifetime" required="true">
-    <cnsl-label
-      >{{ 'POLICY.DATA.PASSWORDCHECKLIFETIME' | translate }}&nbsp;<strong
-        >({{ 'POLICY.DATA.INHOURS' | translate }})</strong
-      ></cnsl-label
-    >
-    <input cnslInput type="number" name="passwordCheckLifetime" formControlName="passwordCheckLifetime" />
-  </cnsl-form-field>
-
-  <cnsl-form-field class="lifetime-form-field" label="external Login Check Lifetime" required="true">
-    <cnsl-label
-      >{{ 'POLICY.DATA.EXTERNALLOGINCHECKLIFETIME' | translate }}&nbsp;<strong
-        >({{ 'POLICY.DATA.INHOURS' | translate }})</strong
-      ></cnsl-label
-    >
-    <input cnslInput type="number" name="externalLoginCheckLifetime" formControlName="externalLoginCheckLifetime" />
-  </cnsl-form-field>
-
-  <cnsl-form-field class="lifetime-form-field" label="MFA Init Skip Lifetime" required="true">
-    <cnsl-label
-      >{{ 'POLICY.DATA.MFAINITSKIPLIFETIME' | translate }}&nbsp;<strong
-        >({{ 'POLICY.DATA.INHOURS' | translate }})</strong
-      ></cnsl-label
-    >
-    <input cnslInput type="number" name="mfaInitSkipLifetime" formControlName="mfaInitSkipLifetime" />
-  </cnsl-form-field>
-
-  <cnsl-form-field class="lifetime-form-field" label="Second Factor Check Lifetime" required="true">
-    <cnsl-label
-      >{{ 'POLICY.DATA.SECONDFACTORCHECKLIFETIME' | translate }}&nbsp;
-      <strong>({{ 'POLICY.DATA.INHOURS' | translate }})</strong></cnsl-label
-    >
-    <input cnslInput type="number" name="secondFactorCheckLifetime" formControlName="secondFactorCheckLifetime" />
-  </cnsl-form-field>
-
-  <cnsl-form-field class="lifetime-form-field" label="Multi Factor Check Lifetime" required="true">
-    <cnsl-label
-      >{{ 'POLICY.DATA.MULTIFACTORCHECKLIFETIME' | translate }}&nbsp;
-      <strong>({{ 'POLICY.DATA.INHOURS' | translate }})</strong></cnsl-label
-    >
-    <input cnslInput type="number" name="multiFactorCheckLifetime" formControlName="multiFactorCheckLifetime" />
-  </cnsl-form-field>
+  <cnsl-card
+    [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.PW_CHECK.TITLE' | translate"
+    [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.PW_CHECK.DESCRIPTION' | translate"
+  >
+    <cnsl-form-field class="lifetime-form-field" label="Password Check Lifetime" required="true">
+      <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
+      <input cnslInput type="number" name="passwordCheckLifetime" formControlName="passwordCheckLifetime" min="1" step="1" />
+    </cnsl-form-field>
+  </cnsl-card>
+  <cnsl-card
+    [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.EXT_LOGIN_CHECK.TITLE' | translate"
+    [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.EXT_LOGIN_CHECK.DESCRIPTION' | translate"
+  >
+    <cnsl-form-field class="lifetime-form-field" label="external Login Check Lifetime" required="true">
+      <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        type="number"
+        name="externalLoginCheckLifetime"
+        formControlName="externalLoginCheckLifetime"
+        min="1"
+        step="1"
+      />
+    </cnsl-form-field>
+  </cnsl-card>
+  <cnsl-card
+    [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.MULTI_FACTOR_INIT.TITLE' | translate"
+    [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.MULTI_FACTOR_INIT.DESCRIPTION' | translate"
+  >
+    <cnsl-form-field class="lifetime-form-field" label="MFA Init Skip Lifetime" required="true">
+      <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
+      <input cnslInput type="number" name="mfaInitSkipLifetime" formControlName="mfaInitSkipLifetime" min="0" step="1" />
+    </cnsl-form-field>
+  </cnsl-card>
+  <cnsl-card
+    [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.SECOND_FACTOR_CHECK.TITLE' | translate"
+    [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.SECOND_FACTOR_CHECK.DESCRIPTION' | translate"
+  >
+    <cnsl-form-field class="lifetime-form-field" label="Second Factor Check Lifetime" required="true">
+      <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        type="number"
+        name="secondFactorCheckLifetime"
+        formControlName="secondFactorCheckLifetime"
+        min="1"
+        step="1"
+      />
+    </cnsl-form-field>
+  </cnsl-card>
+  <cnsl-card
+    [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.MULTI_FACTOR_CHECK.TITLE' | translate"
+    [description]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.MULTI_FACTOR_CHECK.DESCRIPTION' | translate"
+  >
+    <cnsl-form-field class="lifetime-form-field" label="Multi-factor Check Lifetime" required="true">
+      <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.LABEL' | translate }}</cnsl-label>
+      <input
+        cnslInput
+        type="number"
+        name="multiFactorCheckLifetime"
+        formControlName="multiFactorCheckLifetime"
+        min="1"
+        step="1"
+      />
+    </cnsl-form-field>
+  </cnsl-card>
 </form>
 
 <br />
 
-<h3>{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}</h3>
+<h3>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.TITLE' | translate }}</h3>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DESCRIPTION' | translate }}</p>
 
 <div class="max-card-width login-policy-content" *ngIf="loginData">
   <div class="login-policy-row">
     <mat-checkbox
       class="login-policy-toggle"
       color="primary"
-      matTooltip="{{ 'POLICY.DATA.FORCEMFA_DESC' | translate }}"
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USERNAME_PASSWORD_ALLOWED.DESCRIPTION' | translate }}"
       ngDefaultControl
       [(ngModel)]="loginData.allowUsernamePassword"
       [disabled]="
@@ -211,13 +236,13 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USERNAME_PASSWORD_ALLOWED.TITLE' | translate }}
     </mat-checkbox>
 
     <!-- <cnsl-info-section class="info">
@@ -229,6 +254,7 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USER_REGISTRATION_ALLOWED.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.allowRegister"
       [disabled]="
         ([
@@ -236,13 +262,13 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.ALLOWREGISTERUSERS' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USER_REGISTRATION_ALLOWED.TITLE' | translate }}
     </mat-checkbox>
   </div>
   <div class="login-policy-row">
@@ -250,11 +276,12 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.ORG_REGISTRATION_ALLOWED.DESCRIPTION' | translate }}"
       [(ngModel)]="allowOrgRegistration"
       *ngIf="serviceType === PolicyComponentServiceType.ADMIN"
       [disabled]="(['iam.restrictions.write'] | hasRole | async) === false"
     >
-      {{ 'POLICY.DATA.ALLOWREGISTERORGS' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.ORG_REGISTRATION_ALLOWED.TITLE' | translate }}
     </mat-checkbox>
   </div>
   <div class="login-policy-row">
@@ -262,6 +289,7 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.EXTERNAL_LOGIN_ALLOWED.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.allowExternalIdp"
       [disabled]="
         ([
@@ -269,13 +297,13 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.ALLOWEXTERNALIDP' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.EXTERNAL_LOGIN_ALLOWED.TITLE' | translate }}
     </mat-checkbox>
 
     <!-- <ng-template #idpInfo>
@@ -290,6 +318,7 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.HIDE_PASSWORD_RESET.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.hidePasswordReset"
       [disabled]="
         ([
@@ -297,13 +326,13 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.HIDEPASSWORDRESET' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.HIDE_PASSWORD_RESET.TITLE' | translate }}
     </mat-checkbox>
 
     <!-- <ng-template #passwordResetInfo>
@@ -318,6 +347,7 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DOMAIN_DISCOVERY_ALLOWED.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.allowDomainDiscovery"
       [disabled]="
         ([
@@ -325,13 +355,13 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.ALLOWDOMAINDISCOVERY' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DOMAIN_DISCOVERY_ALLOWED.TITLE' | translate }}
     </mat-checkbox>
   </div>
 
@@ -340,6 +370,7 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.IGNORE_UNKNOWN_USERNAMES.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.ignoreUnknownUsernames"
       [disabled]="
         ([
@@ -347,13 +378,13 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.IGNOREUNKNOWNUSERNAMES' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.IGNORE_UNKNOWN_USERNAMES.TITLE' | translate }}
     </mat-checkbox>
   </div>
 
@@ -362,6 +393,7 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_EMAIL_LOGIN.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.disableLoginWithEmail"
       [disabled]="
         ([
@@ -369,13 +401,13 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.DISABLELOGINWITHEMAIL' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_EMAIL_LOGIN.TITLE' | translate }}
     </mat-checkbox>
   </div>
 
@@ -384,6 +416,7 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_PHONE_LOGIN.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.disableLoginWithPhone"
       [disabled]="
         ([
@@ -391,13 +424,13 @@
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
               ? 'policy.write'
-              : ''
+              : '',
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.DISABLELOGINWITHPHONE' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DISABLE_PHONE_LOGIN.TITLE' | translate }}
     </mat-checkbox>
   </div>
 
@@ -414,7 +447,7 @@
               ? 'iam.policy.write'
               : serviceType === PolicyComponentServiceType.MGMT
                 ? 'policy.write'
-                : ''
+                : '',
           ]
             | hasRole
             | async) === false
@@ -440,7 +473,7 @@
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
             ? 'policy.write'
-            : ''
+            : '',
       ]
         | hasRole
         | async) === false

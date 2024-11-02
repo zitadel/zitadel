@@ -42,7 +42,7 @@ func (c *Commands) createAllLoginTextEvents(ctx context.Context, agg *eventstore
 	events = append(events, c.createRegistrationUserEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createExternalRegistrationUserOverviewEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createRegistrationOrgEvents(ctx, agg, existingText, text, defaultText)...)
-	events = append(events, c.createLinkingUserEvents(ctx, agg, existingText, text, defaultText)...)
+	events = append(events, c.createLinkingUserDoneEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createExternalUserNotFoundEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createSuccessLoginEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createLogoutDoneEvents(ctx, agg, existingText, text, defaultText)...)
@@ -686,6 +686,10 @@ func (c *Commands) createPasswordChangeEvents(ctx context.Context, agg *eventsto
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordChangeExpiredDescription, existingText.PasswordChangeExpiredDescription, text.PasswordChange.ExpiredDescription, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordChangeOldPasswordLabel, existingText.PasswordChangeOldPasswordLabel, text.PasswordChange.OldPasswordLabel, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -979,7 +983,7 @@ func (c *Commands) createRegistrationOrgEvents(ctx context.Context, agg *eventst
 	return events
 }
 
-func (c *Commands) createLinkingUserEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+func (c *Commands) createLinkingUserDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
 	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLinkingUserDoneTitle, existingText.LinkingUserDoneTitle, text.LinkingUsersDone.Title, text.Language, defaultText)
 	if event != nil {

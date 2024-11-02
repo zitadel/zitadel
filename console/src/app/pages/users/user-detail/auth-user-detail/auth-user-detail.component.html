@@ -136,7 +136,16 @@
           <cnsl-user-grants
             [userId]="user.id"
             [context]="USERGRANTCONTEXT"
-            [displayedColumns]="['org', 'projectId', 'type', 'creationDate', 'changeDate', 'roleNamesList', 'actions']"
+            [displayedColumns]="[
+              'org',
+              'projectId',
+              'type',
+              'creationDate',
+              'changeDate',
+              'state',
+              'roleNamesList',
+              'actions',
+            ]"
             [disableWrite]="(['user.grant.write$'] | hasRole | async) === false"
             [disableDelete]="(['user.grant.delete$'] | hasRole | async) === false"
           >
@@ -157,6 +166,7 @@
       <ng-container *ngIf="currentSetting === 'metadata'">
         <cnsl-metadata
           [metadata]="metadata"
+          [description]="'DESCRIPTIONS.USERS.SELF.METADATA' | translate"
           [disabled]="(['user.write:' + user.id, 'user.write'] | hasRole | async) === false"
           *ngIf="user && user.id"
           (editClicked)="editMetadata()"

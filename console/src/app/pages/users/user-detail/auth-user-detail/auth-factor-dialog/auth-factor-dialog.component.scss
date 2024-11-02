@@ -9,11 +9,11 @@
 
   .otp-btn,
   .u2f-btn {
-    flex: 1;
     border-radius: 0.5rem;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: flex-start;
     box-sizing: border-box;
     white-space: normal;
     line-height: 1.5rem;
@@ -67,6 +67,10 @@
 
   button {
     margin: 0.5rem;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
   }
 }
 

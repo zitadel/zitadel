@@ -168,9 +168,15 @@
 
     <span class="fill-space"></span>
 
-    <a class="doc-link" href="https://zitadel.com/docs" mat-stroked-button target="_blank">
-      {{ 'MENU.DOCUMENTATION' | translate }}
-    </a>
+    <ng-container *ngIf="authService.privacypolicy | async as pP">
+      <a class="custom-link" *ngIf="pP.customLink" href="{{ pP.customLink }}" mat-stroked-button target="_blank">
+        {{ pP.customLinkText }}
+      </a>
+
+      <a class="doc-link" *ngIf="pP.docsLink" href="{{ pP.docsLink }}" mat-stroked-button target="_blank">
+        {{ 'MENU.DOCUMENTATION' | translate }}
+      </a>
+    </ng-container>
 
     <div class="system-rel" *ngIf="!isOnMe">
       <a

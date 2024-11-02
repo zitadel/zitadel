@@ -61,6 +61,7 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			AdditionalOrigins:        app.AdditionalOrigins,
 			AllowedOrigins:           app.AllowedOrigins,
 			SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
+			BackChannelLogoutUri:     app.BackChannelLogoutURI,
 		},
 	}
 }
@@ -138,6 +139,8 @@ func OIDCGrantTypesFromModel(grantTypes []domain.OIDCGrantType) []app_pb.OIDCGra
 			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN
 		case domain.OIDCGrantTypeDeviceCode:
 			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE
+		case domain.OIDCGrantTypeTokenExchange:
+			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE
 		}
 	}
 	return oidcGrantTypes
@@ -158,6 +161,8 @@ func OIDCGrantTypesToDomain(grantTypes []app_pb.OIDCGrantType) []domain.OIDCGran
 			oidcGrantTypes[i] = domain.OIDCGrantTypeRefreshToken
 		case app_pb.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE:
 			oidcGrantTypes[i] = domain.OIDCGrantTypeDeviceCode
+		case app_pb.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE:
+			oidcGrantTypes[i] = domain.OIDCGrantTypeTokenExchange
 		}
 	}
 	return oidcGrantTypes

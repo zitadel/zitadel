@@ -17,6 +17,7 @@ const (
 	DomainClaimedMessageType            = "DomainClaimed"
 	PasswordlessRegistrationMessageType = "PasswordlessRegistration"
 	PasswordChangeMessageType           = "PasswordChange"
+	InviteUserMessageType               = "InviteUser"
 	MessageTitle                        = "Title"
 	MessagePreHeader                    = "PreHeader"
 	MessageSubject                      = "Subject"
@@ -25,16 +26,6 @@ const (
 	MessageButtonText                   = "ButtonText"
 	MessageFooterText                   = "Footer"
 )
-
-type MessageTexts struct {
-	InitCode                 CustomMessageText
-	PasswordReset            CustomMessageText
-	VerifyEmail              CustomMessageText
-	VerifyPhone              CustomMessageText
-	DomainClaimed            CustomMessageText
-	PasswordlessRegistration CustomMessageText
-	PasswordChange           CustomMessageText
-}
 
 type CustomMessageText struct {
 	models.ObjectRoot
@@ -71,5 +62,6 @@ func IsMessageTextType(textType string) bool {
 		textType == VerifyEmailOTPMessageType ||
 		textType == DomainClaimedMessageType ||
 		textType == PasswordlessRegistrationMessageType ||
-		textType == PasswordChangeMessageType
+		textType == PasswordChangeMessageType ||
+		textType == InviteUserMessageType
 }

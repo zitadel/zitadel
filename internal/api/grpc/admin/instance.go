@@ -37,3 +37,42 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 		),
 	}, nil
 }
+
+func (s *Server) ListInstanceTrustedDomains(ctx context.Context, req *admin_pb.ListInstanceTrustedDomainsRequest) (*admin_pb.ListInstanceTrustedDomainsResponse, error) {
+	queries, err := ListInstanceTrustedDomainsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	domains, err := s.query.SearchInstanceTrustedDomains(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ListInstanceTrustedDomainsResponse{
+		Result: instance_grpc.TrustedDomainsToPb(domains.Domains),
+		Details: object.ToListDetails(
+			domains.Count,
+			domains.Sequence,
+			domains.LastRun,
+		),
+	}, nil
+}
+
+func (s *Server) AddInstanceTrustedDomain(ctx context.Context, req *admin_pb.AddInstanceTrustedDomainRequest) (*admin_pb.AddInstanceTrustedDomainResponse, error) {
+	details, err := s.command.AddTrustedDomain(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddInstanceTrustedDomainResponse{
+		Details: object.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) RemoveInstanceTrustedDomain(ctx context.Context, req *admin_pb.RemoveInstanceTrustedDomainRequest) (*admin_pb.RemoveInstanceTrustedDomainResponse, error) {
+	details, err := s.command.RemoveTrustedDomain(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.RemoveInstanceTrustedDomainResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}

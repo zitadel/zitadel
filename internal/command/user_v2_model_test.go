@@ -167,6 +167,7 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"authRequestID",
 							),
 						),
 					),
@@ -225,6 +226,7 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"authRequestID",
 							),
 						),
 						eventFromEventPusher(
@@ -280,6 +282,7 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"authRequestID",
 							),
 						),
 						eventFromEventPusher(
@@ -669,6 +672,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 								time.Hour*1,
 								"",
 								false,
+								"",
 							),
 						),
 					),
@@ -730,6 +734,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 								time.Hour*1,
 								"",
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -788,6 +793,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 								time.Hour*1,
 								"",
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -855,6 +861,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 								time.Hour*1,
 								"",
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -1014,6 +1021,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 					),
@@ -1058,6 +1066,65 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			},
 		},
 		{
+			name: "user added with phone code external",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"+41791234567",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+								&userAgg.Aggregate,
+								nil,
+								0,
+								false,
+								"id",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
+					PhoneWriteModel: true,
+					StateWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					Phone:                  "+41791234567",
+					IsPhoneVerified:        false,
+					PhoneCode:              nil,
+					PhoneCodeCreationDate:  time.Time{},
+					PhoneCodeExpiry:        0,
+					UserState:              domain.UserStateActive,
+				},
+			},
+		},
+		{
 			name: "user added with phone code verified",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -1082,6 +1149,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -1148,6 +1216,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -1222,6 +1291,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 								},
 								time.Hour*1,
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -1424,6 +1494,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 								domain.NotificationTypeEmail,
 								"",
 								false,
+								"",
 							),
 						),
 					),
@@ -1486,6 +1557,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 								domain.NotificationTypeEmail,
 								"",
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(

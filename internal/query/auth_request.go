@@ -41,7 +41,7 @@ func (a *AuthRequest) checkLoginClient(ctx context.Context) error {
 	return nil
 }
 
-//go:embed embed/auth_request_by_id.sql
+//go:embed auth_request_by_id.sql
 var authRequestByIDQuery string
 
 func (q *Queries) authRequestByIDQuery(ctx context.Context) string {
@@ -61,7 +61,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 
 	var (
 		scope   database.TextArray[string]
-		prompt  database.Array[domain.Prompt]
+		prompt  database.NumberArray[domain.Prompt]
 		locales database.TextArray[string]
 	)
 

@@ -1,14 +1,13 @@
 <div class="max-width-container">
   <div class="enlarged-container" [ngSwitch]="type">
+    <div class="users-title-row">
+      <h1>{{ 'DESCRIPTIONS.USERS.TITLE' | translate }}</h1>
+      <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/users" rel="noreferrer" target="_blank">
+        <mat-icon class="icon">info_outline</mat-icon>
+      </a>
+    </div>
+    <p class="user-list-sub cnsl-secondary-text">{{ 'DESCRIPTIONS.USERS.DESCRIPTION' | translate }}</p>
     <ng-container *ngSwitchCase="Type.TYPE_HUMAN">
-      <div class="users-title-row">
-        <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
-        <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/users" rel="noreferrer" target="_blank">
-          <mat-icon class="icon">info_outline</mat-icon>
-        </a>
-      </div>
-      <p class="user-list-sub cnsl-secondary-text">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
-
       <cnsl-user-table
         [type]="Type.TYPE_HUMAN"
         [canWrite$]="['user.write$'] | hasRole"
@@ -16,11 +15,7 @@
       >
       </cnsl-user-table>
     </ng-container>
-
     <ng-container *ngSwitchCase="Type.TYPE_MACHINE">
-      <h1>{{ 'USER.PAGES.LISTMACHINE' | translate }}</h1>
-      <p class="user-list-sub cnsl-secondary-text">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
-
       <cnsl-user-table
         [type]="Type.TYPE_MACHINE"
         [canWrite$]="['user.write$'] | hasRole"

@@ -2,14 +2,15 @@ package oidc
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/exp/slog"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -21,27 +22,31 @@ import (
 type Server struct {
 	http.Handler
 	*op.LegacyServer
-	features Features
 
-	repo    repository.Repository
-	query   *query.Queries
-	command *command.Commands
-	keySet  *keySetCache
+	repo              repository.Repository
+	query             *query.Queries
+	command           *command.Commands
+	accessTokenKeySet *oidcKeySet
+	idTokenHintKeySet *oidcKeySet
 
 	defaultLoginURL            string
 	defaultLoginURLV2          string
 	defaultLogoutURLV2         string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
+	jwksCacheControlMaxAge     time.Duration
 
 	fallbackLogger      *slog.Logger
-	hashAlg             crypto.HashAlgorithm
+	hasher              *crypto.Hasher
 	signingKeyAlgorithm string
-	assetAPIPrefix      func(ctx context.Context) string
+	encAlg              crypto.EncryptionAlgorithm
+	opCrypto            op.Crypto
+
+	assetAPIPrefix func(ctx context.Context) string
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
-	// some defaults. The new Server will disable enpoints that are nil.
+	// some defaults. The new Server will disable endpoints that are nil.
 	endpoints := op.Endpoints{
 		Authorization:       op.NewEndpoint("/oauth/v2/authorize"),
 		Token:               op.NewEndpoint("/oauth/v2/token"),
@@ -110,23 +115,19 @@ func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Resp
 
 func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	restrictions, err := s.query.GetInstanceRestrictions(ctx)
 	if err != nil {
-		return nil, err
+		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("internal server error"), http.StatusInternalServerError)
 	}
 	allowedLanguages := restrictions.AllowedLanguages
 	if len(allowedLanguages) == 0 {
 		allowedLanguages = i18n.SupportedLanguages()
 	}
 	return op.NewResponse(s.createDiscoveryConfig(ctx, allowedLanguages)), nil
-}
-
-func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.Keys(ctx, r)
 }
 
 func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthRequest]) (_ *op.ClientRequest[oidc.AuthRequest], err error) {
@@ -150,55 +151,6 @@ func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oi
 	return s.LegacyServer.DeviceAuthorization(ctx, r)
 }
 
-func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.AccessTokenRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.CodeExchange(ctx, r)
-}
-
-func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.RefreshTokenRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.RefreshToken(ctx, r)
-}
-
-func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGrantRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.JWTProfile(ctx, r)
-}
-
-func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.TokenExchangeRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.TokenExchange(ctx, r)
-}
-
-func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequest[oidc.ClientCredentialsRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.ClientCredentialsExchange(ctx, r)
-}
-
-func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.DeviceAccessTokenRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.DeviceToken(ctx, r)
-}
-
-func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.UserInfo(ctx, r)
-}
-
 func (s *Server) Revocation(ctx context.Context, r *op.ClientRequest[oidc.RevocationRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -215,24 +167,31 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
+	backChannelLogoutSupported := authz.GetInstance(ctx).Features().EnableBackChannelLogout
+
 	return &oidc.DiscoveryConfiguration{
-		Issuer:                                     issuer,
-		AuthorizationEndpoint:                      s.Endpoints().Authorization.Absolute(issuer),
-		TokenEndpoint:                              s.Endpoints().Token.Absolute(issuer),
-		IntrospectionEndpoint:                      s.Endpoints().Introspection.Absolute(issuer),
-		UserinfoEndpoint:                           s.Endpoints().Userinfo.Absolute(issuer),
-		RevocationEndpoint:                         s.Endpoints().Revocation.Absolute(issuer),
-		EndSessionEndpoint:                         s.Endpoints().EndSession.Absolute(issuer),
-		JwksURI:                                    s.Endpoints().JwksURI.Absolute(issuer),
-		DeviceAuthorizationEndpoint:                s.Endpoints().DeviceAuthorization.Absolute(issuer),
-		ScopesSupported:                            op.Scopes(s.Provider()),
-		ResponseTypesSupported:                     op.ResponseTypes(s.Provider()),
-		GrantTypesSupported:                        op.GrantTypes(s.Provider()),
-		SubjectTypesSupported:                      op.SubjectTypes(s.Provider()),
-		IDTokenSigningAlgValuesSupported:           []string{s.signingKeyAlgorithm},
-		RequestObjectSigningAlgValuesSupported:     op.RequestObjectSigAlgorithms(s.Provider()),
-		TokenEndpointAuthMethodsSupported:          op.AuthMethodsTokenEndpoint(s.Provider()),
-		TokenEndpointAuthSigningAlgValuesSupported: op.TokenSigAlgorithms(s.Provider()),
+		Issuer:                      issuer,
+		AuthorizationEndpoint:       s.Endpoints().Authorization.Absolute(issuer),
+		TokenEndpoint:               s.Endpoints().Token.Absolute(issuer),
+		IntrospectionEndpoint:       s.Endpoints().Introspection.Absolute(issuer),
+		UserinfoEndpoint:            s.Endpoints().Userinfo.Absolute(issuer),
+		RevocationEndpoint:          s.Endpoints().Revocation.Absolute(issuer),
+		EndSessionEndpoint:          s.Endpoints().EndSession.Absolute(issuer),
+		JwksURI:                     s.Endpoints().JwksURI.Absolute(issuer),
+		DeviceAuthorizationEndpoint: s.Endpoints().DeviceAuthorization.Absolute(issuer),
+		ScopesSupported:             op.Scopes(s.Provider()),
+		ResponseTypesSupported:      op.ResponseTypes(s.Provider()),
+		ResponseModesSupported: []string{
+			string(oidc.ResponseModeQuery),
+			string(oidc.ResponseModeFragment),
+			string(oidc.ResponseModeFormPost),
+		},
+		GrantTypesSupported:                                op.GrantTypes(s.Provider()),
+		SubjectTypesSupported:                              op.SubjectTypes(s.Provider()),
+		IDTokenSigningAlgValuesSupported:                   supportedSigningAlgs(ctx),
+		RequestObjectSigningAlgValuesSupported:             op.RequestObjectSigAlgorithms(s.Provider()),
+		TokenEndpointAuthMethodsSupported:                  op.AuthMethodsTokenEndpoint(s.Provider()),
+		TokenEndpointAuthSigningAlgValuesSupported:         op.TokenSigAlgorithms(s.Provider()),
 		IntrospectionEndpointAuthSigningAlgValuesSupported: op.IntrospectionSigAlgorithms(s.Provider()),
 		IntrospectionEndpointAuthMethodsSupported:          op.AuthMethodsIntrospectionEndpoint(s.Provider()),
 		RevocationEndpointAuthSigningAlgValuesSupported:    op.RevocationSigAlgorithms(s.Provider()),
@@ -241,5 +200,14 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
 		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
+		BackChannelLogoutSupported:                         backChannelLogoutSupported,
+		BackChannelLogoutSessionSupported:                  backChannelLogoutSupported,
 	}
+}
+
+func response(resp any, err error) (*op.Response, error) {
+	if err != nil {
+		return nil, err
+	}
+	return op.NewResponse(resp), nil
 }

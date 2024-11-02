@@ -6,10 +6,14 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
+func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (_ *domain.LabelPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-Fn8ds", "Errors.ResourceOwnerMissing")
 	}
@@ -17,7 +21,7 @@ func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, pol
 		return nil, err
 	}
 	addedPolicy := NewOrgLabelPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err = c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +102,10 @@ func (c *Commands) ChangeLabelPolicy(ctx context.Context, resourceOwner string, 
 	return writeModelToLabelPolicy(&existingPolicy.LabelPolicyWriteModel), nil
 }
 
-func (c *Commands) ActivateLabelPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
+func (c *Commands) ActivateLabelPolicy(ctx context.Context, orgID string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if orgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-KKd4X", "Errors.ResourceOwnerMissing")
 	}
@@ -457,9 +464,12 @@ func (c *Commands) removeLabelPolicyAssets(ctx context.Context, existingPolicy *
 	return org.NewLabelPolicyAssetsRemovedEvent(ctx, orgAgg), nil
 }
 
-func (c *Commands) orgLabelPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgLabelPolicyWriteModel, error) {
+func (c *Commands) orgLabelPolicyWriteModelByID(ctx context.Context, orgID string) (_ *OrgLabelPolicyWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	policy := NewOrgLabelPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, policy)
+	err = c.eventstore.FilterToQueryReducer(ctx, policy)
 	if err != nil {
 		return nil, err
 	}

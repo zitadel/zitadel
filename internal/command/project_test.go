@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -44,9 +45,55 @@ func TestCommandSide_AddProject(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				project:       &domain.Project{},
 				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "org with project owner, resourceowner empty",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				project: &domain.Project{
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+				resourceOwner: "",
+				ownerID:       "user1",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "org with project owner, ownerID empty",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				project: &domain.Project{
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+				resourceOwner: "org1",
+				ownerID:       "",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -75,7 +122,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				project: &domain.Project{
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
@@ -113,7 +160,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				project: &domain.Project{
 					Name:                   "project",
 					ProjectRoleAssertion:   true,
@@ -141,11 +188,12 @@ func TestCommandSide_AddProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner, tt.args.ownerID)
+			c.setMilestonesCompletedForTest("instanceID")
+			got, err := c.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner, tt.args.ownerID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -606,7 +654,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -782,7 +830,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -1066,7 +1114,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

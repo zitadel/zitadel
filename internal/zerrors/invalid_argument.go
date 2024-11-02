@@ -1,6 +1,8 @@
 package zerrors
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var (
 	_ InvalidArgument = (*InvalidArgumentError)(nil)
@@ -37,6 +39,15 @@ func (err *InvalidArgumentError) Is(target error) bool {
 		return false
 	}
 	return err.ZitadelError.Is(t.ZitadelError)
+}
+
+func (err *InvalidArgumentError) As(target any) bool {
+	targetErr, ok := target.(*InvalidArgumentError)
+	if !ok {
+		return false
+	}
+	*targetErr = *err
+	return true
 }
 
 func (err *InvalidArgumentError) Unwrap() error {

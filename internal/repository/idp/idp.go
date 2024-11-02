@@ -1,22 +1,25 @@
 package idp
 
 import (
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Options struct {
-	IsCreationAllowed bool `json:"isCreationAllowed,omitempty"`
-	IsLinkingAllowed  bool `json:"isLinkingAllowed,omitempty"`
-	IsAutoCreation    bool `json:"isAutoCreation,omitempty"`
-	IsAutoUpdate      bool `json:"isAutoUpdate,omitempty"`
+	IsCreationAllowed bool                     `json:"isCreationAllowed,omitempty"`
+	IsLinkingAllowed  bool                     `json:"isLinkingAllowed,omitempty"`
+	IsAutoCreation    bool                     `json:"isAutoCreation,omitempty"`
+	IsAutoUpdate      bool                     `json:"isAutoUpdate,omitempty"`
+	AutoLinkingOption domain.AutoLinkingOption `json:"autoLinkingOption,omitempty"`
 }
 
 type OptionChanges struct {
-	IsCreationAllowed *bool `json:"isCreationAllowed,omitempty"`
-	IsLinkingAllowed  *bool `json:"isLinkingAllowed,omitempty"`
-	IsAutoCreation    *bool `json:"isAutoCreation,omitempty"`
-	IsAutoUpdate      *bool `json:"isAutoUpdate,omitempty"`
+	IsCreationAllowed *bool                     `json:"isCreationAllowed,omitempty"`
+	IsLinkingAllowed  *bool                     `json:"isLinkingAllowed,omitempty"`
+	IsAutoCreation    *bool                     `json:"isAutoCreation,omitempty"`
+	IsAutoUpdate      *bool                     `json:"isAutoUpdate,omitempty"`
+	AutoLinkingOption *domain.AutoLinkingOption `json:"autoLinkingOption,omitempty"`
 }
 
 func (o *Options) Changes(options Options) OptionChanges {
@@ -32,6 +35,9 @@ func (o *Options) Changes(options Options) OptionChanges {
 	}
 	if o.IsAutoUpdate != options.IsAutoUpdate {
 		opts.IsAutoUpdate = &options.IsAutoUpdate
+	}
+	if o.AutoLinkingOption != options.AutoLinkingOption {
+		opts.AutoLinkingOption = &options.AutoLinkingOption
 	}
 	return opts
 }
@@ -49,10 +55,13 @@ func (o *Options) ReduceChanges(changes OptionChanges) {
 	if changes.IsAutoUpdate != nil {
 		o.IsAutoUpdate = *changes.IsAutoUpdate
 	}
+	if changes.AutoLinkingOption != nil {
+		o.AutoLinkingOption = *changes.AutoLinkingOption
+	}
 }
 
 func (o *OptionChanges) IsZero() bool {
-	return o.IsCreationAllowed == nil && o.IsLinkingAllowed == nil && o.IsAutoCreation == nil && o.IsAutoUpdate == nil
+	return o.IsCreationAllowed == nil && o.IsLinkingAllowed == nil && o.IsAutoCreation == nil && o.IsAutoUpdate == nil && o.AutoLinkingOption == nil
 }
 
 type RemovedEvent struct {

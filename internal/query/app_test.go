@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -9,104 +10,111 @@ import (
 	"testing"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps6.id,` +
-		` projections.apps6.name,` +
-		` projections.apps6.project_id,` +
-		` projections.apps6.creation_date,` +
-		` projections.apps6.change_date,` +
-		` projections.apps6.resource_owner,` +
-		` projections.apps6.state,` +
-		` projections.apps6.sequence,` +
+	expectedAppQueryBase = `SELECT projections.apps7.id,` +
+		` projections.apps7.name,` +
+		` projections.apps7.project_id,` +
+		` projections.apps7.creation_date,` +
+		` projections.apps7.change_date,` +
+		` projections.apps7.resource_owner,` +
+		` projections.apps7.state,` +
+		` projections.apps7.sequence,` +
 		// api config
-		` projections.apps6_api_configs.app_id,` +
-		` projections.apps6_api_configs.client_id,` +
-		` projections.apps6_api_configs.auth_method,` +
+		` projections.apps7_api_configs.app_id,` +
+		` projections.apps7_api_configs.client_id,` +
+		` projections.apps7_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps6_oidc_configs.app_id,` +
-		` projections.apps6_oidc_configs.version,` +
-		` projections.apps6_oidc_configs.client_id,` +
-		` projections.apps6_oidc_configs.redirect_uris,` +
-		` projections.apps6_oidc_configs.response_types,` +
-		` projections.apps6_oidc_configs.grant_types,` +
-		` projections.apps6_oidc_configs.application_type,` +
-		` projections.apps6_oidc_configs.auth_method_type,` +
-		` projections.apps6_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps6_oidc_configs.is_dev_mode,` +
-		` projections.apps6_oidc_configs.access_token_type,` +
-		` projections.apps6_oidc_configs.access_token_role_assertion,` +
-		` projections.apps6_oidc_configs.id_token_role_assertion,` +
-		` projections.apps6_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps6_oidc_configs.clock_skew,` +
-		` projections.apps6_oidc_configs.additional_origins,` +
-		` projections.apps6_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps7_oidc_configs.app_id,` +
+		` projections.apps7_oidc_configs.version,` +
+		` projections.apps7_oidc_configs.client_id,` +
+		` projections.apps7_oidc_configs.redirect_uris,` +
+		` projections.apps7_oidc_configs.response_types,` +
+		` projections.apps7_oidc_configs.grant_types,` +
+		` projections.apps7_oidc_configs.application_type,` +
+		` projections.apps7_oidc_configs.auth_method_type,` +
+		` projections.apps7_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps7_oidc_configs.is_dev_mode,` +
+		` projections.apps7_oidc_configs.access_token_type,` +
+		` projections.apps7_oidc_configs.access_token_role_assertion,` +
+		` projections.apps7_oidc_configs.id_token_role_assertion,` +
+		` projections.apps7_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps7_oidc_configs.clock_skew,` +
+		` projections.apps7_oidc_configs.additional_origins,` +
+		` projections.apps7_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
 		//saml config
-		` projections.apps6_saml_configs.app_id,` +
-		` projections.apps6_saml_configs.entity_id,` +
-		` projections.apps6_saml_configs.metadata,` +
-		` projections.apps6_saml_configs.metadata_url` +
-		` FROM projections.apps6` +
-		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
-		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps6_saml_configs ON projections.apps6.id = projections.apps6_saml_configs.app_id AND projections.apps6.instance_id = projections.apps6_saml_configs.instance_id` +
-		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps6.id,` +
-		` projections.apps6.name,` +
-		` projections.apps6.project_id,` +
-		` projections.apps6.creation_date,` +
-		` projections.apps6.change_date,` +
-		` projections.apps6.resource_owner,` +
-		` projections.apps6.state,` +
-		` projections.apps6.sequence,` +
+		` projections.apps7_saml_configs.app_id,` +
+		` projections.apps7_saml_configs.entity_id,` +
+		` projections.apps7_saml_configs.metadata,` +
+		` projections.apps7_saml_configs.metadata_url` +
+		` FROM projections.apps7` +
+		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
+		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id`
+	expectedAppQuery       = regexp.QuoteMeta(expectedAppQueryBase)
+	expectedActiveAppQuery = regexp.QuoteMeta(expectedAppQueryBase +
+		` LEFT JOIN projections.projects4 ON projections.apps7.project_id = projections.projects4.id AND projections.apps7.instance_id = projections.projects4.instance_id` +
+		` LEFT JOIN projections.orgs1 ON projections.apps7.resource_owner = projections.orgs1.id AND projections.apps7.instance_id = projections.orgs1.instance_id`)
+	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps7.id,` +
+		` projections.apps7.name,` +
+		` projections.apps7.project_id,` +
+		` projections.apps7.creation_date,` +
+		` projections.apps7.change_date,` +
+		` projections.apps7.resource_owner,` +
+		` projections.apps7.state,` +
+		` projections.apps7.sequence,` +
 		// api config
-		` projections.apps6_api_configs.app_id,` +
-		` projections.apps6_api_configs.client_id,` +
-		` projections.apps6_api_configs.auth_method,` +
+		` projections.apps7_api_configs.app_id,` +
+		` projections.apps7_api_configs.client_id,` +
+		` projections.apps7_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps6_oidc_configs.app_id,` +
-		` projections.apps6_oidc_configs.version,` +
-		` projections.apps6_oidc_configs.client_id,` +
-		` projections.apps6_oidc_configs.redirect_uris,` +
-		` projections.apps6_oidc_configs.response_types,` +
-		` projections.apps6_oidc_configs.grant_types,` +
-		` projections.apps6_oidc_configs.application_type,` +
-		` projections.apps6_oidc_configs.auth_method_type,` +
-		` projections.apps6_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps6_oidc_configs.is_dev_mode,` +
-		` projections.apps6_oidc_configs.access_token_type,` +
-		` projections.apps6_oidc_configs.access_token_role_assertion,` +
-		` projections.apps6_oidc_configs.id_token_role_assertion,` +
-		` projections.apps6_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps6_oidc_configs.clock_skew,` +
-		` projections.apps6_oidc_configs.additional_origins,` +
-		` projections.apps6_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps7_oidc_configs.app_id,` +
+		` projections.apps7_oidc_configs.version,` +
+		` projections.apps7_oidc_configs.client_id,` +
+		` projections.apps7_oidc_configs.redirect_uris,` +
+		` projections.apps7_oidc_configs.response_types,` +
+		` projections.apps7_oidc_configs.grant_types,` +
+		` projections.apps7_oidc_configs.application_type,` +
+		` projections.apps7_oidc_configs.auth_method_type,` +
+		` projections.apps7_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps7_oidc_configs.is_dev_mode,` +
+		` projections.apps7_oidc_configs.access_token_type,` +
+		` projections.apps7_oidc_configs.access_token_role_assertion,` +
+		` projections.apps7_oidc_configs.id_token_role_assertion,` +
+		` projections.apps7_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps7_oidc_configs.clock_skew,` +
+		` projections.apps7_oidc_configs.additional_origins,` +
+		` projections.apps7_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
 		//saml config
-		` projections.apps6_saml_configs.app_id,` +
-		` projections.apps6_saml_configs.entity_id,` +
-		` projections.apps6_saml_configs.metadata,` +
-		` projections.apps6_saml_configs.metadata_url,` +
+		` projections.apps7_saml_configs.app_id,` +
+		` projections.apps7_saml_configs.entity_id,` +
+		` projections.apps7_saml_configs.metadata,` +
+		` projections.apps7_saml_configs.metadata_url,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.apps6` +
-		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
-		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps6_saml_configs ON projections.apps6.id = projections.apps6_saml_configs.app_id AND projections.apps6.instance_id = projections.apps6_saml_configs.instance_id` +
+		` FROM projections.apps7` +
+		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
+		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps6_api_configs.client_id,` +
-		` projections.apps6_oidc_configs.client_id` +
-		` FROM projections.apps6` +
-		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
-		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
+	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps7_api_configs.client_id,` +
+		` projections.apps7_oidc_configs.client_id` +
+		` FROM projections.apps7` +
+		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
+		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps6.project_id` +
-		` FROM projections.apps6` +
-		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
-		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps6_saml_configs ON projections.apps6.id = projections.apps6_saml_configs.app_id AND projections.apps6.instance_id = projections.apps6_saml_configs.instance_id` +
+	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps7.project_id` +
+		` FROM projections.apps7` +
+		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
+		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects4.id,` +
 		` projections.projects4.creation_date,` +
@@ -120,10 +128,10 @@ var (
 		` projections.projects4.has_project_check,` +
 		` projections.projects4.private_labeling_setting` +
 		` FROM projections.projects4` +
-		` JOIN projections.apps6 ON projections.projects4.id = projections.apps6.project_id AND projections.projects4.instance_id = projections.apps6.instance_id` +
-		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
-		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps6_saml_configs ON projections.apps6.id = projections.apps6_saml_configs.app_id AND projections.apps6.instance_id = projections.apps6_saml_configs.instance_id` +
+		` JOIN projections.apps7 ON projections.projects4.id = projections.apps7.project_id AND projections.projects4.instance_id = projections.apps7.instance_id` +
+		` LEFT JOIN projections.apps7_api_configs ON projections.apps7.id = projections.apps7_api_configs.app_id AND projections.apps7.instance_id = projections.apps7_api_configs.instance_id` +
+		` LEFT JOIN projections.apps7_oidc_configs ON projections.apps7.id = projections.apps7_oidc_configs.app_id AND projections.apps7.instance_id = projections.apps7_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps7_saml_configs ON projections.apps7.id = projections.apps7_saml_configs.app_id AND projections.apps7.instance_id = projections.apps7_saml_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 
 	appCols = database.TextArray[string]{
@@ -157,6 +165,7 @@ var (
 		"clock_skew",
 		"additional_origins",
 		"skip_native_app_success_page",
+		"back_channel_logout_uri",
 		//saml config
 		"app_id",
 		"entity_id",
@@ -228,6 +237,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -277,6 +287,7 @@ func Test_AppsPrepare(t *testing.T) {
 							"api-client-id",
 							domain.APIAuthMethodTypePrivateKeyJWT,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -363,6 +374,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// saml config
 							"app-id",
 							"https://test.com/saml/metadata",
@@ -421,8 +433,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -434,6 +446,7 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -461,8 +474,8 @@ func Test_AppsPrepare(t *testing.T) {
 							Version:                  domain.OIDCVersionV1,
 							ClientID:                 "oidc-client-id",
 							RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-							ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							AppType:                  domain.OIDCApplicationTypeUserAgent,
 							AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 							PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -476,6 +489,7 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
 						},
 					},
 				},
@@ -507,8 +521,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -520,6 +534,7 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -547,8 +562,8 @@ func Test_AppsPrepare(t *testing.T) {
 							Version:                  domain.OIDCVersionV1,
 							ClientID:                 "oidc-client-id",
 							RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-							ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							AppType:                  domain.OIDCApplicationTypeUserAgent,
 							AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 							PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -562,6 +577,7 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
 						},
 					},
 				},
@@ -593,8 +609,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -606,6 +622,7 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -633,8 +650,8 @@ func Test_AppsPrepare(t *testing.T) {
 							Version:                  domain.OIDCVersionV1,
 							ClientID:                 "oidc-client-id",
 							RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-							ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							AppType:                  domain.OIDCApplicationTypeUserAgent,
 							AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 							PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -648,6 +665,7 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
 						},
 					},
 				},
@@ -679,8 +697,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -692,6 +710,7 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -719,8 +738,8 @@ func Test_AppsPrepare(t *testing.T) {
 							Version:                  domain.OIDCVersionV1,
 							ClientID:                 "oidc-client-id",
 							RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-							ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							AppType:                  domain.OIDCApplicationTypeUserAgent,
 							AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 							PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -734,6 +753,7 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
 						},
 					},
 				},
@@ -765,8 +785,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -778,6 +798,7 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -805,8 +826,8 @@ func Test_AppsPrepare(t *testing.T) {
 							Version:                  domain.OIDCVersionV1,
 							ClientID:                 "oidc-client-id",
 							RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-							ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							AppType:                  domain.OIDCApplicationTypeUserAgent,
 							AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 							PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -820,6 +841,7 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
 						},
 					},
 				},
@@ -851,8 +873,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeNative,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -864,6 +886,7 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							true,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -891,8 +914,8 @@ func Test_AppsPrepare(t *testing.T) {
 							Version:                  domain.OIDCVersionV1,
 							ClientID:                 "oidc-client-id",
 							RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-							ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							AppType:                  domain.OIDCApplicationTypeNative,
 							AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 							PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -906,6 +929,7 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: true,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
 						},
 					},
 				},
@@ -937,8 +961,8 @@ func Test_AppsPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -950,6 +974,7 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -987,6 +1012,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1007,6 +1033,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1051,8 +1078,8 @@ func Test_AppsPrepare(t *testing.T) {
 							Version:                  domain.OIDCVersionV1,
 							ClientID:                 "oidc-client-id",
 							RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-							ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							AppType:                  domain.OIDCApplicationTypeUserAgent,
 							AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 							PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -1066,6 +1093,7 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
 						},
 					},
 					{
@@ -1120,6 +1148,9 @@ func Test_AppsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.name == "prepareAppsQuery oidc app" {
+				_ = tt.name
+			}
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
@@ -1137,8 +1168,10 @@ func Test_AppPrepare(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareAppQuery no result",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery no result",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueriesScanErr(
 					expectedAppQuery,
@@ -1155,8 +1188,10 @@ func Test_AppPrepare(t *testing.T) {
 			object: (*App)(nil),
 		},
 		{
-			name:    "prepareAppQuery found",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery found",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQuery(
 					expectedAppQuery,
@@ -1175,6 +1210,7 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						// oidc config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1212,8 +1248,10 @@ func Test_AppPrepare(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareAppQuery api app",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery api app",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1233,6 +1271,7 @@ func Test_AppPrepare(t *testing.T) {
 							"api-client-id",
 							domain.APIAuthMethodTypePrivateKeyJWT,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1275,8 +1314,10 @@ func Test_AppPrepare(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1300,8 +1341,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -1313,6 +1354,7 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -1335,8 +1377,8 @@ func Test_AppPrepare(t *testing.T) {
 					Version:                  domain.OIDCVersionV1,
 					ClientID:                 "oidc-client-id",
 					RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-					ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-					GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+					ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+					GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 					AppType:                  domain.OIDCApplicationTypeUserAgent,
 					AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 					PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -1350,11 +1392,98 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
 				},
 			},
-		}, {
-			name:    "prepareAppQuery saml app",
-			prepare: prepareAppQuery,
+		},
+		{
+			name: "prepareAppQuery oidc app active only",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, true)
+			},
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedActiveAppQuery,
+					appCols,
+					[][]driver.Value{
+						{
+							"app-id",
+							"app-name",
+							"project-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.AppStateActive,
+							uint64(20211109),
+							// api config
+							nil,
+							nil,
+							nil,
+							// oidc config
+							"app-id",
+							domain.OIDCVersionV1,
+							"oidc-client-id",
+							database.TextArray[string]{"https://redirect.to/me"},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							domain.OIDCApplicationTypeUserAgent,
+							domain.OIDCAuthMethodTypeNone,
+							database.TextArray[string]{"post.logout.ch"},
+							true,
+							domain.OIDCTokenTypeJWT,
+							true,
+							true,
+							true,
+							1 * time.Second,
+							database.TextArray[string]{"additional.origin"},
+							false,
+							"back.channel.logout.ch",
+							// saml config
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+					},
+				),
+			},
+			object: &App{
+				ID:            "app-id",
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "ro",
+				State:         domain.AppStateActive,
+				Sequence:      20211109,
+				Name:          "app-name",
+				ProjectID:     "project-id",
+				OIDCConfig: &OIDCApp{
+					Version:                  domain.OIDCVersionV1,
+					ClientID:                 "oidc-client-id",
+					RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
+					ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+					GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+					AppType:                  domain.OIDCApplicationTypeUserAgent,
+					AuthMethodType:           domain.OIDCAuthMethodTypeNone,
+					PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
+					IsDevMode:                true,
+					AccessTokenType:          domain.OIDCTokenTypeJWT,
+					AssertAccessTokenRole:    true,
+					AssertIDTokenRole:        true,
+					AssertIDTokenUserinfo:    true,
+					ClockSkew:                1 * time.Second,
+					AdditionalOrigins:        database.TextArray[string]{"additional.origin"},
+					ComplianceProblems:       nil,
+					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
+					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+				},
+			},
+		},
+		{
+			name: "prepareAppQuery saml app",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1374,6 +1503,7 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1417,8 +1547,10 @@ func Test_AppPrepare(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app IsDevMode inactive",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app IsDevMode inactive",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1442,8 +1574,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -1455,6 +1587,7 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -1477,8 +1610,8 @@ func Test_AppPrepare(t *testing.T) {
 					Version:                  domain.OIDCVersionV1,
 					ClientID:                 "oidc-client-id",
 					RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-					ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-					GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+					ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+					GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 					AppType:                  domain.OIDCApplicationTypeUserAgent,
 					AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 					PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -1492,12 +1625,15 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app AssertAccessTokenRole inactive",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app AssertAccessTokenRole inactive",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1521,8 +1657,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -1534,6 +1670,7 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -1556,8 +1693,8 @@ func Test_AppPrepare(t *testing.T) {
 					Version:                  domain.OIDCVersionV1,
 					ClientID:                 "oidc-client-id",
 					RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-					ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-					GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+					ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+					GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 					AppType:                  domain.OIDCApplicationTypeUserAgent,
 					AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 					PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -1571,12 +1708,15 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app AssertIDTokenRole inactive",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app AssertIDTokenRole inactive",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1600,8 +1740,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -1613,6 +1753,7 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -1635,8 +1776,8 @@ func Test_AppPrepare(t *testing.T) {
 					Version:                  domain.OIDCVersionV1,
 					ClientID:                 "oidc-client-id",
 					RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-					ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-					GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+					ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+					GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 					AppType:                  domain.OIDCApplicationTypeUserAgent,
 					AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 					PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -1650,12 +1791,15 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery oidc app AssertIDTokenUserinfo inactive",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery oidc app AssertIDTokenUserinfo inactive",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppQuery,
@@ -1679,8 +1823,8 @@ func Test_AppPrepare(t *testing.T) {
 							domain.OIDCVersionV1,
 							"oidc-client-id",
 							database.TextArray[string]{"https://redirect.to/me"},
-							database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-							database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+							database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+							database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 							domain.OIDCApplicationTypeUserAgent,
 							domain.OIDCAuthMethodTypeNone,
 							database.TextArray[string]{"post.logout.ch"},
@@ -1692,6 +1836,7 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
 							// saml config
 							nil,
 							nil,
@@ -1714,8 +1859,8 @@ func Test_AppPrepare(t *testing.T) {
 					Version:                  domain.OIDCVersionV1,
 					ClientID:                 "oidc-client-id",
 					RedirectURIs:             database.TextArray[string]{"https://redirect.to/me"},
-					ResponseTypes:            database.Array[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
-					GrantTypes:               database.Array[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
+					ResponseTypes:            database.NumberArray[domain.OIDCResponseType]{domain.OIDCResponseTypeIDTokenToken},
+					GrantTypes:               database.NumberArray[domain.OIDCGrantType]{domain.OIDCGrantTypeImplicit},
 					AppType:                  domain.OIDCApplicationTypeUserAgent,
 					AuthMethodType:           domain.OIDCAuthMethodTypeNone,
 					PostLogoutRedirectURIs:   database.TextArray[string]{"post.logout.ch"},
@@ -1729,12 +1874,15 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
 				},
 			},
 		},
 		{
-			name:    "prepareAppQuery sql err",
-			prepare: prepareAppQuery,
+			name: "prepareAppQuery sql err",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+				return prepareAppQuery(ctx, db, false)
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					expectedAppQuery,

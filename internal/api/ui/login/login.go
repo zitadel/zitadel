@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/zitadel/zitadel/feature"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -38,7 +38,6 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
-	featureCheck        feature.Checker
 }
 
 type Config struct {
@@ -75,7 +74,6 @@ func CreateLogin(config Config,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
-	featureCheck feature.Checker,
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
@@ -88,7 +86,6 @@ func CreateLogin(config Config,
 		authRepo:            authRepo,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
-		featureCheck:        featureCheck,
 	}
 	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
@@ -104,7 +101,7 @@ func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.ObjectSrc = middleware.CSPSourceOptsSelf()
 	csp.StyleSrc = csp.StyleSrc.AddNonce()
-	csp.ScriptSrc = csp.ScriptSrc.AddNonce()
+	csp.ScriptSrc = csp.ScriptSrc.AddNonce().AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=")
 	return &csp
 }
 
@@ -122,13 +119,21 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				handler.ServeHTTP(w, r)
 				return
 			}
+			// by default we use SameSite Lax and the externalSecure (TLS) for the secure flag
 			sameSiteMode := csrf.SameSiteLaxMode
-			if len(authz.GetInstance(r.Context()).SecurityPolicyAllowedOrigins()) > 0 {
+			secureOnly := externalSecure
+			instance := authz.GetInstance(r.Context())
+			// in case of `allow iframe`...
+			if len(instance.SecurityPolicyAllowedOrigins()) > 0 {
+				// ... we need to change to SameSite none ...
 				sameSiteMode = csrf.SameSiteNoneMode
+				// ... and since SameSite none requires the secure flag, we'll set it for TLS and for localhost
+				// (regardless of the TLS / externalSecure settings)
+				secureOnly = externalSecure || http_utils.DomainContext(r.Context()).RequestedDomain() == "localhost"
 			}
 			csrf.Protect(csrfCookieKey,
-				csrf.Secure(externalSecure),
-				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
+				csrf.Secure(secureOnly),
+				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, externalSecure, http_utils.PrefixHost)),
 				csrf.Path(path),
 				csrf.ErrorHandler(errorHandler),
 				csrf.SameSite(sameSiteMode),
@@ -158,7 +163,7 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	orgDomain, err := domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain())
+	orgDomain, err := domain.NewIAMDomainName(orgName, http_utils.DomainContext(ctx).RequestedDomain())
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +171,7 @@ func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string
 	if err != nil {
 		return nil, err
 	}
-	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
+	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -194,5 +199,5 @@ func setUserContext(ctx context.Context, userID, resourceOwner string) context.C
 }
 
 func (l *Login) baseURL(ctx context.Context) string {
-	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure) + HandlerPrefix
+	return http_utils.DomainContext(ctx).Origin() + HandlerPrefix
 }

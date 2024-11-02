@@ -8,10 +8,14 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddActionWithID(ctx context.Context, addAction *domain.Action, resourceOwner, actionID string) (_ string, _ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
 	if err != nil {
 		return "", nil, err
@@ -227,9 +231,12 @@ func (c *Commands) deactivateNotAllowedActionsFromOrg(ctx context.Context, resou
 	return events, nil
 }
 
-func (c *Commands) getActionWriteModelByID(ctx context.Context, actionID string, resourceOwner string) (*ActionWriteModel, error) {
+func (c *Commands) getActionWriteModelByID(ctx context.Context, actionID string, resourceOwner string) (_ *ActionWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	actionWriteModel := NewActionWriteModel(actionID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, actionWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, actionWriteModel)
 	if err != nil {
 		return nil, err
 	}

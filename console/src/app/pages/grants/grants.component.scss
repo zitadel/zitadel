@@ -1,8 +1,71 @@
-h1 {
-  margin: 0;
+.grants-title-row {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+  }
+
+  a {
+    .icon {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      width: 1.2rem;
+    }
+  }
 }
 
-.grants-desc {
-  margin-bottom: 1rem;
+.sub {
+  margin-bottom: 1.5rem;
   font-size: 14px;
+}
+
+@mixin grants-theme($theme) {
+  $foreground: map-get($theme, foreground);
+
+  .grants-title-row a {
+    color: map-get($foreground, text);
+  }
+
+  .grants-controls {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid map-get($foreground, dividers);
+
+    .grants-toggle-group {
+      display: flex;
+
+      .toggle-row {
+        display: flex;
+        align-items: center;
+
+        i {
+          margin-right: 0.5rem;
+        }
+
+        .info-i {
+          font-size: 1.2rem;
+          margin-left: 0.5rem;
+          margin-right: 0;
+        }
+
+        .current-dot {
+          height: 8px;
+          width: 8px;
+          border-radius: 50%;
+          background-color: rgb(84, 142, 230);
+          margin-left: 0.5rem;
+        }
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .grid-btn {
+      margin-right: 0.5rem;
+    }
+  }
 }

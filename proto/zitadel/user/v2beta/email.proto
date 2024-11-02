@@ -38,7 +38,6 @@ message HumanEmail {
   bool is_verified = 2;
 }
 
-
 message SendEmailVerificationCode {
   optional string url_template = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},

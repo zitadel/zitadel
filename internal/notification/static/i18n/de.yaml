@@ -3,21 +3,21 @@ InitCode:
   PreHeader: User initialisieren
   Subject: User initialisieren
   Greeting: Hallo {{.DisplayName}},
-  Text: Dieser Benutzer wurde soeben in ZITADEL erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
+  Text: Dieser Benutzer wurde soeben erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den unten stehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses E-Mail nicht angefordert hast, kannst du sie einfach ignorieren.
   ButtonText: Initialisierung abschliessen
 PasswordReset:
   Title: Passwort zurücksetzen
   PreHeader: Passwort zurücksetzen
   Subject: Passwort zurücksetzen
   Greeting: Hallo {{.DisplayName}},
-  Text: Wir haben eine Anfrage für das Zurücksetzen deines Passworts bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du das Zurücksetzen des Passworts nicht angefordert hast, kannst du diese E-Mail ignorieren.
+  Text: Wir haben eine Anfrage zum Zurücksetzen deines Passworts bekommen. Du kannst den unten stehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du das Zurücksetzen des Passworts nicht angefordert hast, kannst du diese E-Mail ignorieren.
   ButtonText: Passwort zurücksetzen
 VerifyEmail:
   Title: E-Mail-Adresse verifizieren
   PreHeader: E-Mail-Adresse verifizieren
   Subject: E-Mail-Adresse verifizieren
   Greeting: Hallo {{.DisplayName}},
-  Text: Eine neue E-Mail-Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button, um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du die E-Mail-Adresse nicht selber hinzugefügt hast, kannst du diese E-Mail ignorieren.
+  Text: Eine neue E-Mail-Adresse wurde hinzugefügt. Bitte verwende den unten stehenden Button, um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du die E-Mail-Adresse nicht selbst hinzugefügt hast, kannst du diese E-Mail ignorieren.
   ButtonText: E-Mail-Adresse verifizieren
 VerifyPhone:
   Title: Telefonnummer verifizieren
@@ -31,7 +31,7 @@ VerifyEmailOTP:
   PreHeader: Einmalpasswort verifizieren
   Subject: Einmalpasswort verifizieren
   Greeting: Hallo {{.DisplayName}},
-  Text: Bitte nutze den 'Authentifizieren'-Button oder kopiere das Einmalpasswort {{.OTP}} und füge es in den Authentifizierungsbildschirm ein, um dich innerhalb der nächsten fünf Minuten zu authentifizieren.
+  Text: Bitte nutze den 'Authentifizieren'-Button oder kopiere das Einmalpasswort {{.OTP}} und gib es zur Bestätigung ein, um dich innerhalb der nächsten fünf Minuten zu authentifizieren.
   ButtonText: Authentifizieren
 VerifySMSOTP:
   Text: >-
@@ -43,14 +43,14 @@ DomainClaimed:
   PreHeader: E-Mail / Benutzername ändern
   Subject: Domain wurde beansprucht
   Greeting: Hallo {{.DisplayName}},
-  Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue E-Mail-Adresse hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
+  Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger Benutzer {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue E-Mail-Adresse hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
   ButtonText: Login
 PasswordlessRegistration:
   Title: Passwortlosen Login hinzufügen
   PreHeader: Passwortlosen Login hinzufügen
   Subject: Passwortlosen Login hinzufügen
   Greeting: Hallo {{.DisplayName}},
-  Text: Wir haben eine Anfrage für das Hinzufügen eines Token für den passwortlosen Login erhalten. Du kannst den untenstehenden Button verwenden, um dein Token oder Gerät hinzuzufügen.
+  Text: Wir haben eine Anfrage für das Hinzufügen eines Token für den passwortlosen Login erhalten. Du kannst den unten stehenden Button verwenden, um dein Token oder Gerät hinzuzufügen.
   ButtonText: Passwortlosen Login hinzufügen
 PasswordChange:
   Title: Passwort wurde geändert
@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Hallo {{.DisplayName}},
   Text: Dein Passwort wurde geändert. Wenn diese Änderung nicht von dir gemacht wurde, empfehlen wir das sofortige Zurücksetzen deines Passworts.
   ButtonText: Login
+InviteUser:
+  Title: Einladung zu {{.ApplicationName}}
+  PreHeader: Einladung zu {{.ApplicationName}}
+  Subject: Einladung zu {{.ApplicationName}}
+  Greeting: Hallo {{.DisplayName}},
+  Text: Ihr Benutzer wurde zu {{.ApplicationName}} eingeladen. Bitte klicken Sie auf die Schaltfläche unten, um den Einladungsprozess abzuschließen. Wenn Sie diese E-Mail nicht angefordert haben, ignorieren Sie sie bitte.
+  ButtonText: Einladung annehmen

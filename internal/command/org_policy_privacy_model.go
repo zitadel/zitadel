@@ -60,6 +60,7 @@ func (wm *OrgPrivacyPolicyWriteModel) NewChangedEvent(
 	privacyLink,
 	helpLink string,
 	supportEmail domain.EmailAddress,
+	docsLink, customLink, customLinkText string,
 ) (*org.PrivacyPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PrivacyPolicyChanges, 0)
@@ -74,6 +75,15 @@ func (wm *OrgPrivacyPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.SupportEmail != supportEmail {
 		changes = append(changes, policy.ChangeSupportEmail(supportEmail))
+	}
+	if wm.DocsLink != docsLink {
+		changes = append(changes, policy.ChangeDocsLink(docsLink))
+	}
+	if wm.CustomLink != customLink {
+		changes = append(changes, policy.ChangeCustomLink(customLink))
+	}
+	if wm.CustomLinkText != customLinkText {
+		changes = append(changes, policy.ChangeCustomLinkText(customLinkText))
 	}
 	if len(changes) == 0 {
 		return nil, false

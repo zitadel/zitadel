@@ -22,37 +22,15 @@ func OrgQueriesToModel(queries []*org_pb.OrgQuery) (_ []query.SearchQuery, err e
 func OrgQueryToModel(apiQuery *org_pb.OrgQuery) (query.SearchQuery, error) {
 	switch q := apiQuery.Query.(type) {
 	case *org_pb.OrgQuery_DomainQuery:
-		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
+		return query.NewOrgVerifiedDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
 	case *org_pb.OrgQuery_NameQuery:
 		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	case *org_pb.OrgQuery_StateQuery:
 		return query.NewOrgStateSearchQuery(OrgStateToDomain(q.StateQuery.State))
+	case *org_pb.OrgQuery_IdQuery:
+		return query.NewOrgIDSearchQuery(q.IdQuery.Id)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
-	}
-}
-
-func OrgQueriesToQuery(queries []*org_pb.OrgQuery) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, len(queries))
-	for i, query := range queries {
-		q[i], err = OrgQueryToQuery(query)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return q, nil
-}
-
-func OrgQueryToQuery(search *org_pb.OrgQuery) (query.SearchQuery, error) {
-	switch q := search.Query.(type) {
-	case *org_pb.OrgQuery_DomainQuery:
-		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
-	case *org_pb.OrgQuery_NameQuery:
-		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
-	case *org_pb.OrgQuery_StateQuery:
-		return query.NewOrgStateSearchQuery(OrgStateToDomain(q.StateQuery.State))
-	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-ADvsd", "List.Query.Invalid")
 	}
 }
 
@@ -184,5 +162,16 @@ func DomainValidationTypeFromModel(validationType domain.OrgDomainValidationType
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_HTTP
 	default:
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
+	}
+}
+
+func FieldNameToOrgColumn(fieldName org_pb.OrgFieldName) query.Column {
+	switch fieldName {
+	case org_pb.OrgFieldName_ORG_FIELD_NAME_NAME:
+		return query.OrgColumnName
+	case org_pb.OrgFieldName_ORG_FIELD_NAME_UNSPECIFIED:
+		return query.Column{}
+	default:
+		return query.Column{}
 	}
 }

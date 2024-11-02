@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"reflect"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -11,9 +11,7 @@ import (
 
 type InstanceSecurityPolicyWriteModel struct {
 	eventstore.WriteModel
-
-	Enabled        bool
-	AllowedOrigins []string
+	SecurityPolicy
 }
 
 func NewInstanceSecurityPolicyWriteModel(ctx context.Context) *InstanceSecurityPolicyWriteModel {
@@ -28,11 +26,17 @@ func NewInstanceSecurityPolicyWriteModel(ctx context.Context) *InstanceSecurityP
 func (wm *InstanceSecurityPolicyWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		if e, ok := event.(*instance.SecurityPolicySetEvent); ok {
-			if e.Enabled != nil {
-				wm.Enabled = *e.Enabled
+
+			if e.EnableIframeEmbedding != nil {
+				wm.EnableIframeEmbedding = *e.EnableIframeEmbedding
+			} else if e.Enabled != nil {
+				wm.EnableIframeEmbedding = *e.Enabled
 			}
 			if e.AllowedOrigins != nil {
 				wm.AllowedOrigins = *e.AllowedOrigins
+			}
+			if e.EnableImpersonation != nil {
+				wm.EnableImpersonation = *e.EnableImpersonation
 			}
 		}
 	}
@@ -53,17 +57,19 @@ func (wm *InstanceSecurityPolicyWriteModel) Query() *eventstore.SearchQueryBuild
 func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	enabled bool,
-	allowedOrigins []string,
+	policy *SecurityPolicy,
 ) (*instance.SecurityPolicySetEvent, error) {
 	changes := make([]instance.SecurityPolicyChanges, 0, 2)
 	var err error
 
-	if wm.Enabled != enabled {
-		changes = append(changes, instance.ChangeSecurityPolicyEnabled(enabled))
+	if wm.EnableIframeEmbedding != policy.EnableIframeEmbedding {
+		changes = append(changes, instance.ChangeSecurityPolicyEnableIframeEmbedding(policy.EnableIframeEmbedding))
 	}
-	if enabled && !reflect.DeepEqual(wm.AllowedOrigins, allowedOrigins) {
-		changes = append(changes, instance.ChangeSecurityPolicyAllowedOrigins(allowedOrigins))
+	if !slices.Equal(wm.AllowedOrigins, policy.AllowedOrigins) {
+		changes = append(changes, instance.ChangeSecurityPolicyAllowedOrigins(policy.AllowedOrigins))
+	}
+	if wm.EnableImpersonation != policy.EnableImpersonation {
+		changes = append(changes, instance.ChangeSecurityPolicyEnableImpersonation(policy.EnableImpersonation))
 	}
 	changeEvent, err := instance.NewSecurityPolicySetEvent(ctx, aggregate, changes)
 	if err != nil {

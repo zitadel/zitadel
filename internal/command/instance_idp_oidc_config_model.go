@@ -5,10 +5,9 @@ import (
 	"reflect"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -94,7 +93,7 @@ func (wm *InstanceIDPOIDCConfigWriteModel) NewChangedEvent(
 	authorizationEndpoint,
 	tokenEndpoint,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	idpDisplayNameMapping,
 	userNameMapping domain.OIDCMappingField,
 	scopes ...string,

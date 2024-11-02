@@ -32,12 +32,14 @@ Password:
   Title: Password
   Description: Enter your login data.
   PasswordLabel: Password
-  MinLength: Minimum length
-  HasUppercase: Uppercase letter
-  HasLowercase: Lowercase letter
-  HasNumber: Number
-  HasSymbol: Symbol
-  Confirmation: Confirmation match
+  MinLength: Must be at least
+  MinLengthp2: characters long.
+  MaxLength: Must be less than 70 characters long.
+  HasUppercase: Must include an uppercase letter.
+  HasLowercase: Must include a lowercase letter.
+  HasNumber: Must include a number.
+  HasSymbol: Must include a symbol.
+  Confirmation: Password confirmation matched.
   ResetLinkText: Reset Password
   BackButtonText: Back
   NextButtonText: Next
@@ -83,6 +85,15 @@ InitUserDone:
   Description: Email verified and Password successfully set
   NextButtonText: Next
   CancelButtonText: Cancel
+
+InviteUser:
+  Title: Activate User
+  Description: Verify your e-mail with the code below and set your password.
+  CodeLabel: Code
+  NewPasswordLabel: New Password
+  NewPasswordConfirm: Confirm Password
+  NextButtonText: Next
+  ResendButtonText: Resend Code
 
 InitMFAPrompt:
   Title: 2-Factor Setup
@@ -188,6 +199,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Change Password
   Description: Change your password. Enter your old and new password.
+  ExpiredDescription: You password has expired and has to be changed. Enter your old and new password.
   OldPasswordLabel: Old Password
   NewPasswordLabel: New Password
   NewPasswordConfirmLabel: Password confirmation
@@ -249,6 +261,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -288,6 +303,9 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -325,6 +343,12 @@ LogoutDone:
   Description: You have logged out successfully.
   LoginButtonText: Login
 
+LinkingUserPrompt:
+  Title: Existing User Found
+  Description: "Do you want to link your existing account:"
+  LinkButtonText: Link
+  OtherButtonText: Other options
+
 LinkingUsersDone:
   Title: Linking User
   Description: User linked.
@@ -333,7 +357,7 @@ LinkingUsersDone:
 
 ExternalNotFound:
   Title: External User Not Found
-  Description: External user not found. Do you want to link your user or auto register a new one.
+  Description: External user not found. Do you want to link your user or auto-register a new one?
   LinkButtonText: Link
   AutoRegisterButtonText: Register
   TosAndPrivacyLabel: Terms and conditions
@@ -355,6 +379,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
   Title: Device Authorization
   UserCode:
@@ -472,8 +499,9 @@ Errors:
       ExternalUserIDEmpty: External User ID is empty
       UserDisplayNameEmpty: User Display Name is empty
       NoExternalUserData: No external User Data received
-      CreationNotAllowed: Creation of a new user is not allowed on this Provider
-      LinkingNotAllowed: Linking of a user is not allowed on this Provider
+      CreationNotAllowed: Creation of a new user is not allowed on this provider
+      LinkingNotAllowed: Linking of a user is not allowed on this provider
+      NoOptionAllowed: Neither creation of linking is allowed on this provider. Please contact your administrator.
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
     ProjectRequired: Login not possible. The organization of the user must be granted to the project. Please contact your administrator.
   IdentityProvider:

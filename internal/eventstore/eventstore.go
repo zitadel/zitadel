@@ -2,30 +2,58 @@ package eventstore
 
 import (
 	"context"
+	"errors"
 	"sort"
 	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // Eventstore abstracts all functions needed to store valid events
 // and filters the stored events
 type Eventstore struct {
-	// TODO: get rid of this mutex,
-	// or if we scale to >4vCPU use a sync.Map
-	interceptorMutex  sync.RWMutex
-	eventInterceptors map[EventType]eventTypeInterceptors
-	eventTypes        []string
-	aggregateTypes    []string
-	PushTimeout       time.Duration
+	PushTimeout time.Duration
+	maxRetries  int
 
-	pusher  Pusher
-	querier Querier
+	pusher   Pusher
+	querier  Querier
+	searcher Searcher
 
 	instances         []string
 	lastInstanceQuery time.Time
 	instancesMu       sync.Mutex
+}
+
+var (
+	eventInterceptors map[EventType]eventTypeInterceptors
+	eventTypes        []string
+	aggregateTypes    []string
+	eventTypeMapping  = map[EventType]AggregateType{}
+)
+
+// RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
+func RegisterFilterEventMapper(aggregateType AggregateType, eventType EventType, mapper func(Event) (Event, error)) {
+	if mapper == nil || eventType == "" {
+		return
+	}
+
+	appendEventType(eventType)
+	appendAggregateType(aggregateType)
+
+	if eventInterceptors == nil {
+		eventInterceptors = make(map[EventType]eventTypeInterceptors)
+	}
+
+	interceptor := eventInterceptors[eventType]
+	interceptor.eventMapper = mapper
+	eventInterceptors[eventType] = interceptor
+	eventTypeMapping[eventType] = aggregateType
 }
 
 type eventTypeInterceptors struct {
@@ -34,11 +62,12 @@ type eventTypeInterceptors struct {
 
 func NewEventstore(config *Config) *Eventstore {
 	return &Eventstore{
-		eventInterceptors: map[EventType]eventTypeInterceptors{},
-		PushTimeout:       config.PushTimeout,
+		PushTimeout: config.PushTimeout,
+		maxRetries:  int(config.MaxRetries),
 
-		pusher:  config.Pusher,
-		querier: config.Querier,
+		pusher:   config.Pusher,
+		querier:  config.Querier,
+		searcher: config.Searcher,
 
 		instancesMu: sync.Mutex{},
 	}
@@ -61,7 +90,23 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
 		defer cancel()
 	}
-	events, err := es.pusher.Push(ctx, cmds...)
+	var (
+		events []Event
+		err    error
+	)
+
+	// Retry when there is a collision of the sequence as part of the primary key.
+	// "duplicate key value violates unique constraint \"events2_pkey\" (SQLSTATE 23505)"
+	// https://github.com/zitadel/zitadel/issues/7202
+retry:
+	for i := 0; i <= es.maxRetries; i++ {
+		events, err = es.pusher.Push(ctx, cmds...)
+		var pgErr *pgconn.PgError
+		if !errors.As(err, &pgErr) || pgErr.ConstraintName != "events2_pkey" || pgErr.SQLState() != "23505" {
+			break retry
+		}
+		logging.WithError(err).Info("eventstore push retry")
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -74,12 +119,30 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 	return mappedEvents, nil
 }
 
+func AggregateTypeFromEventType(typ EventType) AggregateType {
+	return eventTypeMapping[typ]
+}
+
 func (es *Eventstore) EventTypes() []string {
-	return es.eventTypes
+	return eventTypes
 }
 
 func (es *Eventstore) AggregateTypes() []string {
-	return es.aggregateTypes
+	return aggregateTypes
+}
+
+// FillFields implements the [Searcher] interface
+func (es *Eventstore) FillFields(ctx context.Context, events ...FillFieldsEvent) error {
+	return es.searcher.FillFields(ctx, events...)
+}
+
+// Search implements the [Searcher] interface
+func (es *Eventstore) Search(ctx context.Context, conditions ...map[FieldType]any) ([]*SearchResult, error) {
+	if len(conditions) == 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "V3-5Xbr1", "no search conditions")
+	}
+
+	return es.searcher.Search(ctx, conditions...)
 }
 
 // Filter filters the stored events based on the searchQuery
@@ -105,28 +168,21 @@ func (es *Eventstore) Filter(ctx context.Context, searchQuery *SearchQueryBuilde
 
 func (es *Eventstore) mapEvents(events []Event) (mappedEvents []Event, err error) {
 	mappedEvents = make([]Event, len(events))
-
-	es.interceptorMutex.RLock()
-	defer es.interceptorMutex.RUnlock()
-
 	for i, event := range events {
 		mappedEvents[i], err = es.mapEventLocked(event)
 		if err != nil {
 			return nil, err
 		}
 	}
-
 	return mappedEvents, nil
 }
 
 func (es *Eventstore) mapEvent(event Event) (Event, error) {
-	es.interceptorMutex.RLock()
-	defer es.interceptorMutex.RUnlock()
 	return es.mapEventLocked(event)
 }
 
 func (es *Eventstore) mapEventLocked(event Event) (Event, error) {
-	interceptors, ok := es.eventInterceptors[event.Type()]
+	interceptors, ok := eventInterceptors[event.Type()]
 	if !ok || interceptors.eventMapper == nil {
 		return BaseEventFromRepo(event), nil
 	}
@@ -192,6 +248,10 @@ func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, for
 	return instances, nil
 }
 
+func (es *Eventstore) Client() *database.DB {
+	return es.querier.Client()
+}
+
 type QueryReducer interface {
 	reducer
 	//Query returns the SearchQueryFactory for the events needed in reducer
@@ -202,24 +262,6 @@ type QueryReducer interface {
 // appends all events to the reducer and calls it's reduce function
 func (es *Eventstore) FilterToQueryReducer(ctx context.Context, r QueryReducer) error {
 	return es.FilterToReducer(ctx, r.Query(), r)
-}
-
-// RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
-func (es *Eventstore) RegisterFilterEventMapper(aggregateType AggregateType, eventType EventType, mapper func(Event) (Event, error)) *Eventstore {
-	if mapper == nil || eventType == "" {
-		return es
-	}
-	es.interceptorMutex.Lock()
-	defer es.interceptorMutex.Unlock()
-
-	es.appendEventType(eventType)
-	es.appendAggregateType(aggregateType)
-
-	interceptor := es.eventInterceptors[eventType]
-	interceptor.eventMapper = mapper
-	es.eventInterceptors[eventType] = interceptor
-
-	return es
 }
 
 type Reducer func(event Event) error
@@ -233,6 +275,8 @@ type Querier interface {
 	LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error)
 	// InstanceIDs returns the instance ids found by the search query
 	InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error)
+	// Client returns the underlying database connection
+	Client() *database.DB
 }
 
 type Pusher interface {
@@ -242,18 +286,34 @@ type Pusher interface {
 	Push(ctx context.Context, commands ...Command) (_ []Event, err error)
 }
 
-func (es *Eventstore) appendEventType(typ EventType) {
-	i := sort.SearchStrings(es.eventTypes, string(typ))
-	if i < len(es.eventTypes) && es.eventTypes[i] == string(typ) {
-		return
-	}
-	es.eventTypes = append(es.eventTypes[:i], append([]string{string(typ)}, es.eventTypes[i:]...)...)
+type FillFieldsEvent interface {
+	Event
+	Fields() []*FieldOperation
 }
 
-func (es *Eventstore) appendAggregateType(typ AggregateType) {
-	i := sort.SearchStrings(es.aggregateTypes, string(typ))
-	if len(es.aggregateTypes) > i && es.aggregateTypes[i] == string(typ) {
+type Searcher interface {
+	// Search allows to search for specific fields of objects
+	// The instance id is taken from the context
+	// The list of conditions are combined with AND
+	// The search fields are combined with OR
+	// At least one must be defined
+	Search(ctx context.Context, conditions ...map[FieldType]any) (result []*SearchResult, err error)
+	// FillFields is to insert the fields of previously stored events
+	FillFields(ctx context.Context, events ...FillFieldsEvent) error
+}
+
+func appendEventType(typ EventType) {
+	i := sort.SearchStrings(eventTypes, string(typ))
+	if i < len(eventTypes) && eventTypes[i] == string(typ) {
 		return
 	}
-	es.aggregateTypes = append(es.aggregateTypes[:i], append([]string{string(typ)}, es.aggregateTypes[i:]...)...)
+	eventTypes = append(eventTypes[:i], append([]string{string(typ)}, eventTypes[i:]...)...)
+}
+
+func appendAggregateType(typ AggregateType) {
+	i := sort.SearchStrings(aggregateTypes, string(typ))
+	if len(aggregateTypes) > i && aggregateTypes[i] == string(typ) {
+		return
+	}
+	aggregateTypes = append(aggregateTypes[:i], append([]string{string(typ)}, aggregateTypes[i:]...)...)
 }

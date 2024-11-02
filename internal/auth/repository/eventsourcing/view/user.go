@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
@@ -14,11 +13,11 @@ import (
 )
 
 const (
-	userTable = "auth.users2"
+	userTable = "auth.users3"
 )
 
-func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
-	return view.UserByID(v.Db, userTable, userID, instanceID)
+func (v *View) UserByID(ctx context.Context, userID, instanceID string) (*model.UserView, error) {
+	return view.UserByID(ctx, v.Db, userID, instanceID)
 }
 
 func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string) (*model.UserView, error) {
@@ -28,7 +27,7 @@ func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string
 	}
 
 	//nolint: contextcheck // no lint was added because refactor would change too much code
-	return view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	return view.UserByID(ctx, v.Db, queriedUser.ID, instanceID)
 }
 
 func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, resourceOwner, instanceID string) (*model.UserView, error) {
@@ -38,7 +37,7 @@ func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, r
 	}
 
 	//nolint: contextcheck // no lint was added because refactor would change too much code
-	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	user, err := view.UserByID(ctx, v.Db, queriedUser.ID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +49,7 @@ func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, r
 }
 
 func (v *View) UserByEmail(ctx context.Context, email, instanceID string) (*model.UserView, error) {
-	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEqualsIgnoreCase)
+	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +57,7 @@ func (v *View) UserByEmail(ctx context.Context, email, instanceID string) (*mode
 }
 
 func (v *View) UserByEmailAndResourceOwner(ctx context.Context, email, resourceOwner, instanceID string) (*model.UserView, error) {
-	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEquals)
+	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +103,7 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 		OnError(err).
 		Errorf("could not get current sequence for userByID")
 
-	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	user, err := view.UserByID(ctx, v.Db, queriedUser.ID, instanceID)
 	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
 	}
@@ -140,42 +139,6 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 	}
 
 	return user, nil
-}
-
-func (v *View) UsersByOrgID(orgID, instanceID string) ([]*model.UserView, error) {
-	return view.UsersByOrgID(v.Db, userTable, orgID, instanceID)
-}
-
-func (v *View) PutUser(user *model.UserView, event eventstore.Event) error {
-	return view.PutUser(v.Db, userTable, user)
-}
-
-func (v *View) PutUsers(users []*model.UserView, event eventstore.Event) error {
-	return view.PutUsers(v.Db, userTable, users...)
-}
-
-func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) error {
-	err := view.DeleteUser(v.Db, userTable, userID, instanceID)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return err
-	}
-	return nil
-}
-
-func (v *View) DeleteInstanceUsers(event eventstore.Event) error {
-	err := view.DeleteInstanceUsers(v.Db, userTable, event.Aggregate().InstanceID)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return err
-	}
-	return nil
-}
-
-func (v *View) UpdateOrgOwnerRemovedUsers(event eventstore.Event) error {
-	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.Aggregate().InstanceID, event.Aggregate().ID)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return err
-	}
-	return nil
 }
 
 func (v *View) GetLatestUserSequence(ctx context.Context, instanceID string) (_ *query.CurrentState, err error) {

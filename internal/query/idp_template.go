@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -36,6 +35,7 @@ type IDPTemplate struct {
 	IsLinkingAllowed  bool
 	IsAutoCreation    bool
 	IsAutoUpdate      bool
+	AutoLinking       domain.AutoLinkingOption
 	*OAuthIDPTemplate
 	*OIDCIDPTemplate
 	*JWTIDPTemplate
@@ -155,12 +155,14 @@ type AppleIDPTemplate struct {
 }
 
 type SAMLIDPTemplate struct {
-	IDPID             string
-	Metadata          []byte
-	Key               *crypto.CryptoValue
-	Certificate       []byte
-	Binding           string
-	WithSignedRequest bool
+	IDPID                         string
+	Metadata                      []byte
+	Key                           *crypto.CryptoValue
+	Certificate                   []byte
+	Binding                       string
+	WithSignedRequest             bool
+	NameIDFormat                  sql.Null[domain.SAMLNameIDFormat]
+	TransientMappingAttributeName string
 }
 
 var (
@@ -226,6 +228,10 @@ var (
 	}
 	IDPTemplateIsAutoUpdateCol = Column{
 		name:  projection.IDPTemplateIsAutoUpdateCol,
+		table: idpTemplateTable,
+	}
+	IDPTemplateAutoLinkingCol = Column{
+		name:  projection.IDPTemplateAutoLinkingCol,
 		table: idpTemplateTable,
 	}
 )
@@ -696,10 +702,39 @@ var (
 		name:  projection.SAMLWithSignedRequestCol,
 		table: samlIdpTemplateTable,
 	}
+	SAMLNameIDFormatCol = Column{
+		name:  projection.SAMLNameIDFormatCol,
+		table: samlIdpTemplateTable,
+	}
+	SAMLTransientMappingAttributeNameCol = Column{
+		name:  projection.SAMLTransientMappingAttributeName,
+		table: samlIdpTemplateTable,
+	}
 )
 
-// IDPTemplateByID searches for the requested id
-func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (template *IDPTemplate, err error) {
+// IDPTemplateByID searches for the requested id with permission check if necessary
+func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, permissionCheck domain.PermissionCheck, queries ...SearchQuery) (template *IDPTemplate, err error) {
+	idp, err := q.idpTemplateByID(ctx, shouldTriggerBulk, id, withOwnerRemoved, queries...)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil {
+		switch idp.OwnerType {
+		case domain.IdentityProviderTypeSystem:
+			if err := permissionCheck(ctx, domain.PermissionIDPRead, idp.ResourceOwner, idp.ID); err != nil {
+				return nil, err
+			}
+		case domain.IdentityProviderTypeOrg:
+			if err := permissionCheck(ctx, domain.PermissionOrgIDPRead, idp.ResourceOwner, idp.ID); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return idp, nil
+}
+
+// idpTemplateByID searches for the requested id
+func (q *Queries) idpTemplateByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (template *IDPTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -813,6 +848,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			IDPTemplateAutoLinkingCol.identifier(),
 			// oauth
 			OAuthIDCol.identifier(),
 			OAuthClientIDCol.identifier(),
@@ -878,6 +914,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
 			SAMLWithSignedRequestCol.identifier(),
+			SAMLNameIDFormatCol.identifier(),
+			SAMLTransientMappingAttributeNameCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -992,6 +1030,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			var samlCertificate []byte
 			samlBinding := sql.NullString{}
 			samlWithSignedRequest := sql.NullBool{}
+			samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
+			samlTransientMappingAttributeName := sql.NullString{}
 
 			ldapID := sql.NullString{}
 			ldapServers := database.TextArray[string]{}
@@ -1038,6 +1078,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&idpTemplate.IsLinkingAllowed,
 				&idpTemplate.IsAutoCreation,
 				&idpTemplate.IsAutoUpdate,
+				&idpTemplate.AutoLinking,
 				// oauth
 				&oauthID,
 				&oauthClientID,
@@ -1103,6 +1144,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&samlCertificate,
 				&samlBinding,
 				&samlWithSignedRequest,
+				&samlNameIDFormat,
+				&samlTransientMappingAttributeName,
 				// ldap
 				&ldapID,
 				&ldapServers,
@@ -1231,12 +1274,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 			if samlID.Valid {
 				idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
-					IDPID:             samlID.String,
-					Metadata:          samlMetadata,
-					Key:               samlKey,
-					Certificate:       samlCertificate,
-					Binding:           samlBinding.String,
-					WithSignedRequest: samlWithSignedRequest.Bool,
+					IDPID:                         samlID.String,
+					Metadata:                      samlMetadata,
+					Key:                           samlKey,
+					Certificate:                   samlCertificate,
+					Binding:                       samlBinding.String,
+					WithSignedRequest:             samlWithSignedRequest.Bool,
+					NameIDFormat:                  samlNameIDFormat,
+					TransientMappingAttributeName: samlTransientMappingAttributeName.String,
 				}
 			}
 			if ldapID.Valid {
@@ -1298,6 +1343,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			IDPTemplateAutoLinkingCol.identifier(),
 			// oauth
 			OAuthIDCol.identifier(),
 			OAuthClientIDCol.identifier(),
@@ -1363,6 +1409,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
 			SAMLWithSignedRequestCol.identifier(),
+			SAMLNameIDFormatCol.identifier(),
+			SAMLTransientMappingAttributeNameCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -1482,6 +1530,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				var samlCertificate []byte
 				samlBinding := sql.NullString{}
 				samlWithSignedRequest := sql.NullBool{}
+				samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
+				samlTransientMappingAttributeName := sql.NullString{}
 
 				ldapID := sql.NullString{}
 				ldapServers := database.TextArray[string]{}
@@ -1528,6 +1578,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&idpTemplate.IsLinkingAllowed,
 					&idpTemplate.IsAutoCreation,
 					&idpTemplate.IsAutoUpdate,
+					&idpTemplate.AutoLinking,
 					// oauth
 					&oauthID,
 					&oauthClientID,
@@ -1593,6 +1644,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&samlCertificate,
 					&samlBinding,
 					&samlWithSignedRequest,
+					&samlNameIDFormat,
+					&samlTransientMappingAttributeName,
 					// ldap
 					&ldapID,
 					&ldapServers,
@@ -1720,12 +1773,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				}
 				if samlID.Valid {
 					idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
-						IDPID:             samlID.String,
-						Metadata:          samlMetadata,
-						Key:               samlKey,
-						Certificate:       samlCertificate,
-						Binding:           samlBinding.String,
-						WithSignedRequest: samlWithSignedRequest.Bool,
+						IDPID:                         samlID.String,
+						Metadata:                      samlMetadata,
+						Key:                           samlKey,
+						Certificate:                   samlCertificate,
+						Binding:                       samlBinding.String,
+						WithSignedRequest:             samlWithSignedRequest.Bool,
+						NameIDFormat:                  samlNameIDFormat,
+						TransientMappingAttributeName: samlTransientMappingAttributeName.String,
 					}
 				}
 				if ldapID.Valid {

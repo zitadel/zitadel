@@ -27,8 +27,8 @@ type querier interface {
 	eventQuery(useV1 bool) string
 	maxSequenceQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
-	db() *database.DB
-	orderByEventSequence(desc, useV1 bool) string
+	Client() *database.DB
+	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
 	dialect.Database
 }
 
@@ -59,6 +59,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	if err != nil {
 		return err
 	}
+
 	query, rowScanner := prepareColumns(criteria, q.Columns, useV1)
 	where, values := prepareConditions(criteria, q, useV1)
 	if where == "" || query == "" {
@@ -78,10 +79,20 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		q.Desc = true
 	}
 
+	// if there is only one subquery we can optimize the query ordering by ordering by sequence
+	var shouldOrderBySequence bool
+	if len(q.SubQueries) == 1 {
+		for _, filter := range q.SubQueries[0] {
+			if filter.Field == repository.FieldAggregateID {
+				shouldOrderBySequence = filter.Operation == repository.OperationEquals
+			}
+		}
+	}
+
 	switch q.Columns {
 	case eventstore.ColumnsEvent,
 		eventstore.ColumnsMaxSequence:
-		query += criteria.orderByEventSequence(q.Desc, useV1)
+		query += criteria.orderByEventSequence(q.Desc, shouldOrderBySequence, useV1)
 	}
 
 	if q.Limit > 0 {
@@ -99,7 +110,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	var contextQuerier interface {
 		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
 	}
-	contextQuerier = criteria.db()
+	contextQuerier = criteria.Client()
 	if q.Tx != nil {
 		contextQuerier = &tx{Tx: q.Tx}
 	}
@@ -220,8 +231,8 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 	}
 }
 
-func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (string, []any) {
-	clauses, args := prepareQuery(criteria, useV1, query.InstanceID, query.ExcludedInstances)
+func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (_ string, args []any) {
+	clauses, args := prepareQuery(criteria, useV1, query.InstanceID, query.InstanceIDs, query.ExcludedInstances)
 	if clauses != "" && len(query.SubQueries) > 0 {
 		clauses += " AND "
 	}

@@ -4,7 +4,7 @@
       <cnsl-refresh-table
         [loading]="dataSource.loading$ | async"
         *ngIf="projectId"
-        (refreshed)="loadGrantsPage()"
+        (refreshed)="refreshPage()"
         [dataSize]="dataSource.totalResult"
         [selection]="selection"
         [timestamp]="dataSource.viewTimestamp"
@@ -104,7 +104,7 @@
                   class="state"
                   [ngClass]="{
                     active: grant.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE,
-                    inactive: grant.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE
+                    inactive: grant.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE,
                   }"
                 >
                   {{ 'PROJECT.GRANT.STATES.' + grant.state | translate }}
@@ -154,11 +154,11 @@
         <cnsl-paginator
           class="paginator"
           #paginator
-          [pageSize]="50"
+          [pageSize]="INITIAL_PAGESIZE"
           [timestamp]="dataSource.viewTimestamp"
           [pageSizeOptions]="[25, 50, 100, 250]"
           [length]="dataSource.totalResult"
-          (page)="loadGrantsPage($event.pageIndex, $event.pageSize)"
+          (page)="loadGrantsPage($event)"
         >
         </cnsl-paginator>
       </cnsl-refresh-table>

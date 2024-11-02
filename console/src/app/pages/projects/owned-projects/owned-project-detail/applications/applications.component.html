@@ -65,7 +65,7 @@
             class="state"
             [ngClass]="{
               active: app.state === AppState.APP_STATE_ACTIVE,
-              inactive: app.state === AppState.APP_STATE_INACTIVE
+              inactive: app.state === AppState.APP_STATE_INACTIVE,
             }"
           >
             {{ 'APP.PAGES.DETAIL.STATE.' + app?.state | translate }}

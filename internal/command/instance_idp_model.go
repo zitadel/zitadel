@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -61,7 +62,7 @@ func (wm *InstanceOAuthIDPWriteModel) NewChangedEvent(
 	name,
 	clientID,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	authorizationEndpoint,
 	tokenEndpoint,
 	userEndpoint,
@@ -171,7 +172,7 @@ func (wm *InstanceOIDCIDPWriteModel) NewChangedEvent(
 	issuer,
 	clientID,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping bool,
 	options idp.Options,
@@ -344,7 +345,7 @@ func (wm *InstanceAzureADIDPWriteModel) NewChangedEvent(
 	name,
 	clientID,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	tenant string,
 	isEmailVerified bool,
@@ -420,7 +421,7 @@ func (wm *InstanceGitHubIDPWriteModel) NewChangedEvent(
 	name,
 	clientID string,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) (*instance.GitHubIDPChangedEvent, error) {
@@ -485,7 +486,7 @@ func (wm *InstanceGitHubEnterpriseIDPWriteModel) NewChangedEvent(
 	name,
 	clientID string,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	authorizationEndpoint,
 	tokenEndpoint,
 	userEndpoint string,
@@ -563,7 +564,7 @@ func (wm *InstanceGitLabIDPWriteModel) NewChangedEvent(
 	name,
 	clientID string,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) (*instance.GitLabIDPChangedEvent, error) {
@@ -629,7 +630,7 @@ func (wm *InstanceGitLabSelfHostedIDPWriteModel) NewChangedEvent(
 	issuer,
 	clientID string,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) (*instance.GitLabSelfHostedIDPChangedEvent, error) {
@@ -695,7 +696,7 @@ func (wm *InstanceGoogleIDPWriteModel) NewChangedEvent(
 	name,
 	clientID,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) (*instance.GoogleIDPChangedEvent, error) {
@@ -767,7 +768,7 @@ func (wm *InstanceLDAPIDPWriteModel) NewChangedEvent(
 	userObjectClasses []string,
 	userFilters []string,
 	timeout time.Duration,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
 ) (*instance.LDAPIDPChangedEvent, error) {
@@ -848,7 +849,7 @@ func (wm *InstanceAppleIDPWriteModel) NewChangedEvent(
 	teamID,
 	keyID string,
 	privateKey []byte,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) (*instance.AppleIDPChangedEvent, error) {
@@ -912,9 +913,11 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 	metadata,
 	key,
 	certificate []byte,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
+	nameIDFormat *domain.SAMLNameIDFormat,
+	transientMappingAttributeName string,
 	options idp.Options,
 ) (*instance.SAMLIDPChangedEvent, error) {
 	changes, err := wm.SAMLIDPWriteModel.NewChanges(
@@ -925,6 +928,8 @@ func (wm *InstanceSAMLIDPWriteModel) NewChangedEvent(
 		secretCrypto,
 		binding,
 		withSignedRequest,
+		nameIDFormat,
+		transientMappingAttributeName,
 		options,
 	)
 	if err != nil || len(changes) == 0 {

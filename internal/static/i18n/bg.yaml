@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимитът не е намерен
     NoneSpecified: Не са посочени лимити
+    Instance:
+      Blocked: Инстанцията е блокирана
   Restrictions:
     NoneSpecified: Не са посочени ограничения
     DefaultLanguageMustBeAllowed: Езикът по подразбиране трябва да бъде разрешен
@@ -51,16 +53,29 @@ Errors:
     NotFound: SMS конфигурацията не е намерена
     AlreadyActive: SMS конфигурацията вече е активна
     AlreadyDeactivated: SMS конфигурацията вече е деактивирана
+  SMTP:
+    NotEmailMessage: съобщението не е имейл съобщение
+    RequiredAttributes: темата, получателите и съдържанието трябва да бъдат зададени, но някои или всички са празни
+    CouldNotSplit: не можа да раздели хост и порт за свързване към smtp
+    CouldNotDial: не може да се свърже със SMTP сървъра, проверете порта, проблеми със защитната стена...
+    CouldNotDialTLS: не може да се свърже със SMTP сървъра чрез TLS, проверете порта, проблеми със защитната стена...
+    CouldNotCreateClient: не може да създаде smtp клиент
+    CouldNotStartTLS: не можа да стартира TLS
+    CouldNotAuth: не може да добави smtp auth, проверете дали потребителят и паролата ви са правилни, ако са правилни, може би вашият доставчик изисква метод за удостоверяване, който не се поддържа от ZITADEL
+    CouldNotSetSender: не можа да зададе подател
+    CouldNotSetRecipient: не можа да зададе получател
   SMTPConfig:
+    TestPassword: Паролата за тест не е намерена
     NotFound: SMTP конфигурацията не е намерена
     AlreadyExists: SMTP конфигурация вече съществува
+    AlreadyDeactivated: SMTP конфигурацията вече е деактивирана
     SenderAdressNotCustomDomain: >-
       Адресът на изпращача трябва да бъде конфигуриран като персонализиран
       домейн в екземпляра.
+    TestEmailNotFound: Имейл адресът за теста не е намерен
   Notification:
     NoDomain: Няма намерен домейн за съобщение
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Потребителят не може да бъде намерен
     AlreadyExists: Вече съществува потребител
     NotFoundOnOrg: Потребителят не може да бъде намерен в избраната организация
@@ -109,6 +124,7 @@ Errors:
       Key:
         NotFound: Машинният ключ не е намерен
         AlreadyExisting: Машинният ключ вече съществува
+        Invalid: Публичният ключ не е валиден RSA публичен ключ във формат PKIX с PEM кодиране
       Secret:
         NotExisting: Тайната не съществува
         Invalid: Тайната е невалидна
@@ -128,13 +144,14 @@ Errors:
       NotFound: Кодът не е намерен
       Expired: Кодът е изтекъл
       GeneratorAlgNotSupported: Неподдържан генераторен алгоритъм
+      Invalid: кодът е невалиден
     Password:
       NotFound: Паролата не е намерена
       Empty: Паролата е празна
       Invalid: Паролата е невалидна
       NotSet: Потребителят не е задал парола
       NotChanged: Новата парола не може да съвпада с текущата парола
-      NotSupported: Хеш кодирането на паролата не се поддържа
+      NotSupported: Хеш кодирането на паролата не се поддържа. Вижте https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Политиката за парола не е намерена
       MinLength: Паролата е твърде кратка
@@ -327,7 +344,7 @@ Errors:
       NotActive: Грантът по проекта не е активен
       NotInactive: Грантът по проекта не е неактивен
   IAM:
-    NotFound: Екземплярът не е намерен. Вижте https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM не е намерен. Уверете се, че сте получили правилния домейн. Вижте https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Ролите не са сменени
     MemberInvalid: Членът е невалиден
@@ -480,6 +497,7 @@ Errors:
     NotActive: Действието не е активно
     NotInactive: Действието не е неактивно
     MaxAllowed: Не са разрешени допълнителни активни действия
+    NotEnabled: Функцията „Действие“ не е активирана
   Flow:
     FlowTypeMissing: Липсва FlowType
     Empty: Потокът вече е празен
@@ -490,6 +508,8 @@ Errors:
     CloseRows: SQL изразът не можа да бъде завършен
     SQLStatement: SQL изразът не може да бъде създаден
     InvalidRequest: Заявката е невалидна
+    TooManyNestingLevels: Твърде много нива на влагане на заявката (макс. 20)
+    LimitExceeded: Ограничението на заявката е превишено
   Quota:
     AlreadyExists: Вече съществува квота за тази единица
     NotFound: Не е намерена квота за тази единица
@@ -528,6 +548,7 @@ Errors:
     IDPMissing: IDP липсва в заявката
     IDPInvalid: IDP невалиден за заявката
     ResponseInvalid: Отговорът на IDP е невалиден
+    MissingSingleMappingAttribute: Не съдържа атрибута за съпоставяне или има повече от една стойност
     SuccessURLMissing: В заявката липсва URL адрес за успех
     FailureURLMissing: В заявката липсва URL адрес за грешка
     StateMissing: В заявката липсва параметър състояние
@@ -549,6 +570,52 @@ Errors:
     NotExisting: Функцията не съществува
     TypeNotSupported: Типът функция не се поддържа
     InvalidValue: Невалидна стойност за тази функция
+  Target:
+    Invalid: Целта е невалидна
+    NoTimeout: Целта няма време за изчакване
+    InvalidURL: Целта има невалиден URL адрес
+    NotFound: Целта не е намерена
+  Execution:
+    ConditionInvalid: Условието за изпълнение е невалидно
+    Invalid: Изпълнението е невалидно
+    NotFound: Изпълнението не е намерено
+    IncludeNotFound: Включването не е намерено
+    NoTargets: Няма определени цели
+    Failed: неуспешно изпълнение
+    ResponseIsNotValidJSON: Отговорът не е валиден JSON
+  UserSchema:
+    NotEnabled: Функцията „Потребителска схема“ не е активирана
+    Type:
+      Missing: Липсва тип потребителска схема
+      AlreadyExists: Типът потребителска схема вече съществува
+    Authenticator:
+      Invalid: Невалиден тип удостоверител
+    NotActive: Потребителската схема не е активна
+    NotInactive: Потребителската схема не е неактивна
+    NotExists: Потребителската схема не съществува
+    ID:
+      Missing: Липсва идентификатор на потребителска схема
+    Invalid: Потребителската схема е невалидна
+    Data:
+      Invalid: Невалидни данни за потребителска схема
+  TokenExchange:
+    FeatureDisabled: Функцията Token Exchange е деактивирана за вашето копие. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Токенът липсва
+      Invalid: Токенът е невалиден
+      TypeMissing: Липсва тип токен
+      TypeNotAllowed: Типът токен не е разрешен
+      TypeNotSupported: Типът токен не се поддържа
+      NotForAPI: Имитирани токени не са разрешени за API
+    Impersonation:
+      PolicyDisabled: Имитирането е деактивирано в политиката за сигурност на екземпляра
+  WebKey:
+    ActiveDelete: Не може да се изтрие активен уеб ключ
+    Config: Невалидна конфигурация на уеб ключ
+    Duplicate: ID на уеб ключ не е уникален
+    FeatureDisabled: Ключовата уеб функция е деактивирана
+    NoActive: Не е намерен активен уеб ключ
+    NotFound: Уеб ключът не е намерен
 
 AggregateTypes:
   action: Действие
@@ -560,8 +627,28 @@ AggregateTypes:
   usergrant: Предоставяне на потребител
   quota: Квота
   feature: Особеност
+  target: Целта
+  execution: Екзекуция
+  user_schema: Потребителска схема
+  auth_request: Заявка за удостоверяване
+  device_auth: Устройство за удостоверяване
+  idpintent: IDP Intent
+  limits: Ограничения
+  milestone: Етап
+  oidc_session: OIDC сесия
+  restrictions: Ограничения
+  system: Система
+  session: Сесия
+  web_key: Уеб ключ
 
 EventTypes:
+  execution:
+    set: Комплект за изпълнение
+    removed: Изпълнението е изтрито
+  target:
+    added: Целта е създадена
+    changed: Целта е променена
+    removed: Целта е изтрита
   user:
     added: Добавен потребител
     selfregistered: Потребителят се регистрира сам
@@ -574,7 +661,9 @@ EventTypes:
         failed: Проверката на инициализацията е неуспешна
     token:
       added: Токенът за достъп е създаден
+      v2.added: Токенът за достъп е създаден
       removed: Токенът за достъп е премахнат
+    impersonated: Имитиран потребител
     username:
       reserved: Потребителското име е запазено
       released: Потребителското име е освободено
@@ -597,6 +686,7 @@ EventTypes:
         removed: Ключът е премахнат
       secret:
         set: Секретен комплект
+        updated: Тайният хеш е актуализиран
         removed: Тайната е премахната
         check:
           succeeded: Тайната проверка е успешна
@@ -614,6 +704,13 @@ EventTypes:
         check:
           succeeded: Проверката за инициализация е успешна
           failed: Проверката на инициализацията е неуспешна
+      invite:
+        code:
+          added: Генериран е код за покана
+          sent: Изпратен е код за покана
+        check:
+          succeeded: Проверката на поканата е успешна
+          failed: Проверката на поканата е неуспешна
       username:
         reserved: Потребителското име е запазено
         released: Потребителското име е освободено
@@ -974,6 +1071,14 @@ EventTypes:
             succeeded: Проверката на OIDC Client Secret е успешна
             failed: Проверката на OIDC Client Secret е неуспешна
         key:
+          added: Добавен е ключ за приложение OIDC
+          removed: Отстранен ключ за приложение OIDC
+      api:
+        secret:
+          check:
+            succeeded: Тайната проверка на API е успешна
+            failed: Тайната проверка на API е неуспешна
+        key:
           added: Добавен ключ за приложение
           removed: Ключът на приложението е премахнат
       config:
@@ -985,11 +1090,13 @@ EventTypes:
           changed: Конфигурацията на OIDC е променена
           secret:
             changed: Тайната на OIDC е променена
+            updated: Тайният хеш на OIDC е актуализиран
         api:
           added: Добавена е конфигурация на API
           changed: Променена конфигурация на API
           secret:
             changed: Тайната на API е променена
+            updated: Тайният хеш на API е актуализиран
   policy:
     password:
       complexity:
@@ -1088,6 +1195,9 @@ EventTypes:
       config:
         added: Добавена е SMTP конфигурация
         changed: SMTP конфигурацията е променена
+        activated: SMTP конфигурацията е активирана
+        deactivated: SMTP конфигурацията е деактивирана
+        removed: Премахната SMTP конфигурация
         password:
           changed: Тайната на конфигурацията на SMTP е променена
     sms:
@@ -1242,9 +1352,43 @@ EventTypes:
       config:
         added: Добавена е SMTP конфигурация
         changed: SMTP конфигурацията е променена
+        activated: SMTP конфигурацията е активирана
+        deactivated: SMTP конфигурацията е деактивирана
         password:
           changed: Паролата на SMTP конфигурацията е променена
         removed: Премахната SMTP конфигурация
+  user_schema:
+    created: Създадена е потребителска схема
+    updated: Потребителската схема е актуализирана
+    deactivated: Потребителската схема е деактивирана
+    reactivated: Потребителската схема е активирана отново
+    deleted: Потребителската схема е изтрита
+    user:
+      created: Потребител е създаден
+      updated: Потребителят е актуализиран
+      deleted: Потребителят е изтрит
+      email:
+        updated: Имейл адресът е променен
+        verified: Имейл адресът е потвърден
+        verification:
+          failed: Проверката на имейл адреса не бе успешна
+        code:
+          added: Генериран код за потвърждение на имейл адрес
+          sent: Кодът за потвърждение на имейл адреса е изпратен
+      phone:
+        updated: Телефонният номер е променен
+        verified: Телефонният номер е потвърден
+        verification:
+          failed: Неуспешна проверка на телефонния номер
+        code:
+          added: Генериран код за потвърждение на телефонен номер
+          sent: Кодът за потвърждение на телефонния номер е изпратен
+  web_key:
+    added: Добавен уеб ключ
+    activated: Уеб ключът е активиран
+    deactivated: Уеб ключът е деактивиран
+    removed: Уеб ключът е премахнат
+
 Application:
   OIDC:
     UnsupportedVersion: Вашата OIDC версия не се поддържа

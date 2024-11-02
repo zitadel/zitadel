@@ -32,15 +32,17 @@ Password:
   Title: 密码
   Description: 输入您的登录数据。
   PasswordLabel: 密码
-  MinLength: 密码
-  HasUppercase: 大写字母
-  HasLowercase: 小写字母
-  HasNumber: 数字
-  HasSymbol: 符号
-  Confirmation: 确认匹配
-  ResetLinkText: 重设密码
-  BackButtonText: 后退
-  NextButtonText: 继续
+  MinLength: 必须至少有
+  MinLengthp2: 个字符。
+  MaxLength: 必须少于70个字符。
+  HasUppercase: 必须包含一个大写字母。
+  HasLowercase: 必须包含一个小写字母。
+  HasNumber: 必须包含一个数字。
+  HasSymbol: 必须包含一个符号。
+  Confirmation: 密码确认匹配。
+  ResetLinkText: 重置密码
+  BackButtonText: 返回
+  NextButtonText: 下一步
 
 UsernameChange:
   Title: 更改用户名
@@ -84,10 +86,19 @@ InitUserDone:
   NextButtonText: 继续
   CancelButtonText: 取消
 
+InviteUser:
+  Title: 激活用户
+  Description: 使用以下代码验证您的电子邮件并设置您的密码。
+  CodeLabel: 代码
+  NewPasswordLabel: 新密码
+  NewPasswordConfirm: 确认密码
+  NextButtonText: 下一步
+  ResendButtonText: 重新发送代码
+
 InitMFAPrompt:
   Title: 两步验证设置
   Description: 两步验证为您的账户提供了额外的安全保障。这确保只有你能访问你的账户。
-  Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
+  Provider0: 软件应用（如 Google/Microsoft Authenticator、Authy）
   Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
   Provider3: 一次性密码短信
   Provider4: 一次性密码电子邮件
@@ -188,6 +199,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: 更改密码
   Description: 更改您的密码。输入您的旧密码和新密码。
+  ExpiredDescription: 您的密码已过期，需要更改。请输入您的新旧密码。
   OldPasswordLabel: 旧密码
   NewPasswordLabel: 新密码
   NewPasswordConfirmLabel: 确认密码
@@ -249,6 +261,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -288,6 +303,9 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -325,6 +343,12 @@ LogoutDone:
   Description: 您已成功退出登录。
   LoginButtonText: 登录
 
+LinkingUserPrompt:
+  Title: 已找到现有用户
+  Description: "您想关联您现有的帐户吗:"
+  LinkButtonText: 关联
+  OtherButtonText: 其他选项
+
 LinkingUsersDone:
   Title: 用户链接
   Description: 用户链接完成。
@@ -355,6 +379,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
   Title: 设备授权
   UserCode:
@@ -474,6 +501,7 @@ Errors:
       NoExternalUserData: 未收到外部用户数据
       CreationNotAllowed: 不允许在该供应商上创建新用户
       LinkingNotAllowed: 在此提供者上不允许链接一个用户
+      NoOptionAllowed: 此提供商不允许创建或链接。请联系您的管理员。
     GrantRequired: 无法登录，用户需要在应用程序上拥有至少一项授权，请联系您的管理员。
     ProjectRequired: 无法登录，用户的组织必须授予项目，请联系您的管理员。
   IdentityProvider:

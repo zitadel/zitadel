@@ -112,7 +112,7 @@ message EmailQuery {
     string email = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
+            description: "email address of the user"
             max_length: 200;
             example: "\"gigi@zitadel.com\"";
         }

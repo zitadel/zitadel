@@ -11,14 +11,15 @@ type limitsWriteModel struct {
 	eventstore.WriteModel
 	rollingAggregateID string
 	auditLogRetention  *time.Duration
+	block              *bool
 }
 
 // newLimitsWriteModel aggregateId is filled by reducing unit matching events
-func newLimitsWriteModel(instanceId, resourceOwner string) *limitsWriteModel {
+func newLimitsWriteModel(instanceId string) *limitsWriteModel {
 	return &limitsWriteModel{
 		WriteModel: eventstore.WriteModel{
 			InstanceID:    instanceId,
-			ResourceOwner: resourceOwner,
+			ResourceOwner: instanceId,
 		},
 	}
 }
@@ -46,9 +47,13 @@ func (wm *limitsWriteModel) Reduce() error {
 			if e.AuditLogRetention != nil {
 				wm.auditLogRetention = e.AuditLogRetention
 			}
+			if e.Block != nil {
+				wm.block = e.Block
+			}
 		case *limits.ResetEvent:
 			wm.rollingAggregateID = ""
 			wm.auditLogRetention = nil
+			wm.block = nil
 		}
 	}
 	if err := wm.WriteModel.Reduce(); err != nil {
@@ -68,6 +73,9 @@ func (wm *limitsWriteModel) NewChanges(setLimits *SetLimits) (changes []limits.L
 	changes = make([]limits.LimitsChange, 0, 1)
 	if setLimits.AuditLogRetention != nil && (wm.auditLogRetention == nil || *wm.auditLogRetention != *setLimits.AuditLogRetention) {
 		changes = append(changes, limits.ChangeAuditLogRetention(setLimits.AuditLogRetention))
+	}
+	if setLimits.Block != nil && (wm.block == nil || *wm.block != *setLimits.Block) {
+		changes = append(changes, limits.ChangeBlock(setLimits.Block))
 	}
 	return changes
 }

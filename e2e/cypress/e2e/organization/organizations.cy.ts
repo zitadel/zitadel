@@ -18,17 +18,19 @@ describe('organizations', () => {
   describe('add and delete org', () => {
     it('should create an org', () => {
       cy.visit(orgsPathCreate);
-      cy.get('[data-e2e="org-name-input"]').focus().clear().type(newOrg);
+      cy.get('[data-e2e="org-name-input"]').focus().clear().should('be.enabled').type(newOrg);
       cy.get('[data-e2e="create-org-button"]').click();
       cy.contains('tr', newOrg);
     });
 
     it('should delete an org', () => {
       cy.visit(orgsPath);
+      cy.wait(2000);
       cy.contains('tr', newOrg).click();
+      cy.wait(1000);
       cy.get('[data-e2e="actions"]').click();
       cy.get('[data-e2e="delete"]', { timeout: 1000 }).should('be.visible').click();
-      cy.get('[data-e2e="confirm-dialog-input"]').focus().clear().type(newOrg);
+      cy.get('[data-e2e="confirm-dialog-input"]').focus().clear().should('be.enabled').type(newOrg);
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.shouldConfirmSuccess();
       cy.contains('tr', newOrg).should('not.exist');
@@ -47,7 +49,7 @@ describe('organizations', () => {
       cy.get('[data-e2e="actions"]').click();
       cy.get('[data-e2e="rename"]', { timeout: 1000 }).should('be.visible').click();
 
-      cy.get('[data-e2e="name"]').focus().clear().type(testOrgNameChange);
+      cy.get('[data-e2e="name"]').focus().clear().should('be.enabled').type(testOrgNameChange);
       cy.get('[data-e2e="dialog-submit"]').click();
       cy.shouldConfirmSuccess();
       cy.visit(orgPath);

@@ -6,39 +6,26 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
 	"math/big"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/cache"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/repository/action"
-	"github.com/zitadel/zitadel/internal/repository/authrequest"
-	"github.com/zitadel/zitadel/internal/repository/deviceauth"
-	"github.com/zitadel/zitadel/internal/repository/feature"
-	"github.com/zitadel/zitadel/internal/repository/idpintent"
-	instance_repo "github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/keypair"
-	"github.com/zitadel/zitadel/internal/repository/limits"
-	"github.com/zitadel/zitadel/internal/repository/milestone"
-	"github.com/zitadel/zitadel/internal/repository/oidcsession"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/internal/repository/restrictions"
-	"github.com/zitadel/zitadel/internal/repository/session"
-	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
-	usr_grant_repo "github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -50,9 +37,10 @@ type Commands struct {
 
 	jobs sync.WaitGroup
 
-	checkPermission    domain.PermissionCheck
-	newCode            cryptoCodeFunc
-	newCodeWithDefault cryptoCodeWithDefaultFunc
+	checkPermission             domain.PermissionCheck
+	newEncryptedCode            encrypedCodeFunc
+	newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+	newHashedSecret             hashedSecretFunc
 
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
@@ -66,8 +54,8 @@ type Commands struct {
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
-	userPasswordHasher              *crypto.PasswordHasher
-	codeAlg                         crypto.HashAlgorithm
+	userPasswordHasher              *crypto.Hasher
+	secretHasher                    *crypto.Hasher
 	machineKeySize                  int
 	applicationKeySize              int
 	domainVerificationAlg           crypto.EncryptionAlgorithm
@@ -78,6 +66,7 @@ type Commands struct {
 	defaultAccessTokenLifetime      time.Duration
 	defaultRefreshTokenLifetime     time.Duration
 	defaultRefreshTokenIdleLifetime time.Duration
+	phoneCodeVerifier               func(ctx context.Context, id string) (senders.CodeGenerator, error)
 
 	multifactors            domain.MultifactorConfigs
 	webauthnConfig          *webauthn_helper.Config
@@ -91,10 +80,26 @@ type Commands struct {
 	defaultSecretGenerators *SecretGenerators
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+	webKeyGenerator                func(keyID string, alg crypto.EncryptionAlgorithm, genConfig crypto.WebKeyConfig) (encryptedPrivate *crypto.CryptoValue, public *jose.JSONWebKey, err error)
+
+	GrpcMethodExisting     func(method string) bool
+	GrpcServiceExisting    func(method string) bool
+	ActionFunctionExisting func(function string) bool
+	EventExisting          func(event string) bool
+	EventGroupExisting     func(group string) bool
+
+	GenerateDomain func(instanceName, domain string) (string, error)
+
+	caches *Caches
+	// Store instance IDs where all milestones are reached (except InstanceDeleted).
+	// These instance's milestones never need to be invalidated,
+	// so the query and cache overhead can completely eliminated.
+	milestonesCompleted sync.Map
 }
 
 func StartCommands(
 	es *eventstore.Eventstore,
+	cachesConfig *cache.CachesConfig,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
@@ -117,6 +122,19 @@ func StartCommands(
 	idGenerator := id.SonyFlakeGenerator()
 	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
 	sessionAlg := oidcEncryption
+
+	secretHasher, err := defaults.SecretHasher.NewHasher()
+	if err != nil {
+		return nil, fmt.Errorf("secret hasher: %w", err)
+	}
+	userPasswordHasher, err := defaults.PasswordHasher.NewHasher()
+	if err != nil {
+		return nil, fmt.Errorf("password hasher: %w", err)
+	}
+	caches, err := startCaches(context.TODO(), cachesConfig, es.Client())
+	if err != nil {
+		return nil, fmt.Errorf("caches: %w", err)
+	}
 	repo = &Commands{
 		eventstore:                      es,
 		static:                          staticStore,
@@ -134,58 +152,49 @@ func StartCommands(
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
 		userEncryption:                  userEncryption,
+		userPasswordHasher:              userPasswordHasher,
+		secretHasher:                    secretHasher,
+		machineKeySize:                  int(defaults.SecretGenerators.MachineKeySize),
+		applicationKeySize:              int(defaults.SecretGenerators.ApplicationKeySize),
 		domainVerificationAlg:           domainVerificationEncryption,
+		domainVerificationGenerator:     crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
+		domainVerificationValidator:     api_http.ValidateDomain,
 		keyAlgorithm:                    oidcEncryption,
 		certificateAlgorithm:            samlEncryption,
 		webauthnConfig:                  webAuthN,
 		httpClient:                      httpClient,
 		checkPermission:                 permissionCheck,
-		newCode:                         newCryptoCode,
-		newCodeWithDefault:              newCryptoCodeWithDefaultConfig,
+		newEncryptedCode:                newEncryptedCode,
+		newEncryptedCodeWithDefault:     newEncryptedCodeWithDefaultConfig,
 		sessionTokenCreator:             sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:            sessionTokenVerifier,
 		defaultAccessTokenLifetime:      defaultAccessTokenLifetime,
 		defaultRefreshTokenLifetime:     defaultRefreshTokenLifetime,
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
 		defaultSecretGenerators:         defaultSecretGenerators,
-		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.Size),
-	}
-
-	instance_repo.RegisterEventMappers(repo.eventstore)
-	org.RegisterEventMappers(repo.eventstore)
-	usr_repo.RegisterEventMappers(repo.eventstore)
-	usr_grant_repo.RegisterEventMappers(repo.eventstore)
-	proj_repo.RegisterEventMappers(repo.eventstore)
-	keypair.RegisterEventMappers(repo.eventstore)
-	action.RegisterEventMappers(repo.eventstore)
-	quota.RegisterEventMappers(repo.eventstore)
-	limits.RegisterEventMappers(repo.eventstore)
-	restrictions.RegisterEventMappers(repo.eventstore)
-	session.RegisterEventMappers(repo.eventstore)
-	idpintent.RegisterEventMappers(repo.eventstore)
-	authrequest.RegisterEventMappers(repo.eventstore)
-	oidcsession.RegisterEventMappers(repo.eventstore)
-	milestone.RegisterEventMappers(repo.eventstore)
-	feature.RegisterEventMappers(repo.eventstore)
-	deviceauth.RegisterEventMappers(repo.eventstore)
-
-	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
-	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
-	if err != nil {
-		return nil, err
-	}
-	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
-	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
-
-	repo.multifactors = domain.MultifactorConfigs{
-		OTP: domain.OTPConfig{
-			CryptoMFA: otpEncryption,
-			Issuer:    defaults.Multifactors.OTP.Issuer,
+		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
+		webKeyGenerator:                 crypto.GenerateEncryptedWebKey,
+		// always true for now until we can check with an eventlist
+		EventExisting: func(event string) bool { return true },
+		// always true for now until we can check with an eventlist
+		EventGroupExisting:     func(group string) bool { return true },
+		GrpcServiceExisting:    func(service string) bool { return false },
+		GrpcMethodExisting:     func(method string) bool { return false },
+		ActionFunctionExisting: domain.FunctionExists(),
+		multifactors: domain.MultifactorConfigs{
+			OTP: domain.OTPConfig{
+				CryptoMFA: otpEncryption,
+				Issuer:    defaults.Multifactors.OTP.Issuer,
+			},
 		},
+		GenerateDomain: domain.NewGeneratedInstanceDomain,
+		caches:         caches,
 	}
 
-	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
-	repo.domainVerificationValidator = api_http.ValidateDomain
+	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
+		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
+	}
+	repo.phoneCodeVerifier = repo.phoneCodeVerifierFromConfig
 	return repo, nil
 }
 
@@ -196,11 +205,28 @@ type AppendReducer interface {
 }
 
 func (c *Commands) pushAppendAndReduce(ctx context.Context, object AppendReducer, cmds ...eventstore.Command) error {
+	if len(cmds) == 0 {
+		return nil
+	}
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return err
 	}
 	return AppendAndReduce(object, events...)
+}
+
+type AppendReducerDetails interface {
+	AppendEvents(...eventstore.Event)
+	// TODO: Why is it allowed to return an error here?
+	Reduce() error
+	GetWriteModel() *eventstore.WriteModel
+}
+
+func (c *Commands) pushAppendAndReduceDetails(ctx context.Context, object AppendReducerDetails, cmds ...eventstore.Command) (*domain.ObjectDetails, error) {
+	if err := c.pushAppendAndReduce(ctx, object, cmds...); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(object.GetWriteModel()), nil
 }
 
 func AppendAndReduce(object AppendReducer, events ...eventstore.Event) error {
@@ -233,7 +259,7 @@ func exists(ctx context.Context, filter preparation.FilterToQueryReducer, wm exi
 	return wm.Exists(), nil
 }
 
-func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte, error) {
+func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id string) ([]byte, []byte, error) {
 	return func(id string) ([]byte, []byte, error) {
 		priv, pub, err := crypto.GenerateKeyPair(keySize)
 		if err != nil {
@@ -244,12 +270,15 @@ func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte
 		if err != nil {
 			return nil, nil, err
 		}
+		now := time.Now()
 		template := x509.Certificate{
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
 				SerialNumber: id,
 			},
+			NotBefore:             now,
+			NotAfter:              now.Add(lifetime),
 			KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 			ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			BasicConstraintsValid: true,
@@ -309,7 +338,7 @@ func (c *Commands) asyncPush(ctx context.Context, cmds ...eventstore.Command) {
 		_, err := c.eventstore.Push(localCtx, cmds...)
 		if err != nil {
 			for _, cmd := range cmds {
-				logging.WithError(err).Errorf("could not push event %q", cmd.Type())
+				logging.WithError(err).Warnf("could not push event %q", cmd.Type())
 			}
 		}
 

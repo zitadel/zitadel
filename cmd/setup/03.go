@@ -24,7 +24,9 @@ type FirstInstance struct {
 	Org             command.InstanceOrgSetup
 	MachineKeyPath  string
 	PatPath         string
-	Features        map[domain.Feature]any
+	Features        *command.InstanceFeatures
+
+	Skip bool
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
@@ -41,28 +43,20 @@ type FirstInstance struct {
 	domain            string
 }
 
-func (mig *FirstInstance) Execute(ctx context.Context) error {
-	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
-	if err != nil {
-		return fmt.Errorf("cannot start key storage: %w", err)
+func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
+	if mig.Skip {
+		return nil
 	}
-	if err = verifyKey(ctx, mig.userEncryptionKey, keyStorage); err != nil {
+	keyStorage, err := mig.verifyEncryptionKeys(ctx)
+	if err != nil {
 		return err
 	}
 	userAlg, err := crypto.NewAESCrypto(mig.userEncryptionKey, keyStorage)
 	if err != nil {
 		return err
 	}
-
-	if err = verifyKey(ctx, mig.smtpEncryptionKey, keyStorage); err != nil {
-		return err
-	}
 	smtpEncryption, err := crypto.NewAESCrypto(mig.smtpEncryptionKey, keyStorage)
 	if err != nil {
-		return err
-	}
-
-	if err = verifyKey(ctx, mig.oidcEncryptionKey, keyStorage); err != nil {
 		return err
 	}
 	oidcEncryption, err := crypto.NewAESCrypto(mig.oidcEncryptionKey, keyStorage)
@@ -71,6 +65,7 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 	}
 
 	cmd, err := command.StartCommands(mig.es,
+		nil,
 		mig.defaults,
 		mig.zitadelRoles,
 		nil,
@@ -132,7 +127,27 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 			(mig.instanceSetup.Org.Machine.MachineKey != nil && key == nil)) {
 		return err
 	}
+	return mig.outputMachineAuthentication(key, token)
+}
 
+func (mig *FirstInstance) verifyEncryptionKeys(ctx context.Context) (*crypto_db.Database, error) {
+	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot start key storage: %w", err)
+	}
+	if err = verifyKey(ctx, mig.userEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	if err = verifyKey(ctx, mig.smtpEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	if err = verifyKey(ctx, mig.oidcEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	return keyStorage, nil
+}
+
+func (mig *FirstInstance) outputMachineAuthentication(key *command.MachineKey, token string) error {
 	if key != nil {
 		keyDetails, err := key.Detail()
 		if err != nil {

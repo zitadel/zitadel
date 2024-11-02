@@ -59,3 +59,10 @@ PasswordChange:
   Greeting: Dobrý den, {{.DisplayName}},
   Text: Heslo vašeho uživatele bylo změněno. Pokud tato změna nebyla provedena Vámi pak doporučujeme okamžitě resetovat/změnit vaše heslo.
   ButtonText: Přihlásit se
+InviteUser:
+  Title: Pozvánka do {{.ApplicationName}}
+  PreHeader: Pozvánka do {{.ApplicationName}}
+  Subject: Pozvánka do {{.ApplicationName}}
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Váš uživatel byl pozván do {{.ApplicationName}}. Klikněte prosím na tlačítko níže, abyste dokončili proces pozvání. Pokud jste o tento e-mail nepožádali, prosím, ignorujte ho.
+  ButtonText: Přijmout pozvání

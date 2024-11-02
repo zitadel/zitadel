@@ -39,3 +39,20 @@ func fieldNameToInstanceDomainColumn(fieldName instance.DomainFieldName) query.C
 		return query.Column{}
 	}
 }
+
+func ListInstanceTrustedDomainsRequestToModel(req *admin_pb.ListInstanceTrustedDomainsRequest) (*query.InstanceTrustedDomainSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := instance_grpc.TrustedDomainQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.InstanceTrustedDomainSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: fieldNameToInstanceDomainColumn(req.SortingColumn),
+		},
+		Queries: queries,
+	}, nil
+}

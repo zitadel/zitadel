@@ -38,9 +38,9 @@ jobs:
       cache_path: ${{ env.cache_path }}
     steps:
         - 
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
         - 
-          uses: actions/cache/restore@v3
+          uses: actions/cache/restore@v4
           timeout-minutes: 1
           continue-on-error: true
           id: cache
@@ -59,7 +59,7 @@ jobs:
         - 
           # node to install sass
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v4
           with:
             node-version: ${{ inputs.node_version }}
         - 
@@ -68,7 +68,7 @@ jobs:
         
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          uses: actions/setup-go@v4
+          uses: actions/setup-go@v5
           with:
             go-version: ${{ inputs.go_version }}
         - 
@@ -76,7 +76,7 @@ jobs:
           run: make core_build
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          uses: actions/cache/save@v3
+          uses: actions/cache/save@v4
           with:
             key: ${{ steps.cache.outputs.cache-primary-key }}
             path: ${{ env.cache_path }}

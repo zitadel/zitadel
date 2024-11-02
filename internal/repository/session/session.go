@@ -4,10 +4,13 @@ import (
 	"context"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -75,9 +78,10 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type UserCheckedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID            string    `json:"userID"`
-	UserResourceOwner string    `json:"userResourceOwner"`
-	CheckedAt         time.Time `json:"checkedAt"`
+	UserID            string        `json:"userID"`
+	UserResourceOwner string        `json:"userResourceOwner"`
+	CheckedAt         time.Time     `json:"checkedAt"`
+	PreferredLanguage *language.Tag `json:"preferredLanguage,omitempty"`
 }
 
 func (e *UserCheckedEvent) Payload() interface{} {
@@ -94,6 +98,7 @@ func NewUserCheckedEvent(
 	userID,
 	userResourceOwner string,
 	checkedAt time.Time,
+	preferredLanguage *language.Tag,
 ) *UserCheckedEvent {
 	return &UserCheckedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -104,6 +109,7 @@ func NewUserCheckedEvent(
 		UserID:            userID,
 		UserResourceOwner: userResourceOwner,
 		CheckedAt:         checkedAt,
+		PreferredLanguage: preferredLanguage,
 	}
 }
 
@@ -318,6 +324,7 @@ type OTPSMSChallengedEvent struct {
 	Code              *crypto.CryptoValue `json:"code"`
 	Expiry            time.Duration       `json:"expiry"`
 	CodeReturned      bool                `json:"codeReturned,omitempty"`
+	GeneratorID       string              `json:"generatorId,omitempty"`
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
@@ -343,6 +350,7 @@ func NewOTPSMSChallengedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	codeReturned bool,
+	generatorID string,
 ) *OTPSMSChallengedEvent {
 	return &OTPSMSChallengedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -353,12 +361,15 @@ func NewOTPSMSChallengedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		GeneratorID:       generatorID,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
 type OTPSMSSentEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
 }
 
 func (e *OTPSMSSentEvent) Payload() interface{} {
@@ -376,6 +387,7 @@ func (e *OTPSMSSentEvent) SetBaseEvent(base *eventstore.BaseEvent) {
 func NewOTPSMSSentEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	generatorInfo *senders.CodeGeneratorInfo,
 ) *OTPSMSSentEvent {
 	return &OTPSMSSentEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -383,6 +395,7 @@ func NewOTPSMSSentEvent(
 			aggregate,
 			OTPSMSSentType,
 		),
+		GeneratorInfo: generatorInfo,
 	}
 }
 
@@ -463,7 +476,7 @@ func NewOTPEmailChallengedEvent(
 		Expiry:            expiry,
 		ReturnCode:        returnCode,
 		URLTmpl:           urlTmpl,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -646,6 +659,8 @@ func NewLifetimeSetEvent(
 
 type TerminateEvent struct {
 	eventstore.BaseEvent `json:"-"`
+
+	TriggerOrigin string `json:"triggerOrigin,omitempty"`
 }
 
 func (e *TerminateEvent) Payload() interface{} {

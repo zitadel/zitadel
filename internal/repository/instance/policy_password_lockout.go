@@ -19,7 +19,8 @@ type LockoutPolicyAddedEvent struct {
 func NewLockoutPolicyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	maxAttempts uint64,
+	maxPasswordAttempts,
+	maxOTPAttempts uint64,
 	showLockoutFailure bool,
 ) *LockoutPolicyAddedEvent {
 	return &LockoutPolicyAddedEvent{
@@ -28,7 +29,8 @@ func NewLockoutPolicyAddedEvent(
 				ctx,
 				aggregate,
 				LockoutPolicyAddedEventType),
-			maxAttempts,
+			maxPasswordAttempts,
+			maxOTPAttempts,
 			showLockoutFailure),
 	}
 }

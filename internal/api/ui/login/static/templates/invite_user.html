@@ -1,0 +1,63 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+    <h1>{{t "InviteUser.Title"}}</h1>
+
+    {{ template "user-profile" . }}
+
+    <p>{{t "InviteUser.Description"}}</p>
+</div>
+
+<form action="{{ inviteUserUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="userID" value="{{ .UserID }}" />
+    <input type="hidden" name="orgID" value="{{ .OrgID }}" />
+    <input type="text" name="loginName" value="{{if .DisplayLoginNameSuffix}}{{.LoginName}}{{else}}{{.UserName}}{{end}}" autocomplete="username" class="hidden" />
+
+    <div class="fields">
+        <div class="field">
+            <label class="lgn-label" for="code">{{t "InviteUser.CodeLabel"}}</label>
+            <input class="lgn-input" {{if .ErrMessage}}shake {{end}} type="text" id="code" name="code" value="{{.Code}}" autocomplete="one-time-code" autofocus
+                required>
+        </div>
+
+        <div class="field">
+            <label class="lgn-label" for="password">{{t "InviteUser.NewPasswordLabel"}}</label>
+            <input data-minlength="{{ .MinLength }}" data-has-uppercase="{{ .HasUppercase }}"
+                data-has-lowercase="{{ .HasLowercase }}" data-has-number="{{ .HasNumber }}"
+                data-has-symbol="{{ .HasSymbol }}" class="lgn-input" type="password" id="password" name="password"
+                autocomplete="new-password" autofocus required>
+        </div>
+        <div class="field">
+            <label class="lgn-label" for="passwordconfirm">{{t "InviteUser.NewPasswordConfirm"}}</label>
+            <input class="lgn-input" type="password" id="passwordconfirm" name="passwordconfirm"
+                autocomplete="new-password" autofocus required>
+            {{ template "password-complexity-policy-description" . }}
+        </div>
+    </div>
+
+    {{ template "error-message" .}}
+
+    <div class="lgn-actions lgn-reverse-order">
+        <!-- position element in header -->
+        <a class="lgn-icon-button lgn-left-action" href="{{ loginUrl }}">
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </a>
+
+        <button type="submit" id="init-button" name="resend" value="false"
+            class="lgn-primary lgn-raised-button">{{t "InviteUser.NextButtonText"}}</button>
+
+        <span class="fill-space"></span>
+
+        <button type="submit" name="resend" value="true" class="lgn-stroked-button" formnovalidate>{{t "InviteUser.ResendButtonText"}}</button>
+    </div>
+</form>
+
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/password_policy_check.js" }}"></script>
+<script src="{{ resourceUrl "scripts/init_password_check.js" }}"></script>
+
+{{template "main-bottom" .}}

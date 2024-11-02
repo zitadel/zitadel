@@ -18,7 +18,7 @@ func (l *Login) getOrgDomainPolicy(r *http.Request, orgID string) (*query.Domain
 }
 
 func (l *Login) getIDPByID(r *http.Request, id string) (*query.IDPTemplate, error) {
-	return l.query.IDPTemplateByID(r.Context(), false, id, false)
+	return l.query.IDPTemplateByID(r.Context(), false, id, false, nil)
 }
 
 func (l *Login) getLoginPolicy(r *http.Request, orgID string) (*query.LoginPolicy, error) {

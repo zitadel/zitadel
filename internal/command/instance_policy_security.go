@@ -10,9 +10,15 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) SetSecurityPolicy(ctx context.Context, enabled bool, allowedOrigins []string) (*domain.ObjectDetails, error) {
+type SecurityPolicy struct {
+	EnableIframeEmbedding bool
+	AllowedOrigins        []string
+	EnableImpersonation   bool
+}
+
+func (c *Commands) SetSecurityPolicy(ctx context.Context, policy *SecurityPolicy) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareSetSecurityPolicy(instanceAgg, enabled, allowedOrigins)
+	validation := c.prepareSetSecurityPolicy(instanceAgg, policy)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -28,14 +34,14 @@ func (c *Commands) SetSecurityPolicy(ctx context.Context, enabled bool, allowedO
 	}, nil
 }
 
-func (c *Commands) prepareSetSecurityPolicy(a *instance.Aggregate, enabled bool, allowedOrigins []string) preparation.Validation {
+func (c *Commands) prepareSetSecurityPolicy(a *instance.Aggregate, policy *SecurityPolicy) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := c.getSecurityPolicyWriteModel(ctx, filter)
 			if err != nil {
 				return nil, err
 			}
-			cmd, err := writeModel.NewSetEvent(ctx, &a.Aggregate, enabled, allowedOrigins)
+			cmd, err := writeModel.NewSetEvent(ctx, &a.Aggregate, policy)
 			if err != nil {
 				return nil, err
 			}

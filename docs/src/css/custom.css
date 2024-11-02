@@ -127,10 +127,18 @@
   --gigibannerforeground: black;
   --footer-border: rgba(0, 0, 0, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
+  --card-border-hover: #6c8eef;
   --ifm-pagination-nav-color-hover: #000000;
   --input-border: #1a191954;
   --input-hover-border: #000000;
   --input-background: #00000004;
+}
+
+.tile-wrapper {
+  margin: 0 -8px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 pre code {
@@ -232,11 +240,22 @@ pre code {
 }
 
 h1 {
-  font-size: 2.2rem;
+  font-size: 3rem;
 }
 
 h2 {
-  font-size: 1.8rem;
+  font-size: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+h3 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
 }
 
 .navbar__brand {
@@ -305,6 +324,7 @@ h2 {
   --gigibannerforeground: white;
   --footer-border: rgba(255, 255, 255, 0.12);
   --card-border: rgba(135, 149, 161, 0.2);
+  --card-border-hover: #ffffff;
   --ifm-pagination-nav-color-hover: #ffffff;
   --input-border: #f9f7f775;
   --input-hover-border: #ffffff;
@@ -563,4 +583,33 @@ p strong {
   background-color: var(--ifm-color-secondary-contrast-background);
   color: var(--ifm-color-secondary-contrast-foreground);
   border-color: var(--ifm-color-secondary-dark);
+}
+
+.hideondark {
+  display: block !important;
+}
+
+:root[data-theme="dark"] .hideondark {
+  display: none !important;
+}
+
+.hideonlight {
+  display: none !important;
+}
+
+:root[data-theme="dark"] .hideonlight {
+  display: block !important;
+}
+
+
+.player-wrapper {
+  position: relative;
+  padding-top: 56.25%; /* Player ratio: 100 / (1280 / 720) */
+  margin-bottom: 2rem;
+}
+
+.react-player {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

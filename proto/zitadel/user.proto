@@ -65,6 +65,8 @@ message Human {
     Profile profile = 1;
     Email email = 2;
     Phone phone = 3;
+    // The time the user last changed their password.
+    google.protobuf.Timestamp password_changed = 4;
 }
 
 message Machine {
@@ -108,7 +110,7 @@ message Profile {
     ];
     string display_name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "a user can set his display name, if nothing is set ZITADEL computes \"first_name last_name\""
+            description: "a user can set the display name, if nothing is set ZITADEL computes \"first_name last_name\""
             example: "\"Gigi Giraffe\"";
         }
     ];
@@ -140,7 +142,7 @@ message Email {
     ];
     bool is_email_verified = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Is true if the user verified his email or if the email is managed outside ZITADEL"
+            description: "Is true if the user verified the email or if the email is managed outside ZITADEL"
         }
     ];
 }
@@ -154,7 +156,7 @@ message Phone {
     ];
     bool is_phone_verified = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Is true if the user verified his phone or if the phone is managed outside ZITADEL"
+            description: "Is true if the user verified the phone or if the phone is managed outside ZITADEL"
         }
     ];
 }
@@ -311,7 +313,7 @@ message EmailQuery {
     string email_address = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
+            description: "email address of the user"
             max_length: 200;
             example: "\"gigi@zitadel.com\"";
         }
@@ -784,6 +786,21 @@ message UserGrant {
     Type user_type = 19 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "type of the user (human / machine)"
+        }
+    ];
+    string granted_org_id = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    string granted_org_name = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string granted_org_domain = 22 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\"";
         }
     ];
 }

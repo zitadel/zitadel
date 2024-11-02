@@ -3,7 +3,6 @@ package admin
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
@@ -46,68 +45,6 @@ func (s *Server) UpdateSecretGenerator(ctx context.Context, req *admin_pb.Update
 	}, nil
 }
 
-func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigRequest) (*admin_pb.GetSMTPConfigResponse, error) {
-	smtp, err := s.query.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
-	if err != nil {
-		return nil, err
-	}
-	return &admin_pb.GetSMTPConfigResponse{
-		SmtpConfig: SMTPConfigToPb(smtp),
-	}, nil
-}
-
-func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) (*admin_pb.AddSMTPConfigResponse, error) {
-	details, err := s.command.AddSMTPConfig(ctx, AddSMTPToConfig(req))
-	if err != nil {
-		return nil, err
-	}
-	return &admin_pb.AddSMTPConfigResponse{
-		Details: object.ChangeToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner),
-	}, nil
-}
-
-func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) (*admin_pb.UpdateSMTPConfigResponse, error) {
-	details, err := s.command.ChangeSMTPConfig(ctx, UpdateSMTPToConfig(req))
-	if err != nil {
-		return nil, err
-	}
-	return &admin_pb.UpdateSMTPConfigResponse{
-		Details: object.ChangeToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner),
-	}, nil
-}
-
-func (s *Server) RemoveSMTPConfig(ctx context.Context, _ *admin_pb.RemoveSMTPConfigRequest) (*admin_pb.RemoveSMTPConfigResponse, error) {
-	details, err := s.command.RemoveSMTPConfig(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &admin_pb.RemoveSMTPConfigResponse{
-		Details: object.ChangeToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner),
-	}, nil
-}
-
-func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
-	details, err := s.command.ChangeSMTPConfigPassword(ctx, req.Password)
-	if err != nil {
-		return nil, err
-	}
-	return &admin_pb.UpdateSMTPConfigPasswordResponse{
-		Details: object.ChangeToDetailsPb(
-			details.Sequence,
-			details.EventDate,
-			details.ResourceOwner),
-	}, nil
-}
-
 func (s *Server) GetSecurityPolicy(ctx context.Context, req *admin_pb.GetSecurityPolicyRequest) (*admin_pb.GetSecurityPolicyResponse, error) {
 	policy, err := s.query.SecurityPolicy(ctx)
 	if err != nil {
@@ -119,7 +56,7 @@ func (s *Server) GetSecurityPolicy(ctx context.Context, req *admin_pb.GetSecurit
 }
 
 func (s *Server) SetSecurityPolicy(ctx context.Context, req *admin_pb.SetSecurityPolicyRequest) (*admin_pb.SetSecurityPolicyResponse, error) {
-	details, err := s.command.SetSecurityPolicy(ctx, req.EnableIframeEmbedding, req.AllowedOrigins)
+	details, err := s.command.SetSecurityPolicy(ctx, securityPolicyToCommand(req))
 	if err != nil {
 		return nil, err
 	}

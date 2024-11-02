@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants4"
+	UserGrantProjectionTable = "projections.user_grants5"
 
 	UserGrantID                   = "id"
 	UserGrantCreationDate         = "creation_date"
@@ -170,7 +170,7 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 	}
 
 	ctx := setUserGrantContext(e.Aggregate())
-	userOwner, projectOwner, grantOwner, err := getResourceOwners(ctx, p.es, e.Aggregate().InstanceID, e.UserID, e.ProjectID, e.ProjectGrantID)
+	userOwner, projectOwner, grantOwner, err := getUserGrantResourceOwners(ctx, p.es, e.Aggregate().InstanceID, e.UserID, e.ProjectID, e.ProjectGrantID)
 	if err != nil {
 		return nil, err
 	}
@@ -401,11 +401,33 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 
 func getUserResourceOwner(ctx context.Context, es handler.EventStore, instanceID, userID string) (string, error) {
 	userRO, _, _, err := getResourceOwners(ctx, es, instanceID, userID, "", "")
+	if userRO == "" {
+		return "", zerrors.ThrowNotFound(nil, "PROJ-uahkkord22", "Errors.NotFound")
+	}
 	return userRO, err
 }
 
+func getUserGrantResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (string, string, string, error) {
+	userRO, projectRO, grantedOrg, err := getResourceOwners(ctx, es, instanceID, userID, projectID, grantID)
+	if err != nil {
+		return "", "", "", err
+	}
+	// user grant always has a user defined
+	if userRO == "" {
+		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-8x5behx5jy", "Errors.NotFound")
+	}
+	// either a projectID
+	if projectID != "" && projectRO == "" {
+		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-1ldp25o3bx", "Errors.NotFound")
+	}
+	// or a grantID
+	if grantID != "" && grantedOrg == "" {
+		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-9ngp5dcn76", "Errors.NotFound")
+	}
+	return userRO, projectRO, grantedOrg, nil
+}
+
 func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (userRO string, projectRO string, grantedOrg string, err error) {
-	eventCount := 1
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		InstanceID(instanceID).
@@ -416,7 +438,6 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 
 	// if it's a project grant then we only need the resourceowner for the projectgrant, else the project
 	if grantID != "" {
-		eventCount++
 		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -424,8 +445,8 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 			EventData(map[string]interface{}{
 				"grantId": grantID,
 			})
-	} else if projectID != "" {
-		eventCount++
+	}
+	if projectID != "" {
 		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -439,9 +460,8 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 	if err != nil {
 		return "", "", "", err
 	}
-	if len(events) != eventCount {
-		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-0I91sp", "Errors.NotFound")
-	}
+
+	// sorted ascending
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:

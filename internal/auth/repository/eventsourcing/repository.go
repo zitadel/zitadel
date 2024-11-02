@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	auth_handler "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -12,14 +11,16 @@ import (
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	eventstore2 "github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
 type Config struct {
-	SearchLimit uint64
-	Spooler     auth_handler.Config
+	SearchLimit                uint64
+	Spooler                    auth_handler.Config
+	AmountOfCachedAuthRequests uint16
 }
 
 type EsRepository struct {
@@ -38,8 +39,9 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	}
 
 	auth_handler.Register(ctx, conf.Spooler, view, queries)
+	auth_handler.Start(ctx)
 
-	authReq := cache.Start(dbClient)
+	authReq := cache.Start(dbClient, conf.AmountOfCachedAuthRequests)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,
@@ -72,11 +74,13 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			IDPUserLinksProvider:      queries,
 			LockoutPolicyViewProvider: queries,
 			LoginPolicyViewProvider:   queries,
+			PasswordAgePolicyProvider: queries,
 			UserGrantProvider:         queryView,
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,
 			CustomTextProvider:        queries,
-			FeatureCheck:              feature.NewCheck(esV2),
+			PasswordReset:             command,
+			PasswordChecker:           command,
 			IdGenerator:               id.SonyFlakeGenerator(),
 		},
 		eventstore.TokenRepo{
@@ -116,7 +120,11 @@ func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, proj
 	if err != nil {
 		return nil, err
 	}
-	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
+	activeQuery, err := query.NewUserGrantStateQuery(domain.UserGrantStateActive)
+	if err != nil {
+		return nil, err
+	}
+	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID, activeQuery}}
 	grants, err := q.Queries.UserGrants(ctx, queries, true)
 	if err != nil {
 		return nil, err

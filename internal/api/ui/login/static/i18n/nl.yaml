@@ -32,13 +32,15 @@ Password:
   Title: Wachtwoord
   Description: Voer uw inloggegevens in.
   PasswordLabel: Wachtwoord
-  MinLength: Minimum lengte
-  HasUppercase: Hoofdletter
-  HasLowercase: Kleine letter
-  HasNumber: Nummer
-  HasSymbol: Symbool
-  Confirmation: Bevestiging komt overeen
-  ResetLinkText: Reset Wachtwoord
+  MinLength: Moet minstens
+  MinLengthp2: tekens lang zijn.
+  MaxLength: Moet minder dan 70 tekens lang zijn.
+  HasUppercase: Moet een hoofdletter bevatten.
+  HasLowercase: Moet een kleine letter bevatten.
+  HasNumber: Moet een nummer bevatten.
+  HasSymbol: Moet een symbool bevatten.
+  Confirmation: Wachtwoordbevestiging komt overeen.
+  ResetLinkText: Wachtwoord resetten
   BackButtonText: Terug
   NextButtonText: Volgende
 
@@ -83,6 +85,15 @@ InitUserDone:
   Description: E-mail geverifieerd en Wachtwoord succesvol ingesteld
   NextButtonText: Volgende
   CancelButtonText: Annuleren
+
+InviteUser:
+  Title: Gebruiker activeren
+  Description: Verifieer uw e-mail met de onderstaande code en stel uw wachtwoord in.
+  CodeLabel: Code
+  NewPasswordLabel: Nieuw wachtwoord
+  NewPasswordConfirm: Wachtwoord bevestigen
+  NextButtonText: Volgende
+  ResendButtonText: Code opnieuw verzenden
 
 InitMFAPrompt:
   Title: 2-Factor Setup
@@ -188,6 +199,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Verander Wachtwoord
   Description: Verander uw wachtwoord. Voer uw oude en nieuwe wachtwoord in.
+  ExpiredDescription: Je wachtwoord is verlopen en moet worden gewijzigd. Voer uw oude en nieuwe wachtwoord in.
   OldPasswordLabel: Oud Wachtwoord
   NewPasswordLabel: Nieuw Wachtwoord
   NewPasswordConfirmLabel: Bevestig Wachtwoord
@@ -249,6 +261,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -288,6 +303,9 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Nederlands: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -325,6 +343,12 @@ LogoutDone:
   Description: U heeft succesvol uitgelogd.
   LoginButtonText: Inloggen
 
+LinkingUserPrompt:
+  Title: Bestaande gebruiker gevonden
+  Description: "Wilt u uw bestaande account koppelen:"
+  LinkButtonText: Koppeling
+  OtherButtonText: Andere opties
+
 LinkingUsersDone:
   Title: Koppeling Gebruiker
   Description: Gebruiker gekoppeld.
@@ -355,6 +379,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:
@@ -474,6 +501,7 @@ Errors:
       NoExternalUserData: Geen externe Gebruiker Data ontvangen
       CreationNotAllowed: Creatie van een nieuwe gebruiker is niet toegestaan op deze Provider
       LinkingNotAllowed: Koppeling van een gebruiker is niet toegestaan op deze Provider
+      NoOptionAllowed: Noch aanmaak noch koppeling is toegestaan voor deze provider. Neem contact op met uw beheerder.
     GrantRequired: Inloggen niet mogelijk. De gebruiker moet minimaal één grant hebben op de applicatie. Neem contact op met uw beheerder.
     ProjectRequired: Inloggen niet mogelijk. De organisatie van de gebruiker moet toegekend zijn aan het project. Neem contact op met uw beheerder.
   IdentityProvider:

@@ -21,6 +21,7 @@ const (
 	LimitsColumnSequence      = "sequence"
 
 	LimitsColumnAuditLogRetention = "audit_log_retention"
+	LimitsColumnBlock             = "block"
 )
 
 type limitsProjection struct{}
@@ -43,6 +44,7 @@ func (*limitsProjection) Init() *old_handler.Check {
 			handler.NewColumn(LimitsColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(LimitsColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(LimitsColumnAuditLogRetention, handler.ColumnTypeInterval, handler.Nullable()),
+			handler.NewColumn(LimitsColumnBlock, handler.ColumnTypeBool, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(LimitsColumnInstanceID, LimitsColumnResourceOwner),
 		),
@@ -88,13 +90,16 @@ func (p *limitsProjection) reduceLimitsSet(event eventstore.Event) (*handler.Sta
 	updateCols := []handler.Column{
 		handler.NewCol(LimitsColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCol(LimitsColumnResourceOwner, e.Aggregate().ResourceOwner),
-		handler.NewCol(LimitsColumnCreationDate, e.CreationDate()),
+		handler.NewCol(LimitsColumnCreationDate, handler.OnlySetValueOnInsert(LimitsProjectionTable, e.CreationDate())),
 		handler.NewCol(LimitsColumnChangeDate, e.CreationDate()),
 		handler.NewCol(LimitsColumnSequence, e.Sequence()),
 		handler.NewCol(LimitsColumnAggregateID, e.Aggregate().ID),
 	}
 	if e.AuditLogRetention != nil {
 		updateCols = append(updateCols, handler.NewCol(LimitsColumnAuditLogRetention, *e.AuditLogRetention))
+	}
+	if e.Block != nil {
+		updateCols = append(updateCols, handler.NewCol(LimitsColumnBlock, *e.Block))
 	}
 	return handler.NewUpsertStatement(e, conflictCols, updateCols), nil
 }

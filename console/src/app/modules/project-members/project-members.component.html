@@ -24,7 +24,7 @@
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
             ? $any(project)?.projectId
-            : ''
+            : '',
       ]
         | hasRole
         | async
@@ -36,7 +36,7 @@
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
             ? $any(project)?.projectId
-            : ''
+            : '',
       ]
         | hasRole
         | async
@@ -52,7 +52,7 @@
           : projectType === ProjectType.PROJECTTYPE_GRANTED
             ? $any(project)?.projectId
             : '',
-        'project.member.delete'
+        'project.member.delete',
       ]"
     >
       <button
@@ -76,7 +76,7 @@
           : projectType === ProjectType.PROJECTTYPE_GRANTED
             ? $any(project)?.projectId
             : '',
-        'project.member.write'
+        'project.member.write',
       ]"
     >
       <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>

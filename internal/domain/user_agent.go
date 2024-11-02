@@ -15,3 +15,10 @@ type UserAgent struct {
 func (ua UserAgent) IsEmpty() bool {
 	return ua.FingerprintID == nil && len(ua.IP) == 0 && ua.Description == nil && ua.Header == nil
 }
+
+func (ua *UserAgent) GetFingerprintID() string {
+	if ua == nil || ua.FingerprintID == nil {
+		return ""
+	}
+	return *ua.FingerprintID
+}

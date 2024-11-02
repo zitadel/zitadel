@@ -1,12 +1,14 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
 	"strconv"
 	"strings"
 	"time"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
@@ -14,7 +16,7 @@ import (
 )
 
 func init() {
-	config := &Config{}
+	config := new(Config)
 	dialect.Register(config, config, false)
 }
 
@@ -35,7 +37,7 @@ type Config struct {
 	MaxConnLifetime    time.Duration
 	MaxConnIdleTime    time.Duration
 	User               User
-	Admin              User
+	Admin              AdminUser
 	// Additional options to be appended as options=<Options>
 	// The value will be taken as is. Multiple options are space separated.
 	Options string
@@ -50,11 +52,12 @@ func (c *Config) MatchName(name string) bool {
 	return false
 }
 
-func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+	connector := new(Config)
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
 		WeaklyTypedInput: true,
-		Result:           c,
+		Result:           connector,
 	})
 	if err != nil {
 		return nil, err
@@ -66,26 +69,40 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 		}
 	}
 
-	return c, nil
+	return connector, nil
 }
 
-func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, error) {
-	client, err := sql.Open("pgx", c.String(useAdmin, purpose.AppName()))
+func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, *pgxpool.Pool, error) {
+	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, spoolerRatio, pusherRatio, purpose)
+	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	client.SetMaxOpenConns(int(connConfig.MaxIdleConns))
-	client.SetMaxIdleConns(int(connConfig.MaxIdleConns))
-	client.SetConnMaxLifetime(c.MaxConnLifetime)
-	client.SetConnMaxIdleTime(c.MaxConnIdleTime)
+	if connConfig.MaxOpenConns != 0 {
+		config.MaxConns = int32(connConfig.MaxOpenConns)
+	}
 
-	return client, nil
+	config.MaxConnLifetime = c.MaxConnLifetime
+	config.MaxConnIdleTime = c.MaxConnIdleTime
+
+	pool, err := pgxpool.NewWithConfig(
+		context.Background(),
+		config,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if err := pool.Ping(context.Background()); err != nil {
+		return nil, nil, err
+	}
+
+	return stdlib.OpenDBFromPool(pool), pool, nil
 }
 
 func (c *Config) DatabaseName() string {
@@ -112,6 +129,12 @@ type User struct {
 	Username string
 	Password string
 	SSL      SSL
+}
+
+type AdminUser struct {
+	// ExistingDatabase is the database to connect to before the ZITADEL database exists
+	ExistingDatabase string
+	User             `mapstructure:",squash"`
 }
 
 type SSL struct {
@@ -147,7 +170,7 @@ func (s *Config) checkSSL(user User) {
 func (c Config) String(useAdmin bool, appName string) string {
 	user := c.User
 	if useAdmin {
-		user = c.Admin
+		user = c.Admin.User
 	}
 	c.checkSSL(user)
 	fields := []string{
@@ -166,7 +189,11 @@ func (c Config) String(useAdmin bool, appName string) string {
 	if !useAdmin {
 		fields = append(fields, "dbname="+c.Database)
 	} else {
-		fields = append(fields, "dbname=postgres")
+		defaultDB := c.Admin.ExistingDatabase
+		if defaultDB == "" {
+			defaultDB = "postgres"
+		}
+		fields = append(fields, "dbname="+defaultDB)
 	}
 	if user.SSL.Mode != sslDisabledMode {
 		if user.SSL.RootCert != "" {

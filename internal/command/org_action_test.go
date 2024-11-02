@@ -129,7 +129,7 @@ func TestCommands_AddAction(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -330,7 +330,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -463,7 +463,7 @@ func TestCommands_DeactivateAction(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -596,7 +596,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -742,7 +742,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}

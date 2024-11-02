@@ -1,0 +1,53 @@
+---
+title: Symfony PHP Framework
+sidebar_label: Symfony PHP
+---
+
+<table>
+    <tr>
+        <td width="100px">
+            <img width="100px" src="/docs/img/tech/php.svg" alt="php logo"/>
+        </td>
+        <td>
+            <a href="https://symfony.com/" target="_blank">Symfony</a> is a high-performance PHP framework that provides a solid foundation for building scalable and maintainable web applications.
+            Integrate authentication to your Symfony application easily by using the <a href="https://github.com/zitadel/example-symfony-oidc" target="_blank">example-symfony-oidc</a> Example.
+        </td>
+    </tr>
+</table>
+
+### Resources
+- [Example Web App with ZITADEL Login](https://github.com/zitadel/example-symfony-oidc)
+- [Step-By-Step Guide](/docs/examples/login/symfony)
+
+### PHP SDK
+
+ZITADEL does not provide a Symfony specific SDK.
+But you can integrate ZITADEL to your application by using any OIDC Library such as [symfony-oidc](https://github.com/Drenso/symfony-oidc).
+
+Check out our [Example Application](/docs/sdk-examples/symfony#example-application)
+
+### Example Application
+
+The [example-symfony-oidc](https://github.com/zitadel/example-symfony-oidc) repository includes an Example Application ready to start and show how a Symfony application looks like with integrated ZITADEL Login.
+
+What does the Example include:
+- OIDC Code flow with User Info call after authentication.
+- Fully integrated with Symfony security and firewall.
+- User Role mapping
+- Persistent user data using local sqlite file. See DATABASE_URL in .env.
+- Public page at /
+- Authenticated /profile page for all users.
+- Authenticated /admin page for admin role users.
+- Logout
+
+### Step-By-Step Guide
+
+The [Step-By-Step Guide](/docs/examples/login/symfony) leads you through the whole process from configuring the right application in ZITADEL to a ready application with integrated Login.
+
+After completing the Step-By-Step Guide you will have:
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible without authentication
+3. Example page accessible by authenticated user showing retrieved user information
+4. Example administrator page accessible by user with administrator role
+5. Logout
+6. Correct setup for your application in ZITADEL

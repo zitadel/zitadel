@@ -12,21 +12,23 @@ import (
 )
 
 type AuthRequest struct {
-	ID            string
-	LoginClient   string
-	ClientID      string
-	RedirectURI   string
-	State         string
-	Nonce         string
-	Scope         []string
-	Audience      []string
-	ResponseType  domain.OIDCResponseType
-	CodeChallenge *domain.OIDCCodeChallenge
-	Prompt        []domain.Prompt
-	UILocales     []string
-	MaxAge        *time.Duration
-	LoginHint     *string
-	HintUserID    *string
+	ID               string
+	LoginClient      string
+	ClientID         string
+	RedirectURI      string
+	State            string
+	Nonce            string
+	Scope            []string
+	Audience         []string
+	ResponseType     domain.OIDCResponseType
+	ResponseMode     domain.OIDCResponseMode
+	CodeChallenge    *domain.OIDCCodeChallenge
+	Prompt           []domain.Prompt
+	UILocales        []string
+	MaxAge           *time.Duration
+	LoginHint        *string
+	HintUserID       *string
+	NeedRefreshToken bool
 }
 
 type CurrentAuthRequest struct {
@@ -63,12 +65,14 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 		authRequest.Scope,
 		authRequest.Audience,
 		authRequest.ResponseType,
+		authRequest.ResponseMode,
 		authRequest.CodeChallenge,
 		authRequest.Prompt,
 		authRequest.UILocales,
 		authRequest.MaxAge,
 		authRequest.LoginHint,
 		authRequest.HintUserID,
+		authRequest.NeedRefreshToken,
 	))
 	if err != nil {
 		return nil, err
@@ -148,25 +152,6 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
 }
 
-func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *CurrentAuthRequest, err error) {
-	if code == "" {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode")
-	}
-	writeModel, err := c.getAuthRequestWriteModel(ctx, code)
-	if err != nil {
-		return nil, err
-	}
-	if writeModel.AuthRequestState != domain.AuthRequestStateCodeAdded {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode")
-	}
-	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeExchangedEvent(ctx,
-		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
-	if err != nil {
-		return nil, err
-	}
-	return authRequestWriteModelToCurrentAuthRequest(writeModel), nil
-}
-
 func authRequestWriteModelToCurrentAuthRequest(writeModel *AuthRequestWriteModel) (_ *CurrentAuthRequest) {
 	return &CurrentAuthRequest{
 		AuthRequest: &AuthRequest{
@@ -179,6 +164,7 @@ func authRequestWriteModelToCurrentAuthRequest(writeModel *AuthRequestWriteModel
 			Scope:         writeModel.Scope,
 			Audience:      writeModel.Audience,
 			ResponseType:  writeModel.ResponseType,
+			ResponseMode:  writeModel.ResponseMode,
 			CodeChallenge: writeModel.CodeChallenge,
 			Prompt:        writeModel.Prompt,
 			UILocales:     writeModel.UILocales,

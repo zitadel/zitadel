@@ -2,7 +2,6 @@ package templates
 
 import (
 	"fmt"
-	"html"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -16,23 +15,23 @@ const (
 )
 
 type TemplateData struct {
-	Title           string
-	PreHeader       string
-	Subject         string
-	Greeting        string
-	Text            string
-	URL             string
-	ButtonText      string
-	PrimaryColor    string
-	BackgroundColor string
-	FontColor       string
-	LogoURL         string
-	FontURL         string
-	FontFaceFamily  string
-	FontFamily      string
+	Title           string `json:"title,omitempty"`
+	PreHeader       string `json:"preHeader,omitempty"`
+	Subject         string `json:"subject,omitempty"`
+	Greeting        string `json:"greeting,omitempty"`
+	Text            string `json:"text,omitempty"`
+	URL             string `json:"url,omitempty"`
+	ButtonText      string `json:"buttonText,omitempty"`
+	PrimaryColor    string `json:"primaryColor,omitempty"`
+	BackgroundColor string `json:"backgroundColor,omitempty"`
+	FontColor       string `json:"fontColor,omitempty"`
+	LogoURL         string `json:"logoUrl,omitempty"`
+	FontURL         string `json:"fontUrl,omitempty"`
+	FontFaceFamily  string `json:"fontFaceFamily,omitempty"`
+	FontFamily      string `json:"fontFamily,omitempty"`
 
-	IncludeFooter bool
-	FooterText    string
+	IncludeFooter bool   `json:"includeFooter,omitempty"`
+	FooterText    string `json:"footerText,omitempty"`
 }
 
 func (data *TemplateData) Translate(translator *i18n.Translator, msgType string, args map[string]interface{}, langs ...string) {
@@ -40,7 +39,7 @@ func (data *TemplateData) Translate(translator *i18n.Translator, msgType string,
 	data.PreHeader = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessagePreHeader), args, langs...)
 	data.Subject = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageSubject), args, langs...)
 	data.Greeting = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageGreeting), args, langs...)
-	data.Text = html.UnescapeString(translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageText), args, langs...))
+	data.Text = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageText), args, langs...)
 	data.ButtonText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonText), args, langs...)
 	// Footer text is neither included in i18n files nor defaults.yaml
 	footerText := fmt.Sprintf("%s.%s", msgType, domain.MessageFooterText)

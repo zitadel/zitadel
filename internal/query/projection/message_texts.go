@@ -134,7 +134,7 @@ func (p *messageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	cols := []handler.Column{
 		handler.NewCol(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
 		handler.NewCol(MessageTextInstanceIDCol, templateEvent.Aggregate().InstanceID),
-		handler.NewCol(MessageTextCreationDateCol, templateEvent.CreationDate()),
+		handler.NewCol(MessageTextCreationDateCol, handler.OnlySetValueOnInsert(MessageTextTable, templateEvent.CreationDate())),
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
 		handler.NewCol(MessageTextSequenceCol, templateEvent.Sequence()),
 		handler.NewCol(MessageTextStateCol, domain.PolicyStateActive),
@@ -272,7 +272,8 @@ func isMessageTemplate(template string) bool {
 		template == domain.VerifyEmailOTPMessageType ||
 		template == domain.DomainClaimedMessageType ||
 		template == domain.PasswordlessRegistrationMessageType ||
-		template == domain.PasswordChangeMessageType
+		template == domain.PasswordChangeMessageType ||
+		template == domain.InviteUserMessageType
 }
 func isTitle(key string) bool {
 	return key == domain.MessageTitle

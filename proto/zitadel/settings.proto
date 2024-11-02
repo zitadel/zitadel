@@ -7,7 +7,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.settings.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/settings";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings";
 
 message SecretGenerator {
   SecretGeneratorType generator_type = 1;
@@ -38,6 +38,12 @@ message SecretGeneratorQuery {
 
 message SecretGeneratorTypeQuery {
   SecretGeneratorType generator_type = 1;
+}
+
+enum SMTPConfigState {
+  SMTP_CONFIG_STATE_UNSPECIFIED = 0;
+  SMTP_CONFIG_ACTIVE = 1;
+  SMTP_CONFIG_INACTIVE = 2;
 }
 
 enum SecretGeneratorType {
@@ -80,21 +86,86 @@ message SMTPConfig {
       example: "\"replyto@m.zitadel.cloud\"";
     }
   ];
+  SMTPConfigState state = 8;
+  string description = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"Mailjet\"";
+    }
+  ];
+  string id = 10;
+}
+
+message EmailProvider {
+  zitadel.v1.ObjectDetails details = 1;
+  string id = 2;
+  EmailProviderState state = 3;
+  string description = 6;
+
+  oneof config {
+    EmailProviderSMTP smtp = 4;
+    EmailProviderHTTP http = 5;
+  }
+}
+
+enum EmailProviderState {
+  EMAIL_PROVIDER_STATE_UNSPECIFIED = 0;
+  EMAIL_PROVIDER_ACTIVE = 1;
+  EMAIL_PROVIDER_INACTIVE = 2;
+}
+
+message EmailProviderSMTP {
+  string sender_address = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"noreply@m.zitadel.cloud\"";
+    }
+  ];
+  string sender_name = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ZITADEL\"";
+    }
+  ];
+  bool tls = 3;
+  string host = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"smtp.postmarkapp.com:587\"";
+    }
+  ];
+  string user = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+    }
+  ];
+  string reply_to_address = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"replyto@m.zitadel.cloud\"";
+    }
+  ];
+}
+
+message EmailProviderHTTP {
+  string endpoint = 1;
 }
 
 message SMSProvider {
   zitadel.v1.ObjectDetails details = 1;
   string id = 2;
   SMSProviderConfigState state = 3;
+  string description = 6;
 
   oneof config {
     TwilioConfig twilio = 4;
+    HTTPConfig http = 5;
   }
 }
 
 message TwilioConfig {
   string sid = 1;
   string sender_number = 2;
+  string verify_service_sid = 3;
+}
+
+message HTTPConfig {
+  string endpoint = 1;
 }
 
 enum SMSProviderConfigState {
@@ -104,8 +175,8 @@ enum SMSProviderConfigState {
 }
 
 message DebugNotificationProvider {
-    zitadel.v1.ObjectDetails details = 1;
-    bool compact = 2;
+  zitadel.v1.ObjectDetails details = 1;
+  bool compact = 2;
 }
 
 message OIDCSettings {
@@ -122,4 +193,6 @@ message SecurityPolicy {
   bool enable_iframe_embedding = 2;
   // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
   repeated string allowed_origins = 3;
+  // allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
+  bool enable_impersonation = 4;
 }

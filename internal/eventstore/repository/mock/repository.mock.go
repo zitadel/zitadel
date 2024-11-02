@@ -5,6 +5,7 @@
 //
 //	mockgen -package mock -destination ./repository.mock.go github.com/zitadel/zitadel/internal/eventstore Querier,Pusher
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -12,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	database "github.com/zitadel/zitadel/internal/database"
 	eventstore "github.com/zitadel/zitadel/internal/eventstore"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -37,6 +39,20 @@ func NewMockQuerier(ctrl *gomock.Controller) *MockQuerier {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockQuerier) EXPECT() *MockQuerierMockRecorder {
 	return m.recorder
+}
+
+// Client mocks base method.
+func (m *MockQuerier) Client() *database.DB {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Client")
+	ret0, _ := ret[0].(*database.DB)
+	return ret0
+}
+
+// Client indicates an expected call of Client.
+func (mr *MockQuerierMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockQuerier)(nil).Client))
 }
 
 // FilterToReducer mocks base method.

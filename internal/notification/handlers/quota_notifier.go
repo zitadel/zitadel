@@ -65,7 +65,7 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 		ctx := HandlerContext(event.Aggregate())
-		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.AggregateType, quota.NotifiedEventType)
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, map[string]interface{}{"dueEventID": e.ID}, quota.NotifiedEventType)
 		if err != nil {
 			return err
 		}

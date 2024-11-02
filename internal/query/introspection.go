@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -26,21 +25,34 @@ var introspectionTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
 	)
 })
 
+// TriggerIntrospectionProjections triggers all projections
+// relevant to introspection queries concurrently.
 func TriggerIntrospectionProjections(ctx context.Context) {
 	triggerBatch(ctx, introspectionTriggerHandlers()...)
 }
 
+type AppType string
+
+const (
+	AppTypeAPI  = "api"
+	AppTypeOIDC = "oidc"
+)
+
 type IntrospectionClient struct {
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	ProjectID    string
-	PublicKeys   database.Map[[]byte]
+	AppID                string
+	ClientID             string
+	HashedSecret         string
+	AppType              AppType
+	ProjectID            string
+	ResourceOwner        string
+	ProjectRoleAssertion bool
+	PublicKeys           database.Map[[]byte]
 }
 
-//go:embed embed/introspection_client_by_id.sql
+//go:embed introspection_client_by_id.sql
 var introspectionClientByIDQuery string
 
-func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID string, getKeys bool) (_ *IntrospectionClient, err error) {
+func (q *Queries) ActiveIntrospectionClientByID(ctx context.Context, clientID string, getKeys bool) (_ *IntrospectionClient, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -50,7 +62,16 @@ func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID strin
 	)
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		return row.Scan(&client.ClientID, &client.ClientSecret, &client.ProjectID, &client.PublicKeys)
+		return row.Scan(
+			&client.AppID,
+			&client.ClientID,
+			&client.HashedSecret,
+			&client.AppType,
+			&client.ProjectID,
+			&client.ResourceOwner,
+			&client.ProjectRoleAssertion,
+			&client.PublicKeys,
+		)
 	},
 		introspectionClientByIDQuery,
 		instanceID, clientID, getKeys,

@@ -23,13 +23,11 @@ var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
 	management.UnimplementedManagementServiceServer
-	command         *command.Commands
-	query           *query.Queries
-	systemDefaults  systemdefaults.SystemDefaults
-	assetAPIPrefix  func(context.Context) string
-	passwordHashAlg crypto.HashAlgorithm
-	userCodeAlg     crypto.EncryptionAlgorithm
-	externalSecure  bool
+	command        *command.Commands
+	query          *query.Queries
+	systemDefaults systemdefaults.SystemDefaults
+	assetAPIPrefix func(context.Context) string
+	userCodeAlg    crypto.EncryptionAlgorithm
 }
 
 func CreateServer(
@@ -37,16 +35,13 @@ func CreateServer(
 	query *query.Queries,
 	sd systemdefaults.SystemDefaults,
 	userCodeAlg crypto.EncryptionAlgorithm,
-	externalSecure bool,
 ) *Server {
 	return &Server{
-		command:         command,
-		query:           query,
-		systemDefaults:  sd,
-		assetAPIPrefix:  assets.AssetAPI(externalSecure),
-		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
-		userCodeAlg:     userCodeAlg,
-		externalSecure:  externalSecure,
+		command:        command,
+		query:          query,
+		systemDefaults: sd,
+		assetAPIPrefix: assets.AssetAPI(),
+		userCodeAlg:    userCodeAlg,
 	}
 }
 

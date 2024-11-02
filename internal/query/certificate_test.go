@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -109,7 +108,7 @@ func Test_CertificatePrepares(t *testing.T) {
 							sequence:      20211109,
 							resourceOwner: "ro",
 							algorithm:     "",
-							use:           domain.KeyUsageSAMLMetadataSigning,
+							use:           crypto.KeyUsageSAMLMetadataSigning,
 						},
 						expiry:      testNow,
 						certificate: []byte("privateKey"),

@@ -1,0 +1,31 @@
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const content = `### Thanks for your contribution @${{ github.event.pull_request.user.login }}! 🎉
+
+            Please make sure you tick the following checkboxes before marking this Pull Request (PR) as ready for review:
+            
+              - [ ] I am happy with the code
+              - [ ] Documentations and examples are up-to-date
+              - [ ] Logical behavior changes are tested automatically
+              - [ ] No debug or dead code
+              - [ ] My code has no repetitions
+              - [ ] The PR title adheres to the [conventional commit format](https://www.conventionalcommits.org/en/v1.0.0/)
+              - [ ] The example texts in the PR description are replaced.
+              - [ ] If there are any open TODOs or follow-ups, they are described in issues and link to this PR
+              - [ ] If there are deviations from a user stories acceptance criteria or design, they are agreed upon with the PO and documented.
+              `;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: content
+            })

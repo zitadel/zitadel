@@ -5,9 +5,6 @@ import (
 	"time"
 
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -22,10 +19,11 @@ func (notify Notify) SendOTPEmailCode(ctx context.Context, url, code string, exp
 }
 
 func otpArgs(ctx context.Context, code string, expiry time.Duration) map[string]interface{} {
+	domainCtx := http_utils.DomainContext(ctx)
 	args := make(map[string]interface{})
 	args["OTP"] = code
-	args["Origin"] = http_utils.ComposedOrigin(ctx)
-	args["Domain"] = authz.GetInstance(ctx).RequestedDomain()
+	args["Origin"] = domainCtx.Origin()
+	args["Domain"] = domainCtx.RequestedDomain()
 	args["Expiry"] = expiry
 	return args
 }

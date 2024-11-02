@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
@@ -27,11 +26,7 @@ func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (c
 		origin = originEvent.TriggerOrigin()
 	}
 	if origin != "" {
-		originURL, err := url.Parse(origin)
-		if err != nil {
-			return ctx, err
-		}
-		return enrichCtx(ctx, originURL.Hostname(), origin), nil
+		return enrichCtx(ctx, origin)
 	}
 	primary, err := query.NewInstanceDomainPrimarySearchQuery(true)
 	if err != nil {
@@ -48,13 +43,19 @@ func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (c
 	}
 	return enrichCtx(
 		ctx,
-		domains.Domains[0].Domain,
 		http_utils.BuildHTTP(domains.Domains[0].Domain, n.externalPort, n.externalSecure),
-	), nil
+	)
 }
 
-func enrichCtx(ctx context.Context, host, origin string) context.Context {
-	ctx = authz.WithRequestedDomain(ctx, host)
-	ctx = http_utils.WithComposedOrigin(ctx, origin)
-	return ctx
+func enrichCtx(ctx context.Context, origin string) (context.Context, error) {
+	u, err := url.Parse(origin)
+	if err != nil {
+		return nil, err
+	}
+	ctx = http_utils.WithDomainContext(ctx, &http_utils.DomainCtx{
+		InstanceHost: u.Host,
+		PublicHost:   u.Host,
+		Protocol:     u.Scheme,
+	})
+	return ctx, nil
 }

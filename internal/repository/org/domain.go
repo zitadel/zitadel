@@ -18,6 +18,10 @@ const (
 	OrgDomainVerifiedEventType           = domainEventPrefix + "verified"
 	OrgDomainPrimarySetEventType         = domainEventPrefix + "primary.set"
 	OrgDomainRemovedEventType            = domainEventPrefix + "removed"
+
+	OrgDomainSearchType          = "org_domain"
+	OrgDomainVerifiedSearchField = "verified"
+	OrgDomainObjectRevision      = uint8(1)
 )
 
 func NewAddOrgDomainUniqueConstraint(orgDomain string) *eventstore.UniqueConstraint {
@@ -45,6 +49,28 @@ func (e *DomainAddedEvent) Payload() interface{} {
 
 func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *DomainAddedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			domainSearchObject(e.Domain),
+			OrgDomainVerifiedSearchField,
+			&eventstore.Value{
+				Value:       false,
+				ShouldIndex: false,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
 }
 
 func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainAddedEvent {
@@ -167,6 +193,28 @@ func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint
 	return []*eventstore.UniqueConstraint{NewAddOrgDomainUniqueConstraint(e.Domain)}
 }
 
+func (e *DomainVerifiedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			domainSearchObject(e.Domain),
+			OrgDomainVerifiedSearchField,
+			&eventstore.Value{
+				Value:       true,
+				ShouldIndex: false,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
+}
+
 func NewDomainVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainVerifiedEvent {
 	return &DomainVerifiedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -245,6 +293,28 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 	return []*eventstore.UniqueConstraint{NewRemoveOrgDomainUniqueConstraint(e.Domain)}
 }
 
+func (e *DomainRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			domainSearchObject(e.Domain),
+			OrgDomainVerifiedSearchField,
+			&eventstore.Value{
+				Value:       false,
+				ShouldIndex: false,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
+}
+
 func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string, verified bool) *DomainRemovedEvent {
 	return &DomainRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -267,4 +337,12 @@ func DomainRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 
 	return orgDomainRemoved, nil
+}
+
+func domainSearchObject(domain string) eventstore.Object {
+	return eventstore.Object{
+		Type:     OrgDomainSearchType,
+		ID:       domain,
+		Revision: OrgDomainObjectRevision,
+	}
 }

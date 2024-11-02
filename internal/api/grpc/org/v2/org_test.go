@@ -6,15 +6,14 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func Test_addOrganizationRequestToCommand(t *testing.T) {
@@ -110,7 +109,7 @@ func Test_addOrganizationRequestToCommand(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := addOrganizationRequestToCommand(tt.args.request)
-			require.ErrorIs(t, err, tt.wantErr)
+			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -165,7 +164,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := createdOrganizationToPb(tt.args.createdOrg)
-			require.ErrorIs(t, err, tt.wantErr)
+			assert.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
 	}

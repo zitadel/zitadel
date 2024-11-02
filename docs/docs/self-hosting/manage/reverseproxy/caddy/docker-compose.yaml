@@ -3,35 +3,44 @@ version: '3.8'
 services:
 
   proxy-disabled-tls:
-    image: "caddy:2.7.5-alpine"
+    image: "caddy:latest"
     volumes:
       - "./disabled-tls.Caddyfile:/etc/caddy/Caddyfile:ro"
     ports:
       - "80:80"
+    networks:
+      - 'zitadel'
     depends_on:
       zitadel-disabled-tls:
         condition: 'service_healthy'
 
   proxy-external-tls:
-    image: "caddy:2.7.5-alpine"
+    image: "caddy:latest"
     volumes:
       - "./external-tls.Caddyfile:/etc/caddy/Caddyfile:ro"
       - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
       - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
+    networks:
+      - 'zitadel'
     depends_on:
       zitadel-external-tls:
         condition: 'service_healthy'
 
   proxy-enabled-tls:
-    image: "caddy:2.7.5-alpine"
+    image: "caddy:latest"
     volumes:
       - "./enabled-tls.Caddyfile:/etc/caddy/Caddyfile:ro"
       - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
       - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
     ports:
       - "443:443"
+    networks:
+      - 'zitadel'
     depends_on:
       zitadel-enabled-tls:
         condition: 'service_healthy'
+
+networks:
+  zitadel:

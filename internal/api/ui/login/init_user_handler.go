@@ -1,10 +1,11 @@
 package login
 
 import (
-	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -43,16 +44,24 @@ type initUserData struct {
 	HasSymbol    string
 }
 
-func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet bool) string {
-	return fmt.Sprintf("%s%s?userID=%s&loginname=%s&code=%s&orgID=%s&passwordset=%t", externalLink(origin), EndpointInitUser, userID, loginName, code, orgID, passwordSet)
+func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet bool, authRequestID string) string {
+	v := url.Values{}
+	v.Set(queryInitUserUserID, userID)
+	v.Set(queryInitUserLoginName, loginName)
+	v.Set(queryInitUserCode, code)
+	v.Set(queryOrgID, orgID)
+	v.Set(queryInitUserPassword, strconv.FormatBool(passwordSet))
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointInitUser + "?" + v.Encode()
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {
+	authReq := l.checkOptionalAuthRequestOfEmailLinks(r)
 	userID := r.FormValue(queryInitUserUserID)
 	code := r.FormValue(queryInitUserCode)
 	loginName := r.FormValue(queryInitUserLoginName)
 	passwordSet, _ := strconv.ParseBool(r.FormValue(queryInitUserPassword))
-	l.renderInitUser(w, r, nil, userID, loginName, code, passwordSet, nil)
+	l.renderInitUser(w, r, authReq, userID, loginName, code, passwordSet, nil)
 }
 
 func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +94,8 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, "", data.PasswordSet, err)
 		return
 	}
-	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, initCodeGenerator)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, userAgentID, initCodeGenerator)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, "", data.PasswordSet, err)
 		return
@@ -94,16 +104,17 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, loginName string, showPassword bool) {
-	userOrgID := ""
+	var userOrgID, authRequestID string
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
+		authRequestID = authReq.ID
 	}
 	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, userID, loginName, "", showPassword, err)
 		return
 	}
-	_, err = l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID, initCodeGenerator)
+	_, err = l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID, initCodeGenerator, authRequestID)
 	l.renderInitUser(w, r, authReq, userID, loginName, "", showPassword, err)
 }
 

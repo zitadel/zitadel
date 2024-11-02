@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/cache"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -18,27 +19,15 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
-	"github.com/zitadel/zitadel/internal/repository/action"
-	"github.com/zitadel/zitadel/internal/repository/authrequest"
-	"github.com/zitadel/zitadel/internal/repository/deviceauth"
-	"github.com/zitadel/zitadel/internal/repository/idpintent"
-	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/keypair"
-	"github.com/zitadel/zitadel/internal/repository/limits"
-	"github.com/zitadel/zitadel/internal/repository/oidcsession"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/internal/repository/restrictions"
-	"github.com/zitadel/zitadel/internal/repository/session"
-	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
-	"github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
 type Queries struct {
-	eventstore *eventstore.Eventstore
-	client     *database.DB
+	eventstore   *eventstore.Eventstore
+	eventStoreV4 es_v4.Querier
+	client       *database.DB
+	caches       *Caches
 
 	keyEncryptionAlgorithm crypto.EncryptionAlgorithm
 	idpConfigEncryption    crypto.EncryptionAlgorithm
@@ -58,7 +47,9 @@ type Queries struct {
 func StartQueries(
 	ctx context.Context,
 	es *eventstore.Eventstore,
+	esV4 es_v4.Querier,
 	querySqlClient, projectionSqlClient *database.DB,
+	caches *cache.CachesConfig,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
@@ -67,9 +58,11 @@ func StartQueries(
 	permissionCheck func(q *Queries) domain.PermissionCheck,
 	defaultAuditLogRetention time.Duration,
 	systemAPIUsers map[string]*authz.SystemAPIUser,
+	startProjections bool,
 ) (repo *Queries, err error) {
 	repo = &Queries{
 		eventstore:                          es,
+		eventStoreV4:                        esV4,
 		client:                              querySqlClient,
 		DefaultLanguage:                     language.Und,
 		LoginTranslationFileContents:        make(map[string][]byte),
@@ -86,21 +79,6 @@ func StartQueries(
 		},
 		defaultAuditLogRetention: defaultAuditLogRetention,
 	}
-	iam_repo.RegisterEventMappers(repo.eventstore)
-	usr_repo.RegisterEventMappers(repo.eventstore)
-	org.RegisterEventMappers(repo.eventstore)
-	project.RegisterEventMappers(repo.eventstore)
-	action.RegisterEventMappers(repo.eventstore)
-	keypair.RegisterEventMappers(repo.eventstore)
-	usergrant.RegisterEventMappers(repo.eventstore)
-	session.RegisterEventMappers(repo.eventstore)
-	idpintent.RegisterEventMappers(repo.eventstore)
-	authrequest.RegisterEventMappers(repo.eventstore)
-	oidcsession.RegisterEventMappers(repo.eventstore)
-	quota.RegisterEventMappers(repo.eventstore)
-	limits.RegisterEventMappers(repo.eventstore)
-	restrictions.RegisterEventMappers(repo.eventstore)
-	deviceauth.RegisterEventMappers(repo.eventstore)
 
 	repo.checkPermission = permissionCheck(repo)
 
@@ -108,7 +86,13 @@ func StartQueries(
 	if err != nil {
 		return nil, err
 	}
-	projection.Start(ctx)
+	if startProjections {
+		projection.Start(ctx)
+	}
+	repo.caches, err = startCaches(ctx, caches, querySqlClient)
+	if err != nil {
+		return nil, err
+	}
 
 	return repo, nil
 }

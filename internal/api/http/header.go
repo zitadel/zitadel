@@ -8,25 +8,29 @@ import (
 )
 
 const (
-	Authorization   = "authorization"
-	Accept          = "accept"
-	AcceptLanguage  = "accept-language"
-	CacheControl    = "cache-control"
-	ContentType     = "content-type"
-	ContentLength   = "content-length"
-	Expires         = "expires"
-	Location        = "location"
-	Origin          = "origin"
-	Pragma          = "pragma"
-	UserAgentHeader = "user-agent"
-	ForwardedFor    = "x-forwarded-for"
-	XUserAgent      = "x-user-agent"
-	XGrpcWeb        = "x-grpc-web"
-	XRequestedWith  = "x-requested-with"
-	XRobotsTag      = "x-robots-tag"
-	IfNoneMatch     = "If-None-Match"
-	LastModified    = "Last-Modified"
-	Etag            = "Etag"
+	Authorization    = "authorization"
+	Accept           = "accept"
+	AcceptLanguage   = "accept-language"
+	CacheControl     = "cache-control"
+	ContentType      = "content-type"
+	ContentLength    = "content-length"
+	Expires          = "expires"
+	Location         = "location"
+	Origin           = "origin"
+	Pragma           = "pragma"
+	UserAgentHeader  = "user-agent"
+	ForwardedFor     = "x-forwarded-for"
+	ForwardedHost    = "x-forwarded-host"
+	ForwardedProto   = "x-forwarded-proto"
+	Forwarded        = "forwarded"
+	ZitadelForwarded = "x-zitadel-forwarded"
+	XUserAgent       = "x-user-agent"
+	XGrpcWeb         = "x-grpc-web"
+	XRequestedWith   = "x-requested-with"
+	XRobotsTag       = "x-robots-tag"
+	IfNoneMatch      = "If-None-Match"
+	LastModified     = "Last-Modified"
+	Etag             = "Etag"
 
 	ContentSecurityPolicy   = "content-security-policy"
 	XXSSProtection          = "x-xss-protection"
@@ -45,7 +49,7 @@ type key int
 const (
 	httpHeaders key = iota
 	remoteAddr
-	origin
+	domainCtx
 )
 
 func CopyHeadersToContext(h http.Handler) http.Handler {
@@ -68,18 +72,6 @@ func OriginHeader(ctx context.Context) string {
 		return ""
 	}
 	return headers.Get(Origin)
-}
-
-func ComposedOrigin(ctx context.Context) string {
-	o, ok := ctx.Value(origin).(string)
-	if !ok {
-		return ""
-	}
-	return o
-}
-
-func WithComposedOrigin(ctx context.Context, composed string) context.Context {
-	return context.WithValue(ctx, origin, composed)
 }
 
 func RemoteIPFromCtx(ctx context.Context) string {

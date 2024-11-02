@@ -10,7 +10,7 @@ ZITADEL interpretes the scripts as JavaScript.
 Make sure your scripts are ECMAScript 5.1(+) compliant.
 Go to the [goja GitHub page](https://github.com/dop251/goja) for detailed reference about the underlying library features and limitations.
 
-You can find great snippets and examples which show how you can use actions in [this repository](https://github.com/zitadel/actions).
+Stuck customizing ZITADEL actions? Find samples for setting OIDC claims, SAML attributes, extending JIT provisioning data, calling external APIs, and more in [this repository](https://github.com/zitadel/actions).
 
 Actions are a key feature to extend the functionality of ZITADEL and continuously improve the feature and expand the use cases. Check out our [roadmap](https://zitadel.com/roadmap) for more details.
 
@@ -46,10 +46,13 @@ Trigger types define the point during execution of request. Each trigger defines
 
 Currently ZITADEL provides the following flows:
 
-- [Internal Authentication](./internal-authentication.md)
-- [External Authentication](./external-authentication.md)
-- [Complement Token](./complement-token.md)
+- [Internal Authentication](./internal-authentication)
+- [External Authentication](./external-authentication)
+- [Complement Token](./complement-token)
+- [Customize SAML Response](./customize-samlresponse)
 
 ## Available Modules inside Javascript
 
 - [HTTP module](./modules#http) to call API's
+- [Logging module](./modules#log) logs information to stdout
+- [UUID module](./modules#uuid) generates uuids

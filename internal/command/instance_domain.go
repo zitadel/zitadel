@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/ui/console/path"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -74,7 +75,7 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 }
 
 func (c *Commands) addGeneratedInstanceDomain(ctx context.Context, a *instance.Aggregate, instanceName string) ([]preparation.Validation, error) {
-	domain, err := domain.NewGeneratedInstanceDomain(instanceName, authz.GetInstance(ctx).RequestedDomain())
+	domain, err := c.GenerateDomain(instanceName, http.DomainContext(ctx).RequestedDomain())
 	if err != nil {
 		return nil, err
 	}
@@ -143,12 +144,12 @@ func (c *Commands) updateConsoleRedirectURIs(ctx context.Context, filter prepara
 	if !appWriteModel.State.Exists() {
 		return nil, nil
 	}
-	redirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + consoleRedirectPath
+	redirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + path.RedirectPath
 	changes := make([]project.OIDCConfigChanges, 0, 2)
 	if !containsURI(appWriteModel.RedirectUris, redirectURI) {
 		changes = append(changes, project.ChangeRedirectURIs(append(appWriteModel.RedirectUris, redirectURI)))
 	}
-	postLogoutRedirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + consolePostLogoutPath
+	postLogoutRedirectURI := http.BuildHTTP(instanceDomain, c.externalPort, c.externalSecure) + path.PostLogoutPath
 	if !containsURI(appWriteModel.PostLogoutRedirectUris, postLogoutRedirectURI) {
 		changes = append(changes, project.ChangePostLogoutRedirectURIs(append(appWriteModel.PostLogoutRedirectUris, postLogoutRedirectURI)))
 	}

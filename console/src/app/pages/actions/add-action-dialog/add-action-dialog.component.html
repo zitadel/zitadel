@@ -8,13 +8,15 @@
       <input cnslInput formControlName="name" />
     </cnsl-form-field>
 
+    <cnsl-info-section>{{ 'FLOWS.DIALOG.ABOUTNAME' | translate }}</cnsl-info-section>
+
     <ngx-codemirror
       *ngIf="opened$ | async"
       formControlName="script"
       [options]="{
         lineNumbers: true,
         theme: 'material',
-        mode: 'javascript'
+        mode: 'javascript',
       }"
     ></ngx-codemirror>
 

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package zitadel.object.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha;object";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+message RequestContext {
+  // By default, the request context is set to the instance discovered by the domain from the requests host header.
+  oneof owner {
+    bool system = 1 [(validate.rules).bool = {const: true}]; // TODO: move the source of truth from the defaults.yaml into the database
+    string instance_id = 2;
+    string instance_domain = 3;
+    string org_id = 4;
+    string org_domain = 5;
+  }
+}
+
+enum OwnerType {
+  OWNER_TYPE_UNSPECIFIED = 0;
+  OWNER_TYPE_SYSTEM = 1; // TODO: move the source of truth from the defaults.yaml into the database
+  OWNER_TYPE_INSTANCE = 2;
+  OWNER_TYPE_ORG = 3;
+}
+
+message Owner {
+  OwnerType type = 1;
+  string id = 2;
+}
+

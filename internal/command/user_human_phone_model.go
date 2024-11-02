@@ -4,10 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -20,6 +19,8 @@ type HumanPhoneWriteModel struct {
 	Code             *crypto.CryptoValue
 	CodeCreationDate time.Time
 	CodeExpiry       time.Duration
+	GeneratorID      string
+	VerificationID   string
 
 	State     domain.PhoneState
 	UserState domain.UserState
@@ -65,6 +66,10 @@ func (wm *HumanPhoneWriteModel) Reduce() error {
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
 			wm.CodeExpiry = e.Expiry
+			wm.GeneratorID = e.GeneratorID
+		case *user.HumanPhoneCodeSentEvent:
+			wm.GeneratorID = e.GeneratorInfo.GetID()
+			wm.VerificationID = e.GeneratorInfo.GetVerificationID()
 		case *user.HumanPhoneRemovedEvent:
 			wm.State = domain.PhoneStateRemoved
 			wm.IsPhoneVerified = false
@@ -91,6 +96,7 @@ func (wm *HumanPhoneWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPhoneChangedType,
 			user.HumanPhoneVerifiedType,
 			user.HumanPhoneCodeAddedType,
+			user.HumanPhoneCodeSentType,
 			user.HumanPhoneRemovedType,
 			user.UserRemovedType,
 			user.UserV1AddedType,

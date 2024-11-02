@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
@@ -31,6 +32,7 @@ func (c *Config) SetConnector(connector dialect.Connector) {
 type DB struct {
 	*sql.DB
 	dialect.Database
+	Pool *pgxpool.Pool
 }
 
 func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error {
@@ -38,7 +40,7 @@ func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error
 }
 
 func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
 	if err != nil {
 		return err
 	}
@@ -71,7 +73,7 @@ func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (er
 }
 
 func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
 	if err != nil {
 		return err
 	}
@@ -113,7 +115,7 @@ func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...a
 }
 
 func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, error) {
-	client, err := config.connector.Connect(useAdmin, config.EventPushConnRatio, config.ProjectionSpoolerConnRatio, purpose)
+	client, pool, err := config.connector.Connect(useAdmin, config.EventPushConnRatio, config.ProjectionSpoolerConnRatio, purpose)
 	if err != nil {
 		return nil, err
 	}
@@ -125,6 +127,7 @@ func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, erro
 	return &DB{
 		DB:       client,
 		Database: config.connector,
+		Pool:     pool,
 	}, nil
 }
 

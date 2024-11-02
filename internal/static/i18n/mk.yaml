@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимитот не е пронајден
     NoneSpecified: Не се наведени лимити
+    Instance:
+      Blocked: Инстанцата е блокирана
   Restrictions:
     NoneSpecified: Не се наведени ограничувања
     DefaultLanguageMustBeAllowed: Стандардниот јазик мора да биде дозволен
@@ -51,14 +53,27 @@ Errors:
     NotFound: SMS конфигурацијата не е пронајдена
     AlreadyActive: SMS конфигурацијата е веќе активна
     AlreadyDeactivated: SMS конфигурацијата е веќе деактивирана
+  SMTP:
+    NotEmailMessage: пораката не е Email Message
+    RequiredAttributes: предметот, примачите и содржината мора да бидат поставени, но некои или сите се празни
+    CouldNotSplit: не може да се подели домаќинот и портата за поврзување со smtp
+    CouldNotDial: не можев да контактираме со SMTP-серверот, да ја провериме портата, проблеми со заштитен ѕид...
+    CouldNotDialTLS: не можев да контактираме со SMTP-серверот користејќи TLS, проверете ја портата, проблеми со заштитен ѕид...
+    CouldNotCreateClient: не можев да креирам smtp клиент
+    CouldNotStartTLS: не можеше да започне tls
+    CouldNotAuth: не можев да додадам smtp auth, проверете дали и корисникот и лозинката се точни, дали се точни, можеби вашиот провајдер бара метод за автетика што не е поддржан од ZITADEL
+    CouldNotSetSender: не може да се постави испраќач
+    CouldNotSetRecipient: не може да се постави примач
   SMTPConfig:
+    TestPassword: Лозинката за тестот не е пронајдена
     NotFound: SMTP конфигурацијата не е пронајдена
     AlreadyExists: SMTP конфигурацијата веќе постои
+    AlreadyDeactivated: SMTP конфигурацијата е веќе деактивирана
     SenderAdressNotCustomDomain: Адресата на испраќачот мора да биде конфигурирана како прилагоден домен на инстанцата.
+    TestEmailNotFound: Адресата на е-пошта за тест не е пронајдена
   Notification:
     NoDomain: Не е пронајден домен за пораката
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Корисникот не е пронајден
     AlreadyExists: Корисникот веќе постои
     NotFoundOnOrg: Корисникот не е пронајден во избраната организација
@@ -107,6 +122,7 @@ Errors:
       Key:
         NotFound: Machine key не е пронајден
         AlreadyExisting: Machine key веќе постои
+        Invalid: Јавниот клуч не е валиден јавен клуч RSA во формат PKIX со PEM кодирање
       Secret:
         NotExisting: Тајната не постои
         Invalid: Тајната е невалидна
@@ -132,7 +148,7 @@ Errors:
       Invalid: Невалидна лозинка
       NotSet: Корисникот нема поставено лозинка
       NotChanged: Новата лозинка не може да биде иста со вашата тековна лозинка
-      NotSupported: Не е поддржано хаш-кодирањето на лозинката
+      NotSupported: Не е поддржано хаш-кодирањето на лозинката. Проверете го https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Политиката за комплексност на лозинката не е пронајдена
       MinLength: Лозинката е прекратка
@@ -325,7 +341,7 @@ Errors:
       NotActive: Овластувањето за проектот не е активно
       NotInactive: Овластувањето за проектот не е неактивно
   IAM:
-    NotFound: Инстанцата не е пронајдена. Проверете https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM не е пронајден. Проверете дали имате точен домен. Погледнете на https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Улогите не се променети
     MemberInvalid: Членот е невалиден
@@ -466,6 +482,7 @@ Errors:
     NotActive: Акцијата не е активна
     NotInactive: Акцијата не е неактивна
     MaxAllowed: Не се дозволени дополнителни активни акции
+    NotEnabled: Функцијата „Акција“ не е овозможена
   Flow:
     FlowTypeMissing: FlowType не е наведен
     Empty: Flow е веќе празен
@@ -476,6 +493,8 @@ Errors:
     CloseRows: SQL наредбата не може да се заврши
     SQLStatement: SQL наредбата не може да се креира
     InvalidRequest: Барањето е невалидно
+    TooManyNestingLevels: Премногу нивоа на вгнездување на барања (макс 20)
+    LimitExceeded: Превишена граница
   Quota:
     AlreadyExists: Веќе постои квота за оваа единица
     NotFound: Квотата не е пронајдена за оваа единица
@@ -510,6 +529,7 @@ Errors:
     IDPMissing: ID на IDP недостасува во барањето6bg
     IDPInvalid: ВРЛ неважечки за барањето
     ResponseInvalid: Одговорот на ВРЛ е неважечки
+    MissingSingleMappingAttribute: не го содржи атрибутот за мапирање или има повеќе од една вредност
     SuccessURLMissing: URL за успех недостасува во барањето
     FailureURLMissing: URL за неуспех недостасува во барањето
     StateMissing: Параметарот State недостасува во барањето
@@ -532,6 +552,52 @@ Errors:
     NotExisting: Функцијата не постои
     TypeNotSupported: Типот на функција не е поддржан
     InvalidValue: Неважечка вредност за оваа функција
+  Target:
+    Invalid: Целта е неважечка
+    NoTimeout: Целта нема тајмаут
+    InvalidURL: Целта има неважечка URL-адреса
+    NotFound: Целта не е пронајдена
+  Execution:
+    ConditionInvalid: Условот за извршување е неважечки
+    Invalid: Извршувањето е неважечко
+    NotFound: Извршувањето не е пронајдено
+    IncludeNotFound: Вклучете не е пронајден
+    NoTargets: Не се дефинирани цели
+    Failed: Извршувањето не успеа
+    ResponseIsNotValidJSON: Одговорот не е валиден JSON
+  UserSchema:
+    NotEnabled: Функцијата „Корисничка шема“ не е овозможена
+    Type:
+      Missing: Недостасува тип на корисничка шема
+      AlreadyExists: Тип на корисничка шема веќе постои
+    Authenticator:
+      Invalid: Неважечки тип на автентикатор
+    NotActive: Корисничката шема не е активна
+    NotInactive: Корисничката шема не е неактивна
+    NotExists: Корисничката шема не постои
+    ID:
+      Missing: Недостасува ID на корисничка шема
+    Invalid: Корисничката шема е неважечка
+    Data:
+      Invalid: Податоците не се валидни за корисничка шема
+  TokenExchange:
+    FeatureDisabled: Функцијата за размена на токени е оневозможена на вашиот пример. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Недостасува токен
+      Invalid: Токенот е неважечки
+      TypeMissing: Недостасува тип на токен
+      TypeNotAllowed: Типот на токен не е дозволен
+      TypeNotSupported: Типот на токен не е поддржан
+      NotForAPI: Имитирани токени не се дозволени за API
+    Impersonation:
+      PolicyDisabled: Имитирањето е оневозможено во политиката за безбедност на примерот
+  WebKey:
+    ActiveDelete: Не може да се избрише активниот веб-клуч
+    Config: Неважечка конфигурација на веб-клуч
+    Duplicate: ID на веб-клучот не е единствен
+    FeatureDisabled: Функцијата за веб-клуч е оневозможена
+    NoActive: Не е пронајден активен веб-клуч
+    NotFound: Веб-клучот не е пронајден
 
 AggregateTypes:
   action: Акција
@@ -543,8 +609,28 @@ AggregateTypes:
   usergrant: Овластување на корисник
   quota: Квота
   feature: Карактеристика
+  target: Цел
+  execution: Извршување
+  user_schema: Корисничка шема
+  auth_request: Барање за автентикација
+  device_auth: Уред за автентикација
+  idpintent: Намера на IDP
+  limits: Ограничувања
+  milestone: Милениум
+  oidc_session: OIDC сесија
+  restrictions: Ограничувања
+  system: Систем
+  session: Сесија
+  web_key: Веб клуч
 
 EventTypes:
+  execution:
+    set: Комплет за извршување
+    removed: Извршувањето е избришано
+  target:
+    added: Целта е избришана
+    changed: Целта е променета
+    removed: Целта е избришана
   user:
     added: Додаден корисник
     selfregistered: Корисникот се регистрираше сам
@@ -557,7 +643,9 @@ EventTypes:
         failed: Проверката на иницијализацијата е неуспешна
     token:
       added: Креиран е токен за пристап
+      v2.added: Креиран е токен за пристап
       removed: Токенот за пристап е отстранет
+    impersonated: Корисникот имитиран
     username:
       reserved: Корисничкото име е резервирано
       released: Корисничкото име е ослободено
@@ -580,6 +668,7 @@ EventTypes:
         removed: Клучот е отстранет
       secret:
         set: Тајната е додадена
+        updated: Тајниот хаш е ажуриран
         removed: Тајната е отстрането
         check:
           succeeded: Проверката на тајната е успешна
@@ -597,6 +686,13 @@ EventTypes:
         check:
           succeeded: Проверката на иницијализацијата е успешна
           failed: Проверката на иницијализацијата е неуспешна
+      invite:
+        code:
+          added: Генериран е код за покана
+          sent: Изпратен е код за покана
+        check:
+          succeeded: Проверката на поканата е успешна
+          failed: Проверката на поканата е неуспешна
       username:
         reserved: Корисничкото име е резервирано
         released: Корисничкото име е ослободено
@@ -955,6 +1051,14 @@ EventTypes:
             succeeded: Проверката на OIDC клиентска тајна е успешна
             failed: Проверката на OIDC клиентска тајна е неуспешна
         key:
+          added: Додаден е OIDC клуч за апликација
+          removed: OIDC клучот за апликација е отстранет
+      api:
+        secret:
+          check:
+            succeeded: Проверката на тајната на API беше успешна
+            failed: Проверката на тајната на API не успеа
+        key:
           added: Додаден клуч за апликацијата
           removed: Отстранет клуч за апликацијата
       config:
@@ -966,11 +1070,13 @@ EventTypes:
           changed: Променета OIDC конфигурација
           secret:
             changed: Променета OIDC тајна
+            updated: Тајниот хаш на OIDC е ажуриран
         api:
           added: Додадена API конфигурација
           changed: Променета API конфигурација
           secret:
             changed: Променета API тајна
+            updated: Тајниот хаш на API е ажуриран
   policy:
     password:
       complexity:
@@ -1065,6 +1171,9 @@ EventTypes:
       config:
         added: Додадена SMTP конфигурација
         changed: Променета SMTP конфигурација
+        activated: SMTP конфигурацијата е активирана
+        deactivated: SMTP конфигурацијата е деактивирана
+        removed: SMTP конфигурацијата е отстранета
         password:
           changed: Променена тајна на SMTP конфигурација
     sms:
@@ -1209,9 +1318,42 @@ EventTypes:
       config:
         added: Додадена SMTP конфигурација
         changed: Променета SMTP конфигурација
+        activated: SMTP конфигурацијата е активирана
+        deactivated: SMTP конфигурацијата е деактивирана
         password:
           changed: Променета лозинка на SMTP конфигурацијата
         removed: Отстранета SMTP конфигурација
+  user_schema:
+    created: Создадена е корисничка шема
+    updated: Корисничката шема е ажурирана
+    deactivated: Корисничката шема е деактивирана
+    reactivated: Корисничката шема е реактивирана
+    deleted: Корисничката шема е избришана
+    user:
+      created: Корисникот е создаден
+      updated: Корисникот е ажуриран
+      deleted: Корисникот е избришан
+      email:
+        updated: Адресата на е-пошта е променета
+        verified: Адресата на е-пошта е потврдена
+        verification:
+          failed: Потврдата на адресата на е-пошта не успеа
+        code:
+          added: Генериран е код за потврда на адресата на е-пошта
+          sent: Испратен е код за потврда на адресата на е-пошта
+      phone:
+        updated: Телефонскиот број е променет
+        verified: Телефонскиот број е потврден
+        verification:
+          failed: Потврдата на телефонскиот број не успеа
+        code:
+          added: Генериран е кодот за потврда на телефонскиот број
+          sent: Кодот за потврда на телефонскиот број е испратен
+  web_key:
+    added: Додаден е веб-клуч
+    activated: Веб-клучот е активиран
+    deactivated: Веб-клучот е деактивиран
+    removed: Веб-клучот е отстранет
 
 Application:
   OIDC:

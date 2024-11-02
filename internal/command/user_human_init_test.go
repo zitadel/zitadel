@@ -18,7 +18,7 @@ import (
 
 func TestCommandSide_ResendInitialMail(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx             context.Context
@@ -26,6 +26,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 		email           string
 		resourceOwner   string
 		secretGenerator crypto.Generator
+		authRequestID   string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -40,9 +41,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -55,8 +54,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -72,8 +70,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 		{
 			name: "user not initialized, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -107,8 +104,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 		{
 			name: "new code email not changed, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -128,6 +124,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								nil, time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -141,6 +138,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
+							"",
 						),
 					),
 				),
@@ -159,10 +157,9 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 			},
 		},
 		{
-			name: "new code, ok",
+			name: "new code email not changed with authRequestID, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -182,6 +179,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								nil, time.Hour*1,
+								"authRequestID",
 							),
 						),
 					),
@@ -195,6 +193,63 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
+							"authRequestID",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				email:           "email@test.ch",
+				secretGenerator: GetMockSecretGenerator(t),
+				authRequestID:   "authRequestID",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "new code, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
+								"",
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							"",
 						),
 					),
 				),
@@ -212,10 +267,9 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 			},
 		},
 		{
-			name: "new code with change email, ok",
+			name: "new code with authRequestID, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -235,6 +289,62 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								nil, time.Hour*1,
+								"authRequestID",
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							"authRequestID",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
+				authRequestID:   "authRequestID",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "new code with change email, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil, time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -252,6 +362,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 								Crypted:    []byte("a"),
 							},
 							time.Hour*1,
+							"",
 						),
 					),
 				),
@@ -273,9 +384,9 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ResendInitialMail(tt.args.ctx, tt.args.userID, domain.EmailAddress(tt.args.email), tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.ResendInitialMail(tt.args.ctx, tt.args.userID, domain.EmailAddress(tt.args.email), tt.args.resourceOwner, tt.args.secretGenerator, tt.args.authRequestID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -283,7 +394,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -291,8 +402,8 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 
 func TestCommandSide_VerifyInitCode(t *testing.T) {
 	type fields struct {
-		eventstore         *eventstore.Eventstore
-		userPasswordHasher *crypto.PasswordHasher
+		eventstore         func(*testing.T) *eventstore.Eventstore
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx             context.Context
@@ -300,6 +411,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		code            string
 		resourceOwner   string
 		password        string
+		userAgentID     string
 		secretGenerator crypto.Generator
 	}
 	type res struct {
@@ -315,9 +427,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -331,9 +441,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		{
 			name: "code missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -347,8 +455,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -365,8 +472,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		{
 			name: "code not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -398,8 +504,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		{
 			name: "invalid code, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -425,6 +530,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -449,8 +555,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		{
 			name: "valid code, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -476,6 +581,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -505,8 +611,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		{
 			name: "valid code with password, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -535,6 +640,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -578,14 +684,91 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "valid code with password and userAgentID, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate)),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+								"",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"userAgent1",
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:             context.Background(),
+				userID:          "user1",
+				code:            "a",
+				resourceOwner:   "org1",
+				password:        "password",
+				userAgentID:     "userAgent1",
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.secretGenerator)
+			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.userAgentID, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -598,7 +781,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 
 func TestCommandSide_InitCodeSent(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -617,9 +800,7 @@ func TestCommandSide_InitCodeSent(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -632,8 +813,7 @@ func TestCommandSide_InitCodeSent(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -649,8 +829,7 @@ func TestCommandSide_InitCodeSent(t *testing.T) {
 		{
 			name: "code sent, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -685,7 +864,7 @@ func TestCommandSide_InitCodeSent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			err := r.HumanInitCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
 			if tt.res.err == nil {

@@ -521,7 +521,7 @@ func TestNewListQuery(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *ListQuery
+		want    *listQuery
 		wantErr func(error) bool
 	}{
 		{
@@ -575,7 +575,7 @@ func TestNewListQuery(t *testing.T) {
 				data:    []interface{}{"hurst"},
 				compare: ListIn,
 			},
-			want: &ListQuery{
+			want: &listQuery{
 				Column:  testCol,
 				Data:    []interface{}{"hurst"},
 				Compare: ListIn,
@@ -588,7 +588,7 @@ func TestNewListQuery(t *testing.T) {
 				data:    &SubSelect{Column: testCol, Queries: []SearchQuery{&textQuery{testCol, "horst1", TextEquals}}},
 				compare: ListIn,
 			},
-			want: &ListQuery{
+			want: &listQuery{
 				Column:  testCol,
 				Data:    &SubSelect{Column: testCol, Queries: []SearchQuery{&textQuery{testCol, "horst1", TextEquals}}},
 				Compare: ListIn,
@@ -751,7 +751,7 @@ func TestListQuery_comp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &ListQuery{
+			s := &listQuery{
 				Column:  tt.fields.Column,
 				Data:    tt.fields.Data,
 				Compare: tt.fields.Compare,

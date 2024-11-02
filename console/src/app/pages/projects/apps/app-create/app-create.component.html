@@ -233,7 +233,7 @@
           [options]="{
             lineNumbers: true,
             theme: 'material',
-            mode: 'application/xml'
+            mode: 'application/xml',
           }"
         ></ngx-codemirror>
       </div>
@@ -307,7 +307,7 @@
           </span>
         </div>
 
-        <div class="row">
+        <div class="row" *ngIf="appType?.value?.createType === AppCreateType.OIDC && authMethod?.value !== 'DEVICECODE'">
           <span class="left cnsl-secondary-text">
             {{ 'APP.OIDC.REDIRECT' | translate }}
           </span>
@@ -322,7 +322,7 @@
           </span>
         </div>
 
-        <div class="row">
+        <div class="row" *ngIf="appType?.value?.createType === AppCreateType.OIDC && authMethod?.value !== 'DEVICECODE'">
           <span class="left cnsl-secondary-text">
             {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
           </span>
@@ -524,7 +524,7 @@
                 [options]="{
                   lineNumbers: true,
                   theme: 'material',
-                  mode: 'application/xml'
+                  mode: 'application/xml',
                 }"
               ></ngx-codemirror>
             </div>

@@ -7,99 +7,12 @@
         *ngIf="
           breadc[breadc.length - 1] &&
           !breadc[breadc.length - 1].hideNav &&
-          breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER
+          breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER &&
+          breadc[breadc.length - 1].type !== BreadcrumbType.INSTANCE
         "
         [ngSwitch]="breadc[0].type"
       >
         <div class="nav-row" @navrow>
-          <ng-container *ngSwitchCase="BreadcrumbType.INSTANCE">
-            <div class="nav-row-abs" @navroworg>
-              <ng-template cnslHasRole [hasRole]="['iam.read']">
-                <a
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/instance']"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.INSTANCEOVERVIEW' | translate }} </span>
-                  </div>
-                </a>
-
-                <a
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/orgs']"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.ORGS' | translate }} </span>
-                  </div>
-                </a>
-
-                <a
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/events']"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.EVENTS' | translate }} </span>
-                  </div>
-                </a>
-
-                <a
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/views']"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.VIEWS' | translate }} </span>
-                  </div>
-                </a>
-
-                <a
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/failed-events']"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.FAILEDEVENTS' | translate }} </span>
-                  </div>
-                </a>
-
-                <a
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/settings']"
-                  *ngIf="['iam.read', 'iam.policy.read'] | hasRole: true | async"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.SETTINGS' | translate }} </span>
-                  </div>
-                </a>
-
-                <a
-                  *ngIf="customerPortalLink$ | async as customerPortalLink"
-                  class="nav-item external-link"
-                  [href]="customerPortalLink"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.CUSTOMERPORTAL' | translate }} </span>
-                  </div>
-                  <i class="las la-external-link-alt"></i>
-                </a>
-              </ng-template>
-
-              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
-            </div>
-          </ng-container>
-
           <ng-container *ngSwitchCase="BreadcrumbType.ORG">
             <div class="nav-row-abs" @navrowproject>
               <a
@@ -183,7 +96,12 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org-settings']"
-                    *ngIf="['policy.read'] | hasRole | async"
+                    *ngIf="
+                      (['policy.read'] | hasRole | async) &&
+                      ((['iam.read$', 'iam.write$'] | hasRole | async) === false ||
+                        (((authService.cachedOrgs | async)?.length ?? 1) > 1 &&
+                          (['iam.read$', 'iam.write$'] | hasRole | async)))
+                    "
                   >
                     <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
                   </a>

@@ -17,6 +17,8 @@ import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.intercep
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
+import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
+import { GrpcAuthService } from './grpc-auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +27,7 @@ export class GrpcService {
   public auth!: AuthServiceClient;
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
+  public feature!: FeatureServiceClient;
 
   constructor(
     private envService: EnvironmentService,
@@ -71,6 +74,12 @@ export class GrpcService {
             interceptors,
           );
           this.admin = new AdminServiceClient(
+            env.api,
+            null,
+            // @ts-ignore
+            interceptors,
+          );
+          this.feature = new FeatureServiceClient(
             env.api,
             null,
             // @ts-ignore

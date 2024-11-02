@@ -410,7 +410,7 @@ func CustomTextsToLoginDomain(instanceID, aggregateID, lang string, texts *Custo
 			registrationOrgKeyToDomain(text, result)
 		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyLinkingUserDone) {
-			linkingUserKeyToDomain(text, result)
+			linkingUserDoneKeyToDomain(text, result)
 		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyExternalNotFound) {
 			externalUserNotFoundKeyToDomain(text, result)
@@ -888,6 +888,9 @@ func passwordChangeKeyToDomain(text *CustomText, result *domain.CustomLoginText)
 	if text.Key == domain.LoginKeyPasswordChangeDescription {
 		result.PasswordChange.Description = text.Text
 	}
+	if text.Key == domain.LoginKeyPasswordChangeExpiredDescription {
+		result.PasswordChange.ExpiredDescription = text.Text
+	}
 	if text.Key == domain.LoginKeyPasswordChangeOldPasswordLabel {
 		result.PasswordChange.OldPasswordLabel = text.Text
 	}
@@ -1100,7 +1103,7 @@ func registrationOrgKeyToDomain(text *CustomText, result *domain.CustomLoginText
 	}
 }
 
-func linkingUserKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
+func linkingUserDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLinkingUserDoneTitle {
 		result.LinkingUsersDone.Title = text.Text
 	}

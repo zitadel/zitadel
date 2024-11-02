@@ -13,6 +13,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/static"
 )
 
@@ -278,7 +279,7 @@ type db struct {
 
 func prepareDB(t *testing.T, expectations ...expectation) db {
 	t.Helper()
-	client, mock, err := sqlmock.New()
+	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Fatalf("unable to create sql mock: %v", err)
 	}
@@ -295,7 +296,7 @@ type expectation func(m sqlmock.Sqlmock)
 
 func expectExists(query string, value bool, args ...driver.Value) expectation {
 	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(args...).WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(value))
+		m.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(args...).WillReturnRows(m.NewRows([]string{"exists"}).AddRow(value))
 	}
 }
 
@@ -307,7 +308,7 @@ func expectQueryErr(query string, err error, args ...driver.Value) expectation {
 func expectQuery(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
 		q := m.ExpectQuery(regexp.QuoteMeta(stmt)).WithArgs(args...)
-		result := sqlmock.NewRows(cols)
+		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
 			if cols[len(cols)-1] == "count" {

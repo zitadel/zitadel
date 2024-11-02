@@ -67,7 +67,6 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPush(),
 				),
 			},
 			args: args{
@@ -357,7 +356,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

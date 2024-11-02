@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -18,7 +17,7 @@ const (
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Usage      domain.KeyUsage `json:"usage"`
+	Usage      crypto.KeyUsage `json:"usage"`
 	Algorithm  string          `json:"algorithm"`
 	PrivateKey *Key            `json:"privateKey"`
 	PublicKey  *Key            `json:"publicKey"`
@@ -40,7 +39,7 @@ func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 func NewAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	usage domain.KeyUsage,
+	usage crypto.KeyUsage,
 	algorithm string,
 	privateCrypto,
 	publicCrypto *crypto.CryptoValue,

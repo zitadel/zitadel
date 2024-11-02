@@ -1,0 +1,2672 @@
+{
+  "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadata",
+    "HOME": {
+      "TITLE": "Kom igång med ZITADEL",
+      "NEXT": {
+        "TITLE": "Dina nästa steg",
+        "DESCRIPTION": "Slutför följande steg för att säkra din applikation.",
+        "CREATE_PROJECT": {
+          "TITLE": "Skapa ett projekt",
+          "DESCRIPTION": "Lägg till ett projekt och definiera dess roller och behörigheter."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Kom igång",
+          "DESCRIPTION": "Följ snabbstartsguiden steg för steg och börja bygga omedelbart."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentation",
+          "DESCRIPTION": "Utforska ZITADELs kunskapsbas för att bekanta dig med kärnkoncept och idéer. Lär dig hur ZITADEL fungerar och hur du använder det."
+        },
+        "EXAMPLES": {
+          "TITLE": "Exempel och mjukvaruutvecklingskit",
+          "DESCRIPTION": "Bläddra bland våra exempel och SDKs för att använda ZITADEL tillsammans med dina favoritprogrammeringsspråk och verktyg."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organisation",
+      "DESCRIPTION": "En organisation är värd för användare, projekt med appar, identitetsleverantörer och inställningar som företagsbranding. Vill du dela inställningar över flera organisationer? Konfigurera standardinställningar.",
+      "METADATA": "Lägg till anpassade attribut till organisationen som dess plats eller en identifierare i ett annat system. Du kan använda denna information i dina åtgärder."
+    },
+    "PROJECTS": {
+      "TITLE": "Projekt",
+      "DESCRIPTION": "Ett projekt är värd för en eller flera applikationer som du kan använda för att autentisera dina användare. Du kan också auktorisera dina användare med projekt. För att tillåta användare från andra organisationer att logga in på dina applikationer, ge dem åtkomst till ditt projekt.<br/><br/>Om du inte kan hitta ett projekt, kontakta projektets ägare eller någon med motsvarande rättigheter för att få åtkomst.",
+      "OWNED": {
+        "TITLE": "Ägda projekt",
+        "DESCRIPTION": "Detta är de projekt du äger. Du kan hantera dessa projekts inställningar, behörigheter och applikationer."
+      },
+      "GRANTED": {
+        "TITLE": "Beviljade projekt",
+        "DESCRIPTION": "Detta är de projekt som andra organisationer har beviljat dig. Med beviljade projekt kan du ge dina användare åtkomst till andra organisationers applikationer."
+      }
+    },
+    "USERS": {
+      "TITLE": "Användare",
+      "DESCRIPTION": "En användare är en människa eller en maskin som kan få åtkomst till dina applikationer.",
+      "HUMANS": {
+        "TITLE": "Användare",
+        "DESCRIPTION": "Användare autentiserar interaktivt i en webbläsarsession med en inloggningsprompt.",
+        "METADATA": "Lägg till anpassade attribut till användaren som avdelningen. Du kan använda denna information i dina åtgärder."
+      },
+      "MACHINES": {
+        "TITLE": "Tjänsteanvändare",
+        "DESCRIPTION": "Tjänsteanvändare autentiserar icke-interaktivt med en JWT-bärare token signerad med en privat nyckel. De kan också använda en personlig åtkomsttoken.",
+        "METADATA": "Lägg till anpassade attribut till användaren som autentiseringssystemet. Du kan använda denna information i dina åtgärder."
+      },
+      "SELF": {
+        "METADATA": "Lägg till anpassade attribut till din användare som din avdelning. Du kan använda denna information i din organisations åtgärder."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Behörigheter",
+      "DESCRIPTION": "Behörigheter definierar en användares åtkomsträttigheter till ett projekt. Du kan ge en användare åtkomst till ett projekt och definiera användarens roller inom det projektet."
+    },
+    "ACTIONS": {
+      "TITLE": "Åtgärder",
+      "DESCRIPTION": "Kör anpassad kod på händelser som inträffar när dina användare autentiserar sig på ZITADEL. Automatisera dina processer, berika dina användares metadata och deras tokens eller meddela externa system.",
+      "SCRIPTS": {
+        "TITLE": "Skript",
+        "DESCRIPTION": "Skriv din JavaScript-kod en gång och trigga den i flera flöden."
+      },
+      "FLOWS": {
+        "TITLE": "Flöden",
+        "DESCRIPTION": "Välj ett autentiseringsflöde och trigga din åtgärd vid en specifik händelse inom detta flöde."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Standardinställningar",
+        "DESCRIPTION": "Standardinställningar för alla organisationer. Med rätt behörigheter kan vissa av dem åsidosättas i organisationsinställningar."
+      },
+      "ORG": {
+        "TITLE": "Organisationsinställningar",
+        "DESCRIPTION": "Anpassa inställningarna för din organisation."
+      },
+      "FEATURES": {
+        "TITLE": "Funktionsinställningar",
+        "DESCRIPTION": "Lås upp funktioner för din instans."
+      },
+      "IDPS": {
+        "TITLE": "Identitetsleverantörer",
+        "DESCRIPTION": "Skapa och aktivera externa identitetsleverantörer. Välj en välkänd leverantör eller konfigurera någon annan OIDC-, OAuth- eller SAML-kompatibel leverantör efter eget val. Du kan till och med använda dina befintliga JWT-tokens som federerade identiteter genom att konfigurera en JWT-identitetsleverantör.",
+        "NEXT": "Vad nu?",
+        "SAML": {
+          "TITLE": "Konfigurera din SAML-identitetsleverantör",
+          "DESCRIPTION": "ZITADEL är konfigurerad. Nu behöver din SAML-identitetsleverantör lite konfiguration. De flesta leverantörer tillåter dig att bara ladda upp hela ZITADEL-metadata XML. Andra leverantörer ber dig att endast tillhandahålla några specifika URL:er, som till exempel enhets-ID (metadata URL), Assertion Consumer Service (ACS) URL eller Single Logout URL."
+        },
+        "CALLBACK": {
+          "TITLE": "Konfigurera din {{ provider }} identitetsleverantör",
+          "DESCRIPTION": "Innan du kan konfigurera ZITADEL, skicka denna URL till din identitetsleverantör för att möjliggöra webbläsarens omdirigering tillbaka till ZITADEL efter autentisering."
+        },
+        "JWT": {
+          "TITLE": "Använd JWTs som federerade identiteter",
+          "DESCRIPTION": "JWT-identitetsleverantören gör det möjligt för dig att använda dina befintliga JWT-tokens som federerade identiteter. Denna funktion är praktisk om du redan har en utgivare för JWTs. Med en JWT IdP kan du använda dessa JWTs för att skapa och uppdatera användare i ZITADEL direkt."
+        },
+        "LDAP": {
+          "TITLE": "Konfigurera ZITADEL för att ansluta till din LDAP-identitetsleverantör",
+          "DESCRIPTION": "Tillhandahåll anslutningsdetaljerna till din LDAP-server och konfigurera mappningen av dina LDAP-attribut till ZITADEL-attribut."
+        },
+        "AUTOFILL": {
+          "TITLE": "Autofyll användardata",
+          "DESCRIPTION": "Använd en åtgärd för att förbättra dina användares upplevelse. Du kan förifylla ZITADELs registreringsformulär med värden från identitetsleverantören."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktivera IdP",
+          "DESCRIPTION": "Din IdP är inte aktiv än. Aktivera den för att tillåta dina användare att logga in."
+        }
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Lösenordskomplexitet",
+        "DESCRIPTION": "Säkerställ att dina användare använder starka lösenord genom att definiera komplexitetsregler."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Anpassa utseendet och känslan av ditt inloggningsformulär. Kom ihåg att tillämpa din konfiguration när du är klar."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Externa länkar",
+        "DESCRIPTION": "Guida dina användare till anpassade externa resurser som visas på inloggningssidan. Användare måste acceptera användarvillkoren och integritetspolicyn innan de kan registrera sig. Ändra länken till din dokumentation eller ställ in en tom sträng för att dölja dokumentationsknappen från konsolen. Lägg till en anpassad extern länk och en anpassad text för den länken i konsolen, eller ställ in dem tomma för att dölja den knappen."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP-inställningar",
+        "DESCRIPTION": "Konfigurera din SMTP-server för att använda en domän för avsändaradressen som dina användare känner till och litar på."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS-inställningar",
+        "DESCRIPTION": "För att låsa upp alla ZITADEL-funktioner, konfigurera Twilio för att skicka SMS-meddelanden till dina användare."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Händelser",
+        "DESCRIPTION": "Denna sida visar alla tillståndsändringar i din instans så långt tillbaka som din instans revisionsspårgräns. Filtrera listan efter tidsintervall för felsökningsändamål eller filtrera den efter en aggregering för revisionsändamål."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Misslyckade händelser",
+        "DESCRIPTION": "Denna sida visar alla misslyckade händelser i din instans. Om ZITADEL inte beter sig som du förväntar dig, kontrollera alltid denna lista först."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Vy",
+        "DESCRIPTION": "Denna sida visar alla dina databasvyer och när de behandlade sin senaste händelse. Om du saknar data, kontrollera om vyn är uppdaterad."
+      },
+      "LANGUAGES": {
+        "TITLE": "Språk",
+        "DESCRIPTION": "Begränsa de språk som inloggningsformuläret och meddelandena översätts till. Om du vill inaktivera några av språken, dra dem till sektionen Ej tillåtna språk. Du kan ange ett tillåtet språk som standardspråk. Om en användares föredragna språk inte är tillåtet, används standardspråket."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Hemlighetsgeneratorer",
+        "DESCRIPTION": "Definiera dina hemligheters komplexitet och livslängd. Högre komplexitet och livslängd förbättrar säkerheten, lägre komplexitet och livslängd förbättrar dekrypteringsprestandan."
+      },
+      "SECURITY": {
+        "TITLE": "Säkerhetsinställningar",
+        "DESCRIPTION": "Aktivera ZITADEL-funktioner som kan ha säkerhetspåverkan. Du bör verkligen veta vad du gör innan du ändrar dessa inställningar."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect-inställningar",
+        "DESCRIPTION": "Konfigurera dina OIDC-tokeners livslängd. Använd kortare livslängd för att öka dina användares säkerhet, använd längre livslängd för att öka dina användares bekvämlighet.",
+        "LABEL_HOURS": "Maximal livslängd i timmar",
+        "LABEL_DAYS": "Maximal livslängd i dagar",
+        "ACCESS_TOKEN": {
+          "TITLE": "Åtkomsttoken",
+          "DESCRIPTION": "Åtkomsttoken används för att autentisera en användare. Det är en kortlivad token som används för att få åtkomst till användarens data. Använd en kort livslängd för att minimera risken för obehörig åtkomst. Åtkomsttoken kan automatiskt förnyas med en förnyelsetoken."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID-token",
+          "DESCRIPTION": "ID-token är en JSON Web Token (JWT) som innehåller påståenden om användaren. ID-tokenens livslängd bör inte överstiga åtkomsttokenens livslängd."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Förnyelsetoken",
+          "DESCRIPTION": "Förnyelsetoken används för att erhålla en ny åtkomsttoken. Det är en långlivad token som används för att förnya åtkomsttokenen. En användare måste manuellt återautentisera när förnyelsetokenen går ut."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Inaktiv förnyelsetoken",
+          "DESCRIPTION": "Den inaktiva förnyelsetokenens livslängd är den maximala tiden en förnyelsetoken kan vara oanvänd."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Meddelandetexter",
+        "DESCRIPTION": "Anpassa texterna i dina notifikationsmail eller SMS-meddelanden. Om du vill inaktivera några av språken, begränsa dem i dina instansers språkinställningar.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "När du hävdar en domän för din organisation, kommer användare som inte använder denna domän i sitt inloggningsnamn att uppmanas att ändra sitt inloggningsnamn för att matcha den hävdade domänen.",
+          "INIT": "När en användare skapas, kommer de att få ett mail med en länk för att ställa in sitt lösenord.",
+          "PC": "När en användare ändrar sitt lösenord, kommer de att få en notifikation om ändringen om du har aktiverat detta i notifikationsinställningarna.",
+          "PL": "När en användare lägger till en lösenordsfri autentiseringsmetod, måste de aktivera den genom att klicka på en länk i ett mail.",
+          "PR": "När en användare återställer sitt lösenord, kommer de att få ett mail med en länk för att ställa in ett nytt lösenord.",
+          "VE": "När en användare ändrar sin e-postadress, kommer de att få ett mail med en länk för att verifiera den nya adressen.",
+          "VP": "När en användare ändrar sitt telefonnummer, kommer de att få ett SMS med en kod för att verifiera det nya numret.",
+          "VEO": "När en användare lägger till en engångslösenord via e-postmetod, måste de aktivera den genom att ange en kod som skickas till deras e-postadress.",
+          "VSO": "När en användare lägger till en engångslösenord via SMS-metod, måste de aktivera den genom att ange en kod som skickas till deras telefonnummer.",
+          "IU": "När en inbjudningskod för användare skapas, får de ett e-mail med en länk för att ställa in sin autentiseringsmetod."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Inloggningsgränssnittstexter",
+        "DESCRIPTION": "Anpassa texterna i ditt inloggningsformulär. Om en text är tom, visar platshållaren standardvärdet. Om du vill inaktivera några av språken, begränsa dem i dina instansers språkinställningar."
+      },
+      "DOMAINS": {
+        "TITLE": "Domäninställningar",
+        "DESCRIPTION": "Definiera begränsningar för dina domäner och konfigurera dina inloggningsnamnsmönster.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Kräv att anpassade domäner verifieras",
+          "DESCRIPTION": "Om detta är aktiverat, måste organisationsdomäner verifieras innan de kan användas för domänupptäckt eller användarnamnssuffixering."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Inloggningsnamnsmönster",
+          "DESCRIPTION": "Kontrollera mönstret för dina användares inloggningsnamn. ZITADEL väljer din användares organisation så snart de anger sitt inloggningsnamn. Därför måste inloggningsnamnen vara unika över alla organisationer. Om du har användare som har ett konto i flera domäner, kan du säkerställa unikhet genom att suffixera dina inloggningsnamn med organisationsdomänen."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domänverifiering",
+          "DESCRIPTION": "Tillåt endast din organisation att använda de domäner de faktiskt kontrollerar. Om aktiverat, verifieras organisationsdomäner periodiskt genom DNS- eller HTTP-utmaning innan de kan användas. Detta är en säkerhetsfunktion för att förhindra domänkapning."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP-avsändaradress",
+          "DESCRIPTION": "Tillåt endast en SMTP-avsändaradress om den matchar en av dina instansdomäner."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Inloggningstider",
+          "DESCRIPTION": "Förstärk din säkerhet genom att minska några inloggningsrelaterade maximala livslängder.",
+          "LABEL": "Maximal livslängd i timmar",
+          "PW_CHECK": {
+            "TITLE": "Lösenordskontroll",
+            "DESCRIPTION": "Användare kommer att behöva autentisera om med sitt lösenord efter denna period."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Extern inloggningskontroll",
+            "DESCRIPTION": "Dina användare omdirigeras till sina externa identitetsleverantörer under dessa perioder."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Multifaktor initieringskontroll",
+            "DESCRIPTION": "Dina användare kommer att uppmanas att ställa in en andra faktor eller en tvåfaktor under dessa perioder, om de inte redan har gjort det. En livslängd på 0 inaktiverar denna prompt."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Andra faktorkontroll",
+            "DESCRIPTION": "Dina användare måste återvalidera sin andra faktor under dessa perioder."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Tvåfaktorkontroll",
+            "DESCRIPTION": "Dina användare måste återvalidera sin tvåfaktor under dessa perioder."
+          }
+        },
+        "FORM": {
+          "TITLE": "Inloggningsformulär",
+          "DESCRIPTION": "Anpassa inloggningsformuläret.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Användarnamn och lösenord tillåtet",
+            "DESCRIPTION": "Tillåt dina användare att logga in med sitt användarnamn och lösenord. Om detta är inaktiverat, kan dina användare endast logga in med lösenordsfri autentisering eller med en extern identitetsleverantör."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Användarregistrering tillåten",
+            "DESCRIPTION": "Tillåt anonyma användare att skapa ett konto."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Organisationsregistrering tillåten",
+            "DESCRIPTION": "Tillåt anonyma användare att skapa en organisation."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Extern inloggning tillåten",
+            "DESCRIPTION": "Tillåt dina användare att logga in med en extern identitetsleverantör istället för att använda ZITADEL-användaren för att logga in."
+          },
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Lösenordsåterställning dold",
+            "DESCRIPTION": "Tillåt inte dina användare att återställa sitt lösenord."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Domänupptäckt tillåten",
+            "DESCRIPTION": "Hitta dina användares organisationer beroende på deras inloggningsnamns domän, till exempel deras e-postadress."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignorera okända användarnamn",
+            "DESCRIPTION": "Om detta är aktiverat, kommer inloggningsformuläret inte att visa ett felmeddelande om användarnamnet är okänt. Detta hjälper till att förhindra användarnamnsgissning."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Inaktivera e-postinloggning",
+            "DESCRIPTION": "Om detta är aktiverat, kan dina användare inte använda sina e-postadresser för att logga in. Observera att om du inaktiverar detta, måste dina användares e-postadresser vara unika över alla organisationer för att kunna logga in."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Inaktivera telefoninloggning",
+            "DESCRIPTION": "Om detta är aktiverat, kan dina användare inte använda sina telefonnummer för att logga in. Observera att om du inaktiverar detta, måste dina användares telefonnummer vara unika över alla organisationer för att kunna logga in."
+          }
+        }
+      }
+    }
+  },
+  "PAGINATOR": {
+    "PREVIOUS": "Föregående",
+    "NEXT": "Nästa",
+    "COUNT": "Totalt antal resultat",
+    "MORE": "Mer"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontakt",
+      "TOS": "Användarvillkor",
+      "PP": "Integritetspolicy"
+    },
+    "THEME": {
+      "DARK": "Mörk",
+      "LIGHT": "Ljus"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Kom igång med ZITADEL",
+    "DISCLAIMER": "ZITADEL behandlar dina data konfidentiellt och säkert.",
+    "DISCLAIMERLINK": "Mer information",
+    "DOCUMENTATION": {
+      "DESCRIPTION": "Kom igång med ZITADEL snabbt."
+    },
+    "GETSTARTED": {
+      "DESCRIPTION": "Kom igång med ZITADEL snabbt."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Första Steg",
+      "DESCRIPTION": "Kom igång med ZITADEL snabbt."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Genvägar",
+      "SETTINGS": "Tillgängliga genvägar",
+      "PROJECTS": "Projekt",
+      "REORDER": "Håll och dra plattan för att flytta den",
+      "ADD": "Håll och dra en platta för att lägga till"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Dina nästa steg",
+    "MOREDESCRIPTION": "fler genvägar",
+    "COMPLETED": "slutförd",
+    "DISMISS": "Nej tack, jag är ett proffs.",
+    "CARD": {
+      "TITLE": "Få din ZITADEL att fungera",
+      "DESCRIPTION": "Denna checklista hjälper dig att ställa in din instans och guidar dig genom de mest väsentliga stegen"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Ställ in ditt varumärke",
+        "description": "Definiera färg och form på din inloggning och ladda upp din logotyp och ikoner.",
+        "action": "Ställ in varumärke"
+      },
+      "instance.smtp.config.added": {
+        "title": "Ställ in dina SMTP-inställningar",
+        "description": "Ställ in dina egna e-postserverinställningar.",
+        "action": "Ställ in SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Skapa ett projekt",
+        "description": "Lägg till ett projekt och definiera dess roller och behörigheter.",
+        "action": "Skapa projekt"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Registrera din app",
+        "description": "Registrera din webb-, native-, API- eller SAML-applikation och ställ in ett autentiseringsflöde.",
+        "action": "Registrera app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Logga in på din app",
+        "description": "Integrera din applikation med ZITADEL för autentisering och testa det genom att logga in med din administratörsanvändare.",
+        "action": "Logga in"
+      },
+      "user.human.added": {
+        "title": "Lägg till användare",
+        "description": "Lägg till dina applikationsanvändare",
+        "action": "Lägg till användare"
+      },
+      "user.grant.added": {
+        "title": "Bevilja användare",
+        "description": "Tillåt användare att få tillgång till din applikation och ställ in deras roll.",
+        "action": "Bevilja användare"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Standardinställningar",
+    "DASHBOARD": "Hem",
+    "PERSONAL_INFO": "Personlig Information",
+    "DOCUMENTATION": "Dokumentation",
+    "INSTANCEOVERVIEW": "Instans",
+    "ORGS": "Organisationer",
+    "VIEWS": "Vy",
+    "EVENTS": "Händelser",
+    "FAILEDEVENTS": "Misslyckade Händelser",
+    "ORGANIZATION": "Organisation",
+    "PROJECT": "Projekt",
+    "PROJECTOVERVIEW": "Översikt",
+    "PROJECTGRANTS": "Beviljanden",
+    "ROLES": "Roller",
+    "GRANTEDPROJECT": "Beviljade Projekt",
+    "HUMANUSERS": "Användare",
+    "MACHINEUSERS": "Tjänsteanvändare",
+    "LOGOUT": "Logga ut alla användare",
+    "NEWORG": "Ny Organisation",
+    "IAMADMIN": "Du är en IAM-administratör. Observera att du har utökade behörigheter.",
+    "SHOWORGS": "Visa Alla Organisationer",
+    "GRANTS": "Behörigheter",
+    "ACTIONS": "Åtgärder",
+    "PRIVACY": "Integritet",
+    "TOS": "Användarvillkor",
+    "OPENSHORTCUTSTOOLTIP": "Skriv ? för att visa tangentbordsgenvägar",
+    "SETTINGS": "Inställningar",
+    "CUSTOMERPORTAL": "Kundportal"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integrera ZITADEL i din applikation",
+    "DESCRIPTION": "Integrera ZITADEL i din applikation eller använd ett av våra exempel för att komma igång på några minuter.",
+    "BTN_START": "Skapa Applikation",
+    "BTN_LEARNMORE": "Läs Mer",
+    "CREATEPROJECTFORAPP": "Skapa Projekt {{value}}",
+    "SELECT_FRAMEWORK": "Välj Ramverk",
+    "FRAMEWORK": "Ramverk",
+    "FRAMEWORK_OTHER": "Annat (OIDC, SAML, API)",
+    "ALMOSTDONE": "Du är nästan klar.",
+    "REVIEWCONFIGURATION": "Granska Konfiguration",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Vi har skapat en grundläggande konfiguration för {{value}} applikationer. Du kan anpassa denna konfiguration efter dina behov efter skapandet.",
+    "REDIRECTS": "Konfigurera omdirigeringar",
+    "DEVMODEWARN": "Utvecklingsläge är aktiverat som standard. Du kan uppdatera värden för produktion senare.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Bläddra bland Exempel och SDKs",
+    "DUPLICATEAPPRENAME": "En app med samma namn finns redan. Vänligen välj ett annat namn.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Byt Ramverk",
+        "DESCRIPTION": "Välj ett av de tillgängliga ramverken för snabb inställning av din applikation."
+      }
+    }
+  },
+  "ACTIONS": {
+    "ACTIONS": "Åtgärder",
+    "FILTER": "Filter",
+    "RENAME": "Byt namn",
+    "SET": "Sätt",
+    "COPY": "Kopiera till urklipp",
+    "COPIED": "Kopierat till urklipp.",
+    "RESET": "Återställ",
+    "RESETDEFAULT": "Återställ till standard",
+    "RESETTO": "Återställ till: ",
+    "RESETCURRENT": "Återställ till nuvarande",
+    "SHOW": "Visa",
+    "HIDE": "Dölj",
+    "SAVE": "Spara",
+    "SAVENOW": "Spara nu",
+    "NEW": "Ny",
+    "ADD": "Lägg till",
+    "CREATE": "Skapa",
+    "CONTINUE": "Fortsätt",
+    "CONTINUEWITH": "Fortsätt med {{value}}",
+    "BACK": "Tillbaka",
+    "CLOSE": "Stäng",
+    "CLEAR": "Rensa",
+    "CANCEL": "Avbryt",
+    "INFO": "Info",
+    "OK": "OK",
+    "SELECT": "Välj",
+    "VIEW": "Visa",
+    "SELECTIONDELETE": "Radera val",
+    "DELETE": "Radera",
+    "REMOVE": "Ta bort",
+    "VERIFY": "Verifiera",
+    "FINISH": "Avsluta",
+    "FINISHED": "Stäng",
+    "CHANGE": "Ändra",
+    "REACTIVATE": "Återaktivera",
+    "ACTIVATE": "Aktivera",
+    "DEACTIVATE": "Inaktivera",
+    "REFRESH": "Uppdatera",
+    "LOGIN": "Logga in",
+    "EDIT": "Redigera",
+    "PIN": "Fäst / Lossa",
+    "CONFIGURE": "Konfigurera",
+    "SEND": "Skicka",
+    "NEWVALUE": "Nytt värde",
+    "RESTORE": "Återställ",
+    "CONTINUEWITHOUTSAVE": "Fortsätt utan att spara",
+    "OF": "av",
+    "PREVIOUS": "Föregående",
+    "NEXT": "Nästa",
+    "MORE": "mer",
+    "STEP": "Steg",
+    "SETUP": "Inställning",
+    "TEST": "Testa",
+    "UNSAVEDCHANGES": "Osparade ändringar",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Är du säker på att du vill förkasta denna nya åtgärd? Din åtgärd kommer att gå förlorad",
+        "CANCEL": "Avbryt",
+        "DISCARD": "Förkasta"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Visa användare {{value}}"
+    },
+    "DOWNLOAD": "Ladda ner",
+    "APPLY": "Tillämpa"
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Har kontroll över hela instansen, inklusive alla organisationer",
+    "IAM_OWNER_VIEWER": "Har behörighet att granska hela instansen, inklusive alla organisationer",
+    "IAM_ORG_MANAGER": "Har behörighet att skapa och hantera organisationer",
+    "IAM_USER_MANAGER": "Har behörighet att skapa och hantera användare",
+    "IAM_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från alla organisationer",
+    "IAM_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från alla organisationer",
+    "ORG_OWNER": "Har behörighet över hela organisationen",
+    "ORG_USER_MANAGER": "Har behörighet att skapa och hantera användare i organisationen",
+    "ORG_OWNER_VIEWER": "Har behörighet att granska hela organisationen",
+    "ORG_USER_PERMISSION_EDITOR": "Har behörighet att hantera användarbehörigheter",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Har behörighet att hantera projektbehörigheter",
+    "ORG_PROJECT_CREATOR": "Har behörighet att skapa egna projekt och underliggande inställningar",
+    "ORG_ADMIN_IMPERSONATOR": "Har behörighet att imitera administratörer och slutanvändare från organisationen",
+    "ORG_END_USER_IMPERSONATOR": "Har behörighet att imitera slutanvändare från organisationen",
+    "PROJECT_OWNER": "Har behörighet över hela projektet",
+    "PROJECT_OWNER_VIEWER": "Har behörighet att granska hela projektet",
+    "PROJECT_OWNER_GLOBAL": "Har behörighet över hela projektet",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Har behörighet att granska hela projektet",
+    "PROJECT_GRANT_OWNER": "Har behörighet att hantera projektbidraget",
+    "PROJECT_GRANT_OWNER_VIEWER": "Har behörighet att granska projektbidraget"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Alla organisationsinställningar och tabeller i konsolen baseras på en vald organisation. Klicka på denna knapp för att byta organisation eller skapa en ny."
+    },
+    "INSTANCE": {
+      "TEXT": "Klicka här för att komma till instansinställningarna. Observera att du bara har tillgång till denna knapp om du har utökade behörigheter."
+    },
+    "PROFILE": {
+      "TEXT": "Här kan du växla mellan dina användarkonton och hantera dina sessioner och din profil."
+    },
+    "NAV": {
+      "TEXT": "Denna navigering ändras baserat på din valda organisation ovan eller din instans"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Organisationskontexten har ändrats."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Vyn har just ändrats till instans!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "STATE": "Status",
+    "DISPLAYNAME": "Användarens visningsnamn",
+    "EMAIL": "E-post",
+    "USERNAME": "Användarnamn",
+    "ORGNAME": "Organisationsnamn",
+    "PRIMARYDOMAIN": "Primär domän",
+    "PROJECTNAME": "Projektnamn",
+    "RESOURCEOWNER": "Resursägare",
+    "METHODS": {
+      "5": "innehåller",
+      "7": "slutar med",
+      "1": "är lika med"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Tangentbordsgenvägar",
+    "UNDERORGCONTEXT": "Inom organisationssidor",
+    "SIDEWIDE": "Webbplatsomfattande genvägar",
+    "SHORTCUTS": {
+      "HOME": "<strong>G</strong>å till <strong>H</strong>em",
+      "INSTANCE": "<strong>G</strong>å till <strong>I</strong>nstans",
+      "ORG": "<strong>G</strong>å till <strong>O</strong>rganisation",
+      "ORGSETTINGS": "<strong>G</strong>å till Organisations<strong>i</strong>nställningar",
+      "ORGSWITCHER": "Byt Organisation",
+      "ME": "Gå till egen profil",
+      "PROJECTS": "<strong>G</strong>å till <strong>P</strong>rojekt",
+      "USERS": "<strong>G</strong>å till <strong>A</strong>nvändare",
+      "USERGRANTS": "<strong>G</strong>å till <strong>A</strong>uktorisationer",
+      "ACTIONS": "<strong>G</strong>å till Åtgärder och <strong>F</strong>löden",
+      "DOMAINS": "<strong>G</strong>å till <strong>D</strong>omäner"
+    }
+  },
+  "RESOURCEID": "Resurs-ID",
+  "NAME": "Namn",
+  "VERSION": "Version",
+  "TABLE": {
+    "NOROWS": "Ingen data"
+  },
+  "ERRORS": {
+    "REQUIRED": "Vänligen fyll i detta fält.",
+    "ATLEASTONE": "Ange minst ett värde.",
+    "TOKENINVALID": {
+      "TITLE": "Din auktoriseringstoken har gått ut.",
+      "DESCRIPTION": "Klicka på knappen nedan för att logga in igen."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Din instans är blockerad.",
+      "DESCRIPTION": "Be din ZITADEL-instansadministratör att uppdatera prenumerationen."
+    },
+    "INVALID_FORMAT": "Formateringen är ogiltig.",
+    "NOTANEMAIL": "Det angivna värdet är inte en e-postadress.",
+    "MINLENGTH": "Måste vara minst {{requiredLength}} tecken lång.",
+    "MAXLENGTH": "Måste vara mindre än {{requiredLength}} tecken.",
+    "UPPERCASEMISSING": "Måste innehålla en versal.",
+    "LOWERCASEMISSING": "Måste innehålla en gemen.",
+    "SYMBOLERROR": "Måste innehålla en symbol eller ett skiljetecken.",
+    "NUMBERERROR": "Måste innehålla en siffra.",
+    "PWNOTEQUAL": "De angivna lösenorden matchar inte.",
+    "PHONE": "Telefonnumret måste börja med +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Inställningar",
+      "GENERAL": "Allmänt",
+      "IDP": "Identitetsleverantörer",
+      "SECURITY": "Lösenord och Säkerhet",
+      "KEYS": "Nycklar",
+      "PAT": "Personliga Åtkomsttoken",
+      "USERGRANTS": "Auktorisationer",
+      "MEMBERSHIPS": "Medlemskap",
+      "METADATA": "Metadata"
+    },
+    "TITLE": "Personlig Information",
+    "DESCRIPTION": "Hantera din information och säkerhetsinställningar.",
+    "PAGES": {
+      "TITLE": "Användare",
+      "DETAIL": "Detalj",
+      "CREATE": "Skapa",
+      "MY": "Min Information",
+      "LOGINNAMES": "Inloggningsnamn",
+      "LOGINMETHODS": "Inloggningsmetoder",
+      "LOGINNAMESDESC": "Detta är dina inloggningsnamn:",
+      "NOUSER": "Ingen associerad användare.",
+      "REACTIVATE": "Återaktivera",
+      "DEACTIVATE": "Inaktivera",
+      "FILTER": "Filter",
+      "STATE": "Status",
+      "DELETE": "Radera Användare",
+      "UNLOCK": "Lås Upp Användare",
+      "GENERATESECRET": "Generera Klienthemlighet",
+      "REMOVESECRET": "Ta Bort Klienthemlighet",
+      "LOCKEDDESCRIPTION": "Denna användare har blivit låst på grund av att ha överskridit maximalt antal inloggningsförsök och måste låsas upp för att kunna användas igen.",
+      "DELETEACCOUNT": "Radera Konto",
+      "DELETEACCOUNT_DESC": "Om du utför denna åtgärd kommer du att loggas ut och inte längre ha tillgång till ditt konto. Denna åtgärd är inte reversibel, så fortsätt med försiktighet.",
+      "DELETEACCOUNT_BTN": "Radera Konto",
+      "DELETEACCOUNT_SUCCESS": "Konto raderat framgångsrikt!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Skapad",
+      "DATECHANGED": "Ändrad"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Radera Användare",
+      "DELETE_SELF_TITLE": "Radera Konto",
+      "DELETE_DESCRIPTION": "Du är på väg att permanent radera en användare. Är du säker?",
+      "DELETE_SELF_DESCRIPTION": "Du är på väg att permanent radera ditt personliga konto. Detta kommer att logga ut dig och radera din användare. Denna åtgärd kan inte ångras!",
+      "DELETE_AUTH_DESCRIPTION": "Du är på väg att permanent radera ditt personliga konto. Är du säker?",
+      "TYPEUSERNAME": "Skriv '{{value}}' för att bekräfta och radera användaren.",
+      "USERNAME": "Inloggningsnamn",
+      "DELETE_BTN": "Radera permanent"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Skicka E-postmeddelande",
+      "DESCRIPTION": "Klicka på knappen nedan för att skicka en notifikation till den aktuella e-postadressen eller ändra e-postadressen i fältet.",
+      "NEWEMAIL": "Ny e-postadress"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Klienthemlighet",
+      "CLIENTSECRET_DESCRIPTION": "Förvara din klienthemlighet på en säker plats eftersom den kommer att försvinna när dialogrutan stängs."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Inaktivera",
+      "ACTIVATE": "Aktivera",
+      "CHANGEDATE": "Senast Ändrad",
+      "CREATIONDATE": "Skapad Den",
+      "FILTER": {
+        "0": "Filtrera efter Visningsnamn",
+        "1": "Filtrera efter Användarnamn",
+        "2": "Filtrera efter Visningsnamn",
+        "3": "Filtrera efter Användarnamn",
+        "4": "Filtrera efter E-post",
+        "5": "Filtrera efter Visningsnamn",
+        "10": "Filtrera efter organisationsnamn",
+        "12": "Filtrera efter projektnamn"
+      },
+      "EMPTY": "Inga poster"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Skicka registreringslänk",
+      "TABLETYPE": "Typ",
+      "TABLESTATE": "Status",
+      "NAME": "Namn",
+      "EMPTY": "Ingen enhet inställd",
+      "TITLE": "lösenordsfri autentisering",
+      "DESCRIPTION": "Lägg till WebAuthn-baserade autentiseringsmetoder för att logga in på ZITADEL lösenordsfrit.",
+      "MANAGE_DESCRIPTION": "Hantera användarnas andra faktormetoder.",
+      "U2F": "Lägg till metod",
+      "U2F_DIALOG_TITLE": "Verifiera autentiserare",
+      "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda lösenordsfria inloggning",
+      "U2F_SUCCESS": "lösenordsfri autentisering skapad framgångsrikt!",
+      "U2F_ERROR": "Ett fel inträffade under inställningen!",
+      "U2F_NAME": "Autentiserarens namn",
+      "TYPE": {
+        "0": "Ingen MFA definierad",
+        "1": "Engångslösenord (OTP)",
+        "2": "Fingeravtryck, säkerhetsnycklar, Face ID och andra"
+      },
+      "STATE": {
+        "0": "Ingen status",
+        "1": "Inte redo",
+        "2": "Redo",
+        "3": "Raderad"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Ta bort lösenordsfri autentiseringsmetod",
+        "DELETE_DESCRIPTION": "Du håller på att ta bort en lösenordsfri autentiseringsmetod. Är du säker?",
+        "ADD_TITLE": "lösenordsfri autentisering",
+        "ADD_DESCRIPTION": "Välj ett av de tillgängliga alternativen för att skapa en lösenordsfri autentiseringsmetod.",
+        "SEND_DESCRIPTION": "Skicka en registreringslänk till din e-postadress.",
+        "SEND": "Skicka registreringslänk",
+        "SENT": "E-postmeddelandet skickades framgångsrikt. Kontrollera din inkorg för att fortsätta med inställningen.",
+        "QRCODE_DESCRIPTION": "Generera QR-kod för skanning med en annan enhet.",
+        "QRCODE": "Generera QR-kod",
+        "QRCODE_SCAN": "Skanna denna QR-kod för att fortsätta med inställningen på din enhet.",
+        "NEW_DESCRIPTION": "Använd denna enhet för att ställa in lösenordsfrit.",
+        "NEW": "Lägg till ny"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Typ",
+      "TABLESTATE": "Status",
+      "NAME": "Namn",
+      "EMPTY": "Inga ytterligare faktorer",
+      "TITLE": "Tvåfaktorautentisering",
+      "DESCRIPTION": "Lägg till en andra faktor för att säkerställa optimal säkerhet för ditt konto.",
+      "MANAGE_DESCRIPTION": "Hantera användarnas andra faktormetoder.",
+      "ADD": "Lägg till faktor",
+      "OTP": "Autentiseringsapp för TOTP (Tidsbaserat engångslösenord)",
+      "OTP_DIALOG_TITLE": "Lägg till OTP",
+      "OTP_DIALOG_DESCRIPTION": "Skanna QR-koden med en autentiseringsapp och ange koden nedan för att verifiera och aktivera OTP-metoden.",
+      "U2F": "Fingeravtryck, säkerhetsnycklar, Face ID och andra",
+      "U2F_DIALOG_TITLE": "Verifiera faktor",
+      "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda universella tvåfaktor.",
+      "U2F_SUCCESS": "Faktor tillagd framgångsrikt!",
+      "U2F_ERROR": "Ett fel inträffade under inställningen!",
+      "U2F_NAME": "Autentiserarens namn",
+      "OTPSMS": "OTP (Engångslösenord) med SMS",
+      "OTPEMAIL": "OTP (Engångslösenord) med e-post",
+      "SETUPOTPSMSDESCRIPTION": "Vill du ställa in detta telefonnummer som OTP (Engångslösenord) andra faktor?",
+      "OTPSMSSUCCESS": "OTP-faktor inställd med framgång.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Din telefon måste verifieras för att använda denna metod.",
+      "OTPEMAILSUCCESS": "OTP-faktor inställd med framgång.",
+      "TYPE": {
+        "0": "Ingen MFA definierad",
+        "1": "Engångslösenord (OTP)",
+        "2": "Fingeravtryck, säkerhetsnycklar, Face ID och andra"
+      },
+      "STATE": {
+        "0": "Ingen status",
+        "1": "Inte redo",
+        "2": "Redo",
+        "3": "Raderad"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Ta bort andra faktorn",
+        "MFA_DELETE_DESCRIPTION": "Du håller på att ta bort en andra faktor. Är du säker?",
+        "ADD_MFA_TITLE": "Lägg till andra faktorn",
+        "ADD_MFA_DESCRIPTION": "Välj ett av följande alternativ."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Externa identitetsleverantörer",
+      "DESC": "",
+      "IDPCONFIGID": "IDP-konfigurations-ID",
+      "IDPNAME": "IDP-namn",
+      "USERDISPLAYNAME": "Externt namn",
+      "EXTERNALUSERID": "Extern användar-ID",
+      "EMPTY": "Ingen extern IDP hittades",
+      "DIALOG": {
+        "DELETE_TITLE": "Ta bort IDP",
+        "DELETE_DESCRIPTION": "Du håller på att ta bort en identitetsleverantör från en användare. Vill du verkligen fortsätta?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Skapa en ny användare",
+      "DESCRIPTION": "Vänligen ange nödvändig information.",
+      "NAMEANDEMAILSECTION": "Namn och e-post",
+      "GENDERLANGSECTION": "Kön och språk",
+      "PHONESECTION": "Telefonnummer",
+      "PASSWORDSECTION": "Initialt lösenord",
+      "ADDRESSANDPHONESECTION": "Telefonnummer",
+      "INITMAILDESCRIPTION": "Om båda alternativen är valda kommer inget e-postmeddelande för initialisering att skickas. Om endast ett av alternativen är valt kommer ett e-postmeddelande för att tillhandahålla/verifiera uppgifterna att skickas."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Verifiera telefonnummer",
+      "DESCRIPTION": "Ange koden du fick via textmeddelande för att verifiera ditt telefonnummer.",
+      "CODE": "Kod"
+    },
+    "DATA": {
+      "STATE": "Status",
+      "STATE0": "Okänd",
+      "STATE1": "Aktiv",
+      "STATE2": "Inaktiv",
+      "STATE3": "Raderad",
+      "STATE4": "Låst",
+      "STATE5": "Avstängd",
+      "STATE6": "Initial"
+    },
+    "PROFILE": {
+      "TITLE": "Profil",
+      "EMAIL": "E-post",
+      "PHONE": "Telefonnummer",
+      "PHONE_HINT": "Använd + symbolen följt av landskoden, eller välj landet från rullgardinsmenyn och ange sedan telefonnumret",
+      "USERNAME": "Användarnamn",
+      "CHANGEUSERNAME": "ändra",
+      "CHANGEUSERNAME_TITLE": "Ändra användarnamn",
+      "CHANGEUSERNAME_DESC": "Ange det nya namnet i fältet nedan.",
+      "FIRSTNAME": "Förnamn",
+      "LASTNAME": "Efternamn",
+      "NICKNAME": "Smeknamn",
+      "DISPLAYNAME": "Visningsnamn",
+      "PREFERREDLOGINNAME": "Föredraget inloggningsnamn",
+      "PREFERRED_LANGUAGE": "Språk",
+      "GENDER": "Kön",
+      "PASSWORD": "Lösenord",
+      "AVATAR": {
+        "UPLOADTITLE": "Ladda upp din profilbild",
+        "UPLOADBTN": "Välj fil",
+        "UPLOAD": "Ladda upp",
+        "CURRENT": "Nuvarande bild",
+        "PREVIEW": "Förhandsgranska",
+        "DELETESUCCESS": "Raderad framgångsrikt!",
+        "CROPPERERROR": "Ett fel inträffade vid uppladdning av din fil. Försök med ett annat format och storlek om nödvändigt."
+      },
+      "COUNTRY": "Land"
+    },
+    "MACHINE": {
+      "TITLE": "Användardetaljer för tjänst",
+      "USERNAME": "Användarnamn",
+      "NAME": "Namn",
+      "DESCRIPTION": "Beskrivning",
+      "KEYSTITLE": "Nycklar",
+      "KEYSDESC": "Definiera dina nycklar och lägg till ett valfritt utgångsdatum.",
+      "TOKENSTITLE": "Personliga åtkomsttoken",
+      "TOKENSDESC": "Personliga åtkomsttoken fungerar som vanliga OAuth-åtkomsttoken.",
+      "ID": "Nyckel-ID",
+      "TYPE": "Typ",
+      "EXPIRATIONDATE": "Utgångsdatum",
+      "CHOOSEDATEAFTER": "Ange ett giltigt utgångsdatum efter",
+      "CHOOSEEXPIRY": "Välj ett utgångsdatum",
+      "CREATIONDATE": "Skapelsedatum",
+      "KEYDETAILS": "Nyckeldetaljer",
+      "ACCESSTOKENTYPE": "Åtkomsttokentyp",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Lägg till nyckel",
+        "DESCRIPTION": "Välj din nyckeltyp och välj ett valfritt utgångsdatum."
+      },
+      "ADDED": {
+        "TITLE": "Nyckeln skapades",
+        "DESCRIPTION": "Ladda ner nyckeln eftersom den inte kommer att vara synlig efter att du stänger denna dialog!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Radera nyckel",
+          "DESCRIPTION": "Vill du radera den valda nyckeln? Detta kan inte ångras."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Lösenord",
+      "LABEL": "Ett säkert lösenord hjälper till att skydda kontot",
+      "DESCRIPTION": "Ange det nya lösenordet enligt policyn nedan.",
+      "OLD": "Nuvarande lösenord",
+      "NEW": "Nytt lösenord",
+      "CONFIRM": "Bekräfta nytt lösenord",
+      "NEWINITIAL": "Lösenord",
+      "CONFIRMINITIAL": "Bekräfta lösenord",
+      "RESET": "Återställ nuvarande lösenord",
+      "SET": "Ange nytt lösenord",
+      "RESENDNOTIFICATION": "Skicka länk för återställning av lösenord",
+      "REQUIRED": "Några obligatoriska fält saknas.",
+      "MINLENGTHERROR": "Måste vara minst {{value}} tecken långt.",
+      "MAXLENGTHERROR": "Måste vara mindre än {{value}} tecken."
+    },
+    "ID": "ID",
+    "EMAIL": "E-post",
+    "PHONE": "Telefonnummer",
+    "PHONEEMPTY": "Inget telefonnummer definierat",
+    "PHONEVERIFIED": "Telefonnummer verifierat.",
+    "EMAILVERIFIED": "E-post verifierad",
+    "NOTVERIFIED": "inte verifierad",
+    "PREFERRED_LOGINNAME": "Föredraget inloggningsnamn",
+    "ISINITIAL": "Användaren är ännu inte aktiv.",
+    "LOGINMETHODS": {
+      "TITLE": "Kontaktinformation",
+      "DESCRIPTION": "Den angivna informationen används för att skicka viktig information, som e-post för återställning av lösenord, till dig.",
+      "EMAIL": {
+        "TITLE": "E-post",
+        "VALID": "validerad",
+        "ISVERIFIED": "E-post verifierad",
+        "ISVERIFIEDDESC": "Om e-posten anges som verifierad kommer ingen e-postverifieringsbegäran att göras.",
+        "RESEND": "Skicka verifierings-e-post igen",
+        "EDITTITLE": "Ändra e-post",
+        "EDITDESC": "Ange den nya e-posten i fältet nedan."
+      },
+      "PHONE": {
+        "TITLE": "Telefon",
+        "VALID": "validerad",
+        "RESEND": "Skicka verifierings-sms igen",
+        "EDITTITLE": "Ändra nummer",
+        "EDITVALUE": "Telefonnummer",
+        "EDITDESC": "Ange det nya telefonnumret i fältet nedan.",
+        "DELETETITLE": "Radera telefonnummer",
+        "DELETEDESC": "Vill du verkligen radera telefonnumret",
+        "OTPSMSREMOVALWARNING": "Detta konto använder detta telefonnummer som andra faktor. Du kommer inte att kunna använda det efter att du fortsätter."
+      },
+      "RESENDCODE": "Skicka kod igen",
+      "ENTERCODE": "Verifiera",
+      "ENTERCODE_DESC": "Verifiera kod"
+    },
+    "GRANTS": {
+      "TITLE": "Användarbehörigheter",
+      "DESCRIPTION": "Ge denna användare åtkomst till vissa projekt",
+      "CREATE": {
+        "TITLE": "Skapa användarbehörighet",
+        "DESCRIPTION": "Sök efter organisationen, projektet och motsvarande projektroller."
+      },
+      "PROJECTNAME": "Projektnamn",
+      "PROJECT-OWNED": "Projekt",
+      "PROJECT-GRANTED": "Beviljat projekt",
+      "FILTER": {
+        "0": "filtrera för användare",
+        "1": "filtrera för domän",
+        "2": "filtrera för projektnamn",
+        "3": "filtrera för rollnamn"
+      }
+    },
+    "STATE": {
+      "0": "Okänd",
+      "1": "Aktiv",
+      "2": "Inaktiv",
+      "3": "Raderad",
+      "4": "Låst",
+      "5": "Suspenderad",
+      "6": "Initial"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Inloggningsnamn (nuvarande organisation)",
+      "ADDITIONAL-EXTERNAL": "Inloggningsnamn (extern organisation)"
+    },
+    "TARGET": {
+      "SELF": "Om du vill ge en användare från en annan organisation",
+      "EXTERNAL": "För att ge en användare från din organisation",
+      "CLICKHERE": "klicka här"
+    },
+    "SIGNEDOUT": "Du är utloggad. Klicka på knappen \"Logga in\" för att logga in igen.",
+    "SIGNEDOUT_BTN": "Logga in",
+    "EDITACCOUNT": "Redigera konto",
+    "ADDACCOUNT": "Logga in med ett annat konto",
+    "RESENDINITIALEMAIL": "Skicka aktiveringsmail igen",
+    "RESENDEMAILNOTIFICATION": "Skicka e-postmeddelande igen",
+    "TOAST": {
+      "CREATED": "Användare skapad framgångsrikt.",
+      "SAVED": "Profil sparad framgångsrikt.",
+      "USERNAMECHANGED": "Användarnamn ändrat.",
+      "EMAILSAVED": "E-post sparad framgångsrikt.",
+      "INITEMAILSENT": "Initieringsmail skickat.",
+      "PHONESAVED": "Telefon sparad framgångsrikt.",
+      "PHONEREMOVED": "Telefon har tagits bort.",
+      "PHONEVERIFIED": "Telefon verifierad framgångsrikt.",
+      "PHONEVERIFICATIONSENT": "Telefonverifieringskod skickad.",
+      "EMAILVERIFICATIONSENT": "E-postverifieringskod skickad.",
+      "OTPREMOVED": "OTP borttagen.",
+      "U2FREMOVED": "Faktor borttagen.",
+      "PASSWORDLESSREMOVED": "lösenordsfri borttagen.",
+      "INITIALPASSWORDSET": "Initialt lösenord satt.",
+      "PASSWORDNOTIFICATIONSENT": "Lösenordsändringsmeddelande skickat.",
+      "PASSWORDCHANGED": "Lösenord ändrat framgångsrikt.",
+      "REACTIVATED": "Användare reaktiverad.",
+      "DEACTIVATED": "Användare deaktiverad.",
+      "SELECTEDREACTIVATED": "Valda användare reaktiverade.",
+      "SELECTEDDEACTIVATED": "Valda användare deaktiverade.",
+      "SELECTEDKEYSDELETED": "Valda nycklar raderade.",
+      "KEYADDED": "Nyckel tillagd!",
+      "MACHINEADDED": "Serviceanvändare skapad!",
+      "DELETED": "Användare raderad framgångsrikt!",
+      "UNLOCKED": "Användare upplåst framgångsrikt!",
+      "PASSWORDLESSREGISTRATIONSENT": "Registreringslänk skickad framgångsrikt.",
+      "SECRETGENERATED": "Hemlighet genererad framgångsrikt!",
+      "SECRETREMOVED": "Hemlighet borttagen framgångsrikt!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "ZITADEL Manager Roller",
+      "DESCRIPTION": "Detta är alla medlemsbeviljanden för användaren. Du kan också ändra dem på organisations-, projekt- eller IAM-detaljsidor.",
+      "ORGCONTEXT": "Du ser alla organisationer och projekt som är relaterade till den för närvarande valda organisationen.",
+      "USERCONTEXT": "Du ser alla organisationer och projekt som du är auktoriserad till. Inklusive andra organisationer.",
+      "CREATIONDATE": "Skapelsedatum",
+      "CHANGEDATE": "Senast ändrad",
+      "DISPLAYNAME": "Visningsnamn",
+      "REMOVE": "Ta bort",
+      "TYPE": "Typ",
+      "ORGID": "Organisations-ID",
+      "UPDATED": "Medlemskapet uppdaterades.",
+      "NOPERMISSIONTOEDIT": "Du saknar de nödvändiga behörigheterna för att redigera roller!",
+      "TYPES": {
+        "UNKNOWN": "Okänd",
+        "ORG": "Organisation",
+        "PROJECT": "Projekt",
+        "GRANTEDPROJECT": "Beviljat projekt"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Generera ny personlig åtkomsttoken",
+        "DESCRIPTION": "Definiera en anpassad utgångstid för token.",
+        "CHOOSEEXPIRY": "Välj ett utgångsdatum",
+        "CHOOSEDATEAFTER": "Ange ett giltigt utgångsdatum efter"
+      },
+      "ADDED": {
+        "TITLE": "Personlig åtkomsttoken",
+        "DESCRIPTION": "Se till att kopiera din personliga åtkomsttoken. Du kommer inte att kunna se den igen!"
+      },
+      "DELETE": {
+        "TITLE": "Radera token",
+        "DESCRIPTION": "Du är på väg att radera den personliga åtkomsttoken. Är du säker?"
+      },
+      "DELETED": "Token raderad med framgång."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "KEY": "Nyckel",
+    "VALUE": "Värde",
+    "ADD": "Ny post",
+    "SAVE": "Spara",
+    "EMPTY": "Ingen metadata",
+    "SETSUCCESS": "Element sparat framgångsrikt",
+    "REMOVESUCCESS": "Element raderat framgångsrikt"
+  },
+  "FLOWS": {
+    "ID": "ID",
+    "NAME": "Namn",
+    "STATE": "Status",
+    "STATES": {
+      "0": "ingen status",
+      "1": "inaktiv",
+      "2": "aktiv"
+    },
+    "ADDTRIGGER": "Lägg till trigger",
+    "FLOWCHANGED": "Flödet ändrades framgångsrikt",
+    "FLOWCLEARED": "Flödet återställdes framgångsrikt",
+    "TIMEOUT": "Timeout",
+    "TIMEOUTINSEC": "Timeout i sekunder",
+    "ALLOWEDTOFAIL": "Tillåtet att misslyckas",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Varning",
+      "DESCRIPTION": "Om du inaktiverar denna inställning kan det leda till att användare i din organisation inte kan logga in. Dessutom kommer du inte längre att kunna komma åt konsolen för att inaktivera åtgärden. Vi rekommenderar att skapa en administratörsanvändare i en separat organisation eller testa skript först i en utvecklingsmiljö eller en utvecklingsorganisation."
+    },
+    "SCRIPT": "Skript",
+    "FLOWTYPE": "Flödestyp",
+    "TRIGGERTYPE": "Triggertyp",
+    "ACTIONS": "Åtgärder",
+    "ACTIONSMAX": "Baserat på din nivå har du tillgängligt ett begränsat antal åtgärder ({{value}}). Se till att inaktivera de du inte behöver eller överväg att uppgradera din nivå.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Skapa en åtgärd"
+      },
+      "UPDATE": {
+        "TITLE": "Uppdatera åtgärd"
+      },
+      "DELETEACTION": {
+        "TITLE": "Radera åtgärd?",
+        "DESCRIPTION": "Du är på väg att radera en åtgärd. Detta kan inte ångras. Är du säker?",
+        "DELETE_SUCCESS": "Åtgärd raderad framgångsrikt."
+      },
+      "CLEAR": {
+        "TITLE": "Rensa flöde?",
+        "DESCRIPTION": "Du är på väg att återställa flödet tillsammans med dess triggers och åtgärder. Denna ändring kan inte återställas. Är du säker?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Radera valda åtgärder?",
+        "DESCRIPTION": "Är du säker på att du vill radera de valda åtgärderna från flödet?"
+      },
+      "ABOUTNAME": "Namnet på åtgärden och namnet på funktionen i javascriptet måste vara detsamma"
+    },
+    "TOAST": {
+      "ACTIONSSET": "Åtgärder sparade",
+      "ACTIONREACTIVATED": "Åtgärder återaktiverade med framgång",
+      "ACTIONDEACTIVATED": "Åtgärder avaktiverade med framgång"
+    }
+  },
+  "IAM": {
+    "POLICIES": {
+      "TITLE": "Systempolicyer och åtkomstinställningar",
+      "DESCRIPTION": "Hantera dina globala policyer och åtkomstinställningar."
+    },
+    "EVENTSTORE": {
+      "TITLE": "IAM Lagringsadministration",
+      "DESCRIPTION": "Hantera dina ZITADEL-vyer och misslyckade händelser."
+    },
+    "MEMBER": {
+      "TITLE": "Administratörer",
+      "DESCRIPTION": "Dessa administratörer får göra ändringar i din instans."
+    },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Anpassade domäner"
+    },
+    "STATE": {
+      "0": "Ospecificerad",
+      "1": "Skapar",
+      "2": "Kör",
+      "3": "Stoppar",
+      "4": "Stoppad"
+    },
+    "VIEWS": {
+      "VIEWNAME": "Namn",
+      "DATABASE": "Databas",
+      "SEQUENCE": "Sekvens",
+      "EVENTTIMESTAMP": "Tidsstämpel",
+      "LASTSPOOL": "Senaste lyckade spolningen",
+      "ACTIONS": "Åtgärder",
+      "CLEAR": "Rensa",
+      "CLEARED": "Vyn rensades framgångsrikt!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Rensa vy",
+        "VIEW_CLEAR_DESCRIPTION": "Du håller på att rensa en vy. Att rensa en vy skapar en process under vilken data eventuellt inte är tillgänglig för slutanvändare. Är du verkligen säker?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "VIEWNAME": "Namn",
+      "DATABASE": "Databas",
+      "FAILEDSEQUENCE": "Misslyckad sekvens",
+      "FAILURECOUNT": "Antal misslyckanden",
+      "LASTFAILED": "Senast misslyckad vid",
+      "ERRORMESSAGE": "Felmeddelande",
+      "ACTIONS": "Åtgärder",
+      "DELETE": "Ta bort",
+      "DELETESUCCESS": "Misslyckade händelser borttagna."
+    },
+    "EVENTS": {
+      "EDITOR": "Redaktör",
+      "EDITORID": "Redaktör ID",
+      "AGGREGATE": "Aggregera",
+      "AGGREGATEID": "Aggregerings-ID",
+      "AGGREGATETYPE": "Aggregeringstyp",
+      "RESOURCEOWNER": "Resursägare",
+      "SEQUENCE": "Sekvens",
+      "CREATIONDATE": "Skapad vid",
+      "TYPE": "Typ",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrera efter redaktör"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregeringstyp",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrera efter aggregering"
+        },
+        "TYPE": {
+          "TYPELABEL": "Typ",
+          "CHECKBOX": "Filtrera efter typ"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrera efter resursägare"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sekvens",
+          "CHECKBOX": "Filtrera efter sekvens"
+        },
+        "SORT": "Sortera",
+        "ASC": "Stigande",
+        "DESC": "Fallande",
+        "CREATIONDATE": {
+          "RADIO_FROM": "Från",
+          "RADIO_RANGE": "Intervall",
+          "LABEL_SINCE": "Sedan",
+          "LABEL_UNTIL": "Till"
+        },
+        "OTHER": "annan",
+        "OTHERS": "andra"
+      },
+      "DIALOG": {
+        "TITLE": "Händelsedetalj"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Administratör borttagen.",
+      "MEMBERSADDED": "Administratörer tillagda.",
+      "MEMBERADDED": "Administratör tillagd.",
+      "MEMBERCHANGED": "Administratör ändrad.",
+      "ROLEREMOVED": "Roll borttagen.",
+      "ROLECHANGED": "Roll ändrad.",
+      "REACTIVATED": "Återaktiverad",
+      "DEACTIVATED": "Avaktiverad"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Namn",
+      "ID": "ID",
+      "CREATIONDATE": "Skapelsedatum",
+      "DATECHANGED": "Ändrad",
+      "FILTER": "Filter",
+      "FILTERPLACEHOLDER": "Filtrera efter namn",
+      "LIST": "Organisationer",
+      "LISTDESCRIPTION": "Välj en organisation.",
+      "ACTIVE": "Aktiv",
+      "CREATE": "Skapa organisation",
+      "DEACTIVATE": "Inaktivera organisation",
+      "REACTIVATE": "Återaktivera organisation",
+      "NOPERMISSION": "Du har inte behörighet att komma åt organisationsinställningar.",
+      "USERSELFACCOUNT": "Använd ditt personliga konto som organisationsägare",
+      "ORGDETAIL_TITLE": "Ange namnet och domänen för din nya organisation.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Ange namnet på din nya organisation.",
+      "ORGDETAILUSER_TITLE": "Konfigurera organisationsägare",
+      "DELETE": "Radera organisation",
+      "DEFAULTLABEL": "Standard",
+      "SETASDEFAULT": "Ange som standardorganisation",
+      "DEFAULTORGSET": "Standardorganisation ändrad framgångsrikt",
+      "RENAME": {
+        "ACTION": "Byt namn",
+        "TITLE": "Byt namn på organisation",
+        "DESCRIPTION": "Ange det nya namnet för din organisation",
+        "BTN": "Byt namn"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Verifiera ägarskap av {{value}}",
+        "VERIFICATION": "Vi erbjuder dig två metoder för att manuellt validera din domän:",
+        "VERIFICATION_HTML": "- HTTP. Värd en tillfällig verifieringsfil på din webbplats",
+        "VERIFICATION_DNS": "- DNS. Skapa en TXT-post i DNS",
+        "VERIFICATION_DNS_DESC": "Om du hanterar {{ value }} och har tillgång till dina DNS-poster, kan du skapa en ny TXT-post med följande värden:",
+        "VERIFICATION_DNS_HOST_LABEL": "Värd:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Använd denna kod för värdet av TXT-posten:",
+        "VERIFICATION_HTTP_DESC": "Om du har tillgång till din webbhotell, ladda helt enkelt ner verifieringsfilen och ladda upp den på den angivna URL:en",
+        "VERIFICATION_HTTP_URL_LABEL": "Förväntad URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verifieringsfil:",
+        "VERIFICATION_SKIP": "Du kan hoppa över verifieringen för nu och fortsätta skapa din organisation, men för att använda din domän måste detta steg slutföras!",
+        "VERIFICATION_VALIDATION_DESC": "Radera inte verifieringskoden, eftersom ZITADEL kommer att kontrollera ägarskapet av din domän från tid till annan.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Begär ny token",
+        "VERIFICATION_VALIDATION_ONGOING": "Metoden {{ value }} har valts för att verifiera din domän. Klicka på knappen för att utlösa en verifieringskontroll eller återställa verifieringsprocessen.",
+        "VERIFICATION_SUCCESSFUL": "Domän verifierad framgångsrikt!",
+        "RESETMETHOD": "Återställ verifieringsmetod"
+      },
+      "DOWNLOAD_FILE": "Ladda ner fil",
+      "SELECTORGTOOLTIP": "Välj denna organisation.",
+      "PRIMARYDOMAIN": "Primär domän",
+      "STATE": "Status",
+      "USEPASSWORD": "Ange initialt lösenord",
+      "USEPASSWORDDESC": "Användaren behöver inte ange lösenordet under initialiseringen."
+    },
+    "LIST": {
+      "TITLE": "Organisationer",
+      "DESCRIPTION": "Dessa är organisationerna på din instans"
+    },
+    "DOMAINS": {
+      "NEW": "Lägg till domän",
+      "TITLE": "Verifierade domäner",
+      "DESCRIPTION": "Konfigurera dina organisationsdomäner. Denna domän kan användas för domänupptäckt och användarnamnssuffix.",
+      "SETPRIMARY": "Ange som primär",
+      "DELETE": {
+        "TITLE": "Radera domän",
+        "DESCRIPTION": "Du är på väg att radera en av dina domäner."
+      },
+      "ADD": {
+        "TITLE": "Lägg till domän",
+        "DESCRIPTION": "Du är på väg att lägga till en domän för din organisation. Efter en framgångsrik process kan domänen användas för domänupptäckt och som suffix för dina användare."
+      }
+    },
+    "STATE": {
+      "0": "Inte definierad",
+      "1": "Aktiv",
+      "2": "Inaktiverad"
+    },
+    "MEMBER": {
+      "TITLE": "Organisationsadministratörer",
+      "DESCRIPTION": "Definiera användarna som kan ändra dina organisationsinställningar."
+    },
+    "TOAST": {
+      "UPDATED": "Organisationen uppdaterad framgångsrikt.",
+      "DEACTIVATED": "Organisation inaktiverad.",
+      "REACTIVATED": "Organisation återaktiverad.",
+      "DOMAINADDED": "Domän tillagd.",
+      "DOMAINREMOVED": "Domän borttagen.",
+      "MEMBERADDED": "administratör tillagd.",
+      "MEMBERREMOVED": "administratör borttagen.",
+      "MEMBERCHANGED": "administratör ändrad.",
+      "SETPRIMARY": "Primär domän inställd.",
+      "DELETED": "Organisation raderad framgångsrikt",
+      "DEFAULTORGNOTFOUND": "Standardorganisationen hittades inte",
+      "ORG_WAS_DELETED": "Organisationen har raderats."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Inaktivera organisation",
+        "DESCRIPTION": "Du är på väg att inaktivera din organisation. Användare kommer inte att kunna logga in efteråt. Är du säker på att du vill fortsätta?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Återaktivera organisation",
+        "DESCRIPTION": "Du är på väg att återaktivera din organisation. Användare kommer att kunna logga in igen. Är du säker på att du vill fortsätta?"
+      },
+      "DELETE": {
+        "TITLE": "Radera organisation",
+        "DESCRIPTION": "Du är på väg att radera din organisation. Detta initierar en process där all organisationsrelaterad data kommer att raderas. Du kan inte ångra denna åtgärd för tillfället.",
+        "TYPENAME": "Skriv '{{value}}' för att radera din organisation.",
+        "ORGNAME": "Namn",
+        "BTN": "Radera"
+      }
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Instansinställningar",
+      "DESCRIPTION": "Dessa inställningar kommer att gälla för alla dina organisationer om de inte har åsidosatts."
+    },
+    "LIST": {
+      "ORGS": "Organisationer",
+      "FEATURESETTINGS": "Funktioner",
+      "LANGUAGES": "Språk",
+      "LOGIN": "Inloggningsbeteende och säkerhet",
+      "LOCKOUT": "Låsning",
+      "AGE": "Lösenordets utgång",
+      "COMPLEXITY": "Lösenordskomplexitet",
+      "NOTIFICATIONS": "Meddelanden",
+      "SMTP_PROVIDER": "SMTP-leverantör",
+      "SMS_PROVIDER": "SMS/Telefonleverantör",
+      "NOTIFICATIONS_DESC": "SMTP- och SMS-inställningar",
+      "MESSAGETEXTS": "Meddelandetexter",
+      "IDP": "Identitetsleverantörer",
+      "VERIFIED_DOMAINS": "Verifierade domäner",
+      "DOMAIN": "Domäninställningar",
+      "LOGINTEXTS": "Inloggningsgränssnittstexter",
+      "BRANDING": "Varumärke",
+      "PRIVACYPOLICY": "Externa länkar",
+      "OIDC": "OIDC-token livstid och utgång",
+      "SECRETS": "Hemlighetsgenerator",
+      "SECURITY": "Säkerhetsinställningar",
+      "EVENTS": "Händelser",
+      "FAILEDEVENTS": "Misslyckade händelser",
+      "VIEWS": "Vy"
+    },
+    "GROUPS": {
+      "GENERAL": "Allmän information",
+      "NOTIFICATIONS": "Aviseringar",
+      "LOGIN": "Inloggning och åtkomst",
+      "DOMAIN": "Domän",
+      "TEXTS": "Texter och språk",
+      "APPEARANCE": "Utseende",
+      "OTHER": "Övrigt",
+      "STORAGE": "Lagring"
+    }
+  },
+  "SETTING": {
+    "LANGUAGES": {
+      "DEFAULT": "Standardspråk",
+      "ALLOWED": "Tillåtna språk",
+      "NOT_ALLOWED": "Ej tillåtna språk",
+      "ALLOW_ALL": "Tillåt alla",
+      "DISALLOW_ALL": "Tillåt inga",
+      "SETASDEFAULT": "Ange som standardspråk",
+      "DEFAULT_SAVED": "Standardspråk sparat",
+      "ALLOWED_SAVED": "Tillåtna språk sparade",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia",
+        "hu": "Magyar"
+      }
+    },
+    "SMTP": {
+      "TITLE": "SMTP-leverantör",
+      "DESCRIPTION": "Beskrivning",
+      "SENDERADDRESS": "Avsändarens e-postadress",
+      "SENDERNAME": "Avsändarens namn",
+      "REPLYTOADDRESS": "Svarsadress",
+      "HOSTANDPORT": "Värd och port",
+      "USER": "Användare",
+      "PASSWORD": "Lösenord",
+      "SETPASSWORD": "Ange SMTP-lösenord",
+      "PASSWORDSET": "SMTP-lösenordet har angetts framgångsrikt.",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Sparat framgångsrikt!",
+      "NOCHANGES": "Inga ändringar!",
+      "REQUIREDWARN": "För att skicka aviseringar från din domän måste du ange dina SMTP-uppgifter."
+    },
+    "SMS": {
+      "PROVIDERS": "Leverantörer",
+      "PROVIDER": "SMS-leverantör",
+      "ADDPROVIDER": "Lägg till SMS-leverantör",
+      "ADDPROVIDERDESCRIPTION": "Välj en av de tillgängliga leverantörerna och ange de nödvändiga uppgifterna.",
+      "REMOVEPROVIDER": "Ta bort leverantör",
+      "REMOVEPROVIDER_DESC": "Du håller på att ta bort en leverantörskonfiguration. Vill du fortsätta?",
+      "SMSPROVIDERSTATE": {
+        "0": "Ospecificerad",
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
+      "ACTIVATED": "Leverantör aktiverad.",
+      "DEACTIVATED": "Leverantör inaktiverad.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Avsändarnummer",
+        "VERIFYSERVICESID": "Verifieringstjänst-SID",
+        "VERIFYSERVICESID_DESCRIPTION": "Inställning av en Verifieringstjänst-SID gör det möjligt att använda Twilio Verify-tjänsten istället för Meddelandetjänsten för verifiering av telefonnummer och OTP-SMS.",
+        "ADDED": "Twilio tillagd framgångsrikt.",
+        "UPDATED": "Twilio uppdaterad framgångsrikt.",
+        "REMOVED": "Twilio borttagen",
+        "CHANGETOKEN": "Ändra token",
+        "SETTOKEN": "Ange token",
+        "TOKENSET": "Token har angetts framgångsrikt."
+      }
+    },
+    "SECRETS": {
+      "TYPES": "Hemlighetstyper",
+      "TYPE": {
+        "1": "Initieringsmail",
+        "2": "E-postverifiering",
+        "3": "Telefonverifiering",
+        "4": "Återställning av lösenord",
+        "5": "lösenordsfri initiering",
+        "6": "App-hemlighet",
+        "7": "Engångslösenord (OTP) - SMS",
+        "8": "Engångslösenord (OTP) - E-post"
+      },
+      "EXPIRY": "Utgång (på minuter)",
+      "INCLUDEDIGITS": "Inkludera siffror",
+      "INCLUDESYMBOLS": "Inkludera symboler",
+      "INCLUDELOWERLETTERS": "Inkludera små bokstäver",
+      "INCLUDEUPPERLETTERS": "Inkludera stora bokstäver",
+      "LENGTH": "Längd",
+      "UPDATED": "Inställningar uppdaterade."
+    },
+    "SECURITY": {
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Denna inställning ställer in CSP för att tillåta inramning från en uppsättning tillåtna domäner. Observera att genom att aktivera användningen av iFrames, riskerar du att tillåta clickjacking.",
+      "IFRAMEENABLED": "Tillåt iFrame",
+      "ALLOWEDORIGINS": "Tillåtna URL:er",
+      "IMPERSONATIONTITLE": "Impersonation",
+      "IMPERSONATIONENABLED": "Tillåt impersonation",
+      "IMPERSONATIONDESCRIPTION": "Denna inställning tillåter användning av impersonation i princip. Observera att impersonatorn också behöver de lämpliga `*_IMPERSONATOR`-rollerna tilldelade."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Standardorganisation för inloggning",
+      "LOGINDEFAULTORG_DESCRIPTION": "Inloggningsgränssnittet kommer att använda inställningarna för standardorganisationen (och inte från instansen) om ingen organisationskontext är inställd",
+      "OIDCLEGACYINTROSPECTION": "OIDC Legacy introspection",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Vi har nyligen omarbetat introspektionsändpunkten av prestandaskäl. Denna funktion kan användas för att återgå till den äldre implementationen om oväntade buggar uppstår.",
+      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivera den experimentella urn:ietf:params:oauth:grant-type:token-exchange grant-typen för OIDC-tokenändpunkten. Tokenutbyte kan användas för att begära tokens med en mindre omfattning eller impersonera andra användare. Se säkerhetspolicyn för att tillåta impersonation på en instans.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktivera projektionstriggers under en introspektionsbegäran. Detta kan fungera som en lösning om det finns märkbara konsistensproblem i introspektionssvaret men kan påverka prestandan. Vi planerar att ta bort triggers för introspektionsbegäranden i framtiden.",
+      "USERSCHEMA": "Användarschema",
+      "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
+      "ACTIONS": "Åtgärder",
+      "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
+      "STATES": {
+        "INHERITED": "Ärv",
+        "ENABLED": "Aktiverad",
+        "DISABLED": "Inaktiverad"
+      },
+      "INHERITED_DESCRIPTION": "Detta ställer in värdet till systemets standardvärde.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Aktiverad\" ärvs",
+        "DISABLED": "\"Inaktiverad\" ärvs"
+      },
+      "RESET": "Återställ allt till arv"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Återställ inställning",
+        "DEFAULTDESCRIPTION": "Du håller på att återställa dina inställningar till standardkonfigurationen för din instans. Är du säker på att du vill fortsätta?",
+        "LOGINPOLICY_DESCRIPTION": "Varning: Om du fortsätter kommer inställningarna för identitetsleverantören också att återställas till instansinställningen."
+      }
+    }
+  },
+  "POLICY": {
+    "APPLIEDTO": "Tillämpad på",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Lösenordskomplexitet",
+      "DESCRIPTION": "Säkerställer att alla inställda lösenord motsvarar ett specifikt mönster",
+      "SYMBOLANDNUMBERERROR": "Måste bestå av en siffra och en symbol/tecken.",
+      "SYMBOLERROR": "Måste inkludera en symbol/tecken.",
+      "NUMBERERROR": "Måste inkludera en siffra.",
+      "PATTERNERROR": "Lösenordet uppfyller inte det nödvändiga mönstret."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Meddelande",
+      "DESCRIPTION": "Bestämmer vid vilka ändringar meddelanden kommer att skickas.",
+      "PASSWORDCHANGE": "Lösenordsändring"
+    },
+    "PRIVATELABELING": {
+      "DESCRIPTION": "Ge inloggningen din personliga stil och ändra dess beteende.",
+      "PREVIEW_DESCRIPTION": "Ändringar av policyn kommer automatiskt att distribueras till förhandsgranskningsmiljön.",
+      "BTN": "Välj fil",
+      "ACTIVATEPREVIEW": "Tillämpa konfiguration",
+      "DARK": "Mörkt läge",
+      "LIGHT": "Ljust läge",
+      "CHANGEVIEW": "Ändra vy",
+      "ACTIVATED": "Policyändringar är nu LIVE",
+      "THEME": "Tema",
+      "COLORS": "Färger",
+      "FONT": "Typsnitt",
+      "ADVANCEDBEHAVIOR": "Avancerat beteende",
+      "DROP": "Släpp bild här eller",
+      "RELEASE": "Släpp",
+      "DROPFONT": "Släpp typsnittsfil här",
+      "RELEASEFONT": "Släpp",
+      "USEOFLOGO": "Din logotyp kommer att användas i inloggningen samt i e-postmeddelanden, medan ikonen används för mindre UI-element som i organisationsväxlaren i konsolen",
+      "MAXSIZE": "Den maximala storleken är begränsad till 524kB",
+      "EMAILNOSVG": "SVG-filformatet stöds inte i e-postmeddelanden. Ladda därför upp din logotyp i PNG eller annat stöds format.",
+      "MAXSIZEEXCEEDED": "Maximal storlek på 524kB överskriden.",
+      "NOSVGSUPPORTED": "SVG stöds inte!",
+      "FONTINLOGINONLY": "Typsnittet visas för närvarande endast i inloggningsgränssnittet.",
+      "BACKGROUNDCOLOR": "Bakgrundsfärg",
+      "PRIMARYCOLOR": "Primär färg",
+      "WARNCOLOR": "Varningsfärg",
+      "FONTCOLOR": "Typsnittsfärg",
+      "VIEWS": {
+        "PREVIEW": "Förhandsgranskning",
+        "CURRENT": "Nuvarande konfiguration"
+      },
+      "PREVIEW": {
+        "TITLE": "Inloggning",
+        "SECOND": "logga in med ditt ZITADEL-konto.",
+        "ERROR": "Användaren kunde inte hittas!",
+        "PRIMARYBUTTON": "nästa",
+        "SECONDARYBUTTON": "registrera"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatiskt läge",
+        "THEME_MODE_LIGHT": "Endast ljust läge",
+        "THEME_MODE_DARK": "Endast mörkt läge"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Lösenordets utgång",
+      "DESCRIPTION": "Du kan ställa in en policy för utgångsdatum för lösenord.  Den här policyn tvingar användaren att byta lösenord vid nästa inloggning efter att lösenordet har löpt ut. Det finns inga automatiska varningar eller meddelanden."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Låsning av lösenordspolicy",
+      "DESCRIPTION": "Ställ in ett maximalt antal lösenordsförsök, efter vilket konton kommer att blockeras."
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Branding",
+      "BTN": "Välj fil",
+      "DESCRIPTION": "Anpassa utseendet på inloggningen",
+      "ACTIVATEPREVIEW": "Aktivera konfiguration"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Inloggningsinställningar",
+      "DESCRIPTION": "Definiera hur användare kan autentiseras och konfigurera identitetsleverantörer",
+      "DESCRIPTIONCREATEADMIN": "Användare kan välja från de tillgängliga identitetsleverantörerna nedan.",
+      "DESCRIPTIONCREATEMGMT": "Användare kan välja från de tillgängliga identitetsleverantörerna nedan. Observera: Du kan använda systeminställda leverantörer samt leverantörer som endast är inställda för din organisation.",
+      "LIFETIME_INVALID": "Formuläret innehåller ogiltiga värden.",
+      "SAVED": "Sparat framgångsrikt!",
+      "PROVIDER_ADDED": "Identitetsleverantör aktiverad."
+    },
+    "PRIVACY_POLICY": {
+      "DESCRIPTION": "Ställ in din integritetspolicy och länkar till användarvillkor",
+      "TOSLINK": "Länk till användarvillkor",
+      "POLICYLINK": "Länk till integritetspolicy",
+      "HELPLINK": "Länk till hjälp",
+      "SUPPORTEMAIL": "Support-e-post",
+      "DOCSLINK": "Dokumentationslänk (Konsol)",
+      "CUSTOMLINK": "Anpassad länk (Konsol)",
+      "CUSTOMLINKTEXT": "Anpassad länktext (Konsol)",
+      "SAVED": "Sparat framgångsrikt!",
+      "RESET_TITLE": "Återställ standardvärden",
+      "RESET_DESCRIPTION": "Du håller på att återställa standardlänkarna för användarvillkor och integritetspolicy. Vill du verkligen fortsätta?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Inloggningsgränssnittstexter",
+      "DESCRIPTION": "Definiera dina texter för inloggningsgränssnitten. Om texter är tomma kommer standardvärdet som visas som platshållare att användas.",
+      "DESCRIPTION_SHORT": "Definiera dina texter för inloggningsgränssnitten.",
+      "NEWERVERSIONEXISTS": "Nyare version finns",
+      "CURRENTDATE": "Nuvarande konfiguration",
+      "CHANGEDATE": "Nyare version från",
+      "KEYNAME": "Inloggningsskärm / Gränssnitt",
+      "RESET_TITLE": "Återställ standardvärden",
+      "RESET_DESCRIPTION": "Du håller på att återställa alla standardvärden. Alla ändringar du har gjort kommer att raderas permanent. Vill du verkligen fortsätta?",
+      "UNSAVED_TITLE": "Fortsätt utan att spara?",
+      "UNSAVED_DESCRIPTION": "Du har gjort ändringar utan att spara. Vill du spara nu?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Du har valt ett språk som inte är tillåtet. Du kan fortsätta att ändra texterna. Men om du vill att dina användare faktiskt ska kunna använda detta språk, ändra dina instansers begränsningar.",
+      "LANGUAGES_NOT_ALLOWED": "Inte tillåtet:",
+      "LANGUAGE": "Språk",
+      "LANGUAGES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "E-postverifiering klar",
+        "emailVerificationText": "E-postverifiering",
+        "externalUserNotFoundText": "Extern användare hittades inte",
+        "footerText": "Sidfot",
+        "initMfaDoneText": "Initiera MFA klar",
+        "initMfaOtpText": "Initiera MFA",
+        "initMfaPromptText": "Initiera MFA-prompt",
+        "initMfaU2fText": "Initiera Universal Second Factor",
+        "initPasswordDoneText": "Initiera lösenord klart",
+        "initPasswordText": "Initiera lösenord",
+        "initializeDoneText": "Initiera användare klart",
+        "initializeUserText": "Initiera användare",
+        "linkingUserDoneText": "Länka användare klart",
+        "loginText": "Inloggning",
+        "logoutText": "Utloggning",
+        "mfaProvidersText": "MFA-leverantörer",
+        "passwordChangeDoneText": "Lösenordsändring klar",
+        "passwordChangeText": "Lösenordsändring",
+        "passwordResetDoneText": "Lösenordsåterställning klar",
+        "passwordText": "Lösenord",
+        "registrationOptionText": "Registreringsalternativ",
+        "registrationOrgText": "Registrera organisation",
+        "registrationUserText": "Registrera användare",
+        "selectAccountText": "Välj konto",
+        "successLoginText": "Inloggning lyckades",
+        "usernameChangeDoneText": "Användarnamnsändring klar",
+        "usernameChangeText": "Användarnamnsändring",
+        "verifyMfaOtpText": "Verifiera OTP",
+        "verifyMfaU2fText": "Verifiera Universal Second Factor",
+        "passwordlessPromptText": "lösenordsfri Prompt",
+        "passwordlessRegistrationDoneText": "lösenordsfri Registrering Klar",
+        "passwordlessRegistrationText": "lösenordsfri Registrering",
+        "passwordlessText": "lösenordsfri",
+        "externalRegistrationUserOverviewText": "Extern Registrering Användaröversikt"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TYPE": "Notifikation",
+      "TYPES": {
+        "INIT": "Initialisering",
+        "VE": "Verifiera E-post",
+        "VP": "Verifiera Telefon",
+        "VSO": "Verifiera SMS OTP",
+        "VEO": "Verifiera E-post OTP",
+        "PR": "Återställ Lösenord",
+        "DC": "Domänkrav",
+        "PL": "lösenordsfri",
+        "PC": "Lösenordsändring",
+        "IU": "Bjud in användare"
+      },
+      "CHIPS": {
+        "firstname": "Förnamn",
+        "lastname": "Efternamn",
+        "code": "Kod",
+        "preferredLoginName": "Föredraget Inloggningsnamn",
+        "displayName": "Visningsnamn",
+        "nickName": "Smeknamn",
+        "loginnames": "Inloggningsnamn",
+        "domain": "Domän",
+        "lastEmail": "Senaste e-post",
+        "lastPhone": "Senaste telefon",
+        "verifiedEmail": "Verifierad e-post",
+        "verifiedPhone": "Verifierad telefon",
+        "changedate": "Ändringsdatum",
+        "username": "Användarnamn",
+        "tempUsername": "Tillfälligt användarnamn",
+        "otp": "Engångslösenord",
+        "verifyUrl": "Verifiera Engångslösenord URL",
+        "expiry": "Utgångsdatum",
+        "applicationName": "Applikationsnamn"
+      },
+      "TOAST": {
+        "UPDATED": "Anpassade Texter sparade."
+      }
+    },
+    "DEFAULTLABEL": "De nuvarande inställningarna motsvarar standarden för din instans.",
+    "BTN_INSTALL": "Installera",
+    "BTN_EDIT": "Ändra",
+    "DATA": {
+      "DESCRIPTION": "Beskrivning",
+      "MINLENGTH": "måste ha en minsta längd",
+      "HASNUMBER": "måste inkludera en siffra",
+      "HASSYMBOL": "måste inkludera en symbol",
+      "HASLOWERCASE": "måste inkludera en gemen bokstav",
+      "HASUPPERCASE": "måste inkludera en versal bokstav",
+      "SHOWLOCKOUTFAILURES": "visa låsning misslyckanden",
+      "MAXPASSWORDATTEMPTS": "Maximalt antal lösenordsförsök",
+      "MAXOTPATTEMPTS": "Maximalt antal OTP-försök",
+      "EXPIREWARNDAYS": "Utgångsvarning efter dagar",
+      "MAXAGEDAYS": "Maximal giltighetstid i dagar",
+      "USERLOGINMUSTBEDOMAIN": "Lägg till organisationsdomän som suffix till inloggningsnamn",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Om du aktiverar denna inställning kommer alla inloggningsnamn att ha organisationsdomänen som suffix. Om denna inställning är inaktiverad måste du säkerställa att användarnamn är unika över alla organisationer.",
+      "VALIDATEORGDOMAINS": "Organisationsdomänverifiering krävs (DNS eller HTTP-utmaning)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Avsändaradress matchar Instansdomän",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Den konventionella inloggningen med användarnamn och lösenord är tillåten.",
+      "ALLOWEXTERNALIDP_DESC": "Inloggning är tillåten för de underliggande identitetsleverantörerna",
+      "ALLOWREGISTER_DESC": "Om alternativet är valt visas ett ytterligare steg för att registrera en användare i inloggningen.",
+      "FORCEMFA": "Tvinga MFA",
+      "FORCEMFALOCALONLY": "Tvinga MFA för lokalt autentiserade användare",
+      "FORCEMFALOCALONLY_DESC": "Om alternativet är valt måste lokalt autentiserade användare konfigurera en andra faktor för inloggning.",
+      "HIDEPASSWORDRESET_DESC": "Om alternativet är valt kan användaren inte återställa sitt lösenord i inloggningsprocessen.",
+      "HIDELOGINNAMESUFFIX": "Dölj inloggningsnamn suffix",
+      "HIDELOGINNAMESUFFIX_DESC": "Döljer inloggningsnamn suffix i inloggningsgränssnittet",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Om alternativet är valt kommer lösenordsskärmen att visas i inloggningsprocessen även om användaren inte hittades. Felet vid lösenordskontrollen kommer inte att avslöja om användarnamnet eller lösenordet var fel.",
+      "ALLOWDOMAINDISCOVERY_DESC": "Om alternativet är valt kommer suffixet (@domain.com) av ett okänt användarnamn som anges på inloggningsskärmen att matchas mot organisationsdomänerna och omdirigeras till registreringen av den organisationen vid framgång.",
+      "DEFAULTREDIRECTURI": "Standard omdirigerings-URI",
+      "DEFAULTREDIRECTURI_DESC": "Definierar vart användaren kommer att omdirigeras om inloggningen har startat utan en appkontext (t.ex. från e-post)",
+      "ERRORMSGPOPUP": "Visa fel i dialog",
+      "DISABLEWATERMARK": "Dölj Vattenstämpel",
+      "DISABLEWATERMARK_DESC": "Dölj Powered by ZITADEL vattenstämpel i inloggningsgränssnittet"
+    },
+    "RESET": "Återställ till instansstandard",
+    "CREATECUSTOM": "Skapa Anpassad Policy",
+    "TOAST": {
+      "SET": "Policy inställd framgångsrikt!",
+      "RESETSUCCESS": "Policy återställd framgångsrikt!",
+      "UPLOADSUCCESS": "Uppladdad framgångsrikt!",
+      "DELETESUCCESS": "Raderad framgångsrikt!",
+      "UPLOADFAILED": "Uppladdning misslyckades!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organisation",
+    "DESCRIPTION": "Här kan du redigera konfigurationen av din organisation och hantera medlemmarna.",
+    "DETAIL": {
+      "TITLE": "Detalj",
+      "NAME": "Namn",
+      "DOMAIN": "Domän",
+      "STATE": {
+        "0": "Inte definierad",
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Medlemmar",
+      "USERNAME": "Användarnamn",
+      "DISPLAYNAME": "Visningsnamn",
+      "LOGINNAME": "Inloggningsnamn",
+      "EMAIL": "E-post",
+      "ROLES": "Roller",
+      "ADD": "Lägg till medlem",
+      "ADDDESCRIPTION": "Ange namnen på de användare som ska läggas till."
+    },
+    "TABLE": {
+      "TOTAL": "Totalt antal poster",
+      "SELECTION": "Valda element",
+      "DEACTIVATE": "Inaktivera användare",
+      "ACTIVATE": "Aktivera användare",
+      "DELETE": "Radera användare",
+      "CLEAR": "Rensa val"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Projekt",
+      "DESCRIPTION": "Här kan du definiera applikationer, hantera roller och ge andra organisationer tillgång till ditt projekt.",
+      "DELETE": "Radera Projekt",
+      "DETAIL": "Detalj",
+      "CREATE": "Skapa Projekt",
+      "CREATE_DESC": "Ange ditt projekts namn.",
+      "ROLE": "Roll",
+      "NOITEMS": "Inga projekt",
+      "ZITADELPROJECT": "Detta tillhör ZITADEL-projektet. Observera: Om du gör ändringar kan ZITADEL inte fungera som avsett.",
+      "TYPE": {
+        "OWNED": "Ägda Projekt",
+        "OWNED_SINGULAR": "Ägt Projekt",
+        "GRANTED_SINGULAR": "Projekt tilldelat {{name}}"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Varumärkesinställning",
+        "0": {
+          "TITLE": "Ospecificerad",
+          "DESC": "Så snart användaren identifieras kommer varumärket för den identifierade användarens organisation att visas, innan systemets standard visas."
+        },
+        "1": {
+          "TITLE": "Använd projektinställning",
+          "DESC": "Varumärket för organisationen som äger projektet kommer att visas"
+        },
+        "2": {
+          "TITLE": "Använd användarorganisationens inställning",
+          "DESC": "Varumärket för projektets organisation kommer att visas, men så snart användaren identifieras kommer inställningen för den identifierade användarens organisation att visas."
+        },
+        "DIALOG": {
+          "TITLE": "Varumärkesinställning",
+          "DESCRIPTION": "Välj beteendet för inloggningen när du använder projektet."
+        }
+      },
+      "PINNED": "Fäst",
+      "ALL": "Alla",
+      "CREATEDON": "Skapad den",
+      "LASTMODIFIED": "Senast ändrad den",
+      "ADDNEW": "Skapa Nytt Projekt",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Återaktivera Projekt",
+          "DESCRIPTION": "Vill du verkligen återaktivera ditt projekt?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Inaktivera Projekt",
+          "DESCRIPTION": "Vill du verkligen inaktivera ditt projekt?"
+        },
+        "DELETE": {
+          "TITLE": "Radera Projekt",
+          "DESCRIPTION": "Vill du verkligen radera ditt projekt?",
+          "TYPENAME": "Skriv namnet på projektet för att radera det permanent."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Inställningar",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Status",
+      "0": "Ej definierad",
+      "1": "Aktiv",
+      "2": "Inaktiv"
+    },
+    "TYPE": {
+      "TITLE": "Typ",
+      "0": "Okänd typ",
+      "1": "Ägd",
+      "2": "Beviljad"
+    },
+    "NAME": "Namn",
+    "NAMEDIALOG": {
+      "TITLE": "Byt Namn på Projekt",
+      "DESCRIPTION": "Ange det nya namnet för ditt projekt",
+      "NAME": "Nytt Namn"
+    },
+    "MEMBER": {
+      "TITLE": "administratörer",
+      "TITLEDESC": "administratörer kan göra ändringar i detta projekt baserat på deras roll.",
+      "DESCRIPTION": "Dessa administratörer kan kanske redigera ditt projekt.",
+      "USERNAME": "Användarnamn",
+      "DISPLAYNAME": "Visningsnamn",
+      "LOGINNAME": "Inloggningsnamn",
+      "EMAIL": "E-post",
+      "ROLES": "Roller",
+      "USERID": "Användar-ID"
+    },
+    "GRANT": {
+      "EMPTY": "Ingen beviljad organisation.",
+      "TITLE": "Projektbeviljanden",
+      "DESCRIPTION": "Tillåt en annan organisation att använda ditt projekt.",
+      "EDITTITLE": "Redigera roller",
+      "CREATE": {
+        "TITLE": "Skapa Organisationsbeviljande",
+        "SEL_USERS": "Välj de användare du vill ge tillgång",
+        "SEL_PROJECT": "Sök efter ett projekt",
+        "SEL_ROLES": "Välj de roller du vill lägga till i beviljandet",
+        "SEL_USER": "Välj användare",
+        "SEL_ORG": "Sök en organisation",
+        "SEL_ORG_DESC": "Sök organisationen att bevilja.",
+        "ORG_DESCRIPTION": "Du håller på att bevilja en användare för organisationen {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Byt kontext i rubriken ovan för att bevilja en användare för en annan organisation.",
+        "SEL_ORG_FORMFIELD": "Organisation",
+        "FOR_ORG": "Beviljandet skapas för:"
+      },
+      "DETAIL": {
+        "TITLE": "Projektbeviljande",
+        "DESC": "Du kan välja vilka roller som kan användas av den specificerade organisationen och välja administratörer",
+        "MEMBERTITLE": "administratörer",
+        "MEMBERDESC": "Dessa är administratörerna för den beviljade organisationen. Lägg till användare här som ska få tillgång att redigera projektets data.",
+        "PROJECTNAME": "Projektnamn",
+        "GRANTEDORG": "Beviljad Organisation",
+        "RESOURCEOWNER": "Resursägare"
+      },
+      "STATE": "Status",
+      "STATES": {
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
+      "ALL": "Alla",
+      "SHOWDETAIL": "Visa Detaljer",
+      "USER": "Användare",
+      "MEMBERS": "administratörer",
+      "ORG": "Organisation",
+      "PROJECTNAME": "Projektnamn",
+      "GRANTEDORG": "Beviljad Organisation",
+      "GRANTEDORGDOMAIN": "Domän",
+      "RESOURCEOWNER": "Resursägare",
+      "GRANTEDORGNAME": "Organisationsnamn",
+      "GRANTID": "Beviljande-ID",
+      "CREATIONDATE": "Skapelsedatum",
+      "CHANGEDATE": "Senast ändrad",
+      "DATES": "Datum",
+      "ROLENAMESLIST": "Roller",
+      "NOROLES": "Inga roller",
+      "TYPE": "Typ",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Projektbeviljande skapat.",
+        "PROJECTGRANTADDED": "Projektbeviljande skapat.",
+        "PROJECTGRANTCHANGED": "Projektbeviljande ändrat.",
+        "PROJECTGRANTMEMBERADDED": "Beviljandeadministratör tillagd.",
+        "PROJECTGRANTMEMBERCHANGED": "Beviljandeadministratör ändrad.",
+        "PROJECTGRANTMEMBERREMOVED": "Beviljandeadministratör borttagen.",
+        "PROJECTGRANTUPDATED": "Projektbeviljande uppdaterat"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Radera projektbeviljande",
+        "DELETE_DESCRIPTION": "Du håller på att radera ett projektbeviljande. Är du säker?"
+      },
+      "ROLES": "Projektroller"
+    },
+    "APP": {
+      "TITLE": "Applikationer",
+      "NAME": "Namn",
+      "NAMEREQUIRED": "Ett namn krävs."
+    },
+    "ROLE": {
+      "EMPTY": "Ingen roll har skapats ännu.",
+      "ADDNEWLINE": "Lägg till ytterligare roll",
+      "KEY": "Nyckel",
+      "TITLE": "Roller",
+      "DESCRIPTION": "Definiera några roller som kan användas för att skapa projektbidrag.",
+      "NAME": "Namn",
+      "DISPLAY_NAME": "Visningsnamn",
+      "GROUP": "Grupp",
+      "ACTIONS": "Åtgärder",
+      "ADDTITLE": "Skapa roll",
+      "ADDDESCRIPTION": "Ange data för den nya rollen.",
+      "EDITTITLE": "Redigera roll",
+      "EDITDESCRIPTION": "Ange de nya uppgifterna för rollen.",
+      "DELETE": "Ta bort roll",
+      "CREATIONDATE": "Skapad",
+      "CHANGEDATE": "Senast ändrad",
+      "SELECTGROUPTOOLTIP": "Välj alla roller i gruppen {{group}}.",
+      "OPTIONS": "Alternativ",
+      "ASSERTION": "Bekräfta roller vid autentisering",
+      "ASSERTION_DESCRIPTION": "Rollinformation skickas från Userinfo-endpoint och beroende på dina applikationsinställningar i tokens och andra typer.",
+      "CHECK": "Kontrollera auktorisering vid autentisering",
+      "CHECK_DESCRIPTION": "Om inställt, tillåts användare endast autentisera om någon roll är tilldelad deras konto.",
+      "DIALOG": {
+        "DELETE_TITLE": "Ta bort roll",
+        "DELETE_DESCRIPTION": "Du håller på att ta bort en projektroll. Är du säker?"
+      }
+    },
+    "HAS_PROJECT": "Kontrollera projekt vid autentisering",
+    "HAS_PROJECT_DESCRIPTION": "Det kontrolleras om användarens organisation har detta projekt. Om inte, kan användaren inte autentiseras.",
+    "TABLE": {
+      "TOTAL": "Totalt antal poster:",
+      "SELECTION": "Valda element",
+      "DEACTIVATE": "Inaktivera projekt",
+      "ACTIVATE": "Aktivera projekt",
+      "DELETE": "Ta bort projekt",
+      "ORGNAME": "Organisationsnamn",
+      "ORGDOMAIN": "Organisationsdomän",
+      "STATE": "Status",
+      "TYPE": "Typ",
+      "CREATIONDATE": "Skapad den",
+      "CHANGEDATE": "Senast ändrad",
+      "RESOURCEOWNER": "Ägare",
+      "SHOWTABLE": "Visa tabell",
+      "SHOWGRID": "Visa rutnät",
+      "EMPTY": "Inget projekt hittades"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "administratör borttagen.",
+      "MEMBERSADDED": "administratörer tillagda.",
+      "MEMBERADDED": "administratör tillagd.",
+      "MEMBERCHANGED": "administratör ändrad.",
+      "ROLESCREATED": "Roller skapade.",
+      "ROLEREMOVED": "Roll borttagen.",
+      "ROLECHANGED": "Roll ändrad.",
+      "REACTIVATED": "Återaktiverad.",
+      "DEACTIVATED": "Inaktiverad.",
+      "CREATED": "Projekt skapat.",
+      "UPDATED": "Projekt ändrat.",
+      "GRANTUPDATED": "Bidrag ändrat.",
+      "DELETED": "Projekt borttaget."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Ta bort roll",
+      "DELETE_DESCRIPTION": "Du håller på att ta bort en roll. Är du säker?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Nästa steg"
+  },
+  "IDP": {
+    "LIST": {
+      "ACTIVETITLE": "Aktiva identitetsleverantörer"
+    },
+    "CREATE": {
+      "TITLE": "Lägg till leverantör",
+      "DESCRIPTION": "Välj en eller flera av följande leverantörer.",
+      "STEPPERTITLE": "Skapa leverantör",
+      "OIDC": {
+        "TITLE": "OIDC-leverantör",
+        "DESCRIPTION": "Ange de nödvändiga uppgifterna för din OIDC-leverantör."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth-leverantör",
+        "DESCRIPTION": "Ange de nödvändiga uppgifterna för din OAuth-leverantör."
+      },
+      "JWT": {
+        "TITLE": "JWT-leverantör",
+        "DESCRIPTION": "Ange de nödvändiga uppgifterna för din JWT-leverantör."
+      },
+      "GOOGLE": {
+        "TITLE": "Google-leverantör",
+        "DESCRIPTION": "Ange uppgifterna för din Google-identitetsleverantör"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab-leverantör",
+        "DESCRIPTION": "Ange uppgifterna för din Gitlab-identitetsleverantör"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab självhostad leverantör",
+        "DESCRIPTION": "Ange uppgifterna för din självhostade Gitlab-identitetsleverantör"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server-leverantör",
+        "DESCRIPTION": "Ange uppgifterna för din GitHub Enterprise Server-identitetsleverantör"
+      },
+      "GITHUB": {
+        "TITLE": "Github-leverantör",
+        "DESCRIPTION": "Ange uppgifterna för din Github-identitetsleverantör"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft-leverantör",
+        "DESCRIPTION": "Ange uppgifterna för din Microsoft-identitetsleverantör"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Ange uppgifterna för din LDAP-leverantör"
+      },
+      "APPLE": {
+        "TITLE": "Logga in med Apple",
+        "DESCRIPTION": "Ange uppgifterna för din Apple-leverantör"
+      },
+      "SAML": {
+        "TITLE": "Logga in med SAML SP",
+        "DESCRIPTION": "Ange uppgifterna för din SAML-leverantör"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Identitetsleverantör",
+      "DESCRIPTION": "Uppdatera din leverantörskonfiguration",
+      "DATECREATED": "Skapad",
+      "DATECHANGED": "Ändrad"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatisk skapelse",
+      "ISAUTOCREATION_DESC": "Om valt, skapas ett konto om det inte redan finns.",
+      "ISAUTOUPDATE": "Automatisk uppdatering",
+      "ISAUTOUPDATE_DESC": "Om valt, uppdateras konton vid återautentisering.",
+      "ISCREATIONALLOWED": "Kontoinrättning tillåten (manuellt)",
+      "ISCREATIONALLOWED_DESC": "Bestämmer om konton kan skapas med hjälp av ett externt konto. Avaktivera om användare inte ska kunna redigera kontoinformation när automatisk skapelse är aktiverad.",
+      "ISLINKINGALLOWED": "Kontolänkning tillåten (manuellt)",
+      "ISLINKINGALLOWED_DESC": "Bestämmer om en identitet kan länkas manuellt till ett befintligt konto. Avaktivera om användare bara ska kunna länka det föreslagna kontot vid aktiv automatisk länkning.",
+      "AUTOLINKING_DESC": "Avgör om en identitet kommer att uppmanas att länkas till ett befintligt konto.",
+      "AUTOLINKINGTYPE": {
+        "0": "Inaktiverad",
+        "1": "Kontrollera befintligt användarnamn",
+        "2": "Kontrollera befintlig e-post"
+      }
+    },
+    "OWNERTYPES": {
+      "0": "okänd",
+      "1": "Instans",
+      "2": "Organisation"
+    },
+    "STATES": {
+      "1": "aktiv",
+      "2": "inaktiv"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "Hyresgäst-ID",
+      "0": "Allmän",
+      "1": "Organisationer",
+      "2": "Konsumenter"
+    },
+    "AZUREADTENANTTYPE": "Hyresgästtyp",
+    "AZUREADTENANTID": "Hyresgäst-ID",
+    "EMAILVERIFIED": "E-post verifierad",
+    "NAMEHINT": "Om specificerat kommer det att visas i inloggningsgränssnittet.",
+    "OPTIONAL": "valfritt",
+    "LDAPATTRIBUTES": "LDAP-attribut",
+    "UPDATEBINDPASSWORD": "uppdatera Bind-lösenord",
+    "UPDATECLIENTSECRET": "uppdatera klienthemlighet",
+    "ADD": "Lägg till identitetsleverantör",
+    "TYPE": "Typ",
+    "OWNER": "Ägare",
+    "ID": "ID",
+    "NAME": "Namn",
+    "AUTHORIZATIONENDPOINT": "Auktoriseringsslutpunkt",
+    "TOKENENDPOINT": "Token-slutpunkt",
+    "USERENDPOINT": "Användarslutpunkt",
+    "IDATTRIBUTE": "ID-attribut",
+    "AVAILABILITY": "Tillgänglighet",
+    "AVAILABLE": "tillgänglig",
+    "AVAILABLEBUTINACTIVE": "tillgänglig men inaktiv",
+    "SETAVAILABLE": "sätt som tillgänglig",
+    "SETUNAVAILABLE": "sätt som inte tillgänglig",
+    "CONFIG": "Konfiguration",
+    "STATE": "Status",
+    "ISSUER": "Utfärdare",
+    "SCOPESLIST": "Scopes-lista",
+    "CLIENTID": "Klient-ID",
+    "CLIENTSECRET": "Klienthemlighet",
+    "LDAPCONNECTION": "Anslutning",
+    "LDAPUSERBINDING": "Användarbindning",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind-lösenord",
+    "SERVERS": "Servrar",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout i sekunder",
+    "USERBASE": "Användarbas",
+    "USERFILTERS": "Användarfilter",
+    "USEROBJECTCLASSES": "Användarobjektklasser",
+    "REQUIRED": "krävs",
+    "LDAPIDATTRIBUTE": "ID-attribut",
+    "AVATARURLATTRIBUTE": "Avatar-URL-attribut",
+    "DISPLAYNAMEATTRIBUTE": "Visningsnamn-attribut",
+    "EMAILATTRIBUTEATTRIBUTE": "E-post-attribut",
+    "EMAILVERIFIEDATTRIBUTE": "E-post verifierad-attribut",
+    "FIRSTNAMEATTRIBUTE": "Förnamn-attribut",
+    "LASTNAMEATTRIBUTE": "Efternamn-attribut",
+    "NICKNAMEATTRIBUTE": "Smeknamn-attribut",
+    "PHONEATTRIBUTE": "Telefon-attribut",
+    "PHONEVERIFIEDATTRIBUTE": "Telefon verifierad-attribut",
+    "PREFERREDLANGUAGEATTRIBUTE": "Föredraget språk-attribut",
+    "PREFERREDUSERNAMEATTRIBUTE": "Föredraget användarnamn-attribut",
+    "PROFILEATTRIBUTE": "Profil-attribut",
+    "IDPDISPLAYNAMMAPPING": "IDP Visningsnamn-mappning",
+    "USERNAMEMAPPING": "Användarnamn-mappning",
+    "DATES": "Datum",
+    "CREATIONDATE": "Skapad den",
+    "CHANGEDATE": "Senast ändrad",
+    "DEACTIVATE": "Inaktivera",
+    "ACTIVATE": "Aktivera",
+    "DELETE": "Radera",
+    "DELETE_TITLE": "Radera IDP",
+    "DELETE_DESCRIPTION": "Du håller på att radera en identitetsleverantör. De resulterande ändringarna är oåterkalleliga. Vill du verkligen göra detta?",
+    "REMOVE_WARN_TITLE": "Ta bort IDP",
+    "REMOVE_WARN_DESCRIPTION": "Du håller på att ta bort en identitetsleverantör. Detta kommer att ta bort valet av den tillgängliga IDP för dina användare och redan registrerade användare kommer inte att kunna logga in igen. Är du säker på att fortsätta?",
+    "DELETE_SELECTION_TITLE": "Radera IDP",
+    "DELETE_SELECTION_DESCRIPTION": "Du håller på att radera en identitetsleverantör. De resulterande ändringarna är oåterkalleliga. Vill du verkligen göra detta?",
+    "EMPTY": "Ingen IDP tillgänglig",
+    "OIDC": {
+      "GENERAL": "Allmän information",
+      "TITLE": "OIDC-konfiguration",
+      "DESCRIPTION": "Ange data för OIDC-identitetsleverantören."
+    },
+    "JWT": {
+      "TITLE": "JWT-konfiguration",
+      "DESCRIPTION": "Ange data för JWT-identitetsleverantören.",
+      "HEADERNAME": "Header-namn",
+      "JWTENDPOINT": "JWT-slutpunkt",
+      "JWTKEYSENDPOINT": "JWT-nycklar slutpunkt"
+    },
+    "APPLE": {
+      "TEAMID": "Team-ID",
+      "KEYID": "Nyckel-ID",
+      "PRIVATEKEY": "Privat nyckel",
+      "UPDATEPRIVATEKEY": "Uppdatera privat nyckel",
+      "UPLOADPRIVATEKEY": "Ladda upp privat nyckel",
+      "KEYMAXSIZEEXCEEDED": "Maximal storlek på 5kB överskriden."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata-URL",
+      "BINDING": "Bindning",
+      "SIGNEDREQUEST": "Signerad begäran",
+      "NAMEIDFORMAT": "NameID-format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Anpassat mappningsattributnamn",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternativt attributnamn för att mappa användaren om `nameid-format` som returneras är `transient`, t.ex. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
+    },
+    "TOAST": {
+      "SAVED": "Sparat framgångsrikt.",
+      "REACTIVATED": "IDP återaktiverad.",
+      "DEACTIVATED": "IDP inaktiverad.",
+      "SELECTEDREACTIVATED": "Valda IDP:er återaktiverade.",
+      "SELECTEDDEACTIVATED": "Valda IDP:er inaktiverade.",
+      "SELECTEDKEYSDELETED": "Valda IDP:er raderade.",
+      "DELETED": "IDP borttagen framgångsrikt!",
+      "ADDED": "Tillagd framgångsrikt.",
+      "REMOVED": "Borttagen framgångsrikt."
+    },
+    "ISIDTOKENMAPPING": "Mappa från ID-token",
+    "ISIDTOKENMAPPING_DESC": "Om valt, mappas leverantörsinformation från ID-token, inte från användarinfo-slutpunkten."
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "lösenordsfri",
+      "MULTIFACTORDESCRIPTION": "Definiera dina tvåfaktorer för din lösenordsfria autentisering här.",
+      "SECONDFACTORTITLE": "Tvåfaktorautentisering",
+      "SECONDFACTORDESCRIPTION": "Definiera ytterligare möjliga faktorer med vilka du kan säkra din lösenordsautentisering."
+    },
+    "CREATE": {
+      "TITLE": "Ny faktor",
+      "DESCRIPTION": "Välj din nya faktortyp."
+    },
+    "DELETE": {
+      "TITLE": "Radera faktor",
+      "DESCRIPTION": "Du håller på att radera en faktor från inloggningsinställningarna. Är du säker?"
+    },
+    "TOAST": {
+      "ADDED": "Tillagd framgångsrikt.",
+      "SAVED": "Sparat framgångsrikt.",
+      "DELETED": "Borttagen framgångsrikt"
+    },
+    "TYPE": "Typ",
+    "MULTIFACTORTYPES": {
+      "0": "Okänd",
+      "1": "Fingeravtryck, säkerhetsnycklar, Face ID och andra"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Okänd",
+      "1": "Engångslösenord via autentiseringsapp (TOTP)",
+      "2": "Fingeravtryck, säkerhetsnycklar, Face ID och andra",
+      "3": "Engångslösenord via e-post (E-post OTP)",
+      "4": "Engångslösenord via SMS (SMS OTP)"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Inloggningsinställningar",
+      "DESCRIPTION": "Definiera hur dina användare kan autentiseras på din organisation."
+    },
+    "IDPS": "Identitetsleverantörer",
+    "ADDIDP": {
+      "TITLE": "Lägg till identitetsleverantör",
+      "DESCRIPTION": "Du kan välja fördefinierade eller egen skapade leverantörer för autentisering.",
+      "SELECTIDPS": "Identitetsleverantörer"
+    },
+    "PASSWORDLESS": "lösenordsfri inloggning",
+    "PASSWORDLESSTYPE": {
+      "0": "Inte tillåtet",
+      "1": "Tillåtet"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP-leverantör",
+      "DESCRIPTION": "Dessa är SMTP-leverantörerna för din ZITADEL-instans. Aktivera den du vill använda för att skicka meddelanden till dina användare.",
+      "EMPTY": "Ingen SMTP-leverantör tillgänglig",
+      "ACTIVATED": "Aktiverad",
+      "ACTIVATE": "Aktivera leverantör",
+      "DEACTIVATE": "Inaktivera leverantör",
+      "TEST": "Testa din leverantör",
+      "TYPE": "Typ",
+      "DIALOG": {
+        "ACTIVATED": "SMTP-konfigurationen har aktiverats",
+        "ACTIVATE_WARN_TITLE": "Aktivera SMTP-konfiguration",
+        "ACTIVATE_WARN_DESCRIPTION": "Du håller på att aktivera en SMTP-konfiguration. Först kommer vi att inaktivera den nuvarande aktiva leverantören och sedan aktivera denna konfiguration. Är du säker?",
+        "DEACTIVATE_WARN_TITLE": "Inaktivera SMTP-konfiguration",
+        "DEACTIVATE_WARN_DESCRIPTION": "Du håller på att inaktivera en SMTP-konfiguration. Är du säker?",
+        "DEACTIVATED": "SMTP-konfigurationen har inaktiverats",
+        "DELETE_TITLE": "Radera SMTP-konfiguration",
+        "DELETE_DESCRIPTION": "Du håller på att radera en konfiguration. Bekräfta denna åtgärd genom att skriva avsändarnamnet",
+        "DELETED": "SMTP-konfigurationen har raderats",
+        "SENDER": "Skriv {{value}}, för att radera denna SMTP-konfiguration.",
+        "TEST_TITLE": "Testa din SMTP-konfiguration",
+        "TEST_DESCRIPTION": "Ange en e-postadress för att testa din SMTP-konfiguration för den här leverantören",
+        "TEST_EMAIL": "E-postadress",
+        "TEST_RESULT": "Testresultat"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Lägg till SMTP-leverantör",
+      "DESCRIPTION": "Välj en eller flera av följande leverantörer.",
+      "STEPS": {
+        "TITLE": "Lägg till {{ value }} SMTP-leverantör",
+        "CREATE_DESC_TITLE": "Ange dina {{ value }} SMTP-inställningar steg för steg",
+        "CURRENT_DESC_TITLE": "Dessa är dina SMTP-inställningar",
+        "PROVIDER_SETTINGS": "SMTP-leverantörsinställningar",
+        "SENDER_SETTINGS": "Avsändarinställningar",
+        "NEXT_STEPS": "Nästa steg",
+        "ACTIVATE": {
+          "TITLE": "Aktivera din SMTP-leverantör",
+          "DESCRIPTION": "ZITADEL kan inte använda denna SMTP-leverantör för att skicka meddelanden förrän du aktiverar den. Om du aktiverar denna leverantör kommer alla andra aktiva leverantörer nu att inaktiveras."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Inaktivera din SMTP-leverantör",
+          "DESCRIPTION": "Om du inaktiverar denna SMTP-leverantör kan ZITADEL inte använda den för att skicka meddelanden förrän du aktiverar den igen."
+        },
+        "SAVE_SETTINGS": "Spara dina inställningar",
+        "TEST": {
+          "TITLE": "Testa dina inställningar",
+          "DESCRIPTION": "Du kan testa inställningarna för din SMTP-leverantör och kontrollera testresultatet innan du sparar dem",
+          "RESULT": "Ditt e-postmeddelande har skickats"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP-leverantörsinställningar"
+    },
+    "EMPTY": "Ingen SMTP-leverantör tillgänglig",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
+  "APP": {
+    "LIST": "Applikationer",
+    "COMPLIANCE": "OIDC-efterlevnad",
+    "URLS": "URL:er",
+    "CONFIGURATION": "Konfiguration",
+    "TOKEN": "Token-inställningar",
+    "PAGES": {
+      "TITLE": "Applikation",
+      "ID": "ID",
+      "DESCRIPTION": "Här kan du redigera dina applikationsdata och dess konfiguration.",
+      "CREATE": "Skapa applikation",
+      "CREATE_SELECT_PROJECT": "Välj ditt projekt först",
+      "CREATE_NEW_PROJECT": "eller ange namnet för ditt nya projekt",
+      "CREATE_DESC_TITLE": "Ange dina applikationsdetaljer steg för steg",
+      "CREATE_DESC_SUB": "En rekommenderad konfiguration kommer att genereras automatiskt.",
+      "STATE": "Status",
+      "DATECREATED": "Skapad",
+      "DATECHANGED": "Ändrad",
+      "URLS": "URL:er",
+      "DELETE": "Ta bort app",
+      "JUMPTOPROJECT": "För att konfigurera roller, behörigheter och mer, navigera till projektet.",
+      "DETAIL": {
+        "TITLE": "Detalj",
+        "STATE": {
+          "0": "Ej definierad",
+          "1": "Aktiv",
+          "2": "Inaktiv"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Ändra OIDC-konfiguration"
+        },
+        "DELETE": {
+          "TITLE": "Ta bort app",
+          "DESCRIPTION": "Vill du verkligen ta bort denna applikation?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Nästa steg",
+        "0": {
+          "TITLE": "Lägg till roller",
+          "DESC": "Ange dina projektroller"
+        },
+        "1": {
+          "TITLE": "Lägg till användare",
+          "DESC": "Lägg till nya användare i din organisation"
+        },
+        "2": {
+          "TITLE": "Hjälp & Support",
+          "DESC": "Läs vår dokumentation om att skapa applikationer eller kontakta vår support"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Byt namn på app",
+      "DESCRIPTION": "Ange det nya namnet för din app",
+      "NAME": "Nytt namn"
+    },
+    "NAME": "Namn",
+    "TYPE": "Applikationstyp",
+    "AUTHMETHOD": "Autentiseringsmetod",
+    "AUTHMETHODSECTION": "Autentiseringsmetod",
+    "GRANT": "Beviljningstyper",
+    "ADDITIONALORIGINS": "Ytterligare ursprung",
+    "ADDITIONALORIGINSDESC": "Om du vill lägga till ytterligare ursprung till din app som inte används som omdirigering kan du göra det här.",
+    "ORIGINS": "Ursprung",
+    "NOTANORIGIN": "Det angivna värdet är inte ett ursprung",
+    "PROSWITCH": "Jag är ett proffs. Hoppa över denna guide.",
+    "NAMEANDTYPESECTION": "Namn och typ",
+    "TITLEFIRST": "Applikationens namn",
+    "TYPETITLE": "Applikationstyp",
+    "OIDC": {
+      "WELLKNOWN": "Ytterligare länkar kan hämtas från <a href='{{url}}' title='Discovery endpoint' target='_blank'>upptäcktsändpunkten</a>.",
+      "INFO": {
+        "ISSUER": "Utfärdare",
+        "CLIENTID": "Klient-ID"
+      },
+      "CURRENT": "Nuvarande konfiguration",
+      "TOKENSECTIONTITLE": "AuthToken-alternativ",
+      "REDIRECTSECTIONTITLE": "Omdirigeringsinställningar",
+      "REDIRECTTITLE": "Ange de URI:er där inloggningen kommer att omdirigera till.",
+      "POSTREDIRECTTITLE": "Detta är omdirigerings-URI:n efter utloggning.",
+      "REDIRECTDESCRIPTIONWEB": "Omdirigerings-URI:er måste börja med https://. http:// är endast giltigt med aktiverat utvecklingsläge.",
+      "REDIRECTDESCRIPTIONNATIVE": "Omdirigerings-URI:er måste börja med ditt eget protokoll, http://127.0.0.1, http://[::1] eller http://localhost.",
+      "REDIRECTNOTVALID": "Denna omdirigerings-URI är inte giltig.",
+      "COMMAORENTERSEPERATION": "separera med ↵",
+      "TYPEREQUIRED": "Typen är obligatorisk.",
+      "TITLE": "OIDC-konfiguration",
+      "CLIENTID": "Klient-ID",
+      "CLIENTSECRET": "Klienthemlighet",
+      "CLIENTSECRET_NOSECRET": "Med ditt valda autentiseringsflöde krävs ingen hemlighet och är därför inte tillgänglig.",
+      "CLIENTSECRET_DESCRIPTION": "Förvara din klienthemlighet på en säker plats eftersom den kommer att försvinna när dialogen stängs.",
+      "REGENERATESECRET": "Återskapa klienthemlighet",
+      "DEVMODE": "Utvecklingsläge",
+      "DEVMODE_ENABLED": "Aktiverad",
+      "DEVMODE_DISABLED": "Inaktiverad",
+      "DEVMODEDESC": "Observera: Med utvecklingsläge aktiverat kommer omdirigerings-URI:er inte att valideras.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Hoppa över inloggningsframgångssida",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Hoppa över framgångssidan efter en inloggning för denna inhemska app.",
+      "REDIRECT": "Omdirigerings-URI:er",
+      "REDIRECTSECTION": "Omdirigerings-URI:er",
+      "POSTLOGOUTREDIRECT": "Post Logout-URI:er",
+      "RESPONSESECTION": "Svarstyper",
+      "GRANTSECTION": "Beviljningstyper",
+      "GRANTTITLE": "Välj dina beviljningstyper. Obs: Implicit är endast tillgänglig för webbläsarbaserade applikationer.",
+      "APPTYPE": {
+        "0": "Webb",
+        "1": "Användaragent",
+        "2": "Inhemsk"
+      },
+      "RESPONSETYPE": "Svarstyper",
+      "RESPONSE": {
+        "0": "Kod",
+        "1": "ID-token",
+        "2": "Token-ID-token"
+      },
+      "REFRESHTOKEN": "Uppdateringstoken",
+      "GRANTTYPE": "Beviljningstyper",
+      "GRANT": {
+        "0": "Auktoriseringskod",
+        "1": "Implicit",
+        "2": "Uppdateringstoken",
+        "3": "Enhetskod",
+        "4": "Tokenutbyte"
+      },
+      "AUTHMETHOD": {
+        "0": "Grundläggande",
+        "1": "Post",
+        "2": "Ingen",
+        "3": "Privat nyckel JWT"
+      },
+      "TOKENTYPE": "Auth Token-typ",
+      "TOKENTYPE0": "Bärare-token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Jag hoppas verkligen att du vet vad du gör.",
+      "OVERVIEWSECTION": "Översikt",
+      "OVERVIEWTITLE": "Du är nu klar. Granska din konfiguration.",
+      "ACCESSTOKENROLEASSERTION": "Lägg till användarroller till åtkomsttoken",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Om valt, läggs de begärda rollerna för den autentiserade användaren till åtkomsttoken.",
+      "IDTOKENROLEASSERTION": "Användarroller i ID-token",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Om valt, läggs de begärda rollerna för den autentiserade användaren till ID-token.",
+      "IDTOKENUSERINFOASSERTION": "Användarinformation i ID-token",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Möjliggör för klienter att hämta profil, e-post, telefon och adressanspråk från ID-token.",
+      "CLOCKSKEW": "Möjliggör för klienter att hantera klockförskjutning av OP och klient. Varaktigheten (0-5s) kommer att läggas till exp-anspråket och dras av från iats, auth_time och nbf.",
+      "RECOMMENDED": "rekommenderad",
+      "NOTRECOMMENDED": "inte rekommenderad",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Webb",
+            "DESCRIPTION": "Vanliga webbapplikationer som .net, PHP, Node.js, Java, etc."
+          },
+          "NATIVE": {
+            "TITLE": "Inhemsk",
+            "DESCRIPTION": "Mobilappar, skrivbord, smarta enheter, etc."
+          },
+          "USERAGENT": {
+            "TITLE": "Användaragent",
+            "DESCRIPTION": "Single Page Applications (SPA) och i allmänhet alla JS-ramverk som körs i webbläsare"
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Klient-ID"
+      },
+      "REGENERATESECRET": "Återskapa klienthemlighet",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API:er i allmänhet"
+      },
+      "AUTHMETHOD": {
+        "0": "Grundläggande",
+        "1": "Privat nyckel JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML-applikationer"
+      },
+      "CONFIGSECTION": "SAML-konfiguration",
+      "CHOOSEMETADATASOURCE": "Tillhandahåll din SAML-konfiguration med hjälp av ett av följande alternativ:",
+      "METADATAOPT1": "Alternativ 1. Ange URL:en där metadatafilen finns",
+      "METADATAOPT2": "Alternativ 2. Ladda upp en fil som innehåller din metadata-XML",
+      "METADATAOPT3": "Alternativ 3. Skapa en minimal metadatafil på språng genom att ange ENTITYID och ACS-URL",
+      "UPLOAD": "Ladda upp XML-fil",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata från fil",
+      "CERTIFICATE": "SAML-certifikat",
+      "DOWNLOADCERT": "Ladda ner SAML-certifikat",
+      "CREATEMETADATA": "Skapa metadata",
+      "ENTITYID": "Enhets-ID",
+      "ACSURL": "ACS-slutpunkt-URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Kod",
+        "DESCRIPTION": "Byt ut auktoriseringskoden mot token"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Använd en slumpmässig hash istället för en statisk klienthemlighet för ökad säkerhet"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Skicka client_id och client_secret som en del av formuläret"
+      },
+      "PK_JWT": {
+        "TITLE": "Privat Nyckel JWT",
+        "DESCRIPTION": "Använd en privat nyckel för att auktorisera din applikation"
+      },
+      "BASIC": {
+        "TITLE": "Grundläggande",
+        "DESCRIPTION": "Autentisering med användarnamn och lösenord"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Få token direkt från auktoriseringsändpunkten"
+      },
+      "DEVICECODE": {
+        "TITLE": "Enhetskod",
+        "DESCRIPTION": "Auktorisera enheten på en dator eller smartphone."
+      },
+      "CUSTOM": {
+        "TITLE": "Anpassad",
+        "DESCRIPTION": "Din inställning motsvarar ingen annan alternativ."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Applikation återaktiverad.",
+      "DEACTIVATED": "Applikation avaktiverad.",
+      "OIDCUPDATED": "App uppdaterad.",
+      "APIUPDATED": "App uppdaterad",
+      "UPDATED": "App uppdaterad.",
+      "CREATED": "App skapad.",
+      "CLIENTSECRETREGENERATED": "Klienthemlighet genererad.",
+      "DELETED": "App raderad.",
+      "CONFIGCHANGED": "Ändringar upptäckta!"
+    }
+  },
+  "GENDERS": {
+    "0": "Okänd",
+    "1": "Kvinna",
+    "2": "Man",
+    "3": "Annat"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
+  },
+  "MEMBER": {
+    "ADD": "Lägg till en administratör",
+    "CREATIONTYPE": "Skapandetyp",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organisation",
+      "0": "Eget Projekt",
+      "1": "Beviljat Projekt",
+      "4": "Projekt"
+    },
+    "EDITROLE": "Redigera roller",
+    "EDITFOR": "Redigera roller för användaren: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Ta bort administratör",
+      "DELETE_DESCRIPTION": "Du håller på att ta bort en administratör. Är du säker?"
+    },
+    "SHOWDETAILS": "Klicka för att visa detaljer."
+  },
+  "ROLESLABEL": "Roller",
+  "GRANTS": {
+    "TITLE": "Auktoriseringar",
+    "DESC": "Dessa är alla auktoriseringar på din organisation.",
+    "DELETE": "Radera auktorisering",
+    "EMPTY": "Ingen auktorisering hittades",
+    "ADD": "Skapa auktorisering",
+    "ADD_BTN": "Ny",
+    "PROJECT": {
+      "TITLE": "Auktorisering",
+      "DESCRIPTION": "Definiera auktoriseringar för det specificerade projektet. Observera att du bara kan se poster för projekt och användare som du har behörighet för."
+    },
+    "USER": {
+      "TITLE": "Auktorisering",
+      "DESCRIPTION": "Definiera auktoriseringar för den specificerade användaren. Observera att du bara kan se poster för projekt och användare som du har behörighet för."
+    },
+    "CREATE": {
+      "TITLE": "Skapa auktorisering",
+      "DESCRIPTION": "Sök efter organisationen, projektet och de motsvarande rollerna."
+    },
+    "EDIT": {
+      "TITLE": "Ändra auktorisering"
+    },
+    "DETAIL": {
+      "TITLE": "Auktoriseringsdetalj",
+      "DESCRIPTION": "Här kan du se alla detaljer om auktoriseringen."
+    },
+    "TOAST": {
+      "UPDATED": "Auktorisering uppdaterad.",
+      "REMOVED": "Auktorisering borttagen",
+      "BULKREMOVED": "Auktoriseringar borttagna.",
+      "CANTSHOWINFO": "Du kan inte besöka denna användares profil eftersom du inte är medlem i organisationen där denna användare tillhör"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Radera auktorisering",
+      "DELETE_DESCRIPTION": "Du håller på att radera en auktorisering. Vill du fortsätta?",
+      "BULK_DELETE_TITLE": "Radera auktoriseringar",
+      "BULK_DELETE_DESCRIPTION": "Du håller på att radera flera auktoriseringar. Vill du fortsätta?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Senaste ändringar",
+    "BOTTOM": "Du har nått slutet av listan.",
+    "LOADMORE": "Ladda mer",
+    "ORG": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Här kan du se de senaste händelserna som har genererat en organisationsförändring."
+    },
+    "PROJECT": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Här kan du se de senaste händelserna som har genererat en projektförändring."
+    },
+    "USER": {
+      "TITLE": "Aktivitet",
+      "DESCRIPTION": "Här kan du se de senaste händelserna som har genererat en användarförändring."
+    }
+  }
+}

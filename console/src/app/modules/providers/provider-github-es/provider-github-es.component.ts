@@ -4,13 +4,13 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddGitHubEnterpriseServerProviderRequest as AdminAddGitHubEnterpriseServerProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGitHubEnterpriseServerProviderRequest as AdminUpdateGitHubEnterpriseServerProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { AutoLinkingOption, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGitHubEnterpriseServerProviderRequest as MgmtAddGitHubEnterpriseServerProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -24,6 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-github-es',
@@ -31,11 +32,17 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderGithubESComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  public options: Options = new Options()
+    .setIsCreationAllowed(true)
+    .setIsLinkingAllowed(true)
+    .setAutoLinking(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED);
 
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
   public updateClientSecret: boolean = false;
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
   public form!: UntypedFormGroup;
@@ -44,6 +51,25 @@ export class ProviderGithubESComponent {
 
   public provider?: Provider.AsObject;
 
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/github#optional-add-zitadel-action-to-autofill-userdata`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/github#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.nextSvc.callbackUrls();
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -51,6 +77,7 @@ export class ProviderGithubESComponent {
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
+    private nextSvc: ProviderNextService,
   ) {
     this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [requiredValidator]),
@@ -113,6 +140,10 @@ export class ProviderGithubESComponent {
     });
   }
 
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
+  }
+
   private getData(id: string): void {
     this.loading = true;
     const req =
@@ -137,7 +168,7 @@ export class ProviderGithubESComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGenericOAuthProvider() : this.addGenericOAuthProvider();
+    this.provider || this.justCreated$.value ? this.updateGenericOAuthProvider() : this.addGenericOAuthProvider();
   }
 
   public addGenericOAuthProvider(): void {
@@ -158,11 +189,9 @@ export class ProviderGithubESComponent {
     this.loading = true;
     this.service
       .addGitHubEnterpriseServerProvider(req)
-      .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.close();
-        }, 2000);
+      .then((addedIDP) => {
+        this.justCreated$.next(addedIDP.id);
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -171,12 +200,12 @@ export class ProviderGithubESComponent {
   }
 
   public updateGenericOAuthProvider(): void {
-    if (this.provider) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateGitHubEnterpriseServerProviderRequest()
           : new AdminUpdateGitHubEnterpriseServerProviderRequest();
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
       req.setTokenEndpoint(this.tokenEndpoint?.value);

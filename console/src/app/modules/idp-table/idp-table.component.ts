@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
 import {
   ListProvidersRequest as AdminListProvidersRequest,
   ListProvidersResponse as AdminListProvidersResponse,
@@ -36,6 +36,8 @@ import { ContextChangedWorkflowOverlays } from 'src/app/services/overlay/workflo
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
+import { LoginPolicyService } from '../../services/login-policy.service';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'cnsl-idp-table',
@@ -70,6 +72,7 @@ export class IdpTableComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private dialog: MatDialog,
     private router: Router,
+    private loginPolicySvc: LoginPolicyService,
   ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
@@ -298,93 +301,15 @@ export class IdpTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  private addLoginPolicy(): Promise<AddCustomLoginPolicyResponse.AsObject> {
-    const mgmtreq = new AddCustomLoginPolicyRequest();
-    mgmtreq.setAllowExternalIdp(this.loginPolicy.allowExternalIdp);
-    mgmtreq.setAllowRegister(this.loginPolicy.allowRegister);
-    mgmtreq.setAllowUsernamePassword(this.loginPolicy.allowUsernamePassword);
-    mgmtreq.setForceMfa(this.loginPolicy.forceMfa);
-    mgmtreq.setPasswordlessType(this.loginPolicy.passwordlessType);
-    mgmtreq.setHidePasswordReset(this.loginPolicy.hidePasswordReset);
-    mgmtreq.setMultiFactorsList(this.loginPolicy.multiFactorsList);
-    mgmtreq.setSecondFactorsList(this.loginPolicy.secondFactorsList);
-
-    const pcl = new Duration()
-      .setSeconds(this.loginPolicy.passwordCheckLifetime?.seconds ?? 0)
-      .setNanos(this.loginPolicy.passwordCheckLifetime?.nanos ?? 0);
-    mgmtreq.setPasswordCheckLifetime(pcl);
-
-    const elcl = new Duration()
-      .setSeconds(this.loginPolicy.externalLoginCheckLifetime?.seconds ?? 0)
-      .setNanos(this.loginPolicy.externalLoginCheckLifetime?.nanos ?? 0);
-    mgmtreq.setExternalLoginCheckLifetime(elcl);
-
-    const misl = new Duration()
-      .setSeconds(this.loginPolicy.mfaInitSkipLifetime?.seconds ?? 0)
-      .setNanos(this.loginPolicy.mfaInitSkipLifetime?.nanos ?? 0);
-    mgmtreq.setMfaInitSkipLifetime(misl);
-
-    const sfcl = new Duration()
-      .setSeconds(this.loginPolicy.secondFactorCheckLifetime?.seconds ?? 0)
-      .setNanos(this.loginPolicy.secondFactorCheckLifetime?.nanos ?? 0);
-    mgmtreq.setSecondFactorCheckLifetime(sfcl);
-
-    const mficl = new Duration()
-      .setSeconds(this.loginPolicy.multiFactorCheckLifetime?.seconds ?? 0)
-      .setNanos(this.loginPolicy.multiFactorCheckLifetime?.nanos ?? 0);
-    mgmtreq.setMultiFactorCheckLifetime(mficl);
-
-    mgmtreq.setAllowDomainDiscovery(this.loginPolicy.allowDomainDiscovery);
-    mgmtreq.setIgnoreUnknownUsernames(this.loginPolicy.ignoreUnknownUsernames);
-    mgmtreq.setDefaultRedirectUri(this.loginPolicy.defaultRedirectUri);
-
-    return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
-  }
-
   public addIdp(idp: Provider.AsObject): Promise<any> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        if (this.isDefault) {
-          return this.addLoginPolicy()
-            .then(() => {
-              this.loginPolicy.isDefault = false;
-              return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, idp.owner).then(() => {
-                this.toast.showInfo('IDP.TOAST.ADDED', true);
-
-                setTimeout(() => {
-                  this.reloadIDPs$.next();
-                }, 2000);
-              });
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        } else {
-          return (this.service as ManagementService)
-            .addIDPToLoginPolicy(idp.id, idp.owner)
-            .then(() => {
-              this.toast.showInfo('IDP.TOAST.ADDED', true);
-              setTimeout(() => {
-                this.reloadIDPs$.next();
-              }, 2000);
-            })
-            .catch((error) => {
-              this.toast.showError(error);
-            });
-        }
-      case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService)
-          .addIDPToLoginPolicy(idp.id)
-          .then(() => {
-            this.toast.showInfo('IDP.TOAST.ADDED', true);
-            setTimeout(() => {
-              this.reloadIDPs$.next();
-            }, 2000);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-    }
+    return firstValueFrom(this.loginPolicySvc.activateIdp(this.service, idp.id, idp.owner, this.loginPolicy))
+      .then(() => {
+        this.toast.showInfo('IDP.TOAST.ADDED', true);
+        setTimeout(() => {
+          this.reloadIDPs$.next();
+        }, 2000);
+      })
+      .catch(this.toast.showError);
   }
 
   public removeIdp(idp: Provider.AsObject): void {
@@ -403,7 +328,8 @@ export class IdpTableComponent implements OnInit, OnDestroy {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
             if (this.isDefault) {
-              this.addLoginPolicy()
+              this.loginPolicySvc
+                .createCustomLoginPolicy(this.service as ManagementService, this.loginPolicy)
                 .then(() => {
                   this.loginPolicy.isDefault = false;
                   return (this.service as ManagementService)

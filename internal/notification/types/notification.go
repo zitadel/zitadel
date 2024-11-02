@@ -2,11 +2,14 @@ package types
 
 import (
 	"context"
+	"html"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/internal/notification/channels/email"
+	"github.com/zitadel/zitadel/internal/notification/channels/set"
+	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
@@ -21,9 +24,10 @@ type Notify func(
 ) error
 
 type ChannelChains interface {
-	Email(context.Context) (*senders.Chain, *smtp.Config, error)
-	SMS(context.Context) (*senders.Chain, *twilio.Config, error)
+	Email(context.Context) (*senders.Chain, *email.Config, error)
+	SMS(context.Context) (*senders.Chain, *sms.Config, error)
 	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
+	SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error)
 }
 
 func SendEmail(
@@ -42,6 +46,7 @@ func SendEmail(
 		allowUnverifiedNotificationChannel bool,
 	) error {
 		args = mapNotifyUserToArgs(user, args)
+		sanitizeArgsForHTML(args)
 		data := GetTemplateData(ctx, translator, args, url, messageType, user.PreferredLanguage.String(), colors)
 		template, err := templates.GetParsedTemplate(mailhtml, data)
 		if err != nil {
@@ -51,21 +56,40 @@ func SendEmail(
 			ctx,
 			channels,
 			user,
-			data.Subject,
 			template,
+			data,
+			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
 		)
 	}
 }
 
-func SendSMSTwilio(
+func sanitizeArgsForHTML(args map[string]any) {
+	for key, arg := range args {
+		switch a := arg.(type) {
+		case string:
+			args[key] = html.EscapeString(a)
+		case []string:
+			for i, s := range a {
+				a[i] = html.EscapeString(s)
+			}
+		case database.TextArray[string]:
+			for i, s := range a {
+				a[i] = html.EscapeString(s)
+			}
+		}
+	}
+}
+
+func SendSMS(
 	ctx context.Context,
 	channels ChannelChains,
 	translator *i18n.Translator,
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
 	triggeringEvent eventstore.Event,
+	generatorInfo *senders.CodeGeneratorInfo,
 ) Notify {
 	return func(
 		url string,
@@ -79,9 +103,11 @@ func SendSMSTwilio(
 			ctx,
 			channels,
 			user,
-			data.Text,
+			data,
+			args,
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
+			generatorInfo,
 		)
 	}
 }
@@ -99,6 +125,24 @@ func SendJSON(
 			webhookConfig,
 			channels,
 			serializable,
+			triggeringEvent,
+		)
+	}
+}
+
+func SendSecurityTokenEvent(
+	ctx context.Context,
+	setConfig set.Config,
+	channels ChannelChains,
+	token any,
+	triggeringEvent eventstore.Event,
+) Notify {
+	return func(_ string, _ map[string]interface{}, _ string, _ bool) error {
+		return handleSecurityTokenEvent(
+			ctx,
+			setConfig,
+			channels,
+			token,
 			triggeringEvent,
 		)
 	}

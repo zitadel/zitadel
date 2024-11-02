@@ -478,31 +478,31 @@ func (q *SubSelect) comp() sq.Sqlizer {
 	return selectQuery
 }
 
-type ListQuery struct {
+type listQuery struct {
 	Column  Column
 	Data    interface{}
 	Compare ListComparison
 }
 
-func NewListQuery(column Column, value interface{}, compare ListComparison) (*ListQuery, error) {
+func NewListQuery(column Column, value interface{}, compare ListComparison) (*listQuery, error) {
 	if compare < 0 || compare >= listCompareMax {
 		return nil, ErrInvalidCompare
 	}
 	if column.isZero() {
 		return nil, ErrMissingColumn
 	}
-	return &ListQuery{
+	return &listQuery{
 		Column:  column,
 		Data:    value,
 		Compare: compare,
 	}, nil
 }
 
-func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *listQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (q *ListQuery) comp() sq.Sqlizer {
+func (q *listQuery) comp() sq.Sqlizer {
 	if q.Compare != ListIn {
 		return nil
 	}
@@ -517,7 +517,7 @@ func (q *ListQuery) comp() sq.Sqlizer {
 	return sq.Eq{q.Column.identifier(): q.Data}
 }
 
-func (q *ListQuery) Col() Column {
+func (q *listQuery) Col() Column {
 	return q.Column
 }
 
@@ -720,6 +720,25 @@ type listContains struct {
 	args interface{}
 }
 
+func NewListContains(c Column, value interface{}) (*listContains, error) {
+	return &listContains{
+		col:  c,
+		args: value,
+	}, nil
+}
+
+func (q *listContains) Col() Column {
+	return q.col
+}
+
+func (q *listContains) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
 func (q *listContains) ToSql() (string, []interface{}, error) {
 	return q.col.identifier() + " @> ? ", []interface{}{q.args}, nil
+}
+
+func (q *listContains) comp() sq.Sqlizer {
+	return q
 }

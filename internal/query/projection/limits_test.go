@@ -21,7 +21,7 @@ func TestLimitsProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "reduceLimitsSet",
+			name: "reduceLimitsSet auditLogRetention",
 			args: args{
 				event: getEvent(testEvent(
 					limits.SetEventType,
@@ -38,7 +38,7 @@ func TestLimitsProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.limits (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, audit_log_retention) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, audit_log_retention) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.audit_log_retention)",
+							expectedStmt: "INSERT INTO projections.limits (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, audit_log_retention) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, audit_log_retention) = (projections.limits.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.audit_log_retention)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"ro-id",
@@ -53,7 +53,107 @@ func TestLimitsProjection_reduces(t *testing.T) {
 				},
 			},
 		},
-
+		{
+			name: "reduceLimitsSet block true",
+			args: args{
+				event: getEvent(testEvent(
+					limits.SetEventType,
+					limits.AggregateType,
+					[]byte(`{
+							"block": true
+					}`),
+				), limits.SetEventMapper),
+			},
+			reduce: (&limitsProjection{}).reduceLimitsSet,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("limits"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.limits (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, block) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, block) = (projections.limits.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.block)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"ro-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceLimitsSet block false",
+			args: args{
+				event: getEvent(testEvent(
+					limits.SetEventType,
+					limits.AggregateType,
+					[]byte(`{
+							"block": false
+					}`),
+				), limits.SetEventMapper),
+			},
+			reduce: (&limitsProjection{}).reduceLimitsSet,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("limits"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.limits (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, block) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, block) = (projections.limits.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.block)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"ro-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								false,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceLimitsSet all",
+			args: args{
+				event: getEvent(testEvent(
+					limits.SetEventType,
+					limits.AggregateType,
+					[]byte(`{
+							"auditLogRetention": 300000000000,
+							"block": true
+					}`),
+				), limits.SetEventMapper),
+			},
+			reduce: (&limitsProjection{}).reduceLimitsSet,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("limits"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.limits (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, audit_log_retention, block) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, audit_log_retention, block) = (projections.limits.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.audit_log_retention, EXCLUDED.block)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"ro-id",
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								time.Minute * 5,
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
 		{
 			name: "reduceLimitsReset",
 			args: args{

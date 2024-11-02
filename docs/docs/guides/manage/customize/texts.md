@@ -38,6 +38,7 @@ ZITADEL is available in the following languages
 - English (en)
 - Spanish (es)
 - French (fr)
+- Indonesian (id)
 - Italian (it)
 - 日本語 (ja)
 - Polish（pl）
@@ -48,6 +49,8 @@ ZITADEL is available in the following languages
 - Czech (cs)
 - Russian (ru)
 - Dutch (nl)
+- Swedish (sv)
+- Hungarian (hu)
 
 A language is displayed based on your agent's language header.
 If a users language header doesn't match any of the supported or [restricted](#restrict-languages) languages, the instances default language will be used.
@@ -60,6 +63,6 @@ If you only want to enable a subset of the supported languages, you can configur
 The login UI and notification messages are only rendered in one of the allowed languages and fallback to the instances default language.
 Also, the instances OIDC discovery endpoint will only list the allowed languages in the *ui_locales_supported* field.
 
-All language settings are also configurable in the consoles *Languages* instance settings.
+All language settings are also configurable in the consoles *Languages* default settings.
 
 ![Languages](/img/guides/console/languages.png)

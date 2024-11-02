@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package zitadel.feature.v2;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
+
+
+enum Source {
+  SOURCE_UNSPECIFIED = 0;
+  reserved 1;             // in case we want to implement a "DEFAULT" level
+  SOURCE_SYSTEM = 2;
+  SOURCE_INSTANCE = 3;
+  SOURCE_ORGANIZATION = 4;
+  SOURCE_PROJECT = 5;     // reserved for future use
+  SOURCE_APP = 6;         // reserved for future use
+  SOURCE_USER = 7;
+}
+
+// FeatureFlag is a simple boolean Feature setting, without further payload.
+message FeatureFlag {
+  bool enabled = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "false";
+      description: "Whether a feature is enabled.";
+    }
+  ];
+
+  Source source = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The source where the setting of the feature was defined. The source may be the resource itself or a resource owner through inheritance.";
+    }
+  ];
+}
+
+message ImprovedPerformanceFeatureFlag {
+  repeated ImprovedPerformance execution_paths = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[1]";
+      description: "Which of the performance improvements is enabled";
+    }
+  ];
+
+  Source source = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The source where the setting of the feature was defined. The source may be the resource itself or a resource owner through inheritance.";
+    }
+  ];
+}
+
+enum ImprovedPerformance {
+  IMPROVED_PERFORMANCE_UNSPECIFIED = 0;
+  // Uses the eventstore to query the org by id
+  // instead of the sql table.
+  IMPROVED_PERFORMANCE_ORG_BY_ID = 1;
+  // Improves performance on write side by using
+  // optimized processes to query data to determine
+  // correctnes of data.
+  IMPROVED_PERFORMANCE_PROJECT_GRANT = 2;
+  IMPROVED_PERFORMANCE_PROJECT = 3;
+  IMPROVED_PERFORMANCE_USER_GRANT = 4;
+
+  // Improve performance on write side when
+  // users are checked against verified domains
+  // from other organizations.
+  IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED = 5;
+}

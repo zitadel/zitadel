@@ -19,5 +19,5 @@ func MarshalJSON(w http.ResponseWriter, i interface{}, err error, statusCode int
 	}
 	w.Header().Set("content-type", "application/json")
 	_, err = w.Write(b)
-	logging.Log("HTTP-sdgT2").OnError(err).Error("error writing response")
+	logging.WithFields("logID", "HTTP-sdgT2").OnError(err).Error("error writing response")
 }

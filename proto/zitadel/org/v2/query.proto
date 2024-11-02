@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package zitadel.org.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2;org";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/org/v2/org.proto";
+import "zitadel/object/v2/object.proto";
+
+
+message SearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    OrganizationNameQuery name_query = 1;
+    OrganizationDomainQuery domain_query = 2;
+    OrganizationStateQuery state_query = 3;
+    OrganizationIDQuery id_query = 4;
+    DefaultOrganizationQuery default_query = 5;
+  }
+}
+
+message OrganizationNameQuery {
+  // Name of the organization.
+  string name = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"gigi-giraffe\"";
+    }
+  ];
+  // Defines which text equality method is used.
+  zitadel.object.v2.TextQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message OrganizationDomainQuery {
+  // Domain used in organization, not necessary primary domain.
+  string domain = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"citadel.cloud\"";
+    }
+  ];
+  // Defines which text equality method is used.
+  zitadel.object.v2.TextQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message OrganizationStateQuery {
+  // Current state of the organization.
+  OrganizationState state = 1 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message OrganizationIDQuery {
+  // Unique identifier of the organization.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629023906488334\""
+    }
+  ];
+}
+
+enum OrganizationFieldName {
+  ORGANIZATION_FIELD_NAME_UNSPECIFIED = 0;
+  ORGANIZATION_FIELD_NAME_NAME = 1;
+}
+
+message DefaultOrganizationQuery {}

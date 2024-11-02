@@ -46,4 +46,27 @@
       </div>
     </div>
   </div>
+
+  <div class="domain-query">
+    <mat-checkbox
+      id="domain"
+      class="cb"
+      [checked]="getSubFilter(SubQuery.DOMAIN)"
+      (change)="changeCheckbox(SubQuery.DOMAIN, $event)"
+      >{{ 'FILTER.PRIMARYDOMAIN' | translate }}
+    </mat-checkbox>
+    <div class="subquery" *ngIf="getSubFilter(SubQuery.DOMAIN) as dq">
+      <cnsl-form-field class="filter-select-method">
+        <mat-select [value]="dq.getMethod()" (selectionChange)="setMethod(dq, $event)">
+          <mat-option *ngFor="let method of methods" [value]="method">
+            {{ 'FILTER.METHODS.' + method | translate }}
+          </mat-option>
+        </mat-select>
+      </cnsl-form-field>
+
+      <cnsl-form-field class="filter-input-value">
+        <input cnslInput name="value" [value]="dq.getDomain()" (change)="setValue(SubQuery.DOMAIN, dq, $event)" />
+      </cnsl-form-field>
+    </div>
+  </div>
 </cnsl-filter>

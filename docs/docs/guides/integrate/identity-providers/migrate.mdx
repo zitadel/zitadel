@@ -1,12 +1,13 @@
 ---
 title: Migrate from Generic Provider to specific Identity Provider
-sidebar_label: Migrate IDP
+sidebar_label: Migrate IdP
 ---
 
 ## Migrate Generic OIDC Provider
 
 You can migrate from a generic OIDC provider to the following supported templates:
-- AzureAD
+
+- Entra ID (former Azure Active Directory)
 - Google
 
 To migrate, you either use the [Migrate Generic OIDC Identity Provider (Instance)](/docs/apis/resources/admin/admin-service-migrate-generic-oidc-provider#migrate-generic-oidc-identity-provider) or [Migrate Generic OIDC Identity Provider (Organization)](/docs/apis/resources/mgmt/management-service-migrate-generic-oidc-provider#migrate-generic-oidc-identity-provider) API request.
@@ -19,11 +20,12 @@ These calls change the type of the provider and don't delete any linked users.
 
 The available configuration is described in [Google Configuration](./google).
 
-### AzureAD Configuration
+### Entra ID Configuration
 
-The available configuration is described in [AzureAD Configuration](./azure-ad).
+The available configuration is described in [Entra ID Configuration](./azure-ad-oidc).
 
 ## Migrate with Terraform
+
 Please note that you only have to perform this migration if you already have an existing IDP with linked users, that should not loose the connection to the provider.
 If that isn't your case please just add a new provider from scratch. 
 To migrate to a specific provider, you need to follow a few essential steps:

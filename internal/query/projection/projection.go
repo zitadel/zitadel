@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/migration"
 )
 
 const (
@@ -44,6 +45,7 @@ var (
 	LoginNameProjection                 *handler.Handler
 	OrgMemberProjection                 *handler.Handler
 	InstanceDomainProjection            *handler.Handler
+	InstanceTrustedDomainProjection     *handler.Handler
 	InstanceMemberProjection            *handler.Handler
 	ProjectMemberProjection             *handler.Handler
 	ProjectGrantMemberProjection        *handler.Handler
@@ -71,11 +73,23 @@ var (
 	QuotaProjection                     *quotaProjection
 	LimitsProjection                    *handler.Handler
 	RestrictionsProjection              *handler.Handler
+	SystemFeatureProjection             *handler.Handler
+	InstanceFeatureProjection           *handler.Handler
+	TargetProjection                    *handler.Handler
+	ExecutionProjection                 *handler.Handler
+	UserSchemaProjection                *handler.Handler
+	WebKeyProjection                    *handler.Handler
+	DebugEventsProjection               *handler.Handler
+
+	ProjectGrantFields      *handler.FieldHandler
+	OrgDomainVerifiedFields *handler.FieldHandler
 )
 
 type projection interface {
 	Start(ctx context.Context)
 	Init(ctx context.Context) error
+	Trigger(ctx context.Context, opts ...handler.TriggerOpt) (_ context.Context, err error)
+	migration.Migration
 }
 
 var (
@@ -121,6 +135,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	LoginNameProjection = newLoginNameProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_names"]))
 	OrgMemberProjection = newOrgMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_members"]))
 	InstanceDomainProjection = newInstanceDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains"]))
+	InstanceTrustedDomainProjection = newInstanceTrustedDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_trusted_domains"]))
 	InstanceMemberProjection = newInstanceMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam_members"]))
 	ProjectMemberProjection = newProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
 	ProjectGrantMemberProjection = newProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
@@ -141,12 +156,27 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
 	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
 	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
-	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]), systemUsers)
+	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]))
 	QuotaProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
 	LimitsProjection = newLimitsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["limits"]))
 	RestrictionsProjection = newRestrictionsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["restrictions"]))
+	SystemFeatureProjection = newSystemFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["system_features"]))
+	InstanceFeatureProjection = newInstanceFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_features"]))
+	TargetProjection = newTargetProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["targets"]))
+	ExecutionProjection = newExecutionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["executions"]))
+	UserSchemaProjection = newUserSchemaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_schemas"]))
+	WebKeyProjection = newWebKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["web_keys"]))
+	DebugEventsProjection = newDebugEventsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_events"]))
+
+	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
+	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
+
 	newProjectionsList()
 	return nil
+}
+
+func Projections() []projection {
+	return projections
 }
 
 func Init(ctx context.Context) error {
@@ -162,6 +192,16 @@ func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
+}
+
+func ProjectInstance(ctx context.Context) error {
+	for _, projection := range projections {
+		_, err := projection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {
@@ -226,6 +266,7 @@ func newProjectionsList() {
 		LoginNameProjection,
 		OrgMemberProjection,
 		InstanceDomainProjection,
+		InstanceTrustedDomainProjection,
 		InstanceMemberProjection,
 		ProjectMemberProjection,
 		ProjectGrantMemberProjection,
@@ -250,5 +291,12 @@ func newProjectionsList() {
 		QuotaProjection.handler,
 		LimitsProjection,
 		RestrictionsProjection,
+		SystemFeatureProjection,
+		InstanceFeatureProjection,
+		TargetProjection,
+		ExecutionProjection,
+		UserSchemaProjection,
+		WebKeyProjection,
+		DebugEventsProjection,
 	}
 }

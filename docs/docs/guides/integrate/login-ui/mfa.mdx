@@ -1,6 +1,6 @@
 ---
-title: Multi-Factor Authentication(MFA) in ZITADEL
-sidebar_label: Multi-Factor Authentication(MFA)
+title: Multi-Factor Authentication (MFA) in a Custom Login UI
+sidebar_label: Multi-Factor Authentication (MFA)
 ---
 
 import MfaOptions from './_list-mfa-options.mdx';
@@ -30,18 +30,18 @@ ZITADEL supports different Methods:
 
 ### Start TOTP Registration
 
-The user has selected to setup Time-based One-Time-Password (TOTP).
+The user has selected to setup Time-based One-Time Password (TOTP).
 To show the user the QR to register TOTP with his Authenticator App like Google/Microsoft Authenticator or Authy you have to start the registration on the ZITADEL API.
 Generate the QR Code with the URI from the response.
 For users that do not have a QR Code reader make sure to also show the secret, to enable manual configuration.
 
-More detailed information about the API: [Start TOTP Registration Documentation](/apis/resources/user_service/user-service-register-totp)
+More detailed information about the API: [Start TOTP Registration Documentation](/apis/resources/user_service_v2/user-service-register-totp)
 
 Request Example:
 
 ```bash
 curl --request POST \
-    --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/totp \
+    --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/totp \
     --header 'Accept: application/json' \
     --header 'Authorization: Bearer '"$TOKEN"''
     --header 'Content-Type: application/json' \
@@ -64,16 +64,16 @@ Response Example:
 
 ### Verify TOTP Registration
 
-When the user has added the account to his authenticator app, he has to enter the code from the App to finish the registration.
+When the user has added the account to the authenticator app, the code from the App has to be entered to finish the registration.
 This code has to be sent to the verify endpoint in ZITADEL.
 
-More detailed information about the API: [Verify TOTP Documentation](/apis/resources/user_service/user-service-verify-totp-registration)
+More detailed information about the API: [Verify TOTP Documentation](/apis/resources/user_service_v2/user-service-verify-totp-registration)
 
 Request Example:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/totp/verify \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/totp/verify \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''
   --header 'Content-Type: application/json' \
@@ -93,13 +93,13 @@ curl --request POST \
 To be able to check the TOTP you need a session with a checked user. This can either happen before the TOTP check or at the same time.
 In this example we do two separate requests. So the first step is to create a new Sessions.
 
-More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/apis/resources/session_service_v2/session-service-create-session)
 
 Example Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -128,19 +128,18 @@ Example Response
 
 ### Check TOTP
 
-Now you can show the code field to the user, where he has to enter the code from the Authenticator App.
+Now you can show the code field to the user, where the code needs to be entered from the Authenticator App.
 With that code you have to update the existing session with a totp check.
 
-More detailed information about the API: [Update session Documentation](/apis/resources/session_service/session-service-set-session)
+More detailed information about the API: [Update session Documentation](/apis/resources/session_service_v2/session-service-set-session)
 
 Example Request
 ```bash
 curl --request PATCH \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/$SESSION-ID \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/$SESSION-ID \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json' \
   --data '{
-  "sessionToken": "W3mEoesTiYOsiR1LYUCRw3vaEwXKLGDTsqOV_bkOhlah_-ZbuiLgvnzADwe_iYMusbwkMhp7VfMn8j",
   "checks": {
     "totp": {
       "code": "323764"
@@ -165,18 +164,18 @@ When the user has decided to register the phone number to get a code as a second
 If the user already has a verified phone number you can skip this step.
 
 When adding a new phone number, you can choose if you want ZITADEL to send the verification code to the number, or if you want to send it by yourself.
-If ZITADEL should do it, make sure that you have registered an [SMS Provider](/docs/guides/manage/console/instance-settings#sms) and send an empty sendCode object in the request.
+If ZITADEL should do it, make sure that you have registered an [SMS Provider](/docs/guides/manage/console/default-settings#sms) and send an empty sendCode object in the request.
 With an empty returnCode object in the request, ZITADEL will not send the code, but return it in the response.
 
 If you don't want the user to verify the phone number, you can also create it directly as verified, by sending the isVerified attribute.
 
-More detailed information about the API: [Add phone](/apis/resources/user_service/user-service-set-phone)
+More detailed information about the API: [Add phone](/apis/resources/user_service_v2/user-service-set-phone)
 
 Example Request:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER-ID/phone \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER-ID/phone \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -191,12 +190,12 @@ curl --request POST \
 The next step is to show a screen, so the user is able to enter the code for verifying the phone number.
 Send a verify phone request with the code in the body.
 
-More detailed information about the API: [Verify phone](/apis/resources/user_service/user-service-verify-phone)
+More detailed information about the API: [Verify phone](/apis/resources/user_service_v2/user-service-verify-phone)
 
 Example Request:
 ```bash
 curl --request POST \
-    --url https://$ZITADEL_DOMAIN/v2beta/users/$USER-ID/phone/verify \
+    --url https://$ZITADEL_DOMAIN/v2/users/$USER-ID/phone/verify \
     --header 'Accept: application/json' \
     --header 'Authorization: Bearer '"$TOKEN"'' \
     --header 'Content-Type: application/json' \
@@ -209,12 +208,12 @@ curl --request POST \
 
 Now that the user has a verified phone number you can enable SMS OTP on the user.
 
-More detailed information about the API: [Add OTP SMS for a user](/apis/resources/user_service/user-service-add-otpsms)
+More detailed information about the API: [Add OTP SMS for a user](/apis/resources/user_service_v2/user-service-add-otpsms)
 
 Example Request:
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER-ID/otp_sms \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER-ID/otp_sms \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json'
@@ -232,13 +231,13 @@ To be able to check the SMS Code you need a session with a checked user.
 When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
 You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
 
-More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/apis/resources/session_service_v2/session-service-create-session)
 
 Example Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -258,19 +257,18 @@ curl --request POST \
 
 ### Check SMS Code
 
-In the next step you should show the user a code field, where he can enter the code, he got as SMS.
+In the next step you should prompt the user to enter the SMS verification code in the provided field.
 The update session request has a check otpSMS where you should send the code, the user has entered.
 
 Example Request
 
 ```bash
 curl --request PATCH \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/225307381909694507 \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/225307381909694507 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
   --data '{
-  "sessionToken": "W3mEoesTiYOsiR1LYUCRw3WaFwXKLGDRsqOV_bkOhlah_-ZpuiLgvnzADwe_iYMusbwkMhp7VfMn8g",
   "checks": {
     "otpSms": {
       "code": "3237642"
@@ -298,12 +296,12 @@ For the Email second factor the already verified email address will be taken.
 
 As the user already has a verified E-Mail address you can enable E-Mail OTP on the user.
 
-More detailed information about the API: [Add OTP Email for a user](/apis/resources/user_service/user-service-add-otp-email)
+More detailed information about the API: [Add OTP Email for a user](/apis/resources/user_service_v2/user-service-add-otp-email)
 
 Example Request:
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER-ID/otp_email \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER-ID/otp_email \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json'
@@ -321,13 +319,13 @@ To be able to check the Email Code you need a session with a checked user.
 When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
 You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
 
-More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/apis/resources/session_service_v2/session-service-create-session)
 
 Example Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -347,19 +345,18 @@ curl --request POST \
 
 ### Check Email Code
 
-In the next step you should show the user a code field, where he can enter the code, he got per E-Mail.
+Next, display a code field for the user to enter the verification code they received via email.
 The update session request has a check otpEmail where you should send the code, the user has entered.
 
 Example Request
 
 ```bash
 curl --request PATCH \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/225307381909694507 \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/225307381909694507 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
   --data '{
-  "sessionToken": "W3mEoesTiYOsiR1LYUCRw3WaFwXKLGDRsqOV_bkOhlah_-ZpuiLgvnzADwe_iYMusbwkMhp7VfMn8g",
   "checks": {
     "otpEmail": {
       "code": "3237642"
@@ -383,13 +380,13 @@ curl --request PATCH \
 The user has selected to setup Universal Second Factor (U2F).
 To be able to authenticate in the browser you have to start the u2f registration within ZITADEL.
 
-More detailed information about the API: [Start U2F Registration Documentation](/apis/resources/user_service/user-service-register-u-2-f)
+More detailed information about the API: [Start U2F Registration Documentation](/apis/resources/user_service_v2/user-service-register-u-2-f)
 
 Request Example:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/u2f \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/u2f \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''
   --header 'Content-Type: application/json' \
@@ -453,14 +450,14 @@ Include the public key credential you got from the browser in your request.
 You can give the U2F a name, which makes it easier for the user to identify the registered authentication methods.
 Example: Google Pixel, iCloud Keychain, Yubikey, etc
 
-More detailed information about the API: [Verify U2F Documentation](/apis/resources/user_service/user-service-verify-u-2-f-registration)
+More detailed information about the API: [Verify U2F Documentation](/apis/resources/user_service_v2/user-service-verify-u-2-f-registration)
 
 Example Request:
 
 ```bash
 
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/u2f/$PASSKEY_ID \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/u2f/$PASSKEY_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -488,19 +485,19 @@ You have successfully registered a new U2F to the user.
 
 ### Check User
 
-To be able to check the Universal-Second-Factor (U2F) you need a user check and a webAuthN challenge.
+To be able to check the Universal Second Factor (U2F) you need a user check and a webAuthN challenge.
 In the creat session request you can check for the user and directly initiate the webAuthN challenge.
 
 For U2F you can choose between "USER_VERIFICATION_REQUIREMENT_PREFERRED" and "USER_VERIFICATION_REQUIREMENT_DISCOURAGED" for the challenge.
 Best practice is using discouraged, as this doesn't require the user to enter a PIN. With `preferred` the user might be prompted for the PIN, but it is not necessary.
 
-More detailed information about the API: [Create new session Documentation](/apis/resources/session_service/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/apis/resources/session_service_v2/session-service-create-session)
 
 Example Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \

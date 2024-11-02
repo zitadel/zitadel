@@ -41,7 +41,7 @@ Select `CODE` in the next step. This makes sure you still get a secret. Note tha
 
 With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
-> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true` and the Redirect URIs to <http://localhost:3000/api/auth/callback/zitadel>.
+> If you are following along with the [example](https://github.com/zitadel/zitadel-angular), set dev mode to `true` and the Redirect URIs to `http://localhost:3000/api/auth/callback/zitadel`.
 
 If you want to redirect the users back to a route on your application after they have logged out, add an optional redirect in the Post Logout URIs field.
 

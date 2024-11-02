@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 )
@@ -1016,6 +1017,8 @@ func NewSAMLIDPAddedEvent(
 	certificate []byte,
 	binding string,
 	withSignedRequest bool,
+	nameIDFormat *domain.SAMLNameIDFormat,
+	transientMappingAttributeName string,
 	options idp.Options,
 ) *SAMLIDPAddedEvent {
 	return &SAMLIDPAddedEvent{
@@ -1032,6 +1035,8 @@ func NewSAMLIDPAddedEvent(
 			certificate,
 			binding,
 			withSignedRequest,
+			nameIDFormat,
+			transientMappingAttributeName,
 			options,
 		),
 	}

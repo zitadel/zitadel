@@ -276,6 +276,13 @@ enum SAMLBinding {
     SAML_BINDING_ARTIFACT = 3;
 }
 
+enum SAMLNameIDFormat {
+    SAML_NAME_ID_FORMAT_UNSPECIFIED = 0;
+    SAML_NAME_ID_FORMAT_EMAIL_ADDRESS = 1;
+    SAML_NAME_ID_FORMAT_PERSISTENT = 2;
+    SAML_NAME_ID_FORMAT_TRANSIENT = 3;
+}
+
 message ProviderConfig {
     Options options = 1;
     oneof config {
@@ -452,21 +459,17 @@ message LDAPConfig {
 }
 
 message SAMLConfig {
-    bytes metadata_xml = 1 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Metadata of the SAML identity provider";
-        }
-    ];
-    zitadel.idp.v1.SAMLBinding binding = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Binding which defines the type of communication with the identity provider";
-        }
-    ];
-    bool with_signed_request = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Boolean which defines if the authentication requests are signed";
-        }
-    ];
+    // Metadata of the SAML identity provider.
+    bytes metadata_xml = 1;
+    // Binding which defines the type of communication with the identity provider.
+    zitadel.idp.v1.SAMLBinding binding = 2;
+    // Boolean which defines if the authentication requests are signed.
+    bool with_signed_request = 3;
+    // `nameid-format` for the SAML Request.
+    zitadel.idp.v1.SAMLNameIDFormat name_id_format = 4;
+    // Optional name of the attribute, which will be used to map the user
+    // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+    optional string transient_mapping_attribute_name = 5;
 }
 
 message AzureADConfig {
@@ -497,12 +500,12 @@ message AzureADConfig {
 message Options {
     bool is_linking_allowed = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable if users should be able to link an existing ZITADEL user with an external account.";
+            description: "Enable if users should be able to manually link an existing ZITADEL user with an external account. Disable if users should only be allowed to link the proposed account in case of active auto_linking.";
         }
     ];
     bool is_creation_allowed = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable if users should be able to create a new account in ZITADEL when using an external account.";
+            description: "Enable if users should be able to manually create a new account in ZITADEL when using an external account. Disable if users should not be able to edit account information when auto_creation is enabled.";
         }
     ];
     bool is_auto_creation = 3 [
@@ -515,6 +518,21 @@ message Options {
             description: "Enable if a the ZITADEL account fields should be updated automatically on each login.";
         }
     ];
+    AutoLinkingOption auto_linking = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches.";
+        }
+    ];
+}
+
+enum AutoLinkingOption {
+    // AUTO_LINKING_OPTION_UNSPECIFIED disables the auto linking prompt.
+    AUTO_LINKING_OPTION_UNSPECIFIED = 0;
+    // AUTO_LINKING_OPTION_USERNAME will use the username of the external user to check for a corresponding ZITADEL user.
+    AUTO_LINKING_OPTION_USERNAME = 1;
+    // AUTO_LINKING_OPTION_EMAIL  will use the email of the external user to check for a corresponding ZITADEL user with the same verified email
+    // Note that in case multiple users match, no prompt will be shown.
+    AUTO_LINKING_OPTION_EMAIL = 2;
 }
 
 message LDAPAttributes {

@@ -20,7 +20,7 @@
     flex-direction: column;
     padding: 0.5rem 0;
     min-width: 360px;
-    max-width: 360px;
+    max-width: 450px;
     padding-bottom: 0.5rem;
     position: relative;
     color: map-get($foreground, text);
@@ -82,7 +82,7 @@
       }
 
       .aggregate-type-select {
-        min-width: 100px;
+        min-width: 250px;
         margin-right: 0.5rem;
       }
 

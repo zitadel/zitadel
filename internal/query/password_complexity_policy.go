@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -199,9 +198,9 @@ func preparePasswordComplexityPolicyQuery(ctx context.Context, db prepareDatabas
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexity.NotFound")
+					return nil, zerrors.ThrowNotFound(err, "QUERY-hgA9vuM0qg", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-TvvW9Uij7M", "Errors.Internal")
 			}
 			return policy, nil
 		}

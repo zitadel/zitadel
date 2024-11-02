@@ -126,39 +126,6 @@ const routes: Routes = [
     ],
   },
   {
-    path: 'failed-events',
-    loadChildren: () => import('./pages/failed-events/failed-events.module'),
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.read'],
-    },
-  },
-  {
-    path: 'views',
-    loadChildren: () => import('./pages/iam-views/iam-views.module'),
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.read'],
-    },
-  },
-  {
-    path: 'events',
-    loadChildren: () => import('./pages/events/events.module'),
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.read'],
-    },
-  },
-  {
-    path: 'settings',
-    loadChildren: () => import('./pages/instance-settings/instance-settings.module'),
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.read', 'iam.policy.read'],
-      requiresAll: true,
-    },
-  },
-  {
     path: 'org-settings',
     loadChildren: () => import('./pages/org-settings/org-settings.module'),
     canActivate: [AuthGuard, RoleGuard],

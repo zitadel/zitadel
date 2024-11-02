@@ -13,6 +13,7 @@ type ReadModel struct {
 	Events            []Event   `json:"-"`
 	ResourceOwner     string    `json:"-"`
 	InstanceID        string    `json:"-"`
+	Position          float64   `json:"-"`
 }
 
 // AppendEvents adds all the events to the read model.
@@ -43,8 +44,8 @@ func (rm *ReadModel) Reduce() error {
 	}
 	rm.ChangeDate = rm.Events[len(rm.Events)-1].CreatedAt()
 	rm.ProcessedSequence = rm.Events[len(rm.Events)-1].Sequence()
+	rm.Position = rm.Events[len(rm.Events)-1].Position()
 	// all events processed and not needed anymore
-	rm.Events = nil
-	rm.Events = []Event{}
+	rm.Events = rm.Events[0:0]
 	return nil
 }

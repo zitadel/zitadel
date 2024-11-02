@@ -396,6 +396,54 @@ func (s *Server) ResetCustomPasswordChangeMessageTextToDefault(ctx context.Conte
 	}, nil
 }
 
+func (s *Server) GetDefaultInviteUserMessageText(ctx context.Context, req *admin_pb.GetDefaultInviteUserMessageTextRequest) (*admin_pb.GetDefaultInviteUserMessageTextResponse, error) {
+	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.InviteUserMessageType, req.Language)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetDefaultInviteUserMessageTextResponse{
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) GetCustomInviteUserMessageText(ctx context.Context, req *admin_pb.GetCustomInviteUserMessageTextRequest) (*admin_pb.GetCustomInviteUserMessageTextResponse, error) {
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetInstance(ctx).InstanceID(), domain.InviteUserMessageType, req.Language, false)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetCustomInviteUserMessageTextResponse{
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
+	}, nil
+}
+
+func (s *Server) SetDefaultInviteUserMessageText(ctx context.Context, req *admin_pb.SetDefaultInviteUserMessageTextRequest) (*admin_pb.SetDefaultInviteUserMessageTextResponse, error) {
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).InstanceID(), SetInviteUserCustomTextToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.SetDefaultInviteUserMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomInviteUserMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomInviteUserMessageTextToDefaultRequest) (*admin_pb.ResetCustomInviteUserMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveInstanceMessageTexts(ctx, domain.InviteUserMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomInviteUserMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) GetDefaultPasswordlessRegistrationMessageText(ctx context.Context, req *admin_pb.GetDefaultPasswordlessRegistrationMessageTextRequest) (*admin_pb.GetDefaultPasswordlessRegistrationMessageTextResponse, error) {
 	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(ctx, domain.PasswordlessRegistrationMessageType, req.Language)
 	if err != nil {

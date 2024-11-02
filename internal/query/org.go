@@ -4,18 +4,21 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/readmodel"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -53,8 +56,9 @@ var (
 		table: orgsTable,
 	}
 	OrgColumnName = Column{
-		name:  projection.OrgColumnName,
-		table: orgsTable,
+		name:           projection.OrgColumnName,
+		table:          orgsTable,
+		isOrderByLower: true,
 	}
 	OrgColumnDomain = Column{
 		name:  projection.OrgColumnDomain,
@@ -79,6 +83,17 @@ type Org struct {
 	Domain string
 }
 
+func orgsCheckPermission(ctx context.Context, orgs *Orgs, permissionCheck domain_pkg.PermissionCheck) {
+	orgs.Orgs = slices.DeleteFunc(orgs.Orgs,
+		func(org *Org) bool {
+			if err := permissionCheck(ctx, domain_pkg.PermissionOrgRead, org.ID, org.ID); err != nil {
+				return true
+			}
+			return false
+		},
+	)
+}
+
 type OrgSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -92,7 +107,44 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if !authz.GetInstance(ctx).Features().ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeOrgByID) {
+		return q.oldOrgByID(ctx, shouldTriggerBulk, id)
+	}
+
+	foundOrg := readmodel.NewOrg(id)
+	eventCount, err := q.eventStoreV4.Query(
+		ctx,
+		eventstore.NewQuery(
+			authz.GetInstance(ctx).InstanceID(),
+			foundOrg,
+			eventstore.AppendFilters(foundOrg.Filter()...),
+		),
+	)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
+	}
+
+	if eventCount == 0 {
+		return nil, zerrors.ThrowNotFound(nil, "QUERY-leq5Q", "Errors.Org.NotFound")
+	}
+
+	return &Org{
+		ID:            foundOrg.ID,
+		CreationDate:  foundOrg.CreationDate,
+		ChangeDate:    foundOrg.ChangeDate,
+		ResourceOwner: foundOrg.Owner,
+		State:         domain_pkg.OrgState(foundOrg.State.State),
+		Sequence:      uint64(foundOrg.Sequence),
+		Name:          foundOrg.Name,
+		Domain:        foundOrg.PrimaryDomain.Domain,
+	}, nil
+}
+
+func (q *Queries) oldOrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -214,7 +266,18 @@ func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID 
 	return org.ID, nil
 }
 
-func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
+func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries, permissionCheck domain_pkg.PermissionCheck) (*Orgs, error) {
+	orgs, err := q.searchOrgs(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil {
+		orgsCheckPermission(ctx, orgs, permissionCheck)
+	}
+	return orgs, nil
+}
+
+func (q *Queries) searchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -241,8 +304,28 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 	return orgs, err
 }
 
-func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(OrgColumnDomain, value, method)
+func NewOrgIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(OrgColumnID, value, TextEquals)
+}
+
+func NewOrgVerifiedDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
+	domainQuery, err := NewTextQuery(OrgDomainDomainCol, value, method)
+	if err != nil {
+		return nil, err
+	}
+	verifiedQuery, err := NewBoolQuery(OrgDomainIsVerifiedCol, true)
+	if err != nil {
+		return nil, err
+	}
+	subSelect, err := NewSubSelect(OrgDomainOrgIDCol, []SearchQuery{domainQuery, verifiedQuery})
+	if err != nil {
+		return nil, err
+	}
+	return NewListQuery(
+		OrgColumnID,
+		subSelect,
+		ListIn,
+	)
 }
 
 func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {

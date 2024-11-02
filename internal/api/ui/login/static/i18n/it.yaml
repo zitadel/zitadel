@@ -32,14 +32,16 @@ Password:
   Title: Password
   Description: Inserisci i tuoi dati di accesso.
   PasswordLabel: Password
-  MinLength: Lunghezza minima
-  HasUppercase: Lettera maiuscola
-  HasLowercase: Lettera minuscola
-  HasNumber: Numero
-  HasSymbol: Simbolo
-  Confirmation: Conferma password
-  ResetLinkText: Password dimenticata?
-  BackButtonText: indietro
+  MinLength: Deve contenere almeno
+  MinLengthp2: caratteri.
+  MaxLength: Deve contenere meno di 70 caratteri.
+  HasUppercase: Deve includere una lettera maiuscola.
+  HasLowercase: Deve includere una lettera minuscola.
+  HasNumber: Deve includere un numero.
+  HasSymbol: Deve includere un simbolo.
+  Confirmation: La conferma della password corrisponde.
+  ResetLinkText: Reimposta password
+  BackButtonText: Indietro
   NextButtonText: Avanti
 
 UsernameChange:
@@ -83,6 +85,15 @@ InitUserDone:
   Description: Email verificata e password impostata con successo
   NextButtonText: Avanti
   CancelButtonText: annulla
+
+InviteUser:
+  Title: Attiva utente
+  Description: Verifica la tua email con il codice seguente e imposta la tua password.
+  CodeLabel: Codice
+  NewPasswordLabel: Nuova password
+  NewPasswordConfirm: Conferma password
+  NextButtonText: Avanti
+  ResendButtonText: Reinvia codice
 
 InitMFAPrompt:
   Title: Impostazione a 2 fattori
@@ -188,6 +199,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Reimposta password
   Description: Cambia la tua password. Inserisci la tua vecchia e la nuova password.
+  ExpiredDescription: La password è scaduta e deve essere modificata. Inserisci la tua vecchia e la nuova password.
   OldPasswordLabel: Vecchia password
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma della password
@@ -249,6 +261,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -288,6 +303,8 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -325,6 +342,12 @@ LogoutDone:
   Description: Ti sei disconnesso con successo.
   LoginButtonText: Accedi
 
+LinkingUserPrompt:
+  Title: Utente esistente trovato
+  Description: "Desideri collegare il tuo account esistente:"
+  LinkButtonText: Collegare
+  OtherButtonText: Altre opzioni
+
 LinkingUsersDone:
   Title: Collegamento utente
   Description: Collegamento fatto.
@@ -355,6 +378,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 
 DeviceAuth:
   Title: Autorizzazione del dispositivo
@@ -475,6 +501,7 @@ Errors:
       NoExternalUserData: Nessun dato utente esterno ricevuto
       CreationNotAllowed: La creazione di un nuovo utente non è consentita su questo provider.
       LinkingNotAllowed: Il collegamento di un utente non è consentito su questo provider.
+      NoOptionAllowed: Né la creazione né il collegamento sono consentiti per questo provider. Contattare l'amministratore.
     GrantRequired: Accesso non possibile. L'utente deve avere almeno una sovvenzione sull'applicazione. Contatta il tuo amministratore.
     ProjectRequired: Accesso non possibile. L'organizzazione dell'utente deve essere concessa al progetto. Contatta il tuo amministratore.
   IdentityProvider:

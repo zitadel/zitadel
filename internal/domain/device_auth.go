@@ -18,6 +18,7 @@ const (
 	DeviceAuthStateApproved                         // approved
 	DeviceAuthStateDenied                           // denied
 	DeviceAuthStateExpired                          // expired
+	DeviceAuthStateDone                             // done
 
 	deviceAuthStateCount // invalid
 )

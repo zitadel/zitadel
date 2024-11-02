@@ -5,203 +5,343 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, config *twilio.Config) (string, *domain.ObjectDetails, error) {
-	id, err := c.idGenerator.Next()
-	if err != nil {
-		return "", nil, err
+type AddTwilioConfig struct {
+	Details       *domain.ObjectDetails
+	ResourceOwner string
+	ID            string
+
+	Description      string
+	SID              string
+	Token            string
+	SenderNumber     string
+	VerifyServiceSID string
+}
+
+func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *AddTwilioConfig) (err error) {
+	if config.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-ZLrZhKSKq0", "Errors.ResourceOwnerMissing")
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
+	if config.ID == "" {
+		config.ID, err = c.idGenerator.Next()
+		if err != nil {
+			return err
+		}
+	}
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, config.ResourceOwner, config.ID)
 	if err != nil {
-		return "", nil, err
+		return err
 	}
 
 	var token *crypto.CryptoValue
 	if config.Token != "" {
 		token, err = crypto.Encrypt([]byte(config.Token), c.smsEncryption)
 		if err != nil {
-			return "", nil, err
+			return err
 		}
 	}
+	err = c.pushAppendAndReduce(ctx,
+		smsConfigWriteModel,
+		instance.NewSMSConfigTwilioAddedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
+			config.ID,
+			config.Description,
+			config.SID,
+			config.SenderNumber,
+			token,
+			config.VerifyServiceSID,
+		),
+	)
+	if err != nil {
+		return err
+	}
+	config.Details = writeModelToObjectDetails(&smsConfigWriteModel.WriteModel)
+	return nil
+}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioAddedEvent(
+type ChangeTwilioConfig struct {
+	Details       *domain.ObjectDetails
+	ResourceOwner string
+	ID            string
+
+	Description      *string
+	SID              *string
+	Token            *string
+	SenderNumber     *string
+	VerifyServiceSID *string
+}
+
+func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, config *ChangeTwilioConfig) (err error) {
+	if config.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-RHXryJwmFG", "Errors.ResourceOwnerMissing")
+	}
+	if config.ID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-gMr93iNhTR", "Errors.IDMissing")
+	}
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, config.ResourceOwner, config.ID)
+	if err != nil {
+		return err
+	}
+	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
+		return zerrors.ThrowNotFound(nil, "COMMAND-MUY0IFAf8O", "Errors.SMSConfig.NotFound")
+	}
+	changedEvent, hasChanged, err := smsConfigWriteModel.NewTwilioChangedEvent(
 		ctx,
-		iamAgg,
-		id,
+		InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
+		config.ID,
+		config.Description,
 		config.SID,
 		config.SenderNumber,
-		token))
+		config.VerifyServiceSID,
+	)
 	if err != nil {
-		return "", nil, err
-	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
-	if err != nil {
-		return "", nil, err
-	}
-	return id, writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
-}
-
-func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id string, config *twilio.Config) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-e9jwf", "Errors.IDMissing")
-	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
-	if err != nil {
-		return nil, err
-	}
-	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-2m9fw", "Errors.SMSConfig.NotFound")
-	}
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-
-	changedEvent, hasChanged, err := smsConfigWriteModel.NewChangedEvent(
-		ctx,
-		iamAgg,
-		id,
-		config.SID,
-		config.SenderNumber)
-	if err != nil {
-		return nil, err
+		return err
 	}
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-jf9wk", "Errors.NoChangesFound")
+		config.Details = writeModelToObjectDetails(&smsConfigWriteModel.WriteModel)
+		return nil
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	err = c.pushAppendAndReduce(ctx,
+		smsConfigWriteModel,
+		changedEvent,
+	)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
+	config.Details = writeModelToObjectDetails(&smsConfigWriteModel.WriteModel)
+	return nil
 }
 
-func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, id, token string) (*domain.ObjectDetails, error) {
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
+func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, resourceOwner, id, token string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-sLLA1HnMzj", "Errors.ResourceOwnerMissing")
+	}
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-PeNaqbC0r0", "Errors.IDMissing")
+	}
+
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
 	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-fj9wf", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ij3NhEHATp", "Errors.SMSConfig.NotFound")
 	}
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
 	newtoken, err := crypto.Encrypt([]byte(token), c.smsEncryption)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTokenChangedEvent(
-		ctx,
-		iamAgg,
-		id,
-		newtoken))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx,
+		smsConfigWriteModel,
+		instance.NewSMSConfigTokenChangedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
+			id,
+			newtoken,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ActivateSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-dn93n", "Errors.IDMissing")
+type AddSMSHTTP struct {
+	Details       *domain.ObjectDetails
+	ResourceOwner string
+	ID            string
+
+	Description string
+	Endpoint    string
+}
+
+func (c *Commands) AddSMSConfigHTTP(ctx context.Context, config *AddSMSHTTP) (err error) {
+	if config.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-huy99qWjX4", "Errors.ResourceOwnerMissing")
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
+	if config.ID == "" {
+		config.ID, err = c.idGenerator.Next()
+		if err != nil {
+			return err
+		}
+	}
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, config.ResourceOwner, config.ID)
+	if err != nil {
+		return err
+	}
+
+	err = c.pushAppendAndReduce(ctx,
+		smsConfigWriteModel,
+		instance.NewSMSConfigHTTPAddedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
+			config.ID,
+			config.Description,
+			config.Endpoint,
+		),
+	)
+	if err != nil {
+		return err
+	}
+	config.Details = writeModelToObjectDetails(&smsConfigWriteModel.WriteModel)
+	return nil
+}
+
+type ChangeSMSHTTP struct {
+	Details       *domain.ObjectDetails
+	ResourceOwner string
+	ID            string
+
+	Description *string
+	Endpoint    *string
+}
+
+func (c *Commands) ChangeSMSConfigHTTP(ctx context.Context, config *ChangeSMSHTTP) (err error) {
+	if config.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-M622CFQnwK", "Errors.ResourceOwnerMissing")
+	}
+	if config.ID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-phyb2e4Kll", "Errors.IDMissing")
+	}
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, config.ResourceOwner, config.ID)
+	if err != nil {
+		return err
+	}
+	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.HTTP == nil {
+		return zerrors.ThrowNotFound(nil, "COMMAND-6NW4I5Kqzj", "Errors.SMSConfig.NotFound")
+	}
+	changedEvent, hasChanged, err := smsConfigWriteModel.NewHTTPChangedEvent(
+		ctx,
+		InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
+		config.ID,
+		config.Description,
+		config.Endpoint)
+	if err != nil {
+		return err
+	}
+	if !hasChanged {
+		config.Details = writeModelToObjectDetails(&smsConfigWriteModel.WriteModel)
+		return nil
+	}
+	err = c.pushAppendAndReduce(ctx, smsConfigWriteModel, changedEvent)
+	if err != nil {
+		return err
+	}
+	config.Details = writeModelToObjectDetails(&smsConfigWriteModel.WriteModel)
+	return nil
+}
+
+func (c *Commands) ActivateSMSConfig(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-EFgoOg997V", "Errors.ResourceOwnerMissing")
+	}
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-jJ6TVqzvjp", "Errors.IDMissing")
+	}
+
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
 
 	if !smsConfigWriteModel.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-9ULtp9PH5E", "Errors.SMSConfig.NotFound")
 	}
 	if smsConfigWriteModel.State == domain.SMSConfigStateActive {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.AlreadyActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-B25GFeIvRi", "Errors.SMSConfig.AlreadyActive")
 	}
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioActivatedEvent(
-		ctx,
-		iamAgg,
-		id))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx, smsConfigWriteModel,
+		instance.NewSMSConfigActivatedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
+			id,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) DeactivateSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-frkwf", "Errors.IDMissing")
+func (c *Commands) DeactivateSMSConfig(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-V9NWOZj8Gi", "Errors.ResourceOwnerMissing")
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xs1ah1v1CL", "Errors.IDMissing")
+	}
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
 	if !smsConfigWriteModel.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-s39Kg", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-La91dGNhbM", "Errors.SMSConfig.NotFound")
 	}
 	if smsConfigWriteModel.State == domain.SMSConfigStateInactive {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-dm9e3", "Errors.SMSConfig.AlreadyDeactivated")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-OSZAEkYvk7", "Errors.SMSConfig.AlreadyDeactivated")
 	}
-
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigDeactivatedEvent(
-		ctx,
-		iamAgg,
-		id))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx,
+		smsConfigWriteModel,
+		instance.NewSMSConfigDeactivatedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
+			id,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-3j9fs", "Errors.IDMissing")
+func (c *Commands) RemoveSMSConfig(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-cw0NSJsn1v", "Errors.ResourceOwnerMissing")
 	}
-	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Qrz7lvdC4c", "Errors.IDMissing")
+	}
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
 	if !smsConfigWriteModel.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-povEVHPCkV", "Errors.SMSConfig.NotFound")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigRemovedEvent(
-		ctx,
-		iamAgg,
-		id))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx,
+		smsConfigWriteModel,
+		instance.NewSMSConfigRemovedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel),
+			id,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
 }
+
 func (c *Commands) getSMSConfig(ctx context.Context, instanceID, id string) (_ *IAMSMSConfigWriteModel, err error) {
 	writeModel := NewIAMSMSConfigWriteModel(instanceID, id)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
-
 	return writeModel, nil
+}
+
+// getActiveSMSConfig returns the last activated SMS configuration
+func (c *Commands) getActiveSMSConfig(ctx context.Context, instanceID string) (_ *IAMSMSConfigWriteModel, err error) {
+	writeModel := NewIAMSMSLastActivatedConfigWriteModel(instanceID)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return c.getSMSConfig(ctx, instanceID, writeModel.activeID)
 }

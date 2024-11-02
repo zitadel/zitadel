@@ -186,6 +186,7 @@ type CustomLoginTextReadModel struct {
 
 	PasswordChangeTitle                   string
 	PasswordChangeDescription             string
+	PasswordChangeExpiredDescription      string
 	PasswordChangeOldPasswordLabel        string
 	PasswordChangeNewPasswordLabel        string
 	PasswordChangeNewPasswordConfirmLabel string
@@ -261,6 +262,11 @@ type CustomLoginTextReadModel struct {
 	RegisterOrgPrivacyConfirm       string
 	RegisterOrgPrivacyLinkText      string
 	RegisterOrgSaveButtonText       string
+
+	LinkingUserPromptTitle           string
+	LinkingUserPromptDescription     string
+	LinkingUserPromptLinkButtonText  string
+	LinkingUserPromptOtherButtonText string
 
 	LinkingUserDoneTitle            string
 	LinkingUserDoneDescription      string
@@ -1754,6 +1760,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordChangeScreenSetEvent(e *policy
 		wm.PasswordChangeDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyPasswordChangeExpiredDescription {
+		wm.PasswordChangeExpiredDescription = e.Text
+		return
+	}
 	if e.Key == domain.LoginKeyPasswordChangeOldPasswordLabel {
 		wm.PasswordChangeOldPasswordLabel = e.Text
 		return
@@ -1783,6 +1793,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordChangeScreenRemoveEvent(e *pol
 	}
 	if e.Key == domain.LoginKeyPasswordChangeDescription {
 		wm.PasswordChangeDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordChangeExpiredDescription {
+		wm.PasswordChangeExpiredDescription = ""
 		return
 	}
 	if e.Key == domain.LoginKeyPasswordChangeOldPasswordLabel {

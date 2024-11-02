@@ -3,6 +3,7 @@ package gerrors
 import (
 	"errors"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -34,6 +35,10 @@ func ZITADELToGRPCError(err error) error {
 func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {
 	if err == nil {
 		return codes.OK, "", "", false
+	}
+	connErr := new(pgconn.ConnectError)
+	if ok := errors.As(err, &connErr); ok {
+		return codes.Internal, "db connection error", "", true
 	}
 	zitadelErr := new(zerrors.ZitadelError)
 	if ok := errors.As(err, &zitadelErr); !ok {

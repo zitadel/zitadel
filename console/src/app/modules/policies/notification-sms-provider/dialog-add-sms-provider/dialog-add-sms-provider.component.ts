@@ -10,7 +10,7 @@ import {
 import { SMSProvider, TwilioConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { PasswordDialogComponent } from '../password-dialog/password-dialog.component';
+import { PasswordDialogSMSProviderComponent } from '../password-dialog-sms-provider/password-dialog-sms-provider.component';
 
 enum SMSProviderType {
   Twilio = 1,
@@ -41,7 +41,9 @@ export class DialogAddSMSProviderComponent {
   ) {
     this.twilioForm = this.fb.group({
       sid: ['', [requiredValidator]],
-      senderNumber: ['', [requiredValidator]],
+      senderNumber: [''],
+      // NB: not required if not using verification service
+      verifyServiceSid: [''],
     });
 
     this.smsProviders = data.smsProviders;
@@ -62,18 +64,20 @@ export class DialogAddSMSProviderComponent {
       this.req.setId(this.twilioProvider.id);
       this.req.setSid(this.sid?.value);
       this.req.setSenderNumber(this.senderNumber?.value);
+      this.req.setVerifyServiceSid(this.verifyServiceSid?.value ?? '');
       this.dialogRef.close(this.req);
     } else {
       this.req = new AddSMSProviderTwilioRequest();
       this.req.setSid(this.sid?.value);
       this.req.setToken(this.token?.value);
       this.req.setSenderNumber(this.senderNumber?.value);
+      this.req.setVerifyServiceSid(this.verifyServiceSid?.value ?? '');
       this.dialogRef.close(this.req);
     }
   }
 
   public changeToken(): void {
-    const dialogRef = this.dialog.open(PasswordDialogComponent, {
+    const dialogRef = this.dialog.open(PasswordDialogSMSProviderComponent, {
       width: '400px',
       data: {
         i18nTitle: 'SETTING.SMS.TWILIO.SETTOKEN',
@@ -102,6 +106,10 @@ export class DialogAddSMSProviderComponent {
 
   public get senderNumber(): AbstractControl | null {
     return this.twilioForm.get('senderNumber');
+  }
+
+  public get verifyServiceSid(): AbstractControl | null {
+    return this.twilioForm.get('verifyServiceSid');
   }
 
   public get token(): AbstractControl | null {

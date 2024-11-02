@@ -11,25 +11,21 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.ProjectGrantMember) (*domain.ProjectGrantMember, error) {
+func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.ProjectGrantMember) (_ *domain.ProjectGrantMember, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if !member.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-8fi7G", "Errors.Project.Grant.Member.Invalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.ProjectGrantRolePrefix, c.zitadelRoles)) > 0 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-m9gKK", "Errors.Project.Grant.Member.Invalid")
 	}
-	err := c.checkUserExists(ctx, member.UserID, "")
+	err = c.checkUserExists(ctx, member.UserID, "")
 	if err != nil {
 		return nil, err
 	}
 	addedMember := NewProjectGrantMemberWriteModel(member.AggregateID, member.UserID, member.GrantID)
-	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
-	if err != nil {
-		return nil, err
-	}
-	if addedMember.State == domain.MemberStateActive {
-		return nil, zerrors.ThrowAlreadyExists(nil, "PROJECT-16dVN", "Errors.Project.Member.AlreadyExists")
-	}
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
 	pushedEvents, err := c.eventstore.Push(
 		ctx,

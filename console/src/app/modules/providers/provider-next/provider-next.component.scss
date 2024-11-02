@@ -1,0 +1,69 @@
+.cnsl-provider-next {
+  .section {
+    background-color: #8795a110;
+    border: 1px solid #8795a160;
+    border-radius: 4px;
+    padding: 0.25rem 1rem;
+    margin: 0.25rem 0rem;
+    .box {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      .right {
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .title-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .left {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .right {
+      flex-shrink: 0;
+    }
+
+    .title {
+      margin: 1.2rem 0;
+    }
+
+    .next-icon {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      width: 1.2rem;
+    }
+  }
+
+  .description {
+    margin-block-start: 0;
+    font-size: 14px;
+  }
+
+  .download-button {
+    margin-left: 1rem;
+  }
+}
+
+@mixin provider-next-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $button-text-color: map-get($foreground, text);
+  $button-disabled-text-color: map-get($foreground, disabled-button);
+  .cnsl-provider-next {
+    .section {
+      color: $button-text-color;
+
+      &[disabled] {
+        color: $button-disabled-text-color;
+      }
+    }
+  }
+}

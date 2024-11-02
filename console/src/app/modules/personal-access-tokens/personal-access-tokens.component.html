@@ -56,7 +56,7 @@
       <ng-container matColumnDef="expirationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'USER.MACHINE.EXPIRATIONDATE' | translate }}</th>
         <td mat-cell *matCellDef="let key">
-          {{ key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
+          {{ key.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM yyyy, HH:mm' }}
         </td>
       </ng-container>
 

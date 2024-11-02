@@ -54,11 +54,33 @@ Tracing:
 ZITADEL follows the principles that guide cloud-native and twelve factor applications.
 Logs are a stream of time-ordered events collected from all running processes.
 
-ZITADEL processes write the following events to the standard output:
+[ZITADEL is configurable](#default-zitadel-logging-config) to write the following events to the standard output:
 
-- Runtime Logs: Define the log level and record format [in the Log configuration section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L1-L4)
-- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L366) 
-- Actions Exectution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L387) .
+- Runtime Logs: Define the log level and record format in the `Log` configuration section.
+- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary by setting `LogStore.Access.Stdout.Enabled` to true.
+- Actions Execution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this by setting `LogStore.Execution.Stdout.Enabled` to true.
+
+### Default ZITADEL Logging Config
+
+```yaml
+Log:
+  Level: info # ZITADEL_LOG_LEVEL
+  Formatter:
+    Format: text # ZITADEL_LOG_FORMATTER_FORMAT
+    
+LogStore:
+  Access:
+    Stdout:
+      # If enabled, all access logs are printed to the binary's standard output
+      Enabled: false # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED
+  Execution:
+    Stdout:
+      # If enabled, all execution logs are printed to the binary's standard output
+      Enabled: true # ZITADEL_LOGSTORE_EXECUTION_STDOUT_ENABLED
+
+```
+
+### Why ZITADEL does not write logs to files
 
 Log file management should not be in each business apps responsibility.
 Instead, your execution environment should provide tooling for managing logs in a generic way.
@@ -87,17 +109,16 @@ but in the Projections.Customizations.Telemetry section
 
 ## Database
 
-### Prefer CockroachDB
+### Prefer PostgreSQL
 
 ZITADEL supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/).
-We highly recommend using CockroachDB,
-as horizontal scaling is much easier than with PostgreSQL.
-Also, if you are concerned about multi-regional data locality,
-[the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
+We recommend using PostgreSQL, as it is the better choice when you want to prioritize performance and latency.
+
+However, if [multi-regional data locality](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html) is a critical requirement, CockroachDB might be a suitable option.
 
 The indexes for the database are optimized using load tests from [ZITADEL Cloud](https://zitadel.com), 
-which runs with CockroachDB.
-If you identify problems with your Postgresql during load tests that indicate that the indexes are not optimized,
+which runs with PostgreSQL.
+If you identify problems with your CockroachDB during load tests that indicate that the indexes are not optimized,
 please create an issue in our [github repository](https://github.com/zitadel/zitadel).
 
 ### Configure ZITADEL
@@ -106,7 +127,7 @@ Depending on your environment, you maybe would want to tweak some settings about
 
 ```yaml
 Database:
-  cockroach:
+  postgres:
     Host: localhost
     Port: 26257
     Database: zitadel
@@ -118,10 +139,11 @@ Database:
     Options: ""
 ```
 
+
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
 ```yaml
-# The Projections section defines the behaviour for the scheduled and synchronous events projections.
+# The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
   # Time interval between scheduled projections
   RequeueEvery: 60s
@@ -207,7 +229,7 @@ DefaultInstance:
 - If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
 - Learn how to configure ZITADEL via the [Console user interface](/guides/manage/console/overview).
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
-- If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).
+- If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform-provider).
 
 ## Limits and Quotas
 

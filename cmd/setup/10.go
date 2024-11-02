@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -31,7 +32,7 @@ type CorrectCreationDate struct {
 	FailAfter time.Duration
 }
 
-func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
+func (mig *CorrectCreationDate) Execute(ctx context.Context, _ eventstore.Event) (err error) {
 	ctx, cancel := context.WithTimeout(ctx, mig.FailAfter)
 	defer cancel()
 

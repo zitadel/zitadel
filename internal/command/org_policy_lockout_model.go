@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 )
@@ -56,11 +55,15 @@ func (wm *OrgLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *OrgLockoutPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	maxAttempts uint64,
+	maxPasswordAttempts,
+	maxOTPAttempts uint64,
 	showLockoutFailure bool) (*org.LockoutPolicyChangedEvent, bool) {
 	changes := make([]policy.LockoutPolicyChanges, 0)
-	if wm.MaxPasswordAttempts != maxAttempts {
-		changes = append(changes, policy.ChangeMaxAttempts(maxAttempts))
+	if wm.MaxPasswordAttempts != maxPasswordAttempts {
+		changes = append(changes, policy.ChangeMaxPasswordAttempts(maxPasswordAttempts))
+	}
+	if wm.MaxOTPAttempts != maxOTPAttempts {
+		changes = append(changes, policy.ChangeMaxOTPAttempts(maxOTPAttempts))
 	}
 	if wm.ShowLockOutFailures != showLockoutFailure {
 		changes = append(changes, policy.ChangeShowLockOutFailures(showLockoutFailure))

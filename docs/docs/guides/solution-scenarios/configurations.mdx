@@ -9,13 +9,13 @@ In this section we show you the different use-cases we have already experienced,
 
 ## Automatically redirect users if the organization has only one identity provider
 
-You have different customers (organizations) in your ZITADEL instance and they have different needs on how to authenticate their users. One of your customers does only allow login with an external identity provider like Google, Azure AD, and so on.
+You have different customers (organizations) in your ZITADEL instance and they have different needs on how to authenticate their users. One of your customers does only allow login with an external identity provider like Google, Entra ID, and so on.
 If a user of this organization wants to login, you don't want them to enter their username in the ZITADEL Login UI, they should be redirected directly to the identity provider without their interaction.
 
 ### Settings
 
 1. Go to the "Identity Providers" Settings of the organization
-2. Configure the needed identity provider: Read this [guide](../integrate/identity-providers) if you don't know how
+2. Configure the needed identity provider: Read this [guide](../integrate/identity-providers/introduction) if you don't know how
 3. Go to the "Login Behavior and Security" settings of the organization
 4. Disable "Username Password Allowed" and enable "External IDP allowed" in the Advanced Section
 
@@ -41,7 +41,7 @@ Read more about [applications](../manage/console/applications) and the [redirect
 It is possible to trigger the organization directly with the authorization request to ZITADEL.
 
 This will have the following impacts:
-- Trigger organization login behaviour settings
+- Trigger organization login behavior settings
 - Trigger organization branding
 - Only allow users from selected organization to login
 
@@ -70,7 +70,7 @@ You can either set this attribute on your whole ZITADEL instance or just on some
 No matter how the username of your user does look like.
 You can additionally allow login with the email attribute of the user.
 
-You can find this in the "Login Behaviour and Security" Setting of your instance or organizations.
+You can find this in the "Login Behavior and Security" Setting of your instance or organizations.
 Go to the "Advanced" section, per default login with email address should be allowed. It is possible to disable it.
 
 ![Login Policy Advanced Setting: Disable email for login](/img/guides/scenarios/login_policy_advanced.png)
@@ -105,7 +105,7 @@ Go to the "Advanced" section, per default login with phone number should be allo
 ## Embedding ZITADEL in an iFrame
 
 To maximise the security during login and in the Console UI, ZITADEL follows security best practices by setting a
-Content-Security-Policy (CSP) and X-Frame-Options:
+Content-Security-Policy (CSP), X-Frame-Options and cookies with SameSite Lax:
 
 ```
 Content-Security-Policy: frame-ancestors 'none'
@@ -122,7 +122,7 @@ This change can make you vulnerable to clickjacking attacks.
 
 If your applications need to load ZITADEL inside an iframe, e.g. for a silent login or silent refresh, you can enable the use on an instance level.
 
-1. Navigate to the Instance Settings.
+1. Navigate to the Default Settings.
 2. Click on the Security Policy tab.
 3. Enable the "Allow IFrame" and add the host(s) you load the iframe from.
 
@@ -136,7 +136,13 @@ This will change the CSP to the following:
 Content-Security-Policy: frame-ancestors https://custom-domain.com
 ```
 
-and remove the X-Frame-Options header.
+remove the X-Frame-Options header and change the SameSite to `None`.
+
+:::note
+Please note, that SameSite None requires the cookie to be flagged `secure`, which means it must be sent over TLS (HTTPS) or localhost.
+This also means that domains other than localhost must use TLS for this option to work.
+This is due to browser restrictions: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#none
+:::
 
 ### Disable Multi-factor (MFA) Prompt
 

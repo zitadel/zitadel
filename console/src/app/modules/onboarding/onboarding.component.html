@@ -64,14 +64,14 @@
       <div
         class="icon-wrapper"
         [ngStyle]="{
-          background: (themeService.isDarkTheme | async) ? action.darkcolor + 50 : action.lightcolor + 50
+          background: (themeService.isDarkTheme | async) ? action.darkcolor + 50 : action.lightcolor + 50,
         }"
       >
         <div
           class="inner"
           [ngStyle]="{
             background: (themeService.isDarkTheme | async) ? action.darkcolor : action.lightcolor,
-            color: (themeService.isDarkTheme | async) ? action.lightcolor : action.darkcolor
+            color: (themeService.isDarkTheme | async) ? action.lightcolor : action.darkcolor,
           }"
         >
           <i class="{{ action.iconClasses }}"></i>

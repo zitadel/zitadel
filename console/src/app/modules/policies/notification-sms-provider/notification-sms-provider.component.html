@@ -1,10 +1,11 @@
-<h2>{{ 'SETTING.SMS.TITLE' | translate }}</h2>
+<h2>{{ 'DESCRIPTIONS.SETTINGS.SMS_PROVIDER.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.SMS_PROVIDER.DESCRIPTION' | translate }}</p>
 
 <div class="spinner-wr">
   <mat-spinner diameter="30" *ngIf="smsProvidersLoading" color="primary"></mat-spinner>
 </div>
 
-<div class="sms-providers">
+<div class="sms-providers" *ngIf="!smsProvidersLoading">
   <cnsl-card class="sms-card" [nomargin]="true">
     <div class="sms-provider">
       <h4 class="title">Twilio</h4>
@@ -14,7 +15,7 @@
         class="state"
         [ngClass]="{
           active: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
-          inactive: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
+          inactive: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE,
         }"
         >{{ 'SETTING.SMS.SMSPROVIDERSTATE.' + twilio.state | translate }}</span
       >

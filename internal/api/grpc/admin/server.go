@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -30,7 +29,6 @@ type Server struct {
 	query             *query.Queries
 	assetsAPIDomain   func(context.Context) string
 	userCodeAlg       crypto.EncryptionAlgorithm
-	passwordHashAlg   crypto.HashAlgorithm
 	auditLogRetention time.Duration
 }
 
@@ -42,8 +40,6 @@ func CreateServer(
 	database string,
 	command *command.Commands,
 	query *query.Queries,
-	sd systemdefaults.SystemDefaults,
-	externalSecure bool,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	auditLogRetention time.Duration,
 ) *Server {
@@ -51,9 +47,8 @@ func CreateServer(
 		database:          database,
 		command:           command,
 		query:             query,
-		assetsAPIDomain:   assets.AssetAPI(externalSecure),
+		assetsAPIDomain:   assets.AssetAPI(),
 		userCodeAlg:       userCodeAlg,
-		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 		auditLogRetention: auditLogRetention,
 	}
 }

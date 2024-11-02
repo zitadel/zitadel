@@ -14,30 +14,28 @@ import PrefillAction from './_prefill_action.mdx';
 
 <Intro provider="GitLab"/>
 
+## Open the GitLab Identity Provider Template
+
+<IDPsOverview templates="GitLab or GitLab Self Hosted"/>
+
+Click on the ZITADEL Callback URL to copy it to your clipboard.
+You will have to paste it to the GitLab Application later.
+
+![GitLab Provider](/img/guides/zitadel_gitlab_create_provider.png)
+
 ## GitLab Configuration
 
 ### Register a new application
 
-1. Login to [gitlab.com](https://gitlab.com)
+1. Login to [gitlab.com](https://gitlab.com) or to your GitLab self-hosted instance
 2. Select [Edit Profile](https://gitlab.com/-/profile)
 3. Click on [Applications](https://gitlab.com/-/profile/applications) in the side navigation
-
-For **GitLab Self-Hosted** go to your GitLab self-hosted instance and follow the same steps as for GitLab.
-
-Fill in the application name.
-
-You have to add the redirect URI, where GitLab should redirect, after the user has authenticated himself.
-In this example our test instance has the domain `https://acme-gzoe4x.zitadel.cloud`.
-This results in the following redirect URI:
- `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
-
-:::info
-To adapt this for you setup just replace the domain
-:::
+4. Fill in the application name
+5. [Paste the ZITADEL Callback URL you copied before](#open-the-gitlab-identity-provider-template) to the Redirect URI field.
 
 ![Register an OAuth application](/img/guides/gitlab_app_registration.png)
 
-### Client ID and Secret
+### Client ID and secret
 
 After clicking "Save application", you will see the detail page of the application you have just created.
 To be able to connect GitLab to ZITADEL you will need a client ID and a client secret.
@@ -47,32 +45,27 @@ Save the ID and the Secret, you will not be able to copy the secret again, if yo
 
 ## ZITADEL Configuration
 
-### Add custom login policy
+Go back [to the GitLab provider template you opened before in ZITADEL](#open-the-gitlab-identity-provider-template).
+Add the [client ID and secret you created before when you registered your GitLab application](#client-id-and-secret).
 
-<CustomLoginPolicy/>
+You can optionally configure the following settings.
+A useful default will be filled if you don't change anything.
 
-### Go to the IdP Providers Overview
-
-<IDPsOverview templates="GitLab or GitLab Self Hosted"/>
-
-### Create a new GitLab Provider
-
-The GitLab provider templates have everything you need preconfigured.
-Add the client ID and secret you have created in the Gitlab Application.
-
-You can configure the following settings if you like, a useful default will be filled if you don't change anything:
-
-**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This informations will be taken to create/update the user within ZITADEL. ZITADEL ensures that at least the `openid`-scope is always sent.
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
+This informations will be taken to create/update the user within ZITADEL.
+ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <GeneralConfigDescription provider_account="GitLab account" />
-
-![GitLab Provider](/img/guides/zitadel_gitlab_create_provider.png)
 
 ### Activate IdP
 
 <Activate/>
 
 ![Activate the GitLab](/img/guides/zitadel_activate_gitlab.png)
+
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
 
 ## Test the setup
 

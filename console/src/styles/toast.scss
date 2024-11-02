@@ -4,11 +4,6 @@
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
 
-  //   .data-e2e-success {
-  //     background-color: map-get($background, cards) !important;
-  //     color: var(--success) !important;
-  //   }
-
   .data-e2e-failure {
     .mdc-snackbar__surface {
       background-color: map-get($background, toast) !important;

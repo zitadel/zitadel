@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"embed"
 	"strings"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -24,7 +26,7 @@ type LogstoreTables struct {
 	dbType   string
 }
 
-func (mig *LogstoreTables) Execute(ctx context.Context) error {
+func (mig *LogstoreTables) Execute(ctx context.Context, _ eventstore.Event) error {
 	accessStmt, err := readStmt(createAccessLogsTable07, "07", mig.dbType, "access.sql")
 	if err != nil {
 		return err

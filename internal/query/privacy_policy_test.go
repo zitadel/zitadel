@@ -13,18 +13,21 @@ import (
 )
 
 var (
-	preparePrivacyPolicyStmt = `SELECT projections.privacy_policies3.id,` +
-		` projections.privacy_policies3.sequence,` +
-		` projections.privacy_policies3.creation_date,` +
-		` projections.privacy_policies3.change_date,` +
-		` projections.privacy_policies3.resource_owner,` +
-		` projections.privacy_policies3.privacy_link,` +
-		` projections.privacy_policies3.tos_link,` +
-		` projections.privacy_policies3.help_link,` +
-		` projections.privacy_policies3.support_email,` +
-		` projections.privacy_policies3.is_default,` +
-		` projections.privacy_policies3.state` +
-		` FROM projections.privacy_policies3` +
+	preparePrivacyPolicyStmt = `SELECT projections.privacy_policies4.id,` +
+		` projections.privacy_policies4.sequence,` +
+		` projections.privacy_policies4.creation_date,` +
+		` projections.privacy_policies4.change_date,` +
+		` projections.privacy_policies4.resource_owner,` +
+		` projections.privacy_policies4.privacy_link,` +
+		` projections.privacy_policies4.tos_link,` +
+		` projections.privacy_policies4.help_link,` +
+		` projections.privacy_policies4.support_email,` +
+		` projections.privacy_policies4.docs_link,` +
+		` projections.privacy_policies4.custom_link,` +
+		` projections.privacy_policies4.custom_link_text,` +
+		` projections.privacy_policies4.is_default,` +
+		` projections.privacy_policies4.state` +
+		` FROM projections.privacy_policies4` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	preparePrivacyPolicyCols = []string{
 		"id",
@@ -36,6 +39,9 @@ var (
 		"tos_link",
 		"help_link",
 		"support_email",
+		"docs_link",
+		"custom_link",
+		"custom_link_text",
 		"is_default",
 		"state",
 	}
@@ -87,23 +93,29 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 						"tos.ch",
 						"help.ch",
 						"support@example.com",
+						"zitadel.com/docs",
+						"zitadel.com",
+						"Zitadel",
 						true,
 						domain.PolicyStateActive,
 					},
 				),
 			},
 			object: &PrivacyPolicy{
-				ID:            "pol-id",
-				CreationDate:  testNow,
-				ChangeDate:    testNow,
-				Sequence:      20211109,
-				ResourceOwner: "ro",
-				State:         domain.PolicyStateActive,
-				PrivacyLink:   "privacy.ch",
-				TOSLink:       "tos.ch",
-				HelpLink:      "help.ch",
-				SupportEmail:  "support@example.com",
-				IsDefault:     true,
+				ID:             "pol-id",
+				CreationDate:   testNow,
+				ChangeDate:     testNow,
+				Sequence:       20211109,
+				ResourceOwner:  "ro",
+				State:          domain.PolicyStateActive,
+				PrivacyLink:    "privacy.ch",
+				TOSLink:        "tos.ch",
+				HelpLink:       "help.ch",
+				SupportEmail:   "support@example.com",
+				DocsLink:       "zitadel.com/docs",
+				CustomLink:     "zitadel.com",
+				CustomLinkText: "Zitadel",
+				IsDefault:      true,
 			},
 		},
 		{

@@ -1,5 +1,5 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
@@ -8,7 +8,6 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-
 import { ActionKeysType } from '../action-keys/action-keys.component';
 
 @Component({

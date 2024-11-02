@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"strings"
 	"sync"
+	"text/template"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -29,20 +31,49 @@ var oidcUserInfoTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
 	}
 })
 
+// TriggerOIDCUserInfoProjections triggers all projections
+// relevant to userinfo queries concurrently.
 func TriggerOIDCUserInfoProjections(ctx context.Context) {
 	triggerBatch(ctx, oidcUserInfoTriggerHandlers()...)
 }
 
-//go:embed embed/userinfo_by_id.sql
-var oidcUserInfoQuery string
+var (
+	//go:embed userinfo_by_id.sql
+	oidcUserInfoQueryTmpl           string
+	oidcUserInfoQuery               string
+	oidcUserInfoWithRoleOrgIDsQuery string
+)
 
-func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudience []string) (_ *OIDCUserInfo, err error) {
+// build the two variants of the userInfo query
+func init() {
+	tmpl := template.Must(template.New("oidcUserInfoQuery").Parse(oidcUserInfoQueryTmpl))
+	var buf strings.Builder
+	if err := tmpl.Execute(&buf, false); err != nil {
+		panic(err)
+	}
+	oidcUserInfoQuery = buf.String()
+	buf.Reset()
+
+	if err := tmpl.Execute(&buf, true); err != nil {
+		panic(err)
+	}
+	oidcUserInfoWithRoleOrgIDsQuery = buf.String()
+	buf.Reset()
+}
+
+func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudience []string, roleOrgIDs ...string) (userInfo *OIDCUserInfo, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo, err := database.QueryJSONObject[OIDCUserInfo](ctx, q.client, oidcUserInfoQuery,
-		userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
-	)
+	if len(roleOrgIDs) > 0 {
+		userInfo, err = database.QueryJSONObject[OIDCUserInfo](ctx, q.client, oidcUserInfoWithRoleOrgIDsQuery,
+			userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience), database.TextArray[string](roleOrgIDs),
+		)
+	} else {
+		userInfo, err = database.QueryJSONObject[OIDCUserInfo](ctx, q.client, oidcUserInfoQuery,
+			userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
+		)
+	}
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, zerrors.ThrowNotFound(err, "QUERY-Eey2a", "Errors.User.NotFound")
 	}
@@ -67,4 +98,26 @@ type UserInfoOrg struct {
 	ID            string `json:"id,omitempty"`
 	Name          string `json:"name,omitempty"`
 	PrimaryDomain string `json:"primary_domain,omitempty"`
+}
+
+//go:embed userinfo_client_by_id.sql
+var oidcUserinfoClientQuery string
+
+func (q *Queries) GetOIDCUserinfoClientByID(ctx context.Context, clientID string) (projectID string, projectRoleAssertion bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	scan := func(row *sql.Row) error {
+		err := row.Scan(&projectID, &projectRoleAssertion)
+		return err
+	}
+
+	err = q.client.QueryRowContext(ctx, scan, oidcUserinfoClientQuery, authz.GetInstance(ctx).InstanceID(), clientID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", false, zerrors.ThrowNotFound(err, "QUERY-beeW8", "Errors.App.NotFound")
+	}
+	if err != nil {
+		return "", false, zerrors.ThrowInternal(err, "QUERY-Ais4r", "Errors.Internal")
+	}
+	return projectID, projectRoleAssertion, nil
 }

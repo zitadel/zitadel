@@ -65,13 +65,16 @@ func (s *Server) UpdateAction(ctx context.Context, req *mgmt_pb.UpdateActionRequ
 
 func (s *Server) DeactivateAction(ctx context.Context, req *mgmt_pb.DeactivateActionRequest) (*mgmt_pb.DeactivateActionResponse, error) {
 	details, err := s.command.DeactivateAction(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
 	return &mgmt_pb.DeactivateActionResponse{
 		Details: obj_grpc.AddToDetailsPb(
 			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner,
 		),
-	}, err
+	}, nil
 }
 
 func (s *Server) ReactivateAction(ctx context.Context, req *mgmt_pb.ReactivateActionRequest) (*mgmt_pb.ReactivateActionResponse, error) {

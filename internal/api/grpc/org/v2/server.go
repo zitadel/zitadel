@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 )
 
 var _ org.OrganizationServiceServer = (*Server)(nil)

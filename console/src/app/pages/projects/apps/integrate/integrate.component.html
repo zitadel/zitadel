@@ -1,0 +1,138 @@
+<div class="app-integrate-wrapper">
+  <div class="integrate-layout-container">
+    <div class="max-width-container">
+      <div class="top-control">
+        <button (click)="close()" mat-icon-button matTooltip="{{ 'ACTIONS.CLOSE' | translate }}">
+          <mat-icon *ngIf="navigation.isBackPossible">arrow_back</mat-icon>
+          <mat-icon *ngIf="!navigation.isBackPossible">close</mat-icon>
+        </button>
+        <span class="abort">{{ 'APP.PAGES.CREATE' | translate }}</span>
+        <mat-progress-spinner
+          class="progress-spinner"
+          color="primary"
+          *ngIf="loading"
+          diameter="30"
+          mode="indeterminate"
+        ></mat-progress-spinner>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-width-container">
+    <div class="offset-content">
+      <h1>{{ 'QUICKSTART.ALMOSTDONE' | translate }}</h1>
+      <p>{{ 'QUICKSTART.REVIEWCONFIGURATION_DESCRIPTION' | translate: { value: framework()?.title } }}</p>
+
+      <div class="grid-layout">
+        <div>
+          <cnsl-framework-change
+            *ngIf="framework"
+            class="framework-selector"
+            (frameworkChanged)="setFramework($event)"
+          ></cnsl-framework-change>
+          <div class="steps">
+            <div class="step">
+              <span class="step-title">{{ 'PROJECT.PAGES.TITLE' | translate }}</span>
+              <span>{{ projectName$ | async }}</span>
+            </div>
+
+            <div class="step top-border">
+              <a *ngIf="framework()" [href]="'https://zitadel.com' + framework()?.docsLink" target="_blank"
+                >{{ framework()?.title }} {{ 'QUICKSTART.GUIDE' | translate }}</a
+              >
+              <a href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank">{{
+                'QUICKSTART.BROWSEEXAMPLES' | translate
+              }}</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-wrapper">
+          <cnsl-card class="review-card" title="{{ 'QUICKSTART.REVIEWCONFIGURATION' | translate }}">
+            <cnsl-info-section *ngIf="showRenameWarning | async" [type]="InfoSectionType.WARN"
+              ><span class="duplicate-name-warning">{{
+                'QUICKSTART.DUPLICATEAPPRENAME' | translate
+              }}</span></cnsl-info-section
+            >
+            <cnsl-oidc-app-configuration
+              *ngIf="(oidcAppRequest | async)?.toObject() as config"
+              [name]="(oidcAppRequest | async)?.toObject()?.name"
+              (changeName)="editName()"
+              [configuration]="config"
+            ></cnsl-oidc-app-configuration>
+
+            <cnsl-info-section *ngIf="framework()?.description as desc" [type]="InfoSectionType.INFO">
+              <p class="review-description">
+                {{ desc }}
+              </p>
+            </cnsl-info-section>
+          </cnsl-card>
+
+          <cnsl-card
+            title="{{ 'QUICKSTART.REDIRECTS' | translate }}"
+            description="{{ 'APP.OIDC.REDIRECTTITLE' | translate }}"
+          >
+            <cnsl-info-section [type]="InfoSectionType.ALERT">
+              <span class="redirect-description">
+                {{ 'QUICKSTART.DEVMODEWARN' | translate }}
+              </span>
+            </cnsl-info-section>
+            <cnsl-info-section *ngIf="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+              <span class="redirect-description">
+                {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
+              </span>
+            </cnsl-info-section>
+            <cnsl-info-section
+              *ngIf="
+                (oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_WEB ||
+                (oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT
+              "
+            >
+              <span class="redirect-description">
+                {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
+              </span>
+            </cnsl-info-section>
+
+            <cnsl-redirect-uris
+              *ngIf="requestRedirectValuesSubject$"
+              class="redirect-section"
+              [disabled]="false"
+              [isNative]="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+              [(ngModel)]="redirectUris"
+              [getValues]="requestRedirectValuesSubject$"
+              title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+              [devMode]="true"
+              data-e2e="redirect-uris"
+            >
+            </cnsl-redirect-uris>
+
+            <cnsl-redirect-uris
+              *ngIf="requestRedirectValuesSubject$"
+              class="redirect-section"
+              [disabled]="false"
+              [(ngModel)]="postLogoutUrisList"
+              [getValues]="requestRedirectValuesSubject$"
+              title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+              [isNative]="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+              [devMode]="true"
+              data-e2e="postlogout-uris"
+            >
+            </cnsl-redirect-uris>
+          </cnsl-card>
+        </div>
+      </div>
+
+      <div class="app-integrate-actions">
+        <button
+          mat-raised-button
+          [disabled]="loading || !framework()"
+          class="create-button"
+          color="primary"
+          (click)="createApp()"
+          data-e2e="create-button"
+        >
+          {{ 'ACTIONS.CREATE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

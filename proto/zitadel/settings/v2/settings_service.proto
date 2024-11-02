@@ -1,0 +1,479 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/object/v2/object.proto";
+import "zitadel/settings/v2/branding_settings.proto";
+import "zitadel/settings/v2/domain_settings.proto";
+import "zitadel/settings/v2/legal_settings.proto";
+import "zitadel/settings/v2/lockout_settings.proto";
+import "zitadel/settings/v2/login_settings.proto";
+import "zitadel/settings/v2/password_settings.proto";
+import "zitadel/settings/v2/security_settings.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Settings Service";
+    version: "2.0";
+    description: "This API is intended to manage settings in a ZITADEL instance.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+service SettingsService {
+
+  // Get basic information over the instance
+  rpc GetGeneralSettings (GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get basic information over the instance";
+      description: "Return the basic information of the instance for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Get the login settings
+  rpc GetLoginSettings (GetLoginSettingsRequest) returns (GetLoginSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/login"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the login settings";
+      description: "Return the settings for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Get the current active identity providers
+  rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/login/idps"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the current active identity providers";
+      description: "Return the current active identity providers for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Get the password complexity settings
+  rpc GetPasswordComplexitySettings (GetPasswordComplexitySettingsRequest) returns (GetPasswordComplexitySettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/password/complexity"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the password complexity settings";
+      description: "Return the password complexity settings for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Get the password expiry settings
+  rpc GetPasswordExpirySettings (GetPasswordExpirySettingsRequest) returns (GetPasswordExpirySettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/password/expiry"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the password expiry settings";
+      description: "Return the password expiry settings for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Get the current active branding settings
+  rpc GetBrandingSettings (GetBrandingSettingsRequest) returns (GetBrandingSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/branding"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the current active branding settings";
+      description: "Return the current active branding settings for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Get the domain settings
+  rpc GetDomainSettings (GetDomainSettingsRequest) returns (GetDomainSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/domain"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the domain settings";
+      description: "Return the domain settings for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Get the legal and support settings
+  rpc GetLegalAndSupportSettings (GetLegalAndSupportSettingsRequest) returns (GetLegalAndSupportSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/legal_support"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the legal and support settings";
+      description: "Return the legal settings for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Get the lockout settings
+  rpc GetLockoutSettings (GetLockoutSettingsRequest) returns (GetLockoutSettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/lockout"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the lockout settings";
+      description: "Return the lockout settings for the requested context, which define when a user will be locked"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+// Get the security settings
+  rpc GetSecuritySettings(GetSecuritySettingsRequest) returns (GetSecuritySettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2/settings/security";
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Settings";
+      summary: "Get Security Settings";
+      description: "Returns the security settings of the ZITADEL instance."
+    };
+  }
+
+// Set the security settings
+  rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
+    option (google.api.http) = {
+      put: "/v2/policies/security";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Settings";
+      summary: "Set Security Settings";
+      description: "Set the security settings of the ZITADEL instance."
+    };
+  }
+}
+
+message GetLoginSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetLoginSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.v2.LoginSettings settings = 2;
+}
+
+message GetPasswordComplexitySettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetPasswordComplexitySettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.v2.PasswordComplexitySettings settings = 2;
+}
+
+message GetPasswordExpirySettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetPasswordExpirySettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.v2.PasswordExpirySettings settings = 2;
+}
+
+message GetBrandingSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetBrandingSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.v2.BrandingSettings settings = 2;
+}
+
+message GetDomainSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetDomainSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.v2.DomainSettings settings = 2;
+}
+
+message GetLegalAndSupportSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetLegalAndSupportSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.v2.LegalAndSupportSettings settings = 2;
+}
+
+message GetLockoutSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetLockoutSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.v2.LockoutSettings settings = 2;
+}
+
+message GetActiveIdentityProvidersRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetActiveIdentityProvidersResponse {
+  zitadel.object.v2.ListDetails details = 1;
+  repeated zitadel.settings.v2.IdentityProvider identity_providers = 2;
+}
+
+message GetGeneralSettingsRequest {}
+
+message GetGeneralSettingsResponse {
+  string default_org_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default organization for the current context"
+    }
+  ];
+  string default_language = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default language for the current context"
+      example: "\"en\""
+    }
+  ];
+  repeated string supported_languages = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"en\", \"de\", \"it\"]"
+    }
+  ];
+}
+
+// This is an empty request
+message GetSecuritySettingsRequest{}
+
+message GetSecuritySettingsResponse{
+  zitadel.object.v2.Details details = 1;
+  SecuritySettings settings = 2;
+}
+
+message SetSecuritySettingsRequest{
+  EmbeddedIframeSettings embedded_iframe = 1;
+  bool enable_impersonation = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
+    }
+  ];
+}
+
+message SetSecuritySettingsResponse{
+  zitadel.object.v2.Details details = 1;
+}

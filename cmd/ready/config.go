@@ -10,7 +10,6 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
-	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type Config struct {
@@ -27,8 +26,8 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
+			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")

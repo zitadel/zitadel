@@ -32,15 +32,17 @@ Password:
   Title: Senha
   Description: Insira seus dados de login.
   PasswordLabel: Senha
-  MinLength: Comprimento mínimo
-  HasUppercase: Letra maiúscula
-  HasLowercase: Letra minúscula
-  HasNumber: Número
-  HasSymbol: Símbolo
-  Confirmation: Confirmação corresponde
-  ResetLinkText: redefinir senha
-  BackButtonText: voltar
-  NextButtonText: próximo
+  MinLength: Deve ter pelo menos
+  MinLengthp2: caracteres.
+  MaxLength: Deve ter menos de 70 caracteres.
+  HasUppercase: Deve incluir uma letra maiúscula.
+  HasLowercase: Deve incluir uma letra minúscula.
+  HasNumber: Deve incluir um número.
+  HasSymbol: Deve incluir um símbolo.
+  Confirmation: A confirmação da senha corresponde.
+  ResetLinkText: Redefinir senha
+  BackButtonText: Voltar
+  NextButtonText: Próximo
 
 UsernameChange:
   Title: Alterar nome de usuário
@@ -83,6 +85,15 @@ InitUserDone:
   Description: E-mail verificado e senha definida com sucesso
   NextButtonText: próximo
   CancelButtonText: cancelar
+
+InviteUser:
+  Title: Ativar usuário
+  Description: Verifique seu e-mail com o código abaixo e defina sua senha.
+  CodeLabel: Código
+  NewPasswordLabel: Nova senha
+  NewPasswordConfirm: Confirmar senha
+  NextButtonText: Próximo
+  ResendButtonText: Reenviar código
 
 InitMFAPrompt:
   Title: Configuração de 2 fatores
@@ -184,6 +195,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Alterar senha
   Description: Altere sua senha. Insira sua senha antiga e nova.
+  ExpiredDescription: A sua palavra-passe expirou e tem de ser alterada. Insira sua senha antiga e nova.
   OldPasswordLabel: Senha antiga
   NewPasswordLabel: Nova senha
   NewPasswordConfirmLabel: Confirmação de senha
@@ -245,6 +257,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -284,6 +299,9 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -321,6 +339,12 @@ LogoutDone:
   Description: Você fez logout com sucesso.
   LoginButtonText: login
 
+LinkingUserPrompt:
+  Title: Usuário existente encontrado
+  Description: "Deseja vincular sua conta existente:"
+  LinkButtonText: Link
+  OtherButtonText: Outras opções
+
 LinkingUsersDone:
   Title: Vinculação de usuários
   Description: Vinculação de usuários concluída.
@@ -351,6 +375,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 
 DeviceAuth:
   Title: Autorização de dispositivo
@@ -471,6 +498,7 @@ Errors:
       NoExternalUserData: Nenhum dado de usuário externo recebido
       CreationNotAllowed: A criação de um novo usuário não é permitida neste provedor
       LinkingNotAllowed: A vinculação de um usuário não é permitida neste provedor
+      NoOptionAllowed: Nem criação nem vinculação são permitidas neste fornecedor. Contate o seu administrador.
     GrantRequired: Login não é possível. O usuário precisa ter pelo menos uma permissão no aplicativo. Entre em contato com o administrador.
     ProjectRequired: Login não é possível. A organização do usuário precisa ser concedida ao projeto. Entre em contato com o administrador.
   IdentityProvider:

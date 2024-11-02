@@ -13,7 +13,14 @@
     <div class="row">
       <p class="left cnsl-secondary-text">{{ 'USER.MACHINE.CREATIONDATE' | translate }}</p>
       <p *ngIf="keyResponse.details && keyResponse.details.creationDate" class="right">
-        {{ keyResponse.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
+        {{ keyResponse.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM yyyy, HH:mm' }}
+      </p>
+    </div>
+
+    <div class="row" *ngIf="expirationDate">
+      <p class="left cnsl-secondary-text">{{ 'USER.MACHINE.EXPIRATIONDATE' | translate }}</p>
+      <p class="right">
+        {{ expirationDate | localizedDate: 'EEE dd. MMM yyyy, HH:mm' }}
       </p>
     </div>
 

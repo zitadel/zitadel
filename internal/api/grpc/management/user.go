@@ -68,7 +68,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries)
+	res, err := s.query.SearchUsers(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -286,9 +286,8 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 		),
 	}
 	if code != nil {
-		origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
 		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
-			Link:       code.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
+			Link:       code.Link(http.DomainContext(ctx).Origin() + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 			Lifetime:   durationpb.New(code.Expiration),
 			Expiration: durationpb.New(code.Expiration),
 		}
@@ -473,7 +472,7 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ResendInitialMail(ctx, req.UserId, domain.EmailAddress(req.Email), authz.GetCtxData(ctx).OrgID, initCodeGenerator)
+	details, err := s.command.ResendInitialMail(ctx, req.UserId, domain.EmailAddress(req.Email), authz.GetCtxData(ctx).OrgID, initCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}
@@ -487,7 +486,7 @@ func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, emailCodeGenerator)
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, emailCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}
@@ -586,11 +585,7 @@ func (s *Server) SetHumanPassword(ctx context.Context, req *mgmt_pb.SetHumanPass
 }
 
 func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mgmt_pb.SendHumanResetPasswordNotificationRequest) (*mgmt_pb.SendHumanResetPasswordNotificationResponse, error) {
-	passwordCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordResetCode, s.userCodeAlg)
-	if err != nil {
-		return nil, err
-	}
-	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type), passwordCodeGenerator)
+	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type), "")
 	if err != nil {
 		return nil, err
 	}
@@ -613,7 +608,7 @@ func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHuma
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -676,7 +671,7 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -695,10 +690,9 @@ func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.A
 	if err != nil {
 		return nil, err
 	}
-	origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
 	return &mgmt_pb.AddPasswordlessRegistrationResponse{
 		Details:    obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
+		Link:       initCode.Link(http.DomainContext(ctx).Origin() + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }
@@ -774,13 +768,22 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 
 func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRequest) (*mgmt_pb.AddMachineKeyResponse, error) {
 	machineKey := AddMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
+	// If there is no pubkey supplied, then AddUserMachineKey will generate a new one
+	pubkeySupplied := len(machineKey.PublicKey) > 0
 	details, err := s.command.AddUserMachineKey(ctx, machineKey)
 	if err != nil {
 		return nil, err
 	}
-	keyDetails, err := machineKey.Detail()
-	if err != nil {
-		return nil, err
+
+	// Return key details only if the pubkey wasn't supplied, otherwise the user already has
+	// private key locally
+	var keyDetails []byte
+	if !pubkeySupplied {
+		var err error
+		keyDetails, err = machineKey.Detail()
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      machineKey.KeyID,
@@ -800,18 +803,13 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 }
 
 func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.GenerateMachineSecretRequest) (*mgmt_pb.GenerateMachineSecretResponse, error) {
-	// use SecretGeneratorTypeAppSecret as the secrets will be used in the client_credentials grant like a client secret
-	secretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
-	if err != nil {
-		return nil, err
-	}
 	user, err := s.getUserByID(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}
 
 	set := new(command.GenerateMachineSecret)
-	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, secretGenerator, set)
+	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, set)
 	if err != nil {
 		return nil, err
 	}
@@ -894,7 +892,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.IDPUserLinks(ctx, queries, false)
+	res, err := s.query.IDPUserLinks(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}

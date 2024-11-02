@@ -115,6 +115,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     { type: OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT, checked: false, disabled: true },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, checked: false, disabled: true },
     { type: OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE, checked: false, disabled: true },
+    { type: OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE, checked: false, disabled: true },
   ];
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -236,7 +237,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.samlAppRequest.setMetadataUrl(form.metadataUrl);
       }
 
-      if (this.samlAppRequest) {
+      if (this.samlAppRequest && minimalMetadata.length > 0) {
         const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
         this.samlAppRequest.setMetadataXml(base64);
       }

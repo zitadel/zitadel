@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/muhlemmer/gu"
+	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-
-	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -18,7 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 var (
@@ -89,13 +89,9 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata(), req.GetLifetime().AsDuration())
+	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), cmds, req.GetMetadata(), req.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
-	}
-	// if there's no new token, just return the current
-	if set.NewToken == "" {
-		set.NewToken = req.GetSessionToken()
 	}
 	return &session.SetSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
@@ -237,7 +233,6 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 		Id:             factor.UserID,
 		LoginName:      factor.LoginName,
 		DisplayName:    factor.DisplayName,
-		OrganisationId: factor.ResourceOwner,
 		OrganizationId: factor.ResourceOwner,
 	}
 }
@@ -351,7 +346,15 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		if err != nil {
 			return nil, err
 		}
-		sessionChecks = append(sessionChecks, command.CheckUser(user.ID, user.ResourceOwner))
+		if !user.State.IsEnabled() {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "SESSION-Gj4ko", "Errors.User.NotActive")
+		}
+
+		var preferredLanguage *language.Tag
+		if user.Human != nil && !user.Human.PreferredLanguage.IsRoot() {
+			preferredLanguage = &user.Human.PreferredLanguage
+		}
+		sessionChecks = append(sessionChecks, command.CheckUser(user.ID, user.ResourceOwner, preferredLanguage))
 	}
 	if password := checks.GetPassword(); password != nil {
 		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))

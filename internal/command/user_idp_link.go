@@ -12,18 +12,27 @@ import (
 )
 
 func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *AddLink) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}
-	if err := c.checkUserExists(ctx, userID, resourceOwner); err != nil {
+
+	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
+	if err != nil {
 		return nil, err
 	}
+	if !isUserStateExists(existingUser.UserState) {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-vzktar7b7f", "Errors.User.NotFound")
+	}
 	if userID != authz.GetCtxData(ctx).UserID {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
 			return nil, err
 		}
 	}
-	event, err := addLink(ctx, c.eventstore.Filter, user.NewAggregate(userID, resourceOwner), link)
+	//nolint:staticcheck
+	event, err := addLink(ctx, c.eventstore.Filter, user.NewAggregate(existingUser.AggregateID, existingUser.ResourceOwner), link)
 	if err != nil {
 		return nil, err
 	}
@@ -77,12 +86,13 @@ func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggrega
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")
 	}
+	options := idpWriteModel.GetProviderOptions()
 	// IDP user will either be linked or created on a new user
 	// Therefore we need to either check if linking is allowed or creation:
-	if linkToExistingUser && !idpWriteModel.GetProviderOptions().IsLinkingAllowed {
+	if linkToExistingUser && !options.IsLinkingAllowed && options.AutoLinkingOption == domain.AutoLinkingOptionUnspecified {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-Sfee2", "Errors.ExternalIDP.LinkingNotAllowed")
 	}
-	if !linkToExistingUser && !idpWriteModel.GetProviderOptions().IsCreationAllowed {
+	if !linkToExistingUser && !options.IsCreationAllowed && !options.IsAutoCreation {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-SJI3g", "Errors.ExternalIDP.CreationNotAllowed")
 	}
 	return user.NewUserIDPLinkAddedEvent(ctx, human, link.IDPConfigID, link.DisplayName, link.ExternalUserID), nil
@@ -116,6 +126,11 @@ func (c *Commands) removeUserIDPLink(ctx context.Context, link *domain.UserIDPLi
 	}
 	if existingLink.State == domain.UserIDPLinkStateUnspecified || existingLink.State == domain.UserIDPLinkStateRemoved {
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1M9xR", "Errors.User.ExternalIDP.NotFound")
+	}
+	if existingLink.AggregateID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingLink.ResourceOwner, existingLink.AggregateID); err != nil {
+			return nil, nil, err
+		}
 	}
 	userAgg := UserAggregateFromWriteModel(&existingLink.WriteModel)
 	if cascade {

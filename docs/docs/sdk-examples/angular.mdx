@@ -1,0 +1,51 @@
+---
+title: Angular
+sidebar_label: Angular
+---
+
+<table>
+    <tr>
+        <td width="100px">
+            <img width="100px" src="/docs/img/tech/angular.svg" alt="angular logo"/>
+        </td>
+        <td>
+            <a href="https://angular.io/" target="_blank">Angular</a> is a popular JavaScript framework for building single-page applications (SPAs) that is known for its two-way data binding, dependency injection, and modular architecture.
+            Integrate authentication to your Angular application easily by using the <a href="https://github.com/zitadel/zitadel-angular" target="_blank">zitadel-angular</a> Example.
+        </td>
+    </tr>
+</table>
+
+### Resources
+- [Angular Example Application with ZITADEL Login](https://github.com/zitadel/zitadel-angular)
+- [Step-By-Step Guide](/docs/examples/login/angular)
+- [ZITADEL Console](https://github.com/zitadel/zitadel/tree/main/console) is built with Angular and can also be used as a reference
+
+
+### Angular SDK
+
+ZITADEL does not provide an Angular specific SDK.
+But you can integrate ZITADEL to your application by using any OIDC Library such as [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).
+
+Check out our [Example Application](/docs/sdk-examples/angular#example-application)
+
+### Example Application
+
+The [zitadel-angular](https://github.com/zitadel/zitadel-angular) repository includes an Example Application ready to start and show how an Angular application looks like with integrated ZITADEL Login.
+
+What does the Example include:
+- Home Page with Login Button
+- Authenticating user with OIDC PKCE Flow
+- Private Page: Shows user information of authenticated user, only accessible after login
+- Logout
+
+### Step-By-Step Guide
+
+The [Step-By-Step Guide](/docs/examples/login/angular) leads you through the whole process from configuring the right application in ZITADEL to a ready application with integrated Login.
+
+After completing the Step-By-Step Guide you will have:
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible by authenticated user showing retrieved user information
+3. Logout
+4. Correct setup for your application in ZITADEL
+
+![App in console](/img/angular/app-screen.png)

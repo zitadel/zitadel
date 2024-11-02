@@ -19,7 +19,7 @@ func newZitadel() *cobra.Command {
 		Short: "initialize ZITADEL internals",
 		Long: `initialize ZITADEL internals.
 
-Prereqesits:
+Prerequisites:
 - cockroachDB or postgreSQL with user and database
 `,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -95,7 +95,8 @@ func createEncryptionKeys(ctx context.Context, db *database.DB) error {
 		return err
 	}
 	if _, err = tx.Exec(createEncryptionKeysStmt); err != nil {
-		tx.Rollback()
+		rollbackErr := tx.Rollback()
+		logging.OnError(rollbackErr).Error("rollback failed")
 		return err
 	}
 
@@ -110,7 +111,7 @@ func createEvents(ctx context.Context, db *database.DB) (err error) {
 	defer func() {
 		if err != nil {
 			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Debug("rollback failed")
+			logging.OnError(rollbackErr).Error("rollback failed")
 			return
 		}
 		err = tx.Commit()

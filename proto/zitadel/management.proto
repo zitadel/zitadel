@@ -280,6 +280,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ListUsers, with InUserIDQuery
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -291,8 +292,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "User by ID";
-            description: "Returns the full user object (human or machine) including the profile, email, etc."
+            description: "Returns the full user object (human or machine) including the profile, email, etc.\n\nDeprecated: please use user service v2 GetUserByID"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -310,6 +312,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ListUsers, with LoginNameQuery
     rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (GetUserByLoginNameGlobalResponse) {
         option (google.api.http) = {
             get: "/global/users/_by_login_name"
@@ -321,9 +324,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User by login name (globally)";
-            description: "Get a user by login name searched over all organizations. The request only returns data if the login name matches exactly."
+            description: "Get a user by login name searched over all organizations. The request only returns data if the login name matches exactly.\n\nDeprecated: please use user service v2 ListUsers, with LoginNameQuery"
             tags: "Users";
             tags: "Global";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -333,6 +337,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ListUsers
     rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
         option (google.api.http) = {
             post: "/users/_search"
@@ -345,8 +350,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
+            deprecated: true;
             summary: "Search Users";
-            description: "Search for users within an organization. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination."
+            description: "Search for users within an organization. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination.\n\nDeprecated: please use user service v2 ListUsers"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -400,6 +406,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ListUsers, is unique when no user is returned
     rpc IsUserUnique(IsUserUniqueRequest) returns (IsUserUniqueResponse) {
         option (google.api.http) = {
             get: "/users/_is_unique"
@@ -411,8 +418,9 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
+            deprecated: true;
             summary: "Check for existing user";
-            description: "Returns if a user with the requested email or username is unique. So you can create the user."
+            description: "Returns if a user with the requested email or username is unique. So you can create the user. \n\nDeprecated: please use user service v2 ListUsers, is unique when no user is returned"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -424,7 +432,7 @@ service ManagementService {
         };
     }
 
-    // deprecated: use ImportHumanUser
+    // Deprecated: use ImportHumanUser
     rpc AddHumanUser(AddHumanUserRequest) returns (AddHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human"
@@ -437,12 +445,21 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Create User (Human)";
-            description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
+            description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: use ImportHumanUser"
             tags: "Users";
             deprecated: true;
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
+    // Deprecated: please use user service v2 AddHumanUser
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -455,9 +472,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create/Import User (Human)";
-            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
+            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 AddHumanUser"
             tags: "Users";
             tags: "User Human"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -490,9 +508,18 @@ service ManagementService {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
+    // Deprecated: please use user service v2 DeactivateUser
     rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_deactivate"
@@ -505,17 +532,27 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deactivate user";
-            description: "The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data."
+            description: "The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data.\n\nDeprecated: please use user service v2 DeactivateUser"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
+    // Deprecated: please use user service v2 ReactivateUser
     rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_reactivate"
@@ -528,17 +565,27 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Reactivate user";
-            description: "Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'."
+            description: "Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'.\n\nDeprecated: please use user service v2 ReactivateUser"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
+    // Deprecated: please use user service v2 LockUser
     rpc LockUser(LockUserRequest) returns (LockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_lock"
@@ -551,17 +598,27 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Lock user";
-            description: "The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)"
+            description: "The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.),\n\nDeprecated: please use user service v2 LockUser"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
+    // Deprecated: please use user service v2 UnlockUser
     rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_unlock"
@@ -574,17 +631,27 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Unlock user";
-            description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'."
+            description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'.\n\nDeprecated: please use user service v2 UnlockUser"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
+    // Deprecated: please use user service v2 RemoveUser
     rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
         option (google.api.http) = {
             delete: "/users/{id}"
@@ -596,17 +663,27 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete user";
-            description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found"
+            description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found.\n\nDeprecated: please use user service v2 RemoveUser"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
+    // Deprecated: please use user service v2 UpdateHumanUser
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
@@ -619,13 +696,22 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Change user name";
-            description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward."
+            description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward.\n\nDeprecated: please use user service v2 UpdateHumanUser"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
@@ -784,6 +870,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 GetUserByID
     rpc GetHumanProfile(GetHumanProfileRequest) returns (GetHumanProfileResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/profile"
@@ -795,9 +882,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Profile (Human)";
-            description: "Get basic information like first_name and last_name of a user."
+            description: "Get basic information like first_name and last_name of a user.\n\nDeprecated: please use user service v2 GetUserByID"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -815,6 +903,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 UpdateHumanUser
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
@@ -827,9 +916,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Profile (Human)";
-            description: "Update the profile information from a user. The profile includes basic information like first_name and last_name."
+            description: "Update the profile information from a user. The profile includes basic information like first_name and last_name.\n\nDeprecated: please use user service v2 UpdateHumanUser"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -847,6 +937,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 GetUserByID
     rpc GetHumanEmail(GetHumanEmailRequest) returns (GetHumanEmailResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/email"
@@ -858,9 +949,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Email (Human)";
-            description: "Get the email address and the verification state of the address."
+            description: "Get the email address and the verification state of the address.\n\nDeprecated: please use user service v2 GetUserByID"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -878,6 +970,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 SetEmail
     rpc UpdateHumanEmail(UpdateHumanEmailRequest) returns (UpdateHumanEmailResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/email"
@@ -890,9 +983,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Email (Human)";
-            description: "Change the email address of a user. If the state is set to not verified, the user will get a verification email."
+            description: "Change the email address of a user. If the state is set to not verified, the user will get a verification email.\n\nDeprecated: please use user service v2 SetEmail"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -910,6 +1004,8 @@ service ManagementService {
         };
     }
 
+    // Deprecated: not used anymore in user state
+    // To resend a verification email use the user service v2 ResendEmailCode
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/_resend_initialization"
@@ -922,9 +1018,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Resend User Initialization Email";
-            description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address."
+            description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address.\n\nDeprecated: not used anymore in user state"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -942,6 +1039,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ResendEmailCode
     rpc ResendHumanEmailVerification(ResendHumanEmailVerificationRequest) returns (ResendHumanEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/email/_resend_verification"
@@ -954,9 +1052,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Resend User Email Verification";
-            description: "Resend the email verification notification to the given email address of the user."
+            description: "Resend the email verification notification to the given email address of the user.\n\nDeprecated: please use user service v2 ResendEmailCode"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -974,6 +1073,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 GetUserByID
     rpc GetHumanPhone(GetHumanPhoneRequest) returns (GetHumanPhoneResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/phone"
@@ -985,9 +1085,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Phone (Human)";
-            description: "Get the phone number and the verification state of the number. The phone number is only for informational purposes and to send messages, not for Authentication (2FA)."
+            description: "Get the phone number and the verification state of the number. The phone number is only for informational purposes and to send messages, not for Authentication (2FA).\n\nDeprecated: please use user service v2 GetUserByID"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1005,6 +1106,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 SetPhone
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/phone"
@@ -1017,9 +1119,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Phone (Human)";
-            description: "Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA)."
+            description: "Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).\n\nDeprecated: please use user service v2 SetPhone"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1037,6 +1140,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 SetPhone
     rpc RemoveHumanPhone(RemoveHumanPhoneRequest) returns (RemoveHumanPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/phone"
@@ -1048,9 +1152,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove User Phone (Human)";
-            description: "Remove the configured phone number of a user."
+            description: "Remove the configured phone number of a user.\n\nDeprecated: please use user service v2 SetPhone"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1068,6 +1173,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ResendPhoneCode
     rpc ResendHumanPhoneVerification(ResendHumanPhoneVerificationRequest) returns (ResendHumanPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/phone/_resend_verification"
@@ -1080,9 +1186,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Resend User Phone Verification";
-            description: "Resend the notification for the verification of the phone number, to the number stored on the user."
+            description: "Resend the notification for the verification of the phone number, to the number stored on the user.\n\nDeprecated: please use user service v2 ResendPhoneCode"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1131,7 +1238,7 @@ service ManagementService {
         };
     }
 
-    // deprecated: use SetHumanPassword
+    // Deprecated: please use user service v2 SetPassword
     rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_initialize"
@@ -1145,11 +1252,20 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
             tags: "User Human";
-            summary: "Set Human Initial Password";
+            summary: "Set Human Initial Password\n\nDeprecated: please use user service v2 SetPassword";
             deprecated: true;
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
+    // Deprecated: please use user service v2 SetPassword
     rpc SetHumanPassword(SetHumanPasswordRequest) returns (SetHumanPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password"
@@ -1162,9 +1278,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Set User Password";
-            description: "Set a new password for a user. Per default, the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login."
+            description: "Set a new password for a user. Per default, the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login.\n\nDeprecated: please use user service v2 SetPassword"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1182,6 +1299,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 PasswordReset
     rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_reset"
@@ -1194,9 +1312,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Send Reset Password Notification";
-            description: "The user will receive an email with a link to change the password."
+            description: "The user will receive an email with a link to change the password.\n\nDeprecated: please use user service v2 PasswordReset"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1214,6 +1333,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ListAuthenticationMethodTypes
     rpc ListHumanAuthFactors(ListHumanAuthFactorsRequest) returns (ListHumanAuthFactorsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/auth_factors/_search"
@@ -1225,9 +1345,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Authentication Factors (2FA/MFA)";
-            description: "Get a list of authentication factors the user has set. Including Second-Factors (2FA) and Multi-Factors (MFA)."
+            description: "Get a list of authentication factors the user has set. Including Second Factors (2FA) and Multi-Factors (MFA).\n\nDeprecated: please use user service v2 ListAuthenticationMethodTypes"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1245,6 +1366,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 RemoveTOTP
     rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp"
@@ -1256,9 +1378,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP";
-            description: "Remove the configured One-Time-Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator."
+            description: "Remove the configured One-Time Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.\n\nDeprecated: please use user service v2 RemoveTOTP"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1276,6 +1399,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 RemoveU2F
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/u2f/{token_id}"
@@ -1287,7 +1411,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor U2F";
-            description: "Remove the configured Universal-Second-Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc."
+            deprecated: true;
+            description: "Remove the configured Universal Second Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.\n\nDeprecated: please use user service v2 RemoveU2F"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1307,6 +1432,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 RemoveOTPSMS
     rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_sms"
@@ -1318,9 +1444,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP SMS";
-            description: "Remove the configured One-Time-Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+            description: "Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPSMS"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1338,6 +1465,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 RemoveOTPEmail
     rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_email"
@@ -1349,9 +1477,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP SMS";
-            description: "Remove the configured One-Time-Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
+            description: "Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPEmail"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1369,6 +1498,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ListPasskeys
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_search"
@@ -1380,7 +1510,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Search Passwordless/Passkey authentication";
-            description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token."
+            deprecated: true;
+            description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.\n\nDeprecated: please use user service v2 ListPasskeys"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1400,6 +1531,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 RegisterPasskey
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_link"
@@ -1410,9 +1542,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Add Passwordless/Passkey Registration Link";
-            description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
+            description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone\n\nDeprecated: please use user service v2 RegisterPasskey"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1430,6 +1563,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 RegisterPasskey
     rpc SendPasswordlessRegistration(SendPasswordlessRegistrationRequest) returns (SendPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_send_link"
@@ -1441,9 +1575,10 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Send Passwordless/Passkey Registration Link";
-            description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
+            description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.\n\nDeprecated: please use user service v2 RegisterPasskey"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1461,6 +1596,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 RemovePasskey
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/passwordless/{token_id}"
@@ -1472,7 +1608,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete Passwordless/Passkey";
-            description: "Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.)"
+            deprecated: true;
+            description: "Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).\n\nDeprecated: please use user service v2 RemovePasskey"
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1662,7 +1799,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create Key for machine user";
-            description: "A new key is generated and will be returned in the response. Make sure to store the returned key. Machine keys are used to authenticate with jwt profile."
+            description: "If a public key is not supplied, a new key is generated and will be returned in the response. Make sure to store the returned key. If an RSA public key is supplied, the private key is omitted from the response. Machine keys are used to authenticate with jwt profile."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -1839,6 +1976,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 ListLinkedIDPs
     rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/idps/_search"
@@ -1852,7 +1990,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
             summary: "List Social Logins";
-            description: "Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.)"
+            deprecated: true;
+            description: "Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.).\n\nDeprecated: please use user service v2 ListLinkedIDPs"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -1864,6 +2003,7 @@ service ManagementService {
         };
     }
 
+    // Deprecated: please use user service v2 RemoveLinkedIDP
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
@@ -1876,7 +2016,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
             summary: "Remove Social Login";
-            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate."
+            deprecated: true;
+            description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use user service v2 RemoveLinkedIDP"
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -3835,7 +3976,7 @@ service ManagementService {
             tags: "Project Grants"
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List Project Members";
+            summary: "List Project Grant Members";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked."
             parameters: {
                 headers: {
@@ -4142,6 +4283,14 @@ service ManagementService {
             summary: "Get Org IAM Policy";
             description: "Use Get Domain Settings instead"
             deprecated: true;
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -4469,8 +4618,8 @@ service ManagementService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Authentication Methods"
-            summary: "List Multi Factors (MFA)";
-            description: "Returns a list of multi factors (MFA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            summary: "List Multi-factors (MFA)";
+            description: "Returns a list of multi-factors (MFA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4522,7 +4671,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Authentication Methods"
-            summary: "Remove Multi Factor (MFA)";
+            summary: "Remove Multi-factor (MFA)";
             description: "Remove a multi-factor (MFA) from the login settings of the organization. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             parameters: {
                 headers: {
@@ -4662,7 +4811,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/age"
@@ -4676,7 +4824,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Age Settings";
-            description: "Not implemented";
+            description: "Returns the password age settings configured on the organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4688,7 +4836,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc GetDefaultPasswordAgePolicy(GetDefaultPasswordAgePolicyRequest) returns (GetDefaultPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/password/age"
@@ -4702,7 +4849,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Default Password Age Settings";
-            description: "Not implemented";
+            description: "Returns the default password age settings configured on the instance. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4714,7 +4861,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc AddCustomPasswordAgePolicy(AddCustomPasswordAgePolicyRequest) returns (AddCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             post: "/policies/password/age"
@@ -4729,7 +4875,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Add Password Age Settings";
-            description: "Not implemented";
+            description: "Create new password age settings for the organization. This will overwrite the settings of the instance for this organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4741,7 +4887,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc UpdateCustomPasswordAgePolicy(UpdateCustomPasswordAgePolicyRequest) returns (UpdateCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/age"
@@ -4756,7 +4901,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Age Settings";
-            description: "Not implemented";
+            description: "Update the password age settings of the organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4768,7 +4913,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc ResetPasswordAgePolicyToDefault(ResetPasswordAgePolicyToDefaultRequest) returns (ResetPasswordAgePolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/password/age"
@@ -4782,7 +4926,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Reset Password Age Settings to Default";
-            description: "Not implemented";
+            description: "Remove the password age settings of the organization and therefore use the default settings on the instance.. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6352,6 +6496,103 @@ service ManagementService {
         };
     }
 
+    rpc GetCustomInviteUserMessageText(GetCustomInviteUserMessageTextRequest) returns (GetCustomInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/message/invite_user/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Custom Invite User Message Text";
+            description: "Get the custom text of the password-changed message/email that is configured on the organization. The message is sent when an invite code email is requested."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc GetDefaultInviteUserMessageText(GetDefaultInviteUserMessageTextRequest) returns (GetDefaultInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            get: "/text/default/message/invite_user/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Get Default Invite User Message Text";
+            description: "Get the default text of the invite user message/email that is configured on the instance or as translation files in ZITADEL itself. The message is sent when an invite code email is requested."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc SetCustomInviteUserMessageCustomText(SetCustomInviteUserMessageTextRequest) returns (SetCustomInviteUserMessageTextResponse) {
+        option (google.api.http) = {
+            put: "/text/message/invite_user/{language}";
+            body: "*";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Set Custom Invite User Message Text";
+            description: "Set the custom text of the invite user message/email for the organization. The message is sent when an invite code email is requested. The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}} {{.ApplicationName}}"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ResetCustomInviteUserMessageTextToDefault(ResetCustomInviteUserMessageTextToDefaultRequest) returns (ResetCustomInviteUserMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/invite_user/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Message Texts";
+            summary: "Reset Custom Invite User Message Text to Default";
+            description: "Removes the custom text of the invite user message from the organization and therefore the default texts from the instance or translation files will be triggered for the users."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
     rpc GetCustomLoginTexts(GetCustomLoginTextsRequest) returns (GetCustomLoginTextsResponse) {
         option (google.api.http) = {
             get: "/text/login/{language}";
@@ -6723,6 +6964,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "List Identity Providers";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6740,6 +6989,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Get Identity Provider By ID";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6758,6 +7015,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Generic OAuth Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6776,6 +7041,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Generic OAuth Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6794,6 +7067,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6812,6 +7093,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6830,6 +7119,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Migrate Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6848,6 +7145,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add JWT Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6866,6 +7171,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update JWT Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6884,6 +7197,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Azure AD Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6902,6 +7223,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Azure AD Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6920,6 +7249,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitHub Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6938,6 +7275,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitHub Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6956,6 +7301,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitHub Enterprise Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6974,6 +7327,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitHub Enterprise Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6992,6 +7353,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitLab Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7010,6 +7379,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitLab Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7028,6 +7405,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitLab Selfhosted Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7046,6 +7431,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitLab Selfhosted Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7064,6 +7457,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Google Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7082,6 +7483,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Google Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7100,6 +7509,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add LDAP Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7118,6 +7535,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update LDAP Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7136,6 +7561,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Apple Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7154,6 +7587,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Apple Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7172,6 +7613,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add SAML Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7190,6 +7639,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update SAML Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7208,6 +7665,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Regenerate SAML Identity Provider Certificate";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7226,6 +7691,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Delete Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7777,7 +8250,7 @@ message ImportHumanUserRequest {
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 min_length: 1;
                 max_length: 200;
-                example: "\"idp-config-id\"";
+                example: "\"external-user-id\"";
                 description: "The id of the user in the external identity provider"
             }
         ];
@@ -7874,6 +8347,15 @@ message AddMachineUserRequest {
 
     zitadel.user.v1.AccessTokenType access_token_type = 4 [
         (validate.rules).enum = {defined_only: true}
+    ];
+
+    // optionally set your own id unique for the user.
+    optional string user_id = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"316b7fa5-0535-4adb-9e93-963a91b1010c\"";
+        }
     ];
 }
 
@@ -8424,6 +8906,12 @@ message AddMachineKeyRequest {
             description: "The date the key will expire and no logins will be possible";
         }
     ];
+    bytes public_key = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+           example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+           description: "Optionally provide a public key of your own generated RSA private key.";
+        }
+    ];
 }
 
 message AddMachineKeyResponse {
@@ -8720,7 +9208,7 @@ message AddOrgMemberRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     repeated string roles = 2  [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "[\"IAM_OWNER\"]";
+            example: "[\"ORG_OWNER\"]";
             description: "If no roles are provided the user won't have any rights"
         }
     ];
@@ -9314,6 +9802,12 @@ message AddOIDCAppRequest {
             description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
         }
     ];
+    string back_channel_logout_uri = 18 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://example.com/auth/backchannel\"]";
+            description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
+        }
+    ];
 }
 
 message AddOIDCAppResponse {
@@ -9487,6 +9981,12 @@ message UpdateOIDCAppConfigRequest {
     bool skip_native_app_success_page = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
+        }
+    ];
+    string back_channel_logout_uri = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://example.com/auth/backchannel\"]";
+            description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
         }
     ];
 }
@@ -10286,7 +10786,9 @@ message GetDefaultPasswordAgePolicyResponse {
 }
 
 message AddCustomPasswordAgePolicyRequest {
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -10295,7 +10797,9 @@ message AddCustomPasswordAgePolicyResponse {
 }
 
 message UpdateCustomPasswordAgePolicyRequest {
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -10332,6 +10836,12 @@ message AddCustomLockoutPolicyRequest {
             description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
         }
     ];
+    uint32 max_otp_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
+            example: "\"10\""
+        }
+    ];
 }
 
 message AddCustomLockoutPolicyResponse {
@@ -10342,6 +10852,12 @@ message UpdateCustomLockoutPolicyRequest {
     uint32 max_password_attempts = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
+        }
+    ];
+    uint32 max_otp_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
+            example: "\"10\""
         }
     ];
 }
@@ -10397,6 +10913,24 @@ message AddCustomPrivacyPolicyRequest {
             description: "help / support email address."
         }
     ];
+    string docs_link = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to documentation to be shown in the console.";
+            example: "\"https://zitadel.com/docs\"";
+        }
+    ];
+    string custom_link = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to an external resource that will be available to users in the console.";
+            example: "\"https://external.link\"";
+        }
+    ];
+    string custom_link_text = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The button text that would be shown in console pointing to custom link.";
+            example: "\"External\"";
+        }
+    ];
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -10427,6 +10961,24 @@ message UpdateCustomPrivacyPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"support-email@test.com\"";
             description: "help / support email address."
+        }
+    ];
+    string docs_link = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to documentation to be shown in the console.";
+            example: "\"https://zitadel.com/docs\"";
+        }
+    ];
+    string custom_link = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to an external resource that will be available to users in the console.";
+            example: "\"https://external.link\"";
+        }
+    ];
+    string custom_link_text = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The button text that would be shown in console pointing to custom link.";
+            example: "\"External\"";
         }
     ];
 }
@@ -10856,6 +11408,8 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
     zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
     zitadel.text.v1.ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
+    // Deprecated: the linking user prompt screen no longer exists
+    zitadel.text.v1.LinkingUserPromptScreenText linking_user_prompt_text = 36 [deprecated = true];
 }
 
 message SetCustomLoginTextsResponse {
@@ -11471,6 +12025,86 @@ message ResetCustomPasswordChangeMessageTextToDefaultRequest {
 }
 
 message ResetCustomPasswordChangeMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetCustomInviteUserMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetCustomInviteUserMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message GetDefaultInviteUserMessageTextRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetDefaultInviteUserMessageTextResponse {
+    zitadel.text.v1.MessageCustomText custom_text = 1;
+}
+
+message SetCustomInviteUserMessageTextRequest {
+    string language = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"de\""
+        }
+    ];
+    string title = 2 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string pre_header = 3 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string subject = 4 [
+        (validate.rules).string = {max_bytes: 2000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Invitation to {{.ApplicationName}}\""
+            max_length: 500;
+        }
+    ];
+    string greeting = 5 [
+        (validate.rules).string = {max_bytes: 4000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Hello {{.DisplayName}},\""
+            max_length: 1000;
+        }
+    ];
+    string text = 6 [
+        (validate.rules).string = {max_bytes: 40000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Your user has been invited to {{.ApplicationName}}. Please click the button below to finish the invite process. If you didn't ask for this mail, please ignore it.\""
+            max_length: 10000;
+        }
+    ];
+    string button_text = 7 [
+        (validate.rules).string = {max_bytes: 4000},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Accept invite\""
+            max_length: 500;
+        }
+    ];
+    string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+}
+
+message SetCustomInviteUserMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomInviteUserMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomInviteUserMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -12632,31 +13266,28 @@ message AddSAMLProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     oneof metadata {
         option (validate.required) = true;
+        // Metadata of the SAML identity provider.
         bytes metadata_xml = 2 [
-            (validate.rules).bytes.max_len = 500000,
-            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "Metadata of the SAML identity provider";
-            }
+            (validate.rules).bytes.max_len = 500000
         ];
+        // Url to the metadata of the SAML identity provider.
         string metadata_url = 3 [
             (validate.rules).string.max_len = 200,
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"https://test.com/saml/metadata\""
-                description: "Url to the metadata of the SAML identity provider";
             }
         ];
     }
-    zitadel.idp.v1.SAMLBinding binding = 4 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Binding which defines the type of communication with the identity provider";
-        }
-    ];
-    bool with_signed_request = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Boolean which defines if the authentication requests are signed";
-        }
-    ];
+    // Binding which defines the type of communication with the identity provider.
+    zitadel.idp.v1.SAMLBinding binding = 4;
+    // Boolean which defines if the authentication requests are signed.
+    bool with_signed_request = 5;
     zitadel.idp.v1.Options provider_options = 6;
+    // Optionally specify the `nameid-format` requested.
+    optional zitadel.idp.v1.SAMLNameIDFormat name_id_format = 7;
+    // Optionally specify the name of the attribute, which will be used to map the user
+    // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+    optional string transient_mapping_attribute_name = 8;
 }
 
 message AddSAMLProviderResponse {
@@ -12667,33 +13298,30 @@ message AddSAMLProviderResponse {
 message UpdateSAMLProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // Metadata of the SAML identity provider.
     oneof metadata {
         option (validate.required) = true;
         bytes metadata_xml = 3 [
-            (validate.rules).bytes.max_len = 500000,
-            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "Metadata of the SAML identity provider";
-            }
+            (validate.rules).bytes.max_len = 500000
         ];
+        // Url to the metadata of the SAML identity provider.
         string metadata_url = 4 [
             (validate.rules).string.max_len = 200,
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"https://test.com/saml/metadata\""
-                description: "Url to the metadata of the SAML identity provider";
             }
         ];
     }
-    zitadel.idp.v1.SAMLBinding binding = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Binding which defines the type of communication with the identity provider";
-        }
-    ];
-    bool with_signed_request = 6 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Boolean which defines if the authentication requests are signed";
-        }
-    ];
+    // Binding which defines the type of communication with the identity provider.
+    zitadel.idp.v1.SAMLBinding binding = 5;
+    // Boolean which defines if the authentication requests are signed.
+    bool with_signed_request = 6;
     zitadel.idp.v1.Options provider_options = 7;
+    // Optionally specify the `nameid-format` requested.
+    optional zitadel.idp.v1.SAMLNameIDFormat name_id_format = 8;
+    // Optionally specify the name of the attribute, which will be used to map the user
+    // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+    optional string transient_mapping_attribute_name = 9;
 }
 
 message UpdateSAMLProviderResponse {
@@ -13009,18 +13637,37 @@ message ClearFlowResponse {
 }
 
 message SetTriggerActionsRequest {
-    // id of the flow type
+    /* id of the flow type.
+    * Following flows are currently allowed:
+    * - External Authentication: FLOW_TYPE_EXTERNAL_AUTHENTICATION or 1
+    * - Internal Authentication: 3
+    * - Complement Token: 2
+    * - Complement SAML Response: 4
+    */ 
     string flow_type = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-            description: "At the moment you have to send the ID of the Flow Type: ExternalAuthentication=1, CustomiseToken=2, InternalAuthentication=3, PreUserinfoCreation=3";
         }
     ];
-    // id of the trigger type
+    /* id of the trigger type.
+    * Following triggers are currently allowed:
+    * - External Authentication:
+    *   - Post Authentication: TRIGGER_TYPE_POST_AUTHENTICATION or 1
+    *   - Pre Creation: TRIGGER_TYPE_PRE_CREATION or 2
+    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3 
+    * - Internal Authentication:
+    *   - Post Authentication: TRIGGER_TYPE_POST_AUTHENTICATION or 1
+    *   - Pre Creation: TRIGGER_TYPE_PRE_CREATION or 2
+    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3 
+    * - Complement Token:
+    *   - Pre Userinfo Creation: 4
+    *   - Pre Access Token Creation: 5
+    * - Complement SAML Response:
+    *   - Pre SAML Response Creation: 6
+    */
     string trigger_type = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-            description: "At the moment you have to send the ID of the Trigger Type: PostAuthentication=1, PreCreation=2, PostCreation=3, PreUserinfoCreation=4, PreAccessTokenCreation=5";
          }
     ];
     repeated string action_ids = 3;

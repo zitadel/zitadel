@@ -123,7 +123,9 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 			return nil, ctxTimeout.Err()
 		case result := <-ch:
 			logging.OnError(result.err).Errorf("error while importing: %v", result.err)
-			logging.Infof("Import done: %s", result.count.getProgress())
+			if result.count != nil {
+				logging.Infof("Import done: %s", result.count.getProgress())
+			}
 			return result.ret, result.err
 		}
 	} else {
@@ -246,7 +248,10 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 	return dataOrgs, nil
 }
 
-func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Input) ([]byte, error) {
+func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Input) (_ []byte, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	minioClient, err := minio.New(input.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(input.AccessKeyId, input.SecretAccessKey, ""),
 		Secure: input.Ssl,
@@ -272,7 +277,10 @@ func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Inpu
 	return ioutil.ReadAll(object)
 }
 
-func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSInput) ([]byte, error) {
+func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSInput) (_ []byte, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	saJson, err := base64.StdEncoding.DecodeString(input.ServiceaccountJson)
 	if err != nil {
 		return nil, err
@@ -292,8 +300,11 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 	return ioutil.ReadAll(reader)
 }
 
-func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator crypto.Generator) error {
-	_, err := s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
+func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	_, err = s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
 	if err != nil {
 		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
 		if _, err := s.query.OrgByID(ctx, true, org.OrgId); err != nil {
@@ -325,14 +336,17 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: err.Error()})
 		}
 	}
-	return importResources(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator)
+	return importResources(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 }
 
-func importLabelPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) error {
+func importLabelPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.LabelPolicy == nil {
 		return nil
 	}
-	_, err := s.command.AddLabelPolicy(ctx, org.GetOrgId(), management.AddLabelPolicyToDomain(org.GetLabelPolicy()))
+	_, err = s.command.AddLabelPolicy(ctx, org.GetOrgId(), management.AddLabelPolicyToDomain(org.GetLabelPolicy()))
 	if err != nil {
 		*errors = append(*errors, &admin_pb.ImportDataError{Type: "label_policy", Id: org.GetOrgId(), Message: err.Error()})
 		if isCtxTimeout(ctx) {
@@ -351,6 +365,9 @@ func importLabelPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Impor
 }
 
 func importLockoutPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.LockoutPolicy == nil {
 		return
 	}
@@ -360,7 +377,10 @@ func importLockoutPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Imp
 	}
 }
 
-func importOidcIdps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg) error {
+func importOidcIdps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.OidcIdps == nil {
 		return nil
 	}
@@ -380,7 +400,10 @@ func importOidcIdps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	return nil
 }
 
-func importJwtIdps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg) error {
+func importJwtIdps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.JwtIdps == nil {
 		return nil
 	}
@@ -401,6 +424,9 @@ func importJwtIdps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 }
 
 func importLoginPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.LoginPolicy == nil {
 		return
 	}
@@ -411,6 +437,9 @@ func importLoginPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Impor
 }
 
 func importPwComlexityPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.PasswordComplexityPolicy == nil {
 		return
 	}
@@ -421,6 +450,9 @@ func importPwComlexityPolicy(ctx context.Context, s *Server, errors *[]*admin_pb
 }
 
 func importPrivacyPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.PrivacyPolicy == nil {
 		return
 	}
@@ -430,7 +462,10 @@ func importPrivacyPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Imp
 	}
 }
 
-func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) error {
+func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.HumanUsers == nil {
 		return nil
 	}
@@ -465,7 +500,10 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 	return nil
 }
 
-func importMachineUsers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importMachineUsers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.MachineUsers == nil {
 		return nil
 	}
@@ -486,7 +524,10 @@ func importMachineUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	return nil
 }
 
-func importUserMetadata(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importUserMetadata(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.UserMetadata == nil {
 		return nil
 	}
@@ -507,7 +548,10 @@ func importUserMetadata(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	return nil
 }
 
-func importMachineKeys(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importMachineKeys(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.MachineKeys == nil {
 		return nil
 	}
@@ -537,7 +581,10 @@ func importMachineKeys(ctx context.Context, s *Server, errors *[]*admin_pb.Impor
 	return nil
 }
 
-func importUserLinks(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importUserLinks(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.UserLinks == nil {
 		return nil
 	}
@@ -548,6 +595,7 @@ func importUserLinks(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 			IDPExternalID: userLinks.ProvidedUserId,
 			DisplayName:   userLinks.ProvidedUserName,
 		}
+		// TBD: why not command.BulkAddedUserIDPLinks?
 		if _, err := s.command.AddUserIDPLink(ctx, userLinks.UserId, org.GetOrgId(), externalIDP); err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "user_link", Id: userLinks.UserId + "_" + userLinks.IdpId, Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -563,7 +611,10 @@ func importUserLinks(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 
 }
 
-func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.Projects == nil {
 		return nil
 	}
@@ -584,13 +635,16 @@ func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	return nil
 }
 
-func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, appSecretGenerator crypto.Generator) error {
+func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.OidcApps == nil {
 		return nil
 	}
 	for _, app := range org.GetOidcApps() {
 		logging.Debugf("import oidcapplication: %s", app.GetAppId())
-		_, err := s.command.AddOIDCApplicationWithID(ctx, management.AddOIDCAppRequestToDomain(app.App), org.GetOrgId(), app.GetAppId(), appSecretGenerator)
+		_, err := s.command.AddOIDCApplicationWithID(ctx, management.AddOIDCAppRequestToDomain(app.App), org.GetOrgId(), app.GetAppId())
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -605,13 +659,16 @@ func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	return nil
 }
 
-func importAPIApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, appSecretGenerator crypto.Generator) error {
+func importAPIApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.ApiApps == nil {
 		return nil
 	}
 	for _, app := range org.GetApiApps() {
 		logging.Debugf("import apiapplication: %s", app.GetAppId())
-		_, err := s.command.AddAPIApplicationWithID(ctx, management.AddAPIAppRequestToDomain(app.GetApp()), org.GetOrgId(), app.GetAppId(), appSecretGenerator)
+		_, err := s.command.AddAPIApplicationWithID(ctx, management.AddAPIAppRequestToDomain(app.GetApp()), org.GetOrgId(), app.GetAppId())
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "api_app", Id: app.GetAppId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -626,7 +683,10 @@ func importAPIApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 	return nil
 }
 
-func importAppKeys(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importAppKeys(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.AppKeys == nil {
 		return nil
 	}
@@ -658,7 +718,10 @@ func importAppKeys(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 	return nil
 }
 
-func importActions(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importActions(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.Actions == nil {
 		return nil
 	}
@@ -678,12 +741,17 @@ func importActions(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDat
 	}
 	return nil
 }
-func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.ProjectRoles == nil {
 		return nil
 	}
 	for _, role := range org.GetProjectRoles() {
 		logging.Debugf("import projectroles: %s", role.ProjectId+"_"+role.RoleKey)
+
+		// TBD: why not command.BulkAddProjectRole?
 		_, err := s.command.AddProjectRole(ctx, management.AddProjectRoleRequestToDomain(role), org.GetOrgId())
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "project_role", Id: role.ProjectId + "_" + role.RoleKey, Message: err.Error()})
@@ -700,7 +768,10 @@ func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	return nil
 }
 
-func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator crypto.Generator) error {
+func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if err := importOrgDomains(ctx, s, errors, successOrg, org); err != nil {
 		return err
 	}
@@ -724,6 +795,7 @@ func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 	importVerifyPhoneMessageTexts(ctx, s, errors, org)
 	importDomainClaimedMessageTexts(ctx, s, errors, org)
 	importPasswordlessRegistrationMessageTexts(ctx, s, errors, org)
+	importInviteUserMessageTexts(ctx, s, errors, org)
 	if err := importHumanUsers(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode); err != nil {
 		return err
 	}
@@ -742,10 +814,10 @@ func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 	if err := importProjects(ctx, s, errors, successOrg, org, count); err != nil {
 		return err
 	}
-	if err := importOIDCApps(ctx, s, errors, successOrg, org, count, appSecretGenerator); err != nil {
+	if err := importOIDCApps(ctx, s, errors, successOrg, org, count); err != nil {
 		return err
 	}
-	if err := importAPIApps(ctx, s, errors, successOrg, org, count, appSecretGenerator); err != nil {
+	if err := importAPIApps(ctx, s, errors, successOrg, org, count); err != nil {
 		return err
 	}
 	if err := importAppKeys(ctx, s, errors, successOrg, org, count); err != nil {
@@ -760,7 +832,10 @@ func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 	return nil
 }
 
-func importOrgDomains(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg) error {
+func importOrgDomains(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.Domains == nil {
 		return nil
 	}
@@ -799,6 +874,9 @@ func importOrgDomains(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 }
 
 func importLoginTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.LoginTexts == nil {
 		return
 	}
@@ -811,6 +889,9 @@ func importLoginTexts(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 }
 
 func importInitMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.InitMessages == nil {
 		return
 	}
@@ -823,6 +904,9 @@ func importInitMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.
 }
 
 func importPWResetMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.PasswordResetMessages == nil {
 		return
 	}
@@ -835,6 +919,9 @@ func importPWResetMessageTexts(ctx context.Context, s *Server, errors *[]*admin_
 }
 
 func importVerifyEmailMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.VerifyEmailMessages == nil {
 		return
 	}
@@ -847,6 +934,9 @@ func importVerifyEmailMessageTexts(ctx context.Context, s *Server, errors *[]*ad
 }
 
 func importVerifyPhoneMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.VerifyPhoneMessages != nil {
 		return
 	}
@@ -859,6 +949,9 @@ func importVerifyPhoneMessageTexts(ctx context.Context, s *Server, errors *[]*ad
 }
 
 func importDomainClaimedMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.DomainClaimedMessages == nil {
 		return
 	}
@@ -871,6 +964,9 @@ func importDomainClaimedMessageTexts(ctx context.Context, s *Server, errors *[]*
 }
 
 func importPasswordlessRegistrationMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
 	if org.PasswordlessRegistrationMessages == nil {
 		return
 	}
@@ -882,7 +978,25 @@ func importPasswordlessRegistrationMessageTexts(ctx context.Context, s *Server, 
 	}
 }
 
-func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, success *admin_pb.ImportDataSuccess, count *counts, org *admin_pb.DataOrg) error {
+func importInviteUserMessageTexts(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
+	if org.PasswordlessRegistrationMessages == nil {
+		return
+	}
+	for _, message := range org.GetInviteUserMessages() {
+		_, err := s.command.SetOrgMessageText(ctx, authz.GetCtxData(ctx).OrgID, management.SetInviteUserCustomTextToDomain(message))
+		if err != nil {
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "invite_user_messages", Id: org.GetOrgId() + "_" + message.Language, Message: err.Error()})
+		}
+	}
+}
+
+func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, success *admin_pb.ImportDataSuccess, count *counts, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	successOrg := findOldOrg(success, org.OrgId)
 	if successOrg == nil {
 		return nil
@@ -932,7 +1046,10 @@ func importOrg2(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	return nil
 }
 
-func importOrg3(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, success *admin_pb.ImportDataSuccess, count *counts, org *admin_pb.DataOrg) error {
+func importOrg3(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, success *admin_pb.ImportDataSuccess, count *counts, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	successOrg := findOldOrg(success, org.OrgId)
 	if successOrg == nil {
 		return nil
@@ -946,7 +1063,10 @@ func importOrg3(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 	return importProjectMembers(ctx, s, errors, successOrg, count, org)
 }
 
-func importOrgMembers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, count *counts, org *admin_pb.DataOrg) error {
+func importOrgMembers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, count *counts, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.OrgMembers == nil {
 		return nil
 	}
@@ -967,7 +1087,10 @@ func importOrgMembers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 	return nil
 }
 
-func importProjectGrantMembers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, count *counts, org *admin_pb.DataOrg) error {
+func importProjectGrantMembers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, count *counts, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.ProjectGrantMembers == nil {
 		return nil
 	}
@@ -988,7 +1111,10 @@ func importProjectGrantMembers(ctx context.Context, s *Server, errors *[]*admin_
 	return nil
 }
 
-func importProjectMembers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, count *counts, org *admin_pb.DataOrg) error {
+func importProjectMembers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, count *counts, org *admin_pb.DataOrg) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if org.ProjectMembers == nil {
 		return nil
 	}
@@ -1018,15 +1144,14 @@ func findOldOrg(success *admin_pb.ImportDataSuccess, orgId string) *admin_pb.Imp
 	return nil
 }
 
-func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*admin_pb.ImportDataResponse, *counts, error) {
+func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (_ *admin_pb.ImportDataResponse, _ *counts, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	errors := make([]*admin_pb.ImportDataError, 0)
 	success := &admin_pb.ImportDataSuccess{}
 	count := &counts{}
 
-	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
-	if err != nil {
-		return nil, nil, err
-	}
 	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
 	if err != nil {
 		return nil, nil, err
@@ -1064,7 +1189,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		count.appKeysCount += len(org.GetAppKeys())
 	}
 	for _, org := range orgs {
-		if err = importOrg1(ctx, s, &errors, ctxData, org, success, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator); err != nil {
+		if err = importOrg1(ctx, s, &errors, ctxData, org, success, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode); err != nil {
 			return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
 		}
 	}
@@ -1129,6 +1254,7 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			VerifyPhoneMessages:              orgV1.GetVerifyPhoneMessages(),
 			DomainClaimedMessages:            orgV1.GetDomainClaimedMessages(),
 			PasswordlessRegistrationMessages: orgV1.GetPasswordlessRegistrationMessages(),
+			InviteUserMessages:               orgV1.GetInviteUserMessages(),
 			OidcIdps:                         orgV1.GetOidcIdps(),
 			JwtIdps:                          orgV1.GetJwtIdps(),
 			UserLinks:                        orgV1.GetUserLinks(),
@@ -1153,11 +1279,11 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			if err != nil {
 				return nil, err
 			}
-			org.LoginPolicy.ExternalLoginCheckLifetime = durationpb.New(defaultLoginPolicy.ExternalLoginCheckLifetime)
-			org.LoginPolicy.MultiFactorCheckLifetime = durationpb.New(defaultLoginPolicy.MultiFactorCheckLifetime)
-			org.LoginPolicy.SecondFactorCheckLifetime = durationpb.New(defaultLoginPolicy.SecondFactorCheckLifetime)
-			org.LoginPolicy.PasswordCheckLifetime = durationpb.New(defaultLoginPolicy.PasswordCheckLifetime)
-			org.LoginPolicy.MfaInitSkipLifetime = durationpb.New(defaultLoginPolicy.MFAInitSkipLifetime)
+			org.LoginPolicy.ExternalLoginCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.ExternalLoginCheckLifetime))
+			org.LoginPolicy.MultiFactorCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.MultiFactorCheckLifetime))
+			org.LoginPolicy.SecondFactorCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.SecondFactorCheckLifetime))
+			org.LoginPolicy.PasswordCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.PasswordCheckLifetime))
+			org.LoginPolicy.MfaInitSkipLifetime = durationpb.New(time.Duration(defaultLoginPolicy.MFAInitSkipLifetime))
 
 			if orgV1.SecondFactors != nil {
 				org.LoginPolicy.SecondFactors = make([]policy.SecondFactorType, len(orgV1.SecondFactors))

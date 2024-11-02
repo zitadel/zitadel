@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package zitadel.resources.webkey.v3alpha;
+
+import "google/protobuf/timestamp.proto";
+import "zitadel/resources/webkey/v3alpha/config.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha;webkey";
+
+enum WebKeyState {
+  STATE_UNSPECIFIED = 0;
+  STATE_INITIAL = 1;
+  STATE_ACTIVE = 2;
+  STATE_INACTIVE = 3;
+  STATE_REMOVED = 4;
+}
+
+message GetWebKey {
+  zitadel.resources.object.v3alpha.Details details = 1;
+  WebKey config = 2;
+  WebKeyState state = 3;
+}
+
+message WebKey {
+  oneof config {
+    WebKeyRSAConfig rsa = 6;
+    WebKeyECDSAConfig ecdsa = 7;
+    WebKeyED25519Config ed25519 = 8;
+  }
+}

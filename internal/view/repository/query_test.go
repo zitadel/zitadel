@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/jinzhu/gorm"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )

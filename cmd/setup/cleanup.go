@@ -40,7 +40,6 @@ func Cleanup(config *Config) {
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
 	es := eventstore.NewEventstore(config.Eventstore)
-	migration.RegisterMappers(es)
 
 	step, err := migration.LastStuckStep(ctx, es)
 	logging.OnError(err).Fatal("unable to query latest migration")

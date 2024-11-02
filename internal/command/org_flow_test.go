@@ -112,7 +112,7 @@ func TestCommands_ClearFlow(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -276,7 +276,7 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}

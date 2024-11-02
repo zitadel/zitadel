@@ -4,16 +4,14 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -42,17 +40,8 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
-	if !domainPolicy.UserLoginMustBeDomain {
-		index := strings.LastIndex(userName, "@")
-		if index > 1 {
-			domainCheck := NewOrgDomainVerifiedWriteModel(userName[index+1:])
-			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
-				return nil, err
-			}
-			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
-			}
-		}
+	if err = c.userValidateDomain(ctx, orgID, userName, domainPolicy.UserLoginMustBeDomain); err != nil {
+		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
@@ -232,22 +221,6 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
-	if userID == "" { //do not check for empty orgID (JWT Profile requests won't provide it, so service user requests fail)
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
-	}
-	userWriteModel := NewUserWriteModel(userID, orgID)
-	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, lifetime)
-	if err != nil {
-		return nil, err
-	}
-	_, err = c.eventstore.Push(ctx, event)
-	if err != nil {
-		return nil, err
-	}
-	return accessToken, nil
-}
-
 func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID string) (*domain.ObjectDetails, error) {
 	removeEvent, accessTokenWriteModel, err := c.removeAccessToken(ctx, userID, orgID, tokenID)
 	if err != nil {
@@ -262,45 +235,6 @@ func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID
 		return nil, err
 	}
 	return writeModelToObjectDetails(&accessTokenWriteModel.WriteModel), nil
-}
-
-func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, *domain.Token, error) {
-	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
-	if err != nil {
-		return nil, nil, err
-	}
-	if userWriteModel.UserState != domain.UserStateActive {
-		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
-	}
-
-	audience = domain.AddAudScopeToAudience(ctx, audience, scopes)
-
-	preferredLanguage := ""
-	existingHuman, err := c.getHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)
-	if existingHuman != nil {
-		preferredLanguage = existingHuman.PreferredLanguage.String()
-	}
-	expiration := time.Now().UTC().Add(lifetime)
-	tokenID, err := c.idGenerator.Next()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
-	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, expiration),
-		&domain.Token{
-			ObjectRoot: models.ObjectRoot{
-				AggregateID: userWriteModel.AggregateID,
-			},
-			TokenID:           tokenID,
-			UserAgentID:       agentID,
-			ApplicationID:     clientID,
-			RefreshTokenID:    refreshTokenID,
-			Audience:          audience,
-			Scopes:            scopes,
-			Expiration:        expiration,
-			PreferredLanguage: preferredLanguage,
-		}, nil
 }
 
 func (c *Commands) removeAccessToken(ctx context.Context, userID, orgID, tokenID string) (*user.UserTokenRemovedEvent, *UserAccessTokenWriteModel, error) {
@@ -343,7 +277,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 		user.NewDomainClaimedEvent(
 			ctx,
 			userAgg,
-			fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
+			fmt.Sprintf("%s@temporary.%s", id, http_util.DomainContext(ctx).RequestedDomain()),
 			existingUser.UserName,
 			domainPolicy.UserLoginMustBeDomain),
 	}, changedUserGrant, nil
@@ -371,7 +305,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	return user.NewDomainClaimedEvent(
 		ctx,
 		userAgg,
-		fmt.Sprintf("%s@temporary.%s", id, authz.GetInstance(ctx).RequestedDomain()),
+		fmt.Sprintf("%s@temporary.%s", id, http_util.DomainContext(ctx).RequestedDomain()),
 		userWriteModel.UserName,
 		domainPolicy.UserLoginMustBeDomain), nil
 }
@@ -393,7 +327,10 @@ func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID stri
 	return err
 }
 
-func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
@@ -447,8 +384,12 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 	return exists, nil
 }
 
-func (c *Commands) newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-	return c.newCode(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
+func (c *Commands) newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+	return c.newEncryptedCode(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
+}
+
+func (c *Commands) newUserInviteCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+	return c.newEncryptedCodeWithDefault(ctx, filter, domain.SecretGeneratorTypeInviteCode, alg, c.defaultSecretGenerators.InviteCode)
 }
 
 func userWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, resourceOwner string) (*UserWriteModel, error) {

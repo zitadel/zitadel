@@ -31,9 +31,9 @@ If you encounter issues with an enterprise supported feature and you are eligibl
 
 **Enterprise supported features**
 
-- Database PostgreSQL
 - LDAP Identity Provider
 - [Terraform Provider](https://github.com/zitadel/terraform-provider-zitadel)
+- [Helm Chart](https://github.com/zitadel/zitadel-charts)
 
 ### Community supported
 
@@ -51,7 +51,13 @@ Therefore, it's recommended to use caution when using Alpha and Beta software, a
 
 Only features in General Availability will be covered by support services.
 
-We encourage our community to test Alpha and Beta software and provide feedback via our [Discord Chat](https://zitadel.com/chat).
+We encourage our community to check out Preview and test Alpha and Beta software and provide feedback via our [Discord Chat](https://zitadel.com/chat).
+
+### Preview
+
+The Preview state is our initial stage to document planned futures and collect early feedback on the design.
+Features are not yet implemented at all or availability is limited to designated testers.
+We recommend that users exercise caution when using Preview software and avoid using it for critical tasks, as support is limited during this phase.
 
 ### Alpha
 
@@ -69,7 +75,7 @@ During this phase, support is limited as we focus on testing and bug fixing.
 ### General available
 
 Generally available features are available to everyone and have the appropriate test coverage to be used for critical tasks.
-The software will be backwards-compatible with previous versions, for exceptions we will publish a [technical advisory](https://zitadel.com/docs/support/technical_advisory).
+The software will be backwards-compatible with previous versions, for exceptions we will publish a [technical advisory](/docs/support/technical_advisory).
 Features in General Availability are not marked explicitly.
 
 ## Release types

@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package zitadel.resources.object.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha;object";
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/object/v3alpha/object.proto";
+
+message Details {
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  //the timestamp of the first event applied to the object.
+  google.protobuf.Timestamp created = 3;
+  //the timestamp of the last event applied to the object.
+  google.protobuf.Timestamp changed = 4;
+  //the parent object representing the returned objects context.
+  zitadel.object.v3alpha.Owner owner = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message SearchQuery {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      title: "General List Query"
+      description: "Object unspecific list filters like offset, limit and asc/desc."
+    }
+  };
+  uint64 offset = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"0\"";
+    }
+  ];
+  uint32 limit = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "100";
+      description: "Maximum amount of events returned. If not configured otherwise, the default is 100, the maximum is 1000. If the limit exceeds the maximum, ZITADEL throws an error.";
+    }
+  ];
+  // If desc is true, the result is sorted by in descending order. Beware that if desc is true or the sorting column is not the creation date, the pagination results might be inconsistent.
+  bool desc = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default is ascending, because together with the creation date sorting column, this returns the most deterministic pagination results.";
+    }
+  ];
+}
+
+message ListDetails {
+  uint64 applied_limit = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "100";
+    }
+  ];
+  uint64 total_result = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\"";
+    }
+  ];
+  google.protobuf.Timestamp timestamp = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the last time the projection got updated"
+    }
+  ];
+}
+
+enum TextFilterMethod {
+  TEXT_FILTER_METHOD_EQUALS = 0;
+  TEXT_FILTER_METHOD_EQUALS_IGNORE_CASE = 1;
+  TEXT_FILTER_METHOD_STARTS_WITH = 2;
+  TEXT_FILTER_METHOD_STARTS_WITH_IGNORE_CASE = 3;
+  TEXT_FILTER_METHOD_CONTAINS = 4;
+}

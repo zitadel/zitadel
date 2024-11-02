@@ -31,6 +31,7 @@ sandbox.go
 google-credentials
 key.json
 .keys/*
+load-test/.keys
 
 # dumps
 .backups
@@ -82,3 +83,9 @@ go.work
 go.work.sum
 # Local Netlify folder
 .netlify
+
+load-test/node_modules
+load-test/yarn-error.log
+load-test/dist
+load-test/output/*
+.vercel

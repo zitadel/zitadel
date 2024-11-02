@@ -26,6 +26,7 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { error } from 'console';
+import { LoginPolicyService } from '../../../services/login-policy.service';
 
 const minValueValidator = (minValue: number) => (control: AbstractControl) => {
   const value = control.value;
@@ -71,6 +72,7 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
     private fb: UntypedFormBuilder,
     private authService: GrpcAuthService,
     private dialog: MatDialog,
+    private loginPolicySvc: LoginPolicyService,
   ) {}
 
   ngOnDestroy(): void {
@@ -172,45 +174,13 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
   }
 
   private async updateData(): Promise<any> {
-    const calls: Observable<any>[] = [];
+    const calls: Promise<any>[] = [];
 
     if (this.loginData) {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           if (this.isDefault) {
-            const mgmtreq = new AddCustomLoginPolicyRequest();
-            mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
-            mgmtreq.setAllowRegister(this.loginData.allowRegister);
-            mgmtreq.setAllowUsernamePassword(this.loginData.allowUsernamePassword);
-            mgmtreq.setForceMfa(this.loginData.forceMfa);
-            mgmtreq.setForceMfaLocalOnly(this.loginData.forceMfaLocalOnly);
-            mgmtreq.setPasswordlessType(this.loginData.passwordlessType);
-            mgmtreq.setHidePasswordReset(this.loginData.hidePasswordReset);
-            mgmtreq.setMultiFactorsList(this.loginData.multiFactorsList);
-            mgmtreq.setSecondFactorsList(this.loginData.secondFactorsList);
-            mgmtreq.setDisableLoginWithEmail(this.loginData.disableLoginWithEmail);
-            mgmtreq.setDisableLoginWithPhone(this.loginData.disableLoginWithPhone);
-
-            const pcl = new Duration().setSeconds((this.passwordCheckLifetime?.value ?? 0) * 60 * 60);
-            mgmtreq.setPasswordCheckLifetime(pcl);
-
-            const elcl = new Duration().setSeconds((this.externalLoginCheckLifetime?.value ?? 0) * 60 * 60);
-            mgmtreq.setExternalLoginCheckLifetime(elcl);
-
-            const misl = new Duration().setSeconds((this.mfaInitSkipLifetime?.value ?? 0) * 60 * 60);
-            mgmtreq.setMfaInitSkipLifetime(misl);
-
-            const sfcl = new Duration().setSeconds((this.secondFactorCheckLifetime?.value ?? 0) * 60 * 60);
-            mgmtreq.setSecondFactorCheckLifetime(sfcl);
-
-            const mficl = new Duration().setSeconds((this.multiFactorCheckLifetime?.value ?? 0) * 60 * 60);
-            mgmtreq.setMultiFactorCheckLifetime(mficl);
-
-            mgmtreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
-            mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
-            mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
-
-            calls.push(from((this.service as ManagementService).addCustomLoginPolicy(mgmtreq)));
+            calls.push(this.loginPolicySvc.createCustomLoginPolicy(this.service as ManagementService, this.loginData));
             break;
           } else {
             const mgmtreq = new UpdateCustomLoginPolicyRequest();
@@ -243,7 +213,7 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
             mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-            calls.push(from((this.service as ManagementService).updateCustomLoginPolicy(mgmtreq)));
+            calls.push((this.service as ManagementService).updateCustomLoginPolicy(mgmtreq));
             break;
           }
         case PolicyComponentServiceType.ADMIN:
@@ -276,21 +246,19 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
           adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-          calls.push(from((this.service as AdminService).setRestrictions(!this.allowOrgRegistration)));
-          calls.push(from((this.service as AdminService).updateLoginPolicy(adminreq)));
+          calls.push((this.service as AdminService).setRestrictions(!this.allowOrgRegistration));
+          calls.push((this.service as AdminService).updateLoginPolicy(adminreq));
           break;
       }
     } else {
-      calls.push(from(Promise.reject()));
+      calls.push(Promise.reject());
     }
-    return firstValueFrom(
-      forkJoin(calls).pipe(
-        catchError((error, caught) => {
-          // We just ignore the policy not changed error!
-          return (error as { message: string }).message.includes('INSTANCE-5M9vdd') ? of(true) : caught;
-        }),
-      ),
-    );
+    return Promise.all(calls).catch((err) => {
+      if (err?.message?.includes('INSTANCE-5M9vdd')) {
+        return true;
+      }
+      throw err;
+    });
   }
 
   public savePolicy(): void {

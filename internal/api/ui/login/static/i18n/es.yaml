@@ -30,17 +30,19 @@ SelectAccount:
 
 Password:
   Title: Contraseña
-  Description: Introduce tus datos de inicio de sesión.
+  Description: Introduce tus datos de acceso.
   PasswordLabel: Contraseña
-  MinLength: Longitud mínima
-  HasUppercase: Una letra mayúscula
-  HasLowercase: Una letra minúscula
-  HasNumber: Número
-  HasSymbol: Símbolo
-  Confirmation: Las contraseñas coinciden
-  ResetLinkText: restablecer contraseña
-  BackButtonText: atrás
-  NextButtonText: siguiente
+  MinLength: Debe tener al menos
+  MinLengthp2: caracteres de longitud.
+  MaxLength: Debe tener menos de 70 caracteres de longitud.
+  HasUppercase: Debe incluir una letra mayúscula.
+  HasLowercase: Debe incluir una letra minúscula.
+  HasNumber: Debe incluir un número.
+  HasSymbol: Debe incluir un símbolo.
+  Confirmation: La confirmación de la contraseña coincide.
+  ResetLinkText: Restablecer contraseña
+  BackButtonText: Atrás
+  NextButtonText: Siguiente
 
 UsernameChange:
   Title: Cambiar nombre de usuario
@@ -83,6 +85,15 @@ InitUserDone:
   Description: Email verificado y contraseña establecida correctamente
   NextButtonText: siguiente
   CancelButtonText: cancelar
+
+InviteUser:
+  Title: Activar usuario
+  Description: Verifica tu email con el siguiente código y establece tu contraseña.
+  CodeLabel: Código
+  NewPasswordLabel: Nueva contraseña
+  NewPasswordConfirm: Confirmar contraseña
+  NextButtonText: siguiente
+  ResendButtonText: reenviar código
 
 InitMFAPrompt:
   Title: Configuración de doble factor
@@ -188,6 +199,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Cambiar contraseña
   Description: Cambia tu contraseña. Introduce tu contraseña anterior y la nueva.
+  ExpiredDescription: Tu contraseña ha caducado y tiene que cambiarla. Introduzca tu contraseña anterior y la nueva.
   OldPasswordLabel: Contraseña anterior
   NewPasswordLabel: Nueva contraseña
   NewPasswordConfirmLabel: Confirmación de contraseña
@@ -249,6 +261,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -288,6 +303,9 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -325,6 +343,12 @@ LogoutDone:
   Description: Cerraste la sesión con éxito.
   LoginButtonText: iniciar sesión
 
+LinkingUserPrompt:
+  Title: Usuario existente encontrado
+  Description: "¿Quieres vincular tu cuenta existente?"
+  LinkButtonText: Vincular
+  OtherButtonText: Otras opciones
+
 LinkingUsersDone:
   Title: Vinculación de usuario
   Description: usuario vinculado con éxito.
@@ -355,6 +379,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   
 Footer:
   PoweredBy: Powered By
@@ -457,6 +484,7 @@ Errors:
       NoExternalUserData: No se recibieron datos del usuario externo
       CreationNotAllowed: La creación de un nuevo usuario no está permitida para este proveedor
       LinkingNotAllowed: La vinculación de un usuario no está permitida para este proveedor
+      NoOptionAllowed: Ni la creación ni la vinculación están permitidas en este proveedor. Póngase en contacto con su administrador.
     GrantRequired: El inicio de sesión no es posible. Se requiere que el usuario tenga al menos una concesión sobre la aplicación. Por favor contacta con tu administrador.
     ProjectRequired: El inicio de sesión no es posible. La organización del usuario debe tener el acceso concedido para el proyecto. Por favor contacta con tu administrador.
   IdentityProvider:

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -54,6 +54,7 @@ func TestSession_FetchUser(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
+		opts   []ProviderOpts
 		want   want
 	}{
 		{
@@ -199,6 +200,70 @@ func TestSession_FetchUser(t *testing.T) {
 			},
 		},
 		{
+			name: "use ID token",
+			fields: fields{
+				name:         "oidc",
+				issuer:       "https://issuer.com",
+				clientID:     "clientID",
+				clientSecret: "clientSecret",
+				redirectURI:  "redirectURI",
+				scopes:       []string{"openid"},
+				userMapper:   DefaultMapper,
+				httpMock: func(issuer string) {
+					gock.New(issuer).
+						Get(oidc.DiscoveryEndpoint).
+						Reply(200).
+						JSON(&oidc.DiscoveryConfiguration{
+							Issuer:                issuer,
+							AuthorizationEndpoint: issuer + "/authorize",
+							TokenEndpoint:         issuer + "/token",
+							UserinfoEndpoint:      issuer + "/userinfo",
+						})
+				},
+				authURL: "https://issuer.com/authorize?client_id=clientID&redirect_uri=redirectURI&response_type=code&scope=openid&state=testState",
+				tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "accessToken",
+						TokenType:   oidc.BearerToken,
+					},
+					IDTokenClaims: func() *oidc.IDTokenClaims {
+						claims := oidc.NewIDTokenClaims(
+							"https://issuer.com",
+							"sub",
+							[]string{"clientID"},
+							time.Now().Add(1*time.Hour),
+							time.Now().Add(-1*time.Second),
+							"nonce",
+							"",
+							nil,
+							"clientID",
+							0,
+						)
+						claims.SetUserInfo(userinfo())
+						return claims
+					}(),
+				},
+			},
+			opts: []ProviderOpts{
+				WithIDTokenMapping(),
+			},
+			want: want{
+				id:                "sub",
+				firstName:         "firstname",
+				lastName:          "lastname",
+				displayName:       "firstname lastname",
+				nickName:          "nickname",
+				preferredUsername: "username",
+				email:             "email",
+				isEmailVerified:   true,
+				phone:             "phone",
+				isPhoneVerified:   true,
+				preferredLanguage: language.English,
+				avatarURL:         "picture",
+				profile:           "profile",
+			},
+		},
+		{
 			name: "successful fetch with token exchange",
 			fields: fields{
 				name:         "oidc",
@@ -260,7 +325,7 @@ func TestSession_FetchUser(t *testing.T) {
 			tt.fields.httpMock(tt.fields.issuer)
 			a := assert.New(t)
 
-			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper)
+			provider, err := New(tt.fields.name, tt.fields.issuer, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.userMapper, tt.opts...)
 			require.NoError(t, err)
 
 			session := &Session{
@@ -275,7 +340,7 @@ func TestSession_FetchUser(t *testing.T) {
 				a.Fail("invalid error", "expected %v, got %v", tt.want.err, err)
 			}
 			if tt.want.err == nil {
-				a.NoError(err)
+				require.NoError(t, err)
 				a.Equal(tt.want.id, user.GetID())
 				a.Equal(tt.want.firstName, user.GetFirstName())
 				a.Equal(tt.want.lastName, user.GetLastName())

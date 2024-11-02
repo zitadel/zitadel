@@ -185,6 +185,7 @@ const (
 	LoginKeyPasswordChange                        = "PasswordChange."
 	LoginKeyPasswordChangeTitle                   = LoginKeyPasswordChange + "Title"
 	LoginKeyPasswordChangeDescription             = LoginKeyPasswordChange + "Description"
+	LoginKeyPasswordChangeExpiredDescription      = LoginKeyPasswordChange + "ExpiredDescription"
 	LoginKeyPasswordChangeOldPasswordLabel        = LoginKeyPasswordChange + "OldPasswordLabel"
 	LoginKeyPasswordChangeNewPasswordLabel        = LoginKeyPasswordChange + "NewPasswordLabel"
 	LoginKeyPasswordChangeNewPasswordConfirmLabel = LoginKeyPasswordChange + "NewPasswordConfirmLabel"
@@ -522,6 +523,7 @@ type PasswordlessScreenText struct {
 type PasswordChangeScreenText struct {
 	Title                   string
 	Description             string
+	ExpiredDescription      string
 	OldPasswordLabel        string
 	NewPasswordLabel        string
 	NewPasswordConfirmLabel string

@@ -18,11 +18,12 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
+
 	human, err := AddUserRequestToAddHuman(req)
 	if err != nil {
 		return nil, err
@@ -44,14 +45,6 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	if username == "" {
 		username = req.GetEmail().GetEmail()
 	}
-	var urlTemplate string
-	if req.GetEmail().GetSendCode() != nil {
-		urlTemplate = req.GetEmail().GetSendCode().GetUrlTemplate()
-		// test the template execution so the async notification will not fail because of it and the user won't realize
-		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
-			return nil, err
-		}
-	}
 	passwordChangeRequired := req.GetPassword().GetChangeRequired() || req.GetHashedPassword().GetChangeRequired()
 	metadata := make([]*command.AddMetadataEntry, len(req.Metadata))
 	for i, metadataEntry := range req.Metadata {
@@ -68,6 +61,10 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			DisplayName:   link.GetUserName(),
 		}
 	}
+	email, err := addUserRequestEmailToCommand(req.GetEmail())
+	if err != nil {
+		return nil, err
+	}
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
@@ -75,12 +72,7 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		LastName:    req.GetProfile().GetFamilyName(),
 		NickName:    req.GetProfile().GetNickName(),
 		DisplayName: req.GetProfile().GetDisplayName(),
-		Email: command.Email{
-			Address:     domain.EmailAddress(req.GetEmail().GetEmail()),
-			Verified:    req.GetEmail().GetIsVerified(),
-			ReturnCode:  req.GetEmail().GetReturnCode() != nil,
-			URLTemplate: urlTemplate,
-		},
+		Email:       email,
 		Phone: command.Phone{
 			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
 			Verified:   req.GetPhone().GetIsVerified(),
@@ -95,7 +87,27 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		Register:               false,
 		Metadata:               metadata,
 		Links:                  links,
+		TOTPSecret:             req.GetTotpSecret(),
 	}, nil
+}
+
+func addUserRequestEmailToCommand(email *user.SetHumanEmail) (command.Email, error) {
+	address := domain.EmailAddress(email.GetEmail())
+	switch v := email.GetVerification().(type) {
+	case *user.SetHumanEmail_ReturnCode:
+		return command.Email{Address: address, ReturnCode: true}, nil
+	case *user.SetHumanEmail_SendCode:
+		urlTemplate := v.SendCode.GetUrlTemplate()
+		// test the template execution so the async notification will not fail because of it and the user won't realize
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, "userID", "code", "orgID"); err != nil {
+			return command.Email{}, err
+		}
+		return command.Email{Address: address, URLTemplate: urlTemplate}, nil
+	case *user.SetHumanEmail_IsVerified:
+		return command.Email{Address: address, Verified: v.IsVerified, NoEmailVerification: true}, nil
+	default:
+		return command.Email{Address: address}, nil
+	}
 }
 
 func genderToDomain(gender user.Gender) domain.Gender {
@@ -249,49 +261,13 @@ func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
 	if password == nil {
 		return nil
 	}
-	var changeRequired bool
-	var passwordStr *string
-	if password.GetPassword() != nil {
-		passwordStr = &password.GetPassword().Password
-		changeRequired = password.GetPassword().GetChangeRequired()
-	}
-	var hash *string
-	if password.GetHashedPassword() != nil {
-		hash = &password.GetHashedPassword().Hash
-		changeRequired = password.GetHashedPassword().GetChangeRequired()
-	}
-	var code *string
-	if password.GetVerificationCode() != "" {
-		codeT := password.GetVerificationCode()
-		code = &codeT
-	}
-	var oldPassword *string
-	if password.GetCurrentPassword() != "" {
-		oldPasswordT := password.GetCurrentPassword()
-		oldPassword = &oldPasswordT
-	}
 	return &command.Password{
-		PasswordCode:        code,
-		OldPassword:         oldPassword,
-		Password:            passwordStr,
-		EncodedPasswordHash: hash,
-		ChangeRequired:      changeRequired,
+		PasswordCode:        password.GetVerificationCode(),
+		OldPassword:         password.GetCurrentPassword(),
+		Password:            password.GetPassword().GetPassword(),
+		EncodedPasswordHash: password.GetHashedPassword().GetHash(),
+		ChangeRequired:      password.GetPassword().GetChangeRequired() || password.GetHashedPassword().GetChangeRequired(),
 	}
-}
-
-func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
-	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &command.AddLink{
-		IDPID:         req.GetIdpLink().GetIdpId(),
-		DisplayName:   req.GetIdpLink().GetUserName(),
-		IDPExternalID: req.GetIdpLink().GetUserId(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &user.AddIDPLinkResponse{
-		Details: object.DomainToDetailsPb(details),
-	}, nil
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
@@ -392,7 +368,7 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.Star
 }
 
 func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -416,7 +392,7 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetCtxData(ctx).OrgID)
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -455,7 +431,7 @@ func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUse
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}
-	links, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	links, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, nil)
 	if err != nil {
 		return "", err
 	}
@@ -495,7 +471,7 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 }
 
 func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), authz.GetCtxData(ctx).OrgID)
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -503,7 +479,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-nme4gszsvx", "Errors.Intent.NotSucceeded")
 	}
 	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }
@@ -611,7 +587,7 @@ func (s *Server) checkIntentToken(token string, intentID string) error {
 }
 
 func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.ListAuthenticationMethodTypesRequest) (*user.ListAuthenticationMethodTypesResponse, error) {
-	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId())
+	authMethods, err := s.query.ListUserAuthMethodTypes(ctx, req.GetUserId(), true, req.GetDomainQuery().GetIncludeWithoutDomain(), req.GetDomainQuery().GetDomain())
 	if err != nil {
 		return nil, err
 	}
@@ -649,5 +625,56 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	default:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
+	}
+}
+
+func (s *Server) CreateInviteCode(ctx context.Context, req *user.CreateInviteCodeRequest) (*user.CreateInviteCodeResponse, error) {
+	invite, err := createInviteCodeRequestToCommand(req)
+	if err != nil {
+		return nil, err
+	}
+	details, code, err := s.command.CreateInviteCode(ctx, invite)
+	if err != nil {
+		return nil, err
+	}
+	return &user.CreateInviteCodeResponse{
+		Details:    object.DomainToDetailsPb(details),
+		InviteCode: code,
+	}, nil
+}
+
+func (s *Server) ResendInviteCode(ctx context.Context, req *user.ResendInviteCodeRequest) (*user.ResendInviteCodeResponse, error) {
+	details, err := s.command.ResendInviteCode(ctx, req.GetUserId(), "", "")
+	if err != nil {
+		return nil, err
+	}
+	return &user.ResendInviteCodeResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) VerifyInviteCode(ctx context.Context, req *user.VerifyInviteCodeRequest) (*user.VerifyInviteCodeResponse, error) {
+	details, err := s.command.VerifyInviteCode(ctx, req.GetUserId(), req.GetVerificationCode())
+	if err != nil {
+		return nil, err
+	}
+	return &user.VerifyInviteCodeResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*command.CreateUserInvite, error) {
+	switch v := req.GetVerification().(type) {
+	case *user.CreateInviteCodeRequest_SendCode:
+		urlTemplate := v.SendCode.GetUrlTemplate()
+		// test the template execution so the async notification will not fail because of it and the user won't realize
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
+			return nil, err
+		}
+		return &command.CreateUserInvite{UserID: req.GetUserId(), URLTemplate: urlTemplate, ApplicationName: v.SendCode.GetApplicationName()}, nil
+	case *user.CreateInviteCodeRequest_ReturnCode:
+		return &command.CreateUserInvite{UserID: req.GetUserId(), ReturnCode: true}, nil
+	default:
+		return &command.CreateUserInvite{UserID: req.GetUserId()}, nil
 	}
 }

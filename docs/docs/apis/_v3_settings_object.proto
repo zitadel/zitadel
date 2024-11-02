@@ -1,0 +1,193 @@
+syntax = "proto3";
+
+package zitadel.settings.object.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha;object";
+
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/duration.proto";
+
+import "zitadel/object/v3alpha/object.proto";
+
+message Details {
+  //sequence represents the order of events. It's always counting
+  //
+  // on read: the sequence of the last event reduced by the projection
+  //
+  // on manipulation: the timestamp of the event(s) added by the manipulation
+  uint64 sequence = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\"";
+    }
+  ];
+  //change_date is the timestamp when the object was changed
+  //
+  // on read: the timestamp of the last event reduced by the projection
+  //
+  // on manipulation: the timestamp of the event(s) added by the manipulation
+  google.protobuf.Timestamp change_date = 2;
+  //resource_owner represents the context an object belongs to
+  zitadel.object.v3alpha.Owner owner = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+
+message ResolvedBool {
+  bool value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "false";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  optional zitadel.object.v3alpha.Owner owner = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If the value is inherited, the value is inherited from this owner.";
+    }
+  ];
+}
+
+message SetBool {
+  oneof value {
+    bool set = 1;
+    bool reset = 2 [(validate.rules).bool = {
+      const: true
+    }];
+  }
+}
+
+message ResolvedString {
+  string value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"a resolved string\"";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  optional zitadel.object.v3alpha.Owner owner = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If the value is inherited, the value is inherited from this owner.";
+    }
+  ];
+}
+
+message SetString {
+  oneof value {
+    string set = 1 [
+      (validate.rules).string = {
+        max_len: 256
+      }
+    ];
+    bool reset = 2 [(validate.rules).bool = {
+      const: true
+    }];
+  }
+}
+
+message SetStringLong {
+  oneof value {
+    string set = 1 [
+      (validate.rules).string = {
+        max_len: 2048
+      }
+    ];
+    bool reset = 2 [(validate.rules).bool = {
+      const: true
+    }];
+  }
+}
+
+
+message SetStringShort {
+  oneof value {
+    string set = 1 [
+      (validate.rules).string = {
+        max_len: 64
+      }
+    ];
+    bool reset = 2 [(validate.rules).bool = {
+      const: true
+    }];
+  }
+}
+
+message Language {
+  string key = 1 [(validate.rules).string = {pattern: "^[a-z]{2}$"}];
+}
+
+message ResolvedStrings {
+  repeated string value = 1[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"a\", \"resolved\", \"list\", \"of\", \"strings\"]";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  optional zitadel.object.v3alpha.Owner owner = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If the value is inherited, the value is inherited from this owner.";
+    }
+  ];
+}
+
+message SetStrings {
+  oneof value {
+    SetStringsValue set = 1;
+    bool reset = 2 [(validate.rules).bool = {
+      const: true
+    }];
+  }
+}
+
+message SetStringsValue {
+  repeated string value = 1;
+}
+
+message ResolvedUInt64 {
+  uint64 value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "1000";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  optional zitadel.object.v3alpha.Owner owner = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If the value is inherited, the value is inherited from this owner.";
+    }
+  ];
+}
+
+message SetUInt64 {
+  oneof value {
+    uint64 set = 1;
+    bool reset = 2 [(validate.rules).bool = {
+      const: true
+    }];
+  }
+}
+
+
+message ResolvedDuration {
+  google.protobuf.Duration value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"5s\"";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  optional zitadel.object.v3alpha.Owner owner = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If the value is inherited, the value is inherited from this owner.";
+    }
+  ];
+}
+
+message SetDuration {
+  oneof value {
+    google.protobuf.Duration set = 1;
+    bool reset = 2 [(validate.rules).bool = {
+      const: true
+    }];
+  }
+}

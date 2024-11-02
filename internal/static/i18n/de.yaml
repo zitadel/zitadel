@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limits konnten nicht gefunden werden
     NoneSpecified: Keine Limits angegeben
+    Instance:
+      Blocked: Instanz ist blockiert
   Restrictions:
     NoneSpecified: Keine Restriktionen angegeben
     DefaultLanguageMustBeAllowed: Default Sprache muss erlaubt sein
@@ -51,14 +53,27 @@ Errors:
     NotFound: SMS Konfiguration nicht gefunden
     AlreadyActive: SMS Konfiguration ist bereits aktiviert
     AlreadyDeactivated: SMS Konfiguration ist bereits deaktiviert
+  SMTP:
+    NotEmailMessage: Die Nachricht ist nicht EmailMessage
+    RequiredAttributes: Betreff, Empfänger und Inhalt müssen festgelegt werden, aber einige oder alle davon sind leer
+    CouldNotSplit: Host und Port konnten für die Verbindung zu SMTP nicht getrennt werden
+    CouldNotDial: Es konnte keine Verbindung zum SMTP-Server hergestellt werden, Port überprüfen, Firewall-Probleme ...
+    CouldNotDialTLS: Es konnte keine Verbindung zum SMTP-Server über TLS hergestellt werden, überprüfen Sie den Port, Firewall-Probleme ...
+    CouldNotCreateClient: Der SMTP-Client konnte nicht erstellt werden
+    CouldNotStartTLS: TLS konnte nicht gestartet werden
+    CouldNotAuth: Die SMTP-Authentifizierung konnte nicht hinzugefügt werden. Überprüfen Sie, ob sowohl Ihr Benutzername als auch Ihr Passwort korrekt sind. Wenn sie korrekt sind, erfordert Ihr Anbieter möglicherweise eine Authentifizierungsmethode, die von ZITADEL nicht unterstützt wird
+    CouldNotSetSender: Absender konnte nicht eingestellt werden
+    CouldNotSetRecipient: Der Empfänger konnte nicht festgelegt werden
   SMTPConfig:
+    TestPassword: Passwort für Test nicht gefunden
     NotFound: SMTP Konfiguration nicht gefunden
     AlreadyExists: SMTP Konfiguration existiert bereits
+    AlreadyDeactivated: SMTP-Konfiguration bereits deaktiviert
     SenderAdressNotCustomDomain: Die Sender Adresse muss als Custom Domain auf der Instanz registriert sein.
+    TestEmailNotFound: E-Mail-Adresse für den Test nicht gefunden
   Notification:
     NoDomain: Keine Domäne für Nachricht gefunden
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Benutzer konnte nicht gefunden werden
     AlreadyExists: Benutzer existiert bereits
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
@@ -107,6 +122,7 @@ Errors:
       Key:
         NotFound: Maschinen Schlüssel nicht gefunden
         AlreadyExisting: Machine Schlüssel exisiert bereits
+        Invalid: Der öffentliche Schlüssel ist kein gültiger öffentlicher RSA-Schlüssel im PKIX-Format mit PEM-Kodierung
       Secret:
         NotExisting: Secret existiert nicht
         Invalid: Secret ist ungültig
@@ -126,13 +142,14 @@ Errors:
       NotFound: Code konnte nicht gefunden werden
       Expired: Code ist abgelaufen
       GeneratorAlgNotSupported: Generator Algorithmus wird nicht unterstützt
+      Invalid: Code ist nicht gültig
     Password:
       NotFound: Password nicht gefunden
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
       NotChanged: Das neue Passwort darf nicht mit deinem aktuellen Passwort übereinstimmen
-      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
+      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt. Siehe https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
@@ -325,7 +342,7 @@ Errors:
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
   IAM:
-    NotFound: Instanz nicht gefunden. Schau dir https://zitadel.com/docs/self-hosting/manage/custom-domain an
+    NotFound: Instanz nicht gefunden. Stelle sicher, dass Du die richtige Domain hast. Schau unter https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig
@@ -466,6 +483,7 @@ Errors:
     NotActive: Action ist nicht aktiv
     NotInactive: Action ist nicht inaktiv
     MaxAllowed: Keine weitere aktiven Actions mehr erlaubt
+    NotEnabled: Function "Action" ist nicht aktiviert
   Flow:
     FlowTypeMissing: FlowType fehlt
     Empty: Flow ist bereits leer
@@ -476,6 +494,8 @@ Errors:
     CloseRows: SQL Statement konnte nicht abgeschlossen werden
     SQLStatement: SQL Statement konnte nicht erstellt werden
     InvalidRequest: Anfrage ist ungültig
+    TooManyNestingLevels: Zu viele Abfrageverschachtelungsebenen (maximal 20)
+    LimitExceeded: Limit überschritten
   Quota:
     AlreadyExists: Das Kontingent existiert bereits für diese Einheit
     NotFound: Kontingent für diese Einheit nicht gefunden
@@ -510,6 +530,7 @@ Errors:
     IDPMissing: IDP ID fehlt im Request
     IDPInvalid: IDP ungültig für die Anfrage
     ResponseInvalid: IDP-Antwort ist ungültig
+    MissingSingleMappingAttribute: Enthält das Zuordnungsattribut nicht oder hat mehr als einen Wert
     SuccessURLMissing: Success URL fehlt im Request
     FailureURLMissing: Failure URL fehlt im Request
     StateMissing: State parameter fehlt im Request
@@ -532,6 +553,52 @@ Errors:
     NotExisting: Feature existiert nicht
     TypeNotSupported: Feature Typ wird nicht unterstützt
     InvalidValue: Ungültiger Wert für dieses Feature
+  Target:
+    Invalid: Ziel ist ungültig
+    NoTimeout: Ziel hat keinen Timeout
+    InvalidURL: Ziel hat eine ungültige URL
+    NotFound: Ziel nicht gefunden
+  Execution:
+    ConditionInvalid: Die Ausführungsbedingung ist ungültig
+    Invalid: Die Ausführung ist ungültig
+    NotFound: Ausführung nicht gefunden
+    IncludeNotFound: Einschließen nicht gefunden
+    NoTargets: Keine Ziele definiert
+    Failed: Ausführung fehlgeschlagen
+    ResponseIsNotValidJSON: Antwort ist kein gültiges JSON
+  UserSchema:
+    NotEnabled: Funktion Benutzerschema ist nicht aktiviert
+    Type:
+      Missing: Benutzerschematyp fehlt
+      AlreadyExists: Benutzerschematyp existiert bereits
+    Authenticator:
+      Invalid: Ungültiger Authentifizierungstyp
+    NotActive: Benutzerschema nicht aktiv
+    NotInactive: Benutzerschema nicht inaktiv
+    NotExists: Benutzerschema existiert nicht
+    ID:
+      Missing: BenutzerschemaID fehlt
+    Invalid: Benutzerschema ist ungültig
+    Data:
+      Invalid: Daten für Benutzerschema ungültig
+  TokenExchange:
+    FeatureDisabled: Die Token-Austauschfunktion ist für Ihre Instanz deaktiviert. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token fehlt
+      Invalid: Token ist ungültig
+      TypeMissing: Der Tokentyp fehlt
+      TypeNotAllowed: Der Tokentyp ist nicht zulässig
+      TypeNotSupported: Der Tokentyp wird nicht unterstützt
+      NotForAPI: Imitierte Token sind für die API nicht zulässig
+    Impersonation:
+      PolicyDisabled: Der Identitätswechsel ist in der Sicherheitsrichtlinie der Instanz deaktiviert
+  WebKey:
+    ActiveDelete: Aktiver Webschlüssel kann nicht gelöscht werden
+    Config: Ungültige Webschlüsselkonfiguration
+    Duplicate: Webschlüssel-ID nicht eindeutig
+    FeatureDisabled: Webschlüsselfunktion deaktiviert
+    NoActive: Kein aktiver Webschlüssel gefunden
+    NotFound: Webschlüssel nicht gefunden
 
 AggregateTypes:
   action: Action
@@ -543,8 +610,28 @@ AggregateTypes:
   usergrant: Benutzerberechtigung
   quota: Kontingent
   feature: Feature
+  target: Ziel
+  execution: Ausführung
+  user_schema: Benutzerschema
+  auth_request: Authentifizierungsanfrage
+  device_auth: Geräteauthentifizierung
+  idpintent: IDP Intent
+  limits: Limits
+  milestone: Milestone
+  oidc_session: OIDC Sitzung
+  restrictions: Restriktionen
+  system: System
+  session: Session
+  web_key: Webschlüssel
 
 EventTypes:
+  execution:
+    set: Ausführung gesetzt
+    removed: Ausführung gelöscht
+  target:
+    added: Ziel erstellt
+    changed: Ziel geändert
+    removed: Ziel gelöscht
   user:
     added: Benutzer hinzugefügt
     selfregistered: Benutzer hat sich selbst registriert
@@ -557,7 +644,9 @@ EventTypes:
         failed: Benutzerinitialisierung fehlgeschlagen
     token:
       added: Access Token ausgestellt
+      v2.added: Access Token ausgestellt
       removed: Access Token gelöscht
+    impersonated: Benutzer hat sich als Benutzer ausgegeben
     username:
       reserved: Benutzername reserviert
       released: Benutzername freigegeben
@@ -580,6 +669,7 @@ EventTypes:
         removed: Key entfernt
       secret:
         set: Secret gesetzt
+        updated: Geheimer Hash aktualisiert
         removed: Secret entfernt
         check:
           succeeded: Secret Überprüfung erfolgreich
@@ -597,6 +687,13 @@ EventTypes:
         check:
           succeeded: Benutzerinitialisierung erfolgreich
           failed: Benutzerinitialisierung fehlgeschlagen
+      invite:
+        code:
+          added: Einladungscode generiert
+          sent: Einladungscode gesendet
+        check:
+          succeeded: Einladungsprüfung erfolgreich
+          failed: Einladungsprüfung fehlgeschlagen
       username:
         reserved: Benutzername reserviert
         released: Benutzername freigegeben
@@ -955,6 +1052,14 @@ EventTypes:
             succeeded: OIDC Client Secret Validierung erfolgreich
             failed: OIDC Client Secret Validierung fehlgeschlagen
         key:
+          added: OIDC App Key wurde hinzugefügt
+          removed: OIDC App Key wurde gelöscht
+      api:
+        secret:
+          check:
+            succeeded: Überprüfung des API-Geheimnisses erfolgreich
+            failed: Die Überprüfung des API-Geheimnisses ist fehlgeschlagen
+        key:
           added: Applikations Schlüssel hinzugefügt
           removed: Applikations Schlüssel entfernt
       config:
@@ -966,11 +1071,13 @@ EventTypes:
           changed: OIDC Konfiguration geändert
           secret:
             changed: OIDC Client Secret geändert
+            updated: OIDC-Geheim-Hash aktualisiert
         api:
           added: API Konfiguration hinzugefügt
           changed: API Konfiguration geändert
           secret:
             changed: API Client Secret geändert
+            updated: API-Geheimnis-Hash aktualisiert
   policy:
     password:
       complexity:
@@ -1065,6 +1172,9 @@ EventTypes:
       config:
         added: SMTP Konfiguration hinzugefügt
         changed: SMTP Konfiguration geändert
+        activated: SMTP Konfiguration aktiviert
+        deactivated: SMTP Konfiguration deaktiviert
+        removed: SMTP Konfiguration entfernt
         password:
           changed: SMTP Konfigurations Passwort geändert
     sms:
@@ -1210,9 +1320,42 @@ EventTypes:
       config:
         added: SMTP Konfiguration hinzugefügt
         changed: SMTP Konfiguration geändert
+        activated: SMTP Konfiguration aktiviert
+        deactivated: SMTP Konfiguration deaktiviert
         password:
           changed: Passwort von SMTP Konfiguration geändert
         removed: SMTP Konfiguration gelöscht
+  user_schema:
+    created: Benutzerschema erstellt
+    updated: Benutzerschema geändert
+    deactivated: Benutzerschema deaktiviert
+    reactivated: Benutzerschema reaktiviert
+    deleted: Benutzerschema gelöscht
+    user:
+      created: Benutzer erstellt
+      updated: Benutzer aktualisiert
+      deleted: Benutzer gelöscht
+      email:
+        updated: E-Mail-Adresse geändert
+        verified: E-Mail-Adresse verifiziert
+        verification:
+          failed: E-Mail-Adressenverifizierung fehlgeschlagen
+        code:
+          added: E-Mail-Adressenverifizierungscode generiert
+          sent: E-Mail-Adressenverifizierungscode gesendet
+      phone:
+        updated: Telefonnummer geändert
+        verified: Telefonnummer verifiziert
+        verification:
+          failed: Telefonnummernverifizierung fehlgeschlagen
+        code:
+          added: Telefonnummernverifizierungscode generiert
+          sent: Telefonnummernverifizierungscode gesendet
+  web_key:
+    added: Web Key hinzugefügt
+    activated: Web Key aktiviert
+    deactivated: Web Key deaktiviert
+    removed: Web Key entfernen
 
 Application:
   OIDC:

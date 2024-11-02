@@ -126,6 +126,12 @@ func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 	}
 	ctx := setMemberContext(e.Aggregate())
 	userOwner, _, grantedOrg, err := getResourceOwners(ctx, p.es, e.Aggregate().InstanceID, e.UserID, e.Aggregate().ID, e.GrantID)
+	if userOwner == "" {
+		return nil, zerrors.ThrowNotFound(nil, "PROJ-cuvy6nu1tq", "Errors.NotFound")
+	}
+	if grantedOrg == "" {
+		return nil, zerrors.ThrowNotFound(nil, "PROJ-i178hq18k4", "Errors.NotFound")
+	}
 	if err != nil {
 		return nil, err
 	}

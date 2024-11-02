@@ -4,10 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -20,6 +19,7 @@ type HumanInitCodeWriteModel struct {
 	Code             *crypto.CryptoValue
 	CodeCreationDate time.Time
 	CodeExpiry       time.Duration
+	AuthRequestID    string
 
 	UserState domain.UserState
 }
@@ -51,6 +51,7 @@ func (wm *HumanInitCodeWriteModel) Reduce() error {
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
 			wm.CodeExpiry = e.Expiry
+			wm.AuthRequestID = e.AuthRequestID
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.Code = nil

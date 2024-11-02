@@ -30,6 +30,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 						org.AggregateType,
 						[]byte(`{
 						"maxPasswordAttempts": 10,
+						"maxOTPAttempts": 10,
 						"showLockOutFailures": true
 }`),
 					), org.LockoutPolicyAddedEventMapper),
@@ -41,13 +42,14 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.lockout_policies2 (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.lockout_policies3 (creation_date, change_date, sequence, id, state, max_password_attempts, max_otp_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"agg-id",
 								domain.PolicyStateActive,
+								uint64(10),
 								uint64(10),
 								true,
 								false,
@@ -69,6 +71,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 						org.AggregateType,
 						[]byte(`{
 						"maxPasswordAttempts": 10,
+						"maxOTPAttempts": 10,
 						"showLockOutFailures": true
 		}`),
 					), org.LockoutPolicyChangedEventMapper),
@@ -79,10 +82,11 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.lockout_policies2 SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.lockout_policies3 SET (change_date, sequence, max_password_attempts, max_otp_attempts, show_failure) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								uint64(10),
 								uint64(10),
 								true,
 								"agg-id",
@@ -110,7 +114,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.lockout_policies2 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.lockout_policies3 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -137,7 +141,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.lockout_policies2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.lockout_policies3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -156,6 +160,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 						instance.AggregateType,
 						[]byte(`{
 						"maxPasswordAttempts": 10,
+						"maxOTPAttempts": 10,
 						"showLockOutFailures": true
 					}`),
 					), instance.LockoutPolicyAddedEventMapper),
@@ -166,13 +171,14 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.lockout_policies2 (creation_date, change_date, sequence, id, state, max_password_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.lockout_policies3 (creation_date, change_date, sequence, id, state, max_password_attempts, max_otp_attempts, show_failure, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"agg-id",
 								domain.PolicyStateActive,
+								uint64(10),
 								uint64(10),
 								true,
 								true,
@@ -194,6 +200,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 						instance.AggregateType,
 						[]byte(`{
 						"maxPasswordAttempts": 10,
+						"maxOTPAttempts": 10,
 						"showLockOutFailures": true
 					}`),
 					), instance.LockoutPolicyChangedEventMapper),
@@ -204,10 +211,11 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.lockout_policies2 SET (change_date, sequence, max_password_attempts, show_failure) = ($1, $2, $3, $4) WHERE (id = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.lockout_policies3 SET (change_date, sequence, max_password_attempts, max_otp_attempts, show_failure) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								uint64(10),
 								uint64(10),
 								true,
 								"agg-id",
@@ -235,7 +243,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.lockout_policies2 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.lockout_policies3 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",

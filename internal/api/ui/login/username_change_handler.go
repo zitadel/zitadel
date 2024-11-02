@@ -27,7 +27,7 @@ func (l *Login) renderChangeUsername(w http.ResponseWriter, r *http.Request, aut
 
 func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
 	data := new(changeUsernameData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -141,12 +140,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								domain.OIDCVersionV1,
 								"consoleApplicationID",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -161,6 +155,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								time.Second*1,
 								[]string{"https://sub.test.ch"},
 								false,
+								"",
 							),
 						),
 					),
@@ -204,7 +199,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 				return
 			}
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -305,7 +300,7 @@ func TestCommandSide_SetPrimaryInstanceDomain(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -431,7 +426,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

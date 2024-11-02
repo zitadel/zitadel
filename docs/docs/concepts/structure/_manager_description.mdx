@@ -1,7 +1,12 @@
-ZITADEL Managers are Users who have permission to manage ZITADEL itself. This means that those users are allowed to login into your instance console and edit certain parts of the configuration.
-There are some different levels for managers.
+Managers are [human users or service users](/docs/concepts/structure/users) who have permission to manage resources within ZITADEL.
 
-- **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole Instance.
-- **Org Managers**: Managers in the Organization Level are able to manage everything within the granted Organization.
-- **Project Mangers**: In this level the user is able to manage a project.
-- **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
+Manager permissions can be assigned to different levels in ZITADEL:
+
+- **IAM Managers**: This is the highest level. Users with IAM Manager roles are able to manage the whole [Instance](/docs/concepts/structure/instance).
+- **Org Managers**: Managers in the Organization Level are able to view or manage everything, according to their permissions, within the granted [Organization](/docs/concepts/structure/organizations).
+- **Project Mangers**: In this level the user is able to manage a [project](/docs/concepts/structure/projects).
+- **Project Grant Manager**: The project grant manager is for [granted projects](/docs/concepts/structure/granted_projects) by another organization.
+
+Scope of the managers is restricted based on their level.
+That means a Manager, assigned to one organization, will only get access to resources and configurations of that organization.
+Only Managers on the instance level can view resources, such as users, across all organizations.

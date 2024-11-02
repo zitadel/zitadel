@@ -10,6 +10,7 @@ func ModelLockoutPolicyToPb(policy *query.LockoutPolicy) *policy_pb.LockoutPolic
 	return &policy_pb.LockoutPolicy{
 		IsDefault:           policy.IsDefault,
 		MaxPasswordAttempts: policy.MaxPasswordAttempts,
+		MaxOtpAttempts:      policy.MaxOTPAttempts,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,

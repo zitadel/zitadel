@@ -125,6 +125,16 @@
     }
   }
 
+  .jumptoproject-row {
+    display: flex;
+    justify-content: space-between;
+
+    .jumptoproject {
+      margin-top: 0.25rem;
+      display: block;
+    }
+  }
+
   .compliance {
     padding-bottom: 1rem;
     padding-top: 0.5rem;
@@ -294,8 +304,9 @@
   text-decoration: none;
   color: inherit;
   font-family: inherit;
+  text-decoration: underline;
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.download-button {
+  margin-left: 1rem;
 }

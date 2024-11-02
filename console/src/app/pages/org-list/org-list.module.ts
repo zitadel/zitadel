@@ -9,5 +9,6 @@ import { OrgListComponent } from './org-list.component';
 @NgModule({
   declarations: [OrgListComponent],
   imports: [CommonModule, OrgListRoutingModule, OrgTableModule, TranslateModule],
+  exports: [OrgListComponent],
 })
 export default class OrgListModule {}

@@ -8,16 +8,7 @@ import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
 })
-export class FooterComponent implements OnInit {
-  public policy?: PrivacyPolicy.AsObject;
+export class FooterComponent {
   public faXTwitter = faXTwitter;
   constructor(public authService: GrpcAuthService) {}
-
-  ngOnInit(): void {
-    this.authService.getMyPrivacyPolicy().then((policyResp) => {
-      if (policyResp.policy) {
-        this.policy = policyResp.policy;
-      }
-    });
-  }
 }

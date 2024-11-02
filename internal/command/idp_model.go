@@ -108,7 +108,7 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	name,
 	clientID,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	authorizationEndpoint,
 	tokenEndpoint,
 	userEndpoint,
@@ -278,7 +278,7 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	issuer,
 	clientID,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	idTokenMapping bool,
 	options idp.Options,
@@ -636,7 +636,7 @@ func (wm *AzureADIDPWriteModel) NewChanges(
 	name string,
 	clientID string,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	tenant string,
 	isEmailVerified bool,
@@ -772,7 +772,7 @@ func (wm *GitHubIDPWriteModel) NewChanges(
 	name,
 	clientID,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) ([]idp.GitHubIDPChanges, error) {
@@ -904,7 +904,7 @@ func (wm *GitHubEnterpriseIDPWriteModel) NewChanges(
 	name,
 	clientID string,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	authorizationEndpoint,
 	tokenEndpoint,
 	userEndpoint string,
@@ -1037,7 +1037,7 @@ func (wm *GitLabIDPWriteModel) NewChanges(
 	name,
 	clientID,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) ([]idp.GitLabIDPChanges, error) {
@@ -1161,7 +1161,7 @@ func (wm *GitLabSelfHostedIDPWriteModel) NewChanges(
 	issuer string,
 	clientID string,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) ([]idp.GitLabSelfHostedIDPChanges, error) {
@@ -1285,7 +1285,7 @@ func (wm *GoogleIDPWriteModel) NewChanges(
 	name string,
 	clientID string,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) ([]idp.GoogleIDPChanges, error) {
@@ -1460,7 +1460,7 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 	userObjectClasses []string,
 	userFilters []string,
 	timeout time.Duration,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
 ) ([]idp.LDAPIDPChanges, error) {
@@ -1653,7 +1653,7 @@ func (wm *AppleIDPWriteModel) NewChanges(
 	teamID string,
 	keyID string,
 	privateKey []byte,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
 	options idp.Options,
 ) ([]idp.AppleIDPChanges, error) {
@@ -1726,13 +1726,15 @@ func (wm *AppleIDPWriteModel) GetProviderOptions() idp.Options {
 type SAMLIDPWriteModel struct {
 	eventstore.WriteModel
 
-	Name              string
-	ID                string
-	Metadata          []byte
-	Key               *crypto.CryptoValue
-	Certificate       []byte
-	Binding           string
-	WithSignedRequest bool
+	Name                          string
+	ID                            string
+	Metadata                      []byte
+	Key                           *crypto.CryptoValue
+	Certificate                   []byte
+	Binding                       string
+	WithSignedRequest             bool
+	NameIDFormat                  *domain.SAMLNameIDFormat
+	TransientMappingAttributeName string
 	idp.Options
 
 	State domain.IDPState
@@ -1759,6 +1761,8 @@ func (wm *SAMLIDPWriteModel) reduceAddedEvent(e *idp.SAMLIDPAddedEvent) {
 	wm.Certificate = e.Certificate
 	wm.Binding = e.Binding
 	wm.WithSignedRequest = e.WithSignedRequest
+	wm.NameIDFormat = e.NameIDFormat
+	wm.TransientMappingAttributeName = e.TransientMappingAttributeName
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -1782,6 +1786,12 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 	if e.WithSignedRequest != nil {
 		wm.WithSignedRequest = *e.WithSignedRequest
 	}
+	if e.NameIDFormat != nil {
+		wm.NameIDFormat = e.NameIDFormat
+	}
+	if e.TransientMappingAttributeName != nil {
+		wm.TransientMappingAttributeName = *e.TransientMappingAttributeName
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -1790,9 +1800,11 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	metadata,
 	key,
 	certificate []byte,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
+	nameIDFormat *domain.SAMLNameIDFormat,
+	transientMappingAttributeName string,
 	options idp.Options,
 ) ([]idp.SAMLIDPChanges, error) {
 	changes := make([]idp.SAMLIDPChanges, 0)
@@ -1817,6 +1829,12 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	}
 	if wm.WithSignedRequest != withSignedRequest {
 		changes = append(changes, idp.ChangeSAMLWithSignedRequest(withSignedRequest))
+	}
+	if wm.NameIDFormat != nameIDFormat {
+		changes = append(changes, idp.ChangeSAMLNameIDFormat(nameIDFormat))
+	}
+	if wm.TransientMappingAttributeName != transientMappingAttributeName {
+		changes = append(changes, idp.ChangeSAMLTransientMappingAttributeName(transientMappingAttributeName))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -1849,6 +1867,12 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	}
 	if wm.Binding != "" {
 		opts = append(opts, saml2.WithBinding(wm.Binding))
+	}
+	if wm.NameIDFormat != nil {
+		opts = append(opts, saml2.WithNameIDFormat(*wm.NameIDFormat))
+	}
+	if wm.TransientMappingAttributeName != "" {
+		opts = append(opts, saml2.WithTransientMappingAttributeName(wm.TransientMappingAttributeName))
 	}
 	opts = append(opts, saml2.WithCustomRequestTracker(
 		requesttracker.New(

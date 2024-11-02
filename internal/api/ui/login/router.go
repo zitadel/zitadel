@@ -30,6 +30,7 @@ const (
 	EndpointChangePassword                = "/password/change"
 	EndpointPasswordReset                 = "/password/reset"
 	EndpointInitUser                      = "/user/init"
+	EndpointInviteUser                    = "/user/invite"
 	EndpointMFAVerify                     = "/mfa/verify"
 	EndpointMFAPrompt                     = "/mfa/prompt"
 	EndpointMFAInitVerify                 = "/mfa/init/verify"
@@ -53,6 +54,8 @@ const (
 
 	EndpointDeviceAuth       = "/device"
 	EndpointDeviceAuthAction = "/device/{action}"
+
+	EndpointLinkingUserPrompt = "/link/user"
 )
 
 var (
@@ -92,6 +95,8 @@ func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router 
 	router.HandleFunc(EndpointPasswordReset, login.handlePasswordReset).Methods(http.MethodGet)
 	router.HandleFunc(EndpointInitUser, login.handleInitUser).Methods(http.MethodGet)
 	router.HandleFunc(EndpointInitUser, login.handleInitUserCheck).Methods(http.MethodPost)
+	router.HandleFunc(EndpointInviteUser, login.handleInviteUser).Methods(http.MethodGet)
+	router.HandleFunc(EndpointInviteUser, login.handleInviteUserCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMFAVerify, login.handleMFAVerify).Methods(http.MethodPost)
 	router.HandleFunc(EndpointMFAPrompt, login.handleMFAPromptSelection).Methods(http.MethodGet)
 	router.HandleFunc(EndpointMFAPrompt, login.handleMFAPrompt).Methods(http.MethodPost)

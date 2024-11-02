@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -19,20 +20,14 @@ type CurrentProjectionState struct {
 	dbClient *database.DB
 }
 
-func (mig *CurrentProjectionState) Execute(ctx context.Context) error {
-	migrations, err := currentProjectionState.ReadDir("15/" + mig.dbClient.Type())
+func (mig *CurrentProjectionState) Execute(ctx context.Context, _ eventstore.Event) error {
+	statements, err := readStatements(currentProjectionState, "15", mig.dbClient.Type())
 	if err != nil {
 		return err
 	}
-	for _, migration := range migrations {
-		stmt, err := readStmt(currentProjectionState, "15", mig.dbClient.Type(), migration.Name())
-		if err != nil {
-			return err
-		}
-
-		logging.WithFields("file", migration.Name(), "migration", mig.String()).Info("execute statement")
-
-		_, err = mig.dbClient.ExecContext(ctx, stmt)
+	for _, stmt := range statements {
+		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		_, err = mig.dbClient.ExecContext(ctx, stmt.query)
 		if err != nil {
 			return err
 		}

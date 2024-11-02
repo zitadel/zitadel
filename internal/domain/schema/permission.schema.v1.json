@@ -1,0 +1,28 @@
+{
+  "$id": "urn:zitadel:schema:permission-schema:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "urn:zitadel:schema:property-permission": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[rw]$"
+        }
+      ]
+    }
+  },
+  "properties": {
+    "urn:zitadel:schema:permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "owner": {
+          "$ref": "#/$defs/urn:zitadel:schema:property-permission"
+        },
+        "self": {
+          "$ref": "#/$defs/urn:zitadel:schema:property-permission"
+        }
+      }
+    }
+  }
+}

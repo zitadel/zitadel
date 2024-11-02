@@ -10,21 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
-	action_repo "github.com/zitadel/zitadel/internal/repository/action"
-	"github.com/zitadel/zitadel/internal/repository/authrequest"
-	"github.com/zitadel/zitadel/internal/repository/deviceauth"
-	"github.com/zitadel/zitadel/internal/repository/feature"
-	"github.com/zitadel/zitadel/internal/repository/idpintent"
-	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
-	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
-	"github.com/zitadel/zitadel/internal/repository/limits"
-	"github.com/zitadel/zitadel/internal/repository/oidcsession"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
-	quota_repo "github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/internal/repository/session"
-	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
-	"github.com/zitadel/zitadel/internal/repository/usergrant"
 )
 
 type expect func(mockRepository *mock.MockRepository)
@@ -41,21 +26,6 @@ func expectEventstore(expects ...expect) func(*testing.T) *eventstore.Eventstore
 				Pusher:  m.MockPusher,
 			},
 		)
-		iam_repo.RegisterEventMappers(es)
-		org.RegisterEventMappers(es)
-		usr_repo.RegisterEventMappers(es)
-		proj_repo.RegisterEventMappers(es)
-		usergrant.RegisterEventMappers(es)
-		key_repo.RegisterEventMappers(es)
-		action_repo.RegisterEventMappers(es)
-		session.RegisterEventMappers(es)
-		idpintent.RegisterEventMappers(es)
-		authrequest.RegisterEventMappers(es)
-		oidcsession.RegisterEventMappers(es)
-		quota_repo.RegisterEventMappers(es)
-		limits.RegisterEventMappers(es)
-		feature.RegisterEventMappers(es)
-		deviceauth.RegisterEventMappers(es)
 		return es
 	}
 }

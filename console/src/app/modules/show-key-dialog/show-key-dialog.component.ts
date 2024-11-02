@@ -11,6 +11,7 @@ import { InfoSectionType } from '../info-section/info-section.component';
 })
 export class ShowKeyDialogComponent {
   public keyResponse!: AddMachineKeyResponse.AsObject | AddAppKeyResponse.AsObject;
+  public expirationDate: string = '';
   public InfoSectionType: any = InfoSectionType;
 
   constructor(
@@ -18,6 +19,10 @@ export class ShowKeyDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
     this.keyResponse = data.key;
+    if (this.keyResponse.keyDetails) {
+      const keyDetails: { expirationDate: string } = JSON.parse(atob(this.keyResponse.keyDetails.toString()));
+      this.expirationDate = keyDetails.expirationDate;
+    }
   }
 
   public saveFile(): void {

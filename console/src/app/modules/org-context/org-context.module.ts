@@ -12,11 +12,13 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
 import { InputModule } from '../input/input.module';
 import { OrgContextComponent } from './org-context.component';
+import { ScrollableDirective } from 'src/app/directives/scrollable/scrollable.directive';
 
 @NgModule({
   declarations: [OrgContextComponent],
   imports: [
     CommonModule,
+    ScrollableDirective,
     FormsModule,
     A11yModule,
     ReactiveFormsModule,

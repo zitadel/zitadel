@@ -12,38 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDefaultLabelPolicy(
-	ctx context.Context,
-	primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string,
-	hideLoginNameSuffix, errorMsgPopup, disableWatermark bool, themeMode domain.LabelPolicyThemeMode,
-) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
-		prepareAddDefaultLabelPolicy(
-			instanceAgg,
-			primaryColor,
-			backgroundColor,
-			warnColor,
-			fontColor,
-			primaryColorDark,
-			backgroundColorDark,
-			warnColorDark,
-			fontColorDark,
-			hideLoginNameSuffix,
-			errorMsgPopup,
-			disableWatermark,
-			themeMode,
-		))
-	if err != nil {
-		return nil, err
-	}
-	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return pushedEventsToObjectDetails(pushedEvents), nil
-}
-
 func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
@@ -373,6 +341,8 @@ func (c *Commands) getDefaultLabelPolicy(ctx context.Context) (*domain.LabelPoli
 	return policy, nil
 }
 
+// prepareAddDefaultLabelPolicy adds a default label policy, if none exists prior, and activates it directly
+// this functions is only used on instance setup so the policy can be activated directly
 func prepareAddDefaultLabelPolicy(
 	a *instance.Aggregate,
 	primaryColor,
@@ -417,6 +387,7 @@ func prepareAddDefaultLabelPolicy(
 					disableWatermark,
 					themeMode,
 				),
+				instance.NewLabelPolicyActivatedEvent(ctx, &a.Aggregate),
 			}, nil
 		}, nil
 	}

@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/crewjam/saml"
+	"github.com/muhlemmer/gu"
 
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -469,24 +470,36 @@ func updateAppleProviderToCommand(req *admin_pb.UpdateAppleProviderRequest) comm
 }
 
 func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) command.SAMLProvider {
+	var nameIDFormat *domain.SAMLNameIDFormat
+	if req.NameIdFormat != nil {
+		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
+	}
 	return command.SAMLProvider{
-		Name:              req.Name,
-		Metadata:          req.GetMetadataXml(),
-		MetadataURL:       req.GetMetadataUrl(),
-		Binding:           bindingToCommand(req.Binding),
-		WithSignedRequest: req.WithSignedRequest,
-		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                          req.Name,
+		Metadata:                      req.GetMetadataXml(),
+		MetadataURL:                   req.GetMetadataUrl(),
+		Binding:                       bindingToCommand(req.Binding),
+		WithSignedRequest:             req.WithSignedRequest,
+		NameIDFormat:                  nameIDFormat,
+		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) command.SAMLProvider {
+	var nameIDFormat *domain.SAMLNameIDFormat
+	if req.NameIdFormat != nil {
+		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
+	}
 	return command.SAMLProvider{
-		Name:              req.Name,
-		Metadata:          req.GetMetadataXml(),
-		MetadataURL:       req.GetMetadataUrl(),
-		Binding:           bindingToCommand(req.Binding),
-		WithSignedRequest: req.WithSignedRequest,
-		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                          req.Name,
+		Metadata:                      req.GetMetadataXml(),
+		MetadataURL:                   req.GetMetadataUrl(),
+		Binding:                       bindingToCommand(req.Binding),
+		WithSignedRequest:             req.WithSignedRequest,
+		NameIDFormat:                  nameIDFormat,
+		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -27,10 +26,13 @@ type PrivacyPolicy struct {
 	ResourceOwner string
 	State         domain.PolicyState
 
-	TOSLink      string
-	PrivacyLink  string
-	HelpLink     string
-	SupportEmail domain.EmailAddress
+	TOSLink        string
+	PrivacyLink    string
+	HelpLink       string
+	SupportEmail   domain.EmailAddress
+	DocsLink       string
+	CustomLink     string
+	CustomLinkText string
 
 	IsDefault bool
 }
@@ -90,6 +92,18 @@ var (
 	}
 	PrivacyColOwnerRemoved = Column{
 		name:  projection.PrivacyPolicyOwnerRemovedCol,
+		table: privacyTable,
+	}
+	PrivacyColDocsLink = Column{
+		name:  projection.PrivacyPolicyDocsLinkCol,
+		table: privacyTable,
+	}
+	PrivacyColCustomLink = Column{
+		name:  projection.PrivacyPolicyCustomLinkCol,
+		table: privacyTable,
+	}
+	PrivacyColCustomLinkText = Column{
+		name:  projection.PrivacyPolicyCustomLinkTextCol,
 		table: privacyTable,
 	}
 )
@@ -169,6 +183,9 @@ func preparePrivacyPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 			PrivacyColTOSLink.identifier(),
 			PrivacyColHelpLink.identifier(),
 			PrivacyColSupportEmail.identifier(),
+			PrivacyColDocsLink.identifier(),
+			PrivacyColCustomLink.identifier(),
+			PrivacyColCustomLinkText.identifier(),
 			PrivacyColIsDefault.identifier(),
 			PrivacyColState.identifier(),
 		).
@@ -186,6 +203,9 @@ func preparePrivacyPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 				&policy.TOSLink,
 				&policy.HelpLink,
 				&policy.SupportEmail,
+				&policy.DocsLink,
+				&policy.CustomLink,
+				&policy.CustomLinkText,
 				&policy.IsDefault,
 				&policy.State,
 			)
@@ -201,10 +221,13 @@ func preparePrivacyPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 
 func (p *PrivacyPolicy) ToDomain() *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		TOSLink:      p.TOSLink,
-		PrivacyLink:  p.PrivacyLink,
-		HelpLink:     p.HelpLink,
-		SupportEmail: p.SupportEmail,
-		Default:      p.IsDefault,
+		TOSLink:        p.TOSLink,
+		PrivacyLink:    p.PrivacyLink,
+		HelpLink:       p.HelpLink,
+		SupportEmail:   p.SupportEmail,
+		Default:        p.IsDefault,
+		DocsLink:       p.DocsLink,
+		CustomLink:     p.CustomLink,
+		CustomLinkText: p.CustomLinkText,
 	}
 }

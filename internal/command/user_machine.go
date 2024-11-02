@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -45,6 +46,9 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
+
 			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
 			if err != nil {
 				return nil, err
@@ -63,7 +67,10 @@ func AddMachineCommand(a *user.Aggregate, machine *Machine) preparation.Validati
 	}
 }
 
-func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (*domain.ObjectDetails, error) {
+func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if machine.AggregateID == "" {
 		userID, err := c.idGenerator.Next()
 		if err != nil {
@@ -140,7 +147,10 @@ func changeMachineCommand(a *user.Aggregate, machine *Machine) preparation.Valid
 	}
 }
 
-func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, filter preparation.FilterToQueryReducer) (*MachineWriteModel, error) {
+func getMachineWriteModel(ctx context.Context, userID, resourceOwner string, filter preparation.FilterToQueryReducer) (_ *MachineWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	writeModel := NewMachineWriteModel(userID, resourceOwner)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {

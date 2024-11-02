@@ -34,7 +34,7 @@ func (l *Login) renderPassword(w http.ResponseWriter, r *http.Request, authReq *
 
 func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(passwordFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

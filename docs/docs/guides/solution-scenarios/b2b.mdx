@@ -1,5 +1,5 @@
 ---
-title: ZITADEL for B2B Scenarios
+title: Authentication and authorization in multi-tenancy B2B scenarios
 sidebar_label: B2B
 ---
 
@@ -8,8 +8,8 @@ import { B2B } from "../../../src/components/b2b";
 ## Business to Business
 
 B2B describes the situation where an organization interacts with other organizations.
-This **multiple organization architecture** usually adds some form of complexity to an Identity and Access Management System.
-In ZITADEL a B2B organization represents a business partner or partner who typically has its own branding and has different access settings like an additional federated login for its users.
+This **multi-tenancy architecture** usually adds some form of complexity to an Identity and Access Management System.
+In ZITADEL an [organization](/docs/concepts/structure/organizations) can represent a business partner or partner who typically has its own branding and has different access settings like an additional federated login for its users.
 
 B2B can be a simple scenario where an organization only shares one of its projects with another organization or have a more complex case where an organization is offering a portal application to all its partners with included (self)administration.
 
@@ -41,9 +41,9 @@ In order to define the need of the **Portal Application** some planning consider
 
 ### Login
 
-You can decide whether a organization is preselected for the login or if the user is redirected to the default login screen. You can send the user to a specific organization by defining the organization in a custom scope. (primary domain)
-Settings to the branding or the login options of the organization can be made from the organization section in [Console](https://{your_domain}.zitadel.cloud/ui/console/org).
-The behaviour of the login branding can be set in your projects detail page. You can choose the branding of the selected organization, the user resource owner, or the projects resource owner.
+You can decide whether a organization is preselected for the login or if the user is redirected to the default login screen. Using OpenID Connect, you can send the user to a specific organization by defining the organization in a [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) (primary domain).
+Settings to the branding or the login options of the organization can be made from the organization section in [Console](/docs/concepts/features/console).
+The behavior of the login branding can be set in your projects detail page. You can choose the branding of the selected organization, the user resource owner, or the projects resource owner.
 
 ### Organizations
 
@@ -85,4 +85,4 @@ In such a case with this high potential of scalability where user counts can gro
 
 - [Creating an organization](../manage/console/organizations)
 - [Organization Branding](../manage/customize/branding)
-- [Authorization](../integrate/oauth-recommended-flows)
+- [Authorization](../integrate/login/oidc/oauth-recommended-flows)

@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -151,6 +152,7 @@ type HumanPhoneCodeAddedEvent struct {
 	Code              *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry            time.Duration       `json:"expiry,omitempty"`
 	CodeReturned      bool                `json:"code_returned,omitempty"`
+	GeneratorID       string              `json:"generatorId,omitempty"`
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
 }
 
@@ -171,15 +173,18 @@ func NewHumanPhoneCodeAddedEvent(
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
+	generatorID string,
 ) *HumanPhoneCodeAddedEvent {
-	return NewHumanPhoneCodeAddedEventV2(ctx, aggregate, code, expiry, false)
+	return NewHumanPhoneCodeAddedEventV2(ctx, aggregate, code, expiry, false, generatorID)
 }
+
 func NewHumanPhoneCodeAddedEventV2(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	codeReturned bool,
+	generatorID string,
 ) *HumanPhoneCodeAddedEvent {
 	return &HumanPhoneCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -190,7 +195,8 @@ func NewHumanPhoneCodeAddedEventV2(
 		Code:              code,
 		Expiry:            expiry,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		GeneratorID:       generatorID,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -207,7 +213,13 @@ func HumanPhoneCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, e
 }
 
 type HumanPhoneCodeSentEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
+
+	GeneratorInfo *senders.CodeGeneratorInfo `json:"generatorInfo,omitempty"`
+}
+
+func (e *HumanPhoneCodeSentEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *HumanPhoneCodeSentEvent) Payload() interface{} {
@@ -218,18 +230,13 @@ func (e *HumanPhoneCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstr
 	return nil
 }
 
-func NewHumanPhoneCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanPhoneCodeSentEvent {
+func NewHumanPhoneCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate, generatorInfo *senders.CodeGeneratorInfo) *HumanPhoneCodeSentEvent {
 	return &HumanPhoneCodeSentEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanPhoneCodeSentType,
 		),
+		GeneratorInfo: generatorInfo,
 	}
-}
-
-func HumanPhoneCodeSentEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &HumanPhoneCodeSentEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }

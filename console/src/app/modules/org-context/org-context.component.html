@@ -15,13 +15,13 @@
     />
   </div>
 
-  <div class="org-wrapper">
+  <div class="org-wrapper" cnslScrollable (scrollPosition)="onNearEndScroll($event)">
     <button
       class="org-button-with-pin"
       mat-button
       [ngClass]="{
         active: pinnedorg.id === org.id,
-        'border-bottom': pinned.selected.length && i === pinned.selected.length - 1
+        'border-bottom': pinned.selected.length && i === pinned.selected.length - 1,
       }"
       [disabled]="!pinnedorg.id"
       *ngFor="let pinnedorg of pinned.selected; index as i"

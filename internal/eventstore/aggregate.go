@@ -48,15 +48,25 @@ func WithInstanceID(id string) aggregateOpt {
 	}
 }
 
-// AggregateFromWriteModel maps the given WriteModel to an Aggregate
+// AggregateFromWriteModel maps the given WriteModel to an Aggregate.
+// Deprecated: Creates linter errors on missing context. Use [AggregateFromWriteModelCtx] instead.
 func AggregateFromWriteModel(
 	wm *WriteModel,
 	typ AggregateType,
 	version Version,
 ) *Aggregate {
+	return AggregateFromWriteModelCtx(context.Background(), wm, typ, version)
+}
+
+// AggregateFromWriteModelCtx maps the given WriteModel to an Aggregate.
+func AggregateFromWriteModelCtx(
+	ctx context.Context,
+	wm *WriteModel,
+	typ AggregateType,
+	version Version,
+) *Aggregate {
 	return NewAggregate(
-		// TODO: the linter complains if this function is called without passing a context
-		context.Background(),
+		ctx,
 		wm.AggregateID,
 		typ,
 		version,

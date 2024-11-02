@@ -1,5 +1,5 @@
-<h2>{{ 'POLICY.MESSAGE_TEXTS.TITLE' | translate }}</h2>
-<p class="cnsl-secondary-text">{{ 'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate }}</p>
+<h2>{{ 'DESCRIPTIONS.SETTINGS.MESSAGE_TEXTS.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.MESSAGE_TEXTS.DESCRIPTION' | translate }}</p>
 <cnsl-info-section class="locked" *ngIf="langSvc.isNotAllowed(language) | async" [type]="InfoSectionType.WARN">
   {{ 'POLICY.LOGIN_TEXTS.ACTIVE_LANGUAGE_NOT_ALLOWED' | translate }}</cnsl-info-section
 >
@@ -46,6 +46,8 @@
       </mat-select>
     </cnsl-form-field>
   </div>
+
+  <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.MESSAGE_TEXTS.TYPE_DESCRIPTIONS.' + currentType | translate }}</p>
 
   <div class="message-text-content">
     <cnsl-edit-text

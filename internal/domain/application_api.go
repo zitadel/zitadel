@@ -11,7 +11,7 @@ type APIApp struct {
 	AppID              string
 	AppName            string
 	ClientID           string
-	ClientSecret       *crypto.CryptoValue
+	EncodedHash        string
 	ClientSecretString string
 	AuthMethodType     APIAuthMethodType
 
@@ -41,21 +41,21 @@ func (a *APIApp) setClientID(clientID string) {
 	a.ClientID = clientID
 }
 
-func (a *APIApp) setClientSecret(clientSecret *crypto.CryptoValue) {
-	a.ClientSecret = clientSecret
+func (a *APIApp) setClientSecret(encodedHash string) {
+	a.EncodedHash = encodedHash
 }
 
 func (a *APIApp) requiresClientSecret() bool {
 	return a.AuthMethodType == APIAuthMethodTypeBasic
 }
 
-func (a *APIApp) GenerateClientSecretIfNeeded(generator crypto.Generator) (secret string, err error) {
+func (a *APIApp) GenerateClientSecretIfNeeded(generator *crypto.HashGenerator) (plain string, err error) {
 	if a.AuthMethodType == APIAuthMethodTypePrivateKeyJWT {
 		return "", nil
 	}
-	a.ClientSecret, secret, err = NewClientSecret(generator)
+	a.EncodedHash, plain, err = generator.NewCode()
 	if err != nil {
 		return "", err
 	}
-	return secret, nil
+	return plain, nil
 }

@@ -21,7 +21,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 	var errID, errMessage, credentialData string
 	var u2f *domain.WebAuthNToken
 	if err == nil {
-		u2f, err = l.command.HumanAddU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, true)
+		u2f, err = l.command.HumanAddU2FSetup(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
 	}
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -42,7 +42,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 
 func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 	data := new(webAuthNFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -54,7 +54,7 @@ func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	if _, err = l.command.HumanVerifyU2FSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, data.Name, userAgentID, credData); err != nil {
+	if _, err = l.command.HumanVerifyU2FSetup(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, data.Name, userAgentID, credData); err != nil {
 		l.renderRegisterU2F(w, r, authReq, err)
 		return
 	}

@@ -1,5 +1,5 @@
 ---
-title: Support for the OpenID Connect(OIDC) Standard in ZITADEL
+title: Support for the OpenID Connect(OIDC) Standard in a Custom Login UI
 sidebar_label: OIDC Standard
 ---
 
@@ -37,7 +37,11 @@ https://login.example.com/oauth/v2/authorize?client_id=170086824411201793%40your
 The auth request includes all the relevant information for the OIDC standard and in this example we also have a login hint for the login name "minnie-mouse".
 
 You now have to proxy the auth request from your own UI to the authorize Endpoint of ZITADEL.
-Make sure to add the user id of your login UI as a header to the request: ```x-zitadel-login-client: <userid>```
+Make sure to add the user id of your login UI service/machine user as a header to the request: ```x-zitadel-login-client: <userid>```
+
+:::note
+The user id sent in the 'x-zitadel-login-client' has to match to the PAT you are sending in the request.
+:::
 
 Read more about the [Authorize Endpoint Documentation](/docs/apis/openidoauth/endpoints#authorization_endpoint)
 
@@ -47,11 +51,11 @@ The endpoint will redirect you to the domain of your UI on the path /login and a
 ### Get Auth Request by ID
 
 With the ID from the redirect before you will now be able to get the information of the auth request.
-[Get Auth Request By ID Documentation](/docs/apis/resources/oidc_service/oidc-service-get-auth-request)
+[Get Auth Request By ID Documentation](/docs/apis/resources/oidc_service_v2/oidc-service-get-auth-request)
 
 ```bash
 curl --request GET \
-  --url https://$ZITADEL_DOMAIN/v2beta/oidc/auth_requests/V2_224908753244265546 \
+  --url https://$ZITADEL_DOMAIN/v2/oidc/auth_requests/V2_224908753244265546 \
   --header 'Authorization: Bearer '"$TOKEN"''\
 ```
 
@@ -76,7 +80,7 @@ Response Example:
 ### Perform Login
 
 After you have initialized the OIDC flow you can implement the login.
-Implement all the steps you like the user the go trough by [creating](/docs/apis/resources/session_service/session-service-create-session) and [updating](/docs/apis/resources/session_service/session-service-set-session) the user-session.
+Implement all the steps you like the user the go trough by [creating](/docs/apis/resources/session_service_v2/session-service-create-session) and [updating](/docs/apis/resources/session_service/session-service-set-session) the user-session.
 
 Read the following resources for more information about the different checks:
 - [Username and Password](./username-password)
@@ -91,12 +95,12 @@ On the create and update user session request you will always get a session toke
 
 The latest session token has to be sent to the following request:
 
-Read more about the [Finalize Auth Request Documentation](/docs/apis/resources/oidc_service/oidc-service-create-callback)
+Read more about the [Finalize Auth Request Documentation](/docs/apis/resources/oidc_service_v2/oidc-service-create-callback)
 
 Make sure that the authorization header is from the same account that you originally sent in the client id header ```x-zitadel-login-client: <userid>``` on the authorize endpoint.
 ```bash
 curl --request POST \
-  --url $ZITADEL_DOMAIN/v2beta/oidc/auth_requests/V2_224908753244265546 \
+  --url $ZITADEL_DOMAIN/v2/oidc/auth_requests/V2_224908753244265546 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -141,4 +145,4 @@ In case the ZITADEL backend is not able to determine which session to terminate 
 
 ```/logout?post_logout_redirect=```
 
-Prompt the user to select a session, terminate it using the [corresponding endpoint](/docs/apis/resources/session_service/session-service-delete-session) and send the user to the `post_logout_redirect` URL.
+Prompt the user to select a session, terminate it using the [corresponding endpoint](/docs/apis/resources/session_service_v2/session-service-delete-session) and send the user to the `post_logout_redirect` URL.

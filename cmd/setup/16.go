@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -18,7 +19,7 @@ type UniqueConstraintToLower struct {
 	dbClient *database.DB
 }
 
-func (mig *UniqueConstraintToLower) Execute(ctx context.Context) error {
+func (mig *UniqueConstraintToLower) Execute(ctx context.Context, _ eventstore.Event) error {
 	res, err := mig.dbClient.ExecContext(ctx, uniqueConstraintLower)
 	if err != nil {
 		return err

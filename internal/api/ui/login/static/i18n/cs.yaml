@@ -32,12 +32,14 @@ Password:
   Title: Heslo
   Description: Zadejte své přihlašovací údaje.
   PasswordLabel: Heslo
-  MinLength: Minimální délka
-  HasUppercase: Velké písmeno
-  HasLowercase: Malé písmeno
-  HasNumber: Číslo
-  HasSymbol: Symbol
-  Confirmation: Potvrzení shody
+  MinLength: Musí být alespoň
+  MinLengthp2: znaků dlouhé.
+  MaxLength: Musí být kratší než 70 znaků.
+  HasUppercase: Musí obsahovat velké písmeno.
+  HasLowercase: Musí obsahovat malé písmeno.
+  HasNumber: Musí obsahovat číslo.
+  HasSymbol: Musí obsahovat symbol.
+  Confirmation: Potvrzení hesla odpovídá.
   ResetLinkText: Obnovit heslo
   BackButtonText: Zpět
   NextButtonText: Další
@@ -83,6 +85,15 @@ InitUserDone:
   Description: E-mail ověřen a heslo úspěšně nastaveno
   NextButtonText: Další
   CancelButtonText: Zrušit
+
+InviteUser:
+  Title: Aktivace uživatele
+  Description: Ověřte svůj e-mail pomocí níže uvedeného kódu a nastavte si heslo.
+  CodeLabel: Kód
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirm: Potvrďte heslo
+  NextButtonText: Další
+  ResendButtonText: Odeslat kód znovu
 
 InitMFAPrompt:
   Title: Nastavení 2-faktorové autentizace
@@ -188,6 +199,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Změna hesla
   Description: Změňte si heslo. Zadejte své staré a nové heslo.
+  ExpiredDescription: Heslo vypršelo a musí být změněno. Zadejte své staré a nové heslo.
   OldPasswordLabel: Staré heslo
   NewPasswordLabel: Nové heslo
   NewPasswordConfirmLabel: Potvrzení hesla
@@ -249,6 +261,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -288,6 +303,9 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -325,6 +343,12 @@ LogoutDone:
   Description: Byli jste úspěšně odhlášeni.
   LoginButtonText: Přihlásit se
 
+LinkingUserPrompt:
+  Title: Nalezen stávající uživatel
+  Description: "Chcete propojit svůj stávající účet:"
+  LinkButtonText: Odkaz
+  OtherButtonText: Jiné možnosti
+
 LinkingUsersDone:
   Title: Propojení uživatele
   Description: Uživatel propojen.
@@ -355,6 +379,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:
@@ -386,7 +413,7 @@ Errors:
   Internal: Došlo k interní chybě
   AuthRequest:
     NotFound: Authrequest nebyl nalezen
-    UserAgentNotCorresponding: User Agent neodpovídá
+    UserAgentNotCorresponding: User Agent nekoresponduje
     UserAgentNotFound: ID User Agenta nebylo nalezeno
     TokenNotFound: Token nebyl nalezen
     RequestTypeNotSupported: Typ požadavku není podporován
@@ -474,6 +501,7 @@ Errors:
       NoExternalUserData: Nebyla přijata žádná externí uživatelská data
       CreationNotAllowed: Vytvoření nového uživatele není na tomto poskytovateli povoleno
       LinkingNotAllowed: Propojení uživatele není na tomto poskytovateli povoleno
+      NoOptionAllowed:   Ani vytvoření, ani propojení není povoleno pro tohoto poskytovatele. Obraťte se na svého správce.
     GrantRequired: Přihlášení není možné. Uživatel musí mít alespoň jeden oprávnění na aplikaci. Prosím, kontaktujte svého správce.
     ProjectRequired: Přihlášení není možné. Organizace uživatele musí být přidělena k projektu. Prosím, kontaktujte svého správce.
   IdentityProvider:

@@ -32,15 +32,17 @@ Password:
   Title: Лозинка
   Description: Внесете ги вашите податоци за најава.
   PasswordLabel: Лозинка
-  MinLength: Минимална должина
-  HasUppercase: Голема буква
-  HasLowercase: Мала буква
-  HasNumber: Број
-  HasSymbol: Симбол
-  Confirmation: Потврда на лозинка
-  ResetLinkText: ресетирај лозинка
-  BackButtonText: назад
-  NextButtonText: следно
+  MinLength: Мора да биде најмалку
+  MinLengthp2: карактери долго.
+  MaxLength: Мора да биде помалку од 70 карактери.
+  HasUppercase: Мора да вклучи голема буква.
+  HasLowercase: Мора да вклучи мала буква.
+  HasNumber: Мора да вклучи број.
+  HasSymbol: Мора да вклучи симбол.
+  Confirmation: Потврдата за лозинката се совпаѓа.
+  ResetLinkText: Ресетирај лозинка
+  BackButtonText: Назад
+  NextButtonText: Напред
 
 UsernameChange:
   Title: Промена на корисничко име
@@ -83,6 +85,15 @@ InitUserDone:
   Description: Е-поштата е верифицирана и лозинката е успешно поставена.
   NextButtonText: следно
   CancelButtonText: откажи
+
+InviteUser:
+  Title: Активирање на корисникот
+  Description: Проверете го вашиот имејл со кодот подолу и поставете ја вашата лозинка.
+  CodeLabel: Код
+  NewPasswordLabel: Нова лозинка
+  NewPasswordConfirm: Потврди лозинка
+  NextButtonText: Следно
+  ResendButtonText: Повторно испрати код
 
 InitMFAPrompt:
   Title: Подесување на 2-факторска автентикација
@@ -188,6 +199,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Промена на лозинка
   Description: Променете ја вашата лозинка. Внесете ја старата и новата лозинка.
+  ExpiredDescription: Вашата лозинка е истечена и мора да се смени. Внесете ја старата и новата лозинка.
   OldPasswordLabel: Стара лозинка
   NewPasswordLabel: Нова лозинка
   NewPasswordConfirmLabel: Потврда на лозинка
@@ -249,6 +261,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Пол
   Female: Женски
   Male: Машки
@@ -288,6 +303,9 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
   TosLinkText: правилата за користење
@@ -325,6 +343,12 @@ LogoutDone:
   Description: Успешно сте одјавени.
   LoginButtonText: најава
 
+LinkingUserPrompt:
+  Title: Пронајден е постоечки корисник
+  Description: "Дали сакате да ја поврзете вашата постоечка сметка:"
+  LinkButtonText: Bрска
+  OtherButtonText: Други опции
+
 LinkingUsersDone:
   Title: Поврзување на корисници
   Description: Поврзувањето на корисници е завршено.
@@ -355,6 +379,9 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 
 DeviceAuth:
   Title: Овластување преку уред
@@ -475,6 +502,7 @@ Errors:
       NoExternalUserData: Нема преземени податоци за надворешен корисник
       CreationNotAllowed: Креирањето на нов корисник не е дозволено на овој провајдер
       LinkingNotAllowed: Поврзувањето на корисник не е дозволено на овој провајдер
+      NoOptionAllowed: NНиту создавање, ниту поврзување е дозволено за овој провајдер. Ве молиме контактирајте го вашиот администратор.
     GrantRequired: Не е можно најавување. Корисникот мора да има барем едно овластување за апликацијата. Ве молиме контактирајте го вашиот администратор.
     ProjectRequired: Не е можно најавување. Организацијата на корисникот мора да биде доделена на проектот. Ве молиме контактирајте го вашиот администратор.
   IdentityProvider:

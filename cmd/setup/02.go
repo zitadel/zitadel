@@ -3,6 +3,8 @@ package setup
 import (
 	"context"
 	"database/sql"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
@@ -26,7 +28,7 @@ type AssetTable struct {
 	dbClient *sql.DB
 }
 
-func (mig *AssetTable) Execute(ctx context.Context) error {
+func (mig *AssetTable) Execute(ctx context.Context, _ eventstore.Event) error {
 	_, err := mig.dbClient.ExecContext(ctx, createAssets)
 	return err
 }

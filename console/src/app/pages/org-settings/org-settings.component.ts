@@ -7,6 +7,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import {
+  AGE,
   BRANDING,
   COMPLEXITY,
   DOMAIN,
@@ -33,6 +34,7 @@ export class OrgSettingsComponent implements OnInit {
     LOGIN,
     IDP,
     COMPLEXITY,
+    AGE,
     LOCKOUT,
     NOTIFICATIONS,
     VERIFIED_DOMAINS,

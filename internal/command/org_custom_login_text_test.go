@@ -56,7 +56,6 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPush(),
 				),
 			},
 			args: args{
@@ -765,6 +764,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 							),
 						),
@@ -1387,6 +1391,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					PasswordChange: domain.PasswordChangeScreenText{
 						Title:                   "Title",
 						Description:             "Description",
+						ExpiredDescription:      "ExpiredDescription",
 						OldPasswordLabel:        "OldPasswordLabel",
 						NewPasswordLabel:        "NewPasswordLabel",
 						NewPasswordConfirmLabel: "NewPasswordConfirmLabel",
@@ -2165,6 +2170,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -3001,6 +3011,9 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						org.NewCustomTextRemovedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, language.English,
+						),
+						org.NewCustomTextRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, language.English,
 						),
 						org.NewCustomTextRemovedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, language.English,
@@ -3975,6 +3988,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5074,6 +5092,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, language.English,
 							),
 						),
@@ -5908,6 +5931,9 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
 						),
 						org.NewCustomTextSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
+						),
+						org.NewCustomTextSetEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 						),
 						org.NewCustomTextSetEvent(context.Background(),
@@ -6355,6 +6381,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					PasswordChange: domain.PasswordChangeScreenText{
 						Title:                   "Title",
 						Description:             "Description",
+						ExpiredDescription:      "ExpiredDescription",
 						OldPasswordLabel:        "OldPasswordLabel",
 						NewPasswordLabel:        "NewPasswordLabel",
 						NewPasswordConfirmLabel: "NewPasswordConfirmLabel",
@@ -6488,7 +6515,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

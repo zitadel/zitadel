@@ -22,7 +22,7 @@ func TestAMR(t *testing.T) {
 			args{
 				nil,
 			},
-			[]string{},
+			nil,
 		},
 		{
 			"pw checked",

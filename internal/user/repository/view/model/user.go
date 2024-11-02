@@ -18,27 +18,27 @@ import (
 )
 
 const (
-	UserKeyUserID             = "id"
-	UserKeyUserName           = "user_name"
-	UserKeyFirstName          = "first_name"
-	UserKeyLastName           = "last_name"
-	UserKeyNickName           = "nick_name"
-	UserKeyDisplayName        = "display_name"
-	UserKeyEmail              = "email"
-	UserKeyState              = "user_state"
-	UserKeyResourceOwner      = "resource_owner"
-	UserKeyLoginNames         = "login_names"
-	UserKeyPreferredLoginName = "preferred_login_name"
-	UserKeyType               = "user_type"
-	UserKeyInstanceID         = "instance_id"
-	UserKeyOwnerRemoved       = "owner_removed"
-)
-
-type userType string
-
-const (
-	userTypeHuman   = "human"
-	userTypeMachine = "machine"
+	UserKeyUserID                   = "id"
+	UserKeyUserName                 = "user_name"
+	UserKeyFirstName                = "first_name"
+	UserKeyLastName                 = "last_name"
+	UserKeyNickName                 = "nick_name"
+	UserKeyDisplayName              = "display_name"
+	UserKeyEmail                    = "email"
+	UserKeyState                    = "user_state"
+	UserKeyResourceOwner            = "resource_owner"
+	UserKeyLoginNames               = "login_names"
+	UserKeyPreferredLoginName       = "preferred_login_name"
+	UserKeyType                     = "user_type"
+	UserKeyInstanceID               = "instance_id"
+	UserKeyOwnerRemoved             = "owner_removed"
+	UserKeyPasswordSet              = "password_set"
+	UserKeyPasswordInitRequired     = "password_init_required"
+	UserKeyPasswordChange           = "password_change"
+	UserKeyInitRequired             = "init_required"
+	UserKeyPasswordlessInitRequired = "passwordless_init_required"
+	UserKeyMFAInitSkipped           = "mfa_init_skipped"
+	UserKeyChangeDate               = "change_date"
 )
 
 type UserView struct {
@@ -51,7 +51,6 @@ type UserView struct {
 	LoginNames         database.TextArray[string] `json:"-" gorm:"column:login_names"`
 	PreferredLoginName string                     `json:"-" gorm:"column:preferred_login_name"`
 	Sequence           uint64                     `json:"-" gorm:"column:sequence"`
-	Type               userType                   `json:"-" gorm:"column:user_type"`
 	UserName           string                     `json:"userName" gorm:"column:user_name"`
 	InstanceID         string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
 	*MachineView
@@ -236,13 +235,13 @@ func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mode
 }
 
 func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
+	// in case anything needs to be change here check if the Reduce function needs the change as well
 	u.ChangeDate = event.CreatedAt()
 	u.Sequence = event.Sequence()
 	switch event.Type() {
 	case user.MachineAddedEventType:
 		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
-		u.Type = userTypeMachine
 		err = u.setData(event)
 		if err != nil {
 			return err
@@ -253,7 +252,6 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 		user.HumanAddedType:
 		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
-		u.Type = userTypeHuman
 		err = u.setData(event)
 		if err != nil {
 			return err
@@ -396,7 +394,7 @@ func (u *UserView) setData(event eventstore.Event) error {
 func (u *UserView) setPasswordData(event eventstore.Event) error {
 	password := new(es_model.Password)
 	if err := event.Unmarshal(password); err != nil {
-		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return zerrors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""

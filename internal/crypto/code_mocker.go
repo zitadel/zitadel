@@ -60,32 +60,13 @@ func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func
 	return mCrypto
 }
 
-func CreateMockHashAlg(ctrl *gomock.Controller) HashAlgorithm {
-	mCrypto := NewMockHashAlgorithm(ctrl)
-	mCrypto.EXPECT().Algorithm().AnyTimes().Return("hash")
-	mCrypto.EXPECT().Hash(gomock.Any()).AnyTimes().DoAndReturn(
-		func(code []byte) ([]byte, error) {
-			return code, nil
-		},
-	)
-	mCrypto.EXPECT().CompareHash(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
-		func(hashed, comparer []byte) error {
-			if string(hashed) != string(comparer) {
-				return zerrors.ThrowInternal(nil, "id", "invalid")
-			}
-			return nil
-		},
-	)
-	return mCrypto
-}
-
-func createMockCrypto(t *testing.T) Crypto {
-	mCrypto := NewMockCrypto(gomock.NewController(t))
+func createMockCrypto(t *testing.T) EncryptionAlgorithm {
+	mCrypto := NewMockEncryptionAlgorithm(gomock.NewController(t))
 	mCrypto.EXPECT().Algorithm().AnyTimes().Return("crypto")
 	return mCrypto
 }
 
-func createMockGenerator(t *testing.T, crypto Crypto) Generator {
+func createMockGenerator(t *testing.T, crypto EncryptionAlgorithm) Generator {
 	mGenerator := NewMockGenerator(gomock.NewController(t))
 	mGenerator.EXPECT().Alg().AnyTimes().Return(crypto)
 	return mGenerator

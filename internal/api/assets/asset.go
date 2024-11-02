@@ -2,22 +2,28 @@ package assets
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -49,9 +55,9 @@ func (h *Handler) Storage() static.Storage {
 	return h.storage
 }
 
-func AssetAPI(externalSecure bool) func(context.Context) string {
+func AssetAPI() func(context.Context) string {
 	return func(ctx context.Context) string {
-		return http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix
+		return http_util.DomainContext(ctx).Origin() + HandlerPrefix
 	}
 }
 
@@ -71,19 +77,29 @@ type Downloader interface {
 
 type ErrorHandler func(w http.ResponseWriter, r *http.Request, err error, defaultCode int)
 
-func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, defaultCode int) {
-	logging.WithFields("uri", r.RequestURI).WithError(err).Warn("error occurred on asset api")
-	code, ok := http_util.ZitadelErrorToHTTPStatusCode(err)
-	if !ok {
-		code = defaultCode
+func DefaultErrorHandler(translator *i18n.Translator) func(w http.ResponseWriter, r *http.Request, err error, defaultCode int) {
+	return func(w http.ResponseWriter, r *http.Request, err error, defaultCode int) {
+		logging.WithFields("uri", r.RequestURI).WithError(err).Warn("error occurred on asset api")
+		code, ok := http_util.ZitadelErrorToHTTPStatusCode(err)
+		if !ok {
+			code = defaultCode
+		}
+		zErr := new(zerrors.ZitadelError)
+		if errors.As(err, &zErr) {
+			zErr.SetMessage(translator.LocalizeFromCtx(r.Context(), zErr.GetMessage(), nil))
+			zErr.Parent = nil // ensuring we don't leak any unwanted information
+			err = zErr
+		}
+		http.Error(w, err.Error(), code)
 	}
-	http.Error(w, err.Error(), code)
 }
 
 func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
+	translator, err := i18n.NewZitadelTranslator(language.English)
+	logging.OnError(err).Panic("unable to get translator")
 	h := &Handler{
 		commands:        commands,
-		errorHandler:    DefaultErrorHandler,
+		errorHandler:    DefaultErrorHandler(translator),
 		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
 		idGenerator:     idGenerator,
 		storage:         storage,
@@ -94,7 +110,6 @@ func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, aut
 	router := mux.NewRouter()
 	csp := http_mw.SecurityHeaders(&http_mw.DefaultSCP, nil)
 	router.Use(callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor, csp)
-	router.Use(callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return http_util.CopyHeadersToContext(http_mw.CORSInterceptor(router))
@@ -135,10 +150,21 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			err = file.Close()
 			logging.OnError(err).Warn("could not close file")
 		}()
-		contentType := handler.Header.Get("content-type")
+
+		mimeType, err := mimetype.DetectReader(file)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		_, err = file.Seek(0, io.SeekStart)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		size := handler.Size
-		if !uploader.ContentTypeAllowed(contentType) {
-			s.ErrorHandler()(w, r, fmt.Errorf("invalid content-type: %s", contentType), http.StatusBadRequest)
+		if !uploader.ContentTypeAllowed(mimeType.String()) {
+			s.ErrorHandler()(w, r, fmt.Errorf("invalid content-type: %s", mimeType), http.StatusBadRequest)
 			return
 		}
 		if size > uploader.MaxFileSize() {
@@ -155,7 +181,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		uploadInfo := &command.AssetUpload{
 			ResourceOwner: resourceOwner,
 			ObjectName:    objectName,
-			ContentType:   contentType,
+			ContentType:   mimeType.String(),
 			ObjectType:    uploader.ObjectType(),
 			File:          file,
 			Size:          size,

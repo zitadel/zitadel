@@ -3,7 +3,6 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
 	"testing"
 	"time"
 
@@ -17,62 +16,149 @@ import (
 
 func Test_prepareRoles(t *testing.T) {
 	type args struct {
-		projectID    string
-		scope        []string
-		roleAudience []string
+		projectID            string
+		scope                []string
+		projectRoleAssertion bool
+		currentProjectOnly   bool
 	}
 	tests := []struct {
 		name               string
 		args               args
-		wantRa             []string
+		wantRoleAudience   []string
 		wantRequestedRoles []string
 	}{
 		{
-			name: "empty scope and roleAudience",
+			name: "empty scope",
 			args: args{
-				projectID:    "projID",
-				scope:        nil,
-				roleAudience: nil,
+				projectID:            "projID",
+				scope:                nil,
+				projectRoleAssertion: false,
+				currentProjectOnly:   false,
 			},
-			wantRa:             nil,
+			wantRoleAudience:   nil,
 			wantRequestedRoles: nil,
 		},
 		{
-			name: "some scope and roleAudience",
+			name: "project role assertion",
 			args: args{
-				projectID:    "projID",
-				scope:        []string{"openid", "profile"},
-				roleAudience: []string{"project2"},
+				projectID:            "projID",
+				projectRoleAssertion: true,
+				scope:                nil,
+				currentProjectOnly:   false,
 			},
-			wantRa:             []string{"project2", "projID"},
-			wantRequestedRoles: []string{},
+			wantRoleAudience:   []string{"projID"},
+			wantRequestedRoles: nil,
+		},
+		{
+			name: "some scope, current project only",
+			args: args{
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope:                []string{"openid", "profile"},
+				currentProjectOnly:   true,
+			},
+			wantRoleAudience:   []string{"projID"},
+			wantRequestedRoles: nil,
 		},
 		{
 			name: "scope projects roles",
 			args: args{
-				projectID:    "projID",
-				scope:        []string{ScopeProjectsRoles, domain.ProjectIDScope + "project2" + domain.AudSuffix},
-				roleAudience: nil,
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope: []string{
+					"openid", "profile",
+					ScopeProjectsRoles,
+					domain.ProjectIDScope + "project2" + domain.AudSuffix,
+				},
+				currentProjectOnly: false,
 			},
-			wantRa:             []string{"project2", "projID"},
-			wantRequestedRoles: []string{},
+			wantRoleAudience:   []string{"project2", "projID"},
+			wantRequestedRoles: nil,
+		},
+		{
+			name: "scope projects roles ignored, current project only",
+			args: args{
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope: []string{
+					"openid", "profile",
+					ScopeProjectsRoles,
+					domain.ProjectIDScope + "project2" + domain.AudSuffix,
+				},
+				currentProjectOnly: true,
+			},
+			wantRoleAudience:   []string{"projID"},
+			wantRequestedRoles: nil,
 		},
 		{
 			name: "scope project role prefix",
 			args: args{
-				projectID:    "projID",
-				scope:        []string{"openid", "profile", ScopeProjectRolePrefix + "foo", ScopeProjectRolePrefix + "bar"},
-				roleAudience: nil,
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope: []string{
+					"openid", "profile",
+					ScopeProjectRolePrefix + "foo",
+					ScopeProjectRolePrefix + "bar",
+				},
+				currentProjectOnly: false,
 			},
-			wantRa:             []string{"projID"},
+			wantRoleAudience:   []string{"projID"},
+			wantRequestedRoles: []string{"foo", "bar"},
+		},
+		{
+			name: "scope project role prefix and audience",
+			args: args{
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope: []string{
+					"openid", "profile",
+					ScopeProjectRolePrefix + "foo",
+					ScopeProjectRolePrefix + "bar",
+					domain.ProjectIDScope + "project2" + domain.AudSuffix,
+				},
+				currentProjectOnly: false,
+			},
+			wantRoleAudience:   []string{"projID", "project2"},
+			wantRequestedRoles: []string{"foo", "bar"},
+		},
+		{
+			name: "scope project role prefix and audience ignored, current project only",
+			args: args{
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope: []string{
+					"openid", "profile",
+					ScopeProjectRolePrefix + "foo",
+					ScopeProjectRolePrefix + "bar",
+					domain.ProjectIDScope + "project2" + domain.AudSuffix,
+				},
+				currentProjectOnly: true,
+			},
+			wantRoleAudience:   []string{"projID"},
+			wantRequestedRoles: []string{"foo", "bar"},
+		},
+		{
+			name: "no projectID, scope project role prefix and audience",
+			args: args{
+				projectID:            "",
+				projectRoleAssertion: false,
+				scope: []string{
+					"openid", "profile",
+					ScopeProjectRolePrefix + "foo",
+					ScopeProjectRolePrefix + "bar",
+					domain.ProjectIDScope + "project2" + domain.AudSuffix,
+				},
+				currentProjectOnly: false,
+			},
+			wantRoleAudience:   []string{"project2"},
 			wantRequestedRoles: []string{"foo", "bar"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRa, gotRequestedRoles := prepareRoles(context.Background(), tt.args.projectID, tt.args.scope, tt.args.roleAudience)
-			assert.Equal(t, tt.wantRa, gotRa, "roleAudience")
-			assert.Equal(t, tt.wantRequestedRoles, gotRequestedRoles, "requestedRoles")
+			gotRoleAudience, gotRequestedRoles := prepareRoles(context.Background(), tt.args.scope, tt.args.projectID, tt.args.projectRoleAssertion, tt.args.currentProjectOnly)
+			assert.ElementsMatch(t, tt.wantRoleAudience, gotRoleAudience, "roleAudience")
+			assert.ElementsMatch(t, tt.wantRequestedRoles, gotRequestedRoles, "requestedRoles")
 		})
 	}
 }
@@ -180,11 +266,9 @@ func Test_userInfoToOIDC(t *testing.T) {
 	}
 
 	type args struct {
-		projectID      string
-		user           *query.OIDCUserInfo
-		scope          []string
-		roleAudience   []string
-		requestedRoles []string
+		user              *query.OIDCUserInfo
+		userInfoAssertion bool
+		scope             []string
 	}
 	tests := []struct {
 		name string
@@ -194,25 +278,26 @@ func Test_userInfoToOIDC(t *testing.T) {
 		{
 			name: "human, empty",
 			args: args{
-				projectID: "project1",
-				user:      humanUserInfo,
+				user: humanUserInfo,
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "human1",
+			},
 		},
 		{
 			name: "machine, empty",
 			args: args{
-				projectID: "project1",
-				user:      machineUserInfo,
+				user: machineUserInfo,
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "machine1",
+			},
 		},
 		{
 			name: "human, scope openid",
 			args: args{
-				projectID: "project1",
-				user:      humanUserInfo,
-				scope:     []string{oidc.ScopeOpenID},
+				user:  humanUserInfo,
+				scope: []string{oidc.ScopeOpenID},
 			},
 			want: &oidc.UserInfo{
 				Subject: "human1",
@@ -221,22 +306,22 @@ func Test_userInfoToOIDC(t *testing.T) {
 		{
 			name: "machine, scope openid",
 			args: args{
-				projectID: "project1",
-				user:      machineUserInfo,
-				scope:     []string{oidc.ScopeOpenID},
+				user:  machineUserInfo,
+				scope: []string{oidc.ScopeOpenID},
 			},
 			want: &oidc.UserInfo{
 				Subject: "machine1",
 			},
 		},
 		{
-			name: "human, scope email",
+			name: "human, scope email, profileInfoAssertion",
 			args: args{
-				projectID: "project1",
-				user:      humanUserInfo,
-				scope:     []string{oidc.ScopeEmail},
+				user:              humanUserInfo,
+				userInfoAssertion: true,
+				scope:             []string{oidc.ScopeEmail},
 			},
 			want: &oidc.UserInfo{
+				Subject: "human1",
 				UserInfoEmail: oidc.UserInfoEmail{
 					Email:         "foo@bar.com",
 					EmailVerified: true,
@@ -244,24 +329,34 @@ func Test_userInfoToOIDC(t *testing.T) {
 			},
 		},
 		{
-			name: "machine, scope email",
+			name: "human, scope email",
 			args: args{
-				projectID: "project1",
-				user:      machineUserInfo,
-				scope:     []string{oidc.ScopeEmail},
+				user:  humanUserInfo,
+				scope: []string{oidc.ScopeEmail},
 			},
 			want: &oidc.UserInfo{
-				UserInfoEmail: oidc.UserInfoEmail{},
+				Subject: "human1",
 			},
 		},
 		{
-			name: "human, scope profile",
+			name: "machine, scope email, profileInfoAssertion",
 			args: args{
-				projectID: "project1",
-				user:      humanUserInfo,
-				scope:     []string{oidc.ScopeProfile},
+				user:  machineUserInfo,
+				scope: []string{oidc.ScopeEmail},
 			},
 			want: &oidc.UserInfo{
+				Subject: "machine1",
+			},
+		},
+		{
+			name: "human, scope profile, profileInfoAssertion",
+			args: args{
+				user:              humanUserInfo,
+				userInfoAssertion: true,
+				scope:             []string{oidc.ScopeProfile},
+			},
+			want: &oidc.UserInfo{
+				Subject: "human1",
 				UserInfoProfile: oidc.UserInfoProfile{
 					Name:              "xxx",
 					GivenName:         "user",
@@ -276,13 +371,14 @@ func Test_userInfoToOIDC(t *testing.T) {
 			},
 		},
 		{
-			name: "machine, scope profile",
+			name: "machine, scope profile, profileInfoAssertion",
 			args: args{
-				projectID: "project1",
-				user:      machineUserInfo,
-				scope:     []string{oidc.ScopeProfile},
+				user:              machineUserInfo,
+				userInfoAssertion: true,
+				scope:             []string{oidc.ScopeProfile},
 			},
 			want: &oidc.UserInfo{
+				Subject: "machine1",
 				UserInfoProfile: oidc.UserInfoProfile{
 					Name:              "machine",
 					UpdatedAt:         oidc.FromTime(time.Unix(567, 890)),
@@ -291,13 +387,24 @@ func Test_userInfoToOIDC(t *testing.T) {
 			},
 		},
 		{
-			name: "human, scope phone",
+			name: "machine, scope profile",
 			args: args{
-				projectID: "project1",
-				user:      humanUserInfo,
-				scope:     []string{oidc.ScopePhone},
+				user:  machineUserInfo,
+				scope: []string{oidc.ScopeProfile},
 			},
 			want: &oidc.UserInfo{
+				Subject: "machine1",
+			},
+		},
+		{
+			name: "human, scope phone, profileInfoAssertion",
+			args: args{
+				user:              humanUserInfo,
+				userInfoAssertion: true,
+				scope:             []string{oidc.ScopePhone},
+			},
+			want: &oidc.UserInfo{
+				Subject: "human1",
 				UserInfoPhone: oidc.UserInfoPhone{
 					PhoneNumber:         "+31123456789",
 					PhoneNumberVerified: true,
@@ -305,24 +412,35 @@ func Test_userInfoToOIDC(t *testing.T) {
 			},
 		},
 		{
-			name: "machine, scope phone",
+			name: "human, scope phone",
 			args: args{
-				projectID: "project1",
-				user:      machineUserInfo,
-				scope:     []string{oidc.ScopePhone},
+				user:  humanUserInfo,
+				scope: []string{oidc.ScopePhone},
 			},
 			want: &oidc.UserInfo{
+				Subject: "human1",
+			},
+		},
+		{
+			name: "machine, scope phone",
+			args: args{
+				user:  machineUserInfo,
+				scope: []string{oidc.ScopePhone},
+			},
+			want: &oidc.UserInfo{
+				Subject:       "machine1",
 				UserInfoPhone: oidc.UserInfoPhone{},
 			},
 		},
 		{
 			name: "human, scope metadata",
 			args: args{
-				projectID: "project1",
-				user:      humanUserInfo,
-				scope:     []string{ScopeUserMetaData},
+				user:  humanUserInfo,
+				scope: []string{ScopeUserMetaData},
 			},
 			want: &oidc.UserInfo{
+				Subject:       "human1",
+				UserInfoEmail: oidc.UserInfoEmail{},
 				Claims: map[string]any{
 					ClaimUserMetaData: map[string]string{
 						"key1": base64.RawURLEncoding.EncodeToString([]byte{1, 2, 3}),
@@ -334,35 +452,36 @@ func Test_userInfoToOIDC(t *testing.T) {
 		{
 			name: "machine, scope metadata, none found",
 			args: args{
-				projectID: "project1",
-				user:      machineUserInfo,
-				scope:     []string{ScopeUserMetaData},
+				user:  machineUserInfo,
+				scope: []string{ScopeUserMetaData},
 			},
-			want: &oidc.UserInfo{},
+			want: &oidc.UserInfo{
+				Subject: "machine1",
+			},
 		},
 		{
 			name: "machine, scope resource owner",
 			args: args{
-				projectID: "project1",
-				user:      machineUserInfo,
-				scope:     []string{ScopeResourceOwner},
+				user:  machineUserInfo,
+				scope: []string{ScopeResourceOwner},
 			},
 			want: &oidc.UserInfo{
+				Subject: "machine1",
 				Claims: map[string]any{
-					ClaimResourceOwner + "id":             "orgID",
-					ClaimResourceOwner + "name":           "orgName",
-					ClaimResourceOwner + "primary_domain": "orgDomain",
+					ClaimResourceOwnerID:            "orgID",
+					ClaimResourceOwnerName:          "orgName",
+					ClaimResourceOwnerPrimaryDomain: "orgDomain",
 				},
 			},
 		},
 		{
 			name: "human, scope org primary domain prefix",
 			args: args{
-				projectID: "project1",
-				user:      humanUserInfo,
-				scope:     []string{domain.OrgDomainPrimaryScope + "foo.com"},
+				user:  humanUserInfo,
+				scope: []string{domain.OrgDomainPrimaryScope + "foo.com"},
 			},
 			want: &oidc.UserInfo{
+				Subject: "human1",
 				Claims: map[string]any{
 					domain.OrgDomainPrimaryClaim: "foo.com",
 				},
@@ -371,55 +490,16 @@ func Test_userInfoToOIDC(t *testing.T) {
 		{
 			name: "machine, scope org id",
 			args: args{
-				projectID: "project1",
-				user:      machineUserInfo,
-				scope:     []string{domain.OrgIDScope + "orgID"},
+				user:  machineUserInfo,
+				scope: []string{domain.OrgIDScope + "orgID"},
 			},
 			want: &oidc.UserInfo{
+				Subject: "machine1",
 				Claims: map[string]any{
-					domain.OrgIDClaim:                     "orgID",
-					ClaimResourceOwner + "id":             "orgID",
-					ClaimResourceOwner + "name":           "orgName",
-					ClaimResourceOwner + "primary_domain": "orgDomain",
-				},
-			},
-		},
-		{
-			name: "human, roleAudience",
-			args: args{
-				projectID:    "project1",
-				user:         humanUserInfo,
-				roleAudience: []string{"project1"},
-			},
-			want: &oidc.UserInfo{
-				Claims: map[string]any{
-					ClaimProjectRoles: projectRoles{
-						"role1": {"orgID": "orgDomain"},
-						"role2": {"orgID": "orgDomain"},
-					},
-					fmt.Sprintf(ClaimProjectRolesFormat, "project1"): projectRoles{
-						"role1": {"orgID": "orgDomain"},
-						"role2": {"orgID": "orgDomain"},
-					},
-				},
-			},
-		},
-		{
-			name: "human, requested roles",
-			args: args{
-				projectID:      "project1",
-				user:           humanUserInfo,
-				roleAudience:   []string{"project1"},
-				requestedRoles: []string{"role2"},
-			},
-			want: &oidc.UserInfo{
-				Claims: map[string]any{
-					ClaimProjectRoles: projectRoles{
-						"role2": {"orgID": "orgDomain"},
-					},
-					fmt.Sprintf(ClaimProjectRolesFormat, "project1"): projectRoles{
-						"role2": {"orgID": "orgDomain"},
-					},
+					domain.OrgIDClaim:               "orgID",
+					ClaimResourceOwnerID:            "orgID",
+					ClaimResourceOwnerName:          "orgName",
+					ClaimResourceOwnerPrimaryDomain: "orgDomain",
 				},
 			},
 		},
@@ -427,7 +507,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assetPrefix := "https://foo.com/assets"
-			got := userInfoToOIDC(tt.args.projectID, tt.args.user, tt.args.scope, tt.args.roleAudience, tt.args.requestedRoles, assetPrefix)
+			got := userInfoToOIDC(tt.args.user, tt.args.userInfoAssertion, tt.args.scope, assetPrefix)
 			assert.Equal(t, tt.want, got)
 		})
 	}

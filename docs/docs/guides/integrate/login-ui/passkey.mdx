@@ -1,5 +1,5 @@
 ---
-title: Passkeys in ZITADEL
+title: Using Passkeys in a Custom Login UI
 sidebar_label: Passkeys
 ---
 
@@ -23,18 +23,18 @@ There are two options to onboard users with passkeys:
 
 ### Send Registration Link
 
-When you want to send a link to your user, that enables him to register a new passkey device, you can choose if ZITADEL sends the code or ZITADEL can return the code in the API response. This way you can send a link through any channel of your choice (email, sms, phone, in-person, postal, ...).
+When you want to send a link to your user, that enables them to register a new passkey device, you can choose if ZITADEL sends the code or ZITADEL can return the code in the API response. This way you can send a link through any channel of your choice (email, sms, phone, in-person, postal, ...).
 
 If you asked ZITADEL to send the link to the user please make sure to populate the link with the needed values that point towards your registration UI.
 
-More detailed information about the API: [Send Registration Link Documentation](/apis/resources/user_service/user-service-create-passkey-registration-link)
+More detailed information about the API: [Send Registration Link Documentation](/apis/resources/user_service_v2/user-service-create-passkey-registration-link)
 
 Request Example:
 Send either the sendLink or the returnCode (empty message) in the request body, depending on the use case you have.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys/registration_link \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/passkeys/registration_link \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -74,14 +74,14 @@ By specifying the authenticator type you can choose if the passkey should be cro
 
 The API response will provide you the public key credential options, this will be used by the browser to obtain a signed challenge.
 
-More detailed information about the API: [Start Passkey Registration Documentation](/apis/resources/user_service/user-service-register-passkey)
+More detailed information about the API: [Start Passkey Registration Documentation](/apis/resources/user_service_v2/user-service-register-passkey)
 
 Request Example:
 The code only has to be filled if the user did get a registration code.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/passkeys \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -179,13 +179,13 @@ Include the public key credential you got from the browser in your request.
 You can give the Passkey a name, which makes it easier for the user to identify the registered authentication methods.
 Example: Google Pixel, iCloud Keychain, Yubikey, etc
 
-More detailed information about the API: [Verify Passkey Registration Documentation](/apis/resources/user_service/user-service-verify-passkey-registration)
+More detailed information about the API: [Verify Passkey Registration Documentation](/apis/resources/user_service_v2/user-service-verify-passkey-registration)
 
 Example Request:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys/$PASSKEY_ID \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/passkeys/$PASSKEY_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -218,12 +218,12 @@ First step is to ask the user for his username and create a new session with the
 When creating the new session make sure to include the challenge for passkey, resp. webAuthN with a required user verification and the domain of your login UI.
 The response will include the public key credential request options for the passkey in the challenges.
 
-More detailed information about the API: [Create Session Documentation](/apis/resources/session_service/session-service-create-session)
+More detailed information about the API: [Create Session Documentation](/apis/resources/session_service_v2/session-service-create-session)
 
 Example Request:
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

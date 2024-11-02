@@ -1,0 +1,68 @@
+InitCode:
+  Title: Verifiera användare
+  PreHeader: Verifiera användare
+  Subject: Verifiera användare
+  Greeting: Hej {{.DisplayName}},
+  Text: Din användare har skapats. Använd användarnamnet {{.PreferredLoginName}} för att logga in. Klicka på knappen nedan för att genomföra verifieringsprocessen. (Kod {{.Code}}) Om du inte begärt det här meddelande, vänligen ignorera det.
+  ButtonText: Slutför verifiering
+PasswordReset:
+  Title: Återställ lösenord
+  PreHeader: Återställ lösenord
+  Subject: Återställ lösenord
+  Greeting: Hej {{.DisplayName}},
+  Text: Vi har mottagit en begäran om att återställa lösenordet. Använd knappen nedan för att återställa ditt lösenord. (Kod {{.Code}}) Om du inte begärt det här meddelande, vänligen ignorera det.
+  ButtonText: Återställ lösenord
+VerifyEmail:
+  Title: Verifiera e-post
+  PreHeader: Verifiera e-post
+  Subject: Verifiera e-post
+  Greeting: Hej {{.DisplayName}},
+  Text: En ny e-postadress har lagts till. Använd knappen nedan för att verifiera din e-post. (Kod {{.Code}}) Om du inte lagt till en ny e-postadress, vänligen ignorera detta mail.
+  ButtonText: Verifiera e-post
+VerifyPhone:
+  Title: Verifiera telefon
+  PreHeader: Verifiera telefon
+  Subject: Verifiera telefon
+  Greeting: Hej {{.DisplayName}},
+  Text: Ett nytt mobilnummer har lagts till. Använd följande kod för att verifiera det {{.Code}}
+  ButtonText: Verifiera telefon
+VerifyEmailOTP:
+  Title: Verifiera engångslösenord
+  PreHeader: Verifiera engångslösenord
+  Subject: Verifiera engångslösenord
+  Greeting: Hej {{.DisplayName}},
+  Text: Använd engångslösenordet {{.OTP}} för att autentisera inom de närmaste fem minuterna eller klicka på "Autentisera"-knappen.
+  ButtonText: Autentisera
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} är ditt engångslösenord för {{ .Domain }}. Använd det inom {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domän har blivit tagen i anspråk
+  PreHeader: Ändra e-post / användarnamn
+  Subject: Domän har blivit tagen i anspråk
+  Greeting: Hej {{.DisplayName}},
+  Text: Domänen {{.Domain}} har blivit tagen i anspråk av en organisation. Din nuvarande användare {{.Username}} är inte en del av denna organisation. Därför måste du ändra din e-post när du loggar in. Vi har skapat ett tillfälligt användarnamn ({{.TempUsername}}) för denna inloggning.
+  ButtonText: Logga in
+PasswordlessRegistration:
+  Title: Lägg till lösenordsfri inloggning
+  PreHeader: Lägg till lösenordsfri inloggning
+  Subject: Lägg till lösenordsfri inloggning
+  Greeting: Hej {{.DisplayName}},
+  Text: Vi har mottagit en begäran om att lägga till en token för lösenordsfri inloggning. Använd knappen nedan för att lägga till din token eller enhet för lösenordsfri inloggning.
+  ButtonText: Lägg till lösenordsfri inloggning
+PasswordChange:
+  Title: Användarens lösenord har ändrats
+  PreHeader: Ändra lösenord 
+  Subject: Användarens lösenord har ändrats
+  Greeting: Hej {{.DisplayName}},
+  Text: Lösenordet för din användare har ändrats. Om denna ändring inte gjordes av dig, vänligen återställ ditt lösenord omedelbart.
+  ButtonText: Logga in
+InviteUser:
+  Title: Inbjudan till {{.ApplicationName}}
+  PreHeader: Inbjudan till {{.ApplicationName}}
+  Subject: Inbjudan till {{.ApplicationName}}
+  Greeting: Hej {{.DisplayName}},
+  Text: Din användare har blivit inbjuden till {{.ApplicationName}}. Klicka på knappen nedan för att slutföra inbjudansprocessen. Om du inte har begärt detta e-postmeddelande, ignorera det.
+  ButtonText: Acceptera inbjudan

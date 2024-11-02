@@ -8,7 +8,7 @@ OAuth 2 Token Introspection.
 
 At the end of the guide you should have an API with a protected endpoint.
 
-> This documentation references our HTTP example. There's also one for GRPC. Check them out on [GitHub](https://github.com/zitadel/zitadel-go/tree/authorization/example/api).
+> This documentation references our HTTP example. There's also one for GRPC. Check them out on [GitHub](https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go).
 
 ## Set up application and obtain keys
 

@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package zitadel.oidc.v2;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2;oidc";
+
+message AuthRequest{
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    external_docs: {
+      url: "https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest";
+      description: "Find out more about OIDC Auth Request parameters";
+    }
+  };
+  
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the authorization request";
+    }
+  ];
+
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Time when the auth request was created";
+    }
+  ];
+
+  string client_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "OIDC client ID of the application that created the auth request";
+    }
+  ];
+
+  repeated string scope = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Requested scopes by the application, which the user must consent to.";
+    }
+  ];
+  
+  string redirect_uri = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Base URI that points back to the application";
+    }
+  ];
+
+  repeated Prompt prompt = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Prompts that must be displayed to the user";
+    }
+  ];
+
+  repeated string ui_locales = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "End-User's preferred languages and scripts for the user interface, represented as a list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value [fr-CA, fr, en] represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported.";
+    }
+  ];
+
+  optional string login_hint = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Login hint can be set by the application with a user identifier such as an email or phone number.";
+    }
+  ];
+
+  optional google.protobuf.Duration max_age = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specifies the allowable elapsed time in seconds since the last time the End-User was actively authenticated. If the elapsed time is greater than this value, or the field is present with 0 duration, the user must be re-authenticated.";
+    }
+  ];
+  
+  optional string hint_user_id = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "User ID taken from a ID Token Hint if it was present and valid.";
+    }
+  ];
+}
+
+enum Prompt {
+  PROMPT_UNSPECIFIED = 0;
+  PROMPT_NONE = 1;
+  PROMPT_LOGIN = 2;
+  PROMPT_CONSENT = 3;
+  PROMPT_SELECT_ACCOUNT = 4;
+  PROMPT_CREATE = 5;
+}
+
+message AuthorizationError {
+  ErrorReason error = 1;
+  optional string error_description = 2;
+  optional string error_uri = 3;
+}
+
+enum ErrorReason {
+  ERROR_REASON_UNSPECIFIED = 0;
+  
+  // Error states from https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2.1
+  ERROR_REASON_INVALID_REQUEST = 1;
+  ERROR_REASON_UNAUTHORIZED_CLIENT = 2;
+  ERROR_REASON_ACCESS_DENIED = 3;
+  ERROR_REASON_UNSUPPORTED_RESPONSE_TYPE = 4;
+  ERROR_REASON_INVALID_SCOPE = 5;
+  ERROR_REASON_SERVER_ERROR = 6;
+  ERROR_REASON_TEMPORARY_UNAVAILABLE = 7;
+
+  // Error states from https://openid.net/specs/openid-connect-core-1_0.html#AuthError
+  ERROR_REASON_INTERACTION_REQUIRED = 8;
+  ERROR_REASON_LOGIN_REQUIRED = 9;
+  ERROR_REASON_ACCOUNT_SELECTION_REQUIRED = 10;
+  ERROR_REASON_CONSENT_REQUIRED = 11;
+  ERROR_REASON_INVALID_REQUEST_URI = 12;
+  ERROR_REASON_INVALID_REQUEST_OBJECT = 13;
+  ERROR_REASON_REQUEST_NOT_SUPPORTED = 14;
+  ERROR_REASON_REQUEST_URI_NOT_SUPPORTED = 15;
+  ERROR_REASON_REGISTRATION_NOT_SUPPORTED = 16;
+}

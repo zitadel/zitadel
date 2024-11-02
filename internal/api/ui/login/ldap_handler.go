@@ -42,7 +42,7 @@ func (l *Login) renderLDAPLogin(w http.ResponseWriter, r *http.Request, authReq 
 
 func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 	data := new(ldapFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

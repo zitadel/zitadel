@@ -30,7 +30,7 @@ func (s *Server) ListMyPasswordless(ctx context.Context, _ *auth_pb.ListMyPasswo
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (s *Server) ListMyPasswordless(ctx context.Context, _ *auth_pb.ListMyPasswo
 
 func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPasswordlessRequest) (*auth_pb.AddMyPasswordlessResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	token, err := s.command.HumanAddPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false, domain.AuthenticatorAttachmentUnspecified)
+	token, err := s.command.HumanAddPasswordlessSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, domain.AuthenticatorAttachmentUnspecified)
 	if err != nil {
 		return nil, err
 	}
@@ -67,10 +67,9 @@ func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPass
 	if err != nil {
 		return nil, err
 	}
-	origin := http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure)
 	return &auth_pb.AddMyPasswordlessLinkResponse{
 		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
-		Link:       initCode.Link(origin + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
+		Link:       initCode.Link(http.DomainContext(ctx).Origin() + login.HandlerPrefix + login.EndpointPasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
 }

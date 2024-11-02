@@ -16,6 +16,16 @@ type Phone struct {
 	ReturnCode bool
 }
 
-func (c *Commands) newPhoneCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-	return c.newCode(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
+// newPhoneCode generates a new code to be sent out to via SMS or
+// returns the ID of the external code provider (e.g. when using Twilio verification API)
+func (c *Commands) newPhoneCode(ctx context.Context, filter preparation.FilterToQueryReducer, secretGeneratorType domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, string, error) {
+	externalID, err := c.activeSMSProvider(ctx)
+	if err != nil {
+		return nil, "", err
+	}
+	if externalID != "" {
+		return nil, externalID, nil
+	}
+	code, err := c.newEncryptedCodeWithDefault(ctx, filter, secretGeneratorType, alg, defaultConfig)
+	return code, "", err
 }

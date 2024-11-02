@@ -1,35 +1,51 @@
 <cnsl-top-view
   [hasBackButton]="false"
-  title="{{ 'IAM.TITLE' | translate }}"
-  sub="{{ 'IAM.DESCRIPTION' | translate }}"
+  title="{{ 'DESCRIPTIONS.SETTINGS.INSTANCE.TITLE' | translate }}"
+  sub="{{ 'DESCRIPTIONS.SETTINGS.INSTANCE.DESCRIPTION' | translate }}"
   [isActive]="instance?.state === State.STATE_RUNNING"
   [isInactive]="instance?.state === State.STATE_STOPPED || instance?.state === State.STATE_STOPPING"
   [hasContributors]="true"
   stateTooltip="{{ 'INSTANCE.STATE.' + instance?.state | translate }}"
 >
-  <cnsl-contributors
-    topContributors
-    [totalResult]="totalMemberResult"
-    [loading]="loading$ | async"
-    [membersSubject]="membersSubject"
-    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-    (addClicked)="openAddMember()"
-    (showDetailClicked)="showDetail()"
-    (refreshClicked)="loadMembers()"
-    [disabled]="(['iam.member.write'] | hasRole | async) === false"
-  >
-  </cnsl-contributors>
-
+  <div topContributors class="instance-action-wrapper">
+    <a
+      mat-raised-button
+      color="primary"
+      *ngIf="customerPortalLink$ | async as customerPortalLink"
+      class="portal-link external-link"
+      [href]="customerPortalLink"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <div class="cnsl-action-button">
+        <span class="portal-span">{{ 'MENU.CUSTOMERPORTAL' | translate }}</span>
+        <i class="las la-external-link-alt"></i>
+      </div>
+    </a>
+    <cnsl-contributors
+      [totalResult]="totalMemberResult"
+      [loading]="loading$ | async"
+      [membersSubject]="membersSubject"
+      title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+      description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+      (addClicked)="openAddMember()"
+      (showDetailClicked)="showDetail()"
+      (refreshClicked)="loadMembers()"
+      [disabled]="(['iam.member.write'] | hasRole | async) === false"
+    >
+    </cnsl-contributors>
+  </div>
   <cnsl-info-row topContent *ngIf="instance" [instance]="instance"></cnsl-info-row>
 </cnsl-top-view>
 
 <div class="max-width-container">
-  <h2 class="instance-table-title">{{ 'ORG.LIST.TITLE' | translate }}</h2>
-
-  <p class="instance-table-desc cnsl-secondary-text">{{ 'ORG.LIST.DESCRIPTION' | translate }}</p>
-
-  <cnsl-org-table></cnsl-org-table>
-
-  <cnsl-settings-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-settings-grid>
+  <div class="instance-settings-wrapper">
+    <ng-container *ngIf="settingsList | async as list">
+      <cnsl-settings-list
+        [selectedId]="id"
+        [serviceType]="PolicyComponentServiceType.ADMIN"
+        [settingsList]="list"
+      ></cnsl-settings-list>
+    </ng-container>
+  </div>
 </div>

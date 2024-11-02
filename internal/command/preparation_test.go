@@ -7,11 +7,14 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-//Want represents the expected values for each step
+// Want represents the expected values for each step
 type Want struct {
 	ValidationErr error
 	CreateErr     error
@@ -22,7 +25,7 @@ type CommandVerifier interface {
 	Validate(eventstore.Command) bool
 }
 
-//AssertValidation checks if the validation works as inteded
+// AssertValidation checks if the validation works as intended
 func AssertValidation(t *testing.T, ctx context.Context, validation preparation.Validation, filter preparation.FilterToQueryReducer, want Want) {
 	t.Helper()
 
@@ -51,7 +54,7 @@ func AssertValidation(t *testing.T, ctx context.Context, validation preparation.
 	for i, cmd := range want.Commands {
 		if v, ok := cmd.(CommandVerifier); ok {
 			if verified := v.Validate(cmds[i]); !verified {
-				t.Errorf("verification failed on command: = %v, want %v", cmds[i], cmd)
+				t.Errorf("verification failed on command: =\n%v\nwant\n%v", cmds[i], cmd)
 			}
 			continue
 		}
@@ -87,5 +90,19 @@ func (mf *MultiFilter) Filter() preparation.FilterToQueryReducer {
 	return func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 		mf.count++
 		return mf.filters[mf.count-1](ctx, queryFactory)
+	}
+}
+
+func assertObjectDetails(t *testing.T, want, got *domain.ObjectDetails) {
+	if want == nil {
+		assert.Nil(t, got)
+		return
+	}
+	assert.Equal(t, got.CreationDate, want.CreationDate)
+	assert.Equal(t, got.EventDate, want.EventDate)
+	assert.Equal(t, got.ResourceOwner, want.ResourceOwner)
+	assert.Equal(t, got.Sequence, want.Sequence)
+	if want.ID != "" {
+		assert.Equal(t, got.ID, want.ID)
 	}
 }

@@ -18,8 +18,8 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 var (
@@ -157,7 +157,6 @@ func Test_sessionsToPb(t *testing.T) {
 					Id:             "345",
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
-					OrganisationId: "org1",
 					OrganizationId: "org1",
 				},
 			},
@@ -174,7 +173,6 @@ func Test_sessionsToPb(t *testing.T) {
 					Id:             "345",
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
-					OrganisationId: "org1",
 					OrganizationId: "org1",
 				},
 				Password: &session.PasswordFactor{
@@ -194,7 +192,6 @@ func Test_sessionsToPb(t *testing.T) {
 					Id:             "345",
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
-					OrganisationId: "org1",
 					OrganizationId: "org1",
 				},
 				WebAuthN: &session.WebAuthNFactor{
@@ -215,7 +212,6 @@ func Test_sessionsToPb(t *testing.T) {
 					Id:             "345",
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
-					OrganisationId: "org1",
 					OrganizationId: "org1",
 				},
 				Totp: &session.TOTPFactor{

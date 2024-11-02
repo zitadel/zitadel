@@ -8,7 +8,6 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -33,7 +32,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 					testEvent(
 						keypair.AddedEventType,
 						keypair.AggregateType,
-						keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(time.Hour)),
+						keypairAddedEventData(crypto.KeyUsageSigning, time.Now().Add(time.Hour)),
 					), keypair.AddedEventMapper),
 			},
 			reduce: (&keyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
@@ -52,7 +51,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 								"instance-id",
 								uint64(15),
 								"algorithm",
-								domain.KeyUsageSigning,
+								crypto.KeyUsageSigning,
 							},
 						},
 						{
@@ -89,7 +88,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 					testEvent(
 						keypair.AddedEventType,
 						keypair.AggregateType,
-						keypairAddedEventData(domain.KeyUsageSigning, time.Now().Add(-time.Hour)),
+						keypairAddedEventData(crypto.KeyUsageSigning, time.Now().Add(-time.Hour)),
 					), keypair.AddedEventMapper),
 			},
 			reduce: (&keyProjection{}).reduceKeyPairAdded,
@@ -132,7 +131,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 					testEvent(
 						keypair.AddedCertificateEventType,
 						keypair.AggregateType,
-						certificateAddedEventData(domain.KeyUsageSAMLMetadataSigning, time.Now().Add(time.Hour)),
+						certificateAddedEventData(crypto.KeyUsageSAMLMetadataSigning, time.Now().Add(time.Hour)),
 					), keypair.AddedCertificateEventMapper),
 			},
 			reduce: (&keyProjection{certEncryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceCertificateAdded,
@@ -170,10 +169,10 @@ func TestKeyProjection_reduces(t *testing.T) {
 	}
 }
 
-func keypairAddedEventData(usage domain.KeyUsage, t time.Time) []byte {
+func keypairAddedEventData(usage crypto.KeyUsage, t time.Time) []byte {
 	return []byte(`{"algorithm": "algorithm", "usage": ` + fmt.Sprintf("%d", usage) + `, "privateKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}, "publicKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHVibGljS2V5"}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
 }
 
-func certificateAddedEventData(usage domain.KeyUsage, t time.Time) []byte {
+func certificateAddedEventData(usage crypto.KeyUsage, t time.Time) []byte {
 	return []byte(`{"algorithm": "algorithm", "usage": ` + fmt.Sprintf("%d", usage) + `, "certificate": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
 }

@@ -57,6 +57,13 @@
 </cnsl-top-view>
 
 <div class="max-width-container">
+  <cnsl-info-section *ngIf="isNew()" class="problem" [type]="InfoSectionType.INFO">
+    <div class="jumptoproject-row">
+      <span class="jumptoproject">{{ 'APP.PAGES.JUMPTOPROJECT' | translate }}</span>
+      <a [routerLink]="['/projects', projectId]" color="primary" mat-raised-button>{{ 'ACTIONS.CONFIGURE' | translate }}</a>
+    </div>
+  </cnsl-info-section>
+
   <div
     class="compliance"
     *ngIf="app && app.oidcConfig && app.oidcConfig.complianceProblemsList && app.oidcConfig.complianceProblemsList?.length"
@@ -211,7 +218,7 @@
                 [options]="{
                   lineNumbers: true,
                   theme: 'material',
-                  mode: 'application/xml'
+                  mode: 'application/xml',
                 }"
               ></ngx-codemirror>
             </div>
@@ -413,116 +420,49 @@
             </div>
           </cnsl-card>
         </ng-container>
-
-        <ng-container *ngIf="currentSetting === 'urls' && !app?.samlConfig">
-          <cnsl-card title=" {{ 'APP.URLS' | translate }}" *ngIf="environmentMap$ | async as environmentMap">
-            <cnsl-info-section *ngIf="environmentMap.issuer">
+        <ng-container *ngIf="currentSetting === 'urls'">
+          <cnsl-card title=" {{ 'APP.URLS' | translate }}">
+            <cnsl-info-section *ngIf="issuer$ | async as issuer">
               <div
                 class="link"
-                [innerHtml]="
-                  'APP.OIDC.WELLKNOWN' | translate: { url: environmentMap['issuer'] + '/.well-known/openid-configuration' }
-                "
+                [innerHtml]="'APP.OIDC.WELLKNOWN' | translate: { url: issuer + '/.well-known/openid-configuration' }"
               ></div>
             </cnsl-info-section>
-
-            <div class="app-info-row">
-              <div class="app-info-wrapper" *ngFor="let environmentV of environmentMap | keyvalue">
-                <p class="app-info-row-title cnsl-secondary-text">{{ environmentV.key }}</p>
-                <div class="app-copy-row">
-                  <div *ngIf="environmentV.value" class="environment">
-                    <button
-                      [disabled]="copied === environmentV.value"
-                      [matTooltip]="(copied !== environmentV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-                      cnslCopyToClipboard
-                      [valueToCopy]="environmentV.value"
-                      (copiedValue)="copied = environmentV.key"
-                    >
-                      {{ environmentV.value }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="app-info-row">
-              <div class="app-info-wrapper" *ngFor="let wellKnownV of wellKnownMap$ | async | keyvalue">
-                <ng-container *ngIf="wellKnownV.key.endsWith('endpoint') || wellKnownV.key.toString() === 'jwks_uri'">
-                  <p class="app-info-row-title cnsl-secondary-text">{{ wellKnownV.key }}</p>
-                  <div class="app-copy-row">
-                    <div *ngIf="wellKnownV.value" class="environment">
-                      <button
-                        [disabled]="copied === wellKnownV.value"
-                        [matTooltip]="(copied !== wellKnownV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-                        cnslCopyToClipboard
-                        [valueToCopy]="wellKnownV.value"
-                        (copiedValue)="copied = wellKnownV.key"
-                      >
-                        {{ wellKnownV.value }}
-                      </button>
-                    </div>
-                  </div></ng-container
-                >
-              </div>
-            </div>
-          </cnsl-card>
-        </ng-container>
-
-        <ng-container *ngIf="currentSetting === 'urls' && samlForm && app?.samlConfig">
-          <cnsl-card title=" {{ 'APP.URLS' | translate }}" *ngIf="environmentMap$ | async as environmentMap">
-            <div class="app-info-row">
-              <div class="app-info-wrapper" *ngIf="environmentMap['samlCertificateURL']">
-                <p class="app-info-row-title cnsl-secondary-text">{{ 'APP.SAML.CERTIFICATE' | translate }}</p>
-                <div class="app-copy-row">
-                  <div class="environment">
-                    <button
-                      [disabled]="copied === environmentMap['samlCertificateURL']"
-                      [matTooltip]="
-                        (copied !== environmentMap['samlCertificateURL'] ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate
-                      "
-                      cnslCopyToClipboard
-                      [valueToCopy]="environmentMap['samlCertificateURL']"
-                      (copiedValue)="copied = environmentMap['samlCertificateURL']"
-                    >
-                      {{ environmentMap['samlCertificateURL'] }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="app-info-wrapper" *ngIf="environmentMap['samlSSO']">
-                <p class="app-info-row-title cnsl-secondary-text">Single Sign On (SSO)</p>
-                <div class="app-copy-row">
-                  <div class="environment">
-                    <button
-                      [disabled]="copied === environmentMap['samlSSO']"
-                      [matTooltip]="(copied !== environmentMap['samlSSO'] ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-                      cnslCopyToClipboard
-                      [valueToCopy]="environmentMap['samlSSO']"
-                      (copiedValue)="copied = environmentMap['samlSSO']"
-                    >
-                      {{ environmentMap['samlSSO'] }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="app-info-wrapper" *ngIf="environmentMap['samlSLO']">
-                <p class="app-info-row-title cnsl-secondary-text">Single Logoout (SLO)</p>
-                <div class="app-copy-row">
-                  <div class="environment">
-                    <button
-                      [disabled]="copied === environmentMap['samlSLO']"
-                      [matTooltip]="(copied !== environmentMap['samlSLO'] ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-                      cnslCopyToClipboard
-                      [valueToCopy]="environmentMap['samlSLO']"
-                      (copiedValue)="copied = environmentMap['samlSLO']"
-                    >
-                      {{ environmentMap['samlSLO'] }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ng-container *ngIf="app?.apiConfig && apiURLs$ | async as apiURLs">
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                *ngFor="let apiUrl of apiURLs"
+                [label]="apiUrl[0]"
+                [value]="apiUrl[1]"
+              ></cnsl-copy-row>
+            </ng-container>
+            <ng-container *ngIf="app?.samlConfig && samlURLs$ | async as samlMap">
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                *ngIf="samlMap['samlCertificateURL'] as url"
+                [label]="'APP.SAML.CERTIFICATE' | translate"
+                [value]="url"
+              >
+                <a class="download-button" mat-stroked-button [href]="url" download>{{ 'ACTIONS.DOWNLOAD' | translate }}</a>
+              </cnsl-copy-row>
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                *ngIf="samlMap['samlSSO'] as url"
+                label="Single Sign On (SSO)"
+                [value]="url"
+              ></cnsl-copy-row>
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                *ngIf="samlMap['samlSLO'] as url"
+                label="Single Logout (SLO)"
+                [value]="url"
+              ></cnsl-copy-row>
+            </ng-container>
+            <ng-container *ngIf="app?.oidcConfig && wellknownURLs$ | async as wellKnownURLs">
+              <ng-container *ngFor="let wellknown of wellKnownURLs">
+                <cnsl-copy-row labelMinWidth="220px" [label]="wellknown[0]" [value]="wellknown[1]"></cnsl-copy-row>
+              </ng-container>
+            </ng-container>
           </cnsl-card>
         </ng-container>
 

@@ -68,6 +68,7 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		tmplInitPasswordDone:             "init_password_done.html",
 		tmplInitUser:                     "init_user.html",
 		tmplInitUserDone:                 "init_user_done.html",
+		tmplInviteUser:                   "invite_user.html",
 		tmplPasswordResetDone:            "password_reset_done.html",
 		tmplChangePassword:               "change_password.html",
 		tmplChangePasswordDone:           "change_password_done.html",
@@ -193,6 +194,9 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		"initUserUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointInitUser)
 		},
+		"inviteUserUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointInviteUser)
+		},
 		"changePasswordUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangePassword)
 		},
@@ -234,6 +238,9 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		},
 		"ldapUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLDAPCallback)
+		},
+		"linkingUserPromptUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointLinkingUserPrompt)
 		},
 	}
 	var err error
@@ -309,7 +316,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.ChangePasswordStep:
 		l.renderChangePassword(w, r, authReq, err)
 	case *domain.VerifyEMailStep:
-		l.renderMailVerification(w, r, authReq, "", err)
+		l.renderMailVerification(w, r, authReq, authReq.UserID, "", step.InitPassword, err)
 	case *domain.MFAPromptStep:
 		l.renderMFAPrompt(w, r, authReq, step, err)
 	case *domain.InitUserStep:
@@ -326,6 +333,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInternalError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
 	case *domain.ProjectRequiredStep:
 		l.renderInternalError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
+	case *domain.VerifyInviteStep:
+		l.renderInviteUser(w, r, authReq, "", "", "", "", nil)
 	default:
 		l.renderInternalError(w, r, authReq, zerrors.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
@@ -338,7 +347,11 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 		if authReq != nil {
 			log = log.WithField("auth_req_id", authReq.ID)
 		}
-		log.Error()
+		if zerrors.IsInternal(err) {
+			log.Error()
+		} else {
+			log.Info()
+		}
 
 		_, msg = l.getErrorMessage(r, err)
 	}
@@ -524,12 +537,12 @@ func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 }
 
 func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
-	defaultID := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	f, err := l.featureCheck.CheckInstanceBooleanFeature(r.Context(), domain.FeatureLoginDefaultOrg)
-	logging.OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
-	if !f.Boolean {
-		defaultID = authz.GetInstance(r.Context()).InstanceID()
+	instance := authz.GetInstance(r.Context())
+	defaultID := instance.DefaultOrganisationID()
+	if !instance.Features().LoginDefaultOrg {
+		defaultID = instance.InstanceID()
 	}
+
 	if authReq != nil {
 		return authReq.PrivateLabelingOrgID(defaultID)
 	}
@@ -675,6 +688,7 @@ type passwordData struct {
 	HasLowercase string
 	HasNumber    string
 	HasSymbol    string
+	Expired      bool
 }
 
 type userSelectionData struct {
@@ -706,5 +720,5 @@ type mfaDoneData struct {
 type totpData struct {
 	Url    string
 	Secret string
-	QrCode string
+	QrCode template.HTML
 }

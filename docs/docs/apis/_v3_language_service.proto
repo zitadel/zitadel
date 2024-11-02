@@ -1,0 +1,158 @@
+syntax = "proto3";
+
+package zitadel.settings.language.v3alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/language/v3alpha;language";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "zitadel/object/v3alpha/object.proto";
+import "zitadel/settings/object/v3alpha/object.proto";
+import "zitadel/settings/language/v3alpha/language.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Language Settings Service";
+    version: "3.0-alpha";
+    description: "Language Service is intended to manage languages for ZITADEL. Enable the feature flag \"multitenancy_settings\" in order to activate it. Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org. It will continue breaking as long as it is in alpha state.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+  consumes: "application/grpc-web+proto";
+
+  produces: "application/json";
+  produces: "application/grpc";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/settings/v3alpha";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
+        token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the settings in the given context.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// ZITADELLanguageSettings is intended to manage languages for ZITADEL.
+// Enable the feature flag \"multitenancy_settings\" in order to activate it.
+// Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.
+service ZITADELLanguageSettings {
+  rpc SetLanguages (SetLanguageSettingsRequest) returns (SetLanguageSettingsResponse) {
+    option (google.api.http) = {
+      patch: "/languages"
+      body: "settings"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set languages for a given context";
+      description: "Configure and set languages for a given context. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+
+  rpc ResolveLanguages (ResolveLanguageSettingsRequest) returns (ResolveLanguageSettingsResponse) {
+    option (google.api.http) = {
+      get: "/languages"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the languages in the given context";
+      description: "Returns all configured and inherited languages for the given context."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+}
+
+message SetLanguageSettingsRequest{
+  optional zitadel.object.v3alpha.RequestContext ctx = 1;
+  SetLanguageSettings settings = 2;
+}
+
+message SetLanguageSettingsResponse{
+  zitadel.settings.object.v3alpha.Details details = 1;
+}
+
+message ResolveLanguageSettingsRequest{
+  optional zitadel.object.v3alpha.RequestContext ctx = 1;
+}
+
+message ResolveLanguageSettingsResponse{
+  zitadel.settings.object.v3alpha.Details details = 1;
+  ResolvedLanguageSettings settings = 2;
+}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -37,6 +36,10 @@ var (
 		name:  projection.DeviceAuthRequestColumnScopes,
 		table: deviceAuthRequestTable,
 	}
+	DeviceAuthRequestColumnAudience = Column{
+		name:  projection.DeviceAuthRequestColumnAudience,
+		table: deviceAuthRequestTable,
+	}
 	DeviceAuthRequestColumnCreationDate = Column{
 		name:  projection.DeviceAuthRequestColumnCreationDate,
 		table: deviceAuthRequestTable,
@@ -54,33 +57,6 @@ var (
 		table: deviceAuthRequestTable,
 	}
 )
-
-type DeviceAuth struct {
-	ClientID        string
-	DeviceCode      string
-	UserCode        string
-	Expires         time.Time
-	Scopes          []string
-	State           domain.DeviceAuthState
-	Subject         string
-	UserAuthMethods []domain.UserAuthMethodType
-	AuthTime        time.Time
-}
-
-// DeviceAuthByDeviceCode gets the current state of a Device Authorization directly from the eventstore.
-func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, deviceCode string) (deviceAuth *DeviceAuth, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	model := NewDeviceAuthReadModel(deviceCode, authz.GetInstance(ctx).InstanceID())
-	if err := q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
-		return nil, err
-	}
-	if !model.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "QUERY-eeR0e", "Errors.DeviceAuth.NotExisting")
-	}
-	return &model.DeviceAuth, nil
-}
 
 // DeviceAuthRequestByUserCode finds a Device Authorization request by User-Code from the `device_auth_requests` projection.
 func (q *Queries) DeviceAuthRequestByUserCode(ctx context.Context, userCode string) (authReq *domain.AuthRequestDevice, err error) {
@@ -109,6 +85,7 @@ var deviceAuthSelectColumns = []string{
 	DeviceAuthRequestColumnDeviceCode.identifier(),
 	DeviceAuthRequestColumnUserCode.identifier(),
 	DeviceAuthRequestColumnScopes.identifier(),
+	DeviceAuthRequestColumnAudience.identifier(),
 }
 
 func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*domain.AuthRequestDevice, error)) {
@@ -116,7 +93,8 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		func(row *sql.Row) (*domain.AuthRequestDevice, error) {
 			dst := new(domain.AuthRequestDevice)
 			var (
-				scopes database.TextArray[string]
+				scopes   database.TextArray[string]
+				audience database.TextArray[string]
 			)
 
 			err := row.Scan(
@@ -124,6 +102,7 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&dst.DeviceCode,
 				&dst.UserCode,
 				&scopes,
+				&audience,
 			)
 			if errors.Is(err, sql.ErrNoRows) {
 				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
@@ -132,6 +111,7 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				return nil, zerrors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
 			}
 			dst.Scopes = scopes
+			dst.Audience = audience
 			return dst, nil
 		}
 }

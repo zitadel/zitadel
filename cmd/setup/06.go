@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -17,7 +19,7 @@ type OwnerRemoveColumns struct {
 	dbClient *sql.DB
 }
 
-func (mig *OwnerRemoveColumns) Execute(ctx context.Context) error {
+func (mig *OwnerRemoveColumns) Execute(ctx context.Context, _ eventstore.Event) error {
 	stmt := createAdminViews06 + createAuthViews06
 	_, err := mig.dbClient.ExecContext(ctx, stmt)
 	return err

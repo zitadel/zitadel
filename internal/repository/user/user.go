@@ -19,7 +19,9 @@ const (
 	UserReactivatedType       = userEventTypePrefix + "reactivated"
 	UserRemovedType           = userEventTypePrefix + "removed"
 	UserTokenAddedType        = userEventTypePrefix + "token.added"
+	UserTokenV2AddedType      = userEventTypePrefix + "token.v2.added"
 	UserTokenRemovedType      = userEventTypePrefix + "token.removed"
+	UserImpersonatedType      = userEventTypePrefix + "impersonated"
 	UserDomainClaimedType     = userEventTypePrefix + "domain.claimed"
 	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
@@ -209,14 +211,18 @@ func UserRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type UserTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TokenID           string    `json:"tokenId"`
-	ApplicationID     string    `json:"applicationId"`
-	UserAgentID       string    `json:"userAgentId"`
-	RefreshTokenID    string    `json:"refreshTokenID,omitempty"`
-	Audience          []string  `json:"audience"`
-	Scopes            []string  `json:"scopes"`
-	Expiration        time.Time `json:"expiration"`
-	PreferredLanguage string    `json:"preferredLanguage"`
+	TokenID               string             `json:"tokenId,omitempty"`
+	ApplicationID         string             `json:"applicationId,omitempty"`
+	UserAgentID           string             `json:"userAgentId,omitempty"`
+	RefreshTokenID        string             `json:"refreshTokenID,omitempty"`
+	Audience              []string           `json:"audience,omitempty"`
+	Scopes                []string           `json:"scopes,omitempty"`
+	AuthMethodsReferences []string           `json:"authMethodsReferences,omitempty"`
+	AuthTime              time.Time          `json:"authTime,omitempty"`
+	Expiration            time.Time          `json:"expiration,omitempty"`
+	PreferredLanguage     string             `json:"preferredLanguage,omitempty"`
+	Reason                domain.TokenReason `json:"reason,omitempty"`
+	Actor                 *domain.TokenActor `json:"actor,omitempty"`
 }
 
 func (e *UserTokenAddedEvent) Payload() interface{} {
@@ -236,8 +242,12 @@ func NewUserTokenAddedEvent(
 	preferredLanguage,
 	refreshTokenID string,
 	audience,
-	scopes []string,
+	scopes,
+	authMethodsReferences []string,
+	authTime,
 	expiration time.Time,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
 ) *UserTokenAddedEvent {
 	return &UserTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -253,6 +263,8 @@ func NewUserTokenAddedEvent(
 		Scopes:            scopes,
 		Expiration:        expiration,
 		PreferredLanguage: preferredLanguage,
+		Reason:            reason,
+		Actor:             actor,
 	}
 }
 
@@ -266,6 +278,75 @@ func UserTokenAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	}
 
 	return tokenAdded, nil
+}
+
+type UserTokenV2AddedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	TokenID string `json:"tokenId,omitempty"`
+}
+
+func (e *UserTokenV2AddedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *UserTokenV2AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *UserTokenV2AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewUserTokenV2AddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	tokenID string,
+) *UserTokenV2AddedEvent {
+	return &UserTokenV2AddedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserTokenV2AddedType,
+		),
+		TokenID: tokenID,
+	}
+}
+
+type UserImpersonatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	ApplicationID string             `json:"applicationId,omitempty"`
+	Actor         *domain.TokenActor `json:"actor,omitempty"`
+}
+
+func (e *UserImpersonatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *UserImpersonatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *UserImpersonatedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewUserImpersonatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	applicationID string,
+	actor *domain.TokenActor,
+) *UserImpersonatedEvent {
+	return &UserImpersonatedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserImpersonatedType,
+		),
+		ApplicationID: applicationID,
+		Actor:         actor,
+	}
 }
 
 type UserTokenRemovedEvent struct {
@@ -349,7 +430,7 @@ func NewDomainClaimedEvent(
 		UserName:              userName,
 		oldUserName:           oldUserName,
 		userLoginMustBeDomain: userLoginMustBeDomain,
-		TriggeredAtOrigin:     http.ComposedOrigin(ctx),
+		TriggeredAtOrigin:     http.DomainContext(ctx).Origin(),
 	}
 }
 

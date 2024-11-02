@@ -28,7 +28,9 @@
 @import 'src/app/modules/filter-events/filter-events.component';
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
+@import 'src/app/pages/grants/grants.component';
 @import 'src/app/modules/edit-text/edit-text.component.scss';
+@import 'src/app/pages/projects/apps/integrate/integrate.component.scss';
 @import 'src/app/modules/providers/providers.scss';
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/users/user-detail/user-detail/user-detail.component';
@@ -43,10 +45,14 @@
 @import 'src/app/modules/form-field/field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
 @import 'src/app/modules/string-list/string-list.component.scss';
+@import 'src/app/components/quickstart/quickstart.component.scss';
+@import 'src/app/components/framework-autocomplete/framework-autocomplete.component.scss';
+@import 'src/app/components/framework-change/framework-change.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
 @import 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-illustration/project-grant-illustration.component';
 @import 'src/app/modules/accounts-card/accounts-card.component.scss';
 @import 'src/app/modules/onboarding-card/onboarding-card.component.scss';
+@import 'src/app/pages/app-create/app-create.component.scss';
 @import 'src/app/modules/onboarding/onboarding.component.scss';
 @import 'src/app/modules/filter/filter.component.scss';
 @import 'src/app/modules/policies/message-texts/message-texts.component.scss';
@@ -57,7 +63,7 @@
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
 @import 'src/app/modules/policies/idp-settings/idp-settings.component.scss';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
-@import 'src/app/pages/events/events.component';
+@import 'src/app/modules/events/events.component';
 @import 'src/app/pages/home/home.component.scss';
 @import 'src/app/modules/policies/security-policy/security-policy.component.scss';
 @import 'src/app/modules/idp-table/idp-table.component.scss';
@@ -66,7 +72,12 @@
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import 'src/app/modules/create-layout/create-layout.component.scss';
 @import 'src/app/modules/domains/domain-verification/domain-verification.component.scss';
+@import 'src/app/modules/smtp-table/smtp-table.component.scss';
+@import 'src/app/modules/smtp-provider/smtp-provider.scss';
+@import 'src/app/modules/policies/notification-smtp-provider/notification-smtp-provider.component.scss';
 @import './styles/codemirror.scss';
+@import 'src/app/components/copy-row/copy-row.component.scss';
+@import 'src/app/modules/providers/provider-next/provider-next.component.scss';
 
 @mixin component-themes($theme) {
   @include cnsl-color-theme($theme);
@@ -77,13 +88,18 @@
   @include header-theme($theme);
   @include app-type-radio-theme($theme);
   @include idp-table-theme($theme);
+  @include smtp-table-theme($theme);
+  @include smtp-provider-theme($theme);
   @include events-theme($theme);
   @include projects-theme($theme);
+  @include grants-theme($theme);
   @include top-view-theme($theme);
   @include info-overlay-theme($theme);
   @include app-auth-method-radio-theme($theme);
   @include security-policy-theme($theme);
+  @include framework-change-theme($theme);
   @include search-user-autocomplete-theme($theme);
+  @include quickstart-theme($theme);
   @include project-role-chips-theme($theme);
   @include card-theme($theme);
   @include idp-settings-theme($theme);
@@ -124,6 +140,7 @@
   @include refresh-table-theme($theme);
   @include accounts-card-theme($theme);
   @include sidenav-theme($theme);
+  @include framework-autocomplete-theme($theme);
   @include info-section-theme($theme);
   @include actions-theme($theme);
   @include filter-theme($theme);
@@ -131,11 +148,15 @@
   @include project-grid-theme($theme);
   @include granted-project-detail-theme($theme);
   @include user-grants-theme($theme);
+  @include app-create-theme($theme);
   @include info-row-theme($theme);
   @include redirect-uris-theme($theme);
   @include action-keys-theme($theme);
   @include codemirror-theme($theme);
   @include contact-theme($theme);
-  @include app-create-theme($theme);
+  @include app-integrate-theme($theme);
   @include domain-verification-theme($theme);
+  @include copy-row-theme($theme);
+  @include provider-next-theme($theme);
+  @include smtp-settings-theme($theme);
 }

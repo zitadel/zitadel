@@ -19,6 +19,7 @@ type HumanEmailWriteModel struct {
 	Code             *crypto.CryptoValue
 	CodeCreationDate time.Time
 	CodeExpiry       time.Duration
+	AuthRequestID    string
 
 	UserState domain.UserState
 }
@@ -53,6 +54,7 @@ func (wm *HumanEmailWriteModel) Reduce() error {
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()
 			wm.CodeExpiry = e.Expiry
+			wm.AuthRequestID = e.AuthRequestID
 		case *user.HumanEmailVerifiedEvent:
 			wm.IsEmailVerified = true
 			wm.Code = nil

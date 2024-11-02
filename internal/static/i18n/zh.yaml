@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: 未找到限制
     NoneSpecified: 未指定限制
+    Instance:
+      Blocked: 实例被阻止
   Restrictions:
     NoneSpecified: 未指定限制
     DefaultLanguageMustBeAllowed: 默认语言必须被允许
@@ -51,14 +53,27 @@ Errors:
     NotFound: 未找到 SMS 配置
     AlreadyActive: SMS 配置已启用
     AlreadyDeactivated: SMS 配置已停用
+  SMTP:
+    NotEmailMessage: 消息不是电子邮件消息
+    RequiredAttributes: 必须设置主题、收件人和内容，但部分或全部为空
+    CouldNotSplit: 无法拆分主机和端口以连接到 smtp
+    CouldNotDial: 无法与 SMTP 服务器联系，请检查端口、防火墙问题...
+    CouldNotDialTLS: 无法使用 TLS 与 SMTP 服务器联系，请检查端口、防火墙问题...
+    CouldNotCreateClient: 无法创建 smtp 客户端
+    CouldNotStartTLS: 无法启动 tls
+    CouldNotAuth: 无法添加 smtp 身份验证，请检查您的用户名和密码是否正确，如果正确，可能您的提供商需要 ZITADEL 不支持的身份验证方法
+    CouldNotSetSender: 无法设置发件人
+    CouldNotSetRecipient: 无法设置收件人
   SMTPConfig:
+    TestPassword: 未找到测试密码
     NotFound: 未找到 SMTP 配置
     AlreadyExists: SMTP 配置已存在
+    AlreadyDeactivated: SMTP 配置已停用
     SenderAdressNotCustomDomain: 发件人地址必须在在实例的域名设置中验证。
+    TestEmailNotFound: 找不到用于测试的电子邮件地址
   Notification:
     NoDomain: 未找到对应的域名
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: 找不到用户
     AlreadyExists: 用户已存在
     NotFoundOnOrg: 在所选组织中找不到用户
@@ -107,6 +122,7 @@ Errors:
       Key:
         NotFound: 未找到机器密钥
         AlreadyExisting: 已有的机器钥匙
+        Invalid: 公钥不是采用 PEM 编码的 PKIX 格式的有效 RSA 公钥
       Secret:
         NotExisting: 秘密并不存在
         Invalid: 秘密是无效的
@@ -126,13 +142,14 @@ Errors:
       NotFound: 验证码不存在
       Expired: 验证码已过期
       GeneratorAlgNotSupported: 不支持的生成器算法
+      Invalid: 代码无效
     Password:
       NotFound: 未找到密码
       Empty: 密码为空
       Invalid: 密码无效
       NotSet: 用户未设置密码
       NotChanged: 新密码不能与您当前的密码相同
-      NotSupported: 不支持密码哈希编码
+      NotSupported: 不支持密码哈希编码。查看 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: 未找到密码策略
       MinLength: 密码太短
@@ -325,7 +342,7 @@ Errors:
       NotActive: 项目授权不是启用状态
       NotInactive: 项目授权不是停用状态
   IAM:
-    NotFound: 实例未找到。查看 https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM 未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: 角色没有改变
     MemberInvalid: 成员无效
@@ -466,6 +483,7 @@ Errors:
     NotActive: 动作不是启用状态
     NotInactive: 动作不是停用状态
     MaxAllowed: 不允许额外的动作
+    NotEnabled: 未启用“操作”功能
   Flow:
     FlowTypeMissing: 缺少身份认证流程类型
     Empty: 身份认证流程为空
@@ -476,6 +494,8 @@ Errors:
     CloseRows: SQL 语句无法完成
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
+    TooManyNestingLevels: 查询嵌套级别过多（最多 20 个）
+    LimitExceeded: 限制已超出
   Quota:
     AlreadyExists: 这个单位的配额已经存在
     NotFound: 没有找到该单位的配额
@@ -510,6 +530,7 @@ Errors:
     IDPMissing: 请求中缺少IDP ID
     IDPInvalid: 请求的 IDP 无效
     ResponseInvalid: IDP 响应无效
+    MissingSingleMappingAttribute: 不包含映射属性或具有多个值
     SuccessURLMissing: 请求中缺少成功URL
     FailureURLMissing: 请求中缺少失败的URL
     StateMissing: 请求中缺少状态参数
@@ -532,6 +553,52 @@ Errors:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
     InvalidValue: 此功能的值无效
+  Target:
+    Invalid: 目标无效
+    NoTimeout: 目标没有超时
+    InvalidURL: 目标的 URL 无效
+    NotFound: 未找到目标
+  Execution:
+    ConditionInvalid: 执行条件无效
+    Invalid: 执行无效
+    NotFound: 未找到执行
+    IncludeNotFound: 包括未找到的内容
+    NoTargets: 没有定义目标
+    Failed: 执行失败
+    ResponseIsNotValidJSON: 响应不是有效的 JSON
+  UserSchema:
+    NotEnabled: 未启用“用户架构”功能
+    Type:
+      Missing: 缺少用户架构类型
+      AlreadyExists: 用户架构类型已存在
+    Authenticator:
+      Invalid: 验证器类型无效
+    NotActive: 用户架构未激活
+    NotInactive: 用户架构未处于非活动状态
+    NotExists: 用户架构不存在
+    ID:
+      Missing: 缺少用户架构 ID
+    Invalid: 用户架构无效
+    Data:
+      Invalid: 用户架构的数据无效
+  TokenExchange:
+    FeatureDisabled: 您的实例已禁用令牌交换功能。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: 令牌丢失
+      Invalid: 令牌无效
+      TypeMissing: 缺少令牌类型
+      TypeNotAllowed: 不允许的令牌类型
+      TypeNotSupported: 不支持令牌类型
+      NotForAPI: API 不允许使用模拟令牌
+    Impersonation:
+      PolicyDisabled: 实例安全策略中禁用模拟
+  WebKey:
+    ActiveDelete: 无法删除活动 Web 密钥
+    Config: 无效的 Web 密钥配置
+    Duplicate: Web 密钥 ID 不唯一
+    FeatureDisabled: Web 密钥功能已禁用
+    NoActive: 未找到活动 Web 密钥
+    NotFound: 未找到 Web 密钥
 
 AggregateTypes:
   action: 动作
@@ -543,8 +610,28 @@ AggregateTypes:
   usergrant: 用户授权
   quota: 配额
   feature: 特征
+  target: 靶
+  execution: 执行
+  user_schema: 用户模式
+  auth_request: 认证请求
+  device_auth: 设备认证
+  idpintent: IDP 意图
+  limits: 限制
+  milestone: 里程碑
+  oidc_session: OIDC 会话
+  restrictions: 限制
+  system: 系统
+  session: 会话
+  web_key: Web 密钥
 
 EventTypes:
+  execution:
+    set: 执行集
+    removed: 执行已删除
+  target:
+    added: 目标已创建
+    changed: 目标改变
+    removed: 目标已删除
   user:
     added: 已添加用户
     selfregistered: 自注册用户
@@ -557,9 +644,12 @@ EventTypes:
         failed: 初始化检查失败
     token:
       added: 已创建访问令牌
+      v2.added: 已创建访问令牌
+    impersonated: 用户冒充
     username:
       reserved: 保留用户名
       released: 用户名已发布
+      changed: 用户名已更改
     email:
       reserved: 电子邮件地址已保留
       released: 电子邮件地址已发布
@@ -578,6 +668,7 @@ EventTypes:
         removed: 删除服务用户 Key
       secret:
         set: 秘密套装
+        updated: 秘密哈希已更新
         removed: 秘密删除
         check:
           succeeded: 成功的秘密控制
@@ -595,6 +686,13 @@ EventTypes:
         check:
           succeeded: 初始化检查成功
           failed: 初始化检查失败
+      invite:
+        code:
+          added: 生成了邀请码
+          sent: 发送了邀请码
+        check:
+          succeeded: 邀请检查成功
+          failed: 邀请检查失败
       username:
         reserved: 保留用户名
         released: 用户名已发布
@@ -614,6 +712,10 @@ EventTypes:
         check:
           succeeded: 密码检查成功
           failed: 密码检查失败
+        change:
+          sent: 密码更改已发送
+        hash:
+          updated: 密码哈希已更新
       externallogin:
         check:
           succeeded: 外部登录成功
@@ -717,10 +819,6 @@ EventTypes:
       check:
         succeeded: 密码检查成功
         failed: 密码检查失败
-      change:
-        sent: 密码更改已发送
-      hash:
-        updated: 密码哈希已更新
     phone:
       changed: 更改手机号码
       verified: 验证手机号码
@@ -729,6 +827,7 @@ EventTypes:
       code:
         added: 生成的手机号码验证码
         sent: 发送手机号码验证码
+        removed: 电话号码已删除
     profile:
       changed: 修改用户资料
     address:
@@ -741,8 +840,10 @@ EventTypes:
         check:
           succeeded: MFA OTP 验证成功
           failed: MFA OTP 验证失败
+        init:
+          skipped: 跳过 MFA 初始化
       init:
-        skipped: 跳过 MFA 初始化
+        skipped: 跳过多因素初始化
     signed:
       out: 用户退出登录
     grant:
@@ -760,6 +861,12 @@ EventTypes:
       set: 用户元数据集
       removed: 删除用户元数据
       removed.all: 删除所有用户元数据
+    domain:
+      claimed: 已认领域名
+      claimed.sent: 已发送域声明通知
+    pat:
+      added: 添加个人访问令牌
+      removed: 个人访问令牌已删除
   org:
     added: 添加组织
     changed: 更改组织
@@ -806,6 +913,10 @@ EventTypes:
         config:
           added: 添加 SAML IDP 配置
           changed: 更改 SAML IDP 配置
+      jwt:
+        config:
+          added: 添加了 JWT IDP 配置
+          changed: JWT IDP 配置已更改
     customtext:
       set: 设置自定义文本
       removed: 删除自定义文本
@@ -819,6 +930,8 @@ EventTypes:
         idpprovider:
           added: 添加 IDP 到登录策略
           removed: 从登录策略删除 IDP
+          cascade:
+            removed: 从登录策略中删除了身份提供者级联
         secondfactor:
           added: 添加两步认证到登录策略
           removed: 删除两步认证到登录策略
@@ -862,6 +975,14 @@ EventTypes:
           removed: 从标签策略中删除的资产
       privacy:
         added: 添加隐私政策和服务条款
+        changed: 隐私政策和服务条款已更改
+        removed: 隐私政策和 TOS 已删除
+      domain:
+        added: 添加了域策略
+        changed: 域策略已更改
+        removed: 域策略已删除
+      lockout:
+        added: 添加了锁定策略
         changed: 更改隐私政策和服务条款
         removed: 删除隐私政策和服务条款
       notification:
@@ -874,6 +995,20 @@ EventTypes:
         cascade:
           removed: 删除动作级联
         removed: 删除动作
+      cleared: 流量已清除
+    mail:
+      template:
+        added: 添加了电子邮件模板
+        changed: 电子邮件模板已更改
+        removed: 电子邮件模板已删除
+      text:
+        added: 添加了电子邮件文本
+        changed: 电子邮件文本已更改
+        removed: 电子邮件文本已删除
+    metadata:
+      removed: 电子邮件文本已删除
+      removed.all: 所有元数据已删除
+      set: 元数据集
   project:
     added: 添加项目
     changed: 更改项目
@@ -916,6 +1051,14 @@ EventTypes:
             succeeded: 检查 OIDC Client Secret 成功
             failed: 检查 OIDC Client Secret 失败
         key:
+          added: 添加了 OIDC 应用密钥
+          removed: OIDC 应用密钥已删除
+      api:
+        secret:
+          check:
+            succeeded: API密检成功
+            failed: API 秘密检查失败
+        key:
           added: 添加应用 Key
           removed: 删除应用 Key
       config:
@@ -927,11 +1070,13 @@ EventTypes:
           changed: 更改 OIDC 配置
           secret:
             changed: 更改 OIDC Secret
+            updated: OIDC 秘密哈希已更新
         api:
           added: 添加 API 配置
           changed: 更改 API 配置
           secret:
             changed: 更改 API Secret
+            updated: API 秘密哈希已更新
   policy:
     password:
       complexity:
@@ -974,6 +1119,10 @@ EventTypes:
         config:
           added: 添加 SAML IDP 配置
           changed: 更改 SAML IDP 配置
+      jwt:
+        config:
+          added: 添加了身份提供者的 JWT 配置
+          changed: 身份提供商的 JWT 配置已删除
     customtext:
       set: 设置文本
       removed: 删除文本
@@ -1022,6 +1171,9 @@ EventTypes:
       config:
         added: 添加 SMTP 配置
         changed: 更改 SMTP 配置
+        activated: SMTP 配置已激活
+        deactivated: SMTP 配置已停用
+        removed: SMTP 配置已删除
         password:
           changed: 更改 SMTP 安全设置
     sms:
@@ -1036,12 +1188,173 @@ EventTypes:
           deactivated: 停用 Twilio SMS 提供者
   key_pair:
     added: 添加密钥对
+    certificate:
+      added: 证书已添加
   action:
     added: 添加动作
     changed: 更改动作
     deactivated: 停用动作
     reactivated: 启用动作
     removed: 删除动作
+  instance:
+    added: 实例已添加
+    changed: 实例已更改
+    customtext:
+      removed: 自定义文本已删除
+      set: 自定义文本集
+      template:
+        removed: 删除了自定义文本模板
+    default:
+      language:
+        set: 默认语言设置
+      org:
+        set: 默认组织集
+    domain:
+      added: 已添加域名
+      primary:
+        set: 主域集
+      removed: 域名已删除
+    iam:
+      console:
+        set: ZITADEL 控制台应用程序集
+      project:
+        set: ZITADEL 项目集
+    mail:
+      template:
+        added: 添加了电子邮件模板
+        changed: 电子邮件模板已更改
+      text:
+        added: 添加了电子邮件文本
+        changed: 电子邮件文本已更改
+    member:
+      added: 已添加实例成员
+      changed: 实例成员发生变化
+      removed: 实例成员已删除
+      cascade:
+        removed: 实例成员级联已删除
+    notification:
+      provider:
+        debug:
+          fileadded: 添加了文件调试通知提供程序
+          filechanged: 文件调试通知提供程序已更改
+          fileremoved: 删除文件调试通知提供程序
+          logadded: 添加了日志调试通知提供程序
+          logchanged: 日志调试通知提供程序已更改
+          logremoved: 日志调试通知提供程序已删除
+    oidc:
+      settings:
+        added: 添加了 OIDC 设置
+        changed: OIDC 设置已更改
+    policy:
+      domain:
+        added: 添加了域策略
+        changed: 域策略已更改
+      label:
+        activated: 标签政策已激活
+        added: 添加了标签策略
+        assets:
+          removed: 已删除标签政策中的资产
+        changed: 标签政策已更改
+        font:
+          added: 添加到标签政策的字体
+          removed: 从标签政策中删除的字体
+        icon:
+          added: 图标已添加到标签策略
+          removed: 图标已从标签政策中删除
+          dark:
+            added: 图标已添加到暗标签政策
+            removed: 图标已从暗标签政策中删除
+        logo:
+          added: 徽标已添加到标签政策中
+          removed: 徽标已从标签政策中删除
+          dark:
+            added: 徽标已添加到暗标签政策中
+            removed: 徽标从暗标签政策中删除
+      lockout:
+        added: 添加了锁定策略
+        changed: 锁定政策已更改
+      login:
+        added: 添加了登录策略
+        changed: 登录政策已更改
+        idpprovider:
+          added: 身份提供商已添加到登录策略中
+          cascade:
+            removed: 身份提供者级联从登录策略中删除
+          removed: 身份提供商已从登录策略中删除
+        multifactor:
+          added: 登录策略中添加了多因素
+          removed: 从登录策略中删除了多因素
+        secondfactor:
+          added: 添加到登录策略的第二个因素
+          removed: 从登录策略中删除了第二个因素
+      password:
+        age:
+          added: 添加了密码年龄策略
+          changed: 密码期限政策已更改
+        complexity:
+          added: 添加了密码复杂性策略
+          changed: 删除了密码复杂性策略
+      privacy:
+        added: 添加了隐私政策
+        changed: 隐私政策已更改
+      security:
+        set: 安全策略集
+
+    removed: 实例已删除
+    secret:
+      generator:
+        added: 添加了秘密生成器
+        changed: 秘密生成器已更改
+        removed: 秘密生成器已移除
+    sms:
+      configtwilio:
+        activated: Twilio SMS 配置已激活
+        added: 添加了 Twilio SMS 配置
+        changed: Twilio SMS 配置已更改
+        deactivated: Twilio SMS 配置已停用
+        removed: Twilio SMS 配置已删除
+        token:
+          changed: Twilio SMS 配置的令牌已更改
+    smtp:
+      config:
+        added: 添加了 SMTP 配置
+        changed: SMTP 配置已更改
+        activated: SMTP 配置已激活
+        deactivated: SMTP 配置已停用
+        password:
+          changed: SMTP 配置密码已更改
+        removed: SMTP 配置已删除
+  user_schema:
+    created: 已创建用户架构
+    updated: 用户架构已更新
+    deactivated: 用户架构已停用
+    reactivated: 用户架构已重新激活
+    deleted: 用户架构已删除
+    user:
+      created: 用户已创建
+      updated: 用户已更新
+      deleted: 用户已删除
+      email:
+        updated: 电子邮件地址已更改
+        verified: 电子邮件地址已验证
+        verification:
+          failed: 电子邮件地址验证失败
+        code:
+          added: 电子邮件地址验证码已生成
+          sent: 电子邮件地址验证码已发送
+      phone:
+        updated: 电话号码已更改
+        verified: 电话号码已验证
+        verification:
+          failed: 电话号码验证失败
+        code:
+          added: 电话号码验证码已生成
+          sent: 电话号码验证码已发送
+  web_key:
+    added: 已添加 Web Key
+    activated: 已激活 Web Key
+    deactivated: 已停用 Web Key
+    removed: 已删除 Web Key
 
 Application:
   OIDC:

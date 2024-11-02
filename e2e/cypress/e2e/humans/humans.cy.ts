@@ -28,14 +28,14 @@ describe('humans', () => {
       it('should add a user', () => {
         cy.get('[data-e2e="create-user-button"]').should('be.visible').click();
         cy.url().should('contain', 'users/create');
-        cy.get('[formcontrolname="email"]').type('dummy@dummy.com');
+        cy.get('[formcontrolname="email"]').should('be.enabled').type('dummy@dummy.com');
         //force needed due to the prefilled username prefix
-        cy.get('[formcontrolname="userName"]').type(user.addName);
-        cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
-        cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
+        cy.get('[formcontrolname="userName"]').should('be.enabled').type(user.addName);
+        cy.get('[formcontrolname="firstName"]').should('be.enabled').type('e2ehumanfirstname');
+        cy.get('[formcontrolname="lastName"]').should('be.enabled').type('e2ehumanlastname');
         cy.get('mat-select[data-cy="country-calling-code"]').click();
         cy.contains('mat-option', 'Switzerland').scrollIntoView().click();
-        cy.get('[formcontrolname="phone"]').type('123456789');
+        cy.get('[formcontrolname="phone"]').should('be.enabled').type('123456789');
         cy.get('[data-e2e="create-button"]').click({ force: true });
         cy.shouldConfirmSuccess();
         let loginName = user.addName;
@@ -58,7 +58,7 @@ describe('humans', () => {
       it('should delete a human user', () => {
         const rowSelector = `tr:contains(${user.removeName})`;
         cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
-        cy.get('[data-e2e="confirm-dialog-input"]').focus().type(user.removeName);
+        cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.enabled').type(user.removeName);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.shouldConfirmSuccess();
         cy.shouldNotExist({

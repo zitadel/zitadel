@@ -2,6 +2,7 @@ package messages
 
 import (
 	"fmt"
+	"mime"
 	"regexp"
 	"strings"
 	"time"
@@ -33,7 +34,7 @@ func (msg *Email) GetContent() (string, error) {
 	headers := make(map[string]string)
 	from := msg.SenderEmail
 	if msg.SenderName != "" {
-		from = fmt.Sprintf("%s <%s>", msg.SenderName, msg.SenderEmail)
+		from = fmt.Sprintf("%s <%s>", bEncodeWord(msg.SenderName), msg.SenderEmail)
 	}
 	headers["From"] = from
 	if msg.ReplyToAddress != "" {
@@ -50,11 +51,11 @@ func (msg *Email) GetContent() (string, error) {
 	}
 
 	//default mime-type is html
-	mime := "MIME-version: 1.0;" + lineBreak + "Content-Type: text/html; charset=\"UTF-8\";" + lineBreak + lineBreak
+	mime := "MIME-Version: 1.0" + lineBreak + "Content-Type: text/html; charset=\"UTF-8\"" + lineBreak + lineBreak
 	if !isHTML(msg.Content) {
-		mime = "MIME-version: 1.0;" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\";" + lineBreak + lineBreak
+		mime = "MIME-Version: 1.0" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\"" + lineBreak + lineBreak
 	}
-	subject := "Subject: " + qEncodeSubject(msg.Subject) + lineBreak
+	subject := "Subject: " + bEncodeWord(msg.Subject) + lineBreak
 	message += subject + mime + lineBreak + msg.Content
 
 	return message, nil
@@ -68,7 +69,7 @@ func isHTML(input string) bool {
 	return isHTMLRgx.MatchString(input)
 }
 
-// returns a RFC1342 "Q" encoded string to allow non-ascii characters
-func qEncodeSubject(subject string) string {
-	return "=?utf-8?q?" + subject + "?="
+// returns a RFC1342 "B" encoded string to allow non-ascii characters
+func bEncodeWord(word string) string {
+	return mime.BEncoding.Encode("UTF-8", word)
 }

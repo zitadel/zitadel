@@ -17,3 +17,7 @@ type SMTP struct {
 func (smtp *SMTP) HasAuth() bool {
 	return smtp.User != "" && smtp.Password != ""
 }
+
+type ConfigHTTP struct {
+	Endpoint string
+}

@@ -49,6 +49,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "User Authentication Factor"
         },
         {
+            name: "User Authorizations/Grants"
+        },
+        {
             name: "User Email"
         },
         {
@@ -594,7 +597,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "List Authentication Factors";
-            description: "Returns a list of possible authentication factors, multi-factor (MFA), second-factor (2FA)"
+            description: "Returns a list of possible authentication factors, multi-factor (MFA), second factor (2FA)"
         };
     }
 
@@ -609,8 +612,8 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
-            summary: "Add One-Time-Password (OTP)";
-            description: "Add a new One-Time-Password (OTP) factor to the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. Only one OTP per user is allowed. After adding a new OTP it has to be verified."
+            summary: "Add One-Time Password (OTP)";
+            description: "Add a new One-Time Password (OTP) factor to the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. Only one OTP per user is allowed. After adding a new OTP it has to be verified."
         };
     }
 
@@ -626,8 +629,8 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
-            summary: "Verify One-Time-Password (OTP)";
-            description: "Verify the last added One-Time-Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. Only one OTP per user is allowed."
+            summary: "Verify One-Time Password (OTP)";
+            description: "Verify the last added One-Time Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. Only one OTP per user is allowed."
         };
     }
 
@@ -642,8 +645,8 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
-            summary: "Remove One-Time-Password (OTP)";
-            description: "Remove the configured One-Time-Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. As only one OTP per user is allowed, the user will not have OTP as a second-factor afterward."
+            summary: "Remove One-Time Password (OTP)";
+            description: "Remove the configured One-Time Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. As only one OTP per user is allowed, the user will not have OTP as a second factor afterward."
         };
     }
 
@@ -658,8 +661,8 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
-            summary: "Add One-Time-Password (OTP) SMS";
-            description: "Add a new One-Time-Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor."
+            summary: "Add One-Time Password (OTP) SMS";
+            description: "Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor."
         };
     }
 
@@ -674,8 +677,8 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
-            summary: "Remove One-Time-Password (OTP) SMS";
-            description: "Remove the configured One-Time-Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+            summary: "Remove One-Time Password (OTP) SMS";
+            description: "Remove the configured One-Time Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward."
         };
     }
 
@@ -690,8 +693,8 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
-            summary: "Add One-Time-Password (OTP) Email";
-            description: "Add a new One-Time-Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor."
+            summary: "Add One-Time Password (OTP) Email";
+            description: "Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor."
         };
     }
 
@@ -706,8 +709,8 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
-            summary: "Remove One-Time-Password (OTP) Email";
-            description: "Remove the configured One-Time-Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
+            summary: "Remove One-Time Password (OTP) Email";
+            description: "Remove the configured One-Time Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward."
         };
     }
 
@@ -723,7 +726,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Add Universal Second Factor (U2F)";
-            description: "Add a new Universal-Second-Factor (U2F) to the authenticated user. U2F is a device-dependent authentication like FingerScan, FaceID, WindowHello, etc. The factor has to be verified after adding. Multiple factors can be added."
+            description: "Add a new Universal Second Factor (U2F) to the authenticated user. U2F is a device-dependent authentication like FingerScan, FaceID, WindowHello, etc. The factor has to be verified after adding. Multiple factors can be added."
         };
     }
 
@@ -740,7 +743,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Add Universal Second Factor (U2F)";
-            description: "Verify the last added new Universal-Second-Factor (U2F) to the authenticated user."
+            description: "Verify the last added new Universal Second Factor (U2F) to the authenticated user."
         };
     }
 
@@ -756,7 +759,7 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "User Authentication Factor"
             summary: "Remove Universal Second Factor (U2F)";
-            description: "Remove a specific Universal-Second-Factor (U2F) from the authenticated user by sending the id."
+            description: "Remove a specific Universal Second Factor (U2F) from the authenticated user by sending the id."
         };
     }
 
@@ -1562,6 +1565,11 @@ message UserGrant {
             description: "type of the user (human / machine)"
         }
     ];
+    zitadel.user.v1.UserGrantState state = 13 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the user grant";
+        }
+    ];
 }
 
 message ListMyProjectOrgsRequest {
@@ -1569,6 +1577,8 @@ message ListMyProjectOrgsRequest {
     zitadel.v1.ListQuery query = 1;
     //criteria the client is looking for
     repeated zitadel.org.v1.OrgQuery queries = 2;
+    // States by which field the results are sorted.
+    zitadel.org.v1.OrgFieldName sorting_column = 3;
 }
 
 message ListMyProjectOrgsResponse {

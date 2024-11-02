@@ -8,14 +8,13 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
 func (s *Server) GetAuthRequest(ctx context.Context, req *oidc_pb.GetAuthRequestRequest) (*oidc_pb.GetAuthRequestResponse, error) {
@@ -107,12 +106,12 @@ func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID str
 		return nil, err
 	}
 	authReq := &oidc.AuthRequestV2{CurrentAuthRequest: aar}
-	ctx = op.ContextWithIssuer(ctx, http.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), s.externalSecure))
+	ctx = op.ContextWithIssuer(ctx, http.DomainContext(ctx).Origin())
 	var callback string
 	if aar.ResponseType == domain.OIDCResponseTypeCode {
 		callback, err = oidc.CreateCodeCallbackURL(ctx, authReq, s.op.Provider())
 	} else {
-		callback, err = oidc.CreateTokenCallbackURL(ctx, authReq, s.op.Provider())
+		callback, err = s.op.CreateTokenCallbackURL(ctx, authReq)
 	}
 	if err != nil {
 		return nil, err

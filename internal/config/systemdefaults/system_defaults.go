@@ -8,15 +8,17 @@ import (
 
 type SystemDefaults struct {
 	SecretGenerators   SecretGenerators
-	PasswordHasher     crypto.PasswordHashConfig
+	PasswordHasher     crypto.HashConfig
+	SecretHasher       crypto.HashConfig
 	Multifactors       MultifactorConfig
 	DomainVerification DomainVerification
 	Notifications      Notifications
 	KeyConfig          KeyConfig
+	DefaultQueryLimit  uint64
+	MaxQueryLimit      uint64
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost   int
 	MachineKeySize     uint32
 	ApplicationKeySize uint32
 }

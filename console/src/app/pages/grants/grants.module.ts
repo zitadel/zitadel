@@ -7,9 +7,20 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { GrantsRoutingModule } from './grants-routing.module';
 import { GrantsComponent } from './grants.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [GrantsComponent],
-  imports: [CommonModule, GrantsRoutingModule, UserGrantsModule, TranslateModule, HasRoleModule, HasRolePipeModule],
+  imports: [
+    CommonModule,
+    GrantsRoutingModule,
+    UserGrantsModule,
+    TranslateModule,
+    HasRoleModule,
+    HasRolePipeModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
 })
 export default class GrantsModule {}

@@ -126,6 +126,8 @@ type HumanEmailCodeAddedEvent struct {
 	URLTemplate       string              `json:"url_template,omitempty"`
 	CodeReturned      bool                `json:"code_returned,omitempty"`
 	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
+	// AuthRequest is only used in V1 Login UI
+	AuthRequestID string `json:"authRequestID,omitempty"`
 }
 
 func (e *HumanEmailCodeAddedEvent) Payload() interface{} {
@@ -145,8 +147,9 @@ func NewHumanEmailCodeAddedEvent(
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
+	authRequestID string,
 ) *HumanEmailCodeAddedEvent {
-	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, "", false)
+	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, "", false, authRequestID)
 }
 
 func NewHumanEmailCodeAddedEventV2(
@@ -156,6 +159,7 @@ func NewHumanEmailCodeAddedEventV2(
 	expiry time.Duration,
 	urlTemplate string,
 	codeReturned bool,
+	authRequestID string,
 ) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -167,7 +171,8 @@ func NewHumanEmailCodeAddedEventV2(
 		Expiry:            expiry,
 		URLTemplate:       urlTemplate,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
+		AuthRequestID:     authRequestID,
 	}
 }
 

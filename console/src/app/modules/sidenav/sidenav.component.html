@@ -5,8 +5,8 @@
       <p *ngIf="description" class="cnsl-secondary-text">{{ description }}</p>
 
       <button
-        *ngIf="currentSetting !== undefined"
-        (click)="value = undefined"
+        *ngIf="currentSetting"
+        (click)="value = ''"
         class="sidenav-setting-list-element mob-only"
         [ngClass]="{ active: true }"
       >
@@ -18,7 +18,7 @@
         <ng-container>
           <span
             class="sidenav-setting-group hide-on-mobile"
-            [ngClass]="{ show: currentSetting === undefined }"
+            [ngClass]="{ show: !currentSetting }"
             *ngIf="
               (setting.groupI18nKey && i > 0 && setting.groupI18nKey !== settingsList[i - 1].groupI18nKey) ||
               (i === 0 && setting.groupI18nKey)
@@ -29,7 +29,7 @@
           <button
             (click)="value = setting.id"
             class="sidenav-setting-list-element hide-on-mobile"
-            [ngClass]="{ active: currentSetting === setting.id, show: currentSetting === undefined }"
+            [ngClass]="{ active: currentSetting === setting.id, show: !currentSetting }"
             [attr.data-e2e]="'sidenav-element-' + setting.id"
           >
             <span>{{ setting.i18nKey | translate }}</span>
@@ -40,7 +40,7 @@
           <button
             (click)="value = setting.id"
             class="sidenav-setting-list-element hide-on-mobile"
-            [ngClass]="{ active: currentSetting === setting.id, show: currentSetting === undefined }"
+            [ngClass]="{ active: currentSetting === setting.id, show: !currentSetting }"
           >
             <span>{{ setting.i18nKey | translate }}</span>
           </button>

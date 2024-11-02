@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"slices"
 	"strings"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -104,28 +106,7 @@ func (c *Client) AccessTokenType() op.AccessTokenType {
 }
 
 func (c *Client) IsScopeAllowed(scope string) bool {
-	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
-		return true
-	}
-	if strings.HasPrefix(scope, domain.OrgIDScope) {
-		return true
-	}
-	if strings.HasPrefix(scope, domain.ProjectIDScope) {
-		return true
-	}
-	if strings.HasPrefix(scope, domain.SelectIDPScope) {
-		return true
-	}
-	if scope == ScopeUserMetaData {
-		return true
-	}
-	if scope == ScopeResourceOwner {
-		return true
-	}
-	if scope == ScopeProjectsRoles {
-		return true
-	}
-	return slices.Contains(c.allowedScopes, scope)
+	return isScopeAllowed(scope, c.allowedScopes...)
 }
 
 func (c *Client) ClockSkew() time.Duration {
@@ -215,6 +196,8 @@ func grantTypeToOIDC(grantType domain.OIDCGrantType) oidc.GrantType {
 		return oidc.GrantTypeRefreshToken
 	case domain.OIDCGrantTypeDeviceCode:
 		return oidc.GrantTypeDeviceCode
+	case domain.OIDCGrantTypeTokenExchange:
+		return oidc.GrantTypeTokenExchange
 	default:
 		return oidc.GrantTypeCode
 	}
@@ -237,13 +220,41 @@ func removeScopeWithPrefix(scopes []string, scopePrefix ...string) []string {
 	return newScopeList
 }
 
-func clientIDFromCredentials(cc *op.ClientCredentials) (clientID string, assertion bool, err error) {
+func clientIDFromCredentials(ctx context.Context, cc *op.ClientCredentials) (clientID string, assertion bool, err error) {
 	if cc.ClientAssertion != "" {
 		claims := new(oidc.JWTTokenRequest)
 		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
-			return "", false, oidc.ErrInvalidClient().WithParent(err)
+			return "", false, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 		}
 		return claims.Issuer, true, nil
 	}
 	return cc.ClientID, false, nil
+}
+
+func isScopeAllowed(scope string, allowedScopes ...string) bool {
+	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.OrgIDScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.ProjectIDScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.SelectIDPScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.OrgRoleIDScope) {
+		return true
+	}
+	if scope == ScopeUserMetaData {
+		return true
+	}
+	if scope == ScopeResourceOwner {
+		return true
+	}
+	if scope == ScopeProjectsRoles {
+		return true
+	}
+	return slices.Contains(allowedScopes, scope)
 }

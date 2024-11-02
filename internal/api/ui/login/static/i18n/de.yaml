@@ -21,7 +21,7 @@ LDAP:
 SelectAccount:
   Title: Konto auswählen
   Description: Wähle dein Konto aus.
-  TitleLinking: Konto auswählen um zu verknüpfen
+  TitleLinking: Konto für die Benutzerverknüpfung auswählen
   DescriptionLinking: Wähle dein Konto, um dieses mit deinem externen Benutzerkonto zu verbinden.
   OtherUser: Anderer Benutzer
   SessionState0: aktiv
@@ -29,15 +29,17 @@ SelectAccount:
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
 
 Password:
-  Title: Willkommen zurück!
-  Description: Gib deine Benutzerdaten ein.
+  Title: Passwort
+  Description: Geben Sie Ihre Anmeldedaten ein.
   PasswordLabel: Passwort
-  MinLength: Mindestlänge
-  HasUppercase: Großbuchstaben
-  HasLowercase: Kleinbuchstaben
-  HasNumber: Nummer
-  HasSymbol: Symbol
-  Confirmation: Wiederholung stimmt überein
+  MinLength: Muss mindestens
+  MinLengthp2: Zeichen lang sein.
+  MaxLength: Muss weniger als 70 Zeichen lang sein.
+  HasUppercase: Muss einen Großbuchstaben enthalten.
+  HasLowercase: Muss einen Kleinbuchstaben enthalten.
+  HasNumber: Muss eine Zahl enthalten.
+  HasSymbol: Muss ein Symbol enthalten.
+  Confirmation: Passwortbestätigung stimmt überein.
   ResetLinkText: Passwort zurücksetzen
   BackButtonText: Zurück
   NextButtonText: Weiter
@@ -84,9 +86,18 @@ InitUserDone:
   NextButtonText: Weiter
   CancelButtonText: Abbrechen
 
+InviteUser:
+  Title: Benutzer aktivieren
+  Description: Bestätige deine E-Mail-Adresse mit dem unten stehenden Code und lege dein Passwort fest.
+  CodeLabel: Code
+  NewPasswordLabel: Neues Passwort
+  NewPasswordConfirm: Passwort bestätigen
+  NextButtonText: Weiter
+  ResendButtonText: Code erneut senden
+
 InitMFAPrompt:
   Title: Zweitfaktor hinzufügen
-  Description: Zwei-Faktor-Authentifizierung gibt dir eine zusätzliche Sicherheit für dein Benutzerkonto. Damit stellst du sicher, dass nur du Zugriff auf dein Konto hast.
+  Description: Die Zwei-Faktor-Authentifizierung gibt dir eine zusätzliche Sicherheit für dein Benutzerkonto. Damit stellst du sicher, dass nur du Zugriff auf dein Konto hast.
   Provider0: Authentifizierungs-App (z.B. Google/Microsoft Authenticator, Authy)
   Provider1: Geräte-gebunden (z.B. FaceID, Windows Hello, Fingerprint)
   Provider3: Einmalpasswort per SMS
@@ -95,7 +106,7 @@ InitMFAPrompt:
   SkipButtonText: Überspringen
 
 InitMFAOTP:
-  Title: Zwei-Faktor-Anmeldung
+  Title: Zwei-Faktor-Authentifizierung
   Description: Erstelle deinen Zweitfaktor. Installiere eine Authentifizierungs-App, wenn du noch keine hast.
   OTPDescription: Scanne den Code mit einer Authentifizierungs-App (z.B. Google/Mircorsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
   SecretLabel: Secret
@@ -118,12 +129,12 @@ InitMFAU2F:
   Description: Ein Sicherheitsschlüssel ist eine Verifizierungsmethode, die in deinem Telefon integriert sein kann, oder ein externes Gerät, das über Bluetooth oder USB mit deinem Computer verbunden wird.
   TokenNameLabel: Name des Geräts
   NotSupported: WebAuthN wird durch deinen Browser nicht unterstützt. Stelle sicher, dass du die aktuelle Version installiert hast oder nutze eine anderen (z.B. Chrome, Safari, Firefox)
-  RegisterTokenButtonText: Sicherschlüssel hinzufügen
+  RegisterTokenButtonText: Sicherheitsschlüssel hinzufügen
   ErrorRetry: Versuche es erneut, erstelle eine neue Abfrage oder wähle einen andere Methode.
 
 InitMFADone:
   Title: Sicherheitsschlüssel eingerichtet
-  Description: Großartig! Du hast gerade erfolgreich deinen Zweitfaktor eingerichtet und dein Konto viel sicherer gemacht. Der Zweitfaktor muss bei jeder Anmeldung verwendet werden.
+  Description: Großartig! Du hast gerade erfolgreich deinen Zweitfaktor eingerichtet und dein Konto viel sicherer gemacht. Der Zweitfaktor muss ab sofort bei jeder Anmeldung verwendet werden.
   NextButtonText: Weiter
   CancelButtonText: Abbrechen
 
@@ -187,7 +198,8 @@ PasswordlessRegistrationDone:
 
 PasswordChange:
   Title: Passwort ändern
-  Description: Ändere dein Passwort indem du dein altes und dann dein neues Passwort eingibst.
+  Description: Ändere dein Passwort, indem du dein altes und dann dein neues Passwort eingibst.
+  ExpiredDescription: Dein Passwort ist abgelaufen und muss geändert werden. Gib dein altes und neues Passwort ein.
   OldPasswordLabel: Altes Passwort
   NewPasswordLabel: Neues Passwort
   NewPasswordConfirmLabel: Passwort wiederholen
@@ -201,12 +213,12 @@ PasswordChangeDone:
 
 PasswordResetDone:
   Title: Resetlink versendet
-  Description: Prüfe dein E-Mail-Postfach, um ein neues Passwort zu setzen.
+  Description: Prüfe dein E-Mail-Postfach, um ein neues Passwort festzulegen.
   NextButtonText: Weiter
 
 EmailVerification:
   Title: E-Mail-Verifizierung
-  Description: Du hast eine E-Mail zur Verifizierung deiner E-Mail-Adresse bekommen. Gib den Code im untenstehenden Formular ein. Mit erneut versenden, wird dir eine neue E-Mail zugestellt.
+  Description: Du hast eine E-Mail zur Verifizierung deiner E-Mail-Adresse bekommen. Gib den Code im untenstehenden Feld ein. Mit erneut versenden, wird dir eine neue E-Mail gesendet.
   CodeLabel: Code
   NextButtonText: Weiter
   ResendButtonText: Code erneut senden
@@ -219,7 +231,7 @@ EmailVerificationDone:
   LoginButtonText: Anmelden
 
 RegisterOption:
-  Title: Registrationsmöglichkeiten
+  Title: Registrieren
   Description: Wähle aus, wie du dich registrieren möchtest.
   RegisterUsernamePasswordButtonText: Mit Benutzername/Passwort
   ExternalLoginDescription: oder registriere dich mit einem externen Benutzerkonto
@@ -248,6 +260,9 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -287,6 +302,9 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -299,7 +317,7 @@ ExternalRegistrationUserOverview:
 RegistrationOrg:
   Title: Organisation registrieren
   Description: Gib deinen Organisationsnamen und deine Benutzerdaten an.
-  OrgNameLabel: Organisationsname
+  OrgNameLabel: Name der Organisation
   EmailLabel: E-Mail
   UsernameLabel: Benutzername
   FirstnameLabel: Vorname
@@ -315,7 +333,7 @@ RegistrationOrg:
 
 LoginSuccess:
   Title: Erfolgreich angemeldet
-  AutoRedirectDescription: Du wirst automatisch zurück in die Anwendung geleitet. Danach kannst du dieses Fenster schließen.
+  AutoRedirectDescription: Du wirst automatisch zu der Anwendung weitergeleitet. Wenn nicht, klicke auf die Schaltfläche unten. Danach kannst Du das Fenster schließen.
   RedirectedDescription: Du kannst dieses Fenster nun schließen.
   NextButtonText: Weiter
 
@@ -324,15 +342,21 @@ LogoutDone:
   Description: Du wurdest erfolgreich abgemeldet.
   LoginButtonText: Anmelden
 
+LinkingUserPrompt:
+  Title: Vorhandener Benutzer gefunden
+  Description: "Möchten Sie Ihr bestehendes Konto verknüpfen?"
+  LinkButtonText: Verknüpfen
+  OtherButtonText: Andere Optionen
+
 LinkingUsersDone:
-  Title: Benutzerkonto verknpüfen
-  Description: Benuzterkonto verknpüft.
+  Title: Benutzerkonto verknüpfen
+  Description: Das Benutzerkonto wurde erfolgreich verknüpft.
   CancelButtonText: Abbrechen
   NextButtonText: Weiter
 
 ExternalNotFound:
   Title: Externes Benutzerkonto nicht gefunden
-  Description: Externes Benutzerkonto konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verknüpfen oder diesen als neuen Benutzer registrieren.
+  Description: Externes Benutzerkonto konnte nicht gefunden werden. Möchtest du deinen Benutzer mit einem bestehenden Benutzer verknüpfen oder ihn als neuen Benutzer registrieren?
   LinkButtonText: Verknüpfen
   AutoRegisterButtonText: Registrieren
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
@@ -354,19 +378,22 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
 DeviceAuth:
-  Title: Gerätezulassung
+  Title: Gerät verbinden
   UserCode:
-    Label: Benutzercode
-    Description: Gib den auf dem Gerät angezeigten Benutzercode ein
+    Label: Gerätecode
+    Description: Gib den auf dem Gerät angezeigten Code ein
     ButtonNext: Weiter
   Action:
     Description: Gerätezugriff erlauben
-    GrantDevice: Du bist dabei, das Gerät zu erlauben
-    AccessToScopes: Zugriff auf die folgenden Daten
+    GrantDevice: Möchtest du dem Gerät
+    AccessToScopes: Zugriff auf die folgenden Daten erlauben?
     Button:
       Allow: Erlauben
-      Deny: Verweigern
+      Deny: Ablehnen
   Done:
     Description: Abgeschlossen
     Approved: Gerätezulassung genehmigt. Sie können jetzt zum Gerät zurückkehren.
@@ -394,11 +421,11 @@ Errors:
     NotFound: Benutzer konnte nicht gefunden werden
     AlreadyExists: Benutzer existiert bereits
     Inactive: Benutzer ist inaktiv
-    NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
+    NotFoundOnOrg: Benutzer konnte nicht in der gewünschten Organisation gefunden werden
     NotAllowedOrg: Benutzer gehört nicht der benötigten Organisation an
-    NotMatchingUserID: Benutzer stimmt nicht mit Benutzer in Auth Request überein
-    UserIDMissing: UserID ist leer
-    Invalid: Userdaten sind ungültig
+    NotMatchingUserID: Benutzer stimmt nicht mit Benutzer im Auth Request überein
+    UserIDMissing: User-ID ist leer
+    Invalid: Benutzerdaten sind ungültig
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Benutzerkonto verknüpft werden
     Profile:
@@ -411,7 +438,7 @@ Errors:
     Email:
       NotFound: E-Mail-Adresse nicht gefunden
       Invalid: E-Mail-Adresse ist ungültig
-      AlreadyVerified: E-Mail-Adresse ist bereits verifiziert
+      AlreadyVerified: E-Mail-Adresse wurde bereits verifiziert
       NotChanged: E-Mail-Adresse wurde nicht geändert
       Empty: E-Mail-Adresse ist leer
       IDMissing: E-Mail ID fehlt
@@ -437,10 +464,10 @@ Errors:
     UsernameOrPassword:
       Invalid: Benutzername oder Passwort ist ungültig
     PasswordComplexityPolicy:
-      NotFound: Passwortpolicy konnte nicht gefunden werden
+      NotFound: Passwortrichtlinie konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
-      HasLower: Passwort beinhaltet keinen Kleinbuchstaben
-      HasUpper: Passwort beinhaltet keinen Großbuchstaben
+      HasLower: Passwort beinhaltet keine Kleinbuchstaben
+      HasUpper: Passwort beinhaltet keine Großbuchstaben
       HasNumber: Passwort beinhaltet keine Zahl
       HasSymbol: Passwort beinhaltet kein Symbol
     Code:
@@ -451,11 +478,11 @@ Errors:
       NotFound: Code konnte nicht gefunden werden
       GeneratorAlgNotSupported: Generator-Algorithmus wird nicht unterstützt
     EmailVerify:
-      UserIDEmpty: UserID ist leer
+      UserIDEmpty: User-ID ist leer
     ExternalData:
       CouldNotRead: Externe Daten konnten nicht korrekt gelesen werden
     MFA:
-      NoProviders: Es stehen keine Multifaktorprovider zur Verfügung
+      NoProviders: Es steht kein Multifaktorprovider zur Verfügung
       OTP:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
         NotExisting: Multifaktor OTP (OneTimePassword) existiert nicht
@@ -469,21 +496,22 @@ Errors:
       NotAllowed: Externer Login Provider ist nicht erlaubt
       IDPConfigIDEmpty: Identity Provider ID ist leer
       ExternalUserIDEmpty: Externe User ID ist leer
-      UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
-      NoExternalUserData: Keine externe User Daten erhalten
+      UserDisplayNameEmpty: Anzeige-Name des Benutzers ist leer
+      NoExternalUserData: Keine externen User-Daten erhalten
       CreationNotAllowed: Erstellen eines neuen Benutzers mit diesem Provider ist nicht erlaubt
       LinkingNotAllowed: Verknüpfen eines Benutzers mit diesem Provider ist nicht erlaubt
-    GrantRequired: Die Anmeldung an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
-    ProjectRequired: Die Anmeldung an dieser Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
+      NoOptionAllowed: Weder Erstellung noch Verknüpfung ist für diesen Provider erlaubt. Bitte wenden Sie sich an Ihren Administrator.
+    GrantRequired: Die Anmeldung an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte wende dich an deinen Administrator.
+    ProjectRequired: Die Anmeldung an dieser Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte wende dich an deinen Administrator.
   IdentityProvider:
     InvalidConfig: Konfiguration des Identitätsproviders ist ungültig
   IAM:
     LockoutPolicy:
-      NotExisting: Lockout Policy existiert nicht
+      NotExisting: Aussperrungs-Richtlinie existiert nicht
   Org:
     LoginPolicy:
       RegistrationNotAllowed: Registrierung ist nicht erlaubt
   DeviceAuth:
-    NotExisting: Benutzercode existiert nicht
+    NotExisting: Gerätecode existiert nicht
 
 optional: (optional)

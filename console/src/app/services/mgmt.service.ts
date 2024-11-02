@@ -133,6 +133,8 @@ import {
   GetCustomLoginTextsResponse,
   GetCustomPasswordChangeMessageTextRequest,
   GetCustomPasswordChangeMessageTextResponse,
+  GetCustomInviteUserMessageTextRequest,
+  GetCustomInviteUserMessageTextResponse,
   GetCustomPasswordlessRegistrationMessageTextRequest,
   GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
@@ -155,6 +157,8 @@ import {
   GetDefaultLoginTextsResponse,
   GetDefaultPasswordChangeMessageTextRequest,
   GetDefaultPasswordChangeMessageTextResponse,
+  GetDefaultInviteUserMessageTextRequest,
+  GetDefaultInviteUserMessageTextResponse,
   GetDefaultPasswordComplexityPolicyRequest,
   GetDefaultPasswordComplexityPolicyResponse,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
@@ -353,6 +357,7 @@ import {
   RemoveOrgMetadataRequest,
   RemoveOrgMetadataResponse,
   RemoveOrgRequest,
+  RemoveOrgResponse,
   RemovePersonalAccessTokenRequest,
   RemovePersonalAccessTokenResponse,
   RemoveProjectGrantMemberRequest,
@@ -385,6 +390,8 @@ import {
   ResetCustomLoginTextsToDefaultResponse,
   ResetCustomPasswordChangeMessageTextToDefaultRequest,
   ResetCustomPasswordChangeMessageTextToDefaultResponse,
+  ResetCustomInviteUserMessageTextToDefaultRequest,
+  ResetCustomInviteUserMessageTextToDefaultResponse,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest,
   ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse,
   ResetCustomPasswordResetMessageTextToDefaultRequest,
@@ -422,6 +429,8 @@ import {
   SetCustomLoginTextsResponse,
   SetCustomPasswordChangeMessageTextRequest,
   SetCustomPasswordChangeMessageTextResponse,
+  SetCustomInviteUserMessageTextRequest,
+  SetCustomInviteUserMessageTextResponse,
   SetCustomPasswordlessRegistrationMessageTextRequest,
   SetCustomPasswordlessRegistrationMessageTextResponse,
   SetCustomPasswordResetMessageTextRequest,
@@ -801,6 +810,32 @@ export class ManagementService {
     const req = new ResetCustomPasswordChangeMessageTextToDefaultRequest();
     req.setLanguage(lang);
     return this.grpcService.mgmt.resetCustomPasswordChangeMessageTextToDefault(req, null).then((resp) => resp.toObject());
+  }
+
+  public getDefaultInviteUserMessageText(
+    req: GetDefaultInviteUserMessageTextRequest,
+  ): Promise<GetDefaultInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getDefaultInviteUserMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public getCustomInviteUserMessageText(
+    req: GetCustomInviteUserMessageTextRequest,
+  ): Promise<GetCustomInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.getCustomInviteUserMessageText(req, null).then((resp) => resp.toObject());
+  }
+
+  public setCustomInviteUserMessageText(
+    req: SetCustomInviteUserMessageTextRequest,
+  ): Promise<SetCustomInviteUserMessageTextResponse.AsObject> {
+    return this.grpcService.mgmt.setCustomInviteUserMessageCustomText(req, null).then((resp) => resp.toObject());
+  }
+
+  public resetCustomInviteUserMessageTextToDefault(
+    lang: string,
+  ): Promise<ResetCustomInviteUserMessageTextToDefaultResponse.AsObject> {
+    const req = new ResetCustomInviteUserMessageTextToDefaultRequest();
+    req.setLanguage(lang);
+    return this.grpcService.mgmt.resetCustomInviteUserMessageTextToDefault(req, null).then((resp) => resp.toObject());
   }
 
   public updateUserName(userId: string, username: string): Promise<UpdateUserNameResponse.AsObject> {
@@ -1587,9 +1622,13 @@ export class ManagementService {
     return this.grpcService.mgmt.getLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
 
-  public addCustomLockoutPolicy(maxAttempts: number): Promise<AddCustomLockoutPolicyResponse.AsObject> {
+  public addCustomLockoutPolicy(
+    maxPasswordAttempts: number,
+    maxOTPAttempts: number,
+  ): Promise<AddCustomLockoutPolicyResponse.AsObject> {
     const req = new AddCustomLockoutPolicyRequest();
-    req.setMaxPasswordAttempts(maxAttempts);
+    req.setMaxPasswordAttempts(maxPasswordAttempts);
+    req.setMaxOtpAttempts(maxOTPAttempts);
 
     return this.grpcService.mgmt.addCustomLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
@@ -1599,9 +1638,13 @@ export class ManagementService {
     return this.grpcService.mgmt.resetLockoutPolicyToDefault(req, null).then((resp) => resp.toObject());
   }
 
-  public updateCustomLockoutPolicy(maxAttempts: number): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
+  public updateCustomLockoutPolicy(
+    maxPasswordAttempts: number,
+    maxOTPAttempts: number,
+  ): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
     const req = new UpdateCustomLockoutPolicyRequest();
-    req.setMaxPasswordAttempts(maxAttempts);
+    req.setMaxPasswordAttempts(maxPasswordAttempts);
+    req.setMaxOtpAttempts(maxOTPAttempts);
 
     return this.grpcService.mgmt.updateCustomLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
@@ -1741,7 +1784,7 @@ export class ManagementService {
     return this.grpcService.mgmt.removeUser(req, null).then((resp) => resp.toObject());
   }
 
-  public removeOrg(): Promise<RemoveUserResponse.AsObject> {
+  public removeOrg(): Promise<RemoveOrgResponse.AsObject> {
     const req = new RemoveOrgRequest();
     return this.grpcService.mgmt.removeOrg(req, null).then((resp) => resp.toObject());
   }

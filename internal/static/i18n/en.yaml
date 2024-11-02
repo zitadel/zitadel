@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limits not found
     NoneSpecified: No limits specified
+    Instance:
+      Blocked: Instance is blocked
   Restrictions:
     NoneSpecified: No restrictions specified
     DefaultLanguageMustBeAllowed: The default language must be allowed
@@ -51,14 +53,28 @@ Errors:
     NotFound: SMS configuration not found
     AlreadyActive: SMS configuration already active
     AlreadyDeactivated: SMS configuration already deactivated
+    NotExternalVerification: SMS configuration does not support code verification
+  SMTP:
+    NotEmailMessage: message is not EmailMessage
+    RequiredAttributes: subject, recipients and content must be set but some or all of them are empty
+    CouldNotSplit: could not split host and port for connect to smtp
+    CouldNotDial: could not contact with the SMTP server, check the port, firewall issues...
+    CouldNotDialTLS: could not contact with the SMTP server using TLS, check the port, firewall issues...
+    CouldNotCreateClient: could not create smtp client
+    CouldNotStartTLS: could not start tls
+    CouldNotAuth: could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by ZITADEL
+    CouldNotSetSender: could not set sender
+    CouldNotSetRecipient: could not set recipient
   SMTPConfig:
+    TestPassword: Password for test not found
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
+    AlreadyDeactivated: SMTP configuration already deactivated
     SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
+    TestEmailNotFound: Email address for test not found
   Notification:
     NoDomain: No Domain found for message
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: User could not be found
     AlreadyExists: User already exists
     NotFoundOnOrg: User could not be found on chosen organization
@@ -107,6 +123,7 @@ Errors:
       Key:
         NotFound: Machine key not found
         AlreadyExisting: Machine key already existing
+        Invalid: Public key is not a valid RSA public key in PKIX format with PEM encoding
       Secret:
         NotExisting: Secret doesn't exist
         Invalid: Secret is invalid
@@ -126,13 +143,14 @@ Errors:
       NotFound: Code not found
       Expired: Code is expired
       GeneratorAlgNotSupported: Unsupported generator algorithm
+      Invalid: Code is invalid
     Password:
       NotFound: Password not found
       Empty: Password is empty
       Invalid: Password is invalid
       NotSet: User has not set a password
       NotChanged: New password cannot be the same as your current password
-      NotSupported: Password hash encoding not supported
+      NotSupported: Password hash encoding not supported. Check out https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is too short
@@ -325,7 +343,7 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
   IAM:
-    NotFound: Instance not found. Check out https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
@@ -466,6 +484,7 @@ Errors:
     NotActive: Action is not active
     NotInactive: Action is not inactive
     MaxAllowed: No additional active Actions allowed
+    NotEnabled: Feature "Action" is not enabled
   Flow:
     FlowTypeMissing: FlowType missing
     Empty: Flow is already empty
@@ -476,6 +495,8 @@ Errors:
     CloseRows: SQL Statement could not be finished
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
+    TooManyNestingLevels: Too many query nesting levels (Max 20)
+    LimitExceeded: Limit exceeded
   Quota:
     AlreadyExists: Quota already exists for this unit
     NotFound: Quota not found for this unit
@@ -510,6 +531,7 @@ Errors:
     IDPMissing: IDP ID is missing in the request
     IDPInvalid: IDP invalid for the request
     ResponseInvalid: IDP response is invalid
+    MissingSingleMappingAttribute: IDP response does not contain the mapping attribute or has more than one value
     SuccessURLMissing: Success URL is missing in the request
     FailureURLMissing: Failure URL is missing in the request
     StateMissing: State parameter is missing in the request
@@ -532,6 +554,52 @@ Errors:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
     InvalidValue: Invalid value for this feature
+  Target:
+    Invalid: Target is invalid
+    NoTimeout: Target has no timeout
+    InvalidURL: Target has an invalid URL
+    NotFound: Target not found
+  Execution:
+    ConditionInvalid: Execution condition is invalid
+    Invalid: Execution is invalid
+    NotFound: Execution not found
+    IncludeNotFound: Include not found
+    NoTargets: No targets defined
+    Failed: Execution failed
+    ResponseIsNotValidJSON: Response is not valid JSON
+  UserSchema:
+    NotEnabled: Feature "User Schema" is not enabled
+    Type:
+      Missing: User Schema Type missing
+      AlreadyExists: User Schema Type already exists
+    Authenticator:
+      Invalid: Invalid authenticator type
+    NotActive: User Schema not active
+    NotInactive: User Schema not inactive
+    NotExists: User Schema does not exist
+    ID:
+      Missing: User Schema ID missing
+    Invalid: User Schema invalid
+    Data:
+      Invalid: Data invalid for User Schema
+  TokenExchange:
+    FeatureDisabled: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token is missing
+      Invalid: Token is invalid
+      TypeMissing: Token type is missing
+      TypeNotAllowed: Token type is not allowed
+      TypeNotSupported: Token type is not supported
+      NotForAPI: Impersonated tokens not allowed for API
+    Impersonation:
+      PolicyDisabled: Impersonation is disabled in the instance security policy
+  WebKey:
+    ActiveDelete: Cannot delete active web key
+    Config: Invalid web key config
+    Duplicate: Web key ID not unique
+    FeatureDisabled: Web key feature disabled
+    NoActive: No active web key found
+    NotFound: Web key not found
 
 AggregateTypes:
   action: Action
@@ -543,11 +611,31 @@ AggregateTypes:
   usergrant: User grant
   quota: Quota
   feature: Feature
+  target: Target
+  execution: Execution
+  user_schema: User Schema
+  auth_request: Auth Request
+  device_auth: Device Auth
+  idpintent: IDP Intent
+  limits: Limits
+  milestone: Milestone
+  oidc_session: OIDC Session
+  restrictions: Restrictions
+  system: System
+  session: Session
+  web_key: Web Key
 
 EventTypes:
+  execution:
+    set: Execution set
+    removed: Execution deleted
+  target:
+    added: Target created
+    changed: Target changed
+    removed: Target deleted
   user:
     added: User added
-    selfregistered: User registered himself
+    selfregistered: User registered themself
     initialization:
       code:
         added: Initialization code generated
@@ -557,7 +645,9 @@ EventTypes:
         failed: Initialization check failed
     token:
       added: Access Token created
+      v2.added: Access Token created
       removed: Access Token removed
+    impersonated: User impersonated
     username:
       reserved: Username reserved
       released: Username released
@@ -580,13 +670,14 @@ EventTypes:
         removed: Key removed
       secret:
         set: Secret set
+        updated: Secret hash updated
         removed: Secret removed
         check:
           succeeded: Secret check succeeded
           failed: Secret check failed
     human:
       added: Person added
-      selfregistered: Person registered himself
+      selfregistered: Person registered themself
       avatar:
         added: Avatar added
         removed: Avatar removed
@@ -597,6 +688,13 @@ EventTypes:
         check:
           succeeded: Initialization check succeeded
           failed: Initialization check failed
+      invite:
+        code:
+          added: Invitation code generated
+          sent: Invitation code sent
+        check:
+          succeeded: Invitation check succeeded
+          failed: Invitation check failed
       username:
         reserved: Username reserved
         released: Username released
@@ -731,7 +829,7 @@ EventTypes:
       code:
         added: Phone number code generated
         sent: Phone number code sent
-      removed: Phone number removed
+
     profile:
       changed: User profile changed
     address:
@@ -840,8 +938,8 @@ EventTypes:
           added: Second factor added to Login Policy
           removed: Second factor removed from Login Policy
         multifactor:
-          added: Multi factor added to Login Policy
-          removed: Multi factor removed from Login Policy
+          added: Multi-factor added to Login Policy
+          removed: Multi-factor removed from Login Policy
       password:
         complexity:
           added: Password complexity policy added
@@ -955,6 +1053,14 @@ EventTypes:
             succeeded: OIDC Client Secret check succeeded
             failed: OIDC Client Secret check failed
         key:
+          added: OIDC App Key added
+          removed: OIDC App Key removed
+      api:
+        secret:
+          check:
+            succeeded: API secret check succeeded
+            failed: API secret check failed
+        key:
           added: Application key added
           removed: Application key removed
       config:
@@ -966,11 +1072,13 @@ EventTypes:
           changed: OIDC Configuration changed
           secret:
             changed: OIDC secret changed
+            updated: OIDC secret hash updated
         api:
           added: API Configuration added
           changed: API Configuration changed
           secret:
             changed: API secret changed
+            updated: API secret hash updated
   policy:
     password:
       complexity:
@@ -1065,6 +1173,9 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: SMTP configuration activated
+        deactivated: SMTP configuration deactivated
+        removed: SMTP configuration removed
         password:
           changed: SMTP configuration secret changed
     sms:
@@ -1210,9 +1321,44 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: SMTP configuration activated
+        deactivated: SMTP configuration deactivated
         password:
           changed: Password of SMTP configuration changed
         removed: SMTP configuration removed
+  user_schema:
+    created: User Schema created
+    updated: User Schema updated
+    deactivated: User Schema deactivated
+    reactivated: User Schema reactivated
+    deleted: User Schema deleted
+    user:
+      created: User created
+      updated: User updated
+      deleted: User deleted
+      email:
+        updated: Email address changed
+        verified: Email address verified
+        verification:
+          failed: Email address verification failed
+        code:
+          added: Email address verification code generated
+          sent: Email address verification code sent
+      phone:
+        updated: Phone number changed
+        verified: Phone number verified
+        verification:
+          failed: Phone number verification failed
+        code:
+          added: Phone number verification code generated
+          sent: Phone number verification code sent
+
+
+  web_key:
+    added: Web Key added
+    activated: Web Key activated
+    deactivated: Web Key deactivated
+    removed: Web Key removed
 
 Application:
   OIDC:

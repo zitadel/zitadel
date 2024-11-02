@@ -81,6 +81,7 @@ message OrgQuery {
         OrgNameQuery name_query = 1;
         OrgDomainQuery domain_query = 2;
         OrgStateQuery state_query = 3;
+        OrgIDQuery id_query = 4;
     }
 }
 
@@ -122,6 +123,16 @@ message OrgStateQuery {
         }
     ];
 }
+
+message OrgIDQuery {
+    string id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
 
 enum OrgFieldName {
     ORG_FIELD_NAME_UNSPECIFIED = 0;

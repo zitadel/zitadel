@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -35,20 +35,24 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 
 	for _, command := range commands {
 		for _, constraint := range command.UniqueConstraints() {
+			instanceID := command.Aggregate().InstanceID
+			if constraint.IsGlobal {
+				instanceID = ""
+			}
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
 				constraint.UniqueField = strings.ToLower(constraint.UniqueField)
 				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
-				addArgs = append(addArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
-				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				addArgs = append(addArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
+				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
-				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
-				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				deleteArgs = append(deleteArgs, instanceID, constraint.UniqueType, constraint.UniqueField)
+				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:
 				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d)", len(deleteArgs)+1))
-				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID)
-				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
+				deleteArgs = append(deleteArgs, instanceID)
+				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, instanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			}
 		}
 	}

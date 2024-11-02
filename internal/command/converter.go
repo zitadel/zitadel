@@ -10,6 +10,7 @@ func writeModelToObjectDetails(writeModel *eventstore.WriteModel) *domain.Object
 		Sequence:      writeModel.ProcessedSequence,
 		ResourceOwner: writeModel.ResourceOwner,
 		EventDate:     writeModel.ChangeDate,
+		ID:            writeModel.AggregateID,
 	}
 }
 

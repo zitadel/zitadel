@@ -13,7 +13,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
@@ -79,21 +78,21 @@ type externalSAMLIDPCallbackData struct {
 }
 
 // CallbackURL generates the instance specific URL to the IDP callback handler
-func CallbackURL(externalSecure bool) func(ctx context.Context) string {
+func CallbackURL() func(ctx context.Context) string {
 	return func(ctx context.Context) string {
-		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + callbackPath
+		return http_utils.DomainContext(ctx).Origin() + HandlerPrefix + callbackPath
 	}
 }
 
-func SAMLRootURL(externalSecure bool) func(ctx context.Context, idpID string) string {
+func SAMLRootURL() func(ctx context.Context, idpID string) string {
 	return func(ctx context.Context, idpID string) string {
-		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + "/" + idpID + "/"
+		return http_utils.DomainContext(ctx).Origin() + HandlerPrefix + "/" + idpID + "/"
 	}
 }
 
-func LoginSAMLRootURL(externalSecure bool) func(ctx context.Context) string {
+func LoginSAMLRootURL() func(ctx context.Context) string {
 	return func(ctx context.Context) string {
-		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + login.HandlerPrefix + login.EndpointSAMLACS
+		return http_utils.DomainContext(ctx).Origin() + login.HandlerPrefix + login.EndpointSAMLACS
 	}
 }
 
@@ -101,7 +100,6 @@ func NewHandler(
 	commands *command.Commands,
 	queries *query.Queries,
 	encryptionAlgorithm crypto.EncryptionAlgorithm,
-	externalSecure bool,
 	instanceInterceptor func(next http.Handler) http.Handler,
 ) http.Handler {
 	h := &Handler{
@@ -109,9 +107,9 @@ func NewHandler(
 		queries:             queries,
 		parser:              form.NewParser(),
 		encryptionAlgorithm: encryptionAlgorithm,
-		callbackURL:         CallbackURL(externalSecure),
-		samlRootURL:         SAMLRootURL(externalSecure),
-		loginSAMLRootURL:    LoginSAMLRootURL(externalSecure),
+		callbackURL:         CallbackURL(),
+		samlRootURL:         SAMLRootURL(),
+		loginSAMLRootURL:    LoginSAMLRootURL(),
 	}
 
 	router := mux.NewRouter()
@@ -229,11 +227,6 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	sp, err := samlProvider.GetSP()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 
 	intent, err := h.commands.GetActiveIntent(ctx, data.RelayState)
 	if err != nil {
@@ -245,10 +238,10 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session := saml2.Session{
-		ServiceProvider: sp,
-		RequestID:       intent.RequestID,
-		Request:         r,
+	session, err := saml2.NewSession(samlProvider, intent.RequestID, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	idpUser, err := session.FetchUser(r.Context())
@@ -427,7 +420,7 @@ func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID s
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}
-	links, err := h.queries.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	links, err := h.queries.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, nil)
 	if err != nil {
 		return "", err
 	}

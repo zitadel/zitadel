@@ -3,6 +3,8 @@ package command
 import (
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -18,9 +20,11 @@ type WebAuthNChallengeModel struct {
 }
 
 type OTPCode struct {
-	Code         *crypto.CryptoValue
-	Expiry       time.Duration
-	CreationDate time.Time
+	Code           *crypto.CryptoValue
+	Expiry         time.Duration
+	CreationDate   time.Time
+	GeneratorID    string
+	VerificationID string
 }
 
 func (p *WebAuthNChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) *domain.WebAuthNLogin {
@@ -40,6 +44,7 @@ type SessionWriteModel struct {
 	TokenID              string
 	UserID               string
 	UserResourceOwner    string
+	PreferredLanguage    *language.Tag
 	UserCheckedAt        time.Time
 	PasswordCheckedAt    time.Time
 	IntentCheckedAt      time.Time
@@ -50,6 +55,7 @@ type SessionWriteModel struct {
 	WebAuthNUserVerified bool
 	Metadata             map[string][]byte
 	State                domain.SessionState
+	UserAgent            *domain.UserAgent
 	Expiration           time.Time
 
 	WebAuthNChallenge     *WebAuthNChallengeModel
@@ -88,6 +94,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceTOTPChecked(e)
 		case *session.OTPSMSChallengedEvent:
 			wm.reduceOTPSMSChallenged(e)
+		case *session.OTPSMSSentEvent:
+			wm.reduceOTPSMSSent(e)
 		case *session.OTPSMSCheckedEvent:
 			wm.reduceOTPSMSChecked(e)
 		case *session.OTPEmailChallengedEvent:
@@ -119,6 +127,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.WebAuthNCheckedType,
 			session.TOTPCheckedType,
 			session.OTPSMSChallengedType,
+			session.OTPSMSSentType,
 			session.OTPSMSCheckedType,
 			session.OTPEmailChallengedType,
 			session.OTPEmailCheckedType,
@@ -137,12 +146,14 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
 	wm.State = domain.SessionStateActive
+	wm.UserAgent = e.UserAgent
 }
 
 func (wm *SessionWriteModel) reduceUserChecked(e *session.UserCheckedEvent) {
 	wm.UserID = e.UserID
 	wm.UserResourceOwner = e.UserResourceOwner
 	wm.UserCheckedAt = e.CheckedAt
+	wm.PreferredLanguage = e.PreferredLanguage
 }
 
 func (wm *SessionWriteModel) reducePasswordChecked(e *session.PasswordCheckedEvent) {
@@ -177,7 +188,13 @@ func (wm *SessionWriteModel) reduceOTPSMSChallenged(e *session.OTPSMSChallengedE
 		Code:         e.Code,
 		Expiry:       e.Expiry,
 		CreationDate: e.CreationDate(),
+		GeneratorID:  e.GeneratorID,
 	}
+}
+
+func (wm *SessionWriteModel) reduceOTPSMSSent(e *session.OTPSMSSentEvent) {
+	wm.OTPSMSCodeChallenge.GeneratorID = e.GeneratorInfo.GetID()
+	wm.OTPSMSCodeChallenge.VerificationID = e.GeneratorInfo.GetVerificationID()
 }
 
 func (wm *SessionWriteModel) reduceOTPSMSChecked(e *session.OTPSMSCheckedEvent) {

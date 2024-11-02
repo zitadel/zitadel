@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -31,7 +31,11 @@ func TestConfig_serverFromContext(t *testing.T) {
 		},
 		{
 			name: "success from ctx",
-			args: args{authz.WithRequestedDomain(context.Background(), "example.com"), "", ""},
+			args: args{
+				ctx:    http_util.WithDomainContext(context.Background(), &http_util.DomainCtx{InstanceHost: "example.com", Protocol: "https"}),
+				id:     "",
+				origin: "",
+			},
 			want: &webauthn.WebAuthn{
 				Config: &webauthn.Config{
 					RPDisplayName: "DisplayName",
@@ -42,7 +46,11 @@ func TestConfig_serverFromContext(t *testing.T) {
 		},
 		{
 			name: "success from id",
-			args: args{authz.WithRequestedDomain(context.Background(), "example.com"), "external.com", "https://external.com"},
+			args: args{
+				ctx:    http_util.WithDomainContext(context.Background(), &http_util.DomainCtx{InstanceHost: "example.com", Protocol: "https"}),
+				id:     "external.com",
+				origin: "https://external.com",
+			},
 			want: &webauthn.WebAuthn{
 				Config: &webauthn.Config{
 					RPDisplayName: "DisplayName",

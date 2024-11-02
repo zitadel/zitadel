@@ -16,7 +16,7 @@ import (
 func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 	type args struct {
 		user    *query.NotifyUser
-		origin  string
+		origin  *http_utils.DomainCtx
 		code    string
 		codeID  string
 		urlTmpl string
@@ -34,7 +34,7 @@ func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:  "https://example.com",
+				origin:  &http_utils.DomainCtx{InstanceHost: "example.com", Protocol: "https"},
 				code:    "123",
 				codeID:  "456",
 				urlTmpl: "",
@@ -52,7 +52,7 @@ func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:  "https://example.com",
+				origin:  &http_utils.DomainCtx{InstanceHost: "example.com", Protocol: "https"},
 				code:    "123",
 				codeID:  "456",
 				urlTmpl: "{{",
@@ -67,7 +67,7 @@ func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:  "https://example.com",
+				origin:  &http_utils.DomainCtx{InstanceHost: "example.com", Protocol: "https"},
 				code:    "123",
 				codeID:  "456",
 				urlTmpl: "https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}",
@@ -82,7 +82,7 @@ func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, notify := mockNotify()
-			err := notify.SendPasswordlessRegistrationLink(http_utils.WithComposedOrigin(context.Background(), tt.args.origin), tt.args.user, tt.args.code, tt.args.codeID, tt.args.urlTmpl)
+			err := notify.SendPasswordlessRegistrationLink(http_utils.WithDomainContext(context.Background(), tt.args.origin), tt.args.user, tt.args.code, tt.args.codeID, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

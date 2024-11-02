@@ -6,22 +6,28 @@ import (
 	"errors"
 	"math"
 	"math/rand"
+	"slices"
 	"sync"
 	"time"
 
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/migration"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 type EventStore interface {
 	InstanceIDs(ctx context.Context, maxAge time.Duration, forceLoad bool, query *eventstore.SearchQueryBuilder) ([]string, error)
+	FilterToQueryReducer(ctx context.Context, reducer eventstore.QueryReducer) error
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
+	FillFields(ctx context.Context, events ...eventstore.FillFieldsEvent) error
 }
 
 type Config struct {
@@ -56,6 +62,71 @@ type Handler struct {
 	triggeredInstancesSync sync.Map
 
 	triggerWithoutEvents Reduce
+	cacheInvalidations   []func(ctx context.Context, aggregates []*eventstore.Aggregate)
+}
+
+var _ migration.Migration = (*Handler)(nil)
+
+// Execute implements migration.Migration.
+func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) error {
+	start := time.Now()
+	logging.WithFields("projection", h.ProjectionName()).Info("projection starts prefilling")
+	logTicker := time.NewTicker(30 * time.Second)
+	go func() {
+		for range logTicker.C {
+			logging.WithFields("projection", h.ProjectionName()).Info("projection is prefilling")
+		}
+	}()
+
+	instanceIDs, err := h.existingInstances(ctx)
+	if err != nil {
+		return err
+	}
+
+	// default amount of workers is 10
+	workerCount := 10
+
+	if h.client.DB.Stats().MaxOpenConnections > 0 {
+		workerCount = h.client.DB.Stats().MaxOpenConnections / 4
+	}
+	// ensure that at least one worker is active
+	if workerCount == 0 {
+		workerCount = 1
+	}
+	// spawn less workers if not all workers needed
+	if workerCount > len(instanceIDs) {
+		workerCount = len(instanceIDs)
+	}
+
+	instances := make(chan string, workerCount)
+	var wg sync.WaitGroup
+	wg.Add(workerCount)
+	for i := 0; i < workerCount; i++ {
+		go h.executeInstances(ctx, instances, startedEvent, &wg)
+	}
+
+	for _, instance := range instanceIDs {
+		instances <- instance
+	}
+
+	close(instances)
+	wg.Wait()
+
+	logTicker.Stop()
+	logging.WithFields("projection", h.ProjectionName(), "took", time.Since(start)).Info("projections ended prefilling")
+	return nil
+}
+
+func (h *Handler) executeInstances(ctx context.Context, instances <-chan string, startedEvent eventstore.Event, wg *sync.WaitGroup) {
+	for instance := range instances {
+		h.triggerInstances(ctx, []string{instance}, WithMaxPosition(startedEvent.Position()))
+	}
+	wg.Done()
+}
+
+// String implements migration.Migration.
+func (h *Handler) String() string {
+	return h.ProjectionName()
 }
 
 // nowFunc makes [time.Now] mockable
@@ -111,21 +182,56 @@ func (h *Handler) Start(ctx context.Context) {
 	go h.subscribe(ctx)
 }
 
-func (h *Handler) schedule(ctx context.Context) {
-	// if there was no run before trigger within half a second
-	start := randomizeStart(0, 0.5)
-	t := time.NewTimer(start)
-	didInitialize := h.didProjectionInitialize(ctx)
-	if didInitialize {
-		if !t.Stop() {
-			<-t.C
-		}
-		// if there was a trigger before, start the projection
-		// after a second (should generally be after the not initialized projections)
-		// and its configured `RequeueEvery`
-		reset := randomizeStart(1, h.requeueEvery.Seconds())
-		t.Reset(reset)
+type checkInit struct {
+	didInit        bool
+	projectionName string
+}
+
+// AppendEvents implements eventstore.QueryReducer.
+func (ci *checkInit) AppendEvents(...eventstore.Event) {
+	ci.didInit = true
+}
+
+// Query implements eventstore.QueryReducer.
+func (ci *checkInit) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		Limit(1).
+		InstanceID("").
+		AddQuery().
+		AggregateTypes(migration.SystemAggregate).
+		AggregateIDs(migration.SystemAggregateID).
+		EventTypes(migration.DoneType).
+		EventData(map[string]interface{}{
+			"name": ci.projectionName,
+		}).
+		Builder()
+}
+
+// Reduce implements eventstore.QueryReducer.
+func (*checkInit) Reduce() error {
+	return nil
+}
+
+var _ eventstore.QueryReducer = (*checkInit)(nil)
+
+func (h *Handler) didInitialize(ctx context.Context) bool {
+	initiated := checkInit{
+		projectionName: h.ProjectionName(),
 	}
+	err := h.es.FilterToQueryReducer(ctx, &initiated)
+	if err != nil {
+		return false
+	}
+	return initiated.didInit
+}
+
+func (h *Handler) schedule(ctx context.Context) {
+	//  start the projection and its configured `RequeueEvery`
+	reset := randomizeStart(0, h.requeueEvery.Seconds())
+	if !h.didInitialize(ctx) {
+		reset = randomizeStart(0, 0.5)
+	}
+	t := time.NewTimer(reset)
 
 	for {
 		select {
@@ -133,36 +239,27 @@ func (h *Handler) schedule(ctx context.Context) {
 			t.Stop()
 			return
 		case <-t.C:
-			instances, err := h.queryInstances(ctx, didInitialize)
+			instances, err := h.queryInstances(ctx)
 			h.log().OnError(err).Debug("unable to query instances")
 
-			var instanceFailed bool
-			scheduledCtx := call.WithTimestamp(ctx)
-			for _, instance := range instances {
-				instanceCtx := authz.WithInstanceID(scheduledCtx, instance)
-
-				// simple implementation of do while
-				_, err = h.Trigger(instanceCtx)
-				instanceFailed = instanceFailed || err != nil
-				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
-				time.Sleep(h.retryFailedAfter)
-				// retry if trigger failed
-				for ; err != nil; _, err = h.Trigger(instanceCtx) {
-					time.Sleep(h.retryFailedAfter)
-					instanceFailed = instanceFailed || err != nil
-					h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
-					if err == nil {
-						break
-					}
-				}
-			}
-
-			if !didInitialize && !instanceFailed {
-				err = h.setSucceededOnce(ctx)
-				h.log().OnError(err).Debug("unable to set succeeded once")
-				didInitialize = err == nil
-			}
+			h.triggerInstances(call.WithTimestamp(ctx), instances)
 			t.Reset(h.requeueEvery)
+		}
+	}
+}
+
+func (h *Handler) triggerInstances(ctx context.Context, instances []string, triggerOpts ...TriggerOpt) {
+	for _, instance := range instances {
+		instanceCtx := authz.WithInstanceID(ctx, instance)
+
+		// simple implementation of do while
+		_, err := h.Trigger(instanceCtx, triggerOpts...)
+		h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
+		time.Sleep(h.retryFailedAfter)
+		// retry if trigger failed
+		for ; err != nil; _, err = h.Trigger(instanceCtx, triggerOpts...) {
+			time.Sleep(h.retryFailedAfter)
+			h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
 		}
 	}
 }
@@ -223,31 +320,84 @@ func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Ev
 	}
 }
 
-func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]string, error) {
+type existingInstances []string
+
+// AppendEvents implements eventstore.QueryReducer.
+func (ai *existingInstances) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch event.Type() {
+		case instance.InstanceAddedEventType:
+			*ai = append(*ai, event.Aggregate().InstanceID)
+		case instance.InstanceRemovedEventType:
+			*ai = slices.DeleteFunc(*ai, func(s string) bool {
+				return s == event.Aggregate().InstanceID
+			})
+		}
+	}
+}
+
+// Query implements eventstore.QueryReducer.
+func (*existingInstances) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		EventTypes(
+			instance.InstanceAddedEventType,
+			instance.InstanceRemovedEventType,
+		).
+		Builder()
+}
+
+// Reduce implements eventstore.QueryReducer.
+// reduce is not used as events are reduced during AppendEvents
+func (*existingInstances) Reduce() error {
+	return nil
+}
+
+var _ eventstore.QueryReducer = (*existingInstances)(nil)
+
+func (h *Handler) queryInstances(ctx context.Context) ([]string, error) {
+	if h.handleActiveInstances == 0 {
+		return h.existingInstances(ctx)
+	}
+
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 		AwaitOpenTransactions().
 		AllowTimeTravel().
-		ExcludedInstanceID("")
-	if didInitialize && h.handleActiveInstances > 0 {
-		query = query.
-			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
+		CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
+
+	return h.es.InstanceIDs(ctx, h.requeueEvery, false, query)
+}
+
+func (h *Handler) existingInstances(ctx context.Context) ([]string, error) {
+	ai := existingInstances{}
+	if err := h.es.FilterToQueryReducer(ctx, &ai); err != nil {
+		return nil, err
 	}
-	return h.es.InstanceIDs(ctx, h.requeueEvery, !didInitialize, query)
+
+	return ai, nil
 }
 
 type triggerConfig struct {
 	awaitRunning bool
+	maxPosition  float64
 }
 
-type triggerOpt func(conf *triggerConfig)
+type TriggerOpt func(conf *triggerConfig)
 
-func WithAwaitRunning() triggerOpt {
+func WithAwaitRunning() TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.awaitRunning = true
 	}
 }
 
-func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Context, err error) {
+func WithMaxPosition(position float64) TriggerOpt {
+	return func(conf *triggerConfig) {
+		conf.maxPosition = position
+	}
+}
+
+func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
 	config := new(triggerConfig)
 	for _, opt := range opts {
 		opt(config)
@@ -261,7 +411,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Co
 
 	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx, config)
-		h.log().OnError(err).Warn("process events failed")
+		h.log().OnError(err).Info("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
 			return call.ResetTimestamp(ctx), err
@@ -269,7 +419,13 @@ func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Co
 	}
 }
 
-// lockInstances tries to lock the instance.
+// RegisterCacheInvalidation registers a function to be called when a cache needs to be invalidated.
+// In order to avoid race conditions, this method must be called before [Handler.Start] is called.
+func (h *Handler) RegisterCacheInvalidation(invalidate func(ctx context.Context, aggregates []*eventstore.Aggregate)) {
+	h.cacheInvalidations = append(h.cacheInvalidations, invalidate)
+}
+
+// lockInstance tries to lock the instance.
 // If the instance is already locked from another process no cancel function is returned
 // the instance can be skipped then
 // If the instance is locked, an unlock deferrable function is returned
@@ -319,11 +475,11 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 
 	txCtx := ctx
 	if h.txDuration > 0 {
-		var cancel func()
-		ctx, cancel = context.WithTimeout(ctx, h.txDuration)
-		defer cancel()
+		var cancel, cancelTx func()
 		// add 100ms to store current state if iteration takes too long
-		txCtx, cancel = context.WithTimeout(ctx, h.txDuration+100*time.Millisecond)
+		txCtx, cancelTx = context.WithTimeout(ctx, h.txDuration+100*time.Millisecond)
+		defer cancelTx()
+		ctx, cancel = context.WithTimeout(ctx, h.txDuration)
 		defer cancel()
 	}
 
@@ -337,10 +493,6 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
 		}
-		commitErr := tx.Commit()
-		if err == nil {
-			err = commitErr
-		}
 	}()
 
 	currentState, err := h.currentState(ctx, tx, config)
@@ -350,26 +502,42 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 		return additionalIteration, err
 	}
+	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
+	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
+		return false, nil
+	}
 
 	var statements []*Statement
 	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
 	if err != nil {
 		return additionalIteration, err
 	}
+
+	defer func() {
+		commitErr := tx.Commit()
+		if err == nil {
+			err = commitErr
+		}
+		if err == nil && currentState.aggregateID != "" && len(statements) > 0 {
+			h.invalidateCaches(ctx, aggregatesFromStatements(statements))
+		}
+	}()
+
 	if len(statements) == 0 {
 		err = h.setState(tx, currentState)
 		return additionalIteration, err
 	}
 
-	lastProcessedIndex, err := h.executeStatements(ctx, tx, currentState, statements)
+	lastProcessedIndex, err := h.executeStatements(ctx, tx, statements)
+	h.log().OnError(err).WithField("lastProcessedIndex", lastProcessedIndex).Debug("execution of statements failed")
 	if lastProcessedIndex < 0 {
 		return false, err
 	}
 
 	currentState.position = statements[lastProcessedIndex].Position
 	currentState.offset = statements[lastProcessedIndex].offset
-	currentState.aggregateID = statements[lastProcessedIndex].AggregateID
-	currentState.aggregateType = statements[lastProcessedIndex].AggregateType
+	currentState.aggregateID = statements[lastProcessedIndex].Aggregate.ID
+	currentState.aggregateType = statements[lastProcessedIndex].Aggregate.Type
 	currentState.sequence = statements[lastProcessedIndex].Sequence
 	currentState.eventTimestamp = statements[lastProcessedIndex].CreationDate
 	err = h.setState(tx, currentState)
@@ -386,7 +554,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState))
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil {
 		h.log().WithError(err).Debug("filter eventstore failed")
 		return nil, false, err
@@ -398,12 +566,12 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, err
 	}
 
-	idx := skipPreviouslyReduced(statements, currentState)
+	idx := skipPreviouslyReducedStatements(statements, currentState)
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
-		currentState.aggregateID = statements[len(statements)-1].AggregateID
-		currentState.aggregateType = statements[len(statements)-1].AggregateType
+		currentState.aggregateID = statements[len(statements)-1].Aggregate.ID
+		currentState.aggregateType = statements[len(statements)-1].Aggregate.Type
 		currentState.sequence = statements[len(statements)-1].Sequence
 		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
 
@@ -420,11 +588,11 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	return statements, additionalIteration, nil
 }
 
-func skipPreviouslyReduced(statements []*Statement, currentState *state) int {
+func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
 	for i, statement := range statements {
 		if statement.Position == currentState.position &&
-			statement.AggregateID == currentState.aggregateID &&
-			statement.AggregateType == currentState.aggregateType &&
+			statement.Aggregate.ID == currentState.aggregateID &&
+			statement.Aggregate.Type == currentState.aggregateType &&
 			statement.Sequence == currentState.sequence {
 			return i
 		}
@@ -432,7 +600,7 @@ func skipPreviouslyReduced(statements []*Statement, currentState *state) int {
 	return -1
 }
 
-func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
+func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements []*Statement) (lastProcessedIndex int, err error) {
 	lastProcessedIndex = -1
 
 	for i, statement := range statements {
@@ -440,7 +608,7 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentStat
 		case <-ctx.Done():
 			break
 		default:
-			err := h.executeStatement(ctx, tx, currentState, statement)
+			err := h.executeStatement(ctx, tx, statement)
 			if err != nil {
 				return lastProcessedIndex, err
 			}
@@ -450,28 +618,24 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentStat
 	return lastProcessedIndex, nil
 }
 
-func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState *state, statement *Statement) (err error) {
+func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *Statement) (err error) {
 	if statement.Execute == nil {
 		return nil
 	}
 
-	_, err = tx.Exec("SAVEPOINT exec")
+	_, err = tx.ExecContext(ctx, "SAVEPOINT exec_stmt")
 	if err != nil {
 		h.log().WithError(err).Debug("create savepoint failed")
 		return err
 	}
-	var shouldContinue bool
-	defer func() {
-		_, errSave := tx.Exec("RELEASE SAVEPOINT exec")
-		if err == nil {
-			err = errSave
-		}
-	}()
 
 	if err = statement.Execute(tx, h.projection.Name()); err != nil {
 		h.log().WithError(err).Error("statement execution failed")
 
-		shouldContinue = h.handleFailedStmt(tx, failureFromStatement(statement, err))
+		_, rollbackErr := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT exec_stmt")
+		h.log().OnError(rollbackErr).Error("rollback to savepoint failed")
+
+		shouldContinue := h.handleFailedStmt(tx, failureFromStatement(statement, err))
 		if shouldContinue {
 			return nil
 		}
@@ -499,12 +663,11 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {
-		query := builder.
+		builder = builder.
 			AddQuery().
 			AggregateTypes(aggregateType).
-			EventTypes(eventTypes...)
-
-		builder = query.Builder()
+			EventTypes(eventTypes...).
+			Builder()
 	}
 
 	return builder
@@ -513,4 +676,35 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 // ProjectionName returns the name of the underlying projection.
 func (h *Handler) ProjectionName() string {
 	return h.projection.Name()
+}
+
+func (h *Handler) invalidateCaches(ctx context.Context, aggregates []*eventstore.Aggregate) {
+	if len(h.cacheInvalidations) == 0 {
+		return
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(len(h.cacheInvalidations))
+
+	for _, invalidate := range h.cacheInvalidations {
+		go func(invalidate func(context.Context, []*eventstore.Aggregate)) {
+			defer wg.Done()
+			invalidate(ctx, aggregates)
+		}(invalidate)
+	}
+	wg.Wait()
+}
+
+// aggregatesFromStatements returns the unique aggregates from statements.
+// Duplicate aggregates are omitted.
+func aggregatesFromStatements(statements []*Statement) []*eventstore.Aggregate {
+	aggregates := make([]*eventstore.Aggregate, 0, len(statements))
+	for _, statement := range statements {
+		if !slices.ContainsFunc(aggregates, func(aggregate *eventstore.Aggregate) bool {
+			return *statement.Aggregate == *aggregate
+		}) {
+			aggregates = append(aggregates, statement.Aggregate)
+		}
+	}
+	return aggregates
 }

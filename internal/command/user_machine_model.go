@@ -4,9 +4,8 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -19,8 +18,7 @@ type MachineWriteModel struct {
 	Description     string
 	UserState       domain.UserState
 	AccessTokenType domain.OIDCTokenType
-
-	ClientSecret *crypto.CryptoValue
+	HashedSecret    string
 }
 
 func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
@@ -72,9 +70,11 @@ func (wm *MachineWriteModel) Reduce() error {
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		case *user.MachineSecretSetEvent:
-			wm.ClientSecret = e.ClientSecret
+			wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 		case *user.MachineSecretRemovedEvent:
-			wm.ClientSecret = nil
+			wm.HashedSecret = ""
+		case *user.MachineSecretHashUpdatedEvent:
+			wm.HashedSecret = e.HashedSecret
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -95,8 +95,9 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserReactivatedType,
 			user.UserRemovedType,
 			user.MachineSecretSetType,
-			user.MachineSecretRemovedType).
-		Builder()
+			user.MachineSecretRemovedType,
+			user.MachineSecretHashUpdatedType,
+		).Builder()
 }
 
 func (wm *MachineWriteModel) NewChangedEvent(

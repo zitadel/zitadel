@@ -55,12 +55,9 @@ type Storage struct {
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
+	app, err := p.query.ActiveAppBySAMLEntityID(ctx, entityID)
 	if err != nil {
 		return nil, err
-	}
-	if app.State != domain.AppStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
 	}
 	return serviceprovider.NewServiceProvider(
 		app.ID,
@@ -72,12 +69,9 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 }
 
 func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
-	app, err := p.query.AppByID(ctx, appID)
+	app, err := p.query.AppByID(ctx, appID, true)
 	if err != nil {
 		return "", err
-	}
-	if app.State != domain.AppStateActive {
-		return "", zerrors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
 	}
 	return app.SAMLConfig.EntityID, nil
 }
@@ -87,15 +81,15 @@ func (p *Storage) Health(context.Context) error {
 }
 
 func (p *Storage) GetCA(ctx context.Context) (*key.CertificateAndKey, error) {
-	return p.GetCertificateAndKey(ctx, domain.KeyUsageSAMLCA)
+	return p.GetCertificateAndKey(ctx, crypto.KeyUsageSAMLCA)
 }
 
 func (p *Storage) GetMetadataSigningKey(ctx context.Context) (*key.CertificateAndKey, error) {
-	return p.GetCertificateAndKey(ctx, domain.KeyUsageSAMLMetadataSigning)
+	return p.GetCertificateAndKey(ctx, crypto.KeyUsageSAMLMetadataSigning)
 }
 
 func (p *Storage) GetResponseSigningKey(ctx context.Context) (*key.CertificateAndKey, error) {
-	return p.GetCertificateAndKey(ctx, domain.KeyUsageSAMLResponseSinging)
+	return p.GetCertificateAndKey(ctx, crypto.KeyUsageSAMLResponseSinging)
 }
 
 func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID string) (_ models.AuthRequestInt, err error) {
@@ -137,6 +131,9 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	if err != nil {
 		return err
 	}
+	if user.State != domain.UserStateActive {
+		return zerrors.ThrowPreconditionFailed(nil, "SAML-S3gFd", "Errors.User.NotActive")
+	}
 
 	userGrants, err := p.getGrants(ctx, userID, applicationID)
 	if err != nil {
@@ -151,7 +148,7 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	setUserinfo(user, userinfo, attributes, customAttributes)
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse)
+	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse, p.eventstore.FilterToQueryReducer)
 	return nil
 }
 
@@ -162,6 +159,9 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	user, err := p.query.GetUserByLoginName(ctx, true, loginName)
 	if err != nil {
 		return err
+	}
+	if user.State != domain.UserStateActive {
+		return zerrors.ThrowPreconditionFailed(nil, "SAML-FJ262", "Errors.User.NotActive")
 	}
 
 	setUserinfo(user, userinfo, attributes, map[string]*customAttribute{})
@@ -246,7 +246,14 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 					}
 				}),
 				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
-					return object.UserGrantsFromQuery(c, userGrants)
+					return object.UserGrantsFromQuery(ctx, p.query, c, userGrants)
+				}),
+			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						return object.GetOrganizationMetadata(ctx, p.query, c, user.ResourceOwner)
+					}
 				}),
 			),
 		),
@@ -323,10 +330,15 @@ func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (
 	if err != nil {
 		return nil, err
 	}
+	activeQuery, err := query.NewUserGrantStateQuery(domain.UserGrantStateActive)
+	if err != nil {
+		return nil, err
+	}
 	return p.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{
 			projectQuery,
 			userIDQuery,
+			activeQuery,
 		},
 	}, true)
 }

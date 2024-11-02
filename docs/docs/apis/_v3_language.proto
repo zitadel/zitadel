@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package zitadel.settings.language.v3alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/language/v3alpha;language";
+
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "zitadel/settings/object/v3alpha/object.proto";
+import "zitadel/object/v3alpha/object.proto";
+
+message SetLanguageSettings {
+  optional zitadel.settings.object.v3alpha.Language default_language = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default language for the current context"
+      example: "\"en\""
+    }
+  ];
+  optional SetLanguages restricted_languages = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "To these languages, message texts and default login UI labels are translated to. Also, the discovery endpoint only lists these languages."
+      example: "[\"en\", \"de\"]"
+    }
+  ];
+}
+
+message ResolvedLanguageSettings {
+  zitadel.settings.object.v3alpha.ResolvedString default_language = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default language for the current context"
+      example: "\"en\""
+    }
+  ];
+  ResolvedLanguages restricted_languages = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "To these languages, message texts and default login UI labels are translated to. Also, the discovery endpoint only lists these languages."
+      example: "[\"en\", \"de\"]"
+    }
+  ];
+  ResolvedLanguages supported_languages = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "These languages are supported by the system. For simplicity, the field is of type ResolvedLanguages, even though the list is immutable and the owner is always of OWNER_TYPE_SYSTEM."
+      example: "[\"en\", \"de\", \"it\"]"
+    }
+  ];
+}
+
+message SetLanguages {
+  repeated zitadel.settings.object.v3alpha.Language languages = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "List of languages to set"
+      example: "[\"en\", \"de\"]"
+    }
+  ];
+}
+
+message ResolvedLanguages {
+  repeated zitadel.settings.object.v3alpha.Language value = 1[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "List of languages"
+      example: "[\"en\", \"de\"]"
+    }
+  ];
+  optional zitadel.object.v3alpha.Owner owner = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If the value is inherited, the value is inherited from this owner.";
+    }
+  ];
+}

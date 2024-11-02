@@ -38,7 +38,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPush(),
 				),
 			},
 			args: args{
@@ -480,6 +479,9 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						instance.NewCustomTextSetEvent(context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
+						),
+						instance.NewCustomTextSetEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
 						),
 						instance.NewCustomTextSetEvent(context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
@@ -931,6 +933,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					PasswordChange: domain.PasswordChangeScreenText{
 						Title:                   "Title",
 						Description:             "Description",
+						ExpiredDescription:      "ExpiredDescription",
 						OldPasswordLabel:        "OldPasswordLabel",
 						NewPasswordLabel:        "NewPasswordLabel",
 						NewPasswordConfirmLabel: "NewPasswordConfirmLabel",
@@ -1841,6 +1844,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewCustomTextSetEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -2771,6 +2780,9 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						instance.NewCustomTextRemovedEvent(context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, language.English,
+						),
+						instance.NewCustomTextRemovedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, language.English,
 						),
 						instance.NewCustomTextRemovedEvent(context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, language.English,
@@ -3878,6 +3890,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							"INSTANCE",
 							instance.NewCustomTextSetEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewCustomTextSetEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
 							),
 						),
 						eventFromEventPusherWithInstanceID(
@@ -5204,6 +5222,12 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"INSTANCE",
 							instance.NewCustomTextRemovedEvent(context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, language.English,
+							),
+						),
+						eventFromEventPusherWithInstanceID(
+							"INSTANCE",
+							instance.NewCustomTextRemovedEvent(context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, language.English,
 							),
 						),
@@ -6132,6 +6156,9 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
 						),
 						instance.NewCustomTextSetEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
+						),
+						instance.NewCustomTextSetEvent(context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 						),
 						instance.NewCustomTextSetEvent(context.Background(),
@@ -6581,6 +6608,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					PasswordChange: domain.PasswordChangeScreenText{
 						Title:                   "Title",
 						Description:             "Description",
+						ExpiredDescription:      "ExpiredDescription",
 						OldPasswordLabel:        "OldPasswordLabel",
 						NewPasswordLabel:        "NewPasswordLabel",
 						NewPasswordConfirmLabel: "NewPasswordConfirmLabel",
@@ -6715,7 +6743,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

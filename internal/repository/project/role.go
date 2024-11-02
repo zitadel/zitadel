@@ -8,12 +8,18 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var (
+const (
 	UniqueRoleType      = "project_role"
 	roleEventTypePrefix = projectEventTypePrefix + "role."
 	RoleAddedType       = roleEventTypePrefix + "added"
 	RoleChangedType     = roleEventTypePrefix + "changed"
 	RoleRemovedType     = roleEventTypePrefix + "removed"
+
+	ProjectRoleSearchType             = "project_role"
+	ProjectRoleRevision               = uint8(1)
+	ProjectRoleKeySearchField         = "key"
+	ProjectRoleDisplayNameSearchField = "display_name"
+	ProjectRoleGroupSearchField       = "group"
 )
 
 func NewAddProjectRoleUniqueConstraint(roleKey, projectID string) *eventstore.UniqueConstraint {
@@ -43,6 +49,59 @@ func (e *RoleAddedEvent) Payload() interface{} {
 
 func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
+}
+
+func (e *RoleAddedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			projectRoleSearchObject(e.Key),
+			ProjectRoleKeySearchField,
+			&eventstore.Value{
+				Value:       e.Key,
+				ShouldIndex: true,
+			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+		eventstore.SetField(
+			e.Aggregate(),
+			projectRoleSearchObject(e.Key),
+			ProjectRoleDisplayNameSearchField,
+			&eventstore.Value{
+				Value:       e.DisplayName,
+				ShouldIndex: true,
+			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+		eventstore.SetField(
+			e.Aggregate(),
+			projectRoleSearchObject(e.Key),
+			ProjectRoleGroupSearchField,
+			&eventstore.Value{
+				Value:       e.Group,
+				ShouldIndex: true,
+			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
 }
 
 func NewRoleAddedEvent(
@@ -91,6 +150,50 @@ func (e *RoleChangedEvent) Payload() interface{} {
 
 func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *RoleChangedEvent) Fields() []*eventstore.FieldOperation {
+	operations := make([]*eventstore.FieldOperation, 0, 2)
+	if e.DisplayName != nil {
+		operations = append(operations, eventstore.SetField(
+			e.Aggregate(),
+			projectRoleSearchObject(e.Key),
+			ProjectRoleDisplayNameSearchField,
+			&eventstore.Value{
+				Value:       *e.DisplayName,
+				ShouldIndex: true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		))
+	}
+	if e.Group != nil {
+		operations = append(operations, eventstore.SetField(
+			e.Aggregate(),
+			projectRoleSearchObject(e.Key),
+			ProjectRoleGroupSearchField,
+			&eventstore.Value{
+				Value:       *e.Group,
+				ShouldIndex: true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		))
+	}
+
+	return operations
 }
 
 func NewRoleChangedEvent(
@@ -162,6 +265,15 @@ func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
+func (e *RoleRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.RemoveSearchFieldsByAggregateAndObject(
+			e.Aggregate(),
+			projectRoleSearchObject(e.Key),
+		),
+	}
+}
+
 func NewRoleRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -187,4 +299,12 @@ func RoleRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 
 	return e, nil
+}
+
+func projectRoleSearchObject(id string) eventstore.Object {
+	return eventstore.Object{
+		Type:     ProjectRoleSearchType,
+		Revision: ProjectRoleRevision,
+		ID:       id,
+	}
 }

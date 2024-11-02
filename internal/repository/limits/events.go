@@ -17,6 +17,7 @@ const (
 type SetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 	AuditLogRetention     *time.Duration `json:"auditLogRetention,omitempty"`
+	Block                 *bool          `json:"block,omitempty"`
 }
 
 func (e *SetEvent) Payload() any {
@@ -49,6 +50,12 @@ type LimitsChange func(*SetEvent)
 func ChangeAuditLogRetention(auditLogRetention *time.Duration) LimitsChange {
 	return func(e *SetEvent) {
 		e.AuditLogRetention = auditLogRetention
+	}
+}
+
+func ChangeBlock(block *bool) LimitsChange {
+	return func(e *SetEvent) {
+		e.Block = block
 	}
 }
 

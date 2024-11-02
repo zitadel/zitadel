@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"io"
+	"unicode/utf8"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -46,15 +47,17 @@ func (a *AESCrypto) Decrypt(value []byte, keyID string) ([]byte, error) {
 	return DecryptAES(value, key)
 }
 
+// DecryptString decrypts the value using the key identified by keyID.
+// When the decrypted value contains non-UTF8 characters an error is returned.
 func (a *AESCrypto) DecryptString(value []byte, keyID string) (string, error) {
-	key, err := a.decryptionKey(keyID)
+	b, err := a.Decrypt(value, keyID)
 	if err != nil {
 		return "", err
 	}
-	b, err := DecryptAES(value, key)
-	if err != nil {
-		return "", err
+	if !utf8.Valid(b) {
+		return "", zerrors.ThrowPreconditionFailed(err, "CRYPT-hiCh0", "non-UTF-8 in decrypted string")
 	}
+
 	return string(b), nil
 }
 

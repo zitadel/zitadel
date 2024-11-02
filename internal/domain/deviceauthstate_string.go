@@ -13,12 +13,13 @@ func _() {
 	_ = x[DeviceAuthStateApproved-2]
 	_ = x[DeviceAuthStateDenied-3]
 	_ = x[DeviceAuthStateExpired-4]
-	_ = x[deviceAuthStateCount-5]
+	_ = x[DeviceAuthStateDone-5]
+	_ = x[deviceAuthStateCount-6]
 }
 
-const _DeviceAuthState_name = "undefinedinitiatedapproveddeniedexpiredinvalid"
+const _DeviceAuthState_name = "undefinedinitiatedapproveddeniedexpireddoneinvalid"
 
-var _DeviceAuthState_index = [...]uint8{0, 9, 18, 26, 32, 39, 46}
+var _DeviceAuthState_index = [...]uint8{0, 9, 18, 26, 32, 39, 43, 50}
 
 func (i DeviceAuthState) String() string {
 	if i >= DeviceAuthState(len(_DeviceAuthState_index)-1) {

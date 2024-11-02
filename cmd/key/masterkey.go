@@ -2,7 +2,6 @@ package key
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -42,7 +41,7 @@ func MasterKey(cmd *cobra.Command) (string, error) {
 	if masterKeyFromEnv {
 		return os.Getenv(envMasterKey), nil
 	}
-	data, err := ioutil.ReadFile(masterKeyFile)
+	data, err := os.ReadFile(masterKeyFile)
 	if err != nil {
 		return "", err
 	}

@@ -42,7 +42,7 @@ We will not publish this information by default to protect your privacy.
 ### When should I NOT report a vulnerability
 
 - Disclosure of known public files or directories, e.g. robots.txt, files under .well-known, or files that are included in our public repositories (eg, go.mod)
-- DoS of users when [Lockout Policy is enabled](https://zitadel.com/docs/guides/manage/console/instance-settings#lockout)
+- DoS of users when [Lockout Policy is enabled](https://zitadel.com/docs/guides/manage/console/default-settings#lockout)
 - You need help applying security related settings
 
 ## Disclosure Process

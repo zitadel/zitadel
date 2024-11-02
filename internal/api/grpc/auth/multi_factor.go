@@ -26,7 +26,7 @@ func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFac
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (s *Server) RemoveMyAuthFactorOTPEmail(ctx context.Context, _ *auth_pb.Remo
 
 func (s *Server) AddMyAuthFactorU2F(ctx context.Context, _ *auth_pb.AddMyAuthFactorU2FRequest) (*auth_pb.AddMyAuthFactorU2FResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	u2f, err := s.command.HumanAddU2FSetup(ctx, ctxData.UserID, ctxData.ResourceOwner, false)
+	u2f, err := s.command.HumanAddU2FSetup(ctx, ctxData.UserID, ctxData.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

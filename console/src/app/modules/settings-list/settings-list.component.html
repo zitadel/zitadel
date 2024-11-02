@@ -1,4 +1,5 @@
 <cnsl-sidenav
+  *ngIf="currentSetting"
   [title]="title"
   [description]="description"
   [indented]="true"
@@ -6,8 +7,20 @@
   [settingsList]="settingsList"
   queryParam="id"
 >
+  <ng-container *ngIf="currentSetting === 'organizations'">
+    <h2>{{ 'ORG.PAGES.LIST' | translate }}</h2>
+    <p class="org-desc cnsl-secondary-text">{{ 'ORG.PAGES.LISTDESCRIPTION' | translate }}</p>
+
+    <cnsl-org-table></cnsl-org-table>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'features'">
+    <cnsl-features></cnsl-features>
+  </ng-container>
   <ng-container *ngIf="currentSetting === 'complexity'">
     <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'age'">
+    <cnsl-password-age-policy [serviceType]="serviceType"></cnsl-password-age-policy>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'lockout'">
     <cnsl-password-lockout-policy [serviceType]="serviceType"></cnsl-password-lockout-policy>
@@ -56,5 +69,14 @@
   </ng-container>
   <ng-container *ngIf="currentSetting === 'languages' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-language-settings></cnsl-language-settings>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'views' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-iam-views></cnsl-iam-views>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'events' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-events></cnsl-events>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'failedevents' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-iam-failed-events></cnsl-iam-failed-events>
   </ng-container>
 </cnsl-sidenav>

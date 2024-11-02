@@ -49,10 +49,10 @@ func OrgMetadataToPb(data *query.OrgMetadata) *meta_pb.Metadata {
 	}
 }
 
-func MetadataQueriesToQuery(queries []*meta_pb.MetadataQuery) (_ []query.SearchQuery, err error) {
+func OrgMetadataQueriesToQuery(queries []*meta_pb.MetadataQuery) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i], err = MetadataQueryToQuery(query)
+		q[i], err = OrgMetadataQueryToQuery(query)
 		if err != nil {
 			return nil, err
 		}
@@ -60,15 +60,31 @@ func MetadataQueriesToQuery(queries []*meta_pb.MetadataQuery) (_ []query.SearchQ
 	return q, nil
 }
 
-func MetadataQueryToQuery(query *meta_pb.MetadataQuery) (query.SearchQuery, error) {
-	switch q := query.Query.(type) {
+func OrgMetadataQueryToQuery(metadataQuery *meta_pb.MetadataQuery) (query.SearchQuery, error) {
+	switch q := metadataQuery.Query.(type) {
 	case *meta_pb.MetadataQuery_KeyQuery:
-		return MetadataKeyQueryToQuery(q.KeyQuery)
+		return query.NewOrgMetadataKeySearchQuery(q.KeyQuery.Key, object.TextMethodToQuery(q.KeyQuery.Method))
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
 	}
 }
 
-func MetadataKeyQueryToQuery(q *meta_pb.MetadataKeyQuery) (query.SearchQuery, error) {
-	return query.NewOrgMetadataKeySearchQuery(q.Key, object.TextMethodToQuery(q.Method))
+func UserMetadataQueriesToQuery(queries []*meta_pb.MetadataQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = UserMetadataQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func UserMetadataQueryToQuery(metadataQuery *meta_pb.MetadataQuery) (query.SearchQuery, error) {
+	switch q := metadataQuery.Query.(type) {
+	case *meta_pb.MetadataQuery_KeyQuery:
+		return query.NewUserMetadataKeySearchQuery(q.KeyQuery.Key, object.TextMethodToQuery(q.KeyQuery.Method))
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-Vn7qy", "List.Query.Invalid")
+	}
 }

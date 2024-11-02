@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limite não encontrado
     NoneSpecified: Nenhum limite especificado
+    Instance:
+      Blocked: A instância está bloqueada
   Restrictions:
     NoneSpecified: Nenhuma restrição especificada
     DefaultLanguageMustBeAllowed: O idioma padrão deve ser permitido
@@ -51,14 +53,27 @@ Errors:
     NotFound: Configuração de SMS não encontrada
     AlreadyActive: Configuração de SMS já está ativa
     AlreadyDeactivated: Configuração de SMS já está desativada
+  SMTP:
+    NotEmailMessage: a mensagem não é EmailMessage
+    RequiredAttributes: assunto, destinatários e conteúdo devem ser definidos, mas alguns ou todos eles estão vazios
+    CouldNotSplit: não foi possível dividir o host e a porta para conectar ao smtp
+    CouldNotDial: não foi possível entrar em contato com o servidor SMTP, verificar a porta, problemas de firewall...
+    CouldNotDialTLS: não foi possível entrar em contato com o servidor SMTP usando TLS, verifique a porta, problemas de firewall...
+    CouldNotCreateClient: não foi possível criar o cliente smtp
+    CouldNotStartTLS: não foi possível iniciar o tls
+    CouldNotAuth: não foi possível adicionar autenticação smtp, verifique se seu usuário e senha estão corretos, se estiverem corretos, talvez seu provedor exija um método de autenticação não suportado pelo ZITADEL
+    CouldNotSetSender: não foi possível definir o remetente
+    CouldNotSetRecipient: não foi possível definir o destinatário
   SMTPConfig:
+    TestPassword: Senha para teste não encontrada
     NotFound: Configuração de SMTP não encontrada
     AlreadyExists: Configuração de SMTP já existe
+    AlreadyDeactivated: Configuração SMTP já desativada
     SenderAdressNotCustomDomain: O endereço do remetente deve ser configurado como um domínio personalizado na instância.
+    TestEmailNotFound: Endereço de e-mail para teste não encontrado
   Notification:
     NoDomain: Nenhum domínio encontrado para a mensagem
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Usuário não pôde ser encontrado
     AlreadyExists: Usuário já existe
     NotFoundOnOrg: Usuário não pôde ser encontrado na organização escolhida
@@ -107,6 +122,7 @@ Errors:
       Key:
         NotFound: Chave de máquina não encontrada
         AlreadyExisting: Chave de máquina já existe
+        Invalid: A chave pública não é uma chave pública RSA válida no formato PKIX com codificação PEM
       Secret:
         NotExisting: Segredo não existe
         Invalid: Segredo é inválido
@@ -126,12 +142,14 @@ Errors:
       NotFound: Código não encontrado
       Expired: Código expirou
       GeneratorAlgNotSupported: Algoritmo do gerador não suportado
+      Invalid: Código é inválido
     Password:
       NotFound: Senha não encontrada
       Empty: Senha está vazia
       Invalid: Senha é inválida
       NotSet: O usuário não definiu uma senha
       NotChanged: A nova senha não pode ser igual à sua senha atual
+      NotSupported: Codificação hash da senha não suportada. Confira https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Política de complexidade de senha não encontrada
       MinLength: A senha é muito curta
@@ -323,7 +341,7 @@ Errors:
       NotActive: A concessão do projeto não está ativa
       NotInactive: A concessão do projeto não está inativa
   IAM:
-    NotFound: Instância não encontrada. Confira https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM não encontrado. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: As funções não foram alteradas
     MemberInvalid: O membro é inválido
@@ -464,6 +482,7 @@ Errors:
     NotActive: A ação não está ativa
     NotInactive: A ação não está inativa
     MaxAllowed: Não são permitidas ações adicionais ativas
+    NotEnabled: O recurso "Ação" não está ativado
   Flow:
     FlowTypeMissing: O tipo de fluxo está faltando
     Empty: O fluxo já está vazio
@@ -474,6 +493,8 @@ Errors:
     CloseRows: A instrução SQL não pôde ser concluída
     SQLStatement: Não foi possível criar a instrução SQL
     InvalidRequest: O pedido é inválido
+    TooManyNestingLevels: muitos níveis de aninhamento de consulta (máx. 20)
+    LimitExceeded: Limite excedido
   Quota:
     AlreadyExists: Cota já existe para esta unidade
     NotFound: Cota não encontrada para esta unidade
@@ -508,6 +529,7 @@ Errors:
     IDPMissing: O ID do IDP está faltando na solicitação
     IDPInvalid: IDP inválido para o pedido
     ResponseInvalid: A resposta da PDI é inválida
+    MissingSingleMappingAttribute: Não contém o atributo de mapeamento ou tem mais de um valor
     SuccessURLMissing: A URL de sucesso está faltando na solicitação
     FailureURLMissing: A URL de falha está faltando na solicitação
     StateMissing: O parâmetro de estado está faltando na solicitação
@@ -526,6 +548,52 @@ Errors:
     NotExisting: O recurso não existe
     TypeNotSupported: O tipo de recurso não é compatível
     InvalidValue: Valor inválido para este recurso
+  Target:
+    Invalid: A meta é inválida
+    NoTimeout: O destino não tem tempo limite
+    InvalidURL: O destino tem um URL inválido
+    NotFound: Destino não encontrado
+  Execution:
+    ConditionInvalid: A condição de execução é inválida
+    Invalid: A execução é inválida
+    NotFound: Execução não encontrada
+    IncludeNotFound: Incluir não encontrado
+    NoTargets: Nenhuma meta definida
+    Failed: Falha na execução
+    ResponseIsNotValidJSON: A resposta não é um JSON válido
+  UserSchema:
+    NotEnabled: O recurso "Esquema do usuário" não está habilitado
+    Type:
+      Missing: Tipo de esquema de usuário ausente
+      AlreadyExists: O tipo de esquema de usuário já existe
+    Authenticator:
+      Invalid: Tipo de autenticador inválido
+    NotActive: Esquema do usuário não ativo
+    NotInactive: Esquema do usuário não inativo
+    NotExists: O esquema do usuário não existe
+    ID:
+      Missing: ID do esquema do utilizador em falta
+    Invalid: Esquema de utilizador inválido
+    Data:
+      Invalid: Dados inválidos para o esquema do utilizador
+  TokenExchange:
+    FeatureDisabled: O recurso Token Exchange está desabilitado para sua instância. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: O token está faltando
+      Invalid: O token é inválido
+      TypeMissing: O tipo de token está faltando
+      TypeNotAllowed: O tipo de token não é permitido
+      TypeNotSupported: O tipo de token não é compatível
+      NotForAPI: Tokens personificados não permitidos para API
+    Impersonation:
+      PolicyDisabled: A representação está desativada na política de segurança da instância
+  WebKey:
+    ActiveDelete: Não é possível eliminar a chave web ativa
+    Config: Configuração de chave web inválida
+    Duplicate: ID da chave Web não exclusivo
+    FeatureDisabled: Recurso chave da Web desativado
+    NoActive: Nenhuma chave web ativa encontrada
+    NotFound: Chave Web não encontrada
 
 AggregateTypes:
   action: Ação
@@ -537,8 +605,28 @@ AggregateTypes:
   usergrant: Concessão de usuário
   quota: Cota
   feature: Recurso
+  target: Objetivo
+  execution: Execução
+  user_schema: Esquema do usuário
+  auth_request: Solicitação de autenticação
+  device_auth: Autenticação de dispositivo
+  idpintent: Intenção de IDP
+  limits: Limites
+  milestone: Marco
+  oidc_session: Sessão OIDC
+  restrictions: Restrições
+  system: Sistema
+  session: Sessão
+  web_key: Chave da Web
 
 EventTypes:
+  execution:
+    set: Conjunto de execução
+    removed: Execução excluída
+  target:
+    added: Destino criado
+    changed: Destino alterada
+    removed: Destino excluído
   user:
     added: Usuário adicionado
     selfregistered: Usuário se registrou
@@ -551,7 +639,9 @@ EventTypes:
         failed: Verificação de inicialização falhou
     token:
       added: Token de acesso criado
+      v2.added: Token de acesso criado
       removed: Token de acesso removido
+    impersonated: Usuário personificado
     username:
       reserved: Nome de usuário reservado
       released: Nome de usuário liberado
@@ -574,6 +664,7 @@ EventTypes:
         removed: Chave removida
       secret:
         set: Segredo definido
+        updated: Hash secreto atualizado
         removed: Segredo removido
         check:
           succeeded: Verificação de segredo bem-sucedida
@@ -591,6 +682,13 @@ EventTypes:
         check:
           succeeded: Verificação de inicialização bem-sucedida
           failed: Verificação de inicialização falhou
+      invite:
+        code:
+          added: Código de convite gerado
+          sent: Código de convite enviado
+        check:
+          succeeded: Verificação do convite bem-sucedida
+          failed: Verificação do convite falhou
       username:
         reserved: Nome de usuário reservado
         released: Nome de usuário liberado
@@ -948,6 +1046,11 @@ EventTypes:
           check:
             succeeded: Verificação de segredo do cliente OIDC bem-sucedida
             failed: Verificação de segredo do cliente OIDC falhou
+      api:
+        secret:
+          check:
+            succeeded: Verificação secreta da API bem-sucedida
+            failed: Falha na verificação do segredo da API
         key:
           added: Chave do aplicativo adicionada
           removed: Chave do aplicativo removida
@@ -960,11 +1063,13 @@ EventTypes:
           changed: Configuração OIDC alterada
           secret:
             changed: Segredo OIDC alterado
+            updated: Hash secreto do OIDC atualizado
         api:
           added: Configuração de API adicionada
           changed: Configuração de API alterada
           secret:
             changed: Segredo da API alterado
+            updated: Hash secreto da API atualizado
   policy:
     password:
       complexity:
@@ -1059,6 +1164,9 @@ EventTypes:
       config:
         added: Configuração SMTP adicionada
         changed: Configuração SMTP alterada
+        activated: Configuração SMTP ativada
+        deactivated: Configuração SMTP desativada
+        removed: Configuração SMTP removida
         password:
           changed: Segredo da configuração SMTP alterado
     sms:
@@ -1204,9 +1312,42 @@ EventTypes:
       config:
         added: Configuração SMTP adicionada
         changed: Configuração SMTP alterada
+        activated: Configuração SMTP ativada
+        deactivated: Configuração SMTP desativada
         password:
           changed: Senha da configuração SMTP alterada
         removed: Configuração SMTP removida
+  user_schema:
+    created: Esquema de usuário criado
+    updated: Esquema do usuário atualizado
+    deactivated: Esquema de usuário desativado
+    reactivated: Esquema do usuário reativado
+    deleted: Esquema do usuário excluído
+    user:
+      created: Utilizador criado
+      updated: Utilizador atualizado
+      deleted: Utilizador excluído
+      email:
+        updated: Endereço de e-mail alterado
+        verified: Endereço de e-mail verificado
+        verification:
+          failed: Falha na verificação do endereço de e-mail
+        code:
+          added: Código de verificação do endereço de e-mail gerado
+          sent: Código de verificação do endereço de e-mail enviado
+      phone:
+        updated: Número de telefone alterado
+        verified: Número de telefone verificado
+        verification:
+          failed: Falha na verificação do número de telefone
+        code:
+          added: Código de verificação do número de telefone gerado
+          sent: Código de verificação do número de telefone enviado
+  web_key:
+    added: Chave Web adicionada
+    activated: Chave Web ativada
+    deactivated: Chave Web desativada
+    removed: Chave Web removida
 
 Application:
   OIDC:

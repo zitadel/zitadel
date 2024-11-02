@@ -1,6 +1,7 @@
 package object
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -11,6 +12,28 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 )
+
+func OrgMetadataListFromQuery(c *actions.FieldConfig, orgMetadata *query.OrgMetadataList) goja.Value {
+	result := &metadataList{
+		Count:     orgMetadata.Count,
+		Sequence:  orgMetadata.Sequence,
+		Timestamp: orgMetadata.LastRun,
+		Metadata:  make([]*metadata, len(orgMetadata.Metadata)),
+	}
+
+	for i, md := range orgMetadata.Metadata {
+		result.Metadata[i] = &metadata{
+			CreationDate:  md.CreationDate,
+			ChangeDate:    md.ChangeDate,
+			ResourceOwner: md.ResourceOwner,
+			Sequence:      md.Sequence,
+			Key:           md.Key,
+			Value:         metadataByteArrayToValue(md.Value, c.Runtime),
+		}
+	}
+
+	return c.Runtime.ToValue(result)
+}
 
 func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetadataList) goja.Value {
 	result := &userMetadataList{
@@ -55,6 +78,21 @@ func UserMetadataListFromSlice(c *actions.FieldConfig, metadata []query.UserMeta
 	return c.Runtime.ToValue(result)
 }
 
+func GetOrganizationMetadata(ctx context.Context, queries *query.Queries, c *actions.FieldConfig, organizationID string) goja.Value {
+	metadata, err := queries.SearchOrgMetadata(
+		ctx,
+		true,
+		organizationID,
+		&query.OrgMetadataSearchQueries{},
+		false,
+	)
+	if err != nil {
+		logging.WithError(err).Info("unable to get org metadata in action")
+		panic(err)
+	}
+	return OrgMetadataListFromQuery(c, metadata)
+}
+
 func metadataByteArrayToValue(val []byte, runtime *goja.Runtime) goja.Value {
 	var value interface{}
 	if !json.Valid(val) {
@@ -71,6 +109,22 @@ func metadataByteArrayToValue(val []byte, runtime *goja.Runtime) goja.Value {
 		panic(err)
 	}
 	return runtime.ToValue(value)
+}
+
+type metadataList struct {
+	Count     uint64
+	Sequence  uint64
+	Timestamp time.Time
+	Metadata  []*metadata
+}
+
+type metadata struct {
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	Sequence      uint64
+	Key           string
+	Value         goja.Value
 }
 
 type userMetadataList struct {

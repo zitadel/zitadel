@@ -23,9 +23,11 @@ import (
 func TestCommands_AddUserTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("inst1", "org1", "user1")
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	userAgg2 := &user.NewAggregate("user2", "org1").Aggregate
 
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -39,12 +41,33 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "wrong user",
+			name: "other user, permission error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(ctx,
+								userAgg,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
 			args: args{
 				userID:        "foo",
 				resourceowner: "org1",
 			},
-			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "create otp error",
@@ -53,8 +76,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 				resourceowner: "org1",
 			},
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -67,8 +89,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 				resourceowner: "org1",
 			},
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(ctx,
@@ -118,8 +139,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 				resourceowner: "org1",
 			},
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(ctx,
@@ -162,11 +182,63 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 			},
 			want: true,
 		},
+		{
+			name: "success, other user",
+			args: args{
+				userID:        "user2",
+				resourceowner: "org1",
+			},
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(ctx,
+								userAgg2,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgAddedEvent(ctx,
+								userAgg2,
+								"org",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(ctx,
+								userAgg2,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(),
+					expectRandomPush([]eventstore.Command{
+						user.NewHumanOTPAddedEvent(ctx, userAgg2, nil),
+					}),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			want: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 				multifactors: domain.MultifactorConfigs{
 					OTP: domain.OTPConfig{
 						Issuer:    "zitadel.com",
@@ -190,15 +262,19 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
+	key, err := domain.NewTOTPKey("example.com", "user1")
 	require.NoError(t, err)
+	secret, err := crypto.Encrypt([]byte(key.Secret()), cryptoAlg)
+	require.NoError(t, err)
+
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
 	code, err := totp.GenerateCode(key.Secret(), time.Now())
 	require.NoError(t, err)
 
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -213,17 +289,46 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "wrong user id",
+			name: "other user, no permission, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
 			args: args{
 				userID: "foo",
 			},
-			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
+			name: "user id, with permission, success",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, &user.NewAggregate("foo", "org1").Aggregate, secret),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPVerifiedEvent(ctx, &user.NewAggregate("foo", "org1").Aggregate, ""),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID: "foo",
+				code:   code,
+			},
 		},
 		{
 			name: "success",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
@@ -244,7 +349,8 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 				multifactors: domain.MultifactorConfigs{
 					OTP: domain.OTPConfig{
 						CryptoMFA: cryptoAlg,

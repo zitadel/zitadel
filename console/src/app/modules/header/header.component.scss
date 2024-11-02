@@ -224,7 +224,8 @@
         flex: 1;
       }
 
-      .doc-link {
+      .doc-link,
+      .custom-link {
         margin-right: 1rem;
 
         @media only screen and (max-width: 800px) {
@@ -247,12 +248,16 @@
             display: none;
           }
 
-          @media only screen and (min-width: 600px) {
-            display: inline;
+          display: inline;
 
-            i {
-              margin-right: -0.5rem;
-              margin-left: 0.25rem;
+          i {
+            margin-right: -0.5rem;
+            margin-left: 0.25rem;
+          }
+
+          @media only screen and (max-width: 375px) {
+            .iam-label {
+              font-size: x-small;
             }
           }
         }

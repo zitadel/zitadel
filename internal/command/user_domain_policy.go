@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -60,7 +61,10 @@ func orgDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReduce
 }
 
 // Deprecated: Use commands.instanceDomainPolicyWriteModel directly, to remove use of eventstore.Filter function
-func instanceDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*InstanceDomainPolicyWriteModel, error) {
+func instanceDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (_ *InstanceDomainPolicyWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	policy := NewInstanceDomainPolicyWriteModel(ctx)
 	events, err := filter(ctx, policy.Query())
 	if err != nil {
@@ -74,7 +78,10 @@ func instanceDomainPolicy(ctx context.Context, filter preparation.FilterToQueryR
 	return policy, err
 }
 
-func domainPolicyUsernames(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (*DomainPolicyUsernamesWriteModel, error) {
+func domainPolicyUsernames(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (_ *DomainPolicyUsernamesWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	policy := NewDomainPolicyUsernamesWriteModel(orgID)
 	events, err := filter(ctx, policy.Query())
 	if err != nil {

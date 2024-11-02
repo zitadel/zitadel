@@ -12,9 +12,15 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, maxAttempts uint64, showLockoutFailure bool) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, maxPasswordAttempts, maxOTPAttempts uint64, showLockoutFailure bool) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultLockoutPolicy(instanceAgg, maxAttempts, showLockoutFailure))
+	//nolint:staticcheck
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultLockoutPolicy(
+		instanceAgg,
+		maxPasswordAttempts,
+		maxOTPAttempts,
+		showLockoutFailure,
+	))
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +32,7 @@ func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, maxAttempts uint
 }
 
 func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
-	existingPolicy, err := c.defaultLockoutPolicyWriteModelByID(ctx)
+	existingPolicy, err := defaultLockoutPolicyWriteModelByID(ctx, c.eventstore.FilterToQueryReducer)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +41,13 @@ func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domai
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LockoutPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
+		ctx,
+		instanceAgg,
+		policy.MaxPasswordAttempts,
+		policy.MaxOTPAttempts,
+		policy.ShowLockOutFailures,
+	)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-0psjF", "Errors.IAM.LockoutPolicy.NotChanged")
 	}
@@ -51,12 +63,12 @@ func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domai
 	return writeModelToLockoutPolicy(&existingPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) defaultLockoutPolicyWriteModelByID(ctx context.Context) (policy *InstanceLockoutPolicyWriteModel, err error) {
+func defaultLockoutPolicyWriteModelByID(ctx context.Context, reducer func(ctx context.Context, r eventstore.QueryReducer) error) (policy *InstanceLockoutPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstanceLockoutPolicyWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = reducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +77,8 @@ func (c *Commands) defaultLockoutPolicyWriteModelByID(ctx context.Context) (poli
 
 func prepareAddDefaultLockoutPolicy(
 	a *instance.Aggregate,
-	maxAttempts uint64,
+	maxPasswordAttempts,
+	maxOTPAttempts uint64,
 	showLockoutFailure bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
@@ -83,7 +96,7 @@ func prepareAddDefaultLockoutPolicy(
 				return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-0olDf", "Errors.Instance.LockoutPolicy.AlreadyExists")
 			}
 			return []eventstore.Command{
-				instance.NewLockoutPolicyAddedEvent(ctx, &a.Aggregate, maxAttempts, showLockoutFailure),
+				instance.NewLockoutPolicyAddedEvent(ctx, &a.Aggregate, maxPasswordAttempts, maxOTPAttempts, showLockoutFailure),
 			}, nil
 		}, nil
 	}

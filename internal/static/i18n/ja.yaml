@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: 制限が見つかりません
     NoneSpecified: 制限が指定されていません
+    Instance:
+      Blocked: インスタンスはブロックされています
   Restrictions:
     NoneSpecified: 制限が指定されていません
     DefaultLanguageMustBeAllowed: デフォルト言語は許可されている必要があります
@@ -51,14 +53,27 @@ Errors:
     NotFound: SMS構成が見つかりません
     AlreadyActive: このSMS構成はすでにアクティブです
     AlreadyDeactivated: このSMS構成はすでに非アクティブです
+  SMTP:
+    NotEmailMessage: メッセージは EmailMessage ではありません
+    RequiredAttributes: 件名、受信者、コンテンツを設定する必要がありますが、一部またはすべてが空です
+    CouldNotSplit: smtp に接続するためにホストとポートを分割できませんでした
+    CouldNotDial: SMTP サーバーに接続できませんでした。ポート、ファイアウォールの問題を確認してください...
+    CouldNotDialTLS: TLS を使用して SMTP サーバーに接続できませんでした。ポート、ファイアウォールの問題を確認してください...
+    CouldNotCreateClient: SMTPクライアントを作成できませんでした
+    CouldNotStartTLS: TLSを開始できませんでした
+    CouldNotAuth: smtp 認証を追加できませんでした。ユーザーとパスワードの両方が正しいかどうかを確認してください。正しい場合は、プロバイダーが ZITADEL でサポートされていない認証方法を必要としている可能性があります。
+    CouldNotSetSender: 送信者を設定できませんでした
+    CouldNotSetRecipient: 受信者を設定できませんでした
   SMTPConfig:
+    TestPassword: テスト用のパスワードが見つかりません
     NotFound: SMTP構成が見つかりません
     AlreadyExists: すでに存在するSMTP構成です
+    AlreadyDeactivated: SMTP設定はすでに無効化されています
     SenderAdressNotCustomDomain: 送信者アドレスは、インスタンスのカスタムドメインとして構成する必要があります。
+    TestEmailNotFound: テスト用のメールアドレスが見つかりません
   Notification:
     NoDomain: メッセージのドメインが見つかりません
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: ユーザーが見つかりません
     AlreadyExists: 既に存在するユーザーです
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
@@ -100,6 +115,7 @@ Errors:
       Key:
         NotFound: マシーンキーが見つかりません
         AlreadyExisting: すでに存在しているマシーンキーです
+        Invalid: 公開キーは、PEM エンコードを使用した PKIX 形式の有効な RSA 公開キーではありません
       Secret:
         NotExisting: シークレットは存在しません
         Invalid: 無効なシークレットです
@@ -118,13 +134,14 @@ Errors:
       NotFound: コードが見つかりません
       Expired: 有効期限切れのコードです
       GeneratorAlgNotSupported: サポートされていない生成アルゴリズムです
+      Invalid: コードが無効
     Password:
       NotFound: パスワードが見つかりません
       Empty: パスワードは空です
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
       NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
-      NotSupported: パスワードハッシュエンコードはサポートされていません
+      NotSupported: パスワードハッシュエンコードはサポートされていません。 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets を参照してください。
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
       MinLength: パスワードが短すぎます
@@ -314,7 +331,7 @@ Errors:
       NotActive: プロジェクトグラントはアクティブではありません
       NotInactive: プロジェクトグラントは非アクティブではありません
   IAM:
-    NotFound: インスタンスが見つかりません https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAMが見つかりません。正しいドメインを持っていることを確認してください。 https://zitadel.com/docs/apis/introduction#domains を参照してください
     Member:
       RolesNotChanged: ロールは変更されていません
     MemberInvalid: 無効なメンバーです
@@ -455,6 +472,7 @@ Errors:
     NotActive: アクションはアクティブではありません
     NotInactive: アクションは非アクティブではありません
     MaxAllowed: 追加のアクティブアクションは許可されていません
+    NotEnabled: 機能「アクション」が有効になっていません
   Flow:
     FlowTypeMissing: フロータイプがありません
     Empty: フローはすでに空です
@@ -465,6 +483,8 @@ Errors:
     CloseRows: SQLステートメントの終了に失敗しました
     SQLStatement: SQLステートメントの作成に失敗しました
     InvalidRequest: 無効なリクエストです
+    TooManyNestingLevels: クエリのネスト レベルが多すぎます (最大 20)
+    LimitExceeded: 制限を超えました
   Quota:
     AlreadyExists: このユニットにはすでにクォータが存在しています
     NotFound: このユニットにはクォータが見つかりません
@@ -499,6 +519,7 @@ Errors:
     IDPMissing: リクエストにIDP IDが含まれていません
     IDPInvalid: リクエストのIDPが無効
     ResponseInvalid: IDPの回答は無効
+    MissingSingleMappingAttribute: マッピング属性が含まれていない、または複数の値がある
     SuccessURLMissing: リクエストに成功時の URL がありません
     FailureURLMissing: リクエストに失敗の URL がありません
     StateMissing: リクエストに State パラメータがありません
@@ -521,6 +542,52 @@ Errors:
     NotExisting: 機能が存在しません
     TypeNotSupported: 機能タイプはサポートされていません
     InvalidValue: この機能には無効な値です
+  Target:
+    Invalid: ターゲットが無効です
+    NoTimeout: ターゲットにはタイムアウトがありません
+    InvalidURL: ターゲットに無効な URL があります
+    NotFound: ターゲットが見つかりません
+  Execution:
+    ConditionInvalid: 実行条件が不正です
+    Invalid: 実行は無効です
+    NotFound: 実行が見つかりませんでした
+    IncludeNotFound: 見つからないものを含める
+    NoTargets: ターゲットが定義されていません
+    Failed: 実行に失敗しました
+    ResponseIsNotValidJSON: 応答は有効な JSON ではありません
+  UserSchema:
+    NotEnabled: 機能「ユーザースキーマ」が有効になっていません
+    Type:
+      Missing: ユーザースキーマタイプがありません
+      AlreadyExists: ユーザースキーマタイプはすでに存在します
+    Authenticator:
+      Invalid: 無効な認証子のタイプ
+    NotActive: ユーザースキーマがアクティブではありません
+    NotInactive: ユーザースキーマが非アクティブではありません
+    NotExists: ユーザースキーマが存在しません
+    ID:
+      Missing: ユーザー スキーマ ID がありません
+    Invalid: ユーザー スキーマが無効です
+    Data:
+      Invalid: ユーザー スキーマのデータが無効です
+  TokenExchange:
+    FeatureDisabled: インスタンスではトークン交換機能が無効になっています。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: トークンがありません
+      Invalid: トークンが無効です
+      TypeMissing: トークンの種類がありません
+      TypeNotAllowed: トークンの種類は許可されていません
+      TypeNotSupported: トークンタイプはサポートされていません
+      NotForAPI: 偽装されたトークンは API では許可されません
+    Impersonation:
+      PolicyDisabled: インスタンスのセキュリティ ポリシーで偽装が無効になっています
+  WebKey:
+    ActiveDelete: アクティブな Web キーを削除できません
+    Config: 無効な Web キー設定
+    Duplicate: Web キー ID が一意ではありません
+    FeatureDisabled: Web キー機能が無効です
+    NoActive: アクティブな Web キーが見つかりません
+    NotFound: Web キーが見つかりません
 
 AggregateTypes:
   action: アクション
@@ -532,8 +599,28 @@ AggregateTypes:
   usergrant: ユーザーグラント
   quota: クォータ
   feature: 特徴
+  target: 目標
+  execution: 実行
+  user_schema: ユーザースキーマ
+  auth_request: 認証リクエスト
+  device_auth: デバイス認証
+  idpintent: IDPインテント
+  limits: 制限
+  milestone: マイルストーン
+  oidc_session: OIDCセッション
+  restrictions: 制限
+  system: システム
+  session: セッション
+  web_key: Web キー
 
 EventTypes:
+  execution:
+    set: 実行セット
+    removed: 実行は削除されました
+  target:
+    added: ターゲットが作成されました
+    changed: ターゲットが変更されました
+    removed: ターゲットが削除されました
   user:
     added: ユーザーの追加
     selfregistered: ユーザー自身の登録
@@ -546,7 +633,9 @@ EventTypes:
         failed: 初期化チェックの失敗
     token:
       added: アクセストークンの作成
+      v2.added: アクセストークンの作成
       removed: アクセストークンの削除
+    impersonated: ユーザーがなりすました
     username:
       reserved: ユーザー名の予約
       released: ユーザー名の解放
@@ -569,6 +658,7 @@ EventTypes:
         removed: キーの削除
       secret:
         set: シークレットのセット
+        updated: 秘密のハッシュが更新されました
         removed: シークレットの削除
         check:
           succeeded: シークレットチェックの成功
@@ -586,6 +676,13 @@ EventTypes:
         check:
           succeeded: 初期化チェックの成功
           failed: 初期化チェックの失敗
+      invite:
+        code:
+          added: 招待コードが生成されました
+          sent: 招待コードが送信されました
+        check:
+          succeeded: 招待のチェックが成功しました
+          failed: 招待のチェックが失敗しました
       username:
         reserved: ユーザー名の予約
         released: ユーザー名の解放
@@ -943,6 +1040,11 @@ EventTypes:
           check:
             succeeded: OIDCクライアントシークレットチェックの成功
             failed: OIDCクライアントシークレットチェックの失敗
+      api:
+        secret:
+          check:
+            succeeded: APIシークレットチェックに成功しました
+            failed: APIシークレットチェックに失敗しました
         key:
           added: アプリケーションキーの追加
           removed: アプリケーションキーの削除
@@ -955,11 +1057,13 @@ EventTypes:
           changed: OIDC構成の変更
           secret:
             changed: OIDCシークレットの変更
+            updated: OIDC シークレットハッシュが更新されました
         api:
           added: API構成の追加
           changed: API構成の変更
           secret:
             changed: APIのシークレットの変更
+            updated: API シークレット ハッシュが更新されました
   policy:
     password:
       complexity:
@@ -1054,6 +1158,9 @@ EventTypes:
       config:
         added: SMTP構成の追加
         changed: SMTP構成の変更
+        activated: SMTP設定が有効化されました
+        deactivated: SMTP設定が無効化されました
+        removed: SMTP設定が削除されました
         password:
           changed: SMTP構成シークレットの変更
     sms:
@@ -1199,9 +1306,42 @@ EventTypes:
       config:
         added: SMTP構成の追加
         changed: SMTP構成の変更
+        activated: SMTP設定が有効化されました
+        deactivated: SMTP設定が無効化されました
         password:
           changed: SMTP構成パスワードの変更
         removed: SMTP構成の削除
+  user_schema:
+    created: ーザースキーマが作成されました
+    updated: ユーザースキーマが更新されました
+    deactivated: ユーザースキーマが非アクティブ化されました
+    reactivated: ユーザースキーマが再アクティブ化されました
+    deleted: ユーザースキーマが削除されました
+    user:
+      created: ユーザーが作成されました
+      updated: ユーザーが更新されました
+      deleted: ユーザーが削除されました
+      email:
+        updated: メールアドレスが変更されました
+        verified: メールアドレスが確認されました
+        verification:
+          failed: メールアドレスの確認に失敗しました
+        code:
+          added: メールアドレスの確認コードが生成されました
+          sent: メールアドレスの確認コードが送信されました
+      phone:
+        updated: 電話番号が変更されました
+        verified: 電話番号が確認されました
+        verification:
+          failed: 電話番号の確認に失敗しました
+        code:
+          added: 電話番号の確認コードが生成されました
+          sent: 電話番号の確認コードが送信されました
+  web_key:
+    added: Web キーが追加されました
+    activated: Web キーが有効化されました
+    deactivated: Web キーが無効化されました
+    removed: Web キーが削除されました
 
 Application:
   OIDC:
