@@ -23,6 +23,8 @@
         <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/zitadel/zitadel"></a>
     <a href="https://discord.gg/YgjEuJzZ3x" alt="Discord Chat">
         <img src="https://badgen.net/discord/online-members/YgjEuJzZ3x" /></a>
+    <a href="https://gurubase.io/g/zitadel" alt="Gurubase">
+        <img src="https://img.shields.io/badge/Gurubase-Ask%20ZITADEL%20Guru-006BFF" /></a>
 </p>
 
 <p align="center">
