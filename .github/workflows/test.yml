@@ -38,32 +38,32 @@ jobs:
         uses: actions/setup-node@v4.0.2
         with:
           node-version: 20.x
+          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.0.0
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
       - uses: actions/cache@v4.0.2
-        name: Setup pnpm cache
+        name: Setup Cypress cache
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-binary-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-cypress-binary-
+        # The Cypress binary cache needs to be updated together with the pnpm dependencies cache.
+        # That's why we don't conditionally cache it using if: ${{ matrix.command == 'test:integration' }}
 
       - name: Install Dependencies
-        run: CYPRESS_INSTALL_BINARY=${{ matrix.command == 'test:integration' }} pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
+        # We can cache the Playwright binary cache independently from the pnpm cache, because we install it separately.
+        # After pnpm install --frozen-lockfile, we can get the version so we only have to download the binary once per version.
       - run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - uses: actions/cache@v4.0.2
         name: Setup Playwright binary cache
+        id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-binary-${{ env.PLAYWRIGHT_VERSION }}
@@ -73,7 +73,7 @@ jobs:
 
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
-        if: ${{ matrix.command == 'test:acceptance' }}
+        if: ${{ matrix.command == 'test:acceptance' && steps.playwright-cache.outputs.cache-hit != 'true' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
