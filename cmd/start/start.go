@@ -224,6 +224,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}
 	commands, err := command.StartCommands(
 		eventstoreClient,
+		config.Caches,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		storage,
@@ -269,6 +270,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
+		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		*config.Telemetry,
 		config.ExternalDomain,
@@ -282,6 +284,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
+		keys.OIDC,
+		config.OIDC.DefaultBackChannelLogoutLifetime,
 	)
 	notification.Start(ctx)
 

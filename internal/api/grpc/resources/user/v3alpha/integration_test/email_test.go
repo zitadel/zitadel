@@ -350,10 +350,10 @@ func TestServer_SetContactEmail(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.SetContactEmail(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCode {
 				assert.NotNil(t, got.VerificationCode)
@@ -545,10 +545,10 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.VerifyContactEmail(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 		})
 	}
@@ -757,10 +757,10 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 			}
 			got, err := instance.Client.UserV3Alpha.ResendContactEmailCode(tt.ctx, tt.req)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			integration.AssertResourceDetails(t, tt.res.want, got.Details)
 			if tt.res.returnCode {
 				assert.NotNil(t, got.VerificationCode)

@@ -411,6 +411,7 @@ OIDC:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
+  DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
   ProviderConfig:
@@ -600,7 +601,10 @@ Actions:
     # Wildcard sub domains are currently unsupported
     DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
       - localhost
-      - "127.0.0.1"
+      - "127.0.0.0/8"
+      - "::1"
+      - "0.0.0.0"
+      - "::"
 
 LogStore:
   Access:

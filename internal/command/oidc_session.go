@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -71,7 +72,8 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Iung5", "Errors.AuthRequest.NoCode")
 	}
 
-	sessionModel := NewSessionWriteModel(authReqModel.SessionID, authz.GetInstance(ctx).InstanceID())
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	sessionModel := NewSessionWriteModel(authReqModel.SessionID, instanceID)
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionModel)
 	if err != nil {
 		return nil, "", err
@@ -118,14 +120,22 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		}
 	}
 	cmd.SetAuthRequestSuccessful(ctx, authReqModel.aggregate)
-	session, err = cmd.PushEvents(ctx)
-	return session, authReqModel.State, err
+	postCommit, err := cmd.SetMilestones(ctx, authReqModel.ClientID, true)
+	if err != nil {
+		return nil, "", err
+	}
+	if session, err = cmd.PushEvents(ctx); err != nil {
+		return nil, "", err
+	}
+	postCommit(ctx)
+	return session, authReqModel.State, nil
 }
 
 func (c *Commands) CreateOIDCSession(ctx context.Context,
 	userID,
 	resourceOwner,
-	clientID string,
+	clientID,
+	backChannelLogoutURI string,
 	scope,
 	audience []string,
 	authMethods []domain.UserAuthMethodType,
@@ -154,6 +164,7 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	}
 
 	cmd.AddSession(ctx, userID, resourceOwner, sessionID, clientID, audience, scope, authMethods, authTime, nonce, preferredLanguage, userAgent)
+	cmd.RegisterLogout(ctx, sessionID, userID, clientID, backChannelLogoutURI)
 	if responseType != domain.OIDCResponseTypeIDToken {
 		if err = cmd.AddAccessToken(ctx, scope, userID, resourceOwner, reason, actor); err != nil {
 			return nil, err
@@ -164,7 +175,15 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 			return nil, err
 		}
 	}
-	return cmd.PushEvents(ctx)
+	postCommit, err := cmd.SetMilestones(ctx, clientID, sessionID != "")
+	if err != nil {
+		return nil, err
+	}
+	if session, err = cmd.PushEvents(ctx); err != nil {
+		return nil, err
+	}
+	postCommit(ctx)
+	return session, nil
 }
 
 type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string) (scope []string, err error)
@@ -286,7 +305,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, userID, resource
 	}
 	sessionID = IDPrefixV2 + sessionID
 	return &OIDCSessionEvents{
-		eventstore:               c.eventstore,
+		commands:                 c,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
 		events:                   pending,
@@ -344,7 +363,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 		return nil, err
 	}
 	return &OIDCSessionEvents{
-		eventstore:               c.eventstore,
+		commands:                 c,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
 		oidcSessionWriteModel:    sessionWriteModel,
@@ -355,7 +374,7 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 }
 
 type OIDCSessionEvents struct {
-	eventstore            *eventstore.Eventstore
+	commands              *Commands
 	idGenerator           id.Generator
 	encryptionAlg         crypto.EncryptionAlgorithm
 	events                []eventstore.Command
@@ -420,6 +439,26 @@ func (c *OIDCSessionEvents) SetAuthRequestFailed(ctx context.Context, authReques
 	c.events = append(c.events, authrequest.NewFailedEvent(ctx, authRequestAggregate, domain.OIDCErrorReasonFromError(err)))
 }
 
+func (c *OIDCSessionEvents) RegisterLogout(ctx context.Context, sessionID, userID, clientID, backChannelLogoutURI string) {
+	// If there's no SSO session (e.g. service accounts) we do not need to register a logout handler.
+	// Also, if the client did not register a backchannel_logout_uri it will not support it (https://openid.net/specs/openid-connect-backchannel-1_0.html#BCRegistration)
+	if sessionID == "" || backChannelLogoutURI == "" {
+		return
+	}
+	if !authz.GetFeatures(ctx).EnableBackChannelLogout {
+		return
+	}
+
+	c.events = append(c.events, sessionlogout.NewBackChannelLogoutRegisteredEvent(
+		ctx,
+		&sessionlogout.NewAggregate(sessionID, authz.GetInstance(ctx).InstanceID()).Aggregate,
+		c.oidcSessionWriteModel.AggregateID,
+		userID,
+		clientID,
+		backChannelLogoutURI,
+	))
+}
+
 func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, userID, resourceOwner string, reason domain.TokenReason, actor *domain.TokenActor) error {
 	accessTokenID, err := c.idGenerator.Next()
 	if err != nil {
@@ -470,7 +509,7 @@ func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID,
 }
 
 func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error) {
-	pushedEvents, err := c.eventstore.Push(ctx, c.events...)
+	pushedEvents, err := c.commands.eventstore.Push(ctx, c.events...)
 	if err != nil {
 		return nil, err
 	}
@@ -499,7 +538,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
 		session.TokenID = c.oidcSessionWriteModel.AggregateID + TokenDelimiter + c.accessTokenID
 	}
-	activity.Trigger(ctx, c.oidcSessionWriteModel.UserResourceOwner, c.oidcSessionWriteModel.UserID, tokenReasonToActivityMethodType(c.oidcSessionWriteModel.AccessTokenReason), c.eventstore.FilterToQueryReducer)
+	activity.Trigger(ctx, c.oidcSessionWriteModel.UserResourceOwner, c.oidcSessionWriteModel.UserID, tokenReasonToActivityMethodType(c.oidcSessionWriteModel.AccessTokenReason), c.commands.eventstore.FilterToQueryReducer)
 	return session, nil
 }
 

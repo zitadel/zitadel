@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -70,7 +71,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args{
-				ctx:             context.Background(),
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
 				authRequestID:   "",
 				complianceCheck: mockAuthRequestComplianceChecker(nil),
 			},
@@ -86,7 +87,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				),
 			},
 			args{
-				ctx:             context.Background(),
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
 				authRequestID:   "V2_authRequestID",
 				complianceCheck: mockAuthRequestComplianceChecker(nil),
 			},
@@ -102,7 +103,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				),
 			},
 			args{
-				ctx:             context.Background(),
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
 				authRequestID:   "V2_authRequestID",
 				complianceCheck: mockAuthRequestComplianceChecker(nil),
 			},
@@ -706,6 +707,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
+			c.setMilestonesCompletedForTest("instanceID")
 			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck, tt.args.needRefreshToken)
 			require.ErrorIs(t, err, tt.res.err)
 
@@ -731,22 +733,23 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 		checkPermission                 domain.PermissionCheck
 	}
 	type args struct {
-		ctx               context.Context
-		userID            string
-		resourceOwner     string
-		clientID          string
-		audience          []string
-		scope             []string
-		authMethods       []domain.UserAuthMethodType
-		authTime          time.Time
-		nonce             string
-		preferredLanguage *language.Tag
-		userAgent         *domain.UserAgent
-		reason            domain.TokenReason
-		actor             *domain.TokenActor
-		needRefreshToken  bool
-		sessionID         string
-		responseType      domain.OIDCResponseType
+		ctx                  context.Context
+		userID               string
+		resourceOwner        string
+		clientID             string
+		backChannelLogoutURI string
+		audience             []string
+		scope                []string
+		authMethods          []domain.UserAuthMethodType
+		authTime             time.Time
+		nonce                string
+		preferredLanguage    *language.Tag
+		userAgent            *domain.UserAgent
+		reason               domain.TokenReason
+		actor                *domain.TokenActor
+		needRefreshToken     bool
+		sessionID            string
+		responseType         domain.OIDCResponseType
 	}
 	tests := []struct {
 		name    string
@@ -763,16 +766,17 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:               context.Background(),
-				userID:            "userID",
-				resourceOwner:     "orgID",
-				clientID:          "clientID",
-				audience:          []string{"audience"},
-				scope:             []string{"openid", "offline_access"},
-				authMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				authTime:          testNow,
-				nonce:             "nonce",
-				preferredLanguage: &language.Afrikaans,
+				ctx:                  authz.WithInstanceID(context.Background(), "instanceID"),
+				userID:               "userID",
+				resourceOwner:        "orgID",
+				clientID:             "clientID",
+				backChannelLogoutURI: "backChannelLogoutURI",
+				audience:             []string{"audience"},
+				scope:                []string{"openid", "offline_access"},
+				authMethods:          []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:             testNow,
+				nonce:                "nonce",
+				preferredLanguage:    &language.Afrikaans,
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -820,7 +824,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -895,7 +899,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1175,7 +1179,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1273,7 +1277,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1297,6 +1301,308 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				needRefreshToken: false,
 				sessionID:        "sessionID",
 				responseType:     domain.OIDCResponseTypeUnspecified,
+			},
+			want: &OIDCSession{
+				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				ClientID:          "clientID",
+				UserID:            "userID",
+				Audience:          []string{"audience"},
+				Expiration:        time.Time{}.Add(time.Hour),
+				Scope:             []string{"openid", "offline_access"},
+				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:          testNow,
+				Nonce:             "nonce",
+				PreferredLanguage: &language.Afrikaans,
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason: domain.TokenReasonAuthRequest,
+				Actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				SessionID: "sessionID",
+			},
+		},
+		{
+			name: "with backChannelLogoutURI",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilter(), // token lifetime
+					expectPush(
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest,
+							&domain.TokenActor{
+								UserID: "user2",
+								Issuer: "foo.com",
+							},
+						),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:                  authz.WithInstanceID(context.Background(), "instanceID"),
+				userID:               "userID",
+				resourceOwner:        "org1",
+				clientID:             "clientID",
+				backChannelLogoutURI: "backChannelLogoutURI",
+				audience:             []string{"audience"},
+				scope:                []string{"openid", "offline_access"},
+				authMethods:          []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:             testNow,
+				nonce:                "nonce",
+				preferredLanguage:    &language.Afrikaans,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAuthRequest,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+			},
+			want: &OIDCSession{
+				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				ClientID:          "clientID",
+				UserID:            "userID",
+				Audience:          []string{"audience"},
+				Expiration:        time.Time{}.Add(time.Hour),
+				Scope:             []string{"openid", "offline_access"},
+				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:          testNow,
+				Nonce:             "nonce",
+				PreferredLanguage: &language.Afrikaans,
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason: domain.TokenReasonAuthRequest,
+				Actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+			},
+		},
+		{
+			name: "with backChannelLogoutURI and sessionID",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilter(), // token lifetime
+					expectPush(
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest,
+							&domain.TokenActor{
+								UserID: "user2",
+								Issuer: "foo.com",
+							},
+						),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:                  authz.WithInstanceID(context.Background(), "instanceID"),
+				userID:               "userID",
+				resourceOwner:        "org1",
+				clientID:             "clientID",
+				backChannelLogoutURI: "backChannelLogoutURI",
+				audience:             []string{"audience"},
+				scope:                []string{"openid", "offline_access"},
+				authMethods:          []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:             testNow,
+				nonce:                "nonce",
+				preferredLanguage:    &language.Afrikaans,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAuthRequest,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+				sessionID:        "sessionID",
+			},
+			want: &OIDCSession{
+				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				ClientID:          "clientID",
+				UserID:            "userID",
+				Audience:          []string{"audience"},
+				Expiration:        time.Time{}.Add(time.Hour),
+				Scope:             []string{"openid", "offline_access"},
+				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:          testNow,
+				Nonce:             "nonce",
+				PreferredLanguage: &language.Afrikaans,
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason: domain.TokenReasonAuthRequest,
+				Actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				SessionID: "sessionID",
+			},
+		},
+		{
+			name: "with backChannelLogoutURI and sessionID, backchannel logout enabled",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						user.NewHumanAddedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.Afrikaans,
+							domain.GenderUnspecified,
+							"email",
+							false,
+						),
+					),
+					expectFilter(), // token lifetime
+					expectPush(
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						sessionlogout.NewBackChannelLogoutRegisteredEvent(context.Background(),
+							&sessionlogout.NewAggregate("sessionID", "instanceID").Aggregate,
+							"V2_oidcSessionID",
+							"userID",
+							"clientID",
+							"backChannelLogoutURI",
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest,
+							&domain.TokenActor{
+								UserID: "user2",
+								Issuer: "foo.com",
+							},
+						),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:                  authz.WithFeatures(authz.WithInstanceID(context.Background(), "instanceID"), feature.Features{EnableBackChannelLogout: true}),
+				userID:               "userID",
+				resourceOwner:        "org1",
+				clientID:             "clientID",
+				backChannelLogoutURI: "backChannelLogoutURI",
+				audience:             []string{"audience"},
+				scope:                []string{"openid", "offline_access"},
+				authMethods:          []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:             testNow,
+				nonce:                "nonce",
+				preferredLanguage:    &language.Afrikaans,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAuthRequest,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+				sessionID:        "sessionID",
 			},
 			want: &OIDCSession{
 				TokenID:           "V2_oidcSessionID-at_accessTokenID",
@@ -1354,7 +1660,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				}),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1436,7 +1742,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				}),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
@@ -1496,10 +1802,12 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 				checkPermission:                 tt.fields.checkPermission,
 			}
+			c.setMilestonesCompletedForTest("instanceID")
 			got, err := c.CreateOIDCSession(tt.args.ctx,
 				tt.args.userID,
 				tt.args.resourceOwner,
 				tt.args.clientID,
+				tt.args.backChannelLogoutURI,
 				tt.args.scope,
 				tt.args.audience,
 				tt.args.authMethods,

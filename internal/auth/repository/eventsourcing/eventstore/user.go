@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -27,26 +28,40 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.Eventstore.Health(ctx)
 }
 
-func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {
-	userSessions, err := repo.View.UserSessionsByAgentID(ctx, agentID, authz.GetInstance(ctx).InstanceID())
+func (repo *UserRepo) UserSessionsByAgentID(ctx context.Context, agentID string) ([]command.HumanSignOutSession, error) {
+	sessions, err := repo.View.UserSessionsByAgentID(ctx, agentID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, 0, len(userSessions))
-	for _, session := range userSessions {
-		if session.State.V == domain.UserSessionStateActive {
-			userIDs = append(userIDs, session.UserID)
+	signoutSessions := make([]command.HumanSignOutSession, 0, len(sessions))
+	for _, session := range sessions {
+		if session.State.V == domain.UserSessionStateActive && session.ID.Valid {
+			signoutSessions = append(signoutSessions, command.HumanSignOutSession{
+				ID:     session.ID.String,
+				UserID: session.UserID,
+			})
 		}
 	}
-	return userIDs, nil
+	return signoutSessions, nil
 }
 
 func (repo *UserRepo) UserAgentIDBySessionID(ctx context.Context, sessionID string) (string, error) {
 	return repo.View.UserAgentIDBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
 }
 
-func (repo *UserRepo) ActiveUserIDsBySessionID(ctx context.Context, sessionID string) (userAgentID string, userIDs []string, err error) {
-	return repo.View.ActiveUserIDsBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
+func (repo *UserRepo) ActiveUserSessionsBySessionID(ctx context.Context, sessionID string) (userAgentID string, signoutSessions []command.HumanSignOutSession, err error) {
+	userAgentID, sessions, err := repo.View.ActiveUserSessionsBySessionID(ctx, sessionID, authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return "", nil, err
+	}
+	signoutSessions = make([]command.HumanSignOutSession, 0, len(sessions))
+	for sessionID, userID := range sessions {
+		signoutSessions = append(signoutSessions, command.HumanSignOutSession{
+			ID:     sessionID,
+			UserID: userID,
+		})
+	}
+	return userAgentID, signoutSessions, nil
 }
 
 func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {

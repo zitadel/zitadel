@@ -45,6 +45,7 @@ type OIDCApp struct {
 	ClockSkew                time.Duration
 	AdditionalOrigins        []string
 	SkipNativeAppSuccessPage bool
+	BackChannelLogoutURI     string
 
 	State AppState
 }

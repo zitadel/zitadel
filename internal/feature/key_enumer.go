@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_event"
+const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logout"
 
-var _KeyIndex = [...]uint8{0, 11, 28, 61, 81, 92, 106, 113, 133, 140, 163, 197, 221}
+var _KeyIndex = [...]uint8{0, 11, 28, 61, 81, 92, 106, 113, 133, 140, 163, 197, 221, 247}
 
-const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_event"
+const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_erroroidc_single_v1_session_terminationdisable_user_token_eventenable_back_channel_logout"
 
 func (i Key) String() string {
 	if i < 0 || i >= Key(len(_KeyIndex)-1) {
@@ -36,9 +36,10 @@ func _KeyNoOp() {
 	_ = x[KeyDebugOIDCParentError-(9)]
 	_ = x[KeyOIDCSingleV1SessionTermination-(10)]
 	_ = x[KeyDisableUserTokenEvent-(11)]
+	_ = x[KeyEnableBackChannelLogout-(12)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination, KeyDisableUserTokenEvent, KeyEnableBackChannelLogout}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName[0:11]:         KeyUnspecified,
@@ -65,6 +66,8 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName[163:197]: KeyOIDCSingleV1SessionTermination,
 	_KeyName[197:221]:      KeyDisableUserTokenEvent,
 	_KeyLowerName[197:221]: KeyDisableUserTokenEvent,
+	_KeyName[221:247]:      KeyEnableBackChannelLogout,
+	_KeyLowerName[221:247]: KeyEnableBackChannelLogout,
 }
 
 var _KeyNames = []string{
@@ -80,6 +83,7 @@ var _KeyNames = []string{
 	_KeyName[140:163],
 	_KeyName[163:197],
 	_KeyName[197:221],
+	_KeyName[221:247],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.

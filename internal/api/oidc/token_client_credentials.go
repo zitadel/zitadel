@@ -35,6 +35,7 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 		client.userID,
 		client.resourceOwner,
 		client.clientID,
+		"", // backChannelLogoutURI not needed for service user session
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
