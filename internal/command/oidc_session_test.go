@@ -987,7 +987,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:               context.Background(),
+				ctx:               authz.WithInstanceID(context.Background(), "instanceID"),
 				userID:            "userID",
 				resourceOwner:     "org1",
 				clientID:          "clientID",
