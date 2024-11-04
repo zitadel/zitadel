@@ -10,13 +10,21 @@ Caches:
   Connectors:
     Postgres:
       Enabled: true
-      AutoPrune:
-        Interval: 30s
-        TimeOut: 1s
+    Redis:
+      Enabled: true
   Instance:
+    Connector: "redis"
+    MaxAge: 1h
+    LastUsage: 10m
+    Log:
+      Level: info
+      AddSource: true
+      Formatter:
+        Format: text
+  Milestones:
     Connector: "postgres"
     MaxAge: 1h
-    LastUsage: 30m
+    LastUsage: 10m
     Log:
       Level: info
       AddSource: true
