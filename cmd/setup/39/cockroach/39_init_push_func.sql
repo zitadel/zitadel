@@ -1,18 +1,14 @@
 -- represents an event to be created.
-DO $$ BEGIN
-    CREATE TYPE eventstore.command AS (
-        instance_id TEXT
-        , aggregate_type TEXT
-        , aggregate_id TEXT
-        , command_type TEXT
-        , revision INT2
-        , payload JSONB
-        , creator TEXT
-        , owner TEXT
-    );
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
+CREATE TYPE IF NOT EXISTS eventstore.command AS (
+    instance_id TEXT
+    , aggregate_type TEXT
+    , aggregate_id TEXT
+    , command_type TEXT
+    , revision INT2
+    , payload JSONB
+    , creator TEXT
+    , owner TEXT
+);
 
 /*
 select * from eventstore.commands_to_events(
@@ -29,9 +25,6 @@ ARRAY[
 
 -- index is used for filtering for the current sequence of the aggregate
 CREATE INDEX IF NOT EXISTS e_push_idx ON eventstore.events2(instance_id, aggregate_type, aggregate_id, owner, sequence DESC);
-
--- TODO: remove drop before merge
-DROP FUNCTION IF EXISTS eventstore.commands_to_events(eventstore.command[]);
 
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 AS $$
 SELECT
@@ -89,9 +82,6 @@ ORDER BY
     c.in_tx_order;
 $$ LANGUAGE SQL;
 
--- TODO: remove drop before merge
-DROP FUNCTION IF EXISTS eventstore.push(eventstore.command[]);
-
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS TABLE(
     instance_id TEXT
     , aggregate_type TEXT
@@ -101,7 +91,7 @@ CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURN
     , "position" DECIMAL
     , in_tx_order INT4
 ) AS $$
-INSERT INTO eventstore.events2
-SELECT * FROM eventstore.commands_to_events(commands)
-RETURNING instance_id, aggregate_type, aggregate_id, created_at, "sequence", position, in_tx_order
+    INSERT INTO eventstore.events2
+    SELECT * FROM eventstore.commands_to_events(commands)
+    RETURNING instance_id, aggregate_type, aggregate_id, created_at, "sequence", position, in_tx_order
 $$ LANGUAGE SQL;

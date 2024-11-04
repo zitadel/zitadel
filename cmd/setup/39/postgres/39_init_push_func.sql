@@ -30,9 +30,6 @@ ARRAY[
 -- index is used for filtering for the current sequence of the aggregate
 CREATE INDEX IF NOT EXISTS e_push_idx ON eventstore.events2(instance_id, aggregate_type, aggregate_id, owner, sequence DESC);
 
--- TODO: remove drop before merge
-DROP FUNCTION IF EXISTS eventstore.commands_to_events(eventstore.command[]);
-
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 AS $$
 SELECT
     c.instance_id,
@@ -88,9 +85,6 @@ JOIN (
 ORDER BY
     c.in_tx_order;
 $$ LANGUAGE SQL;
-
--- TODO: remove drop before merge
-DROP FUNCTION IF EXISTS eventstore.push(eventstore.command[]);
 
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS TABLE(
     instance_id TEXT
