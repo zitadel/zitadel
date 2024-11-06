@@ -75,13 +75,6 @@ Data location refers to a region, consisting of one or many countries or territo
 
 We can not guarantee that during transit the data will only remain within this region. We take measures, as outlined in our [privacy policy](../policies/privacy-policy), to protect your data in transit and in rest.
 
-The following regions will be available when using our cloud service. This list is for informational purposes and will be updated in due course, please refer to our website for all available regions at this time.
-
-- **United States**: Exclusively hosted on regions in the United States
-- **European Union**: Exclusively hosted on regions in the European Union
-- **Switzerland**: Exclusively on Swiss region
-- **Australia**: Exclusively hosted on regions in the Australia
-
 ## Backup
 
 Our backup strategy executes daily full backups and differential backups on much higher frequency.
