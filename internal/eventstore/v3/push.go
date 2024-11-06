@@ -14,10 +14,14 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	tx, err := es.client.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -27,18 +31,21 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 		sequences []*latestSequence
 	)
 
-	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		sequences, err = latestSequences(ctx, tx, commands)
+	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() (err error) {
+		inTxCtx, span := tracing.NewSpan(ctx)
+		defer func() { span.EndWithError(err) }()
+
+		sequences, err = latestSequences(inTxCtx, tx, commands)
 		if err != nil {
 			return err
 		}
 
-		events, err = insertEvents(ctx, tx, sequences, commands)
+		events, err = insertEvents(inTxCtx, tx, sequences, commands)
 		if err != nil {
 			return err
 		}
 
-		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+		if err = handleUniqueConstraints(inTxCtx, tx, commands); err != nil {
 			return err
 		}
 
@@ -51,7 +58,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			}
 		}
 
-		return handleFieldCommands(ctx, tx, commands)
+		return handleFieldCommands(inTxCtx, tx, commands)
 	})
 
 	if err != nil {
