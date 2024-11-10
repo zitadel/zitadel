@@ -1,0 +1,1406 @@
+Errors:
+  Internal: 내부 오류가 발생했습니다
+  NoChangesFound: 변경 사항 없음
+  OriginNotAllowed: 이 "Origin"은 허용되지 않습니다
+  IDMissing: ID가 누락되었습니다
+  ResourceOwnerMissing: 리소스 소유 조직이 누락되었습니다
+  RemoveFailed: 제거할 수 없습니다
+  ProjectionName:
+    Invalid: 잘못된 투영 이름입니다
+  Assets:
+    EmptyKey: 자산 키가 비어 있습니다
+    Store:
+      NotInitialized: 자산 저장소가 초기화되지 않았습니다
+      NotConfigured: 자산 저장소가 구성되지 않았습니다
+    Bucket:
+      Internal: 버킷 생성 중 내부 오류 발생
+      AlreadyExists: 버킷이 이미 존재합니다
+      CreateFailed: 버킷이 생성되지 않았습니다
+      ListFailed: 버킷을 읽을 수 없습니다
+      RemoveFailed: 버킷이 삭제되지 않았습니다
+      SetPublicFailed: 버킷을 공개로 설정할 수 없습니다
+    Object:
+      PutFailed: 객체가 생성되지 않았습니다
+      GetFailed: 객체를 읽을 수 없습니다
+      NotFound: 객체를 찾을 수 없습니다
+      PresignedTokenFailed: 서명된 토큰을 생성할 수 없습니다
+      ListFailed: 객체 목록을 읽을 수 없습니다
+      RemoveFailed: 객체를 삭제할 수 없습니다
+  Limit:
+    ExceedsDefault: 제한이 기본 제한을 초과합니다
+  Limits:
+    NotFound: 제한을 찾을 수 없습니다
+    NoneSpecified: 지정된 제한이 없습니다
+    Instance:
+      Blocked: 인스턴스가 차단되었습니다
+  Restrictions:
+    NoneSpecified: 지정된 제한이 없습니다
+    DefaultLanguageMustBeAllowed: 기본 언어는 허용되어야 합니다
+  Language:
+    NotParsed: 언어를 구문 분석할 수 없습니다
+    NotSupported: 지원되지 않는 언어입니다
+    NotAllowed: 허용되지 않는 언어입니다
+    Undefined: 언어가 정의되지 않았습니다
+    Duplicate: 중복된 언어가 있습니다
+  OIDCSettings:
+    NotFound: OIDC 구성을 찾을 수 없습니다
+    AlreadyExists: OIDC 구성이 이미 존재합니다
+  SecretGenerator:
+    AlreadyExists: 시크릿 생성기가 이미 존재합니다
+    TypeMissing: 시크릿 생성기 유형이 누락되었습니다
+    NotFound: 시크릿 생성기를 찾을 수 없습니다
+  SMSConfig:
+    NotFound: SMS 구성을 찾을 수 없습니다
+    AlreadyActive: SMS 구성이 이미 활성화되었습니다
+    AlreadyDeactivated: SMS 구성이 이미 비활성화되었습니다
+    NotExternalVerification: SMS 구성은 코드 검증을 지원하지 않습니다
+  SMTP:
+    NotEmailMessage: 메시지가 이메일 메시지가 아닙니다
+    RequiredAttributes: subject, recipients 및 content가 설정되어야 하지만 일부 또는 모두 비어 있습니다
+    CouldNotSplit: smtp 연결을 위해 호스트와 포트를 분할할 수 없습니다
+    CouldNotDial: SMTP 서버에 연결할 수 없습니다. 포트 또는 방화벽 문제를 확인하십시오...
+    CouldNotDialTLS: TLS를 사용하여 SMTP 서버에 연결할 수 없습니다. 포트 또는 방화벽 문제를 확인하십시오...
+    CouldNotCreateClient: smtp 클라이언트를 생성할 수 없습니다
+    CouldNotStartTLS: TLS를 시작할 수 없습니다
+    CouldNotAuth: smtp 인증을 추가할 수 없습니다. 사용자 이름과 비밀번호가 정확한지 확인하십시오. 정확하다면 제공자가 ZITADEL에서 지원하지 않는 인증 방법을 요구할 수 있습니다
+    CouldNotSetSender: 발신자를 설정할 수 없습니다
+    CouldNotSetRecipient: 수신자를 설정할 수 없습니다
+  SMTPConfig:
+    TestPassword: 테스트할 비밀번호가 없습니다
+    NotFound: SMTP 구성을 찾을 수 없습니다
+    AlreadyExists: SMTP 구성이 이미 존재합니다
+    AlreadyDeactivated: SMTP 구성이 이미 비활성화되었습니다
+    SenderAdressNotCustomDomain: 발신자 주소는 인스턴스에서 사용자 정의 도메인으로 구성되어야 합니다
+    TestEmailNotFound: 테스트할 이메일 주소가 없습니다
+  Notification:
+    NoDomain: 메시지에 대한 도메인을 찾을 수 없습니다
+  User:
+    NotFound: 사용자를 찾을 수 없습니다
+    AlreadyExists: 사용자가 이미 존재합니다
+    NotFoundOnOrg: 선택한 조직에서 사용자를 찾을 수 없습니다
+    NotAllowedOrg: 사용자가 필수 조직의 구성원이 아닙니다
+    UserIDMissing: 사용자 ID가 누락되었습니다
+    UserIDWrong: "요청한 사용자와 인증된 사용자가 일치하지 않습니다"
+    DomainPolicyNil: 조직 정책이 비어 있습니다
+    EmailAsUsernameNotAllowed: 이메일을 사용자 이름으로 사용할 수 없습니다
+    Invalid: 사용자 데이터가 잘못되었습니다
+    DomainNotAllowedAsUsername: 도메인이 이미 예약되어 사용할 수 없습니다
+    AlreadyInactive: 사용자가 이미 비활성 상태입니다
+    NotInactive: 사용자가 비활성 상태가 아닙니다
+    CantDeactivateInitial: 초기 상태의 사용자는 비활성화할 수 없으며 삭제만 가능합니다
+    ShouldBeActiveOrInitial: 사용자가 활성 상태이거나 초기 상태가 아닙니다
+    AlreadyInitialised: 사용자가 이미 초기화되었습니다
+    NotInitialised: 사용자가 아직 초기화되지 않았습니다
+    NotLocked: 사용자가 잠겨 있지 않습니다
+    NoChanges: 변경 사항이 없습니다
+    InitCodeNotFound: 초기화 코드를 찾을 수 없습니다
+    UsernameNotChanged: 사용자 이름이 변경되지 않았습니다
+    InvalidURLTemplate: URL 템플릿이 잘못되었습니다
+    Profile:
+      NotFound: 프로필을 찾을 수 없습니다
+      NotChanged: 프로필이 변경되지 않았습니다
+      Empty: 프로필이 비어 있습니다
+      FirstNameEmpty: 프로필의 이름이 비어 있습니다
+      LastNameEmpty: 프로필의 성이 비어 있습니다
+      IDMissing: 프로필 ID가 누락되었습니다
+    Email:
+      NotFound: 이메일을 찾을 수 없습니다
+      Invalid: 이메일이 잘못되었습니다
+      AlreadyVerified: 이메일이 이미 인증되었습니다
+      NotChanged: 이메일이 변경되지 않았습니다
+      Empty: 이메일이 비어 있습니다
+      IDMissing: 이메일 ID가 누락되었습니다
+    Phone:
+      NotFound: 전화번호를 찾을 수 없습니다
+      Invalid: 전화번호가 잘못되었습니다
+      AlreadyVerified: 전화번호가 이미 인증되었습니다
+      Empty: 전화번호가 비어 있습니다
+      NotChanged: 전화번호가 변경되지 않았습니다
+    Address:
+      NotFound: 주소를 찾을 수 없습니다
+      NotChanged: 주소가 변경되지 않았습니다
+    Machine:
+      Key:
+        NotFound: 머신 키를 찾을 수 없습니다
+        AlreadyExisting: 머신 키가 이미 존재합니다
+        Invalid: 공개 키가 PKIX 형식의 PEM 인코딩을 따르는 유효한 RSA 공개 키가 아닙니다
+      Secret:
+        NotExisting: 시크릿이 존재하지 않습니다
+        Invalid: 시크릿이 잘못되었습니다
+        CouldNotGenerate: 시크릿을 생성할 수 없습니다
+    PAT:
+      NotFound: 개인 액세스 토큰을 찾을 수 없습니다
+    NotHuman: 사용자는 개인이어야 합니다
+    NotMachine: 사용자는 기술적이어야 합니다
+    WrongType: 이 사용자 유형에는 허용되지 않습니다
+    NotAllowedToLink: 사용자는 외부 로그인 제공자와 링크할 수 없습니다
+    Username:
+      AlreadyExists: 사용자 이름이 이미 사용 중입니다
+      Reserved: 사용자 이름이 이미 사용 중입니다
+      Empty: 사용자 이름이 비어 있습니다
+    Code:
+      Empty: 코드가 비어 있습니다
+      NotFound: 코드를 찾을 수 없습니다
+      Expired: 코드가 만료되었습니다
+      GeneratorAlgNotSupported: 지원되지 않는 생성 알고리즘
+      Invalid: 코드가 잘못되었습니다
+    Password:
+      NotFound: 비밀번호를 찾을 수 없습니다
+      Empty: 비밀번호가 비어 있습니다
+      Invalid: 비밀번호가 잘못되었습니다
+      NotSet: 사용자가 비밀번호를 설정하지 않았습니다
+      NotChanged: 새 비밀번호는 현재 비밀번호와 다르지 않아야 합니다
+      NotSupported: 비밀번호 해시 인코딩이 지원되지 않습니다. 자세한 내용은 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets를 참조하세요
+    PasswordComplexityPolicy:
+      NotFound: 비밀번호 정책을 찾을 수 없습니다
+      MinLength: 비밀번호가 너무 짧습니다
+      MinLengthNotAllowed: 지정된 최소 길이는 허용되지 않습니다
+      HasLower: 비밀번호에는 소문자가 포함되어야 합니다
+      HasUpper: 비밀번호에는 대문자가 포함되어야 합니다
+      HasNumber: 비밀번호에는 숫자가 포함되어야 합니다
+      HasSymbol: 비밀번호에는 기호가 포함되어야 합니다
+    ExternalIDP:
+      Invalid: 외부 IDP가 잘못되었습니다
+      IDPConfigNotExisting: 이 조직에 대해 유효하지 않은 IDP 제공자입니다
+      NotAllowed: 외부 IDP가 허용되지 않습니다
+      MinimumExternalIDPNeeded: 최소 하나의 IDP가 추가되어야 합니다
+      AlreadyExists: 외부 IDP가 이미 사용 중입니다
+      NotFound: 외부 IDP를 찾을 수 없습니다
+      LoginFailed: 외부 IDP에서 로그인에 실패했습니다
+    MFA:
+      OTP:
+        AlreadyReady: 다중 요소 OTP(일회용 비밀번호)가 이미 설정되었습니다
+        NotExisting: 다중 요소 OTP(일회용 비밀번호)가 존재하지 않습니다
+        NotReady: 다중 요소 OTP(일회용 비밀번호)가 준비되지 않았습니다
+        InvalidCode: 코드가 잘못되었습니다
+      U2F:
+        NotExisting: U2F가 존재하지 않습니다
+      Passwordless:
+        NotExisting: 패스워드리스가 존재하지 않습니다
+    WebAuthN:
+      NotFound: WebAuthN 토큰을 찾을 수 없습니다
+      BeginRegisterFailed: WebAuthN 등록 시작에 실패했습니다
+      MarshalError: 데이터 직렬화 오류 발생
+      ErrorOnParseCredential: 자격 증명 데이터 구문 분석 오류
+      CreateCredentialFailed: 자격 증명 생성 오류
+      BeginLoginFailed: WebAuthN 로그인 시작에 실패했습니다
+      ValidateLoginFailed: 로그인 자격 증명 확인 오류
+      CloneWarning: 자격 증명이 복제될 수 있습니다
+    RefreshToken:
+      Invalid: 리프레시 토큰이 잘못되었습니다
+      NotFound: 리프레시 토큰을 찾을 수 없습니다
+  Instance:
+    NotFound: 인스턴스를 찾을 수 없습니다
+    AlreadyExists: 인스턴스가 이미 존재합니다
+    NotChanged: 인스턴스가 변경되지 않았습니다
+  Org:
+    AlreadyExists: 조직 이름이 이미 사용 중입니다
+    Invalid: 조직이 유효하지 않습니다
+    AlreadyDeactivated: 조직이 이미 비활성화되었습니다
+    AlreadyActive: 조직이 이미 활성화되었습니다
+    Empty: 조직이 비어 있습니다
+    NotFound: 조직을 찾을 수 없습니다
+    NotChanged: 조직이 변경되지 않았습니다
+    DefaultOrgNotDeletable: 기본 조직은 삭제할 수 없습니다
+    ZitadelOrgNotDeletable: ZITADEL 프로젝트가 포함된 조직은 삭제할 수 없습니다
+    InvalidDomain: 유효하지 않은 도메인입니다
+    DomainMissing: 도메인이 누락되었습니다
+    DomainNotOnOrg: 조직에 도메인이 존재하지 않습니다
+    DomainNotVerified: 도메인이 인증되지 않았습니다
+    DomainAlreadyVerified: 도메인이 이미 인증되었습니다
+    DomainVerificationTypeInvalid: 도메인 인증 유형이 유효하지 않습니다
+    DomainVerificationMissing: 도메인 인증이 아직 시작되지 않았습니다
+    DomainVerificationFailed: 도메인 인증에 실패했습니다
+    DomainVerificationTXTNotFound: 도메인에서 _zitadel-challenge TXT 레코드를 찾을 수 없습니다. DNS 서버에 추가했는지 확인하거나 새로운 레코드가 전파될 때까지 기다리세요
+    DomainVerificationTXTNoMatch: 도메인에서 _zitadel-challenge TXT 레코드를 찾았으나 올바른 토큰 텍스트가 포함되어 있지 않습니다. DNS 서버에 올바른 토큰을 추가했는지 확인하거나 새로운 레코드가 전파될 때까지 기다리세요
+    DomainVerificationHTTPNotFound: 예상되는 URL에 챌린지를 포함하는 파일을 찾을 수 없습니다. 파일이 올바른 위치에 읽기 권한으로 업로드되었는지 확인하세요
+    DomainVerificationHTTPNoMatch: 예상되는 URL에 챌린지 파일이 있지만 올바른 토큰 텍스트가 포함되어 있지 않습니다. 파일의 내용을 확인하세요
+    DomainVerificationTimeout: DNS 서버에 대한 쿼리에서 시간 초과가 발생했습니다
+    PrimaryDomainNotDeletable: 기본 도메인은 삭제할 수 없습니다
+    DomainNotFound: 도메인을 찾을 수 없습니다
+    MemberIDMissing: 구성원 ID가 누락되었습니다
+    MemberNotFound: 조직 구성원을 찾을 수 없습니다
+    InvalidMember: 조직 구성원이 유효하지 않습니다
+    UserIDMissing: 사용자 ID가 누락되었습니다
+    PolicyAlreadyExists: 정책이 이미 존재합니다
+    PolicyNotExisting: 정책이 존재하지 않습니다
+    IdpInvalid: IDP 설정이 유효하지 않습니다
+    IdpNotExisting: IDP 설정이 존재하지 않습니다
+    OIDCConfigInvalid: OIDC IDP 설정이 유효하지 않습니다
+    IdpIsNotOIDC: IDP 설정이 OIDC 유형이 아닙니다
+    Domain:
+      AlreadyExists: 도메인이 이미 존재합니다
+      InvalidCharacter: 도메인에는 영숫자, ., -만 허용됩니다
+      EmptyString: 유효하지 않은 문자들이 비어 있는 문자열로 대체되었고 결과 도메인이 비어 있습니다
+    IDP:
+      InvalidSearchQuery: 잘못된 검색 쿼리입니다
+      ClientIDMissing: ClientID가 누락되었습니다
+      TeamIDMissing: TeamID가 누락되었습니다
+      KeyIDMissing: KeyID가 누락되었습니다
+      PrivateKeyMissing: 개인 키가 누락되었습니다
+    LoginPolicy:
+      NotFound: 로그인 정책을 찾을 수 없습니다
+      Invalid: 로그인 정책이 유효하지 않습니다
+      RedirectURIInvalid: 기본 리디렉트 URI가 유효하지 않습니다
+      NotExisting: 로그인 정책이 존재하지 않습니다
+      AlreadyExists: 로그인 정책이 이미 존재합니다
+      IdpProviderAlreadyExisting: IDP 제공자가 이미 존재합니다
+      IdpProviderNotExisting: IDP 제공자가 존재하지 않습니다
+      RegistrationNotAllowed: 등록이 허용되지 않습니다
+      UsernamePasswordNotAllowed: 사용자 이름/비밀번호로 로그인할 수 없습니다
+      MFA:
+        AlreadyExists: 다중 인증이 이미 존재합니다
+        NotExisting: 다중 인증이 존재하지 않습니다
+        Unspecified: 다중 인증이 유효하지 않습니다
+    MailTemplate:
+      NotFound: 기본 메일 템플릿을 찾을 수 없습니다
+      NotChanged: 기본 메일 템플릿이 변경되지 않았습니다
+      AlreadyExists: 기본 메일 템플릿이 이미 존재합니다
+      Invalid: 기본 메일 템플릿이 유효하지 않습니다
+    CustomMessageText:
+      NotFound: 기본 메시지 텍스트를 찾을 수 없습니다
+      NotChanged: 기본 메시지 텍스트가 변경되지 않았습니다
+      AlreadyExists: 기본 메시지 텍스트가 이미 존재합니다
+      Invalid: 기본 메시지 텍스트가 유효하지 않습니다
+    PasswordComplexityPolicy:
+      NotFound: 비밀번호 복잡성 정책을 찾을 수 없습니다
+      Empty: 비밀번호 복잡성 정책이 비어 있습니다
+      NotExisting: 비밀번호 복잡성 정책이 존재하지 않습니다
+      AlreadyExists: 비밀번호 복잡성 정책이 이미 존재합니다
+    PasswordLockoutPolicy:
+      NotFound: 비밀번호 잠금 정책을 찾을 수 없습니다
+      Empty: 비밀번호 잠금 정책이 비어 있습니다
+      NotExisting: 비밀번호 잠금 정책이 존재하지 않습니다
+      AlreadyExists: 비밀번호 잠금 정책이 이미 존재합니다
+    PasswordAgePolicy:
+      NotFound: 비밀번호 만료 정책을 찾을 수 없습니다
+      Empty: 비밀번호 만료 정책이 비어 있습니다
+      NotExisting: 비밀번호 만료 정책이 존재하지 않습니다
+      AlreadyExists: 비밀번호 만료 정책이 이미 존재합니다
+    OrgIAMPolicy:
+      Empty: 조직 IAM 정책이 비어 있습니다
+      NotExisting: 조직 IAM 정책이 존재하지 않습니다
+      AlreadyExists: 조직 IAM 정책이 이미 존재합니다
+    NotificationPolicy:
+      NotFound: 알림 정책을 찾을 수 없습니다
+      NotChanged: 알림 정책이 변경되지 않았습니다
+      AlreadyExists: 알림 정책이 이미 존재합니다
+    LabelPolicy:
+      NotFound: 개인 라벨 정책을 찾을 수 없습니다
+      NotChanged: 개인 라벨 정책이 변경되지 않았습니다
+  Project:
+    ProjectIDMissing: 프로젝트 ID가 누락되었습니다
+    AlreadyExists: 조직에 프로젝트가 이미 존재합니다
+    OrgNotExisting: 조직이 존재하지 않습니다
+    UserNotExisting: 사용자가 존재하지 않습니다
+    CouldNotGenerateClientSecret: 클라이언트 시크릿을 생성할 수 없습니다
+    Invalid: 프로젝트가 유효하지 않습니다
+    NotActive: 프로젝트가 활성 상태가 아닙니다
+    NotInactive: 프로젝트가 비활성화 상태가 아닙니다
+    NotFound: 프로젝트를 찾을 수 없습니다
+    UserIDMissing: 사용자 ID가 누락되었습니다
+    Member:
+      NotFound: 프로젝트 구성원을 찾을 수 없습니다
+      Invalid: 프로젝트 구성원이 유효하지 않습니다
+      AlreadyExists: 프로젝트 구성원이 이미 존재합니다
+      NotExisting: 프로젝트 구성원이 존재하지 않습니다
+    MinimumOneRoleNeeded: 최소 하나의 역할이 추가되어야 합니다
+    Role:
+      AlreadyExists: 역할이 이미 존재합니다
+      Invalid: 역할이 유효하지 않습니다
+      NotExisting: 역할이 존재하지 않습니다
+    IDMissing: ID가 누락되었습니다
+    App:
+      AlreadyExists: 애플리케이션이 이미 존재합니다
+      NotFound: 애플리케이션을 찾을 수 없습니다
+      Invalid: 애플리케이션이 유효하지 않습니다
+      NotExisting: 애플리케이션이 존재하지 않습니다
+      NotActive: 애플리케이션이 활성 상태가 아닙니다
+      NotInactive: 애플리케이션이 비활성 상태가 아닙니다
+      OIDCConfigInvalid: OIDC 설정이 유효하지 않습니다
+      APIConfigInvalid: API 설정이 유효하지 않습니다
+      SAMLConfigInvalid: SAML 설정이 유효하지 않습니다
+      IsNotOIDC: 애플리케이션이 OIDC 유형이 아닙니다
+      IsNotAPI: 애플리케이션이 API 유형이 아닙니다
+      IsNotSAML: 애플리케이션이 SAML 유형이 아닙니다
+      SAMLMetadataMissing: SAML 메타데이터가 누락되었습니다
+      SAMLMetadataFormat: SAML 메타데이터 형식 오류
+      SAMLEntityIDAlreadyExisting: SAML EntityID가 이미 존재합니다
+      OIDCAuthMethodNoSecret: 선택한 OIDC 인증 방법에는 시크릿이 필요하지 않습니다
+      APIAuthMethodNoSecret: 선택한 API 인증 방법에는 시크릿이 필요하지 않습니다
+      AuthMethodNoPrivateKeyJWT: 선택한 인증 방법에는 키가 필요하지 않습니다
+      ClientSecretInvalid: 클라이언트 시크릿이 유효하지 않습니다
+      Key:
+        AlreadyExisting: 애플리케이션 키가 이미 존재합니다
+        NotFound: 애플리케이션 키를 찾을 수 없습니다
+    RequiredFieldsMissing: 필요한 필드가 일부 누락되었습니다
+    Grant:
+      AlreadyExists: 프로젝트 권한이 이미 존재합니다
+      NotFound: 권한을 찾을 수 없습니다
+      Invalid: 프로젝트 권한이 유효하지 않습니다
+      NotExisting: 프로젝트 권한이 존재하지 않습니다
+      HasNotExistingRole: 프로젝트에 존재하지 않는 역할이 있습니다
+      NotActive: 프로젝트 권한이 활성 상태가 아닙니다
+      NotInactive: 프로젝트 권한이 비활성 상태가 아닙니다
+  IAM:
+    NotFound: 인스턴스를 찾을 수 없습니다. 도메인이 올바른지 확인하십시오. https://zitadel.com/docs/apis/introduction#domains 를 참조하세요
+    Member:
+      RolesNotChanged: 역할이 변경되지 않았습니다
+    MemberInvalid: 구성원이 유효하지 않습니다
+    MemberAlreadyExisting: 구성원이 이미 존재합니다
+    MemberNotExisting: 구성원이 존재하지 않습니다
+    IDMissing: ID가 누락되었습니다
+    IAMProjectIDMissing: IAM 프로젝트 ID가 누락되었습니다
+    IamProjectAlreadySet: IAM 프로젝트 ID가 이미 설정되었습니다
+    IdpInvalid: IDP 설정이 유효하지 않습니다
+    IdpNotExisting: IDP 설정이 존재하지 않습니다
+    OIDCConfigInvalid: OIDC IDP 설정이 유효하지 않습니다
+    IdpIsNotOIDC: IDP 설정이 OIDC 유형이 아닙니다
+    LoginPolicyInvalid: 로그인 정책이 유효하지 않습니다
+    LoginPolicyNotExisting: 로그인 정책이 존재하지 않습니다
+    IdpProviderInvalid: IDP 제공자가 유효하지 않습니다
+    LoginPolicy:
+      NotFound: 기본 로그인 정책을 찾을 수 없습니다
+      NotChanged: 기본 로그인 정책이 변경되지 않았습니다
+      NotExisting: 기본 로그인 정책이 존재하지 않습니다
+      AlreadyExists: 기본 로그인 정책이 이미 존재합니다
+      RedirectURIInvalid: 기본 리디렉트 URI가 유효하지 않습니다
+      MFA:
+        AlreadyExists: 다중 인증이 이미 존재합니다
+        NotExisting: 다중 인증이 존재하지 않습니다
+        Unspecified: 다중 인증이 유효하지 않습니다
+      IDP:
+        AlreadyExists: IDP 제공자가 이미 존재합니다
+        NotExisting: IDP 제공자가 존재하지 않습니다
+        Invalid: IDP 제공자가 유효하지 않습니다
+      IDPConfig:
+        AlreadyExists: IDP 설정이 이미 존재합니다
+        NotInactive: IDP 설정이 비활성화 상태가 아닙니다
+        NotActive: IDP 설정이 활성 상태가 아닙니다
+    LabelPolicy:
+      NotFound: 기본 개인 라벨 정책을 찾을 수 없습니다
+      NotChanged: 기본 개인 라벨 정책이 변경되지 않았습니다
+    MailTemplate:
+      NotFound: 기본 메일 템플릿을 찾을 수 없습니다
+      NotChanged: 기본 메일 템플릿이 변경되지 않았습니다
+      AlreadyExists: 기본 메일 템플릿이 이미 존재합니다
+      Invalid: 기본 메일 템플릿이 유효하지 않습니다
+    CustomMessageText:
+      NotFound: 기본 메시지 텍스트를 찾을 수 없습니다
+      NotChanged: 기본 메시지 텍스트가 변경되지 않았습니다
+      AlreadyExists: 기본 메시지 텍스트가 이미 존재합니다
+      Invalid: 기본 메시지 텍스트가 유효하지 않습니다
+    PasswordComplexityPolicy:
+      NotFound: 기본 비밀번호 복잡성 정책을 찾을 수 없습니다
+      NotExisting: 기본 비밀번호 복잡성 정책이 존재하지 않습니다
+      AlreadyExists: 기본 비밀번호 복잡성 정책이 이미 존재합니다
+      Empty: 기본 비밀번호 복잡성 정책이 비어 있습니다
+      NotChanged: 기본 비밀번호 복잡성 정책이 변경되지 않았습니다
+    PasswordAgePolicy:
+      NotFound: 기본 비밀번호 만료 정책을 찾을 수 없습니다
+      NotExisting: 기본 비밀번호 만료 정책이 존재하지 않습니다
+      AlreadyExists: 기본 비밀번호 만료 정책이 이미 존재합니다
+      Empty: 기본 비밀번호 만료 정책이 비어 있습니다
+      NotChanged: 기본 비밀번호 만료 정책이 변경되지 않았습니다
+    PasswordLockoutPolicy:
+      NotFound: 기본 비밀번호 잠금 정책을 찾을 수 없습니다
+      NotExisting: 기본 비밀번호 잠금 정책이 존재하지 않습니다
+      AlreadyExists: 기본 비밀번호 잠금 정책이 이미 존재합니다
+      Empty: 기본 비밀번호 잠금 정책이 비어 있습니다
+      NotChanged: 기본 비밀번호 잠금 정책이 변경되지 않았습니다
+    DomainPolicy:
+      NotFound: 조직 IAM 정책을 찾을 수 없습니다
+      Empty: 조직 IAM 정책이 비어 있습니다
+      NotExisting: 조직 IAM 정책이 존재하지 않습니다
+      AlreadyExists: 조직 IAM 정책이 이미 존재합니다
+      NotChanged: 조직 IAM 정책이 변경되지 않았습니다
+    NotificationPolicy:
+      NotFound: 기본 알림 정책을 찾을 수 없습니다
+      NotChanged: 기본 알림 정책이 변경되지 않았습니다
+      AlreadyExists: 기본 알림 정책이 이미 존재합니다
+  Policy:
+    AlreadyExists: 정책이 이미 존재합니다
+    Label:
+      Invalid:
+        PrimaryColor: 기본 색상이 유효한 16진수 색상 값이 아닙니다
+        BackgroundColor: 배경 색상이 유효한 16진수 색상 값이 아닙니다
+        WarnColor: 경고 색상이 유효한 16진수 색상 값이 아닙니다
+        FontColor: 글꼴 색상이 유효한 16진수 색상 값이 아닙니다
+        PrimaryColorDark: 기본 색상(다크 모드)이 유효한 16진수 색상 값이 아닙니다
+        BackgroundColorDark: 배경 색상(다크 모드)이 유효한 16진수 색상 값이 아닙니다
+        WarnColorDark: 경고 색상(다크 모드)이 유효한 16진수 색상 값이 아닙니다
+        FontColorDark: 글꼴 색상(다크 모드)이 유효한 16진수 색상 값이 아닙니다
+  UserGrant:
+    AlreadyExists: 사용자 권한이 이미 존재합니다
+    NotFound: 사용자 권한을 찾을 수 없습니다
+    Invalid: 사용자 권한이 유효하지 않습니다
+    NotChanged: 사용자 권한이 변경되지 않았습니다
+    IDMissing: ID가 누락되었습니다
+    NotActive: 사용자 권한이 활성 상태가 아닙니다
+    NotInactive: 사용자 권한이 비활성 상태가 아닙니다
+    NoPermissionForProject: 사용자가 이 프로젝트에 대한 권한이 없습니다
+    RoleKeyNotFound: 역할을 찾을 수 없습니다
+  Member:
+    AlreadyExists: 구성원이 이미 존재합니다
+  IDPConfig:
+    AlreadyExists: 동일한 이름의 IDP 설정이 이미 존재합니다
+    NotExisting: IDP 설정이 존재하지 않습니다
+  Changes:
+    NotFound: 기록을 찾을 수 없습니다
+    AuditRetention: 기록이 감사 로그 보존 기간을 초과했습니다
+  Token:
+    NotFound: 토큰을 찾을 수 없습니다
+    Invalid: 토큰이 유효하지 않습니다
+  UserSession:
+    NotFound: 사용자 세션을 찾을 수 없습니다
+  Key:
+    NotFound: 키를 찾을 수 없습니다
+    ExpireBeforeNow: 만료일이 이미 경과했습니다
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: 다중 인증이 필수로 설정되었지만 가능한 제공자가 구성되지 않았습니다. 시스템 관리자에게 문의하십시오.
+  Step:
+    Started:
+      AlreadyExists: 이미 시작된 단계가 존재합니다
+    Done:
+      AlreadyExists: 이미 완료된 단계가 존재합니다
+  CustomText:
+    AlreadyExists: 사용자 정의 텍스트가 이미 존재합니다
+    Invalid: 사용자 정의 텍스트가 유효하지 않습니다
+    NotFound: 사용자 정의 텍스트를 찾을 수 없습니다
+  TranslationFile:
+    ReadError: 번역 파일을 읽는 중 오류 발생
+    MergeError: 번역 파일을 사용자 정의 번역과 병합할 수 없습니다
+    NotFound: 번역 파일이 존재하지 않습니다
+  Metadata:
+    NotFound: 메타데이터를 찾을 수 없습니다
+    NoData: 메타데이터 목록이 비어 있습니다
+    Invalid: 메타데이터가 유효하지 않습니다
+    KeyNotExisting: 하나 이상의 키가 존재하지 않습니다
+  Action:
+    Invalid: 작업이 유효하지 않습니다
+    NotFound: 작업을 찾을 수 없습니다
+    NotActive: 작업이 활성화되지 않았습니다
+    NotInactive: 작업이 비활성화되지 않았습니다
+    MaxAllowed: 추가 활성 작업이 허용되지 않습니다
+    NotEnabled: "\"작업\" 기능이 활성화되지 않았습니다"
+  Flow:
+    FlowTypeMissing: FlowType이 누락되었습니다
+    Empty: 플로우가 이미 비어 있습니다
+    WrongTriggerType: TriggerType이 유효하지 않습니다
+    NoChanges: 변경 사항이 없습니다
+    ActionIDsNotExist: ActionIDs가 존재하지 않습니다
+  Query:
+    CloseRows: SQL 문을 완료할 수 없습니다
+    SQLStatement: SQL 문을 생성할 수 없습니다
+    InvalidRequest: 요청이 유효하지 않습니다
+    TooManyNestingLevels: 쿼리 중첩 수준이 너무 많습니다 (최대 20)
+    LimitExceeded: 제한을 초과했습니다
+  Quota:
+    AlreadyExists: 이 단위에 대한 할당량이 이미 존재합니다
+    NotFound: 이 단위에 대한 할당량을 찾을 수 없습니다
+    Invalid:
+      CallURL: 할당량 호출 URL이 유효하지 않습니다
+      Percent: 할당량 백분율이 1 미만입니다
+      Unimplemented: 이 단위에 대해 할당량이 구현되지 않았습니다
+      Amount: 할당량 금액이 1 미만입니다
+      ResetInterval: 할당량 재설정 간격이 1분보다 짧습니다
+      Noop: 알림 없는 무제한 할당량은 효과가 없습니다
+    Access:
+      Exhausted: 인증된 요청에 대한 할당량이 소진되었습니다
+    Execution:
+      Exhausted: 실행 시간에 대한 할당량이 소진되었습니다
+  LogStore:
+    Access:
+      StorageFailed: 액세스 로그를 데이터베이스에 저장하지 못했습니다
+      ScanFailed: 인증된 요청 사용량 조회 실패
+    Execution:
+      StorageFailed: 작업 실행 로그를 데이터베이스에 저장하지 못했습니다
+      ScanFailed: 작업 실행 시간 사용량 조회 실패
+  Session:
+    NotExisting: 세션이 존재하지 않습니다
+    Terminated: 세션이 이미 종료되었습니다
+    Expired: 세션이 만료되었습니다
+    PositiveLifetime: 세션 수명은 0보다 작아서는 안 됩니다
+    Token:
+      Invalid: 세션 토큰이 유효하지 않습니다
+    WebAuthN:
+      NoChallenge: WebAuthN 챌린지가 없는 세션
+  Intent:
+    IDPMissing: 요청에서 IDP ID가 누락되었습니다
+    IDPInvalid: 요청에 대한 IDP가 유효하지 않습니다
+    ResponseInvalid: IDP 응답이 유효하지 않습니다
+    MissingSingleMappingAttribute: IDP 응답에 매핑 속성이 포함되어 있지 않거나 값이 하나 이상 있습니다
+    SuccessURLMissing: 요청에 성공 URL이 누락되었습니다
+    FailureURLMissing: 요청에 실패 URL이 누락되었습니다
+    StateMissing: 요청에 상태 매개변수가 누락되었습니다
+    NotStarted: 의도가 시작되지 않았거나 이미 종료되었습니다
+    NotSucceeded: 의도가 성공하지 않았습니다
+    TokenCreationFailed: 토큰 생성 실패
+    InvalidToken: 의도 토큰이 유효하지 않습니다
+    OtherUser: 다른 사용자를 위한 의도입니다
+  AuthRequest:
+    AlreadyExists: 인증 요청이 이미 존재합니다
+    NotExisting: 인증 요청이 존재하지 않습니다
+    WrongLoginClient: 다른 로그인 클라이언트에 의해 생성된 인증 요청
+  OIDCSession:
+    RefreshTokenInvalid: 새로 고침 토큰이 유효하지 않습니다
+    Token:
+      Invalid: 토큰이 유효하지 않습니다
+      Expired: 토큰이 만료되었습니다
+    InvalidClient: 토큰이 이 클라이언트에 대해 발행되지 않았습니다
+  Feature:
+    NotExisting: 기능이 존재하지 않습니다
+    TypeNotSupported: 기능 유형이 지원되지 않습니다
+    InvalidValue: 이 기능에 대해 유효하지 않은 값
+  Target:
+    Invalid: 대상이 유효하지 않습니다
+    NoTimeout: 대상에 타임아웃이 없습니다
+    InvalidURL: 대상 URL이 유효하지 않습니다
+    NotFound: 대상을 찾을 수 없습니다
+  Execution:
+    ConditionInvalid: 실행 조건이 유효하지 않습니다
+    Invalid: 실행이 유효하지 않습니다
+    NotFound: 실행을 찾을 수 없습니다
+    IncludeNotFound: 포함을 찾을 수 없습니다
+    NoTargets: 정의된 대상이 없습니다
+    Failed: 실행 실패
+    ResponseIsNotValidJSON: 응답이 유효한 JSON이 아닙니다
+  UserSchema:
+    NotEnabled: "\"사용자 스키마\" 기능이 활성화되지 않았습니다"
+    Type:
+      Missing: 사용자 스키마 유형이 누락되었습니다
+      AlreadyExists: 사용자 스키마 유형이 이미 존재합니다
+    Authenticator:
+      Invalid: 인증기 유형이 유효하지 않습니다
+    NotActive: 사용자 스키마가 활성 상태가 아닙니다
+    NotInactive: 사용자 스키마가 비활성 상태가 아닙니다
+    NotExists: 사용자 스키마가 존재하지 않습니다
+    ID:
+      Missing: 사용자 스키마 ID가 누락되었습니다
+    Invalid: 사용자 스키마가 유효하지 않습니다
+    Data:
+      Invalid: 사용자 스키마에 대한 데이터가 유효하지 않습니다
+  TokenExchange:
+    FeatureDisabled: 토큰 교환 기능이 인스턴스에서 비활성화되어 있습니다. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: 토큰이 누락되었습니다
+      Invalid: 토큰이 유효하지 않습니다
+      TypeMissing: 토큰 유형이 누락되었습니다
+      TypeNotAllowed: 허용되지 않는 토큰 유형입니다
+      TypeNotSupported: 지원되지 않는 토큰 유형입니다
+      NotForAPI: API에 대해 대리 인증된 토큰을 허용하지 않습니다
+    Impersonation:
+      PolicyDisabled: 인스턴스 보안 정책에서 대리 인증이 비활성화되었습니다
+  WebKey:
+    ActiveDelete: 활성 웹 키를 삭제할 수 없습니다
+    Config: 웹 키 설정이 유효하지 않습니다
+    Duplicate: 웹 키 ID가 고유하지 않습니다
+    FeatureDisabled: 웹 키 기능이 비활성화되었습니다
+    NoActive: 활성 웹 키가 없습니다
+    NotFound: 웹 키를 찾을 수 없습니다
+
+AggregateTypes:
+  action: 작업
+  instance: 인스턴스
+  key_pair: 키 쌍
+  org: 조직
+  project: 프로젝트
+  user: 사용자
+  usergrant: 사용자 권한
+  quota: 할당량
+  feature: 기능
+  target: 대상
+  execution: 실행
+  user_schema: 사용자 스키마
+  auth_request: 인증 요청
+  device_auth: 디바이스 인증
+  idpintent: IDP 의도
+  limits: 제한
+  milestone: 마일스톤
+  oidc_session: OIDC 세션
+  restrictions: 제한 사항
+  system: 시스템
+  session: 세션
+  web_key: 웹 키
+
+EventTypes:
+  execution:
+    set: 실행 설정됨
+    removed: 실행 삭제됨
+  target:
+    added: 대상 생성됨
+    changed: 대상 변경됨
+    removed: 대상 삭제됨
+  user:
+    added: 사용자 추가됨
+    selfregistered: 사용자가 자체 등록함
+    initialization:
+      code:
+        added: 초기화 코드 생성됨
+        sent: 초기화 코드 전송됨
+      check:
+        succeeded: 초기화 확인 성공
+        failed: 초기화 확인 실패
+    token:
+      added: 액세스 토큰 생성됨
+      v2.added: 액세스 토큰 생성됨
+      removed: 액세스 토큰 삭제됨
+    impersonated: 사용자 대리 로그인됨
+    username:
+      reserved: 사용자 이름 예약됨
+      released: 사용자 이름 해제됨
+      changed: 사용자 이름 변경됨
+    email:
+      reserved: 이메일 주소 예약됨
+      released: 이메일 주소 해제됨
+      changed: 이메일 주소 변경됨
+      verified: 이메일 주소 인증됨
+      verification:
+        failed: 이메일 주소 인증 실패
+      code:
+        added: 이메일 인증 코드 생성됨
+        sent: 이메일 인증 코드 전송됨
+    machine:
+      added: 기술 사용자 추가됨
+      changed: 기술 사용자 변경됨
+      key:
+        added: 키 추가됨
+        removed: 키 삭제됨
+      secret:
+        set: 시크릿 설정됨
+        updated: 시크릿 해시 업데이트됨
+        removed: 시크릿 삭제됨
+        check:
+          succeeded: 시크릿 확인 성공
+          failed: 시크릿 확인 실패
+    human:
+      added: 사용자 추가됨
+      selfregistered: 사용자가 자체 등록함
+      avatar:
+        added: 아바타 추가됨
+        removed: 아바타 삭제됨
+      initialization:
+        code:
+          added: 초기화 코드 생성됨
+          sent: 초기화 코드 전송됨
+        check:
+          succeeded: 초기화 확인 성공
+          failed: 초기화 확인 실패
+      invite:
+        code:
+          added: 초대 코드 생성됨
+          sent: 초대 코드 전송됨
+        check:
+          succeeded: 초대 확인 성공
+          failed: 초대 확인 실패
+      username:
+        reserved: 사용자 이름 예약됨
+        released: 사용자 이름 해제됨
+      email:
+        changed: 이메일 주소 변경됨
+        verified: 이메일 주소 인증됨
+        verification:
+          failed: 이메일 주소 인증 실패
+        code:
+          added: 이메일 인증 코드 생성됨
+          sent: 이메일 인증 코드 전송됨
+      password:
+        changed: 비밀번호 변경됨
+        code:
+          added: 비밀번호 코드 생성됨
+          sent: 비밀번호 코드 전송됨
+        check:
+          succeeded: 비밀번호 확인 성공
+          failed: 비밀번호 확인 실패
+        change:
+          sent: 비밀번호 변경 전송됨
+        hash:
+          updated: 비밀번호 해시 업데이트됨
+      externallogin:
+        check:
+          succeeded: 외부 로그인 성공
+      externalidp:
+        added: 외부 IDP 추가됨
+        removed: 외부 IDP 삭제됨
+        cascade:
+          removed: 외부 IDP 연쇄 삭제됨
+        id:
+          migrated: 외부 IDP의 사용자 ID가 마이그레이션됨
+      phone:
+        changed: 전화번호 변경됨
+        verified: 전화번호 인증됨
+        verification:
+          failed: 전화번호 인증 실패
+        code:
+          added: 전화번호 코드 생성됨
+          sent: 전화번호 코드 전송됨
+        removed: 전화번호 삭제됨
+      profile:
+        changed: 사용자 프로필 변경됨
+      address:
+        changed: 사용자 주소 변경됨
+      mfa:
+        otp:
+          added: 다중인증 OTP 추가됨
+          verified: 다중인증 OTP 인증됨
+          removed: 다중인증 OTP 삭제됨
+          check:
+            succeeded: 다중인증 OTP 확인 성공
+            failed: 다중인증 OTP 확인 실패
+          sms:
+            added: 다중인증 OTP SMS 추가됨
+            removed: 다중인증 OTP SMS 삭제됨
+            code:
+              added: 다중인증 OTP SMS 코드 추가됨
+              sent: 다중인증 OTP SMS 코드 전송됨
+            check:
+              succeeded: 다중인증 OTP SMS 확인 성공
+              failed: 다중인증 OTP SMS 확인 실패
+          email:
+            added: 다중인증 OTP 이메일 추가됨
+            removed: 다중인증 OTP 이메일 삭제됨
+            code:
+              added: 다중인증 OTP 이메일 코드 추가됨
+              sent: 다중인증 OTP 이메일 코드 전송됨
+            check:
+              succeeded: 다중인증 OTP 이메일 확인 성공
+              failed: 다중인증 OTP 이메일 확인 실패
+        u2f:
+          token:
+            added: 다중인증 U2F 토큰 추가됨
+            verified: 다중인증 U2F 토큰 인증됨
+            removed: 다중인증 U2F 토큰 삭제됨
+            begin:
+              login: 다중인증 U2F 확인 시작됨
+            check:
+              succeeded: 다중인증 U2F 확인 성공
+              failed: 다중인증 U2F 확인 실패
+            signcount:
+              changed: 다중인증 U2F 토큰의 체크섬이 변경됨
+        init:
+          skipped: 다중인증 초기화 건너뜀
+      passwordless:
+        token:
+          added: 비밀번호 없는 로그인 토큰 추가됨
+          verified: 비밀번호 없는 로그인 토큰 인증됨
+          removed: 비밀번호 없는 로그인 토큰 삭제됨
+          begin:
+            login: 비밀번호 없는 로그인 확인 시작됨
+          check:
+            succeeded: 비밀번호 없는 로그인 확인 성공
+            failed: 비밀번호 없는 로그인 확인 실패
+          signcount:
+            changed: 비밀번호 없는 로그인 토큰의 체크섬이 변경됨
+        initialization:
+          code:
+            added: 비밀번호 없는 초기화 코드 추가됨
+            sent: 비밀번호 없는 초기화 코드 전송됨
+            requested: 비밀번호 없는 초기화 코드 요청됨
+            check:
+              succeeded: 비밀번호 없는 초기화 코드 확인 성공
+              failed: 비밀번호 없는 초기화 코드 확인 실패
+      signed:
+        out: 사용자 로그아웃됨
+      refresh:
+        token:
+          added: 리프레시 토큰 생성됨
+          renewed: 리프레시 토큰 갱신됨
+          removed: 리프레시 토큰 삭제됨
+    locked: 사용자 잠금됨
+    unlocked: 사용자 잠금 해제됨
+    deactivated: 사용자 비활성화됨
+    reactivated: 사용자 재활성화됨
+    removed: 사용자 삭제됨
+    password:
+      changed: 비밀번호 변경됨
+      code:
+        added: 비밀번호 코드 생성됨
+        sent: 비밀번호 코드 전송됨
+      check:
+        succeeded: 비밀번호 확인 성공
+        failed: 비밀번호 확인 실패
+    phone:
+      changed: 전화번호 변경됨
+      verified: 전화번호 인증됨
+      verification:
+        failed: 전화번호 인증 실패
+      code:
+        added: 전화번호 코드 생성됨
+        sent: 전화번호 코드 전송됨
+
+    profile:
+      changed: 사용자 프로필 변경됨
+    address:
+      changed: 사용자 주소 변경됨
+    mfa:
+      otp:
+        added: 다중인증 OTP 추가됨
+        verified: 다중인증 OTP 인증됨
+        removed: 다중인증 OTP 삭제됨
+        check:
+          succeeded: 다중인증 OTP 확인 성공
+          failed: 다중인증 OTP 확인 실패
+        init:
+          skipped: 다중인증 OTP 초기화 건너뜀
+      init:
+        skipped: 다중인증 초기화 건너뜀
+    signed:
+      out: 사용자 로그아웃됨
+    grant:
+      added: 권한 추가됨
+      changed: 권한 변경됨
+      removed: 권한 삭제됨
+      deactivated: 권한 비활성화됨
+      reactivated: 권한 재활성화됨
+      reserved: 권한 예약됨
+      released: 권한 해제됨
+      cascade:
+        removed: 권한 연쇄 삭제됨
+        changed: 권한 변경됨
+    metadata:
+      set: 사용자 메타데이터 설정됨
+      removed: 사용자 메타데이터 삭제됨
+      removed.all: 모든 사용자 메타데이터 삭제됨
+    domain:
+      claimed: 도메인 클레임됨
+      claimed.sent: 도메인 클레임 알림 전송됨
+    pat:
+      added: 개인 액세스 토큰 추가됨
+      removed: 개인 액세스 토큰 삭제됨
+  org:
+    added: 조직 추가됨
+    changed: 조직 변경됨
+    deactivated: 조직 비활성화됨
+    reactivated: 조직 재활성화됨
+    removed: 조직 삭제됨
+    domain:
+      added: 도메인 추가됨
+      verification:
+        added: 도메인 인증 추가됨
+        failed: 도메인 인증 실패
+      verified: 도메인 인증됨
+      removed: 도메인 삭제됨
+      primary:
+        set: 기본 도메인 설정됨
+      reserved: 도메인 예약됨
+      released: 도메인 해제됨
+    name:
+      reserved: 조직 이름 예약됨
+      released: 조직 이름 해제됨
+    member:
+      added: 조직 멤버 추가됨
+      changed: 조직 멤버 변경됨
+      removed: 조직 멤버 삭제됨
+      cascade:
+        removed: 조직 멤버 연쇄 삭제됨
+    iam:
+      policy:
+        added: 시스템 정책 추가됨
+        changed: 시스템 정책 변경됨
+        removed: 시스템 정책 삭제됨
+    idp:
+      config:
+        added: IDP 설정 추가됨
+        changed: IDP 설정 변경됨
+        removed: IDP 설정 삭제됨
+        deactivated: IDP 설정 비활성화됨
+        reactivated: IDP 설정 재활성화됨
+      oidc:
+        config:
+          added: OIDC IDP 설정 추가됨
+          changed: OIDC IDP 설정 변경됨
+      saml:
+        config:
+          added: SAML IDP 설정 추가됨
+          changed: SAML IDP 설정 변경됨
+      jwt:
+        config:
+          added: JWT IDP 설정 추가됨
+          changed: JWT IDP 설정 변경됨
+    customtext:
+      set: 사용자 지정 텍스트 설정됨
+      removed: 사용자 지정 텍스트 삭제됨
+      template:
+        removed: 사용자 지정 템플릿 삭제됨
+    policy:
+      login:
+        added: 로그인 정책 추가됨
+        changed: 로그인 정책 변경됨
+        removed: 로그인 정책 삭제됨
+        idpprovider:
+          added: 로그인 정책에 IDP 추가됨
+          removed: 로그인 정책에서 IDP 삭제됨
+          cascade:
+            removed: 로그인 정책에서 연쇄 삭제됨
+        secondfactor:
+          added: 로그인 정책에 2차 인증 추가됨
+          removed: 로그인 정책에서 2차 인증 삭제됨
+        multifactor:
+          added: 로그인 정책에 다중인증 추가됨
+          removed: 로그인 정책에서 다중인증 삭제됨
+      password:
+        complexity:
+          added: 비밀번호 복잡도 정책 추가됨
+          changed: 비밀번호 복잡도 정책 변경됨
+          removed: 비밀번호 복잡도 정책 삭제됨
+        age:
+          added: 비밀번호 만료 정책 추가됨
+          changed: 비밀번호 만료 정책 변경됨
+          removed: 비밀번호 만료 정책 삭제됨
+        lockout:
+          added: 비밀번호 잠금 정책 추가됨
+          changed: 비밀번호 잠금 정책 변경됨
+          removed: 비밀번호 잠금 정책 삭제됨
+      label:
+        added: 레이블 정책 추가됨
+        changed: 레이블 정책 변경됨
+        activated: 레이블 정책 활성화됨
+        removed: 레이블 정책 삭제됨
+        logo:
+          added: 레이블 정책에 로고 추가됨
+          removed: 레이블 정책에서 로고 삭제됨
+          dark:
+            added: 레이블 정책에 다크 모드 로고 추가됨
+            removed: 레이블 정책에서 다크 모드 로고 삭제됨
+        icon:
+          added: 레이블 정책에 아이콘 추가됨
+          removed: 레이블 정책에서 아이콘 삭제됨
+          dark:
+            added: 레이블 정책에 다크 모드 아이콘 추가됨
+            removed: 레이블 정책에서 다크 모드 아이콘 삭제됨
+        font:
+          added: 레이블 정책에 폰트 추가됨
+          removed: 레이블 정책에서 폰트 삭제됨
+        assets:
+          removed: 레이블 정책에서 자산 삭제됨
+      privacy:
+        added: 개인정보처리방침 및 이용 약관 추가됨
+        changed: 개인정보처리방침 및 이용 약관 변경됨
+        removed: 개인정보처리방침 및 이용 약관 삭제됨
+      domain:
+        added: 도메인 정책 추가됨
+        changed: 도메인 정책 변경됨
+        removed: 도메인 정책 삭제됨
+      lockout:
+        added: 잠금 정책 추가됨
+        changed: 잠금 정책 변경됨
+        removed: 잠금 정책 삭제됨
+      notification:
+        added: 알림 정책 추가됨
+        changed: 알림 정책 변경됨
+        removed: 알림 정책 삭제됨
+    flow:
+      trigger_actions:
+        set: 작업 설정됨
+        cascade:
+          removed: 연쇄 작업 삭제됨
+        removed: 작업 삭제됨
+      cleared: 플로우 초기화됨
+    mail:
+      template:
+        added: 이메일 템플릿 추가됨
+        changed: 이메일 템플릿 변경됨
+        removed: 이메일 템플릿 삭제됨
+      text:
+        added: 이메일 텍스트 추가됨
+        changed: 이메일 텍스트 변경됨
+        removed: 이메일 텍스트 삭제됨
+    metadata:
+      removed: 메타데이터 삭제됨
+      removed.all: 모든 메타데이터 삭제됨
+      set: 메타데이터 설정됨
+  project:
+    added: 프로젝트 추가됨
+    changed: 프로젝트 변경됨
+    deactivated: 프로젝트 비활성화됨
+    reactivated: 프로젝트 재활성화됨
+    removed: 프로젝트 삭제됨
+    member:
+      added: 프로젝트 멤버 추가됨
+      changed: 프로젝트 멤버 변경됨
+      removed: 프로젝트 멤버 삭제됨
+      cascade:
+        removed: 프로젝트 멤버 연쇄 삭제됨
+    role:
+      added: 프로젝트 역할 추가됨
+      changed: 프로젝트 역할 변경됨
+      removed: 프로젝트 역할 삭제됨
+    grant:
+      added: 관리 액세스 추가됨
+      changed: 관리 액세스 변경됨
+      removed: 관리 액세스 삭제됨
+      deactivated: 관리 액세스 비활성화됨
+      reactivated: 관리 액세스 재활성화됨
+      cascade:
+        changed: 관리 액세스 변경됨
+      member:
+        added: 관리 액세스 멤버 추가됨
+        changed: 관리 액세스 멤버 변경됨
+        removed: 관리 액세스 멤버 삭제됨
+        cascade:
+          removed: 관리 액세스 연쇄 삭제됨
+    application:
+      added: 애플리케이션 추가됨
+      changed: 애플리케이션 변경됨
+      removed: 애플리케이션 삭제됨
+      deactivated: 애플리케이션 비활성화됨
+      reactivated: 애플리케이션 재활성화됨
+      oidc:
+        secret:
+          check:
+            succeeded: OIDC 클라이언트 시크릿 확인 성공
+            failed: OIDC 클라이언트 시크릿 확인 실패
+        key:
+          added: OIDC 앱 키 추가됨
+          removed: OIDC 앱 키 삭제됨
+      api:
+        secret:
+          check:
+            succeeded: API 시크릿 확인 성공
+            failed: API 시크릿 확인 실패
+        key:
+          added: 애플리케이션 키 추가됨
+          removed: 애플리케이션 키 삭제됨
+      config:
+        saml:
+          added: SAML 설정 추가됨
+          changed: SAML 설정 변경됨
+        oidc:
+          added: OIDC 설정 추가됨
+          changed: OIDC 설정 변경됨
+          secret:
+            changed: OIDC 시크릿 변경됨
+            updated: OIDC 시크릿 해시 갱신됨
+        api:
+          added: API 설정 추가됨
+          changed: API 설정 변경됨
+          secret:
+            changed: API 시크릿 변경됨
+            updated: API 시크릿 해시 갱신됨
+  policy:
+    password:
+      complexity:
+        added: 비밀번호 복잡도 정책 추가됨
+        changed: 비밀번호 복잡도 정책 변경됨
+      age:
+        added: 비밀번호 만료 정책 추가됨
+        changed: 비밀번호 만료 정책 변경됨
+      lockout:
+        added: 비밀번호 잠금 정책 추가됨
+        changed: 비밀번호 잠금 정책 변경됨
+  iam:
+    setup:
+      started: ZITADEL 설정 시작됨
+      done: ZITADEL 설정 완료됨
+    global:
+      org:
+        set: 글로벌 조직 설정됨
+    project:
+      iam:
+        set: ZITADEL 프로젝트 설정됨
+    member:
+      added: ZITADEL 멤버 추가됨
+      changed: ZITADEL 멤버 변경됨
+      removed: ZITADEL 멤버 삭제됨
+      cascade:
+        removed: ZITADEL 멤버 연쇄 삭제됨
+    idp:
+      config:
+        added: IDP 설정 추가됨
+        changed: IDP 설정 변경됨
+        removed: IDP 설정 삭제됨
+        deactivated: IDP 설정 비활성화됨
+        reactivated: IDP 설정 재활성화됨
+      oidc:
+        config:
+          added: OIDC IDP 설정 추가됨
+          changed: OIDC IDP 설정 변경됨
+      saml:
+        config:
+          added: SAML IDP 설정 추가됨
+          changed: SAML IDP 설정 변경됨
+      jwt:
+        config:
+          added: IDP에 JWT 설정 추가됨
+          changed: IDP로부터 JWT 설정 삭제됨
+    customtext:
+      set: 텍스트 설정됨
+      removed: 텍스트 삭제됨
+    policy:
+      login:
+        added: 기본 로그인 정책 추가됨
+        changed: 기본 로그인 정책 변경됨
+        idpprovider:
+          added: 기본 로그인 정책에 IDP 추가됨
+          removed: 기본 로그인 정책에서 IDP 삭제됨
+      label:
+        added: 레이블 정책 추가됨
+        changed: 레이블 정책 변경됨
+        activated: 레이블 정책 활성화됨
+        logo:
+          added: 로고가 레이블 정책에 추가됨
+          removed: 레이블 정책에서 로고가 삭제됨
+          dark:
+            added: 다크 모드 로고가 레이블 정책에 추가됨
+            removed: 다크 모드 로고가 레이블 정책에서 삭제됨
+        icon:
+          added: 아이콘이 레이블 정책에 추가됨
+          removed: 레이블 정책에서 아이콘이 삭제됨
+          dark:
+            added: 다크 모드 아이콘이 레이블 정책에 추가됨
+            removed: 다크 모드 아이콘이 레이블 정책에서 삭제됨
+        font:
+          added: 폰트가 레이블 정책에 추가됨
+          removed: 레이블 정책에서 폰트가 삭제됨
+        assets:
+          removed: 레이블 정책에서 자산 삭제됨
+    default:
+      language:
+        set: 기본 언어 설정됨
+    oidc:
+      settings:
+        added: OIDC 설정 추가됨
+        changed: OIDC 설정 변경됨
+        removed: OIDC 설정 삭제됨
+    secret:
+      generator:
+        added: 시크릿 생성기 추가됨
+        changed: 시크릿 생성기 변경됨
+        removed: 시크릿 생성기 삭제됨
+    smtp:
+      config:
+        added: SMTP 설정 추가됨
+        changed: SMTP 설정 변경됨
+        activated: SMTP 설정 활성화됨
+        deactivated: SMTP 설정 비활성화됨
+        removed: SMTP 설정 삭제됨
+        password:
+          changed: SMTP 설정 비밀번호 변경됨
+    sms:
+      config:
+        twilio:
+          added: Twilio SMS 제공자 추가됨
+          changed: Twilio SMS 제공자 변경됨
+          token:
+            changed: Twilio SMS 제공자 토큰 변경됨
+          removed: Twilio SMS 제공자 삭제됨
+          activated: Twilio SMS 제공자 활성화됨
+          deactivated: Twilio SMS 제공자 비활성화됨
+  key_pair:
+    added: 키 페어 추가됨
+    certificate:
+      added: 인증서 추가됨
+  action:
+    added: 작업 추가됨
+    changed: 작업 변경됨
+    deactivated: 작업 비활성화됨
+    reactivated: 작업 재활성화됨
+    removed: 작업 삭제됨
+  instance:
+    added: 인스턴스 추가됨
+    changed: 인스턴스 변경됨
+    customtext:
+      removed: 사용자 정의 텍스트 삭제됨
+      set: 사용자 정의 텍스트 설정됨
+      template:
+        removed: 사용자 정의 템플릿 삭제됨
+    default:
+      language:
+        set: 기본 언어 설정됨
+      org:
+        set: 기본 조직 설정됨
+    domain:
+      added: 도메인 추가됨
+      primary:
+        set: 기본 도메인 설정됨
+      removed: 도메인 삭제됨
+    iam:
+      console:
+        set: ZITADEL 콘솔 애플리케이션 설정됨
+      project:
+        set: ZITADEL 프로젝트 설정됨
+    mail:
+      template:
+        added: 이메일 템플릿 추가됨
+        changed: 이메일 템플릿 변경됨
+      text:
+        added: 이메일 텍스트 추가됨
+        changed: 이메일 텍스트 변경됨
+    member:
+      added: 인스턴스 멤버 추가됨
+      changed: 인스턴스 멤버 변경됨
+      removed: 인스턴스 멤버 삭제됨
+      cascade:
+        removed: 인스턴스 멤버 연쇄 삭제됨
+    notification:
+      provider:
+        debug:
+          fileadded: 파일 디버그 알림 제공자 추가됨
+          filechanged: 파일 디버그 알림 제공자 변경됨
+          fileremoved: 파일 디버그 알림 제공자 삭제됨
+          logadded: 로그 디버그 알림 제공자 추가됨
+          logchanged: 로그 디버그 알림 제공자 변경됨
+          logremoved: 로그 디버그 알림 제공자 삭제됨
+    oidc:
+      settings:
+        added: OIDC 설정 추가됨
+        changed: OIDC 설정 변경됨
+    policy:
+      domain:
+        added: 도메인 정책 추가됨
+        changed: 도메인 정책 변경됨
+      label:
+        activated: 레이블 정책 활성화됨
+        added: 레이블 정책 추가됨
+        assets:
+          removed: 레이블 정책에서 자산 삭제됨
+        changed: 레이블 정책 변경됨
+        font:
+          added: 레이블 정책에 폰트 추가됨
+          removed: 레이블 정책에서 폰트 삭제됨
+        icon:
+          added: 레이블 정책에 아이콘 추가됨
+          removed: 레이블 정책에서 아이콘 삭제됨
+          dark:
+            added: 레이블 정책에 다크 모드 아이콘 추가됨
+            removed: 레이블 정책에서 다크 모드 아이콘 삭제됨
+        logo:
+          added: 레이블 정책에 로고 추가됨
+          removed: 레이블 정책에서 로고 삭제됨
+          dark:
+            added: 레이블 정책에 다크 모드 로고 추가됨
+            removed: 레이블 정책에서 다크 모드 로고 삭제됨
+      lockout:
+        added: 잠금 정책 추가됨
+        changed: 잠금 정책 변경됨
+      login:
+        added: 로그인 정책 추가됨
+        changed: 로그인 정책 변경됨
+        idpprovider:
+          added: 로그인 정책에 IDP 추가됨
+          cascade:
+            removed: 로그인 정책에서 연쇄 IDP 삭제됨
+          removed: 로그인 정책에서 IDP 삭제됨
+        multifactor:
+          added: 다중 인증 추가됨
+          removed: 다중 인증 삭제됨
+        secondfactor:
+          added: 2차 인증 추가됨
+          removed: 2차 인증 삭제됨
+      password:
+        age:
+          added: 비밀번호 만료 정책 추가됨
+          changed: 비밀번호 만료 정책 변경됨
+        complexity:
+          added: 비밀번호 복잡도 정책 추가됨
+          changed: 비밀번호 복잡도 정책 변경됨
+      privacy:
+        added: 개인정보 보호 정책 추가됨
+        changed: 개인정보 보호 정책 변경됨
+      security:
+        set: 보안 정책 설정됨
+
+    removed: 인스턴스 삭제됨
+    secret:
+      generator:
+        added: 시크릿 생성기 추가됨
+        changed: 시크릿 생성기 변경됨
+        removed: 시크릿 생성기 삭제됨
+    sms:
+      configtwilio:
+        activated: Twilio SMS 설정 활성화됨
+        added: Twilio SMS 설정 추가됨
+        changed: Twilio SMS 설정 변경됨
+        deactivated: Twilio SMS 설정 비활성화됨
+        removed: Twilio SMS 설정 삭제됨
+        token:
+          changed: Twilio SMS 설정 토큰 변경됨
+    smtp:
+      config:
+        added: SMTP 설정 추가됨
+        changed: SMTP 설정 변경됨
+        activated: SMTP 설정 활성화됨
+        deactivated: SMTP 설정 비활성화됨
+        password:
+          changed: SMTP 설정 비밀번호 변경됨
+        removed: SMTP 설정 삭제됨
+  user_schema:
+    created: 사용자 스키마 생성됨
+    updated: 사용자 스키마 업데이트됨
+    deactivated: 사용자 스키마 비활성화됨
+    reactivated: 사용자 스키마 재활성화됨
+    deleted: 사용자 스키마 삭제됨
+    user:
+      created: 사용자 생성됨
+      updated: 사용자 업데이트됨
+      deleted: 사용자 삭제됨
+      email:
+        updated: 이메일 주소 변경됨
+        verified: 이메일 주소 인증됨
+        verification:
+          failed: 이메일 주소 인증 실패
+        code:
+          added: 이메일 주소 인증 코드 생성됨
+          sent: 이메일 주소 인증 코드 전송됨
+      phone:
+        updated: 전화번호 변경됨
+        verified: 전화번호 인증됨
+        verification:
+          failed: 전화번호 인증 실패
+        code:
+          added: 전화번호 인증 코드 생성됨
+          sent: 전화번호 인증 코드 전송됨
+
+
+  web_key:
+    added: 웹 키 추가됨
+    activated: 웹 키 활성화됨
+    deactivated: 웹 키 비활성화됨
+    removed: 웹 키 삭제됨
+
+Application:
+  OIDC:
+    UnsupportedVersion: 지원되지 않는 OIDC 버전입니다
+    V1:
+      NotCompliant: 설정이 OIDC 1.0 표준과 일치하지 않습니다.
+      NoRedirectUris: 적어도 하나의 리디렉션 URI가 등록되어야 합니다.
+      NotAllCombinationsAreAllowed: 설정은 준수하지만 모든 가능한 조합이 허용되는 것은 아닙니다.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: 코드 인증 방식에서는 웹 앱 유형에 대해서만 HTTP 리디렉션 URI가 허용됩니다.
+          CustomOnlyForNative: 코드 인증 방식에서는 네이티브 앱 유형에 대해서만 사용자 정의 리디렉션 URI를 허용합니다  (e.g appname:// ).
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: 암시적 인증 방식에서는 사용자 정의 리디렉션 URI를 허용하지 않습니다.
+          HttpNotAllowed: 암시적 인증 방식에서는 HTTP 리디렉션 URI를 허용하지 않습니다.
+          HttpLocalhostOnlyForNative: http://localhost 리디렉션 URI는 네이티브 애플리케이션에서만 허용됩니다.
+      Native:
+        AuthMethodType:
+          NotNone: 네이티브 애플리케이션의 authmethodtype은 none이어야 합니다.
+        RedirectUris:
+          MustBeHttpLocalhost: 리디렉션 URI는 http://127.0.0.1, http://[::1], http://localhost와 같은 자체 프로토콜로 시작해야 합니다.
+      UserAgent:
+        AuthMethodType:
+          NotNone: 사용자 에이전트 앱의 authmethodtype은 none이어야 합니다.
+      GrantType:
+        Refresh:
+          NoAuthCode: 리프레시 토큰은 인증 코드와 함께 사용할 때만 허용됩니다.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: 미지정
+      ExternalAuthentication: 외부 인증
+      CustomiseToken: 토큰 커스터마이징
+      InternalAuthentication: 내부 인증
+      CustomizeSAMLResponse: SAML 응답 커스터마이징
+  TriggerType:
+    Unspecified: 미지정
+    PostAuthentication: 인증 후
+    PreCreation: 생성 전
+    PostCreation: 생성 후
+    PreUserinfoCreation: 사용자 정보 생성 전
+    PreAccessTokenCreation: 액세스 토큰 생성 전
+    PreSAMLResponseCreation: SAML 응답 생성 전
