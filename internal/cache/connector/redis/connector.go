@@ -105,6 +105,8 @@ type Config struct {
 
 	// Add suffix to client name. Default is empty.
 	IdentitySuffix string
+
+	CircuitBreaker *CBConfig
 }
 
 type Connector struct {
@@ -146,6 +148,7 @@ func optionsFromConfig(c Config) *redis.Options {
 		ConnMaxLifetime:       c.ConnMaxLifetime,
 		DisableIndentity:      c.DisableIndentity,
 		IdentitySuffix:        c.IdentitySuffix,
+		Limiter:               newLimiter(c.CircuitBreaker, c.MaxActiveConns),
 	}
 	if c.EnableTLS {
 		opts.TLSConfig = new(tls.Config)
