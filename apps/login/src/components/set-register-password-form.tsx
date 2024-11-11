@@ -65,11 +65,13 @@ export function SetRegisterPasswordForm({
       organization: organization,
       authRequestId: authRequestId,
       password: values.password,
-    }).catch(() => {
-      setError("Could not register user");
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not register user");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && "error" in response) {
       setError(response.error);

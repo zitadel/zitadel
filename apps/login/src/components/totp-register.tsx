@@ -51,7 +51,6 @@ export function TotpRegister({
     setLoading(true);
     return verifyTOTP(values.code, loginName, organization)
       .then((response) => {
-        setLoading(false);
         // if attribute is set, validate MFA after it is setup, otherwise proceed as usual (when mfa is enforced to login)
         if (checkAfter) {
           const params = new URLSearchParams({});
@@ -96,8 +95,10 @@ export function TotpRegister({
         }
       })
       .catch((e) => {
-        setLoading(false);
         setError(e.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }
 

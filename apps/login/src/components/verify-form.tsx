@@ -41,13 +41,15 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
     const response = await resendVerification({
       userId,
       isInvite: isInvite,
-    }).catch(() => {
-      setError("Could not resend email");
-      setLoading(false);
-      return;
-    });
+    })
+      .catch(() => {
+        setError("Could not resend email");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-    setLoading(false);
     return response;
   }
 
@@ -61,13 +63,14 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
         code: value.code,
         userId,
         isInvite: isInvite,
-      }).catch((error) => {
-        setError("Could not verify user");
-        setLoading(false);
-        return;
-      });
-
-      setLoading(false);
+      })
+        .catch(() => {
+          setError("Could not verify user");
+          return;
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     },
     [isInvite, userId],
   );

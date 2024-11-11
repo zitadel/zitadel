@@ -71,13 +71,14 @@ export function SetPasswordForm({
       payload = { ...payload, code: values.code };
     }
 
-    const changeResponse = await changePassword(payload).catch(() => {
-      setError("Could not set password");
-      setLoading(false);
-      return;
-    });
-
-    setLoading(false);
+    const changeResponse = await changePassword(payload)
+      .catch(() => {
+        setError("Could not set password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (changeResponse && "error" in changeResponse) {
       setError(changeResponse.error);
@@ -107,13 +108,14 @@ export function SetPasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
-    }).catch((error) => {
-      setLoading(false);
-      setError("Could not verify password");
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not verify password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (
       passwordResponse &&

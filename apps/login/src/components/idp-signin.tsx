@@ -60,9 +60,10 @@ export function IdpSignin({
       .catch((error) => {
         setError(error.message);
         return;
+      })
+      .finally(() => {
+        setLoading(false);
       });
-
-    setLoading(false);
   }, []);
 
   return (
