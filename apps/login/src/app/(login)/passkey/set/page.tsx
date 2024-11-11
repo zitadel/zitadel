@@ -15,7 +15,8 @@ export default async function Page({
   const t = await getTranslations({ locale, namespace: "passkey" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, prompt, organization, authRequestId } = searchParams;
+  const { loginName, prompt, organization, authRequestId, userId } =
+    searchParams;
 
   const session = await loadMostRecentSession({
     loginName,

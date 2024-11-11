@@ -1,6 +1,6 @@
 "use client";
 
-import { registerUser, RegisterUserResponse } from "@/lib/server/register";
+import { registerUser } from "@/lib/server/register";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -66,16 +66,20 @@ export function RegisterFormWithoutPassword({
       firstName: values.firstname,
       lastName: values.lastname,
       organization: organization,
-    }).catch((error) => {
-      setError("Could not register user");
-      setLoading(false);
-    });
+      authRequestId: authRequestId,
+    })
+      .catch(() => {
+        setError("Could not register user");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && "error" in response) {
       setError(response.error);
+      return;
     }
-
-    setLoading(false);
 
     return response;
   }
@@ -97,22 +101,7 @@ export function RegisterFormWithoutPassword({
     if (withPassword) {
       return router.push(`/register?` + new URLSearchParams(registerParams));
     } else {
-      const session = (await submitAndRegister(value)) as RegisterUserResponse;
-
-      const params = new URLSearchParams({});
-      if (session?.factors?.user?.loginName) {
-        params.set("loginName", session.factors?.user?.loginName);
-      }
-
-      if (organization) {
-        params.set("organization", organization);
-      }
-
-      if (authRequestId) {
-        params.set("authRequestId", authRequestId);
-      }
-
-      return router.push(`/passkey/set?` + new URLSearchParams(params));
+      return submitAndRegister(value);
     }
   }
 
@@ -162,9 +151,7 @@ export function RegisterFormWithoutPassword({
         />
       )}
 
-      <p className="mt-4 ztdl-p mb-6 block text-text-light-secondary-500 dark:text-text-dark-secondary-500">
-        {t("selectMethod")}
-      </p>
+      <p className="mt-4 ztdl-p mb-6 block text-left">{t("selectMethod")}</p>
 
       <div className="pb-4">
         <AuthenticationMethodRadio
@@ -186,7 +173,7 @@ export function RegisterFormWithoutPassword({
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
           onClick={handleSubmit((values) =>
-            submitAndContinue(values, selected === methods[0] ? false : true),
+            submitAndContinue(values, !(selected.name === methods[0].name)),
           )}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}

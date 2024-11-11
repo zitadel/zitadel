@@ -12,9 +12,7 @@ type Props = {
 export const ThemeWrapper = ({ children, branding }: Props) => {
   useEffect(() => {
     setTheme(document, branding);
-  }, []);
+  }, [branding]);
 
-  const defaultClasses = "bg-background-light-600 dark:bg-background-dark-600";
-
-  return <div className={defaultClasses}>{children}</div>;
+  return <div>{children}</div>;
 };

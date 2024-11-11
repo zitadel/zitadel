@@ -22,7 +22,8 @@ export default async function Page({
   const t = await getTranslations({ locale, namespace: "password" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { userId, loginName, organization, authRequestId, code } = searchParams;
+  const { userId, loginName, organization, authRequestId, code, initial } =
+    searchParams;
 
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
@@ -81,7 +82,7 @@ export default async function Page({
           ></UserAvatar>
         ) : null}
 
-        <Alert type={AlertType.INFO}>{t("set.codeSent")}</Alert>
+        {!initial && <Alert type={AlertType.INFO}>{t("set.codeSent")}</Alert>}
 
         {passwordComplexity &&
         (loginName ?? user?.preferredLoginName) &&
@@ -93,6 +94,7 @@ export default async function Page({
             authRequestId={authRequestId}
             organization={organization}
             passwordComplexitySettings={passwordComplexity}
+            codeRequired={!(initial === "true")}
           />
         ) : (
           <div className="py-4">

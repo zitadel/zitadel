@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   zitadel:
     user: "${ZITADEL_DEV_UID}"
@@ -8,24 +6,29 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./machinekey:/machinekey
+      - ./pat:/pat
       - ./zitadel.yaml:/zitadel.yaml
     depends_on:
       db:
         condition: "service_healthy"
 
   db:
-    image: "cockroachdb/cockroach:v22.2.2"
-    command: "start-single-node --insecure --http-addr :9090"
+    restart: 'always'
+    image: "${POSTGRES_IMAGE:-postgres:latest}"
+    environment:
+      - POSTGRES_USER=zitadel
+      - PGUSER=zitadel
+      - POSTGRES_DB=zitadel
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c shared_buffers=1GB -c work_mem=16MB -c effective_io_concurrency=100 -c wal_level=minimal -c archive_mode=off -c max_wal_senders=0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9090/health?ready=1"]
-      interval: "10s"
-      timeout: "30s"
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: '10s'
+      timeout: '30s'
       retries: 5
-      start_period: "20s"
+      start_period: '20s'
     ports:
-      - "26257:26257"
-      - "9090:9090"
+      - 5432:5432
 
   wait_for_zitadel:
     image: curlimages/curl:8.00.1
@@ -33,7 +36,7 @@ services:
       [
         "/bin/sh",
         "-c",
-        "i=0; while ! curl http://zitadel:8080/debug/ready && [ $$i -lt 30 ]; do sleep 1; i=$$((i+1)); done; [ $$i -eq 30 ] && exit 1 || exit 0",
+        "i=0; while ! curl http://zitadel:8080/debug/ready && [ $$i -lt 30 ]; do sleep 1; i=$$((i+1)); done; [ $$i -eq 120 ] && exit 1 || exit 0",
       ]
     depends_on:
       - zitadel
@@ -43,11 +46,11 @@ services:
     container_name: setup
     build: .
     environment:
-      KEY: /key/zitadel-admin-sa.json
-      SERVICE: http://zitadel:8080
-      WRITE_ENVIRONMENT_FILE: /apps/login/.env.acceptance
+      PAT_FILE: /pat/zitadel-admin-sa.pat
+      ZITADEL_API_INTERNAL_URL: http://zitadel:8080
+      WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
     volumes:
-      - "./machinekey:/key"
+      - "./pat:/pat"
       - "../apps/login:/apps/login"
     depends_on:
       wait_for_zitadel:

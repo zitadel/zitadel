@@ -42,7 +42,7 @@ export function UserAvatar({
           loginName={loginName ?? ""}
         />
       </div>
-      <span className="ml-4 text-14px max-w-[250px] text-ellipsis overflow-hidden">
+      <span className="ml-4 pr-4 text-14px max-w-[250px] text-ellipsis overflow-hidden">
         {loginName}
       </span>
       <span className="flex-grow"></span>

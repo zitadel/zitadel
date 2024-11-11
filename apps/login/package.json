@@ -24,6 +24,7 @@
     "build": "next build",
     "prestart": "pnpm build",
     "start": "next start",
+    "start:built": "next start",
     "clean": "pnpm mock:destroy && rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
   "git": {

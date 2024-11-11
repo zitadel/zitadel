@@ -57,11 +57,10 @@ export function LoginOTP({
       initialized.current = true;
       setLoading(true);
       updateSessionForOTPChallenge()
-        .then((response) => {
-          setLoading(false);
-        })
         .catch((error) => {
           setError(error);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -89,12 +88,13 @@ export function LoginOTP({
       organization,
       challenges,
       authRequestId,
-    }).catch((error) => {
-      setError(error.message ?? "Could not request OTP challenge");
-      setLoading(false);
-    });
-
-    setLoading(false);
+    })
+      .catch((error) => {
+        setError(error.message ?? "Could not request OTP challenge");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     return response;
   }
@@ -139,13 +139,14 @@ export function LoginOTP({
       organization,
       checks,
       authRequestId,
-    }).catch(() => {
-      setError("Could not verify OTP code");
-      setLoading(false);
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not verify OTP code");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     return response;
   }
@@ -206,11 +207,10 @@ export function LoginOTP({
               onClick={() => {
                 setLoading(true);
                 updateSessionForOTPChallenge()
-                  .then((response) => {
-                    setLoading(false);
-                  })
                   .catch((error) => {
                     setError(error);
+                  })
+                  .finally(() => {
                     setLoading(false);
                   });
               }}
@@ -225,6 +225,7 @@ export function LoginOTP({
           type="text"
           {...register("code", { required: "This field is required" })}
           label="Code"
+          autoComplete="one-time-code"
         />
       </div>
 

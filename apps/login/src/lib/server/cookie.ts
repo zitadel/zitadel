@@ -7,7 +7,7 @@ import {
   getSession,
   setSession,
 } from "@/lib/zitadel";
-import { timestampDate } from "@zitadel/client";
+import { timestampMs } from "@zitadel/client";
 import {
   Challenges,
   RequestChallenges,
@@ -20,9 +20,9 @@ type CustomCookieData = {
   token: string;
   loginName: string;
   organization?: string;
-  creationDate: string;
-  expirationDate: string;
-  changeDate: string;
+  creationTs: string;
+  expirationTs: string;
+  changeTs: string;
   authRequestId?: string; // if its linked to an OIDC flow
 };
 
@@ -42,14 +42,14 @@ export async function createSessionAndUpdateCookie(
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: response.session.creationDate
-            ? `${timestampDate(response.session.creationDate).toDateString()}`
+          creationTs: response.session.creationDate
+            ? `${timestampMs(response.session.creationDate)}`
             : "",
-          expirationDate: response.session.expirationDate
-            ? `${timestampDate(response.session.expirationDate).toDateString()}`
+          expirationTs: response.session.expirationDate
+            ? `${timestampMs(response.session.expirationDate)}`
             : "",
-          changeDate: response.session.changeDate
-            ? `${timestampDate(response.session.changeDate).toDateString()}`
+          changeTs: response.session.changeDate
+            ? `${timestampMs(response.session.changeDate)}`
             : "",
           loginName: response.session.factors.user.loginName ?? "",
         };
@@ -97,14 +97,14 @@ export async function createSessionForIdpAndUpdateCookie(
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: response.session.creationDate
-            ? `${timestampDate(response.session.creationDate).toDateString()}`
+          creationTs: response.session.creationDate
+            ? `${timestampMs(response.session.creationDate)}`
             : "",
-          expirationDate: response.session.expirationDate
-            ? `${timestampDate(response.session.expirationDate).toDateString()}`
+          expirationTs: response.session.expirationDate
+            ? `${timestampMs(response.session.expirationDate)}`
             : "",
-          changeDate: response.session.changeDate
-            ? `${timestampDate(response.session.changeDate).toDateString()}`
+          changeTs: response.session.changeDate
+            ? `${timestampMs(response.session.changeDate)}`
             : "",
           loginName: response.session.factors.user.loginName ?? "",
           organization: response.session.factors.user.organizationId ?? "",
@@ -151,11 +151,11 @@ export async function setSessionAndUpdateCookie(
       const sessionCookie: CustomCookieData = {
         id: recentCookie.id,
         token: updatedSession.sessionToken,
-        creationDate: recentCookie.creationDate,
-        expirationDate: recentCookie.expirationDate,
+        creationTs: recentCookie.creationTs,
+        expirationTs: recentCookie.expirationTs,
         // just overwrite the changeDate with the new one
-        changeDate: updatedSession.details?.changeDate
-          ? `${timestampDate(updatedSession.details.changeDate).toDateString()}`
+        changeTs: updatedSession.details?.changeDate
+          ? `${timestampMs(updatedSession.details.changeDate)}`
           : "",
         loginName: recentCookie.loginName,
         organization: recentCookie.organization,
@@ -174,11 +174,11 @@ export async function setSessionAndUpdateCookie(
           const newCookie: CustomCookieData = {
             id: sessionCookie.id,
             token: updatedSession.sessionToken,
-            creationDate: sessionCookie.creationDate,
-            expirationDate: sessionCookie.expirationDate,
+            creationTs: sessionCookie.creationTs,
+            expirationTs: sessionCookie.expirationTs,
             // just overwrite the changeDate with the new one
-            changeDate: updatedSession.details?.changeDate
-              ? `${timestampDate(updatedSession.details.changeDate).toDateString()}`
+            changeTs: updatedSession.details?.changeDate
+              ? `${timestampMs(updatedSession.details.changeDate)}`
               : "",
             loginName: session.factors?.user?.loginName ?? "",
             organization: session.factors?.user?.organizationId ?? "",

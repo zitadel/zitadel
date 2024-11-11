@@ -169,7 +169,6 @@ export const PROVIDER_MAPPING: {
 } = {
   [IdentityProviderType.GOOGLE]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation as OIDC_USER;
-    console.log(rawInfo);
 
     return create(AddHumanUserRequestSchema, {
       username: idp.userName,

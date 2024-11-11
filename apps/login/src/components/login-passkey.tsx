@@ -61,16 +61,17 @@ export function LoginPasskey({
           }
 
           return submitLoginAndContinue(pK)
-            .then(() => {
-              setLoading(false);
-            })
             .catch((error) => {
               setError(error);
+            })
+            .finally(() => {
               setLoading(false);
             });
         })
         .catch((error) => {
           setError(error);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -94,10 +95,13 @@ export function LoginPasskey({
         },
       }),
       authRequestId,
-    }).catch(() => {
-      setError("Could not request passkey challenge");
-    });
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not request passkey challenge");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     return session;
   }
@@ -112,11 +116,13 @@ export function LoginPasskey({
         webAuthN: { credentialAssertionData: data },
       } as Checks,
       authRequestId,
-    }).catch(() => {
-      setError("Could not verify passkey");
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not verify passkey");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     return response;
   }
@@ -243,7 +249,9 @@ export function LoginPasskey({
           variant={ButtonVariants.Primary}
           disabled={loading}
           onClick={async () => {
-            const response = await updateSessionForChallenge();
+            const response = await updateSessionForChallenge().finally(() => {
+              setLoading(false);
+            });
 
             const pK =
               response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions
@@ -251,15 +259,16 @@ export function LoginPasskey({
 
             if (!pK) {
               setError("Could not request passkey challenge");
-              setLoading(false);
+              return;
             }
 
+            setLoading(true);
+
             return submitLoginAndContinue(pK)
-              .then(() => {
-                setLoading(false);
-              })
               .catch((error) => {
                 setError(error);
+              })
+              .finally(() => {
                 setLoading(false);
               });
           }}

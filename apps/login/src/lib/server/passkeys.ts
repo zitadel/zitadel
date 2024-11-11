@@ -37,10 +37,16 @@ export async function registerPasskeyLink(
     sessionToken: sessionCookie.token,
   });
 
-  const domain = headers().get("host");
+  const host = headers().get("host");
 
-  if (!domain) {
+  if (!host) {
     throw new Error("Could not get domain");
+  }
+
+  const [hostname, port] = host.split(":");
+
+  if (!hostname) {
+    throw new Error("Could not get hostname");
   }
 
   const userId = session?.session?.factors?.user?.id;
@@ -60,7 +66,7 @@ export async function registerPasskeyLink(
     throw new Error("Missing code in response");
   }
 
-  return registerPasskey(userId, registerLink.code, domain);
+  return registerPasskey(userId, registerLink.code, hostname);
 }
 
 export async function verifyPasskey(command: VerifyPasskeyCommand) {

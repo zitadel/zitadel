@@ -12,7 +12,6 @@ import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
@@ -57,18 +56,18 @@ export function ChangePasswordForm({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const router = useRouter();
-
   async function submitChange(values: Inputs) {
     setLoading(true);
     const changeResponse = await setMyPassword({
       sessionId: sessionId,
       password: values.password,
-    }).catch(() => {
-      setError("Could not change password");
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not change password");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (changeResponse && "error" in changeResponse) {
       setError(changeResponse.error);
@@ -80,6 +79,8 @@ export function ChangePasswordForm({
       return;
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // wait for a second, to prevent eventual consistency issues
+
     const passwordResponse = await sendPassword({
       loginName,
       organization,
@@ -87,13 +88,14 @@ export function ChangePasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
-    }).catch(() => {
-      setLoading(false);
-      setError("Could not verify password");
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not verify password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (
       passwordResponse &&

@@ -3,9 +3,11 @@ import { RegisterFormWithoutPassword } from "@/components/register-form-without-
 import { SetRegisterPasswordForm } from "@/components/set-register-password-form";
 import {
   getBrandingSettings,
+  getDefaultOrg,
   getLegalAndSupportSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
@@ -16,11 +18,19 @@ export default async function Page({
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "register" });
 
-  const { firstname, lastname, email, organization, authRequestId } =
+  let { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
   if (!organization) {
-    // TODO: get default organization
+    const org: Organization | null = await getDefaultOrg().catch((error) => {
+      console.warn(error);
+      return null;
+    });
+    if (!org) {
+      console.warn("No default organization found");
+    } else {
+      organization = org.id;
+    }
   }
 
   const setPassword = !!(firstname && lastname && email);

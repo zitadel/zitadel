@@ -40,11 +40,14 @@ export function SessionItem({
     setLoading(true);
     const response = await cleanupSession({
       sessionId: id,
-    }).catch((error) => {
-      setError(error.message);
-    });
+    })
+      .catch((error) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-    setLoading(false);
     return response;
   }
 
