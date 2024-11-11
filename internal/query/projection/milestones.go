@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	MilestonesProjectionTable = "projections.milestones2"
+	MilestonesProjectionTable = "projections.milestones3"
 
 	MilestoneColumnInstanceID  = "instance_id"
 	MilestoneColumnType        = "type"
@@ -76,9 +76,6 @@ func (p *milestoneProjection) reducePushed(event eventstore.Event) (*handler.Sta
 	e, err := assertEvent[*milestone.PushedEvent](event)
 	if err != nil {
 		return nil, err
-	}
-	if e.Agg.Version != milestone.AggregateVersion {
-		return handler.NewNoOpStatement(event), nil // Skip v1 events.
 	}
 	if e.MilestoneType != milestone.InstanceDeleted {
 		return handler.NewUpdateStatement(

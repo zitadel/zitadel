@@ -31,7 +31,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(timedTestEvent(
 					milestone.ReachedEventType,
 					milestone.AggregateType,
-					[]byte(`{"type": "instance_created"}`),
+					[]byte(`{"type": "InstanceCreated"}`),
 					now,
 					withVersion(milestone.AggregateVersion),
 				), milestone.ReachedEventMapper),
@@ -43,7 +43,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.milestones2 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.milestones3 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								milestone.InstanceCreated,
@@ -60,7 +60,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(timedTestEvent(
 					milestone.ReachedEventType,
 					milestone.AggregateType,
-					[]byte(`{"type": "instance_created", "reachedDate":"2006-01-02T15:04:05Z"}`),
+					[]byte(`{"type": "InstanceCreated", "reachedDate":"2006-01-02T15:04:05Z"}`),
 					now,
 					withVersion(milestone.AggregateVersion),
 				), milestone.ReachedEventMapper),
@@ -72,7 +72,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.milestones2 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.milestones3 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								milestone.InstanceCreated,
@@ -89,7 +89,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(timedTestEvent(
 					milestone.PushedEventType,
 					milestone.AggregateType,
-					[]byte(`{"type": "project_created"}`),
+					[]byte(`{"type": "ProjectCreated"}`),
 					now,
 					withVersion(milestone.AggregateVersion),
 				), milestone.PushedEventMapper),
@@ -101,7 +101,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones2 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
+							expectedStmt: "UPDATE projections.milestones3 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
 							expectedArgs: []interface{}{
 								now,
 								"instance-id",
@@ -118,7 +118,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(timedTestEvent(
 					milestone.PushedEventType,
 					milestone.AggregateType,
-					[]byte(`{"type": "project_created", "pushedDate":"2006-01-02T15:04:05Z"}`),
+					[]byte(`{"type": "ProjectCreated", "pushedDate":"2006-01-02T15:04:05Z"}`),
 					now,
 					withVersion(milestone.AggregateVersion),
 				), milestone.PushedEventMapper),
@@ -130,7 +130,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones2 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
+							expectedStmt: "UPDATE projections.milestones3 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
 							expectedArgs: []interface{}{
 								date,
 								"instance-id",
@@ -147,7 +147,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					milestone.PushedEventType,
 					milestone.AggregateType,
-					[]byte(`{"type": "instance_deleted"}`),
+					[]byte(`{"type": "InstanceDeleted"}`),
 					withVersion(milestone.AggregateVersion),
 				), milestone.PushedEventMapper),
 			},
@@ -158,7 +158,7 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.milestones2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.milestones3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"instance-id",
 							},
