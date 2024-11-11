@@ -173,6 +173,7 @@
   "error": {
     "unknownContext": "Der Kontext des Benutzers konnte nicht ermittelt werden. Stellen Sie sicher, dass Sie zuerst den Benutzernamen eingeben oder einen loginName als Suchparameter angeben.",
     "sessionExpired": "Ihre aktuelle Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
-    "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+    "failedLoading": "Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "tryagain": "Erneut versuchen"
   }
 }

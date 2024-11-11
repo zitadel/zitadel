@@ -67,19 +67,19 @@ export function RegisterFormWithoutPassword({
       lastName: values.lastname,
       organization: organization,
       authRequestId: authRequestId,
-    }).catch((error) => {
-      setError("Could not register user");
-      setLoading(false);
-      return;
-    });
+    })
+      .catch(() => {
+        setError("Could not register user");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && "error" in response) {
       setError(response.error);
-      setLoading(false);
       return;
     }
-
-    setLoading(false);
 
     return response;
   }
