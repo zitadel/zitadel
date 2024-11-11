@@ -411,5 +411,13 @@ func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *man
 	if err != nil {
 		return nil, "", nil, err
 	}
+	mustAwait(func() error {
+		_, err := i.Client.Mgmt.GetMachineKeyByIDs(ctx, &management.GetMachineKeyByIDsRequest{
+			UserId: machine.GetUserId(),
+			KeyId:  keyResp.GetKeyId(),
+		})
+		return err
+	})
+
 	return machine, name, keyResp.GetKeyDetails(), nil
 }
