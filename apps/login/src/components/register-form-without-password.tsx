@@ -173,10 +173,7 @@ export function RegisterFormWithoutPassword({
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
           onClick={handleSubmit((values) =>
-            submitAndContinue(
-              values,
-              selected.name === methods[0].name ? false : true,
-            ),
+            submitAndContinue(values, !(selected.name === methods[0].name)),
           )}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
