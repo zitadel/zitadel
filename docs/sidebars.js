@@ -844,13 +844,25 @@ module.exports = {
     {
       type: "category",
       label: "Benchmarks",
-      collapsed: true,      
+      collapsed: false,      
       link: {
         type: "doc",
         id: "apis/benchmarks/index",
       },
       items: [
-        "apis/benchmarks/machine_jwt_profile_grant/22-10-24",
+        {
+          type: "category",
+          label: "v2.65.0",
+          link: {
+            title: "v2.65.0",
+            slug: "/apis/benchmarks/v2.65.0",
+            description:
+              "Benchmark results of Zitadel v2.65.0\n"
+          },
+          items: [
+            "apis/benchmarks/v2.65.0/machine_jwt_profile_grant/index",
+          ],
+        },
       ],
     },
   ],
