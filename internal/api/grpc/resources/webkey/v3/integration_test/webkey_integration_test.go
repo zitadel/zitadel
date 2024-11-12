@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_Feature_Disabled(t *testing.T) {
-	instance, iamCtx := createInstance(t, false)
+	instance, iamCtx, _ := createInstance(t, false)
 	client := instance.Client.WebKeyV3Alpha
 
 	t.Run("CreateWebKey", func(t *testing.T) {
@@ -62,18 +62,18 @@ func TestServer_Feature_Disabled(t *testing.T) {
 }
 
 func TestServer_ListWebKeys(t *testing.T) {
-	instance, iamCtx := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t, true)
 	// After the feature is first enabled, we can expect 2 generated keys with the default config.
 	checkWebKeyListState(iamCtx, t, instance, 2, "", &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
 		},
-	})
+	}, creationDate)
 }
 
 func TestServer_CreateWebKey(t *testing.T) {
-	instance, iamCtx := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t, true)
 	client := instance.Client.WebKeyV3Alpha
 
 	_, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
@@ -93,11 +93,11 @@ func TestServer_CreateWebKey(t *testing.T) {
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
 		},
-	})
+	}, creationDate)
 }
 
 func TestServer_ActivateWebKey(t *testing.T) {
-	instance, iamCtx := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t, true)
 	client := instance.Client.WebKeyV3Alpha
 
 	resp, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
@@ -122,11 +122,11 @@ func TestServer_ActivateWebKey(t *testing.T) {
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
 		},
-	})
+	}, creationDate)
 }
 
 func TestServer_DeleteWebKey(t *testing.T) {
-	instance, iamCtx := createInstance(t, true)
+	instance, iamCtx, creationDate := createInstance(t, true)
 	client := instance.Client.WebKeyV3Alpha
 
 	keyIDs := make([]string, 2)
@@ -178,11 +178,12 @@ func TestServer_DeleteWebKey(t *testing.T) {
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
 		},
-	})
+	}, creationDate)
 }
 
-func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, context.Context) {
+func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, context.Context, *timestamppb.Timestamp) {
 	instance := integration.NewInstance(CTX)
+	creationDate := timestamppb.Now()
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	if enableFeature {
@@ -191,6 +192,8 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 		})
 		require.NoError(t, err)
 	}
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(iamCTX, time.Minute)
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
 		if enableFeature {
@@ -199,9 +202,9 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 		} else {
 			assert.Error(collect, err)
 		}
-	}, time.Minute, time.Second)
+	}, retryDuration, tick)
 
-	return instance, iamCTX
+	return instance, iamCTX, creationDate
 }
 
 func assertFeatureDisabledError(t *testing.T, err error) {
@@ -212,7 +215,9 @@ func assertFeatureDisabledError(t *testing.T, err error) {
 	assert.Contains(t, s.Message(), "WEBKEY-Ohx6E")
 }
 
-func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integration.Instance, nKeys int, expectActiveKeyID string, config any) {
+func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integration.Instance, nKeys int, expectActiveKeyID string, config any, creationDate *timestamppb.Timestamp) {
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 		resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
 		require.NoError(collect, err)
@@ -223,8 +228,8 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integrati
 		var gotActiveKeyID string
 		for _, key := range list {
 			integration.AssertResourceDetails(t, &resource_object.Details{
-				Created: timestamppb.Now(),
-				Changed: timestamppb.Now(),
+				Created: creationDate,
+				Changed: creationDate,
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
 					Id:   instance.ID(),
@@ -243,5 +248,5 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integrati
 		if expectActiveKeyID != "" {
 			assert.Equal(collect, expectActiveKeyID, gotActiveKeyID)
 		}
-	}, time.Minute, time.Second)
+	}, retryDuration, tick)
 }

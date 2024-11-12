@@ -55,14 +55,20 @@ func (c *Commands) requestPasswordReset(ctx context.Context, userID string, retu
 			return nil, nil, err
 		}
 	}
-	code, err := c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
+	var passwordCode *EncryptedCode
+	var generatorID string
+	if notificationType == domain.NotificationTypeSms {
+		passwordCode, generatorID, err = c.newPhoneCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption, c.defaultSecretGenerators.PasswordVerificationCode) //nolint:staticcheck
+	} else {
+		passwordCode, err = c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
+	}
 	if err != nil {
 		return nil, nil, err
 	}
-	cmd := user.NewHumanPasswordCodeAddedEventV2(ctx, UserAggregateFromWriteModel(&model.WriteModel), code.Crypted, code.Expiry, notificationType, urlTmpl, returnCode)
+	cmd := user.NewHumanPasswordCodeAddedEventV2(ctx, UserAggregateFromWriteModelCtx(ctx, &model.WriteModel), passwordCode.CryptedCode(), passwordCode.CodeExpiry(), notificationType, urlTmpl, returnCode, generatorID)
 
 	if returnCode {
-		plainCode = &code.Plain
+		plainCode = &passwordCode.Plain
 	}
 	if err = c.pushAppendAndReduce(ctx, model, cmd); err != nil {
 		return nil, nil, err

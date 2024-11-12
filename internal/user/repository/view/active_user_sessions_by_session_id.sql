@@ -1,6 +1,7 @@
 SELECT
     s.user_agent_id,
-    s.user_id
+    s.user_id,
+    s.id
 FROM auth.user_sessions s
     JOIN auth.user_sessions s2
         ON s.instance_id = s2.instance_id

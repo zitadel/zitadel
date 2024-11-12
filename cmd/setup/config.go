@@ -15,7 +15,7 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -31,7 +31,7 @@ import (
 type Config struct {
 	ForMirror       bool
 	Database        database.Config
-	Caches          *cache.CachesConfig
+	Caches          *connector.CachesConfig
 	SystemDefaults  systemdefaults.SystemDefaults
 	InternalAuthZ   internal_authz.Config
 	ExternalDomain  string
@@ -121,6 +121,10 @@ type Steps struct {
 	s32AddAuthSessionID                     *AddAuthSessionID
 	s33SMSConfigs3TwilioAddVerifyServiceSid *SMSConfigs3TwilioAddVerifyServiceSid
 	s34AddCacheSchema                       *AddCacheSchema
+	s35AddPositionToIndexEsWm               *AddPositionToIndexEsWm
+	s36FillV2Milestones                     *FillV3Milestones
+	s37Apps7OIDConfigsBackChannelLogoutURI  *Apps7OIDConfigsBackChannelLogoutURI
+	s38BackChannelLogoutNotificationStart   *BackChannelLogoutNotificationStart
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
+	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/senders"
@@ -26,6 +27,7 @@ type ChannelChains interface {
 	Email(context.Context) (*senders.Chain, *email.Config, error)
 	SMS(context.Context) (*senders.Chain, *sms.Config, error)
 	Webhook(context.Context, webhook.Config) (*senders.Chain, error)
+	SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error)
 }
 
 func SendEmail(
@@ -123,6 +125,24 @@ func SendJSON(
 			webhookConfig,
 			channels,
 			serializable,
+			triggeringEvent,
+		)
+	}
+}
+
+func SendSecurityTokenEvent(
+	ctx context.Context,
+	setConfig set.Config,
+	channels ChannelChains,
+	token any,
+	triggeringEvent eventstore.Event,
+) Notify {
+	return func(_ string, _ map[string]interface{}, _ string, _ bool) error {
+		return handleSecurityTokenEvent(
+			ctx,
+			setConfig,
+			channels,
+			token,
 			triggeringEvent,
 		)
 	}

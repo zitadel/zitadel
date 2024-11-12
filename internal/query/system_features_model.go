@@ -59,6 +59,7 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemImprovedPerformanceEventType,
 			feature_v2.SystemOIDCSingleV1SessionTerminationEventType,
 			feature_v2.SystemDisableUserTokenEvent,
+			feature_v2.SystemEnableBackChannelLogout,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -94,6 +95,8 @@ func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.S
 		features.OIDCSingleV1SessionTermination.set(level, event.Value)
 	case feature.KeyDisableUserTokenEvent:
 		features.DisableUserTokenEvent.set(level, event.Value)
+	case feature.KeyEnableBackChannelLogout:
+		features.EnableBackChannelLogout.set(level, event.Value)
 	}
 	return nil
 }

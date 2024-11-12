@@ -36,18 +36,26 @@ func (c *Client) CreateAttestationResponse(optionsPb *structpb.Struct) (*structp
 	if err != nil {
 		return nil, fmt.Errorf("webauthn.Client.CreateAttestationResponse: %w", err)
 	}
-	parsedAttestationOptions, err := virtualwebauthn.ParseAttestationOptions(string(options))
+	attestationResponse, err := c.CreateAttestationResponseData(options)
 	if err != nil {
-		return nil, fmt.Errorf("webauthn.Client.CreateAttestationResponse: %w", err)
+		return nil, err
 	}
 	resp := new(structpb.Struct)
-	err = protojson.Unmarshal([]byte(virtualwebauthn.CreateAttestationResponse(
-		c.rp, c.auth, c.credential, *parsedAttestationOptions,
-	)), resp)
+	err = protojson.Unmarshal(attestationResponse, resp)
 	if err != nil {
 		return nil, fmt.Errorf("webauthn.Client.CreateAttestationResponse: %w", err)
 	}
 	return resp, nil
+}
+
+func (c *Client) CreateAttestationResponseData(options []byte) ([]byte, error) {
+	parsedAttestationOptions, err := virtualwebauthn.ParseAttestationOptions(string(options))
+	if err != nil {
+		return nil, fmt.Errorf("webauthn.Client.CreateAttestationResponse: %w", err)
+	}
+	return []byte(virtualwebauthn.CreateAttestationResponse(
+		c.rp, c.auth, c.credential, *parsedAttestationOptions,
+	)), nil
 }
 
 func (c *Client) CreateAssertionResponse(optionsPb *structpb.Struct, verifyUser bool) (*structpb.Struct, error) {

@@ -51,6 +51,9 @@ By executing the commands below, you will download the following file:
 # Download the docker compose example configuration.
 wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/deploy/docker-compose-sa.yaml -O docker-compose.yaml
 
+# create the machine key directory
+mkdir machinekey
+
 # Run the database and application containers.
 docker compose up --detach
 
