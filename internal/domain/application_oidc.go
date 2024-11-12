@@ -79,7 +79,8 @@ const (
 type OIDCResponseType int32
 
 const (
-	OIDCResponseTypeCode OIDCResponseType = iota
+	OIDCResponseTypeUnspecified OIDCResponseType = iota - 1 // Negative offset not to break existing configs.
+	OIDCResponseTypeCode
 	OIDCResponseTypeIDToken
 	OIDCResponseTypeIDTokenToken
 )
