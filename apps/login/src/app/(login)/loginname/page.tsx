@@ -29,9 +29,10 @@ export default async function Page({
 
   const loginName = searchParams?.loginName;
   const authRequestId = searchParams?.authRequestId;
-  let organization = searchParams?.organization;
+  const organization = searchParams?.organization;
   const submit: boolean = searchParams?.submit === "true";
 
+  let defaultOrganization;
   if (!organization) {
     const org: Organization | null = await getDefaultOrg().catch((error) => {
       console.warn(error);
@@ -40,19 +41,25 @@ export default async function Page({
     if (!org) {
       console.warn("No default organization found");
     } else {
-      organization = org.id;
+      defaultOrganization = org.id;
     }
   }
-
-  const loginSettings = await getLoginSettings(organization);
-
-  const identityProviders = await getIdentityProviders(organization);
 
   const host = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
 
-  const branding = await getBrandingSettings(organization);
+  const loginSettings = await getLoginSettings(
+    organization ?? defaultOrganization,
+  );
+
+  const identityProviders = await getIdentityProviders(
+    organization ?? defaultOrganization,
+  );
+
+  const branding = await getBrandingSettings(
+    organization ?? defaultOrganization,
+  );
 
   return (
     <DynamicTheme branding={branding}>
@@ -63,7 +70,7 @@ export default async function Page({
         <UsernameForm
           loginName={loginName}
           authRequestId={authRequestId}
-          organization={organization}
+          organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
         >
@@ -72,7 +79,7 @@ export default async function Page({
               host={host}
               identityProviders={identityProviders}
               authRequestId={authRequestId}
-              organization={organization}
+              organization={organization ?? defaultOrganization} // use the organization from the searchParams here otherwise fallback to the default organization
             ></SignInWithIdp>
           )}
         </UsernameForm>

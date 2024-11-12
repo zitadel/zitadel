@@ -143,8 +143,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     const factor = availableSecondFactors[0];
@@ -167,8 +170,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     return redirect(`/mfa?` + params);
@@ -181,8 +187,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     return redirect(`/password/change?` + params);
@@ -197,8 +206,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     // TODO: provide a way to setup passkeys on mfa page?
@@ -233,8 +245,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
       authRequest: command.authRequestId,
     });
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     return { nextStep: `/login?${params}` };
@@ -252,8 +267,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
         },
   );
 
-  if (command.organization) {
-    params.append("organization", command.organization);
+  if (command.organization || session.factors?.user?.organizationId) {
+    params.append(
+      "organization",
+      command.organization ?? session.factors?.user?.organizationId,
+    );
   }
 
   return redirect(`/signedin?` + params);
