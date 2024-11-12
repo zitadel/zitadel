@@ -62,6 +62,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemImprovedPerformanceEventType,
 			feature_v2.SystemOIDCSingleV1SessionTerminationEventType,
 			feature_v2.SystemDisableUserTokenEvent,
+			feature_v2.SystemEnableBackChannelLogout,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -100,6 +101,9 @@ func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 	case feature.KeyDisableUserTokenEvent:
 		v := value.(bool)
 		features.DisableUserTokenEvent = &v
+	case feature.KeyEnableBackChannelLogout:
+		v := value.(bool)
+		features.EnableBackChannelLogout = &v
 	}
 }
 
@@ -115,6 +119,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.SystemImprovedPerformanceEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCSingleV1SessionTermination, f.OIDCSingleV1SessionTermination, feature_v2.SystemOIDCSingleV1SessionTerminationEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DisableUserTokenEvent, f.DisableUserTokenEvent, feature_v2.SystemDisableUserTokenEvent)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.SystemEnableBackChannelLogout)
 	return cmds
 }
 

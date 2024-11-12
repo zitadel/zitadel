@@ -18,7 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
-	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
@@ -49,7 +49,7 @@ type Config struct {
 	HTTP1HostHeader     string
 	WebAuthNName        string
 	Database            database.Config
-	Caches              *cache.CachesConfig
+	Caches              *connector.CachesConfig
 	Tracing             tracing.Config
 	Metrics             metrics.Config
 	Profiler            profiler.Config

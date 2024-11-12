@@ -870,9 +870,7 @@ type dbMock struct {
 }
 
 func (m *dbMock) expectQuery(t *testing.T, expectedQuery string, args []driver.Value, events ...*repository.Event) *dbMock {
-	m.mock.ExpectBegin()
 	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
-	m.mock.ExpectCommit()
 	rows := m.mock.NewRows([]string{"sequence"})
 	for _, event := range events {
 		rows = rows.AddRow(event.Seq)
@@ -882,9 +880,7 @@ func (m *dbMock) expectQuery(t *testing.T, expectedQuery string, args []driver.V
 }
 
 func (m *dbMock) expectQueryScanErr(t *testing.T, expectedQuery string, args []driver.Value, events ...*repository.Event) *dbMock {
-	m.mock.ExpectBegin()
 	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
-	m.mock.ExpectRollback()
 	rows := m.mock.NewRows([]string{"sequence"})
 	for _, event := range events {
 		rows = rows.AddRow(event.Seq)
@@ -894,7 +890,6 @@ func (m *dbMock) expectQueryScanErr(t *testing.T, expectedQuery string, args []d
 }
 
 func (m *dbMock) expectQueryErr(t *testing.T, expectedQuery string, args []driver.Value, err error) *dbMock {
-	m.mock.ExpectBegin()
 	m.mock.ExpectQuery(expectedQuery).WithArgs(args...).WillReturnError(err)
 	return m
 }

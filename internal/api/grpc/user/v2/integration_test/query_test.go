@@ -190,7 +190,6 @@ func TestServer_GetUserByID(t *testing.T) {
 func TestServer_GetUserByID_Permission(t *testing.T) {
 	t.Parallel()
 
-	timeNow := time.Now().UTC()
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
@@ -237,7 +236,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 					},
 				},
 				Details: &object.Details{
-					ChangeDate:    timestamppb.New(timeNow),
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -275,7 +274,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 					},
 				},
 				Details: &object.Details{
-					ChangeDate:    timestamppb.New(timeNow),
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -303,24 +302,29 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ttt, err)
+					return
+				}
+				if !assert.NoError(ttt, err) {
+					return
+				}
 
-			tt.want.User.UserId = tt.args.req.GetUserId()
-			tt.want.User.Username = newOrgOwnerEmail
-			tt.want.User.PreferredLoginName = newOrgOwnerEmail
-			tt.want.User.LoginNames = []string{newOrgOwnerEmail}
-			if human := tt.want.User.GetHuman(); human != nil {
-				human.Email.Email = newOrgOwnerEmail
-			}
-			// details tested in GetUserByID
-			tt.want.User.Details = got.User.GetDetails()
+				tt.want.User.UserId = tt.args.req.GetUserId()
+				tt.want.User.Username = newOrgOwnerEmail
+				tt.want.User.PreferredLoginName = newOrgOwnerEmail
+				tt.want.User.LoginNames = []string{newOrgOwnerEmail}
+				if human := tt.want.User.GetHuman(); human != nil {
+					human.Email.Email = newOrgOwnerEmail
+				}
+				// details tested in GetUserByID
+				tt.want.User.Details = got.User.GetDetails()
 
-			assert.Equal(t, tt.want.User, got.User)
+				assert.Equal(ttt, tt.want.User, got.User)
+			}, retryDuration, tick, "timeout waiting for expected user result")
 		})
 	}
 }

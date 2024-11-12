@@ -59,6 +59,7 @@ type OIDCApp struct {
 	AdditionalOrigins        database.TextArray[string]
 	AllowedOrigins           database.TextArray[string]
 	SkipNativeAppSuccessPage bool
+	BackChannelLogoutURI     string
 }
 
 type SAMLApp struct {
@@ -241,6 +242,10 @@ var (
 	}
 	AppOIDCConfigColumnSkipNativeAppSuccessPage = Column{
 		name:  projection.AppOIDCConfigColumnSkipNativeAppSuccessPage,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnBackChannelLogoutURI = Column{
+		name:  projection.AppOIDCConfigColumnBackChannelLogoutURI,
 		table: appOIDCConfigsTable,
 	}
 )
@@ -536,6 +541,7 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase, activeOnly bool) (
 		AppOIDCConfigColumnClockSkew.identifier(),
 		AppOIDCConfigColumnAdditionalOrigins.identifier(),
 		AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+		AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 
 		AppSAMLConfigColumnAppID.identifier(),
 		AppSAMLConfigColumnEntityID.identifier(),
@@ -600,6 +606,7 @@ func scanApp(row *sql.Row) (*App, error) {
 		&oidcConfig.clockSkew,
 		&oidcConfig.additionalOrigins,
 		&oidcConfig.skipNativeAppSuccessPage,
+		&oidcConfig.backChannelLogoutURI,
 
 		&samlConfig.appID,
 		&samlConfig.entityID,
@@ -649,6 +656,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
 			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 		).From(appsTable.identifier()).
 			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
@@ -685,6 +693,7 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.clockSkew,
 				&oidcConfig.additionalOrigins,
 				&oidcConfig.skipNativeAppSuccessPage,
+				&oidcConfig.backChannelLogoutURI,
 			)
 
 			if err != nil {
@@ -896,6 +905,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
 			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
@@ -948,6 +958,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 					&oidcConfig.clockSkew,
 					&oidcConfig.additionalOrigins,
 					&oidcConfig.skipNativeAppSuccessPage,
+					&oidcConfig.backChannelLogoutURI,
 
 					&samlConfig.appID,
 					&samlConfig.entityID,
@@ -1020,6 +1031,7 @@ type sqlOIDCConfig struct {
 	responseTypes            database.NumberArray[domain.OIDCResponseType]
 	grantTypes               database.NumberArray[domain.OIDCGrantType]
 	skipNativeAppSuccessPage sql.NullBool
+	backChannelLogoutURI     sql.NullString
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -1043,6 +1055,7 @@ func (c sqlOIDCConfig) set(app *App) {
 		ResponseTypes:            c.responseTypes,
 		GrantTypes:               c.grantTypes,
 		SkipNativeAppSuccessPage: c.skipNativeAppSuccessPage.Bool,
+		BackChannelLogoutURI:     c.backChannelLogoutURI.String,
 	}
 	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems

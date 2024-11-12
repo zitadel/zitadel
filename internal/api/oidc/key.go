@@ -348,7 +348,7 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 		return nil, err
 	}
 	if len(keys.Keys) > 0 {
-		return o.privateKeyToSigningKey(selectSigningKey(keys.Keys))
+		return PrivateKeyToSigningKey(SelectSigningKey(keys.Keys), o.encAlg)
 	}
 	var position float64
 	if keys.State != nil {
@@ -377,8 +377,8 @@ func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bo
 	return position >= maxSequence, nil
 }
 
-func (o *OPStorage) privateKeyToSigningKey(key query.PrivateKey) (_ op.SigningKey, err error) {
-	keyData, err := crypto.Decrypt(key.Key(), o.encAlg)
+func PrivateKeyToSigningKey(key query.PrivateKey, algorithm crypto.EncryptionAlgorithm) (_ op.SigningKey, err error) {
+	keyData, err := crypto.Decrypt(key.Key(), algorithm)
 	if err != nil {
 		return nil, err
 	}
@@ -430,7 +430,7 @@ func (o *OPStorage) getMaxKeySequence(ctx context.Context) (float64, error) {
 	)
 }
 
-func selectSigningKey(keys []query.PrivateKey) query.PrivateKey {
+func SelectSigningKey(keys []query.PrivateKey) query.PrivateKey {
 	return keys[len(keys)-1]
 }
 
