@@ -5,7 +5,7 @@ import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertType } from "./alert";
@@ -71,9 +71,14 @@ export function PasswordForm({
 
     if (response && "error" in response && response.error) {
       setError(response.error);
+      return;
     }
 
-    return response;
+    if (response && response.nextStep) {
+      return redirect(response.nextStep);
+    }
+
+    return;
   }
 
   async function resetPasswordAndContinue() {

@@ -249,7 +249,8 @@ export async function sendPassword(command: UpdateSessionCommand) {
       params.append("organization", command.organization);
     }
 
-    return redirect(`/login?` + params);
+    // move this to browser
+    return { nextStep: `/login?${params}` };
   }
 
   // without OIDC flow
