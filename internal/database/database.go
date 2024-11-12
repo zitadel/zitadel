@@ -40,20 +40,7 @@ func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error
 }
 
 func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
-			return
-		}
-		err = tx.Commit()
-	}()
-
-	rows, err := tx.QueryContext(ctx, query, args...)
+	rows, err := db.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -73,20 +60,7 @@ func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (er
 }
 
 func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
-			return
-		}
-		err = tx.Commit()
-	}()
-
-	row := tx.QueryRowContext(ctx, query, args...)
+	row := db.DB.QueryRowContext(ctx, query, args...)
 	logging.OnError(row.Err()).Error("unexpected query error")
 
 	err = scan(row)

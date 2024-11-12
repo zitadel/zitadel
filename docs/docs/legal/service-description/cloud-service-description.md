@@ -75,12 +75,6 @@ Data location refers to a region, consisting of one or many countries or territo
 
 We can not guarantee that during transit the data will only remain within this region. We take measures, as outlined in our [privacy policy](../policies/privacy-policy), to protect your data in transit and in rest.
 
-The following regions will be available when using our cloud service. This list is for informational purposes and will be updated in due course, please refer to our website for all available regions at this time.
-
-- **Global**: All available cloud regions offered by our cloud provider
-- **Switzerland**: Exclusively on Swiss region
-- **GDPR safe countries**: Hosting location is within any of the EU member states and [Adequate Countries](https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en) as recognized by the European Commission under the GDPR
-
 ## Backup
 
 Our backup strategy executes daily full backups and differential backups on much higher frequency.

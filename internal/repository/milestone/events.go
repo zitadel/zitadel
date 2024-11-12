@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-//go:generate enumer -type Type -json -linecomment -transform=snake
+//go:generate enumer -type Type -json -linecomment
 type Type int
 
 const (
@@ -20,7 +20,7 @@ const (
 )
 
 const (
-	eventTypePrefix  = "milestone."
+	eventTypePrefix  = "milestone.v2."
 	ReachedEventType = eventTypePrefix + "reached"
 	PushedEventType  = eventTypePrefix + "pushed"
 )
