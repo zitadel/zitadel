@@ -31,22 +31,22 @@ type AutoPruneConfig struct {
 	Timeout time.Duration
 }
 
-func (c AutoPruneConfig) StartAutoPrune(background context.Context, pruner Pruner, name string) (close func()) {
-	return c.startAutoPrune(background, pruner, name, clockwork.NewRealClock())
+func (c AutoPruneConfig) StartAutoPrune(background context.Context, pruner Pruner, purpose Purpose) (close func()) {
+	return c.startAutoPrune(background, pruner, purpose, clockwork.NewRealClock())
 }
 
-func (c *AutoPruneConfig) startAutoPrune(background context.Context, pruner Pruner, name string, clock clockwork.Clock) (close func()) {
+func (c *AutoPruneConfig) startAutoPrune(background context.Context, pruner Pruner, purpose Purpose, clock clockwork.Clock) (close func()) {
 	if c.Interval <= 0 {
 		return func() {}
 	}
 	background, cancel := context.WithCancel(background)
 	// randomize the first interval
 	timer := clock.NewTimer(time.Duration(rand.Int63n(int64(c.Interval))))
-	go c.pruneTimer(background, pruner, name, timer)
+	go c.pruneTimer(background, pruner, purpose, timer)
 	return cancel
 }
 
-func (c *AutoPruneConfig) pruneTimer(background context.Context, pruner Pruner, name string, timer clockwork.Timer) {
+func (c *AutoPruneConfig) pruneTimer(background context.Context, pruner Pruner, purpose Purpose, timer clockwork.Timer) {
 	defer func() {
 		if !timer.Stop() {
 			<-timer.Chan()
@@ -58,9 +58,9 @@ func (c *AutoPruneConfig) pruneTimer(background context.Context, pruner Pruner, 
 		case <-background.Done():
 			return
 		case <-timer.Chan():
-			timer.Reset(c.Interval)
 			err := c.doPrune(background, pruner)
-			logging.OnError(err).WithField("name", name).Error("cache auto prune")
+			logging.OnError(err).WithField("purpose", purpose).Error("cache auto prune")
+			timer.Reset(c.Interval)
 		}
 	}
 }
