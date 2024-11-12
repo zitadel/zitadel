@@ -237,6 +237,8 @@ export async function sendPassword(command: UpdateSessionCommand) {
       params.append("organization", command.organization);
     }
 
+    console.log("nextStep", `/login?${params}`);
+
     return { nextStep: `/login?${params}` };
   }
 

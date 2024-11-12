@@ -77,8 +77,6 @@ export function PasswordForm({
     if (response && response.nextStep) {
       return redirect(response.nextStep);
     }
-
-    return;
   }
 
   async function resetPasswordAndContinue() {
