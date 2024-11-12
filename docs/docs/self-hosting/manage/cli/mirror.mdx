@@ -1,30 +1,34 @@
 ---
-title: Mirror data to another database
+title: Mirroring Data
 sidebar_label: Mirror command
 ---
 
-The `mirror` command allows you to do database to database migrations. This functionality is useful to copy data from one database to another.
+The `mirror` command allows you to do database to database migrations as well as migrations between a database and files. This functionality is useful for copying data between databases, or between a database and files.
 
-The data can be mirrored to multiple database without influencing each other.
+The data can be mirrored to multiple databases without influencing each other.
 
 ## Use cases
 
 Migrate from cockroachdb to postgres or vice versa.
 
+Migrate from a database to files for sharing.
+
 Replicate data to a secondary environment for testing.
 
 ## Prerequisites
 
-You need an existing source database, most probably the database ZITADEL currently serves traffic from.
+If using database as source, you need an existing source database, most probably the database ZITADEL currently serves traffic from.
 
-To mirror the data the destination database needs to be initialized and setup without an instance.
+If using database as destination, database needs to be initialized and setup without an instance.
 
-### Start the destination database 
+If using files as source, you need the following existing files: `system.assets.csv`, `system.encryption_keys.csv`, `auth.auth_requests.csv`, `eventstore.events2.csv`, and `eventstore.unique_constraints.csv`. These files all need to be in the same directory as the one set in the config file.
+
+### Start the destination database
 
 Follow one of the following guides to start the database:
 
-* [Linux](/docs/self-hosting/deploy/linux#run-postgresql)
-* [MacOS](/docs/self-hosting/deploy/macos#install-postgresql)
+- [Linux](/docs/self-hosting/deploy/linux#run-postgresql)
+- [MacOS](/docs/self-hosting/deploy/macos#install-postgresql)
 
 Or use the following commands for [Docker Compose](/docs/self-hosting/deploy/compose)
 
@@ -63,7 +67,9 @@ Flags:
                                  * system.assets
                                  * auth.auth_requests
                                  * eventstore.unique_constraints
-                                 The should be provided if you want to execute the mirror command multiple times so that the static data are also mirrored to prevent inconsistent states.
+                                 This should be provided if you want to execute the mirror command multiple times so that the static data are also mirrored to prevent inconsistent states.
+
+# Both --ignore-previous and --replace flags need to be set if mirroring to/from files
 
       --instance strings         id or comma separated ids of the instance(s) to migrate. Either this or the `--system`-flag must be set. Make sure to always use the same flag if you execute the command multiple times.
       --system                   migrates the whole system. Either this or the `--instance`-flag must be set. Make sure to always use the same flag if you execute the command multiple times.
@@ -79,7 +85,7 @@ Flags:
 ## Configuration
 
 ```yaml
-# The source database the data are copied from. Use either cockroach or postgres, by default cockroach is used
+# The source database the data are copied from. Use either cockroach, postgres, or files. By default cockroach is used
 Source:
   cockroach:
     Host: localhost # ZITADEL_SOURCE_COCKROACH_HOST
@@ -91,15 +97,15 @@ Source:
     ProjectionSpoolerConnRatio: 0.33 # ZITADEL_SOURCE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
     MaxConnLifetime: 30m # ZITADEL_SOURCE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_SOURCE_COCKROACH_MAXCONNIDLETIME
-    Options: "" # ZITADEL_SOURCE_COCKROACH_OPTIONS
+    Options: '' # ZITADEL_SOURCE_COCKROACH_OPTIONS
     User:
       Username: zitadel # ZITADEL_SOURCE_COCKROACH_USER_USERNAME
-      Password: "" # ZITADEL_SOURCE_COCKROACH_USER_PASSWORD
+      Password: '' # ZITADEL_SOURCE_COCKROACH_USER_PASSWORD
       SSL:
         Mode: disable # ZITADEL_SOURCE_COCKROACH_USER_SSL_MODE
-        RootCert: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_CERT
-        Key: "" # ZITADEL_SOURCE_COCKROACH_USER_SSL_KEY
+        RootCert: '' # ZITADEL_SOURCE_COCKROACH_USER_SSL_ROOTCERT
+        Cert: '' # ZITADEL_SOURCE_COCKROACH_USER_SSL_CERT
+        Key: '' # ZITADEL_SOURCE_COCKROACH_USER_SSL_KEY
   # Postgres is used as soon as a value is set
   # The values describe the possible fields to set values
   postgres:
@@ -119,8 +125,11 @@ Source:
         RootCert: # ZITADEL_SOURCE_POSTGRES_USER_SSL_ROOTCERT
         Cert: # ZITADEL_SOURCE_POSTGRES_USER_SSL_CERT
         Key: # ZITADEL_SOURCE_POSTGRES_USER_SSL_KEY
+  # Files are used as soon as a path is set
+  file:
+    path: # /path/to/my/directory
 
-# The destination database the data are copied to. Use either cockroach or postgres, by default cockroach is used
+# The destination database the data are copied to. Use either cockroach, postgres, or files. By default cockroach is used
 Destination:
   cockroach:
     Host: localhost # ZITADEL_DESTINATION_COCKROACH_HOST
@@ -132,15 +141,15 @@ Destination:
     MaxConnIdleTime: 5m # ZITADEL_DESTINATION_COCKROACH_MAXCONNIDLETIME
     EventPushConnRatio: 0.01 # ZITADEL_DESTINATION_COCKROACH_EVENTPUSHCONNRATIO
     ProjectionSpoolerConnRatio: 0.5 # ZITADEL_DESTINATION_COCKROACH_PROJECTIONSPOOLERCONNRATIO
-    Options: "" # ZITADEL_DESTINATION_COCKROACH_OPTIONS
+    Options: '' # ZITADEL_DESTINATION_COCKROACH_OPTIONS
     User:
       Username: zitadel # ZITADEL_DESTINATION_COCKROACH_USER_USERNAME
-      Password: "" # ZITADEL_DESTINATION_COCKROACH_USER_PASSWORD
+      Password: '' # ZITADEL_DESTINATION_COCKROACH_USER_PASSWORD
       SSL:
         Mode: disable # ZITADEL_DESTINATION_COCKROACH_USER_SSL_MODE
-        RootCert: "" # ZITADEL_DESTINATION_COCKROACH_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DESTINATION_COCKROACH_USER_SSL_CERT
-        Key: "" # ZITADEL_DESTINATION_COCKROACH_USER_SSL_KEY
+        RootCert: '' # ZITADEL_DESTINATION_COCKROACH_USER_SSL_ROOTCERT
+        Cert: '' # ZITADEL_DESTINATION_COCKROACH_USER_SSL_CERT
+        Key: '' # ZITADEL_DESTINATION_COCKROACH_USER_SSL_KEY
   # Postgres is used as soon as a value is set
   # The values describe the possible fields to set values
   postgres:
@@ -160,6 +169,9 @@ Destination:
         RootCert: # ZITADEL_DESTINATION_POSTGRES_USER_SSL_ROOTCERT
         Cert: # ZITADEL_DESTINATION_POSTGRES_USER_SSL_CERT
         Key: # ZITADEL_DESTINATION_POSTGRES_USER_SSL_KEY
+  # Files are used as soon as a path is set
+  file:
+    path: # /path/to/my/directory
 
 # As cockroachdb first copies the data into memory this parameter is used to iterate through the events table and fetch only the given amount of events per iteration
 EventBulkSize: 10000 # ZITADEL_EVENTBULKSIZE
@@ -202,7 +214,7 @@ Copies the events since the last migration and unique constraints to the destina
 
 Executes all projections in the destination database.
 
-It is NOOP if the projections are already up-to-date. 
+It is NOOP if the projections are already up-to-date.
 
 ### `zitadel mirror system`
 
@@ -214,19 +226,17 @@ Prints the amount of rows of the source and destination database and the diff. P
 
 The following tables will likely have an unequal count:
 
-* **projections.current_states**: If your deployment was upgraded several times, the number of entries in the destination will be lower
-* **projections.locks**: If your deployment was upgraded several times, the number of entries in the destination will be lower
-* **projections.keys4\***: Only not expired keys are inserted, the number of entries in the destination will be lower
-* **projections.failed_events**: Should be lower or equal.
-* **auth.users2**: Was replaced with auth.users3, the number of entries in the destination will be 0
-* **auth.users3**: Is the replacement of auth.users2, the number of entries in the destination will be equal or higher
+- **projections.current_states**: If your deployment was upgraded several times, the number of entries in the destination will be lower
+- **projections.locks**: If your deployment was upgraded several times, the number of entries in the destination will be lower
+- **projections.keys4\***: Only not expired keys are inserted, the number of entries in the destination will be lower
+- **projections.failed_events**: Should be lower or equal.
+- **auth.users2**: Was replaced with auth.users3, the number of entries in the destination will be 0
+- **auth.users3**: Is the replacement of auth.users2, the number of entries in the destination will be equal or higher
 
 ## Limitations
-
-It is not possible to use files as source or destination. See github issue [here](https://github.com/zitadel/zitadel/issues/7966)
 
 Currently the encryption keys of the source database must be copied to the destination database. See github issue [here](https://github.com/zitadel/zitadel/issues/7964)
 
 It is not possible to change the domain of the ZITADEL deployment.
 
-Once you mirrored an instance using the `--instance` flag, you have to make sure you don't mirror other preexisting instances. This means for example, you cannot mirror a few instances and then pass the `--system` flag. You have to pass all remaining instances explicitly, once you used the `--instance` flag 
+Once you mirrored an instance using the `--instance` flag, you have to make sure you don't mirror other preexisting instances. This means for example, you cannot mirror a few instances and then pass the `--system` flag. You have to pass all remaining instances explicitly, once you used the `--instance` flag
