@@ -3,11 +3,12 @@ import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UsernameForm } from "@/components/username-form";
 import {
   getBrandingSettings,
-  getLegalAndSupportSettings,
+  getDefaultOrg,
   getLoginSettings,
   settingsService,
 } from "@/lib/zitadel";
 import { makeReqCtx } from "@zitadel/client/v2";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
 function getIdentityProviders(orgId?: string) {
@@ -28,11 +29,22 @@ export default async function Page({
 
   const loginName = searchParams?.loginName;
   const authRequestId = searchParams?.authRequestId;
-  const organization = searchParams?.organization;
+  let organization = searchParams?.organization;
   const submit: boolean = searchParams?.submit === "true";
 
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg().catch((error) => {
+      console.warn(error);
+      return null;
+    });
+    if (!org) {
+      console.warn("No default organization found");
+    } else {
+      organization = org.id;
+    }
+  }
+
   const loginSettings = await getLoginSettings(organization);
-  const legal = await getLegalAndSupportSettings();
 
   const identityProviders = await getIdentityProviders(organization);
 
@@ -55,7 +67,7 @@ export default async function Page({
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
         >
-          {legal && identityProviders && process.env.ZITADEL_API_URL && (
+          {identityProviders && process.env.ZITADEL_API_URL && (
             <SignInWithIdp
               host={host}
               identityProviders={identityProviders}
