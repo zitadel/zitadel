@@ -102,7 +102,6 @@ export async function GET(request: NextRequest) {
 
         // works not with _rsc request
         try {
-          console.log("create callack for provided session");
           const { callbackUrl } = await createCallback(
             create(CreateCallbackRequestSchema, {
               authRequestId,
@@ -269,7 +268,6 @@ export async function GET(request: NextRequest) {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
-            console.log("create callack with prompt none");
             const { callbackUrl } = await createCallback(
               create(CreateCallbackRequestSchema, {
                 authRequestId,
@@ -307,8 +305,6 @@ export async function GET(request: NextRequest) {
               sessionToken: cookie?.token,
             };
             try {
-              console.log("create callack - default");
-
               const { callbackUrl } = await createCallback(
                 create(CreateCallbackRequestSchema, {
                   authRequestId,
