@@ -69,6 +69,7 @@ func (s *Server) refreshTokenV1(ctx context.Context, client *Client, r *op.Clien
 		refreshToken.Actor,
 		true,
 		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
 	if err != nil {
 		return nil, err
