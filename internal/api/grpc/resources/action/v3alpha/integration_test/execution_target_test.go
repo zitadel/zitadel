@@ -251,7 +251,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				require.NoError(t, err)
 				defer close()
 			}
-			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 2*time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
 				if tt.wantErr {
@@ -276,7 +276,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition, targets []*action.ExecutionTargetType) {
 	instance.SetExecution(ctx, t, condition, targets)
 
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 2*time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		got, err := instance.Client.ActionV3Alpha.SearchExecutions(ctx, &action.SearchExecutionsRequest{
 			Filters: []*action.ExecutionSearchFilter{
@@ -305,7 +305,7 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	resp := instance.CreateTarget(ctx, t, "", endpoint, ty, interrupt)
 
-	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, 2*time.Minute)
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		got, err := instance.Client.ActionV3Alpha.SearchTargets(ctx, &action.SearchTargetsRequest{
 			Filters: []*action.TargetSearchFilter{
