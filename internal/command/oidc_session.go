@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/repository/sessionlogout"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -133,7 +134,8 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 func (c *Commands) CreateOIDCSession(ctx context.Context,
 	userID,
 	resourceOwner,
-	clientID string,
+	clientID,
+	backChannelLogoutURI string,
 	scope,
 	audience []string,
 	authMethods []domain.UserAuthMethodType,
@@ -145,6 +147,7 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	actor *domain.TokenActor,
 	needRefreshToken bool,
 	sessionID string,
+	responseType domain.OIDCResponseType,
 ) (session *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -161,8 +164,11 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	}
 
 	cmd.AddSession(ctx, userID, resourceOwner, sessionID, clientID, audience, scope, authMethods, authTime, nonce, preferredLanguage, userAgent)
-	if err = cmd.AddAccessToken(ctx, scope, userID, resourceOwner, reason, actor); err != nil {
-		return nil, err
+	cmd.RegisterLogout(ctx, sessionID, userID, clientID, backChannelLogoutURI)
+	if responseType != domain.OIDCResponseTypeIDToken {
+		if err = cmd.AddAccessToken(ctx, scope, userID, resourceOwner, reason, actor); err != nil {
+			return nil, err
+		}
 	}
 	if needRefreshToken {
 		if err = cmd.AddRefreshToken(ctx, userID); err != nil {
@@ -431,6 +437,26 @@ func (c *OIDCSessionEvents) SetAuthRequestSuccessful(ctx context.Context, authRe
 
 func (c *OIDCSessionEvents) SetAuthRequestFailed(ctx context.Context, authRequestAggregate *eventstore.Aggregate, err error) {
 	c.events = append(c.events, authrequest.NewFailedEvent(ctx, authRequestAggregate, domain.OIDCErrorReasonFromError(err)))
+}
+
+func (c *OIDCSessionEvents) RegisterLogout(ctx context.Context, sessionID, userID, clientID, backChannelLogoutURI string) {
+	// If there's no SSO session (e.g. service accounts) we do not need to register a logout handler.
+	// Also, if the client did not register a backchannel_logout_uri it will not support it (https://openid.net/specs/openid-connect-backchannel-1_0.html#BCRegistration)
+	if sessionID == "" || backChannelLogoutURI == "" {
+		return
+	}
+	if !authz.GetFeatures(ctx).EnableBackChannelLogout {
+		return
+	}
+
+	c.events = append(c.events, sessionlogout.NewBackChannelLogoutRegisteredEvent(
+		ctx,
+		&sessionlogout.NewAggregate(sessionID, authz.GetInstance(ctx).InstanceID()).Aggregate,
+		c.oidcSessionWriteModel.AggregateID,
+		userID,
+		clientID,
+		backChannelLogoutURI,
+	))
 }
 
 func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, userID, resourceOwner string, reason domain.TokenReason, actor *domain.TokenActor) error {

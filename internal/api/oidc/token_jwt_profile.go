@@ -45,6 +45,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		client.userID,
 		client.resourceOwner,
 		client.clientID,
+		"", // backChannelLogoutURI not needed for service user session
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePrivateKey},
@@ -56,6 +57,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		nil,
 		false,
 		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
 	if err != nil {
 		return nil, err

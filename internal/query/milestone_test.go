@@ -11,14 +11,14 @@ import (
 
 var (
 	expectedMilestoneQuery = regexp.QuoteMeta(`
-		SELECT projections.milestones2.instance_id,
+		SELECT projections.milestones3.instance_id,
 		   projections.instance_domains.domain,
-		   projections.milestones2.reached_date,
-		   projections.milestones2.last_pushed_date,
-		   projections.milestones2.type,
+		   projections.milestones3.reached_date,
+		   projections.milestones3.last_pushed_date,
+		   projections.milestones3.type,
 		   COUNT(*) OVER ()
-		FROM projections.milestones2 AS OF SYSTEM TIME '-1 ms'
-		LEFT JOIN projections.instance_domains ON projections.milestones2.instance_id = projections.instance_domains.instance_id
+		FROM projections.milestones3 AS OF SYSTEM TIME '-1 ms'
+		LEFT JOIN projections.instance_domains ON projections.milestones3.instance_id = projections.instance_domains.instance_id
 		`)
 
 	milestoneCols = []string{

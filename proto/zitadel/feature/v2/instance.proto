@@ -86,6 +86,13 @@ message SetInstanceFeaturesRequest{
       description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
     }
   ];
+
+  optional bool enable_back_channel_logout = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -183,6 +190,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Do not push user token meta-event user.token.v2.added to improve performance on many concurrent single (machine-)user logins";
+    }
+  ];
+
+  FeatureFlag enable_back_channel_logout = 13 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the flag is enabled, you'll be able to use the OIDC Back-Channel Logout to be notified in your application about terminated user sessions.";
     }
   ];
 }

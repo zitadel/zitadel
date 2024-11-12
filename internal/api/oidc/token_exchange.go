@@ -288,6 +288,7 @@ func (s *Server) createExchangeAccessToken(
 		userID,
 		resourceOwner,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		audience,
 		authMethods,
@@ -299,6 +300,7 @@ func (s *Server) createExchangeAccessToken(
 		actor,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
 	if err != nil {
 		return "", "", "", 0, err
@@ -315,7 +317,7 @@ func (s *Server) createExchangeJWT(
 	client *Client,
 	getUserInfo userInfoFunc,
 	roleAssertion bool,
-	getSigner signerFunc,
+	getSigner SignerFunc,
 	userID,
 	resourceOwner string,
 	audience,
@@ -333,6 +335,7 @@ func (s *Server) createExchangeJWT(
 		userID,
 		resourceOwner,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		audience,
 		authMethods,
@@ -344,6 +347,7 @@ func (s *Server) createExchangeJWT(
 		actor,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
 	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, roleAssertion, getSigner)
 	if err != nil {
