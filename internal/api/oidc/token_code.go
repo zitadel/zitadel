@@ -87,6 +87,7 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 		authReq.SessionID,
+		authReq.oidc().ResponseType,
 	)
 	if err != nil {
 		return nil, err

@@ -57,6 +57,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		nil,
 		false,
 		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
 	if err != nil {
 		return nil, err
