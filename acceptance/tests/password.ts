@@ -1,21 +1,20 @@
 import {Page} from "@playwright/test";
+import {changePasswordScreen, passwordScreen} from "./password-screen";
+
+const passwordSubmitButton = "submit-button"
+
+
+export async function startChangePassword(page: Page, loginname: string) {
+    await page.goto('password/change?' + new URLSearchParams({loginName: loginname}));
+}
 
 export async function changePassword(page: Page, loginname: string, password: string) {
-    await page.goto('password/change?' + new URLSearchParams({loginName: loginname}));
+    await startChangePassword(page, loginname);
     await changePasswordScreen(page, password, password)
-    await page.getByTestId("submit-button").click();
+    await page.getByTestId(passwordSubmitButton).click();
 }
 
-async function changePasswordScreen(page: Page, password1: string, password2: string) {
-    await page.getByTestId('password-text-input').pressSequentially(password1);
-    await page.getByTestId('password-confirm-text-input').pressSequentially(password2);
-}
-
-export async function passwordScreen(page: Page, password: string) {
-    await page.getByTestId("password-text-input").pressSequentially(password);
-}
-
-export async function registerPasswordScreen(page: Page, password1: string, password2: string) {
-    await page.getByTestId('password-text-input').pressSequentially(password1);
-    await page.getByTestId('password-confirm-text-input').pressSequentially(password2);
+export async function password(page: Page, password: string) {
+    await passwordScreen(page, password)
+    await page.getByTestId(passwordSubmitButton).click()
 }

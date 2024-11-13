@@ -106,7 +106,7 @@ export function UsernameForm({
       </div>
 
       {error && (
-        <div className="py-4">
+        <div className="py-4" data-testid="error">
           <Alert>{error}</Alert>
         </div>
       )}

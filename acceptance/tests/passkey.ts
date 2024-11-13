@@ -1,4 +1,5 @@
-import {Page} from "@playwright/test";
+import {expect, Page} from "@playwright/test";
+import {CDPSession} from "playwright-core";
 
 const BASE64_ENCODED_PK =
     "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDbBOu5Lhs4vpowbCnmCyLUpIE7JM9sm9QXzye2G+jr+Kr" +
@@ -20,10 +21,15 @@ const BASE64_ENCODED_PK =
     "zJOGpf9x2RSWzQJ+dq8+6fACgfFZOVpN644+sAHfNPAI/gnNKU5OfUv+eav8fBnzlf1A3y3GIkyMyzFN3DE7e0n/lyqxE4H" +
     "BYGpI8g==";
 
-export async function passkeyScreen(page: Page) {
-    const client = await page.context().newCDPSession(page);
-    await client.send('WebAuthn.enable', {enableUI: true});
-    const result = await client.send('WebAuthn.addVirtualAuthenticator', {
+interface session {
+    client: CDPSession
+    authenticatorId: string
+}
+
+async function client(page: Page): Promise<session> {
+    const cdpSession = await page.context().newCDPSession(page);
+    await cdpSession.send('WebAuthn.enable', {enableUI: false});
+    const result = await cdpSession.send('WebAuthn.addVirtualAuthenticator', {
         options: {
             protocol: 'ctap2',
             transport: 'internal',
@@ -33,30 +39,120 @@ export async function passkeyScreen(page: Page) {
             automaticPresenceSimulation: true,
         },
     });
-    const authenticatorId = result.authenticatorId;
+    return {client: cdpSession, authenticatorId: result.authenticatorId};
+}
 
+export async function passkeyRegister(page: Page): Promise<string> {
+    const session = await client(page)
+
+    await passkeyNotExisting(session.client, session.authenticatorId);
+    await simulateSuccessfulPasskeyRegister(
+        session.client,
+        session.authenticatorId,
+        () =>
+            page.getByTestId("submit-button").click()
+    );
+    await passkeyRegistered(session.client, session.authenticatorId);
+
+    return session.authenticatorId
+}
+
+export async function passkey(page: Page, authenticatorId: string) {
+    const cdpSession = await page.context().newCDPSession(page);
+    await cdpSession.send('WebAuthn.enable', {enableUI: false});
+
+    const signCount = await passkeyExisting(cdpSession, authenticatorId);
+
+    await simulateSuccessfulPasskeyInput(
+        cdpSession,
+        authenticatorId,
+        () =>
+            page.getByTestId("submit-button").click()
+    );
+
+    await passkeyUsed(cdpSession, authenticatorId, signCount);
+}
+
+async function passkeyNotExisting(client: CDPSession, authenticatorId: string) {
+    const result = await client.send('WebAuthn.getCredentials', {authenticatorId});
+    expect(result.credentials).toHaveLength(0);
+}
+
+async function passkeyRegistered(client: CDPSession, authenticatorId: string) {
+    const result = await client.send('WebAuthn.getCredentials', {authenticatorId});
+    expect(result.credentials).toHaveLength(1);
+    await passkeyUsed(client, authenticatorId, 0);
+}
+
+async function passkeyExisting(client: CDPSession, authenticatorId: string): Promise<number> {
+    const result = await client.send('WebAuthn.getCredentials', {authenticatorId});
+    expect(result.credentials).toHaveLength(1);
+    return result.credentials[0].signCount
+}
+
+async function passkeyUsed(client: CDPSession, authenticatorId: string, signCount: number) {
+    const result = await client.send('WebAuthn.getCredentials', {authenticatorId});
+    expect(result.credentials).toHaveLength(1);
+    expect(result.credentials[0].signCount).toBeGreaterThan(signCount);
+}
+
+async function simulateSuccessfulPasskeyRegister(client: CDPSession, authenticatorId: string, operationTrigger: () => Promise<void>) {
     // initialize event listeners to wait for a successful passkey input event
     const operationCompleted = new Promise<void>(resolve => {
-        client.on('WebAuthn.credentialAdded', () => resolve());
-        client.on('WebAuthn.credentialAsserted', () => resolve());
+        client.on('WebAuthn.credentialAdded', () => {
+            console.log('Credential Added!');
+            resolve()
+        });
     });
 
-    const url = new URL(process.env.ZITADEL_API_URL!)
-    await client.send('WebAuthn.addCredential', {
-        credential: {
-            credentialId: "",
-            rpId: url.hostname,
-            privateKey: BASE64_ENCODED_PK,
-            isResidentCredential: false,
-            signCount: 0,
-        },
-        authenticatorId: authenticatorId
-    });
+    // perform a user action that triggers passkey prompt
+    await operationTrigger();
 
-
-    // triggers passkey check
-    await page.getByTestId("submit-button").click()
-
-    // wait for successfully verified
+    // wait to receive the event that the passkey was successfully registered or verified
     await operationCompleted;
 }
+
+async function simulateSuccessfulPasskeyInput(client: CDPSession, authenticatorId: string, operationTrigger: () => Promise<void>) {
+    // initialize event listeners to wait for a successful passkey input event
+    const operationCompleted = new Promise<void>(resolve => {
+        client.on('WebAuthn.credentialAsserted', () => {
+            console.log('Credential Asserted!');
+            resolve()
+        });
+    });
+
+    // perform a user action that triggers passkey prompt
+    await operationTrigger();
+
+    // wait to receive the event that the passkey was successfully registered or verified
+    await operationCompleted;
+}
+
+async function simulateFailedPasskeyInput(client: CDPSession, authenticatorId: string, operationTrigger: () => Promise<void>, postOperationCheck: () => Promise<void>) {
+    // set isUserVerified option to false
+    // (so that subsequent passkey operations will fail)
+    await client.send('WebAuthn.setUserVerified', {
+        authenticatorId: authenticatorId,
+        isUserVerified: false,
+    });
+
+    // set automaticPresenceSimulation option to true
+    // (so that the virtual authenticator will respond to the next passkey prompt)
+    await client.send('WebAuthn.setAutomaticPresenceSimulation', {
+        authenticatorId: authenticatorId,
+        enabled: true,
+    });
+
+    // perform a user action that triggers passkey prompt
+    await operationTrigger();
+
+    // wait for an expected UI change that indicates the passkey operation has completed
+    await postOperationCheck();
+
+    // set automaticPresenceSimulation option back to false
+    await client.send('WebAuthn.setAutomaticPresenceSimulation', {
+        authenticatorId,
+        enabled: false,
+    });
+}
+

@@ -2,7 +2,7 @@ import {test as base} from "@playwright/test";
 import path from 'path';
 import dotenv from 'dotenv';
 import {PasskeyUser} from "./user";
-import {checkLogin} from "./login";
+import {loginScreenExpect, loginWithPasskey} from "./login";
 
 // Read from ".env" file.
 dotenv.config({path: path.resolve(__dirname, '.env.local')});
@@ -16,11 +16,11 @@ const test = base.extend<{ user: PasskeyUser }>({
             organization: "",
         });
         await user.ensure(page);
-        await use(user)
+        await use(user);
     },
 });
 
 test("username and passkey login", async ({user, page}) => {
-    await user.login(page)
-    await checkLogin(page, user.fullName());
+    await loginWithPasskey(page, user.getAuthenticatorId(), user.getUsername())
+    await loginScreenExpect(page, user.getFullName());
 });

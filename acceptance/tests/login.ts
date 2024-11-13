@@ -1,23 +1,29 @@
 import {expect, Page} from "@playwright/test";
-import {loginnameScreen} from "./loginname";
-import {passwordScreen} from "./password";
-import {passkeyScreen} from "./passkey";
+import {loginname} from "./loginname";
+import {password} from "./password";
 
-export async function loginWithPassword(page: Page, username: string, password: string) {
+export async function startLogin(page: Page) {
     await page.goto("/loginname");
-    await loginnameScreen(page, username)
-    await page.getByTestId("submit-button").click()
-    await passwordScreen(page, password)
-    await page.getByTestId("submit-button").click()
 }
 
-export async function loginWithPasskey(page: Page, username: string) {
-    await page.goto("/loginname");
-    await loginnameScreen(page, username)
-    await page.getByTestId("submit-button").click()
-    await passkeyScreen(page)
+export async function loginWithPassword(page: Page, username: string, pw: string) {
+    await startLogin(page);
+    await loginname(page, username);
+    await password(page, pw);
 }
 
-export async function checkLogin(page: Page, fullName: string) {
+export async function loginWithPasskey(page: Page, authenticatorId: string, username: string) {
+    await startLogin(page);
+    await loginname(page, username);
+    // await passkey(page, authenticatorId);
+}
+
+export async function loginScreenExpect(page: Page, fullName: string) {
     await expect(page.getByRole('heading')).toContainText(fullName);
+}
+
+export async function loginWithOTP(page: Page, username: string, password: string) {
+    await loginWithPassword(page, username, password);
+
+
 }

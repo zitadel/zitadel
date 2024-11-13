@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
 import {Page} from "@playwright/test";
 import {registerWithPasskey} from "./register";
-import {loginWithPasskey, loginWithPassword} from "./login";
+import {loginWithPassword} from "./login";
 import {changePassword} from "./password";
-import {removeUser, getUserByUsername} from './zitadel';
+import {getUserByUsername, removeUser} from './zitadel';
 
 export interface userProps {
     email: string;
@@ -59,7 +59,7 @@ class User {
     }
 
     async remove() {
-        await removeUser(this.userId())
+        await removeUser(this.getUserId())
         return
     }
 
@@ -67,37 +67,33 @@ class User {
         this.user = userId
     }
 
-    public userId() {
+    public getUserId() {
         return this.user;
     }
 
-    public username() {
+    public getUsername() {
         return this.props.email;
     }
 
-    public password() {
+    public getPassword() {
         return this.props.password;
     }
 
-    public firstname() {
+    public getFirstname() {
         return this.props.firstName
     }
 
-    public lastname() {
+    public getLastname() {
         return this.props.lastName
     }
 
-    public fullName() {
+    public getFullName() {
         return this.props.firstName + " " + this.props.lastName
     }
 
-    public async login(page: Page) {
-        await loginWithPassword(page, this.username(), this.password())
-    }
-
-    public async changePassword(page: Page, password: string) {
-        await loginWithPassword(page, this.username(), this.password())
-        await changePassword(page, this.username(), password)
+    public async doPasswordChange(page: Page, password: string) {
+        await loginWithPassword(page, this.getUsername(), this.getPassword())
+        await changePassword(page, this.getUsername(), password)
         this.props.password = password
     }
 }
@@ -105,8 +101,7 @@ class User {
 export class PasswordUser extends User {
 }
 
-enum OtpType {
-    time = "time-based",
+export enum OtpType {
     sms = "sms",
     email = "email",
 }
@@ -116,6 +111,7 @@ export interface otpUserProps {
     firstName: string;
     lastName: string;
     organization: string;
+    password: string,
     type: OtpType,
 }
 
@@ -129,7 +125,7 @@ export class PasswordUserWithOTP extends User {
             firstName: props.firstName,
             lastName: props.lastName,
             organization: props.organization,
-            password: ""
+            password: props.password,
         })
         this.type = props.type
     }
@@ -137,27 +133,16 @@ export class PasswordUserWithOTP extends User {
     async ensure(page: Page) {
         await super.ensure(page)
 
-        const body = {
-            username: this.props.email,
-            organization: {
-                orgId: this.props.organization
-            },
-            profile: {
-                givenName: this.props.firstName,
-                familyName: this.props.lastName,
-            },
-            email: {
-                email: this.props.email,
-                isVerified: true,
-            },
-            password: {
-                password: this.props.password!,
-            }
+        let url = "otp_"
+        switch (this.type) {
+            case OtpType.sms:
+                url = url + "sms"
+            case OtpType.email:
+                url = url + "email"
         }
 
-        const response = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/human", {
+        const response = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/" + this.getUserId() + "/" + url, {
             method: 'POST',
-            body: JSON.stringify(body),
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
@@ -168,7 +153,14 @@ export class PasswordUserWithOTP extends User {
             console.error(error);
             throw new Error(error);
         }
+
+        // TODO: get code from SMS or Email provider
+        this.code = ""
         return
+    }
+
+    public getCode() {
+        return this.code
     }
 }
 
@@ -180,6 +172,8 @@ export interface passkeyUserProps {
 }
 
 export class PasskeyUser extends User {
+    private authenticatorId: string
+
     constructor(props: passkeyUserProps) {
         super({
             email: props.email,
@@ -192,19 +186,20 @@ export class PasskeyUser extends User {
 
     public async ensure(page: Page) {
         await this.remove()
-        await registerWithPasskey(page, this.firstname(), this.lastname(), this.username())
-    }
-
-    public async login(page: Page) {
-        await loginWithPasskey(page, this.username())
+        const authId = await registerWithPasskey(page, this.getFirstname(), this.getLastname(), this.getUsername())
+        this.authenticatorId = authId
     }
 
     public async remove() {
-        const resp = await getUserByUsername(this.username())
+        const resp = await getUserByUsername(this.getUsername())
         if (!resp || !resp.result || !resp.result[0]) {
             return
         }
         this.setUserId(resp.result[0].userId)
         await super.remove()
+    }
+
+    public getAuthenticatorId(): string {
+        return this.authenticatorId
     }
 }
