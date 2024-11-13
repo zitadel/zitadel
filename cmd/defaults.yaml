@@ -211,11 +211,11 @@ Caches:
       # host:port address.
       Addr: localhost:6379
       # ClientName will execute the `CLIENT SETNAME ClientName` command for each conn.
-      ClientName: ZITADEL_cache
+      ClientName: ""
       # Use the specified Username to authenticate the current connection
       # with one of the connections defined in the ACL list when connecting
       # to a Redis 6.0 instance, or greater, that is using the Redis ACL system.
-      Username: zitadel
+      Username: ""
       # Optional password. Must match the password specified in the
       # requirepass server configuration option (if connecting to a Redis 5.0 instance, or lower),
       # or the User Password when connecting to a Redis 6.0 instance, or greater,
