@@ -889,6 +889,7 @@ module.exports = {
         "self-hosting/manage/http2",
         "self-hosting/manage/tls_modes",
         "self-hosting/manage/database/database",
+        "self-hosting/manage/cache",
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
         {
