@@ -29,19 +29,19 @@
     }
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.8",
-    "@playwright/test": "^1.48.1",
-    "@types/node": "^22.7.5",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@changesets/cli": "^2.27.9",
+    "@playwright/test": "^1.48.2",
+    "@types/node": "^22.9.0",
+    "@vitejs/plugin-react": "^4.3.3",
     "@zitadel/prettier-config": "workspace:*",
     "eslint": "8.57.1",
     "eslint-config-zitadel": "workspace:*",
     "prettier": "^3.2.5",
-    "prettier-plugin-organize-imports": "^4.0.0",
-    "tsup": "^8.3.0",
-    "turbo": "2.1.2",
-    "typescript": "^5.6.2",
-    "vite-tsconfig-paths": "^5.0.1",
-    "vitest": "^2.1.1"
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "tsup": "^8.3.5",
+    "turbo": "2.2.3",
+    "typescript": "^5.6.3",
+    "vite-tsconfig-paths": "^5.1.2",
+    "vitest": "^2.1.4"
   }
 }

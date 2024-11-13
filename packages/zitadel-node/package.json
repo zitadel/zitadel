@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@connectrpc/connect": "^2.0.0-alpha.1",
-    "@types/node": "^22.5.5",
+    "@types/node": "^22.9.0",
     "@zitadel/client": "workspace:*",
     "@zitadel/tsconfig": "workspace:*",
     "eslint-config-zitadel": "workspace:*"
