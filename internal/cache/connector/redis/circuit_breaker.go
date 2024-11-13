@@ -67,6 +67,7 @@ func newLimiter(config *CBConfig, maxActiveConns int) redis.Limiter {
 	}
 }
 
+// Allow implements [redis.Limiter].
 func (l *limiter) Allow() error {
 	done, err := l.cb.Allow()
 	if err != nil {
@@ -76,6 +77,8 @@ func (l *limiter) Allow() error {
 	return nil
 }
 
+// ReportResult implements [redis.Limiter].
+//
 // ReportResult checks the error returned by the Redis client.
 // `nil`, [redis.Nil] and [context.Canceled] are not considered failures.
 // Any other error, like connection or [context.DeadlineExceeded] is counted as a failure.

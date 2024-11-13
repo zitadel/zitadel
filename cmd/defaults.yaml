@@ -291,6 +291,7 @@ Caches:
       DisableIndentity: false
       # Add suffix to client name. Default is empty.
       IdentitySuffix: ""
+      # Implementation of [Circuit Breaker Pattern](https://learn.microsoft.com/en-us/previous-versions/msp-n-p/dn589784(v=pandp.10)?redirectedfrom=MSDN)
       CircuitBreaker:
         # Interval when the counters are reset to 0.
         # 0 interval never resets the counters until the CB is opened.
