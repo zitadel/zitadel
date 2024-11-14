@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
@@ -689,26 +688,34 @@ func Test_redisCache_Truncate(t *testing.T) {
 	}
 }
 
-func prepareCache(t *testing.T, conf cache.Config) (cache.Cache[testIndex, string, *testObject], *miniredis.Miniredis) {
+func prepareCache(t *testing.T, conf cache.Config, options ...func(*Config)) (cache.Cache[testIndex, string, *testObject], *miniredis.Miniredis) {
 	conf.Log = &logging.Config{
 		Level:     "debug",
 		AddSource: true,
 	}
 	server := miniredis.RunT(t)
 	server.Select(testDB)
-	client := redis.NewClient(&redis.Options{
-		Network: "tcp",
-		Addr:    server.Addr(),
-	})
+
+	connConfig := Config{
+		Enabled:          true,
+		Network:          "tcp",
+		Addr:             server.Addr(),
+		DisableIndentity: true,
+	}
+	for _, option := range options {
+		option(&connConfig)
+	}
+	connector := NewConnector(connConfig)
 	t.Cleanup(func() {
-		client.Close()
+		connector.Close()
 		server.Close()
-	})
-	connector := NewConnector(Config{
-		Enabled: true,
-		Network: "tcp",
-		Addr:    server.Addr(),
 	})
 	c := NewCache[testIndex, string, *testObject](conf, connector, testDB, testIndices)
 	return c, server
+}
+
+func withCircuitBreakerOption(cb *CBConfig) func(*Config) {
+	return func(c *Config) {
+		c.CircuitBreaker = cb
+	}
 }

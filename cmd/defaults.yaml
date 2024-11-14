@@ -211,11 +211,11 @@ Caches:
       # host:port address.
       Addr: localhost:6379
       # ClientName will execute the `CLIENT SETNAME ClientName` command for each conn.
-      ClientName: ZITADEL_cache
+      ClientName: ""
       # Use the specified Username to authenticate the current connection
       # with one of the connections defined in the ACL list when connecting
       # to a Redis 6.0 instance, or greater, that is using the Redis ACL system.
-      Username: zitadel
+      Username: ""
       # Optional password. Must match the password specified in the
       # requirepass server configuration option (if connecting to a Redis 5.0 instance, or lower),
       # or the User Password when connecting to a Redis 6.0 instance, or greater,
@@ -291,6 +291,19 @@ Caches:
       DisableIndentity: false
       # Add suffix to client name. Default is empty.
       IdentitySuffix: ""
+      # Implementation of [Circuit Breaker Pattern](https://learn.microsoft.com/en-us/previous-versions/msp-n-p/dn589784(v=pandp.10)?redirectedfrom=MSDN)
+      CircuitBreaker:
+        # Interval when the counters are reset to 0.
+        # 0 interval never resets the counters until the CB is opened.
+        Interval: 0
+        # Amount of consecutive failures permitted
+        MaxConsecutiveFailures: 5
+        # The ratio of failed requests out of total requests
+        MaxFailureRatio: 0.1
+        # Timeout after opening of the CB, until the state is set to half-open.
+        Timeout: 60s
+        # The allowed amount of requests that are allowed to pass when the CB is half-open.
+        MaxRetryRequests: 1
 
   # Instance caches auth middleware instances, gettable by domain or ID.
   Instance:
