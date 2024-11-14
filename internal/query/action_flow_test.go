@@ -33,8 +33,9 @@ var (
 		` projections.flow_triggers3.sequence,` +
 		` projections.flow_triggers3.resource_owner` +
 		` FROM projections.flow_triggers3` +
-		` LEFT JOIN projections.actions3 ON projections.flow_triggers3.action_id = projections.actions3.id AND projections.flow_triggers3.instance_id = projections.actions3.instance_id`
-	// ` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.actions3 ON projections.flow_triggers3.action_id = projections.actions3.id AND projections.flow_triggers3.instance_id = projections.actions3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'` +
+		` ORDER BY projections.flow_triggers3.trigger_sequence`
 	prepareFlowCols = []string{
 		"id",
 		"creation_date",
@@ -66,8 +67,9 @@ var (
 		` projections.actions3.allowed_to_fail,` +
 		` projections.actions3.timeout` +
 		` FROM projections.flow_triggers3` +
-		` LEFT JOIN projections.actions3 ON projections.flow_triggers3.action_id = projections.actions3.id AND projections.flow_triggers3.instance_id = projections.actions3.instance_id`
-	// ` AS OF SYSTEM TIME '-1 ms'`
+		` LEFT JOIN projections.actions3 ON projections.flow_triggers3.action_id = projections.actions3.id AND projections.flow_triggers3.instance_id = projections.actions3.instance_id` +
+		` AS OF SYSTEM TIME '-1 ms'` +
+		` ORDER BY projections.flow_triggers3.trigger_sequence`
 
 	prepareTriggerActionCols = []string{
 		"id",
