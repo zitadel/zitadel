@@ -34,7 +34,10 @@ export default async function Page({
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg().catch((error) => {
+      console.warn(error);
+      return null;
+    });
     if (org) {
       defaultOrganization = org.id;
     }
