@@ -109,11 +109,15 @@ func writeEvents(ctx context.Context, tx *sql.Tx, commands []eventstore.Command)
 
 func checkExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 	return conn.Raw(func(driverConn any) error {
-		conn := driverConn.(*stdlib.Conn).Conn()
-		var cmd *command
-		if _, ok := conn.TypeMap().TypeForValue(cmd); ok {
+		conn, ok := driverConn.(*stdlib.Conn)
+		if !ok {
 			return nil
 		}
-		return registerEventstoreTypes(ctx, conn)
+
+		var cmd *command
+		if _, ok := conn.Conn().TypeMap().TypeForValue(cmd); ok {
+			return nil
+		}
+		return registerEventstoreTypes(ctx, conn.Conn())
 	})
 }
