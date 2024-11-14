@@ -43,6 +43,6 @@ do
       --url "${ZITADEL_API_INTERNAL_URL}/v2/organizations/_search" \
       --header "Authorization: Bearer ${PAT}" \
       --header "Host: ${ZITADEL_API_DOMAIN}" \
-      -d '{"queries": [{"defaultQuery": {}}]}' | jq -r '.result | length')
+      -d '{"queries": [{"defaultQuery": {"value": true}}]}' | jq -r '.result | length')
   echo "Received default organization response results: ${DEFAULTORG_RESPONSE_RESULTS}"
 done
