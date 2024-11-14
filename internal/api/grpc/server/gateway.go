@@ -60,6 +60,7 @@ var (
 	errorHandler = runtime.ErrorHandlerFunc(
 		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
 			setSpanNameWithGatewayPattern(ctx)
+			runtime.DefaultHTTPErrorHandler(ctx, mux, marshaler, w, r, err)
 		})
 
 	serveMuxOptions = func(hostHeaders []string) []runtime.ServeMuxOption {
