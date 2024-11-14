@@ -127,9 +127,9 @@ func CreateGatewayWithPrefix(
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
 		grpc.WithChainUnaryInterceptor(
-			client_middleware.DefaultTracingClient(),
 			client_middleware.UnaryActivityClientInterceptor(),
 		),
+		grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -154,9 +154,9 @@ func CreateGateway(
 		[]grpc.DialOption{
 			grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
 			grpc.WithChainUnaryInterceptor(
-				client_middleware.DefaultTracingClient(),
 				client_middleware.UnaryActivityClientInterceptor(),
 			),
+			grpc.WithStatsHandler(client_middleware.DefaultTracingClient()),
 		})
 	if err != nil {
 		return nil, err
