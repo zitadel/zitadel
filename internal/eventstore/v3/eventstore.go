@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
@@ -31,8 +32,8 @@ func registerEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
 		"eventstore.push",
 	})
 	if err != nil {
-		// TODO: log error
-		return err
+		logging.WithError(err).Debug("unable to load types")
+		return nil
 	}
 	m := conn.TypeMap()
 

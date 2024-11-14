@@ -24,9 +24,9 @@ ARRAY[
 */
 
 -- index is used for filtering for the current sequence of the aggregate
-CREATE INDEX CONCURRENTLY IF NOT EXISTS e_push_idx ON eventstore.events2(instance_id, aggregate_type, aggregate_id, owner, sequence DESC);
+CREATE INDEX IF NOT EXISTS e_push_idx ON eventstore.events2(instance_id, aggregate_type, aggregate_id, "owner", "sequence" DESC);
 
-CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 AS $$
+CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 SELECT
     c.instance_id,
     c.aggregate_type,
@@ -42,11 +42,18 @@ SELECT
     c.in_tx_order
 FROM (
     SELECT
-        c.*,
-        NOW() AS created_at,
-        EXTRACT(EPOCH FROM clock_timestamp()) AS position,
-        ROW_NUMBER() OVER () AS in_tx_order
-    FROM UNNEST(commands) AS c
+        ("cmds").instance_id
+        , ("cmds").aggregate_type
+        , ("cmds").aggregate_id
+        , ("cmds").command_type
+        , ("cmds").revision
+        , ("cmds").payload
+        , ("cmds").creator
+        , ("cmds").owner
+        , NOW() AS created_at
+        , EXTRACT(EPOCH FROM clock_timestamp())::DECIMAL AS position
+        , ROW_NUMBER() OVER () AS in_tx_order
+    FROM UNNEST(commands) AS "cmds"
 ) AS c
 JOIN (
     SELECT
@@ -57,11 +64,11 @@ JOIN (
         COALESCE(MAX(e.sequence), 0) AS sequence
     FROM (
         SELECT DISTINCT
-            instance_id,
-            aggregate_type,
-            aggregate_id,
-            owner
-        FROM UNNEST(commands)
+            ("cmds").instance_id,
+            ("cmds").aggregate_type,
+            ("cmds").aggregate_id,
+            ("cmds").owner
+        FROM UNNEST(commands) AS "cmds"
     ) AS a
     LEFT JOIN eventstore.events2 AS e
         ON a.instance_id = e.instance_id
@@ -79,10 +86,10 @@ JOIN (
     AND c.aggregate_id = cs.aggregate_id
     AND c.owner = cs.owner
 ORDER BY
-    c.in_tx_order;
+    c.in_tx_order
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS TABLE(
+CREATE TYPE IF NOT EXISTS eventstore.event AS (
     instance_id TEXT
     , aggregate_type TEXT
     , aggregate_id TEXT
@@ -90,7 +97,9 @@ CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURN
     , "sequence" INT8
     , "position" DECIMAL
     , in_tx_order INT4
-) AS $$
+);
+
+CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.event AS $$
     INSERT INTO eventstore.events2
     SELECT * FROM eventstore.commands_to_events(commands)
     RETURNING instance_id, aggregate_type, aggregate_id, created_at, "sequence", position, in_tx_order
