@@ -162,7 +162,7 @@ All HTTP and gRPC requests send to ZITADEL receive an instance context. The inst
 - Instance [features](/docs/guides/manage/console/default-settings#features)
 - Instance domains: generated and [custom](/docs/guides/manage/cloud/instances#add-custom-domain)
 - [Trusted domains](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain)
-- Security settings (IFrame policy)
+- Security settings ([IFrame policy](/docs/guides/solution-scenarios/configurations#embedding-zitadel-in-an-iframe))
 - Limits[^2]
 - [Allowed languages](/docs/guides/manage/console/default-settings#languages)
 
@@ -185,21 +185,27 @@ The following configuration is recommended for single instance setups with a sin
 ```yaml
 Caches:
   Memory:
-    Enabled: false
+    Enabled: true
   Instance:
     Connector: "memory"
     MaxAge: 1h
 ```
 
-The following configuration is recommended for single instance setups with high traffic on multiple servers:
+The following configuration is recommended for single instance setups with high traffic on multiple servers, where Redis is not available:
 
 ```yaml
 Caches:
   Memory:
     Enabled: true
+  Postgres:
+    Enabled: true
   Instance:
     Connector: "memory"
     MaxAge: 1s
+  Milestones:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUsage: 10m
 ```
 
 When running many instances on multiple servers:
