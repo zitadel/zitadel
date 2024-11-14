@@ -1,35 +1,3 @@
--- represents an event to be created.
-DO $$ BEGIN
-    CREATE TYPE eventstore.command AS (
-        instance_id TEXT
-        , aggregate_type TEXT
-        , aggregate_id TEXT
-        , command_type TEXT
-        , revision INT2
-        , payload JSONB
-        , creator TEXT
-        , owner TEXT
-    );
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
-/*
-select * from eventstore.commands_to_events(
-ARRAY[
-    ROW('', 'system', 'SYSTEM', 'ct1', 1, '{"key": "value"}', 'c1', 'SYSTEM')
-    , ROW('', 'system', 'SYSTEM', 'ct2', 1, '{"key": "value"}', 'c1', 'SYSTEM')
-    , ROW('289525561255060732', 'org', '289575074711790844', 'ct3', 1, '{"key": "value"}', 'c1', '289575074711790844')
-    , ROW('289525561255060732', 'user', '289575075164906748', 'ct3', 1, '{"key": "value"}', 'c1', '289575074711790844')
-    , ROW('289525561255060732', 'oidc_session', 'V2_289575178579535100', 'ct3', 1, '{"key": "value"}', 'c1', '289575074711790844')
-    , ROW('', 'system', 'SYSTEM', 'ct3', 1, '{"key": "value"}', 'c1', 'SYSTEM')
-]::eventstore.command[]
-);
-*/
-
--- index is used for filtering for the current sequence of the aggregate
-CREATE INDEX CONCURRENTLY IF NOT EXISTS e_push_idx ON eventstore.events2(instance_id, aggregate_type, aggregate_id, owner, sequence DESC);
-
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 AS $$
 SELECT
     c.instance_id,
@@ -48,7 +16,7 @@ FROM (
     SELECT
         c.*,
         NOW() AS created_at,
-        EXTRACT(EPOCH FROM clock_timestamp()) AS position,
+        EXTRACT(EPOCH FROM NOW()) AS position,
         ROW_NUMBER() OVER () AS in_tx_order
     FROM UNNEST(commands) AS c
 ) AS c
