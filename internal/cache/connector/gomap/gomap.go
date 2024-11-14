@@ -14,14 +14,14 @@ import (
 )
 
 type mapCache[I, K comparable, V cache.Entry[I, K]] struct {
-	config   *cache.CacheConfig
+	config   *cache.Config
 	indexMap map[I]*index[K, V]
 	logger   *slog.Logger
 }
 
 // NewCache returns an in-memory Cache implementation based on the builtin go map type.
 // Object values are stored as-is and there is no encoding or decoding involved.
-func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, indices []I, config cache.CacheConfig) cache.PrunerCache[I, K, V] {
+func NewCache[I, K comparable, V cache.Entry[I, K]](background context.Context, indices []I, config cache.Config) cache.PrunerCache[I, K, V] {
 	m := &mapCache[I, K, V]{
 		config:   &config,
 		indexMap: make(map[I]*index[K, V], len(indices)),
@@ -116,7 +116,7 @@ func (c *mapCache[I, K, V]) Truncate(ctx context.Context) error {
 
 type index[K comparable, V any] struct {
 	mutex   sync.RWMutex
-	config  *cache.CacheConfig
+	config  *cache.Config
 	entries map[K]*entry[V]
 }
 
@@ -177,7 +177,7 @@ type entry[V any] struct {
 	lastUse atomic.Int64 // UnixMicro time
 }
 
-func (e *entry[V]) isValid(c *cache.CacheConfig) bool {
+func (e *entry[V]) isValid(c *cache.Config) bool {
 	if e.invalid.Load() {
 		return false
 	}

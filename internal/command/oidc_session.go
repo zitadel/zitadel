@@ -147,6 +147,7 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	actor *domain.TokenActor,
 	needRefreshToken bool,
 	sessionID string,
+	responseType domain.OIDCResponseType,
 ) (session *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -164,8 +165,10 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 
 	cmd.AddSession(ctx, userID, resourceOwner, sessionID, clientID, audience, scope, authMethods, authTime, nonce, preferredLanguage, userAgent)
 	cmd.RegisterLogout(ctx, sessionID, userID, clientID, backChannelLogoutURI)
-	if err = cmd.AddAccessToken(ctx, scope, userID, resourceOwner, reason, actor); err != nil {
-		return nil, err
+	if responseType != domain.OIDCResponseTypeIDToken {
+		if err = cmd.AddAccessToken(ctx, scope, userID, resourceOwner, reason, actor); err != nil {
+			return nil, err
+		}
 	}
 	if needRefreshToken {
 		if err = cmd.AddRefreshToken(ctx, userID); err != nil {

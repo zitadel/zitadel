@@ -41,7 +41,7 @@ func (o *testObject) Keys(index testIndex) []string {
 }
 
 func Test_mapCache_Get(t *testing.T) {
-	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.CacheConfig{
+	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.Config{
 		MaxAge:     time.Second,
 		LastUseAge: time.Second / 4,
 		Log: &logging.Config{
@@ -103,7 +103,7 @@ func Test_mapCache_Get(t *testing.T) {
 }
 
 func Test_mapCache_Invalidate(t *testing.T) {
-	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.CacheConfig{
+	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.Config{
 		MaxAge:     time.Second,
 		LastUseAge: time.Second / 4,
 		Log: &logging.Config{
@@ -124,7 +124,7 @@ func Test_mapCache_Invalidate(t *testing.T) {
 }
 
 func Test_mapCache_Delete(t *testing.T) {
-	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.CacheConfig{
+	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.Config{
 		MaxAge:     time.Second,
 		LastUseAge: time.Second / 4,
 		Log: &logging.Config{
@@ -157,7 +157,7 @@ func Test_mapCache_Delete(t *testing.T) {
 }
 
 func Test_mapCache_Prune(t *testing.T) {
-	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.CacheConfig{
+	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.Config{
 		MaxAge:     time.Second,
 		LastUseAge: time.Second / 4,
 		Log: &logging.Config{
@@ -193,7 +193,7 @@ func Test_mapCache_Prune(t *testing.T) {
 }
 
 func Test_mapCache_Truncate(t *testing.T) {
-	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.CacheConfig{
+	c := NewCache[testIndex, string, *testObject](context.Background(), testIndices, cache.Config{
 		MaxAge:     time.Second,
 		LastUseAge: time.Second / 4,
 		Log: &logging.Config{
@@ -235,7 +235,7 @@ func Test_entry_isValid(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		config *cache.CacheConfig
+		config *cache.Config
 		want   bool
 	}{
 		{
@@ -245,7 +245,7 @@ func Test_entry_isValid(t *testing.T) {
 				invalid: true,
 				lastUse: time.Now(),
 			},
-			config: &cache.CacheConfig{
+			config: &cache.Config{
 				MaxAge:     time.Minute,
 				LastUseAge: time.Second,
 			},
@@ -258,7 +258,7 @@ func Test_entry_isValid(t *testing.T) {
 				invalid: false,
 				lastUse: time.Now(),
 			},
-			config: &cache.CacheConfig{
+			config: &cache.Config{
 				MaxAge:     time.Minute,
 				LastUseAge: time.Second,
 			},
@@ -271,7 +271,7 @@ func Test_entry_isValid(t *testing.T) {
 				invalid: false,
 				lastUse: time.Now(),
 			},
-			config: &cache.CacheConfig{
+			config: &cache.Config{
 				LastUseAge: time.Second,
 			},
 			want: true,
@@ -283,7 +283,7 @@ func Test_entry_isValid(t *testing.T) {
 				invalid: false,
 				lastUse: time.Now().Add(-(time.Second * 2)),
 			},
-			config: &cache.CacheConfig{
+			config: &cache.Config{
 				MaxAge:     time.Minute,
 				LastUseAge: time.Second,
 			},
@@ -296,7 +296,7 @@ func Test_entry_isValid(t *testing.T) {
 				invalid: false,
 				lastUse: time.Now().Add(-(time.Second * 2)),
 			},
-			config: &cache.CacheConfig{
+			config: &cache.Config{
 				MaxAge: time.Minute,
 			},
 			want: true,
@@ -308,7 +308,7 @@ func Test_entry_isValid(t *testing.T) {
 				invalid: false,
 				lastUse: time.Now(),
 			},
-			config: &cache.CacheConfig{
+			config: &cache.Config{
 				MaxAge:     time.Minute,
 				LastUseAge: time.Second,
 			},
