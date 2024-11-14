@@ -47,6 +47,7 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 		nil,
 		false,
 		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
 	if err != nil {
 		return nil, err
