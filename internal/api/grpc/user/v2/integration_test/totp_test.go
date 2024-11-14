@@ -18,8 +18,6 @@ import (
 )
 
 func TestServer_RegisterTOTP(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
@@ -106,8 +104,6 @@ func TestServer_RegisterTOTP(t *testing.T) {
 }
 
 func TestServer_VerifyTOTPRegistration(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
@@ -211,8 +207,6 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 }
 
 func TestServer_RemoveTOTP(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
