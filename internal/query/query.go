@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -50,7 +50,7 @@ func StartQueries(
 	es *eventstore.Eventstore,
 	esV4 es_v4.Querier,
 	querySqlClient, projectionSqlClient *database.DB,
-	caches *cache.CachesConfig,
+	cacheConnectors connector.Connectors,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm, targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
@@ -91,7 +91,7 @@ func StartQueries(
 	if startProjections {
 		projection.Start(ctx)
 	}
-	repo.caches, err = startCaches(ctx, caches, querySqlClient)
+	repo.caches, err = startCaches(ctx, cacheConnectors)
 	if err != nil {
 		return nil, err
 	}

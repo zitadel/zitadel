@@ -288,7 +288,9 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 		if !assert.NoError(ttt, err) {
 			return
 		}
-		assert.Len(ttt, got.GetResult(), 1)
+		if !assert.Len(ttt, got.GetResult(), 1) {
+			return
+		}
 		gotTargets := got.GetResult()[0].GetExecution().GetTargets()
 		// always first check length, otherwise its failed anyway
 		if assert.Len(ttt, gotTargets, len(targets)) {
@@ -296,7 +298,6 @@ func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *in
 				assert.EqualExportedValues(ttt, targets[i].GetType(), gotTargets[i].GetType())
 			}
 		}
-
 	}, retryDuration, tick, "timeout waiting for expected execution result")
 	return
 }
@@ -316,7 +317,9 @@ func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Inst
 		if !assert.NoError(ttt, err) {
 			return
 		}
-		assert.Len(ttt, got.GetResult(), 1)
+		if !assert.Len(ttt, got.GetResult(), 1) {
+			return
+		}
 		config := got.GetResult()[0].GetConfig()
 		assert.Equal(ttt, config.GetEndpoint(), endpoint)
 		switch ty {

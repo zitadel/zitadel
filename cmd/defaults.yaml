@@ -185,34 +185,149 @@ Database:
 
 # Caches are EXPERIMENTAL. The following config may have breaking changes in the future.
 # If no config is provided, caching is disabled by default.
-# Caches:
+Caches:
   # Connectors are reused by caches.
-#  Connectors:
+  Connectors:
     # Memory connector works with local server memory.
     # It is the simplest (and probably fastest) cache implementation.
     # Unsuitable for deployments with multiple containers,
     # as each container's cache may hold a different state of the same object.
-#    Memory:
-#      Enabled: true
+    Memory:
+      Enabled: false
       # AutoPrune removes invalidated or expired object from the cache.
-#      AutoPrune:
-#        Interval: 15m
-#        TimeOut: 30s
+      AutoPrune:
+        Interval: 1m
+        TimeOut: 5s
+    Postgres:
+      Enabled: false
+      AutoPrune:
+        Interval: 15m
+        TimeOut: 30s
+    Redis:
+      Enabled: false
+      # The network type, either tcp or unix.
+      # Default is tcp.
+      # Network string
+      # host:port address.
+      Addr: localhost:6379
+      # ClientName will execute the `CLIENT SETNAME ClientName` command for each conn.
+      ClientName: ""
+      # Use the specified Username to authenticate the current connection
+      # with one of the connections defined in the ACL list when connecting
+      # to a Redis 6.0 instance, or greater, that is using the Redis ACL system.
+      Username: ""
+      # Optional password. Must match the password specified in the
+      # requirepass server configuration option (if connecting to a Redis 5.0 instance, or lower),
+      # or the User Password when connecting to a Redis 6.0 instance, or greater,
+      # that is using the Redis ACL system.
+      Password: ""
+      # Each ZITADEL cache uses an incremental DB namespace.
+      # This option offsets the first DB so it doesn't conflict with other databases on the same server.
+      # Note that ZITADEL uses FLUSHDB command to truncate a cache.
+      # This can have destructive consequences when overlapping DB namespaces are used.
+      DBOffset: 10
+      # Maximum number of retries before giving up.
+      # Default is 3 retries; -1 (not 0) disables retries.
+      MaxRetries: 3
+      # Minimum backoff between each retry.
+      # Default is 8 milliseconds; -1 disables backoff.
+      MinRetryBackoff: 8ms
+      # Maximum backoff between each retry.
+      # Default is 512 milliseconds; -1 disables backoff.
+      MaxRetryBackoff: 512ms
+      # Dial timeout for establishing new connections.
+      # Default is 5 seconds.
+      DialTimeout: 1s
+      # Timeout for socket reads. If reached, commands will fail
+      # with a timeout instead of blocking. Supported values:
+      #   - `0` - default timeout (3 seconds).
+      #   - `-1` - no timeout (block indefinitely).
+      #   - `-2` - disables SetReadDeadline calls completely.
+      ReadTimeout: 100ms
+      # Timeout for socket writes. If reached, commands will fail
+      # with a timeout instead of blocking.  Supported values:
+      #   - `0` - default timeout (3 seconds).
+      #   - `-1` - no timeout (block indefinitely).
+      #   - `-2` - disables SetWriteDeadline calls completely.
+      WriteTimeout: 100ms
+      # Type of connection pool.
+      # true for FIFO pool, false for LIFO pool.
+      # Note that FIFO has slightly higher overhead compared to LIFO,
+      # but it helps closing idle connections faster reducing the pool size.
+      PoolFIFO: false
+      # Base number of socket connections.
+      # Default is 10 connections per every available CPU as reported by runtime.GOMAXPROCS.
+      # If there is not enough connections in the pool, new connections will be allocated in excess of PoolSize,
+      # you can limit it through MaxActiveConns
+      PoolSize: 20
+      # Amount of time client waits for connection if all connections
+      # are busy before returning an error.
+      # Default is ReadTimeout + 1 second.
+      PoolTimeout: 100ms
+      # Minimum number of idle connections which is useful when establishing
+      # new connection is slow.
+      # Default is 0. the idle connections are not closed by default.
+      MinIdleConns: 5
+      # Maximum number of idle connections.
+      # Default is 0. the idle connections are not closed by default.
+      MaxIdleConns: 10
+      # Maximum number of connections allocated by the pool at a given time.
+      # When zero, there is no limit on the number of connections in the pool.
+      MaxActiveConns: 40
+      # ConnMaxIdleTime is the maximum amount of time a connection may be idle.
+      # Should be less than server's timeout.
+      # Expired connections may be closed lazily before reuse.
+      # If d <= 0, connections are not closed due to a connection's idle time.
+      # Default is 30 minutes. -1 disables idle timeout check.
+      ConnMaxIdleTime: 30m
+      # ConnMaxLifetime is the maximum amount of time a connection may be reused.
+      # Expired connections may be closed lazily before reuse.
+      # If <= 0, connections are not closed due to a connection's age.
+      # Default is to not close idle connections.
+      ConnMaxLifetime: -1
+      # Enable TLS server authentication using the default system bundle.
+      EnableTLS: false
+      # Disable set-lib on connect. Default is false.
+      DisableIndentity: false
+      # Add suffix to client name. Default is empty.
+      IdentitySuffix: ""
+      # Implementation of [Circuit Breaker Pattern](https://learn.microsoft.com/en-us/previous-versions/msp-n-p/dn589784(v=pandp.10)?redirectedfrom=MSDN)
+      CircuitBreaker:
+        # Interval when the counters are reset to 0.
+        # 0 interval never resets the counters until the CB is opened.
+        Interval: 0
+        # Amount of consecutive failures permitted
+        MaxConsecutiveFailures: 5
+        # The ratio of failed requests out of total requests
+        MaxFailureRatio: 0.1
+        # Timeout after opening of the CB, until the state is set to half-open.
+        Timeout: 60s
+        # The allowed amount of requests that are allowed to pass when the CB is half-open.
+        MaxRetryRequests: 1
 
   # Instance caches auth middleware instances, gettable by domain or ID.
-#  Instance:
+  Instance:
     # Connector must be enabled above.
     # When connector is empty, this cache will be disabled.
-#    Connector: "memory"
-#    MaxAge: 1h
-#    LastUsage: 10m
-#
-    # Log enables cache-specific logging. Default to error log to stdout when omitted.
-#    Log:
-#      Level: debug
-#      AddSource: true
-#      Formatter:
-#        Format: text
+    Connector: ""
+    MaxAge: 1h
+    LastUsage: 10m
+    # Log enables cache-specific logging. Default to error log to stderr when omitted.
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
+  # Milestones caches instance milestone state, gettable by instance ID
+  Milestones:
+    Connector: ""
+    MaxAge: 1h
+    LastUsage: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
@@ -285,7 +400,7 @@ Projections:
     org_domain_verified_fields:
       TransactionDuration: 0s
       BulkLimit: 2000
-    
+
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
@@ -367,7 +482,7 @@ OIDC:
   AuthMethodPrivateKeyJWT: true # ZITADEL_OIDC_AUTHMETHODPRIVATEKEYJWT
   GrantTypeRefreshToken: true # ZITADEL_OIDC_GRANTTYPEREFRESHTOKEN
   RequestObjectSupported: true # ZITADEL_OIDC_REQUESTOBJECTSUPPORTED
-  
+
   # Deprecated: The signing algorithm is determined by the generated keys.
   # Use the web keys resource to generate keys with different algorithms.
   SigningKeyAlgorithm: RS256 # ZITADEL_OIDC_SIGNINGKEYALGORITHM
@@ -380,7 +495,7 @@ OIDC:
   DefaultRefreshTokenIdleExpiration: 720h # ZITADEL_OIDC_DEFAULTREFRESHTOKENIDLEEXPIRATION
   # 2160h are 90 days, three months
   DefaultRefreshTokenExpiration: 2160h # ZITADEL_OIDC_DEFAULTREFRESHTOKENEXPIRATION
-  
+
   # HTTP Cache-Control max-age header value to set on the jwks endpoint.
   # Only used when the web keys feature is enabled.  0 sets a no-store value.
   JWKSCacheControlMaxAge: 5m # ZITADEL_OIDC_JWKSCACHECONTROLMAXAGE
@@ -411,6 +526,7 @@ OIDC:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
+  DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
   ProviderConfig:
@@ -930,7 +1046,7 @@ DefaultInstance:
       PreHeader: Verify email
       Subject: Verify email
       Greeting: Hello {{.DisplayName}},
-      Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you din't add a new email, please ignore this email.
+      Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you didn't add a new email, please ignore this email.
       ButtonText: Verify email
     - MessageTextType: VerifyPhone
       Language: en

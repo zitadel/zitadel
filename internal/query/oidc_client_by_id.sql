@@ -1,7 +1,7 @@
 with client as (
 	select c.instance_id,
-		c.app_id, a.state, c.client_id, c.client_secret, c.redirect_uris, c.response_types, c.grant_types,
-		c.application_type, c.auth_method_type, c.post_logout_redirect_uris, c.is_dev_mode,
+		c.app_id, a.state, c.client_id, c.back_channel_logout_uri, c.client_secret, c.redirect_uris, c.response_types,
+		c.grant_types, c.application_type, c.auth_method_type, c.post_logout_redirect_uris, c.is_dev_mode,
 		c.access_token_type, c.access_token_role_assertion, c.id_token_role_assertion,
 		c.id_token_userinfo_assertion, c.clock_skew, c.additional_origins, a.project_id, p.project_role_assertion
 	from projections.apps7_oidc_configs c

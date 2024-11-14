@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/passwap"
 	"github.com/zitadel/passwap/bcrypt"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -174,6 +175,7 @@ func TestAddOIDCApp(t *testing.T) {
 						0,
 						[]string{"https://sub.test.ch"},
 						false,
+						"",
 					),
 				},
 			},
@@ -239,6 +241,7 @@ func TestAddOIDCApp(t *testing.T) {
 						0,
 						nil,
 						false,
+						"",
 					),
 				},
 			},
@@ -304,6 +307,7 @@ func TestAddOIDCApp(t *testing.T) {
 						0,
 						nil,
 						false,
+						"",
 					),
 				},
 			},
@@ -369,6 +373,7 @@ func TestAddOIDCApp(t *testing.T) {
 						0,
 						nil,
 						false,
+						"",
 					),
 				},
 			},
@@ -418,7 +423,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp:       &domain.OIDCApp{},
 				resourceOwner: "org1",
 			},
@@ -434,7 +439,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp: &domain.OIDCApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -463,7 +468,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp: &domain.OIDCApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -515,13 +520,14 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							time.Second*1,
 							[]string{"https://sub.test.ch"},
 							true,
+							"https://test.ch/backchannel",
 						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp: &domain.OIDCApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -542,6 +548,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 1,
 					AdditionalOrigins:        []string{" https://sub.test.ch "},
 					SkipNativeAppSuccessPage: true,
+					BackChannelLogoutURI:     " https://test.ch/backchannel ",
 				},
 				resourceOwner: "org1",
 			},
@@ -570,6 +577,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 1,
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
+					BackChannelLogoutURI:     "https://test.ch/backchannel",
 					State:                    domain.AppStateActive,
 					Compliance:               &domain.Compliance{},
 				},
@@ -613,13 +621,14 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							time.Second*1,
 							[]string{"https://sub.test.ch"},
 							true,
+							"https://test.ch/backchannel",
 						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
 				oidcApp: &domain.OIDCApp{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "project1",
@@ -640,6 +649,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 1,
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
+					BackChannelLogoutURI:     "https://test.ch/backchannel",
 				},
 				resourceOwner: "org1",
 			},
@@ -668,6 +678,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 1,
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
+					BackChannelLogoutURI:     "https://test.ch/backchannel",
 					State:                    domain.AppStateActive,
 					Compliance:               &domain.Compliance{},
 				},
@@ -676,7 +687,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
+			c := &Commands{
 				eventstore:      tt.fields.eventstore(t),
 				idGenerator:     tt.fields.idGenerator,
 				newHashedSecret: mockHashedSecret("secret"),
@@ -684,7 +695,8 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					ClientSecret: emptyConfig,
 				},
 			}
-			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
+			c.setMilestonesCompletedForTest("instanceID")
+			got, err := c.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -845,6 +857,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								time.Second*1,
 								[]string{"https://sub.test.ch"},
 								true,
+								"https://test.ch/backchannel",
 							),
 						),
 					),
@@ -873,6 +886,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 1,
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
+					BackChannelLogoutURI:     "https://test.ch/backchannel",
 				},
 				resourceOwner: "org1",
 			},
@@ -914,6 +928,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								time.Second*1,
 								[]string{"https://sub.test.ch"},
 								true,
+								"https://test.ch/backchannel",
 							),
 						),
 					),
@@ -942,6 +957,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 1,
 					AdditionalOrigins:        []string{" https://sub.test.ch "},
 					SkipNativeAppSuccessPage: true,
+					BackChannelLogoutURI:     " https://test.ch/backchannel ",
 				},
 				resourceOwner: "org1",
 			},
@@ -983,6 +999,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								time.Second*1,
 								[]string{"https://sub.test.ch"},
 								true,
+								"https://test.ch/backchannel",
 							),
 						),
 					),
@@ -1017,6 +1034,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 2,
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
+					BackChannelLogoutURI:     "https://test.ch/backchannel",
 				},
 				resourceOwner: "org1",
 			},
@@ -1044,6 +1062,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 2,
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
+					BackChannelLogoutURI:     "https://test.ch/backchannel",
 					Compliance:               &domain.Compliance{},
 					State:                    domain.AppStateActive,
 				},
@@ -1168,6 +1187,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 								time.Second*1,
 								[]string{"https://sub.test.ch"},
 								false,
+								"",
 							),
 						),
 					),
@@ -1211,6 +1231,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 					ClockSkew:                time.Second * 1,
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "",
 					State:                    domain.AppStateActive,
 				},
 			},
@@ -1325,6 +1346,7 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 							time.Second*1,
 							[]string{"https://sub.test.ch"},
 							false,
+							"",
 						),
 					),
 				),
@@ -1360,6 +1382,7 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 							time.Second*1,
 							[]string{"https://sub.test.ch"},
 							false,
+							"",
 						),
 					),
 				),
@@ -1394,6 +1417,7 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 							time.Second*1,
 							[]string{"https://sub.test.ch"},
 							false,
+							"",
 						),
 					),
 				),

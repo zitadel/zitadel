@@ -25,7 +25,7 @@ import (
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
-	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
@@ -72,7 +72,7 @@ type ProjectionsConfig struct {
 	EncryptionKeys *encryption.EncryptionKeyConfig
 	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config
-	Caches         *cache.CachesConfig
+	Caches         *connector.CachesConfig
 
 	Admin admin_es.Config
 	Auth  auth_es.Config
@@ -128,13 +128,16 @@ func projections(
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
+	cacheConnectors, err := connector.StartConnectors(config.Caches, client)
+	logging.OnError(err).Fatal("unable to start caches")
+
 	queries, err := query.StartQueries(
 		ctx,
 		es,
 		esV4.Querier,
 		client,
 		client,
-		config.Caches,
+		cacheConnectors,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,
@@ -162,8 +165,9 @@ func projections(
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
-	commands, err := command.StartCommands(
+	commands, err := command.StartCommands(ctx,
 		es,
+		cacheConnectors,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		staticStorage,
@@ -201,6 +205,7 @@ func projections(
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
+		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
 		*config.Telemetry,
 		config.ExternalDomain,
@@ -214,6 +219,8 @@ func projections(
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
+		keys.OIDC,
+		config.OIDC.DefaultBackChannelLogoutLifetime,
 	)
 
 	config.Auth.Spooler.Client = client
