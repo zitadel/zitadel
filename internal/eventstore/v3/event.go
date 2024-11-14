@@ -53,10 +53,14 @@ func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *eve
 	return &event{
 		aggregate: sequence.aggregate,
 		command: &command{
-			Creator:     cmd.Creator(),
-			Revision:    uint16(revision),
-			CommandType: string(cmd.Type()),
-			Payload:     payload,
+			InstanceID:    cmd.Aggregate().InstanceID,
+			AggregateType: string(cmd.Aggregate().Type),
+			AggregateID:   cmd.Aggregate().ID,
+			CommandType:   string(cmd.Type()),
+			Revision:      uint16(revision),
+			Payload:       payload,
+			Creator:       cmd.Creator(),
+			Owner:         cmd.Aggregate().ResourceOwner,
 		},
 		sequence: sequence.sequence,
 	}, nil
@@ -69,7 +73,7 @@ func commandsToEvents(ctx context.Context, cmds []eventstore.Command) (_ []event
 		if cmd.Aggregate().InstanceID == "" {
 			cmd.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
 		}
-		events[i], err = commandToEvent(ctx, cmd)
+		events[i], err = commandToEvent(cmd)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -78,7 +82,7 @@ func commandsToEvents(ctx context.Context, cmds []eventstore.Command) (_ []event
 	return events, commands, nil
 }
 
-func commandToEvent(ctx context.Context, cmd eventstore.Command) (_ eventstore.Event, err error) {
+func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
 	var payload Payload
 	if cmd.Payload() != nil {
 		payload, err = json.Marshal(cmd.Payload())
@@ -164,5 +168,5 @@ func (e *event) Unmarshal(ptr any) error {
 
 // DataAsBytes implements [eventstore.Event]
 func (e *event) DataAsBytes() []byte {
-	return []byte(e.command.Payload)
+	return e.command.Payload
 }

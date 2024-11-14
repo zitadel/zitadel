@@ -72,3 +72,13 @@ func mockAggregate(id string) *eventstore.Aggregate {
 		Version:       "v1",
 	}
 }
+
+func mockAggregateWithInstance(id, instance string) *eventstore.Aggregate {
+	return &eventstore.Aggregate{
+		ID:            id,
+		InstanceID:    instance,
+		Type:          "type",
+		ResourceOwner: "ro",
+		Version:       "v1",
+	}
+}

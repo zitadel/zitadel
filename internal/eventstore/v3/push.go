@@ -16,7 +16,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	events, err = es.writeEvents(ctx, commands)
+	events, err = es.writeCommands(ctx, commands)
 	if isSetupNotExecutedError(err) {
 		return es.pushWithoutFunc(ctx, commands...)
 	}
@@ -24,14 +24,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	return events, err
 }
 
-var (
-	//go:embed push.sql
-	pushStmt string
-	//go:embed push2.sql
-	push2Stmt string
-)
-
-func (es *Eventstore) writeEvents(ctx context.Context, commands []eventstore.Command) (_ []eventstore.Event, err error) {
+func (es *Eventstore) writeCommands(ctx context.Context, commands []eventstore.Command) (_ []eventstore.Event, err error) {
 	conn, err := es.client.Conn(ctx)
 	if err != nil {
 		return nil, err
@@ -95,7 +88,7 @@ func writeEvents(ctx context.Context, tx *sql.Tx, commands []eventstore.Command)
 		return nil, err
 	}
 
-	rows, err := tx.QueryContext(ctx, push2Stmt, cmds)
+	rows, err := tx.QueryContext(ctx, `select created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, cmds)
 	if err != nil {
 		return nil, err
 	}

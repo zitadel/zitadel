@@ -3,6 +3,7 @@ package eventstore
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
 	"fmt"
 	"strings"
@@ -42,6 +43,11 @@ func isSetupNotExecutedError(err error) bool {
 	}
 	return false
 }
+
+var (
+	//go:embed push.sql
+	pushStmt string
+)
 
 // pushWithoutFunc implements pushing events before setup step 39 was introduced.
 // TODO: remove with v3
@@ -171,8 +177,8 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			events[i].(*event).aggregate.ID,
 			events[i].(*event).command.Revision,
 			events[i].(*event).command.Creator,
-			events[i].(*event).command.CommandType,
-			events[i].(*event).command.Payload,
+			eventstore.EventType(events[i].(*event).command.CommandType),
+			Payload(events[i].(*event).command.Payload),
 			events[i].(*event).sequence,
 			i,
 		)

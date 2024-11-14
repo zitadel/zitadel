@@ -1,1 +1,0 @@
-select created_at, "sequence", position from eventstore.push($1::eventstore.command[])
