@@ -2,6 +2,7 @@ package telemetry
 
 import (
 	"net/http"
+	"net/url"
 	"strings"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -30,5 +31,9 @@ func TelemetryHandler(handler http.Handler, ignoredEndpoints ...string) http.Han
 }
 
 func spanNameFormatter(_ string, r *http.Request) string {
-	return r.Host + r.URL.EscapedPath()
+	uri, err := url.Parse(r.RequestURI)
+	if err == nil {
+		return uri.EscapedPath()
+	}
+	return r.URL.EscapedPath()
 }
