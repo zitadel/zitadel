@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
@@ -34,9 +33,60 @@ func (t *transaction) Rollback(ctx context.Context) error {
 	return t.Tx.Rollback()
 }
 
+// checks whether the error is caused because setup step 39 was not executed
+func isSetupNotExecutedError(err error) bool {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		return pgErr.Code == "42704" && strings.Contains(pgErr.Message, "type \"eventstore.command[]\" does not exist")
+	}
+	return false
+}
+
 // pushWithoutFunc implements pushing events before setup step 39 was introduced.
 // TODO: remove with v3
-func (es *Eventstore) pushWithoutFunc(ctx context.Context)
+func (es *Eventstore) pushWithoutFunc(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	tx, err := es.client.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	// tx is not closed because [crdb.ExecuteInTx] takes care of that
+	var (
+		sequences []*latestSequence
+	)
+
+	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
+		sequences, err = latestSequences(ctx, tx, commands)
+		if err != nil {
+			return err
+		}
+
+		events, err = es.writeEventsOld(ctx, tx, sequences, commands)
+		if err != nil {
+			return err
+		}
+
+		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+			return err
+		}
+
+		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
+		// Thats why we enable it manually
+		if es.client.Type() == "cockroach" {
+			_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
+			if err != nil {
+				return err
+			}
+		}
+
+		return handleFieldCommands(ctx, tx, commands)
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return events, nil
+}
 
 func (es *Eventstore) writeEventsOld(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
 	events, placeholders, args, err := mapCommands(commands, sequences)
@@ -95,7 +145,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 		}
 		sequence.sequence++
 
-		events[i], err = commandToEvent(sequence, command)
+		events[i], err = commandToEventOld(sequence, command)
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -113,20 +163,16 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			i*argsPerCommand+10,
 		)
 
-		revision, err := strconv.Atoi(strings.TrimPrefix(string(events[i].(*event).Rev), "v"))
-		if err != nil {
-			return nil, nil, nil, zerrors.ThrowInternal(err, "V3-JoZEp", "Errors.Internal")
-		}
 		args = append(args,
-			events[i].(*event).InstanceID,
-			events[i].(*event).ResourceOwner,
-			events[i].(*event).AggregateType,
-			events[i].(*event).AggregateID,
-			revision,
-			events[i].(*event).CreatorUser,
-			events[i].(*event).Typ,
-			events[i].(*event).Data,
-			events[i].(*event).Seq,
+			events[i].(*event).aggregate.InstanceID,
+			events[i].(*event).aggregate.ResourceOwner,
+			events[i].(*event).aggregate.Type,
+			events[i].(*event).aggregate.ID,
+			events[i].(*event).command.Revision,
+			events[i].(*event).command.Creator,
+			events[i].(*event).command.CommandType,
+			events[i].(*event).command.Payload,
+			events[i].(*event).sequence,
 			i,
 		)
 	}

@@ -4,21 +4,24 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	"encoding/json"
 
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	return nil, nil
+	events, err = es.writeEvents(ctx, commands)
+	if isSetupNotExecutedError(err) {
+		return es.pushWithoutFunc(ctx, commands...)
+	}
+
+	return events, err
 }
 
 var (
@@ -29,7 +32,16 @@ var (
 )
 
 func (es *Eventstore) writeEvents(ctx context.Context, commands []eventstore.Command) (_ []eventstore.Event, err error) {
-	tx, err := es.client.BeginTx(ctx, &sql.TxOptions{
+	conn, err := es.client.Conn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	if err = checkExecutionPlan(ctx, conn); err != nil {
+		return nil, err
+	}
+
+	tx, err := conn.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelReadCommitted,
 		ReadOnly:  false,
 	})
@@ -78,7 +90,7 @@ func writeEvents(ctx context.Context, tx *sql.Tx, commands []eventstore.Command)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	events, cmds, err := commandsToEvents2(ctx, commands)
+	events, cmds, err := commandsToEvents(ctx, commands)
 	if err != nil {
 		return nil, err
 	}
@@ -102,45 +114,13 @@ func writeEvents(ctx context.Context, tx *sql.Tx, commands []eventstore.Command)
 	return events, nil
 }
 
-func commandsToEvents2(ctx context.Context, cmds []eventstore.Command) (_ []eventstore.Event, _ []*command, err error) {
-	events := make([]eventstore.Event, len(cmds))
-	commands := make([]*command, len(cmds))
-	for i, cmd := range cmds {
-		if cmd.Aggregate().InstanceID == "" {
-			cmd.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
+func checkExecutionPlan(ctx context.Context, conn *sql.Conn) error {
+	return conn.Raw(func(driverConn any) error {
+		conn := driverConn.(*stdlib.Conn).Conn()
+		var cmd *command
+		if _, ok := conn.TypeMap().TypeForValue(cmd); ok {
+			return nil
 		}
-		events[i], err = commandToEvent2(ctx, cmd)
-		if err != nil {
-			return nil, nil, err
-		}
-		commands[i] = events[i].(*event).command
-	}
-	return events, commands, nil
-}
-
-func commandToEvent2(ctx context.Context, cmd eventstore.Command) (_ eventstore.Event, err error) {
-	var payload Payload
-	if cmd.Payload() != nil {
-		payload, err = json.Marshal(cmd.Payload())
-		if err != nil {
-			logging.WithError(err).Warn("marshal payload failed")
-			return nil, zerrors.ThrowInternal(err, "V3-MInPK", "Errors.Internal")
-		}
-	}
-
-	command := &command{
-		InstanceID:    cmd.Aggregate().InstanceID,
-		AggregateType: string(cmd.Aggregate().Type),
-		AggregateID:   cmd.Aggregate().ID,
-		CommandType:   string(cmd.Type()),
-		Revision:      cmd.Revision(),
-		Payload:       payload,
-		Creator:       cmd.Creator(),
-		Owner:         cmd.Aggregate().ResourceOwner,
-	}
-
-	return &event{
-		aggregate: cmd.Aggregate(),
-		command:   command,
-	}, nil
+		return registerEventstoreTypes(ctx, conn)
+	})
 }

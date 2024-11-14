@@ -1,9 +1,14 @@
 package eventstore
 
 import (
+	"context"
 	"encoding/json"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/zitadel/logging"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -31,24 +36,74 @@ type event struct {
 	position  float64
 }
 
-// func commandToEvent(sequence *latestSequence, cmd eventstore.Command) (_ *event, err error) {
-// 	var payload Payload
-// 	if cmd.Payload() != nil {
-// 		payload, err = json.Marshal(cmd.Payload())
-// 		if err != nil {
-// 			logging.WithError(err).Warn("marshal payload failed")
-// 			return nil, zerrors.ThrowInternal(err, "V3-MInPK", "Errors.Internal")
-// 		}
-// 	}
-// 	return &event{
-// 		aggregate: sequence.aggregate,
-// 		creator:   cmd.Creator(),
-// 		revision:  cmd.Revision(),
-// 		typ:       cmd.Type(),
-// 		payload:   payload,
-// 		sequence:  sequence.sequence,
-// 	}, nil
-// }
+// TODO: remove on v3
+func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *event, err error) {
+	var payload Payload
+	if cmd.Payload() != nil {
+		payload, err = json.Marshal(cmd.Payload())
+		if err != nil {
+			logging.WithError(err).Warn("marshal payload failed")
+			return nil, zerrors.ThrowInternal(err, "V3-MInPK", "Errors.Internal")
+		}
+	}
+	revision, err := strconv.Atoi(strings.TrimPrefix(string(cmd.Aggregate().Version), "v"))
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "V3-hN3ki", "Errors.Internal")
+	}
+	return &event{
+		aggregate: sequence.aggregate,
+		command: &command{
+			Creator:     cmd.Creator(),
+			Revision:    uint16(revision),
+			CommandType: string(cmd.Type()),
+			Payload:     payload,
+		},
+		sequence: sequence.sequence,
+	}, nil
+}
+
+func commandsToEvents(ctx context.Context, cmds []eventstore.Command) (_ []eventstore.Event, _ []*command, err error) {
+	events := make([]eventstore.Event, len(cmds))
+	commands := make([]*command, len(cmds))
+	for i, cmd := range cmds {
+		if cmd.Aggregate().InstanceID == "" {
+			cmd.Aggregate().InstanceID = authz.GetInstance(ctx).InstanceID()
+		}
+		events[i], err = commandToEvent(ctx, cmd)
+		if err != nil {
+			return nil, nil, err
+		}
+		commands[i] = events[i].(*event).command
+	}
+	return events, commands, nil
+}
+
+func commandToEvent(ctx context.Context, cmd eventstore.Command) (_ eventstore.Event, err error) {
+	var payload Payload
+	if cmd.Payload() != nil {
+		payload, err = json.Marshal(cmd.Payload())
+		if err != nil {
+			logging.WithError(err).Warn("marshal payload failed")
+			return nil, zerrors.ThrowInternal(err, "V3-MInPK", "Errors.Internal")
+		}
+	}
+
+	command := &command{
+		InstanceID:    cmd.Aggregate().InstanceID,
+		AggregateType: string(cmd.Aggregate().Type),
+		AggregateID:   cmd.Aggregate().ID,
+		CommandType:   string(cmd.Type()),
+		Revision:      cmd.Revision(),
+		Payload:       payload,
+		Creator:       cmd.Creator(),
+		Owner:         cmd.Aggregate().ResourceOwner,
+	}
+
+	return &event{
+		aggregate: cmd.Aggregate(),
+		command:   command,
+	}, nil
+}
 
 // CreationDate implements [eventstore.Event]
 func (e *event) CreationDate() time.Time {
