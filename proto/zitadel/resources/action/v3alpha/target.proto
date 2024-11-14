@@ -91,7 +91,7 @@ message PatchTarget {
     }
   ];
   // Regenerate the key used for signing and checking the payload sent to the target.
-  optional google.protobuf.Timestamp expiration_signing_key = 7;
+  optional google.protobuf.Duration expiration_signing_key = 7;
 }
 
 
