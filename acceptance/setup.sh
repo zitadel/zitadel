@@ -34,3 +34,14 @@ DEBUG=true" > ${WRITE_ENVIRONMENT_FILE}
 
 echo "Wrote environment file ${WRITE_ENVIRONMENT_FILE}"
 cat ${WRITE_ENVIRONMENT_FILE}
+
+# waiting for default organization
+until $(echo "$DEFAULTORG_RESPONSE" | jq -r '.result | length') == 1
+do
+  DEFAULTORG_RESPONSE=$(curl -s --request POST \
+      --url "${ZITADEL_API_INTERNAL_URL}/v2/organizations/_search" \
+      --header "Authorization: Bearer ${PAT}" \
+      --header "Host: ${ZITADEL_API_DOMAIN}" \
+      -d '{"queries": [{"defaultQuery": {}}]}'  )
+  echo "Received default organization response: ${DEFAULTORG_RESPONSE}"
+done
