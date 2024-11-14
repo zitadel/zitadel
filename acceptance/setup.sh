@@ -42,10 +42,12 @@ DEFAULTORG_RESPONSE_RESULTS=0
 until [ ${DEFAULTORG_RESPONSE_RESULTS} -eq 1 ]
 do
   sleep 1s
-  DEFAULTORG_RESPONSE_RESULTS=$(curl -s --request POST \
+  DEFAULTORG_RESPONSE=$(curl -s --request POST \
       --url "${ZITADEL_API_INTERNAL_URL}/v2/organizations/_search" \
       --header "Authorization: Bearer ${PAT}" \
       --header "Host: ${ZITADEL_API_DOMAIN}" \
-      -d '{"queries": [{"defaultQuery": {"value": true}}]}' | jq -r '.result | length')
-  echo "Received default organization response results: ${DEFAULTORG_RESPONSE_RESULTS}"
+      -d '{"queries": [{"defaultQuery": {"value": true}}]}')
+  echo "Received default organization response: ${DEFAULTORG_RESPONSE}"
+  DEFAULTORG_RESPONSE_RESULTS=$(echo $DEFAULTORG_RESPONSE | jq -r '.result | length')
+  echo "Received default organization response result: ${DEFAULTORG_RESPONSE_RESULTS}"
 done
