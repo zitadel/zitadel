@@ -59,7 +59,7 @@ var (
 
 	errorHandler = runtime.ErrorHandlerFunc(
 		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
-			setSpanNameWithGatewayPattern(ctx)
+			setRequestURIPattern(ctx)
 			runtime.DefaultHTTPErrorHandler(ctx, mux, marshaler, w, r, err)
 		})
 
@@ -89,7 +89,7 @@ var (
 	}
 
 	responseForwarder = func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
-		setSpanNameWithGatewayPattern(ctx)
+		setRequestURIPattern(ctx)
 		t, ok := resp.(CustomHTTPResponse)
 		if ok {
 			// TODO: find a way to return a location header if needed w.Header().Set("location", t.Location())
@@ -270,11 +270,12 @@ func grpcCredentials(tlsConfig *tls.Config) credentials.TransportCredentials {
 	return creds
 }
 
-func setSpanNameWithGatewayPattern(ctx context.Context) {
+func setRequestURIPattern(ctx context.Context) {
 	pattern, ok := runtime.HTTPPathPattern(ctx)
 	if !ok {
 		return
 	}
 	span := trace.SpanFromContext(ctx)
 	span.SetName(pattern)
+	metrics.SetRequestURIPattern(ctx, pattern)
 }
