@@ -36,12 +36,18 @@ echo "Wrote environment file ${WRITE_ENVIRONMENT_FILE}"
 cat ${WRITE_ENVIRONMENT_FILE}
 
 # waiting for default organization
-until $(echo "$DEFAULTORG_RESPONSE" | jq -r '.result | length') == 1
-do
+until [ "$(echo "$DEFAULTORG_RESPONSE" | jq -r '.result | length')" -eq 1 ]; do
   DEFAULTORG_RESPONSE=$(curl -s --request POST \
       --url "${ZITADEL_API_INTERNAL_URL}/v2/organizations/_search" \
       --header "Authorization: Bearer ${PAT}" \
       --header "Host: ${ZITADEL_API_DOMAIN}" \
-      -d '{"queries": [{"defaultQuery": {}}]}'  )
+      -d '{"queries": [{"defaultQuery": {}}]}' )
+
+  if [ $? -ne 0 ]; then
+    echo "Error: Failed to fetch default organization response"
+    exit 1
+  fi
+
   echo "Received default organization response: ${DEFAULTORG_RESPONSE}"
+  sleep 5
 done
