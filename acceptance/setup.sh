@@ -35,10 +35,13 @@ DEBUG=true" > ${WRITE_ENVIRONMENT_FILE}
 echo "Wrote environment file ${WRITE_ENVIRONMENT_FILE}"
 cat ${WRITE_ENVIRONMENT_FILE}
 
+sleep 10s
+
 DEFAULTORG_RESPONSE_RESULTS=0
 # waiting for default organization
 until [ ${DEFAULTORG_RESPONSE_RESULTS} -eq 1 ]
 do
+  sleep 1s
   DEFAULTORG_RESPONSE_RESULTS=$(curl -s --request POST \
       --url "${ZITADEL_API_INTERNAL_URL}/v2/organizations/_search" \
       --header "Authorization: Bearer ${PAT}" \
