@@ -186,11 +186,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
         redirect("/verify?" + paramsVerify);
       }
-      // what to do with users with valid email but no auth methods? redirect to /authenticator/set?
-      // return {
-      //   error:
-      //     "User has no available authentication methods. Contact your administrator to setup authentication for the requested user.",
-      // };
 
       const paramsAuthenticatorSetup = new URLSearchParams({
         loginName: session.factors?.user?.loginName,

@@ -35,11 +35,12 @@ export function IdpSignin({
       },
       authRequestId,
     }).catch((error) => {
-      setError(error.message);
-      return;
-    });
-
-    setLoading(false);
+        setError(error.message);
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   return (

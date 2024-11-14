@@ -67,19 +67,19 @@ export function RegisterFormWithoutPassword({
       lastName: values.lastname,
       organization: organization,
       authRequestId: authRequestId,
-    }).catch((error) => {
-      setError("Could not register user");
-      setLoading(false);
-      return;
-    });
+    })
+      .catch(() => {
+        setError("Could not register user");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && "error" in response) {
       setError(response.error);
-      setLoading(false);
       return;
     }
-
-    setLoading(false);
 
     return response;
   }
@@ -173,10 +173,7 @@ export function RegisterFormWithoutPassword({
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
           onClick={handleSubmit((values) =>
-            submitAndContinue(
-              values,
-              selected.name === methods[0].name ? false : true,
-            ),
+            submitAndContinue(values, !(selected.name === methods[0].name)),
           )}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}

@@ -29,13 +29,14 @@ export function VerifyRedirectButton({
     await sendVerificationRedirectWithoutCheck({
       userId,
       authRequestId,
-    }).catch((error) => {
-      setError("Could not verify user");
-      setLoading(false);
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch((error) => {
+        setError("Could not verify user");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   return (

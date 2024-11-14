@@ -61,11 +61,13 @@ export function ChangePasswordForm({
     const changeResponse = await setMyPassword({
       sessionId: sessionId,
       password: values.password,
-    }).catch(() => {
-      setError("Could not change password");
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not change password");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (changeResponse && "error" in changeResponse) {
       setError(changeResponse.error);
@@ -86,13 +88,14 @@ export function ChangePasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
-    }).catch(() => {
-      setLoading(false);
-      setError("Could not verify password");
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not verify password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (
       passwordResponse &&

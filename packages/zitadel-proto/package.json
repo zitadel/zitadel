@@ -18,6 +18,6 @@
     "@bufbuild/protobuf": "^2.0.0"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.41.0"
+    "@bufbuild/buf": "^1.46.0"
   }
 }

@@ -55,13 +55,14 @@ export function InviteForm({
       firstName: values.firstname,
       lastName: values.lastname,
       organization: organization,
-    }).catch(() => {
-      setError("Could not create invitation Code");
-      setLoading(false);
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not create invitation Code");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && typeof response === "object" && "error" in response) {
       setError(response.error);
