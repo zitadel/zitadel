@@ -10,6 +10,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/zitadel/logging"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -56,6 +57,11 @@ var (
 		},
 	)
 
+	errorHandler = runtime.ErrorHandlerFunc(
+		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
+			setSpanNameWithGatewayPattern(ctx)
+		})
+
 	serveMuxOptions = func(hostHeaders []string) []runtime.ServeMuxOption {
 		return []runtime.ServeMuxOption{
 			runtime.WithMarshalerOption(jsonMarshaler.ContentType(nil), jsonMarshaler),
@@ -65,6 +71,7 @@ var (
 			runtime.WithOutgoingHeaderMatcher(runtime.DefaultHeaderMatcher),
 			runtime.WithForwardResponseOption(responseForwarder),
 			runtime.WithRoutingErrorHandler(httpErrorHandler),
+			runtime.WithErrorHandler(errorHandler),
 		}
 	}
 
@@ -81,6 +88,7 @@ var (
 	}
 
 	responseForwarder = func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
+		setSpanNameWithGatewayPattern(ctx)
 		t, ok := resp.(CustomHTTPResponse)
 		if ok {
 			// TODO: find a way to return a location header if needed w.Header().Set("location", t.Location())
@@ -259,4 +267,13 @@ func grpcCredentials(tlsConfig *tls.Config) credentials.TransportCredentials {
 		creds = credentials.NewTLS(tlsConfigClone)
 	}
 	return creds
+}
+
+func setSpanNameWithGatewayPattern(ctx context.Context) {
+	pattern, ok := runtime.HTTPPathPattern(ctx)
+	if !ok {
+		return
+	}
+	span := trace.SpanFromContext(ctx)
+	span.SetName(pattern)
 }
