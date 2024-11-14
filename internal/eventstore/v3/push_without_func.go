@@ -37,11 +37,15 @@ func (t *transaction) Rollback(ctx context.Context) error {
 
 // checks whether the error is caused because setup step 39 was not executed
 func isSetupNotExecutedError(err error) bool {
+	if err == nil {
+		return false
+	}
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
-		return pgErr.Code == "42704" && strings.Contains(pgErr.Message, "type \"eventstore.command[]\" does not exist")
+		return (pgErr.Code == "42704" && strings.Contains(pgErr.Message, "eventstore.command[]")) ||
+			(pgErr.Code == "42883" && strings.Contains(pgErr.Message, "eventstore.push()"))
 	}
-	return false
+	return errors.Is(err, errTypesNotFound)
 }
 
 var (

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"errors"
 
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
@@ -107,11 +108,13 @@ func writeEvents(ctx context.Context, tx *sql.Tx, commands []eventstore.Command)
 	return events, nil
 }
 
+var errTypesNotFound = errors.New("types not found")
+
 func checkExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 	return conn.Raw(func(driverConn any) error {
 		conn, ok := driverConn.(*stdlib.Conn)
 		if !ok {
-			return nil
+			return errTypesNotFound
 		}
 
 		var cmd *command
