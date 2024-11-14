@@ -32,11 +32,7 @@ services:
 
   wait_for_zitadel:
     image: curlimages/curl:8.00.1
-    command:
-      [
-        "CMD-SHELL",
-        "until curl -s -o /dev/null -w '%{http_code}' http://zitadel:8080/debug/ready | grep -q 200; do sleep 5; done",
-      ]
+    command: /bin/sh -c "until curl -s -o /dev/null -w '%{http_code}' http://zitadel:8080/debug/ready | grep -q 200; do sleep 5; done"
 
     depends_on:
       - zitadel
