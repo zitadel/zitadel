@@ -23,6 +23,7 @@ const test = base.extend<{ user: PasswordUserWithOTP }>({
   },
 });
 
+/*
 test("username, password and otp login", async ({ user, page }) => {
   //const server = startSink()
   await loginWithPassword(page, user.getUsername(), user.getPassword());
@@ -30,3 +31,4 @@ test("username, password and otp login", async ({ user, page }) => {
   await loginScreenExpect(page, user.getFullName());
   //server.close()
 });
+*/

@@ -24,11 +24,17 @@ const test = base.extend<{ user: PasswordUser }>({
 });
 
 test("username and password changed login", async ({ user, page }) => {
-  const changedPw = "ChangedPw1!";
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
-  await changePassword(page, user.getUsername(), changedPw);
-  await loginWithPassword(page, user.getUsername(), changedPw);
-  await loginScreenExpect(page, user.getFullName());
+    const changedPw = "ChangedPw1!"
+    await loginWithPassword(page, user.getUsername(), user.getPassword())
+
+    // wait for projection of token
+    await page.waitForTimeout(2000)
+
+    await changePassword(page, user.getUsername(), changedPw)
+    await loginScreenExpect(page, user.getFullName());
+
+    await loginWithPassword(page, user.getUsername(), changedPw)
+    await loginScreenExpect(page, user.getFullName());
 });
 
 test("password not with desired complexity", async ({ user, page }) => {

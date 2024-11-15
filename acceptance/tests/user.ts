@@ -57,6 +57,9 @@ class User {
       console.error("Error making request:", error);
       throw error;
     }
+
+    // wait for projection of user
+    await page.waitForTimeout(3000)
   }
 
   async remove() {
@@ -164,6 +167,9 @@ export class PasswordUserWithOTP extends User {
       console.error("Error making request:", error);
       throw error;
     }
+
+    // wait for projection of user
+    await page.waitForTimeout(2000)
   }
 
   public getCode() {
@@ -195,6 +201,9 @@ export class PasskeyUser extends User {
     await this.remove();
     const authId = await registerWithPasskey(page, this.getFirstname(), this.getLastname(), this.getUsername());
     this.authenticatorId = authId;
+
+    // wait for projection of user
+    await page.waitForTimeout(2000)
   }
 
   public async remove() {
