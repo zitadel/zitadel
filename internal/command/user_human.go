@@ -448,7 +448,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 			return nil, nil, err
 		}
 
-		if existing.UserState != domain.UserStateUnspecified {
+		if existing.UserState.Exists() {
 			return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ziuna", "Errors.User.AlreadyExisting")
 		}
 	}
