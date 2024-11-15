@@ -1,7 +1,7 @@
 services:
   zitadel:
     user: "${ZITADEL_DEV_UID}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
+    image: ghcr.io/zitadel/zitadel:v2.65.0
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
@@ -14,7 +14,7 @@ services:
 
   db:
     restart: "always"
-    image: "${POSTGRES_IMAGE:-postgres:latest}"
+    image: postgres:17.0-alpine3.19
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel
