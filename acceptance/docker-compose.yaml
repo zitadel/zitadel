@@ -44,6 +44,7 @@ services:
       PAT_FILE: /pat/zitadel-admin-sa.pat
       ZITADEL_API_INTERNAL_URL: http://zitadel:8080
       WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
+      WRITE_TEST_ENVIRONMENT_FILE: /acceptance/tests/.env.local
     volumes:
       - "./pat:/pat"
       - "../apps/login:/apps/login"

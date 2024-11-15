@@ -26,7 +26,7 @@ fi
 
 WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.local}
 echo "Writing environment file to ${WRITE_ENVIRONMENT_FILE} when done."
-WRITE_TEST_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../acceptance/tests/.env.local}
+WRITE_TEST_ENVIRONMENT_FILE=${WRITE_TEST_ENVIRONMENT_FILE:-$(dirname "$0")/../acceptance/tests/.env.local}
 echo "Writing environment file to ${WRITE_TEST_ENVIRONMENT_FILE} when done."
 
 echo "ZITADEL_API_URL=${ZITADEL_API_URL}
