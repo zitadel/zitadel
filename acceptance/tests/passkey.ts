@@ -107,4 +107,3 @@ async function simulateSuccessfulPasskeyInput(client: CDPSession, authenticatorI
     // wait to receive the event that the passkey was successfully registered or verified
     await operationCompleted;
 }
-s

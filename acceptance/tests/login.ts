@@ -19,6 +19,7 @@ export async function loginWithPasskey(page: Page, authenticatorId: string, user
 }
 
 export async function loginScreenExpect(page: Page, fullName: string) {
+    await expect(page).toHaveURL(/signedin.*/)
     await expect(page.getByRole('heading')).toContainText(fullName);
 }
 

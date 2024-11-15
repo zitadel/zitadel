@@ -1,8 +1,6 @@
 import fetch from "node-fetch";
 import {Page} from "@playwright/test";
 import {registerWithPasskey} from "./register";
-import {loginWithPassword} from "./login";
-import {changePassword} from "./password";
 import {getUserByUsername, removeUser} from './zitadel';
 
 export interface userProps {
@@ -59,7 +57,11 @@ class User {
     }
 
     async remove() {
-        await removeUser(this.getUserId())
+        const resp = await getUserByUsername(this.getUsername())
+        if (!resp || !resp.result || !resp.result[0]) {
+            return
+        }
+        await removeUser(resp.result[0].userId)
         return
     }
 
@@ -89,12 +91,6 @@ class User {
 
     public getFullName() {
         return this.props.firstName + " " + this.props.lastName
-    }
-
-    public async doPasswordChange(page: Page, password: string) {
-        await loginWithPassword(page, this.getUsername(), this.getPassword())
-        await changePassword(page, this.getUsername(), password)
-        this.props.password = password
     }
 }
 
@@ -191,11 +187,6 @@ export class PasskeyUser extends User {
     }
 
     public async remove() {
-        const resp = await getUserByUsername(this.getUsername())
-        if (!resp || !resp.result || !resp.result[0]) {
-            return
-        }
-        this.setUserId(resp.result[0].userId)
         await super.remove()
     }
 
