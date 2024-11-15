@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import axios from "axios";
 
 export async function removeUserByUsername(username: string) {
   const resp = await getUserByUsername(username);
@@ -9,18 +9,22 @@ export async function removeUserByUsername(username: string) {
 }
 
 export async function removeUser(id: string) {
-  const response = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/" + id, {
-    method: "DELETE",
-    headers: {
-      Authorization: "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!,
-    },
-  });
-  if (response.statusCode >= 400 && response.statusCode != 404) {
-    const error = "HTTP Error: " + response.statusCode + " - " + response.statusMessage;
-    console.error(error);
-    throw new Error(error);
+  try {
+    const response = await axios.delete(`${process.env.ZITADEL_API_URL}/v2/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+      },
+    });
+
+    if (response.status >= 400 && response.status !== 404) {
+      const error = `HTTP Error: ${response.status} - ${response.statusText}`;
+      console.error(error);
+      throw new Error(error);
+    }
+  } catch (error) {
+    console.error("Error making request:", error);
+    throw error;
   }
-  return;
 }
 
 export async function getUserByUsername(username: string) {
@@ -33,20 +37,24 @@ export async function getUserByUsername(username: string) {
       },
     ],
   };
-  const jsonBody = JSON.stringify(listUsersBody);
-  const registerResponse = await fetch(process.env.ZITADEL_API_URL! + "/v2/users", {
-    method: "POST",
-    body: jsonBody,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!,
-    },
-  });
-  if (registerResponse.statusCode >= 400) {
-    const error = "HTTP Error: " + registerResponse.statusCode + " - " + registerResponse.statusMessage;
-    console.error(error);
-    throw new Error(error);
+
+  try {
+    const response = await axios.post(`${process.env.ZITADEL_API_URL}/v2/users`, listUsersBody, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+      },
+    });
+
+    if (response.status >= 400) {
+      const error = `HTTP Error: ${response.status} - ${response.statusText}`;
+      console.error(error);
+      throw new Error(error);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error making request:", error);
+    throw error;
   }
-  const respJson = await registerResponse.json();
-  return respJson;
 }

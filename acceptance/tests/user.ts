@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import fetch from "node-fetch";
+import axios from "axios";
 import { registerWithPasskey } from "./register";
 import { getUserByUsername, removeUser } from "./zitadel";
 
@@ -40,29 +40,31 @@ class User {
       },
     };
 
-    const response = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/human", {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!,
-      },
-    });
-    if (response.statusCode >= 400 && response.statusCode != 409) {
-      const error = "HTTP Error: " + response.statusCode + " - " + response.statusMessage;
-      console.error(error);
-      throw new Error(error);
+    try {
+      const response = await axios.post(`${process.env.ZITADEL_API_URL}/v2/users/human`, body, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+        },
+      });
+
+      if (response.status >= 400 && response.status !== 409) {
+        const error = `HTTP Error: ${response.status} - ${response.statusText}`;
+        console.error(error);
+        throw new Error(error);
+      }
+    } catch (error) {
+      console.error("Error making request:", error);
+      throw error;
     }
-    return;
   }
 
   async remove() {
-    const resp = await getUserByUsername(this.getUsername());
+    const resp: any = await getUserByUsername(this.getUsername());
     if (!resp || !resp.result || !resp.result[0]) {
       return;
     }
     await removeUser(resp.result[0].userId);
-    return;
   }
 
   public setUserId(userId: string) {
@@ -90,7 +92,7 @@ class User {
   }
 
   public getFullName() {
-    return this.props.firstName + " " + this.props.lastName;
+    return `${this.props.firstName} ${this.props.lastName}`;
   }
 }
 
@@ -132,26 +134,36 @@ export class PasswordUserWithOTP extends User {
     switch (this.type) {
       case OtpType.sms:
         url = url + "sms";
+        break;
       case OtpType.email:
         url = url + "email";
+        break;
     }
 
-    const response = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/" + this.getUserId() + "/" + url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!,
-      },
-    });
-    if (response.statusCode >= 400 && response.statusCode != 409) {
-      const error = "HTTP Error: " + response.statusCode + " - " + response.statusMessage;
-      console.error(error);
-      throw new Error(error);
-    }
+    try {
+      const response = await axios.post(
+        `${process.env.ZITADEL_API_URL}/v2/users/${this.getUserId()}/${url}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+          },
+        },
+      );
 
-    // TODO: get code from SMS or Email provider
-    this.code = "";
-    return;
+      if (response.status >= 400 && response.status !== 409) {
+        const error = `HTTP Error: ${response.status} - ${response.statusText}`;
+        console.error(error);
+        throw new Error(error);
+      }
+
+      // TODO: get code from SMS or Email provider
+      this.code = "";
+    } catch (error) {
+      console.error("Error making request:", error);
+      throw error;
+    }
   }
 
   public getCode() {
