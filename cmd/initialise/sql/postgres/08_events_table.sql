@@ -51,7 +51,7 @@ SELECT
     c.created_at,
     c.payload,
     c.creator,
-    c.owner,
+    cs.owner,
     c.position,
     c.in_tx_order
 FROM (
@@ -67,7 +67,7 @@ JOIN (
         a.instance_id,
         a.aggregate_type,
         a.aggregate_id,
-        a.owner,
+        CASE WHEN (e.owner <> '') THEN e.owner ELSE a.owner END AS owner,
         COALESCE(MAX(e.sequence), 0) AS sequence
     FROM (
         SELECT DISTINCT
@@ -86,12 +86,12 @@ JOIN (
         a.instance_id,
         a.aggregate_type,
         a.aggregate_id,
-        a.owner
+        4
 ) AS cs
     ON c.instance_id = cs.instance_id
     AND c.aggregate_type = cs.aggregate_type
     AND c.aggregate_id = cs.aggregate_id
-    AND (cs.owner = '' OR cs.owner = c.owner)
+    AND (c.owner = '' OR cs.owner = c.owner)
 ORDER BY
     c.in_tx_order;
 $$ LANGUAGE SQL;
