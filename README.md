@@ -89,6 +89,10 @@ Available data regions are:
 ZITADEL Cloud comes with a free tier, providing you with all the same features as the open-source version.
 Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
+## Adopters
+
+We are grateful to the organizations and individuals who are using ZITADEL. If you are using ZITADEL, please consider adding your name to our [Adopters list](./ADOPTERS.md) by submitting a pull request.
+
 ### Example applications
 
 Clone one of our [example applications](https://zitadel.com/docs/sdk-examples/introduction) or deploy them directly to Vercel.
