@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 
 test("username and password", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/loginname");
   const loginname = page.getByLabel("Loginname");
   await loginname.pressSequentially("zitadel-admin@zitadel.localhost");
   await loginname.press("Enter");

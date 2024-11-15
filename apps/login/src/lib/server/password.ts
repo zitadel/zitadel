@@ -124,23 +124,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
   }
 
-  const submitted = {
-    sessionId: session.id,
-    factors: session.factors,
-    challenges: session.challenges,
-    authMethods,
-    userState: user.state,
-  };
-
-  if (
-    !submitted ||
-    !submitted.authMethods ||
-    !submitted.factors?.user?.loginName
-  ) {
+  if (!authMethods || !session.factors?.user?.loginName) {
     return { error: "Could not verify password!" };
   }
 
-  const availableSecondFactors = submitted?.authMethods?.filter(
+  const availableSecondFactors = authMethods?.filter(
     (m: AuthenticationMethodType) =>
       m !== AuthenticationMethodType.PASSWORD &&
       m !== AuthenticationMethodType.PASSKEY,
@@ -148,15 +136,18 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   if (availableSecondFactors?.length == 1) {
     const params = new URLSearchParams({
-      loginName: submitted.factors?.user.loginName,
+      loginName: session.factors?.user.loginName,
     });
 
     if (command.authRequestId) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     const factor = availableSecondFactors[0];
@@ -172,35 +163,41 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
   } else if (availableSecondFactors?.length >= 1) {
     const params = new URLSearchParams({
-      loginName: submitted.factors.user.loginName,
+      loginName: session.factors.user.loginName,
     });
 
     if (command.authRequestId) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     return redirect(`/mfa?` + params);
-  } else if (submitted.userState === UserState.INITIAL) {
+  } else if (user.state === UserState.INITIAL) {
     const params = new URLSearchParams({
-      loginName: submitted.factors.user.loginName,
+      loginName: session.factors.user.loginName,
     });
 
     if (command.authRequestId) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     return redirect(`/password/change?` + params);
   } else if (command.forceMfa && !availableSecondFactors.length) {
     const params = new URLSearchParams({
-      loginName: submitted.factors.user.loginName,
+      loginName: session.factors.user.loginName,
       force: "true", // this defines if the mfa is forced in the settings
       checkAfter: "true", // this defines if the check is directly made after the setup
     });
@@ -209,8 +206,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
     // TODO: provide a way to setup passkeys on mfa page?
@@ -239,33 +239,39 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   //   return router.push(`/passkey/set?` + params);
   // }
-  else if (command.authRequestId && submitted.sessionId) {
+  else if (command.authRequestId && session.id) {
     const params = new URLSearchParams({
-      sessionId: submitted.sessionId,
+      sessionId: session.id,
       authRequest: command.authRequestId,
     });
 
-    if (command.organization) {
-      params.append("organization", command.organization);
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ?? session.factors?.user?.organizationId,
+      );
     }
 
-    return redirect(`/login?` + params);
+    return { nextStep: `/login?${params}` };
   }
 
   // without OIDC flow
   const params = new URLSearchParams(
     command.authRequestId
       ? {
-          loginName: submitted.factors.user.loginName,
+          loginName: session.factors.user.loginName,
           authRequestId: command.authRequestId,
         }
       : {
-          loginName: submitted.factors.user.loginName,
+          loginName: session.factors.user.loginName,
         },
   );
 
-  if (command.organization) {
-    params.append("organization", command.organization);
+  if (command.organization || session.factors?.user?.organizationId) {
+    params.append(
+      "organization",
+      command.organization ?? session.factors?.user?.organizationId,
+    );
   }
 
   return redirect(`/signedin?` + params);
