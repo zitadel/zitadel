@@ -48,6 +48,7 @@ services:
     volumes:
       - "./pat:/pat"
       - "../apps/login:/apps/login"
+      - "../acceptance/tests:/acceptance/tests"
     depends_on:
       wait_for_zitadel:
         condition: "service_completed_successfully"
