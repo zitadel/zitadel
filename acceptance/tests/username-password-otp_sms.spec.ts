@@ -1,7 +1,6 @@
 import { test as base } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
-import { loginScreenExpect, loginWithPassword } from "./login";
 import { OtpType, PasswordUserWithOTP } from "./user";
 
 // Read from ".env" file.

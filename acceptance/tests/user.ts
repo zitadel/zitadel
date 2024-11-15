@@ -59,7 +59,7 @@ class User {
     }
 
     // wait for projection of user
-    await page.waitForTimeout(3000)
+    await page.waitForTimeout(3000);
   }
 
   async remove() {
@@ -169,7 +169,7 @@ export class PasswordUserWithOTP extends User {
     }
 
     // wait for projection of user
-    await page.waitForTimeout(2000)
+    await page.waitForTimeout(2000);
   }
 
   public getCode() {
@@ -203,7 +203,7 @@ export class PasskeyUser extends User {
     this.authenticatorId = authId;
 
     // wait for projection of user
-    await page.waitForTimeout(2000)
+    await page.waitForTimeout(2000);
   }
 
   public async remove() {
