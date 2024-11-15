@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	saml_xml "github.com/zitadel/saml/pkg/provider/xml"
+	"github.com/zitadel/saml/pkg/provider/xml/md"
 	"golang.org/x/crypto/bcrypt"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
@@ -111,13 +112,15 @@ func TestServer_SAMLMetadata(t *testing.T) {
 	oauthIdpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
 	type args struct {
-		ctx   context.Context
-		idpID string
+		ctx        context.Context
+		idpID      string
+		internalUI bool
 	}
 	tests := []struct {
-		name string
-		args args
-		want int
+		name    string
+		args    args
+		want    int
+		wantACS []md.IndexedEndpointType
 	}{
 		{
 			name: "saml metadata, invalid idp",
@@ -142,11 +145,115 @@ func TestServer_SAMLMetadata(t *testing.T) {
 				idpID: samlRedirectIdpID,
 			},
 			want: http.StatusOK,
+			wantACS: []md.IndexedEndpointType{
+				{
+					XMLName: xml.Name{
+						Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+						Local: "AssertionConsumerService",
+					},
+					Index:            "1",
+					IsDefault:        "",
+					Binding:          saml.HTTPPostBinding,
+					Location:         http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/idps/" + samlRedirectIdpID + "/saml/acs",
+					ResponseLocation: "",
+				},
+				{
+					XMLName: xml.Name{
+						Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+						Local: "AssertionConsumerService",
+					},
+					Index:            "2",
+					IsDefault:        "",
+					Binding:          saml.HTTPArtifactBinding,
+					Location:         http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/idps/" + samlRedirectIdpID + "/saml/acs",
+					ResponseLocation: "",
+				},
+				{
+					XMLName: xml.Name{
+						Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+						Local: "AssertionConsumerService",
+					},
+					Index:            "3",
+					IsDefault:        "",
+					Binding:          saml.HTTPPostBinding,
+					Location:         http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/ui/login/login/externalidp/saml/acs",
+					ResponseLocation: "",
+				},
+				{
+					XMLName: xml.Name{
+						Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+						Local: "AssertionConsumerService",
+					},
+					Index:            "4",
+					IsDefault:        "",
+					Binding:          saml.HTTPArtifactBinding,
+					Location:         http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/ui/login/login/externalidp/saml/acs",
+					ResponseLocation: "",
+				},
+			},
+		},
+		{
+			name: "saml metadata, ok (internalUI)",
+			args: args{
+				ctx:        CTX,
+				idpID:      samlRedirectIdpID,
+				internalUI: true,
+			},
+			want: http.StatusOK,
+			wantACS: []md.IndexedEndpointType{
+				{
+					XMLName: xml.Name{
+						Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+						Local: "AssertionConsumerService",
+					},
+					Index:            "0",
+					IsDefault:        "true",
+					Binding:          saml.HTTPPostBinding,
+					Location:         http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/ui/login/login/externalidp/saml/acs",
+					ResponseLocation: "",
+				},
+				{
+					XMLName: xml.Name{
+						Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+						Local: "AssertionConsumerService",
+					},
+					Index:            "1",
+					IsDefault:        "",
+					Binding:          saml.HTTPArtifactBinding,
+					Location:         http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/ui/login/login/externalidp/saml/acs",
+					ResponseLocation: "",
+				},
+				{
+					XMLName: xml.Name{
+						Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+						Local: "AssertionConsumerService",
+					},
+					Index:            "2",
+					IsDefault:        "",
+					Binding:          saml.HTTPPostBinding,
+					Location:         http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/idps/" + samlRedirectIdpID + "/saml/acs",
+					ResponseLocation: "",
+				},
+				{
+					XMLName: xml.Name{
+						Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+						Local: "AssertionConsumerService",
+					},
+					Index:            "3",
+					IsDefault:        "",
+					Binding:          saml.HTTPArtifactBinding,
+					Location:         http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/idps/" + samlRedirectIdpID + "/saml/acs",
+					ResponseLocation: "",
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			metadataURL := http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/metadata"
+			if tt.args.internalUI {
+				metadataURL = metadataURL + "?internalUI=true"
+			}
 			resp, err := http.Get(metadataURL)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want, resp.StatusCode)
@@ -155,10 +262,11 @@ func TestServer_SAMLMetadata(t *testing.T) {
 				defer resp.Body.Close()
 				assert.NoError(t, err)
 
-				_, err = saml_xml.ParseMetadataXmlIntoStruct(b)
+				metadata, err := saml_xml.ParseMetadataXmlIntoStruct(b)
 				assert.NoError(t, err)
-			}
 
+				assert.Equal(t, metadata.SPSSODescriptor.AssertionConsumerService, tt.wantACS)
+			}
 		})
 	}
 }
