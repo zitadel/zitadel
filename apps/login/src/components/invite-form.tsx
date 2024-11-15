@@ -1,20 +1,14 @@
 "use client";
 
-import { registerUser } from "@/lib/server/register";
-import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import { inviteUser } from "@/lib/server/invite";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
-import {
-  AuthenticationMethodRadio,
-  methods,
-} from "./authentication-method-radio";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
-import { PrivacyPolicyCheckboxes } from "./privacy-policy-checkboxes";
 import { Spinner } from "./spinner";
 
 type Inputs =
@@ -26,21 +20,17 @@ type Inputs =
   | FieldValues;
 
 type Props = {
-  legal: LegalAndSupportSettings;
   firstname?: string;
   lastname?: string;
   email?: string;
   organization?: string;
-  authRequestId?: string;
 };
 
-export function RegisterFormWithoutPassword({
-  legal,
+export function InviteForm({
   email,
   firstname,
   lastname,
   organization,
-  authRequestId,
 }: Props) {
   const t = useTranslations("register");
 
@@ -54,64 +44,60 @@ export function RegisterFormWithoutPassword({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [selected, setSelected] = useState(methods[0]);
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
 
-  async function submitAndRegister(values: Inputs) {
+  async function submitAndContinue(values: Inputs) {
     setLoading(true);
-    const response = await registerUser({
+    const response = await inviteUser({
       email: values.email,
       firstName: values.firstname,
       lastName: values.lastname,
       organization: organization,
-      authRequestId: authRequestId,
     })
       .catch(() => {
-        setError("Could not register user");
+        setError("Could not create invitation Code");
         return;
       })
       .finally(() => {
         setLoading(false);
       });
 
-    if (response && "error" in response) {
+    if (response && typeof response === "object" && "error" in response) {
       setError(response.error);
       return;
     }
 
-    return response;
-  }
-
-  async function submitAndContinue(
-    value: Inputs,
-    withPassword: boolean = false,
-  ) {
-    const registerParams: any = value;
-
-    if (organization) {
-      registerParams.organization = organization;
+    if (!response) {
+      setError("Could not create invitation Code");
+      return;
     }
 
-    if (authRequestId) {
-      registerParams.authRequestId = authRequestId;
+    const params = new URLSearchParams({});
+
+    if (response) {
+      params.append("userId", response);
     }
 
-    if (withPassword) {
-      return router.push(`/register?` + new URLSearchParams(registerParams));
-    } else {
-      return submitAndRegister(value);
-    }
+    return router.push(`/invite/success?` + params);
   }
 
   const { errors } = formState;
 
-  const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
-
   return (
     <form className="w-full">
       <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="col-span-2">
+          <TextInput
+            type="email"
+            autoComplete="email"
+            required
+            {...register("email", { required: "This field is required" })}
+            label="E-mail"
+            error={errors.email?.message as string}
+          />
+        </div>
         <div className="">
           <TextInput
             type="firstname"
@@ -120,7 +106,6 @@ export function RegisterFormWithoutPassword({
             {...register("firstname", { required: "This field is required" })}
             label="First name"
             error={errors.firstname?.message as string}
-            data-testid="firstname-text-input"
           />
         </div>
         <div className="">
@@ -131,36 +116,8 @@ export function RegisterFormWithoutPassword({
             {...register("lastname", { required: "This field is required" })}
             label="Last name"
             error={errors.lastname?.message as string}
-            data-testid="lastname-text-input"
           />
         </div>
-        <div className="col-span-2">
-          <TextInput
-            type="email"
-            autoComplete="email"
-            required
-            {...register("email", { required: "This field is required" })}
-            label="E-mail"
-            error={errors.email?.message as string}
-            data-testid="email-text-input"
-          />
-        </div>
-      </div>
-
-      {legal && (
-        <PrivacyPolicyCheckboxes
-          legal={legal}
-          onChange={setTosAndPolicyAccepted}
-        />
-      )}
-
-      <p className="mt-4 ztdl-p mb-6 block text-left">{t("selectMethod")}</p>
-
-      <div className="pb-4">
-        <AuthenticationMethodRadio
-          selected={selected}
-          selectionChanged={setSelected}
-        />
       </div>
 
       {error && (
@@ -170,15 +127,12 @@ export function RegisterFormWithoutPassword({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton data-testid="back-button" />
+        <BackButton />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
-          disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
-          onClick={handleSubmit((values) =>
-            submitAndContinue(values, !(selected.name === methods[0].name)),
-          )}
-          data-testid="submit-button"
+          disabled={loading || !formState.isValid}
+          onClick={handleSubmit(submitAndContinue)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("submit")}

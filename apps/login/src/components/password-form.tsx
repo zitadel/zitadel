@@ -60,13 +60,14 @@ export function PasswordForm({
       }),
       authRequestId,
       forceMfa: loginSettings?.forceMfa,
-    }).catch(() => {
-      setLoading(false);
-      setError("Could not verify password");
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not verify password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && "error" in response && response.error) {
       setError(response.error);
@@ -83,12 +84,14 @@ export function PasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
-    }).catch(() => {
-      setError("Could not reset password");
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not reset password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && "error" in response) {
       setError(response.error);

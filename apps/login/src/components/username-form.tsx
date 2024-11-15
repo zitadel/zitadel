@@ -52,11 +52,13 @@ export function UsernameForm({
       loginName: values.loginName,
       organization,
       authRequestId,
-    }).catch(() => {
-      setError("An internal error occurred");
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("An internal error occurred");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (res?.error) {
       setError(res.error);

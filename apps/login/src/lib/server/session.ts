@@ -1,17 +1,12 @@
 "use server";
 
 import {
-  createSessionAndUpdateCookie,
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
 import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import {
-  Checks,
-  ChecksSchema,
-} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import {
   getMostRecentSessionCookie,
@@ -31,26 +26,13 @@ type CreateNewSessionCommand = {
   authRequestId?: string;
 };
 
-export async function createNewSession(options: CreateNewSessionCommand) {
-  const { userId, idpIntent, loginName, password, authRequestId } = options;
+export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
+  const { userId, idpIntent, authRequestId } = options;
 
-  if (userId && idpIntent) {
-    return createSessionForIdpAndUpdateCookie(userId, idpIntent, authRequestId);
-  } else if (loginName) {
-    const checks = create(
-      ChecksSchema,
-      password
-        ? {
-            user: { search: { case: "loginName", value: loginName } },
-            password: { password },
-          }
-        : { user: { search: { case: "loginName", value: loginName } } },
-    );
-
-    return createSessionAndUpdateCookie(checks, undefined, authRequestId);
-  } else {
+  if (!userId || !idpIntent) {
     throw new Error("No userId or loginName provided");
   }
+  return createSessionForIdpAndUpdateCookie(userId, idpIntent, authRequestId);
 }
 
 export type UpdateSessionCommand = {
@@ -94,7 +76,8 @@ export async function updateSession(options: UpdateSessionCommand) {
     challenges.webAuthN &&
     !challenges.webAuthN.domain
   ) {
-    challenges.webAuthN.domain = host;
+    const [hostname, port] = host.split(":");
+    challenges.webAuthN.domain = hostname;
   }
 
   const recent = await sessionPromise;

@@ -47,15 +47,17 @@ export function RegisterU2f({
       passkeyName,
       publicKeyCredential,
       sessionId,
-    }).catch(() => {
-      setError("An error on verifying passkey occurred");
-    });
+    })
+      .catch(() => {
+        setError("An error on verifying passkey occurred");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && "error" in response && response?.error) {
       setError(response?.error);
     }
-
-    setLoading(false);
 
     return response;
   }
@@ -65,11 +67,13 @@ export function RegisterU2f({
     setLoading(true);
     const response = await addU2F({
       sessionId,
-    }).catch(() => {
-      setError("An error on registering passkey");
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("An error on registering passkey");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (response && "error" in response && response?.error) {
       setError(response?.error);
@@ -115,7 +119,6 @@ export function RegisterU2f({
         !(resp as any).rawId
       ) {
         setError("An error on registering passkey");
-        setLoading(false);
         return;
       }
 
@@ -139,7 +142,6 @@ export function RegisterU2f({
       const submitResponse = await submitVerify(u2fId, "", data, sessionId);
 
       if (!submitResponse) {
-        setLoading(false);
         setError("An error on verifying passkey");
         return;
       }
@@ -177,8 +179,6 @@ export function RegisterU2f({
 
       router.push(urlToContinue);
     }
-
-    setLoading(false);
   }
 
   return (

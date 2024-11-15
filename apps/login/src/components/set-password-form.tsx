@@ -35,6 +35,7 @@ type Props = {
   userId: string;
   organization?: string;
   authRequestId?: string;
+  codeRequired: boolean;
 };
 
 export function SetPasswordForm({
@@ -44,6 +45,7 @@ export function SetPasswordForm({
   loginName,
   userId,
   code,
+  codeRequired,
 }: Props) {
   const t = useTranslations("password");
 
@@ -57,24 +59,34 @@ export function SetPasswordForm({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  async function submitRegister(values: Inputs) {
+  async function submitPassword(values: Inputs) {
     setLoading(true);
-    const changeResponse = await changePassword({
+    let payload: { userId: string; password: string; code?: string } = {
       userId: userId,
       password: values.password,
-      code: values.code,
-    }).catch(() => {
-      setError("Could not register user");
-    });
+    };
+
+    // this is not required for initial password setup
+    if (codeRequired) {
+      payload = { ...payload, code: values.code };
+    }
+
+    const changeResponse = await changePassword(payload)
+      .catch(() => {
+        setError("Could not set password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (changeResponse && "error" in changeResponse) {
       setError(changeResponse.error);
+      return;
     }
 
-    setLoading(false);
-
     if (!changeResponse) {
-      setError("Could not register user");
+      setError("Could not set password");
       return;
     }
 
@@ -87,6 +99,8 @@ export function SetPasswordForm({
       params.append("organization", organization);
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for a second to avoid eventual consistency issues with an initial password being set
+
     const passwordResponse = await sendPassword({
       loginName,
       organization,
@@ -94,13 +108,14 @@ export function SetPasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
-    }).catch(() => {
-      setLoading(false);
-      setError("Could not verify password");
-      return;
-    });
-
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not verify password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (
       passwordResponse &&
@@ -109,23 +124,6 @@ export function SetPasswordForm({
     ) {
       setError(passwordResponse.error);
     }
-
-    // // skip verification for now as it is an app based flow
-    // // return router.push(`/verify?` + params);
-
-    // // check for mfa force to continue with mfa setup
-
-    // if (authRequestId && changeResponse.sessionId) {
-    //   if (authRequestId) {
-    //     params.append("authRequest", authRequestId);
-    //   }
-    //   return router.push(`/login?` + params);
-    // } else {
-    //   if (authRequestId) {
-    //     params.append("authRequestId", authRequestId);
-    //   }
-    //   return router.push(`/signedin?` + params);
-    // }
   }
 
   const { errors } = formState;
@@ -152,24 +150,28 @@ export function SetPasswordForm({
   return (
     <form className="w-full">
       <div className="pt-4 grid grid-cols-1 gap-4 mb-4">
-        <div className="flex flex-row items-end">
-          <div className="flex-1">
-            <TextInput
-              type="text"
-              required
-              {...register("code", {
-                required: "This field is required",
-              })}
-              label="Code"
-              error={errors.code?.message as string}
-            />
+        {codeRequired && (
+          <div className="flex flex-row items-end">
+            <div className="flex-1">
+              <TextInput
+                type="text"
+                required
+                {...register("code", {
+                  required: "This field is required",
+                })}
+                label="Code"
+                autoComplete="one-time-code"
+                error={errors.code?.message as string}
+              />
+            </div>
+
+            <div className="ml-4 mb-1">
+              <Button variant={ButtonVariants.Secondary}>
+                {t("set.resend")}
+              </Button>
+            </div>
           </div>
-          <div className="ml-4 mb-1">
-            <Button variant={ButtonVariants.Secondary}>
-              {t("set.resend")}
-            </Button>
-          </div>
-        </div>
+        )}
         <div className="">
           <TextInput
             type="password"
@@ -217,7 +219,7 @@ export function SetPasswordForm({
             !formState.isValid ||
             watchPassword !== watchConfirmPassword
           }
-          onClick={handleSubmit(submitRegister)}
+          onClick={handleSubmit(submitPassword)}
           data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}

@@ -50,11 +50,14 @@ export function RegisterPasskey({
       passkeyName,
       publicKeyCredential,
       sessionId,
-    }).catch(() => {
-      setError("Could not verify Passkey");
-    });
+    })
+      .catch(() => {
+        setError("Could not verify Passkey");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-    setLoading(false);
     return response;
   }
 
@@ -62,10 +65,13 @@ export function RegisterPasskey({
     setLoading(true);
     const resp = await registerPasskeyLink({
       sessionId,
-    }).catch(() => {
-      setError("Could not register passkey");
-    });
-    setLoading(false);
+    })
+      .catch(() => {
+        setError("Could not register passkey");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     if (!resp) {
       setError("An error on registering passkey");

@@ -1,16 +1,20 @@
 "use server";
 
+import { timestampDate, timestampFromMs } from "@zitadel/client";
 import { cookies } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "./i18n";
+
+// TODO: improve this to handle overflow
+const MAX_COOKIE_SIZE = 2048;
 
 export type Cookie = {
   id: string;
   token: string;
   loginName: string;
   organization?: string;
-  creationDate: string;
-  expirationDate: string;
-  changeDate: string;
+  creationTs: string;
+  expirationTs: string;
+  changeTs: string;
   authRequestId?: string; // if its linked to an OIDC flow
 };
 
@@ -56,13 +60,24 @@ export async function addSessionToCookie<T>(
   if (index > -1) {
     currentSessions[index] = session;
   } else {
-    currentSessions = [...currentSessions, session];
+    const temp = [...currentSessions, session];
+
+    if (JSON.stringify(temp).length >= MAX_COOKIE_SIZE) {
+      console.log("WARNING COOKIE OVERFLOW");
+      // TODO: improve cookie handling
+      // this replaces the first session (oldest) with the new one
+      currentSessions = [session].concat(currentSessions.slice(1));
+    } else {
+      currentSessions = [session].concat(currentSessions);
+    }
   }
 
   if (cleanup) {
     const now = new Date();
     const filteredSessions = currentSessions.filter((session) =>
-      session.expirationDate ? new Date(session.expirationDate) > now : true,
+      session.expirationTs
+        ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
+        : true,
     );
     return setSessionHttpOnlyCookie(filteredSessions);
   } else {
@@ -89,7 +104,9 @@ export async function updateSessionCookie<T>(
     if (cleanup) {
       const now = new Date();
       const filteredSessions = sessions.filter((session) =>
-        session.expirationDate ? new Date(session.expirationDate) > now : true,
+        session.expirationTs
+          ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
+          : true,
       );
       return setSessionHttpOnlyCookie(filteredSessions);
     } else {
@@ -115,7 +132,9 @@ export async function removeSessionFromCookie<T>(
   if (cleanup) {
     const now = new Date();
     const filteredSessions = reducedSessions.filter((session) =>
-      session.expirationDate ? new Date(session.expirationDate) > now : true,
+      session.expirationTs
+        ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
+        : true,
     );
     return setSessionHttpOnlyCookie(filteredSessions);
   } else {
@@ -131,10 +150,7 @@ export async function getMostRecentSessionCookie<T>(): Promise<any> {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
 
     const latest = sessions.reduce((prev, current) => {
-      return new Date(prev.changeDate).getTime() >
-        new Date(current.changeDate).getTime()
-        ? prev
-        : current;
+      return prev.changeTs > current.changeTs ? prev : current;
     });
 
     return latest;
@@ -216,8 +232,8 @@ export async function getAllSessionCookieIds<T>(
       const now = new Date();
       return sessions
         .filter((session) =>
-          session.expirationDate
-            ? new Date(session.expirationDate) > now
+          session.expirationTs
+            ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
             : true,
         )
         .map((session) => session.id);
@@ -246,7 +262,9 @@ export async function getAllSessions<T>(
     if (cleanup) {
       const now = new Date();
       return sessions.filter((session) =>
-        session.expirationDate ? new Date(session.expirationDate) > now : true,
+        session.expirationTs
+          ? timestampDate(timestampFromMs(Number(session.expirationTs))) > now
+          : true,
       );
     } else {
       return sessions;
@@ -287,10 +305,7 @@ export async function getMostRecentCookieWithLoginname<T>({
     const latest =
       filtered && filtered.length
         ? filtered.reduce((prev, current) => {
-            return new Date(prev.changeDate).getTime() >
-              new Date(current.changeDate).getTime()
-              ? prev
-              : current;
+            return prev.changeTs > current.changeTs ? prev : current;
           })
         : undefined;
 
