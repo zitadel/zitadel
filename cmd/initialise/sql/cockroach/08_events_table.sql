@@ -83,7 +83,7 @@ JOIN (
         ON a.instance_id = e.instance_id
         AND a.aggregate_type = e.aggregate_type
         AND a.aggregate_id = e.aggregate_id
-        AND a.owner = e.owner
+        AND (a.owner = '' OR a.owner = e.owner)
     GROUP BY
         a.instance_id,
         a.aggregate_type,
@@ -93,7 +93,7 @@ JOIN (
     ON c.instance_id = cs.instance_id
     AND c.aggregate_type = cs.aggregate_type
     AND c.aggregate_id = cs.aggregate_id
-    AND c.owner = cs.owner
+    AND (cs.owner = '' OR cs.owner = c.owner)
 ORDER BY
     c.in_tx_order
 $$ LANGUAGE SQL;
