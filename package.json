@@ -37,6 +37,7 @@
     "dotenv": "^16.4.5",
     "eslint": "8.57.1",
     "eslint-config-zitadel": "workspace:*",
+    "node-fetch": "^3.3.2",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^4.1.0",
     "tsup": "^8.3.5",
