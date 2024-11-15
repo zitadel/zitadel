@@ -91,7 +91,7 @@ message PatchTarget {
     }
   ];
   // Regenerate the key used for signing and checking the payload sent to the target.
-  // And set the graceful period for the existing key. During that time, the previous
+  // Set the graceful period for the existing key. During that time, the previous
   // signing key and the new one will be used to sign the request to allow you a smooth
   // transition onf your API.
   //
