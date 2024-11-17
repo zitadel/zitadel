@@ -89,14 +89,14 @@ func writeEvents(ctx context.Context, tx *sql.Tx, commands []eventstore.Command)
 		return nil, err
 	}
 
-	rows, err := tx.QueryContext(ctx, `select created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, cmds)
+	rows, err := tx.QueryContext(ctx, `select owner, created_at, "sequence", position from eventstore.push($1::eventstore.command[])`, cmds)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	for i := 0; rows.Next(); i++ {
-		err = rows.Scan(&events[i].(*event).createdAt, &events[i].(*event).sequence, &events[i].(*event).position)
+		err = rows.Scan(&events[i].(*event).command.Owner, &events[i].(*event).createdAt, &events[i].(*event).sequence, &events[i].(*event).position)
 		if err != nil {
 			logging.WithError(err).Warn("failed to scan events")
 			return nil, err

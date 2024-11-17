@@ -96,16 +96,8 @@ ORDER BY
     c.in_tx_order;
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS TABLE(
-    instance_id TEXT
-    , aggregate_type TEXT
-    , aggregate_id TEXT
-    , created_at TIMESTAMPTZ
-    , "sequence" INT8
-    , "position" DECIMAL
-    , in_tx_order INT4
-) AS $$
+CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 INSERT INTO eventstore.events2
 SELECT * FROM eventstore.commands_to_events(commands)
-RETURNING instance_id, aggregate_type, aggregate_id, created_at, "sequence", position, in_tx_order
+RETURNING *
 $$ LANGUAGE SQL;
