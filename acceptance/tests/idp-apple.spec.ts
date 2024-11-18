@@ -27,14 +27,12 @@ const test = base.extend<{ user: PasswordUserWithOTP }>({
 // Note for all tests, in case Apple doesn't deliver all relevant information per default
 // We should add an action in the needed cases
 
-test("login with Apple IDP - auto redirect", async ({user, page}) => {
-    // Given idp Apple is configure on the organization as only authencation method
-    // Given the user has only idp Apple added as auth method
-
-    // User is automatically redirected to Apple
-    // User authenticates in Apple
-    // User is redirect to ZITADEL login
-    // User is redirected to the app (default redirect url)
+test("login with Apple IDP", async ({user, page}) => {
+    // Given idp Apple is configured on the organization
+    // Given the user has Apple added as auth method
+    // User authenticates with Apple
+    // User is redirected back to login
+    // User is redirected to the app
 });
 
 
