@@ -13,9 +13,13 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+var appNamePrefix = dialect.DBPurposeEventPusher.AppName() + "_"
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	tx, err := es.client.BeginTx(ctx, nil)
@@ -26,6 +30,13 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	var (
 		sequences []*latestSequence
 	)
+
+	// needs to be set like this because psql complains about parameters in the SET statement
+	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
+	if err != nil {
+		logging.WithError(err).Warn("failed to set application name")
+		return nil, err
+	}
 
 	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
 		sequences, err = latestSequences(ctx, tx, commands)
