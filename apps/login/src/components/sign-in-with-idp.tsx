@@ -64,17 +64,6 @@ export function SignInWithIdp({
     return response;
   }
 
-  async function navigateToAuthUrl(id: string, type: IdentityProviderType) {
-    const startFlowResponse = await startFlow(id, idpTypeToSlug(type));
-    if (
-      startFlowResponse &&
-      startFlowResponse.nextStep.case === "authUrl" &&
-      startFlowResponse?.nextStep.value
-    ) {
-      router.push(startFlowResponse.nextStep.value);
-    }
-  }
-
   return (
     <div className="flex flex-col w-full space-y-2 text-sm">
       {identityProviders &&
@@ -86,7 +75,7 @@ export function SignInWithIdp({
                   key={`idp-${i}`}
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(idp.id, IdentityProviderType.APPLE)
+                    startFlow(idp.id, idpTypeToSlug(IdentityProviderType.APPLE))
                   }
                 ></SignInWithApple>
               );
@@ -96,7 +85,7 @@ export function SignInWithIdp({
                   key={`idp-${i}`}
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(idp.id, IdentityProviderType.OAUTH)
+                    startFlow(idp.id, idpTypeToSlug(IdentityProviderType.OAUTH))
                   }
                 ></SignInWithGeneric>
               );
@@ -106,7 +95,7 @@ export function SignInWithIdp({
                   key={`idp-${i}`}
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(idp.id, IdentityProviderType.OIDC)
+                    startFlow(idp.id, idpTypeToSlug(IdentityProviderType.OIDC))
                   }
                 ></SignInWithGeneric>
               );
@@ -116,7 +105,10 @@ export function SignInWithIdp({
                   key={`idp-${i}`}
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(idp.id, IdentityProviderType.GITHUB)
+                    startFlow(
+                      idp.id,
+                      idpTypeToSlug(IdentityProviderType.GITHUB),
+                    )
                   }
                 ></SignInWithGithub>
               );
@@ -126,7 +118,10 @@ export function SignInWithIdp({
                   key={`idp-${i}`}
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(idp.id, IdentityProviderType.GITHUB_ES)
+                    startFlow(
+                      idp.id,
+                      idpTypeToSlug(IdentityProviderType.GITHUB_ES),
+                    )
                   }
                 ></SignInWithGithub>
               );
@@ -136,7 +131,10 @@ export function SignInWithIdp({
                   key={`idp-${i}`}
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(idp.id, IdentityProviderType.AZURE_AD)
+                    startFlow(
+                      idp.id,
+                      idpTypeToSlug(IdentityProviderType.AZURE_AD),
+                    )
                   }
                 ></SignInWithAzureAd>
               );
@@ -147,7 +145,10 @@ export function SignInWithIdp({
                   e2e="google"
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(idp.id, IdentityProviderType.GOOGLE)
+                    startFlow(
+                      idp.id,
+                      idpTypeToSlug(IdentityProviderType.GOOGLE),
+                    )
                   }
                 ></SignInWithGoogle>
               );
@@ -157,7 +158,10 @@ export function SignInWithIdp({
                   key={`idp-${i}`}
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(idp.id, IdentityProviderType.GITLAB)
+                    startFlow(
+                      idp.id,
+                      idpTypeToSlug(IdentityProviderType.GITLAB),
+                    )
                   }
                 ></SignInWithGitlab>
               );
@@ -167,9 +171,9 @@ export function SignInWithIdp({
                   key={`idp-${i}`}
                   name={idp.name}
                   onClick={() =>
-                    navigateToAuthUrl(
+                    startFlow(
                       idp.id,
-                      IdentityProviderType.GITLAB_SELF_HOSTED,
+                      idpTypeToSlug(IdentityProviderType.GITLAB_SELF_HOSTED),
                     )
                   }
                 ></SignInWithGitlab>
