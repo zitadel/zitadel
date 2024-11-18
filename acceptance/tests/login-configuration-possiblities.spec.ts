@@ -26,13 +26,10 @@ const test = base.extend<{ user: PasswordUser }>({
 });
 
 test("login with mfa setup, mfa setup prompt", async ({user, page}) => {
-    // Given the organization has set "multifactor init check time" to 40
-    // Given the organization has enabled all possible mfa types 
-    // Given the user has a password but no mfa registered and never authenticated
-
-    // enter login name
-    // enter password
-    // User is prompted to setup a mfa, all possible mfa providers are listed, the user can choose the provider
+    // Given the organization has enabled at least one mfa types 
+    // Given the user has a password but no mfa registered
+    // User authenticates with login name and password
+    // User is prompted to setup a mfa, mfa providers are listed, the user can choose the provider
 });
 
 test("login with mfa setup, mfa setup prompt", async ({user, page}) => {
