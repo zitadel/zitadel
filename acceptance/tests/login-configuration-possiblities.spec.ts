@@ -32,15 +32,13 @@ test("login with mfa setup, mfa setup prompt", async ({user, page}) => {
     // User is prompted to setup a mfa, mfa providers are listed, the user can choose the provider
 });
 
-test("login with mfa setup, mfa setup prompt", async ({user, page}) => {
+test("login with mfa setup, no mfa setup prompt", async ({user, page}) => {
     // Given the organization has set "multifactor init check time" to 0
-    // Given the organization has enabled all possible mfa types 
-    // Given the user has a password but no mfa registered and never authenticated
-
-    // enter login name
-    // enter password
-    // user is redirected to app
-});
+    // Given the organization has enabled mfa types 
+    // Given the user has a password but no mfa registered
+    // User authenticates with loginname and password
+    // user is directly loged in and not prompted to setup mfa
+    });
 
 test("login with mfa setup, force mfa for local authenticated users", async ({user, page}) => {
     // Given the organization has enabled force mfa for local authentiacted users
