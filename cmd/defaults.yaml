@@ -68,7 +68,7 @@ Port: 8080 # ZITADEL_PORT
 # It can differ from Port e.g. if a reverse proxy forwards the traffic to ZITADEL
 # Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalPort: 8080 # ZITADEL_EXTERNALPORT
-# ExternalPort is the domain on which end users access ZITADEL.
+# ExternalDomain is the domain on which end users access ZITADEL.
 # Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalDomain: localhost # ZITADEL_EXTERNALDOMAIN
 # ExternalSecure specifies if ZITADEL is exposed externally using HTTPS or HTTP.
