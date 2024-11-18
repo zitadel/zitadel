@@ -24,3 +24,25 @@ test("username and passkey login", async ({ user, page }) => {
   await loginWithPasskey(page, user.getAuthenticatorId(), user.getUsername());
   await loginScreenExpect(page, user.getFullName());
 });
+
+test("username and passkey login, if passkey enabled", async ({user, page}) => {
+    // Given passkey is enabled on the organization of the user
+    // Given the user has only passkey enabled as authentication
+
+    // enter username
+    // passkey popup is directly shown
+    // user verifies passkey
+    // user is redirected to app
+});
+
+test("username and passkey login, multiple auth methods", async ({user, page}) => {
+    // Given passkey and password is enabled on the organization of the user
+    // Given the user has password and passkey registered
+
+    // enter username
+    // passkey popup is directly shown
+    // user aborts passkey authentication
+    // user switches to password authentication
+    // user enters password
+    // user is redirected to app
+});
