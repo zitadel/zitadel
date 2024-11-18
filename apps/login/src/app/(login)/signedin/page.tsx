@@ -1,14 +1,21 @@
+import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SelfServiceMenu } from "@/components/self-service-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
-import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
+import {
+  createCallback,
+  getBrandingSettings,
+  getLoginSettings,
+  getSession,
+} from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import {
   CreateCallbackRequestSchema,
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 async function loadSession(loginName: string, authRequestId?: string) {
@@ -48,6 +55,11 @@ export default async function Page({ searchParams }: { searchParams: any }) {
 
   const branding = await getBrandingSettings(organization);
 
+  let loginSettings;
+  if (!authRequestId) {
+    loginSettings = await getLoginSettings(organization);
+  }
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
@@ -65,6 +77,22 @@ export default async function Page({ searchParams }: { searchParams: any }) {
 
         {sessionFactors?.id && (
           <SelfServiceMenu sessionId={sessionFactors?.id} />
+        )}
+
+        {loginSettings?.defaultRedirectUri && (
+          <div className="mt-8 flex w-full flex-row items-center">
+            <span className="flex-grow"></span>
+
+            <Link href={loginSettings?.defaultRedirectUri}>
+              <Button
+                type="submit"
+                className="self-end"
+                variant={ButtonVariants.Primary}
+              >
+                {t("continue")}
+              </Button>
+            </Link>
+          </div>
         )}
       </div>
     </DynamicTheme>

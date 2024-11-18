@@ -176,15 +176,15 @@ export function LoginPasskey({
           },
         };
 
-        return submitLogin(data).then((resp) => {
+        return submitLogin(data).then(async (resp) => {
           return authRequestId && resp?.sessionId
-            ? finishFlow({
+            ? await finishFlow({
                 sessionId: resp.sessionId,
                 authRequestId: authRequestId,
                 organization: organization,
               })
             : resp?.factors?.user?.loginName
-              ? finishFlow({
+              ? await finishFlow({
                   loginName: resp.factors.user.loginName,
                   organization: organization,
                 })

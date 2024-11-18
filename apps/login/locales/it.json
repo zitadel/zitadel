@@ -151,7 +151,8 @@
   },
   "signedin": {
     "title": "Benvenuto {user}!",
-    "description": "Sei connesso."
+    "description": "Sei connesso.",
+    "continue": "Continua"
   },
   "verify": {
     "userIdMissing": "Nessun userId fornito!",

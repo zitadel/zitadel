@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getLoginSettings } from "./zitadel";
 
 type FinishFlowCommand =
   | {
@@ -8,25 +9,32 @@ type FinishFlowCommand =
   | { loginName: string };
 
 /**
- * on client: redirects user back to OIDC application or to a success page
+ * for client: redirects user back to OIDC application or to a success page when using authRequestId, check if a default redirect and redirect to it, or just redirect to a success page with the loginName
  * @param command
  * @returns
  */
-export function finishFlow(
+export async function finishFlow(
   command: FinishFlowCommand & { organization?: string },
 ) {
-  return "sessionId" in command && "authRequestId" in command
-    ? redirect(
-        `/login?` +
-          new URLSearchParams({
-            sessionId: command.sessionId,
-            authRequest: command.authRequestId,
-          }),
-      )
-    : redirect(
-        `/signedin?` +
-          new URLSearchParams({
-            loginName: command.loginName,
-          }),
-      );
+  if ("sessionId" in command && "authRequestId" in command) {
+    return redirect(
+      `/login?` +
+        new URLSearchParams({
+          sessionId: command.sessionId,
+          authRequest: command.authRequestId,
+        }),
+    );
+  }
+
+  const loginSettings = await getLoginSettings(command.organization);
+  if (loginSettings?.defaultRedirectUri) {
+    return redirect(loginSettings.defaultRedirectUri);
+  }
+
+  return redirect(
+    `/signedin?` +
+      new URLSearchParams({
+        loginName: command.loginName,
+      }),
+  );
 }
