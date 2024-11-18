@@ -47,17 +47,6 @@ test("login with Apple IDP - auto redirect, error", async ({user, page}) => {
 });
 
 
-test("login with Apple IDP", async ({user, page}) => {
-    // Given username password and idp Apple is configure on the organization as authencation method
-    // Given the user has username password and Apple configured
-
-    // Login form shows username field and a Apple Login button
-    // User clicks on the Apple button
-    // User is redirected to Apple
-    // User authenticates in Apple and gets an error
-    // User is redirect to ZITADEL login automatically
-    // User is redirected to app automatically (default redirect url)
-});
 
  
 test("login with Apple IDP, error", async ({user, page}) => {
