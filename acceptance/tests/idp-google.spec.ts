@@ -24,7 +24,6 @@ const test = base.extend<{ user: PasswordUserWithOTP }>({
     },
 });
 
-
 test("login with Google IDP - auto redirect", async ({user, page}) => {
     // Given idp Google is configure on the organization as only authencation method
     // Given the user has only idp Google added as auth method
