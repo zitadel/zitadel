@@ -26,9 +26,30 @@ fi
 
 WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.local}
 echo "Writing environment file to ${WRITE_ENVIRONMENT_FILE} when done."
+WRITE_TEST_ENVIRONMENT_FILE=${WRITE_TEST_ENVIRONMENT_FILE:-$(dirname "$0")/../acceptance/tests/.env.local}
+echo "Writing environment file to ${WRITE_TEST_ENVIRONMENT_FILE} when done."
 
 echo "ZITADEL_API_URL=${ZITADEL_API_URL}
 ZITADEL_SERVICE_USER_ID=${ZITADEL_SERVICE_USER_ID}
-ZITADEL_SERVICE_USER_TOKEN=${PAT}" > ${WRITE_ENVIRONMENT_FILE}
+ZITADEL_SERVICE_USER_TOKEN=${PAT}
+DEBUG=true"| tee "${WRITE_ENVIRONMENT_FILE}" "${WRITE_TEST_ENVIRONMENT_FILE}" > /dev/null
 echo "Wrote environment file ${WRITE_ENVIRONMENT_FILE}"
 cat ${WRITE_ENVIRONMENT_FILE}
+
+echo "Wrote environment file ${WRITE_TEST_ENVIRONMENT_FILE}"
+cat ${WRITE_TEST_ENVIRONMENT_FILE}
+
+DEFAULTORG_RESPONSE_RESULTS=0
+# waiting for default organization
+until [ ${DEFAULTORG_RESPONSE_RESULTS} -eq 1 ]
+do
+  DEFAULTORG_RESPONSE=$(curl -s --request POST \
+      --url "${ZITADEL_API_INTERNAL_URL}/v2/organizations/_search" \
+      --header "Authorization: Bearer ${PAT}" \
+      --header "Host: ${ZITADEL_API_DOMAIN}" \
+      --header "Content-Type: application/json" \
+      -d "{\"queries\": [{\"defaultQuery\":{}}]}" )
+  echo "Received default organization response: ${DEFAULTORG_RESPONSE}"
+  DEFAULTORG_RESPONSE_RESULTS=$(echo $DEFAULTORG_RESPONSE | jq -r '.result | length')
+  echo "Received default organization response result: ${DEFAULTORG_RESPONSE_RESULTS}"
+done

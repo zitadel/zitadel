@@ -1,50 +1,60 @@
-import fetch from "node-fetch";
+import axios from "axios";
 
 export async function removeUserByUsername(username: string) {
-    const resp = await getUserByUsername(username)
-    if (!resp || !resp.result || !resp.result[0]) {
-        return
-    }
-    await removeUser(resp.result[0].userId)
+  const resp = await getUserByUsername(username);
+  if (!resp || !resp.result || !resp.result[0]) {
+    return;
+  }
+  await removeUser(resp.result[0].userId);
 }
 
 export async function removeUser(id: string) {
-    const response = await fetch(process.env.ZITADEL_API_URL! + "/v2/users/" + id, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
-        }
+  try {
+    const response = await axios.delete(`${process.env.ZITADEL_API_URL}/v2/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+      },
     });
-    if (response.statusCode >= 400 && response.statusCode != 404) {
-        const error = 'HTTP Error: ' + response.statusCode + ' - ' + response.statusMessage;
-        console.error(error);
-        throw new Error(error);
+
+    if (response.status >= 400 && response.status !== 404) {
+      const error = `HTTP Error: ${response.status} - ${response.statusText}`;
+      console.error(error);
+      throw new Error(error);
     }
-    return
+  } catch (error) {
+    console.error("Error making request:", error);
+    throw error;
+  }
 }
 
 export async function getUserByUsername(username: string) {
-    const listUsersBody = {
-        queries: [{
-            userNameQuery: {
-                userName: username,
-            }
-        }]
-    }
-    const jsonBody = JSON.stringify(listUsersBody)
-    const registerResponse = await fetch(process.env.ZITADEL_API_URL! + "/v2/users", {
-        method: 'POST',
-        body: jsonBody,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': "Bearer " + process.env.ZITADEL_SERVICE_USER_TOKEN!
-        }
+  const listUsersBody = {
+    queries: [
+      {
+        userNameQuery: {
+          userName: username,
+        },
+      },
+    ],
+  };
+
+  try {
+    const response = await axios.post(`${process.env.ZITADEL_API_URL}/v2/users`, listUsersBody, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
+      },
     });
-    if (registerResponse.statusCode >= 400) {
-        const error = 'HTTP Error: ' + registerResponse.statusCode + ' - ' + registerResponse.statusMessage;
-        console.error(error);
-        throw new Error(error);
+
+    if (response.status >= 400) {
+      const error = `HTTP Error: ${response.status} - ${response.statusText}`;
+      console.error(error);
+      throw new Error(error);
     }
-    const respJson = await registerResponse.json()
-    return respJson
+
+    return response.data;
+  } catch (error) {
+    console.error("Error making request:", error);
+    throw error;
+  }
 }

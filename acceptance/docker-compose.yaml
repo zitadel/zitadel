@@ -1,7 +1,7 @@
 services:
   zitadel:
     user: "${ZITADEL_DEV_UID}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
+    image: ghcr.io/zitadel/zitadel:v2.65.0
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
@@ -13,8 +13,8 @@ services:
         condition: "service_healthy"
 
   db:
-    restart: 'always'
-    image: "${POSTGRES_IMAGE:-postgres:latest}"
+    restart: "always"
+    image: postgres:17.0-alpine3.19
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel
@@ -23,21 +23,16 @@ services:
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c shared_buffers=1GB -c work_mem=16MB -c effective_io_concurrency=100 -c wal_level=minimal -c archive_mode=off -c max_wal_senders=0
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
-      interval: '10s'
-      timeout: '30s'
+      interval: "10s"
+      timeout: "30s"
       retries: 5
-      start_period: '20s'
+      start_period: "20s"
     ports:
       - 5432:5432
 
   wait_for_zitadel:
     image: curlimages/curl:8.00.1
-    command:
-      [
-        "/bin/sh",
-        "-c",
-        "i=0; while ! curl http://zitadel:8080/debug/ready && [ $$i -lt 30 ]; do sleep 1; i=$$((i+1)); done; [ $$i -eq 120 ] && exit 1 || exit 0",
-      ]
+    command: /bin/sh -c "until curl -s -o /dev/null -i -f http://zitadel:8080/debug/ready; do echo 'waiting' && sleep 1; done; echo 'ready' && sleep 5;" || false
     depends_on:
       - zitadel
 
@@ -49,9 +44,11 @@ services:
       PAT_FILE: /pat/zitadel-admin-sa.pat
       ZITADEL_API_INTERNAL_URL: http://zitadel:8080
       WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
+      WRITE_TEST_ENVIRONMENT_FILE: /acceptance/tests/.env.local
     volumes:
       - "./pat:/pat"
       - "../apps/login:/apps/login"
+      - "../acceptance/tests:/acceptance/tests"
     depends_on:
       wait_for_zitadel:
         condition: "service_completed_successfully"

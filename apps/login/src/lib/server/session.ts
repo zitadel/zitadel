@@ -7,7 +7,6 @@ import {
 import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { headers } from "next/headers";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -68,7 +67,7 @@ export async function updateSession(options: UpdateSessionCommand) {
         });
 
   // TODO remove ports from host header for URL with port
-  const host = "localhost"
+  const host = "localhost";
 
   if (
     host &&

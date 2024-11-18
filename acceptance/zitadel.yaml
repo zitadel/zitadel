@@ -1,5 +1,11 @@
 FirstInstance:
   PatPath: /pat/zitadel-admin-sa.pat
+  PrivacyPolicy:
+    TOSLink: "https://zitadel.com/docs/legal/terms-of-service"
+    PrivacyLink: "https://zitadel.com/docs/legal/policies/privacy-policy"
+    HelpLink: "https://zitadel.com/docs"
+    SupportEmail: "support@zitadel.com"
+    DocsLink: "https://zitadel.com/docs"
   Org:
     Human:
       UserName: zitadel-admin

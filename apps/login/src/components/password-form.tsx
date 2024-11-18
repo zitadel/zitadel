@@ -71,9 +71,12 @@ export function PasswordForm({
 
     if (response && "error" in response && response.error) {
       setError(response.error);
+      return;
     }
 
-    return response;
+    if (response && response.nextStep) {
+      return router.push(response.nextStep);
+    }
   }
 
   async function resetPasswordAndContinue() {

@@ -4,10 +4,6 @@ on: pull_request
 
 jobs:
   quality:
-    env:
-      ZITADEL_IMAGE: ghcr.io/zitadel/zitadel:v2.63.4
-      POSTGRES_IMAGE: postgres:17.0-alpine3.19
-
     name: Ensure Quality
 
     runs-on: ubuntu-latest
