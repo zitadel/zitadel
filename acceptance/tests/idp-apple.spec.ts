@@ -36,14 +36,13 @@ test("login with Apple IDP", async ({user, page}) => {
 });
 
 
-test("login with Apple IDP - auto redirect, error", async ({user, page}) => {
-    // Given idp Apple is configure on the organization as only authencation method
-    // Given the user has only idp Apple added as auth method
-
-    // User is automatically redirected to Apple
-    // User authenticates in Apple and gets an error
-    // User is redirect to ZITADEL login
-    // Error is shown to the user "Something went wrong in Apple Login"
+test("login with Apple IDP - error", async ({user, page}) => {
+    // Given idp Apple is configure on the organization    
+    // Given the user Apple added as auth method
+    // User is redirected to Apple
+    // User authenticates with Apple and gets an error
+    // User is redirect back to login
+    // An error is shown to the user "Something went wrong in Apple Login"
 });
 
 
