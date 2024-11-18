@@ -2,6 +2,14 @@ import { stub } from "../support/mock";
 
 describe("login", () => {
   beforeEach(() => {
+    stub("zitadel.org.v2.OrganizationService", "ListOrganizations", {
+      data: {
+        details: {
+          totalResult: 1,
+        },
+        result: [{ id: "256088834543534543" }],
+      },
+    });
     stub("zitadel.session.v2.SessionService", "CreateSession", {
       data: {
         details: {

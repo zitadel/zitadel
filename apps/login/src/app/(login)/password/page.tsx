@@ -3,7 +3,12 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { PasswordForm } from "@/components/password-form";
 import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
+import {
+  getBrandingSettings,
+  getDefaultOrg,
+  getLoginSettings,
+} from "@/lib/zitadel";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -16,7 +21,16 @@ export default async function Page({
   const t = await getTranslations({ locale, namespace: "password" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, organization, authRequestId, alt } = searchParams;
+  let { loginName, organization, authRequestId, alt } = searchParams;
+
+  let defaultOrganization;
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg();
+
+    if (org) {
+      defaultOrganization = org.id;
+    }
+  }
 
   // also allow no session to be found (ignoreUnkownUsername)
   let sessionFactors;
@@ -30,8 +44,12 @@ export default async function Page({
     console.warn(error);
   }
 
-  const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(organization);
+  const branding = await getBrandingSettings(
+    organization ?? defaultOrganization,
+  );
+  const loginSettings = await getLoginSettings(
+    organization ?? defaultOrganization,
+  );
 
   return (
     <DynamicTheme branding={branding}>
@@ -62,7 +80,7 @@ export default async function Page({
           <PasswordForm
             loginName={loginName}
             authRequestId={authRequestId}
-            organization={organization}
+            organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
             loginSettings={loginSettings}
             promptPasswordless={
               loginSettings?.passkeysType === PasskeysType.ALLOWED
