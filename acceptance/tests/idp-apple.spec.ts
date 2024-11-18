@@ -49,18 +49,6 @@ test("login with Apple IDP - auto redirect, error", async ({user, page}) => {
 
 
  
-test("login with Apple IDP, error", async ({user, page}) => {
-    // Given username password and idp Apple is configure on the organization as authencation method
-    // Given the user has username password and Apple configured
-
-    // Login form shows username field and a Apple Login button
-    // User clicks on the Apple button
-    // User is redirected to Apple
-    // User authenticates in Apple and gets an error
-    // User is redirect to ZITADEL login
-    // Error is shown to the user "Something went wrong in Apple Login"
-    // User can choose password for authentication
-});
 
 test("login with Apple IDP, no user existing - auto register", async ({user, page}) => {
     // Given idp Apple is configure on the organization as only authencation method
