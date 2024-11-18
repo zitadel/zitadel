@@ -16,7 +16,7 @@ const test = base.extend<{ user: PasswordUserWithOTP }>({
             lastName: "last",
             password: "Password1!",
             organization: "",
-            type: OtpType.sms,
+            type: OtpType.email,
         });
 
         await user.ensure(page);
@@ -60,7 +60,6 @@ test("username, password and email otp login, resend code", async ({user, page})
     // User enters the new code in the ui
     // User is redirected to the app
 });
-
 
 test("username, password and email otp login, wrong code", async ({user, page}) => {
     // Given email otp is enabled on the organizaiton of the user
