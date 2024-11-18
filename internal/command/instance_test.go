@@ -13,7 +13,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/cache/noop"
+	"github.com/zitadel/zitadel/internal/cache/connector/noop"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -127,6 +127,7 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 			0,
 			nil,
 			false,
+			"",
 		),
 	}
 }
@@ -439,6 +440,7 @@ func generatedDomainFilters(instanceID, orgID, projectID, appID, generatedDomain
 				0,
 				nil,
 				false,
+				"",
 			),
 		),
 		expectFilter(

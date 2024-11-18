@@ -9,6 +9,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -64,8 +65,9 @@ func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error
 		return err
 	}
 
-	cmd, err := command.StartCommands(mig.es,
-		nil,
+	cmd, err := command.StartCommands(ctx,
+		mig.es,
+		connector.Connectors{},
 		mig.defaults,
 		mig.zitadelRoles,
 		nil,

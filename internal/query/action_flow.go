@@ -168,6 +168,7 @@ func prepareTriggerActionsQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID) + db.Timetravel(call.Took(ctx))).
+			OrderBy(FlowsTriggersColumnTriggerSequence.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) ([]*Action, error) {
 			actions := make([]*Action, 0)
@@ -220,6 +221,7 @@ func prepareFlowQuery(ctx context.Context, db prepareDatabase, flowType domain.F
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID) + db.Timetravel(call.Took(ctx))).
+			OrderBy(FlowsTriggersColumnTriggerSequence.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Flow, error) {
 			flow := &Flow{

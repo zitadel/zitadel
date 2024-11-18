@@ -3123,9 +3123,9 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 	}
 	type (
 		args struct {
-			ctx     context.Context
-			agentID string
-			userIDs []string
+			ctx      context.Context
+			agentID  string
+			sessions []HumanSignOutSession
 		}
 	)
 	type res struct {
@@ -3144,9 +3144,9 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:     context.Background(),
-				agentID: "",
-				userIDs: []string{"user1"},
+				ctx:      context.Background(),
+				agentID:  "",
+				sessions: []HumanSignOutSession{{ID: "session1", UserID: "user1"}},
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -3158,9 +3158,9 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			args: args{
-				ctx:     context.Background(),
-				agentID: "agent1",
-				userIDs: []string{},
+				ctx:      context.Background(),
+				agentID:  "agent1",
+				sessions: []HumanSignOutSession{},
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -3174,9 +3174,9 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:     context.Background(),
-				agentID: "agent1",
-				userIDs: []string{"user1"},
+				ctx:      context.Background(),
+				agentID:  "agent1",
+				sessions: []HumanSignOutSession{{ID: "session1", UserID: "user1"}},
 			},
 			res: res{},
 		},
@@ -3204,14 +3204,15 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 						user.NewHumanSignedOutEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"agent1",
+							"session1",
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:     context.Background(),
-				agentID: "agent1",
-				userIDs: []string{"user1"},
+				ctx:      context.Background(),
+				agentID:  "agent1",
+				sessions: []HumanSignOutSession{{ID: "session1", UserID: "user1"}},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -3259,18 +3260,20 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 						user.NewHumanSignedOutEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
 							"agent1",
+							"session1",
 						),
 						user.NewHumanSignedOutEvent(context.Background(),
 							&user.NewAggregate("user2", "org1").Aggregate,
 							"agent1",
+							"session2",
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:     context.Background(),
-				agentID: "agent1",
-				userIDs: []string{"user1", "user2"},
+				ctx:      context.Background(),
+				agentID:  "agent1",
+				sessions: []HumanSignOutSession{{ID: "session1", UserID: "user1"}, {ID: "session2", UserID: "user2"}},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -3284,7 +3287,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			err := r.HumansSignOut(tt.args.ctx, tt.args.agentID, tt.args.userIDs)
+			err := r.HumansSignOut(tt.args.ctx, tt.args.agentID, tt.args.sessions)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

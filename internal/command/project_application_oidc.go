@@ -31,6 +31,7 @@ type addOIDCApp struct {
 	ClockSkew                   time.Duration
 	AdditionalOrigins           []string
 	SkipSuccessPageForNativeApp bool
+	BackChannelLogoutURI        string
 
 	ClientID          string
 	ClientSecret      string
@@ -108,6 +109,7 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 					app.ClockSkew,
 					trimStringSliceWhiteSpaces(app.AdditionalOrigins),
 					app.SkipSuccessPageForNativeApp,
+					app.BackChannelLogoutURI,
 				),
 			}, nil
 		}, nil
@@ -199,6 +201,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		oidcApp.ClockSkew,
 		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
 		oidcApp.SkipNativeAppSuccessPage,
+		strings.TrimSpace(oidcApp.BackChannelLogoutURI),
 	))
 
 	addedApplication.AppID = oidcApp.AppID
@@ -256,6 +259,7 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.ClockSkew,
 		trimStringSliceWhiteSpaces(oidc.AdditionalOrigins),
 		oidc.SkipNativeAppSuccessPage,
+		strings.TrimSpace(oidc.BackChannelLogoutURI),
 	)
 	if err != nil {
 		return nil, err

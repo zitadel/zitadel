@@ -36,6 +36,10 @@ jobs:
           --health-timeout 5s
           --health-retries 5
           --health-start-period 10s
+      cache:
+        image: redis:latest
+        ports:
+          - 6379:6379
     steps:
       - 
         uses: actions/checkout@v4
