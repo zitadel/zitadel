@@ -1,12 +1,9 @@
 package repository
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -50,14 +47,6 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 				return count, zerrors.ThrowInvalidArgument(err, "VIEW-KaGue", "query is invalid")
 			}
 		}
-
-		query = query.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
-		defer func() {
-			if err := query.Commit().Error; err != nil {
-				logging.OnError(err).Info("commit failed")
-			}
-			query.RollbackUnlessCommitted()
-		}()
 
 		query = query.Count(&count)
 		if res == nil {

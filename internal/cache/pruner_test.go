@@ -30,7 +30,7 @@ func TestAutoPruneConfig_startAutoPrune(t *testing.T) {
 		called: make(chan struct{}),
 	}
 	clock := clockwork.NewFakeClock()
-	close := c.startAutoPrune(ctx, &pruner, "foo", clock)
+	close := c.startAutoPrune(ctx, &pruner, PurposeAuthzInstance, clock)
 	defer close()
 	clock.Advance(time.Second)
 

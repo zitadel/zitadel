@@ -22,7 +22,7 @@ func OrgQueriesToModel(queries []*org_pb.OrgQuery) (_ []query.SearchQuery, err e
 func OrgQueryToModel(apiQuery *org_pb.OrgQuery) (query.SearchQuery, error) {
 	switch q := apiQuery.Query.(type) {
 	case *org_pb.OrgQuery_DomainQuery:
-		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
+		return query.NewOrgVerifiedDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
 	case *org_pb.OrgQuery_NameQuery:
 		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	case *org_pb.OrgQuery_StateQuery:

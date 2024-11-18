@@ -40,25 +40,25 @@ type PGXPool interface {
 }
 
 type pgCache[I ~int, K ~string, V cache.Entry[I, K]] struct {
-	name    string
-	config  *cache.CacheConfig
-	indices []I
-	pool    PGXPool
-	logger  *slog.Logger
+	purpose   cache.Purpose
+	config    *cache.Config
+	indices   []I
+	connector *Connector
+	logger    *slog.Logger
 }
 
 // NewCache returns a cache that stores and retrieves objects using PostgreSQL unlogged tables.
-func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, name string, config cache.CacheConfig, indices []I, pool PGXPool, dialect string) (cache.PrunerCache[I, K, V], error) {
+func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, purpose cache.Purpose, config cache.Config, indices []I, connector *Connector) (cache.PrunerCache[I, K, V], error) {
 	c := &pgCache[I, K, V]{
-		name:    name,
-		config:  &config,
-		indices: indices,
-		pool:    pool,
-		logger:  config.Log.Slog().With("cache_name", name),
+		purpose:   purpose,
+		config:    &config,
+		indices:   indices,
+		connector: connector,
+		logger:    config.Log.Slog().With("cache_purpose", purpose),
 	}
 	c.logger.InfoContext(ctx, "pg cache logging enabled")
 
-	if dialect == "postgres" {
+	if connector.Dialect == "postgres" {
 		if err := c.createPartition(ctx); err != nil {
 			return nil, err
 		}
@@ -68,10 +68,10 @@ func NewCache[I ~int, K ~string, V cache.Entry[I, K]](ctx context.Context, name 
 
 func (c *pgCache[I, K, V]) createPartition(ctx context.Context) error {
 	var query strings.Builder
-	if err := createPartitionTmpl.Execute(&query, c.name); err != nil {
+	if err := createPartitionTmpl.Execute(&query, c.purpose.String()); err != nil {
 		return err
 	}
-	_, err := c.pool.Exec(ctx, query.String())
+	_, err := c.connector.Exec(ctx, query.String())
 	return err
 }
 
@@ -87,7 +87,7 @@ func (c *pgCache[I, K, V]) set(ctx context.Context, entry V) (err error) {
 	keys := c.indexKeysFromEntry(entry)
 	c.logger.DebugContext(ctx, "pg cache set", "index_key", keys)
 
-	_, err = c.pool.Exec(ctx, setQuery, c.name, keys, entry)
+	_, err = c.connector.Exec(ctx, setQuery, c.purpose.String(), keys, entry)
 	if err != nil {
 		c.logger.ErrorContext(ctx, "pg cache set", "err", err)
 		return err
@@ -117,7 +117,7 @@ func (c *pgCache[I, K, V]) get(ctx context.Context, index I, key K) (value V, er
 	if !slices.Contains(c.indices, index) {
 		return value, cache.NewIndexUnknownErr(index)
 	}
-	err = c.pool.QueryRow(ctx, getQuery, c.name, index, key, c.config.MaxAge, c.config.LastUseAge).Scan(&value)
+	err = c.connector.QueryRow(ctx, getQuery, c.purpose.String(), index, key, c.config.MaxAge, c.config.LastUseAge).Scan(&value)
 	return value, err
 }
 
@@ -125,7 +125,7 @@ func (c *pgCache[I, K, V]) Invalidate(ctx context.Context, index I, keys ...K) (
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = c.pool.Exec(ctx, invalidateQuery, c.name, index, keys)
+	_, err = c.connector.Exec(ctx, invalidateQuery, c.purpose.String(), index, keys)
 	c.logger.DebugContext(ctx, "pg cache invalidate", "index", index, "keys", keys)
 	return err
 }
@@ -134,7 +134,7 @@ func (c *pgCache[I, K, V]) Delete(ctx context.Context, index I, keys ...K) (err 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = c.pool.Exec(ctx, deleteQuery, c.name, index, keys)
+	_, err = c.connector.Exec(ctx, deleteQuery, c.purpose.String(), index, keys)
 	c.logger.DebugContext(ctx, "pg cache delete", "index", index, "keys", keys)
 	return err
 }
@@ -143,7 +143,7 @@ func (c *pgCache[I, K, V]) Prune(ctx context.Context) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = c.pool.Exec(ctx, pruneQuery, c.name, c.config.MaxAge, c.config.LastUseAge)
+	_, err = c.connector.Exec(ctx, pruneQuery, c.purpose.String(), c.config.MaxAge, c.config.LastUseAge)
 	c.logger.DebugContext(ctx, "pg cache prune")
 	return err
 }
@@ -152,7 +152,7 @@ func (c *pgCache[I, K, V]) Truncate(ctx context.Context) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, err = c.pool.Exec(ctx, truncateQuery, c.name)
+	_, err = c.connector.Exec(ctx, truncateQuery, c.purpose.String())
 	c.logger.DebugContext(ctx, "pg cache truncate")
 	return err
 }

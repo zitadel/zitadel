@@ -18,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -88,10 +89,18 @@ type Commands struct {
 	EventGroupExisting     func(group string) bool
 
 	GenerateDomain func(instanceName, domain string) (string, error)
+
+	caches *Caches
+	// Store instance IDs where all milestones are reached (except InstanceDeleted).
+	// These instance's milestones never need to be invalidated,
+	// so the query and cache overhead can completely eliminated.
+	milestonesCompleted sync.Map
 }
 
 func StartCommands(
+	ctx context.Context,
 	es *eventstore.Eventstore,
+	cacheConnectors connector.Connectors,
 	defaults sd.SystemDefaults,
 	zitadelRoles []authz.RoleMapping,
 	staticStore static.Storage,
@@ -122,6 +131,10 @@ func StartCommands(
 	userPasswordHasher, err := defaults.PasswordHasher.NewHasher()
 	if err != nil {
 		return nil, fmt.Errorf("password hasher: %w", err)
+	}
+	caches, err := startCaches(ctx, cacheConnectors)
+	if err != nil {
+		return nil, fmt.Errorf("caches: %w", err)
 	}
 	repo = &Commands{
 		eventstore:                      es,
@@ -176,6 +189,7 @@ func StartCommands(
 			},
 		},
 		GenerateDomain: domain.NewGeneratedInstanceDomain,
+		caches:         caches,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
