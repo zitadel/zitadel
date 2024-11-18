@@ -1,4 +1,5 @@
 "use client";
+import { finishFlow } from "@/lib/login";
 import { verifyTOTP } from "@/lib/server-actions";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -67,31 +68,18 @@ export function TotpRegister({
 
           return router.push(`/otp/time-based?` + params);
         } else {
-          if (authRequestId && sessionId) {
-            const params = new URLSearchParams({
-              sessionId: sessionId,
-              authRequest: authRequestId,
-            });
-
-            if (organization) {
-              params.append("organization", organization);
-            }
-
-            return router.push(`/login?` + params);
-          } else if (loginName) {
-            const params = new URLSearchParams({
-              loginName,
-            });
-
-            if (authRequestId) {
-              params.append("authRequestId", authRequestId);
-            }
-            if (organization) {
-              params.append("organization", organization);
-            }
-
-            return router.push(`/signedin?` + params);
-          }
+          return authRequestId && sessionId
+            ? finishFlow({
+                sessionId: sessionId,
+                authRequestId: authRequestId,
+                organization: organization,
+              })
+            : loginName
+              ? finishFlow({
+                  loginName: loginName,
+                  organization: organization,
+                })
+              : null;
         }
       })
       .catch((e) => {

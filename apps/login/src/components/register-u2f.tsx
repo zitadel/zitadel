@@ -1,6 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
+import { finishFlow } from "@/lib/login";
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
@@ -62,7 +63,7 @@ export function RegisterU2f({
     return response;
   }
 
-  async function submitRegisterAndContinue(): Promise<boolean | void> {
+  async function submitRegisterAndContinue(): Promise<boolean | void | null> {
     setError("");
     setLoading(true);
     const response = await addU2F({
@@ -146,38 +147,37 @@ export function RegisterU2f({
         return;
       }
 
-      const paramsToContinue = new URLSearchParams({});
-      let urlToContinue = "/accounts";
-
-      if (sessionId) {
-        paramsToContinue.append("sessionId", sessionId);
-      }
-
-      if (loginName) {
-        paramsToContinue.append("loginName", loginName);
-      }
-      if (organization) {
-        paramsToContinue.append("organization", organization);
-      }
-
       if (checkAfter) {
-        if (authRequestId) {
-          paramsToContinue.append("authRequestId", authRequestId);
-        }
-        urlToContinue = `/u2f?` + paramsToContinue;
-      } else if (authRequestId && sessionId) {
-        if (authRequestId) {
-          paramsToContinue.append("authRequest", authRequestId);
-        }
-        urlToContinue = `/login?` + paramsToContinue;
-      } else if (loginName) {
-        if (authRequestId) {
-          paramsToContinue.append("authRequestId", authRequestId);
-        }
-        urlToContinue = `/signedin?` + paramsToContinue;
-      }
+        const paramsToContinue = new URLSearchParams({});
 
-      router.push(urlToContinue);
+        if (sessionId) {
+          paramsToContinue.append("sessionId", sessionId);
+        }
+        if (loginName) {
+          paramsToContinue.append("loginName", loginName);
+        }
+        if (organization) {
+          paramsToContinue.append("organization", organization);
+        }
+        if (authRequestId) {
+          paramsToContinue.append("authRequestId", authRequestId);
+        }
+
+        return router.push(`/u2f?` + paramsToContinue);
+      } else {
+        return authRequestId && sessionId
+          ? finishFlow({
+              sessionId: sessionId,
+              authRequestId: authRequestId,
+              organization: organization,
+            })
+          : loginName
+            ? finishFlow({
+                loginName: loginName,
+                organization: organization,
+              })
+            : null;
+      }
     }
   }
 

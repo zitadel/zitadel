@@ -1,6 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
+import { finishFlow } from "@/lib/login";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import {
@@ -176,26 +177,18 @@ export function LoginPasskey({
         };
 
         return submitLogin(data).then((resp) => {
-          if (authRequestId && resp && resp.sessionId) {
-            return router.push(
-              `/login?` +
-                new URLSearchParams({
-                  sessionId: resp.sessionId,
-                  authRequest: authRequestId,
-                }),
-            );
-          } else {
-            const params = new URLSearchParams({});
-
-            if (authRequestId) {
-              params.set("authRequestId", authRequestId);
-            }
-            if (resp?.factors?.user?.loginName) {
-              params.set("loginName", resp.factors.user.loginName);
-            }
-
-            return router.push(`/signedin?` + params);
-          }
+          return authRequestId && resp?.sessionId
+            ? finishFlow({
+                sessionId: resp.sessionId,
+                authRequestId: authRequestId,
+                organization: organization,
+              })
+            : resp?.factors?.user?.loginName
+              ? finishFlow({
+                  loginName: resp.factors.user.loginName,
+                  organization: organization,
+                })
+              : null;
         });
       });
   }

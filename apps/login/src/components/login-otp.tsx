@@ -1,5 +1,6 @@
 "use client";
 
+import { finishFlow } from "@/lib/login";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
@@ -154,40 +155,18 @@ export function LoginOTP({
   function setCodeAndContinue(values: Inputs, organization?: string) {
     return submitCode(values, organization).then((response) => {
       if (response) {
-        if (authRequestId && response && response.sessionId) {
-          const params = new URLSearchParams({
-            sessionId: response.sessionId,
-            authRequest: authRequestId,
-          });
-
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          if (authRequestId) {
-            params.append("authRequest", authRequestId);
-          }
-
-          if (sessionId) {
-            params.append("sessionId", sessionId);
-          }
-
-          return router.push(`/login?` + params);
-        } else {
-          const params = new URLSearchParams();
-          if (response?.factors?.user?.loginName) {
-            params.append("loginName", response.factors.user.loginName);
-          }
-          if (authRequestId) {
-            params.append("authRequestId", authRequestId);
-          }
-
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          return router.push(`/signedin?` + params);
-        }
+        return authRequestId && response.sessionId
+          ? finishFlow({
+              sessionId: response.sessionId,
+              authRequestId: authRequestId,
+              organization: response.factors?.user?.organizationId,
+            })
+          : response.factors?.user
+            ? finishFlow({
+                loginName: response.factors.user.loginName,
+                organization: response.factors?.user?.organizationId,
+              })
+            : null;
       }
     });
   }

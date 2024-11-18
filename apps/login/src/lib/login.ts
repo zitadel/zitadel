@@ -8,7 +8,7 @@ type FinishFlowCommand =
   | { loginName: string };
 
 /**
- * redirects user back to OIDC application or to a success page
+ * on client: redirects user back to OIDC application or to a success page
  * @param command
  * @returns
  */
