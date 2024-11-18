@@ -34,7 +34,8 @@ export function IdpSignin({
         idpIntentToken,
       },
       authRequestId,
-    }).catch((error) => {
+    })
+      .catch((error) => {
         setError(error.message);
         return;
       })
