@@ -3,6 +3,35 @@
 Dear community!
 We're excited to announce bi-weekly office hours.
 
+## #6 Q&A 
+
+Hey folks!
+
+We’re inviting you to our next open office hours session! C: From leveraging ZITADEL actions to exploring your use cases, join our hosts Silvan & Stefan on Wednesday, November 20, 2024 at 11:00 AM (EST) as they answer your questions about ZITADEL! 
+
+🦒 **What to expect**
+
+An open Q&A session - Share your questions and support others with their inquiries.
+A space to share your thoughts / feedback on the ZITADEL platform
+
+🗒️ **Details**
+
+Target audience: All ZITADEL platform users & community members
+Topic: Q&A Session 
+Date & time: Wednesday, November 20, 2024 at 11:00 AM (EST)
+Duration: ~1 hour 
+Platform: ZITADEL’s Discord stage channel 
+
+Register for this event here ➡️ https://discord.gg/bnuAe2RX?event=1307010383713927230
+
+🗓️ **Add this to your calendar** ➡️ [Google Calendar](https://calendar.google.com/calendar/u/0/r/eventedit?dates=20241120T110000/20241120T110000&details=We%E2%80%99re+inviting+you+to+our+next+open+office+hours+session!+C:+From+leveraging+ZITADEL+actions+to+exploring+your+use+cases,+join+our+hosts+Silvan+%26+Stefan+as+they+answer+your+questions+about+ZITADEL!+%0A%0A**What+to+expect**%0A%0A-+An+open+Q%26A+session+-+Share+your+questions+and+support+others+with+their+inquiries.+%0A-+A+space+to+share+your+thoughts+/+feedback+on+the+ZITADEL+platform+++%0A%0A**Details**+%0A%0A**Target+audience:**+All+ZITADEL+platform+users+%26+community+members%0A**Topic**:+Q%26A+Session+%0A**Date+%26+time**:+Wednesday,+November+20,+2024+11:00+AM%0A**Duration**:+~1+hour+%0A**Platform**:+ZITADEL%E2%80%99s+Discord+stage+channel&location=Discord:+ZITADEL+server,+office+hours&text=Open+Office+Hours)
+
+
+If you have any questions prior to the live session, be sure to share them in the office hours stage chat
+
+Looking forward to seeing you there! Share this with other ZITADEL users & people who might be interested in ZITADEL! It’s appreciated 🫶 
+
+
 ## #5 Q&A
 
 Dear community,
