@@ -34,3 +34,38 @@ test("username, password and otp login", async ({user, page}) => {
 });
 
 
+test("username, password and sms otp login", async ({user, page}) => {
+    // Given sms otp is enabled on the organizaiton of the user
+    // Given the user has only sms otp configured as second factor
+
+    // User enters username
+    // User enters password
+    // User receives an sms with a verification code
+    // User enters the code into the ui
+    // User is redirected to the app
+});
+
+
+test("username, password and sms otp login, resend code", async ({user, page}) => {
+    // Given sms otp is enabled on the organizaiton of the user
+    // Given the user has only sms otp configured as second factor
+
+    // User enters username
+    // User enters password
+    // User receives an sms with a verification code
+    // User clicks resend code
+    // User receives a new sms with a verification code
+    // User is redirected to the app
+});
+
+
+test("username, password and sms otp login, wrong code", async ({user, page}) => {
+    // Given sms otp is enabled on the organizaiton of the user
+    // Given the user has only sms otp configured as second factor
+
+    // User enters username
+    // User enters password
+    // User receives an sms with a verification code
+    // User enters a wrond code
+    // Error message - "Invalid code" is shown
+});

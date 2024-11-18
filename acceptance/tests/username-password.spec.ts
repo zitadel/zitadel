@@ -43,3 +43,53 @@ test("username and password login, wrong password", async ({user, page}) => {
     await password(page, "wrong")
     await passwordScreenExpect(page, "wrong")
 });
+
+test("username and password login, wrong username, ignore unknown usernames", async ({user, page}) => {
+    // Given user doesn't exist but ignore unknown usernames setting is set to true
+    // Given username password login is enabled on the users organization
+
+    // enter login name
+    // enter password
+    // redirect to loginname page --> error message username or password wrong
+});
+
+test("username and password login, initial password change", async ({user, page}) => {
+    // Given user is created and has changePassword set to true
+    // Given username password login is enabled on the users organization
+
+    // enter login name
+    // enter password
+    // create new password
+});
+
+test("username and password login, reset password - enter code manually", async ({user, page}) => {
+    // Given user has forgotten password and clicks the forgot password button
+    // Given username password login is enabled on the users organization
+
+    // enter login name
+    // click password forgotten
+    // enter code from email
+    // user is redirected to app
+});
+
+test("username and password login, reset password - click link", async ({user, page}) => {
+    // Given user has forgotten password and clicks the forgot password button, and then the link in the email
+    // Given username password login is enabled on the users organization
+
+    // enter login name
+    // click password forgotten
+    // click link in email
+    // set new password
+    // redirect to app
+});
+
+test("username and password login, reset password, resend code", async ({user, page}) => {
+    // Given user has forgotten password and clicks the forgot password button and then resend code
+    // Given username password login is enabled on the users organization
+
+    // enter login name
+    // click password forgotten
+    // click resend code
+    // enter code from second email
+    // user is authenticated
+});
