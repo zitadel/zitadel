@@ -32,7 +32,7 @@ test("username, password and totp login", async ({user, page}) => {
     // User enters password
     // Screen for entering the code is shown directly
     // User enters the code into the ui
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 
@@ -59,5 +59,5 @@ test("username, password and totp login, multiple mfa options", async ({user, pa
     // User clicks button to use email otp instead
     // User receives an email with a verification code
     // User enters code in ui
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });

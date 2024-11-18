@@ -32,7 +32,7 @@ test("login with Gitlab IDP - auto redirect", async ({user, page}) => {
     // User is automatically redirected to Gitlab
     // User authenticates in Gitlab
     // User is redirect to ZITADEL login
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 
@@ -56,7 +56,7 @@ test("login with Gitlab IDP", async ({user, page}) => {
     // User is redirected to Gitlab
     // User authenticates in Gitlab and gets an error
     // User is redirect to ZITADEL login automatically
-    // User is redirected to app automatically
+    // User is redirected to app automatically (default redirect url)
 });
 
  
@@ -83,7 +83,7 @@ test("login with Gitlab IDP, no user existing - auto register", async ({user, pa
     // User authenticates in Gitlab
     // User is redirect to ZITADEL login
     // User is created in ZITADEL
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 test("login with Gitlab IDP, no user existing - auto register not possible", async ({user, page}) => {
@@ -99,7 +99,7 @@ test("login with Gitlab IDP, no user existing - auto register not possible", asy
     // User fills missing information
     // User clicks register button
     // User is created in ZITADEL
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 test("login with Gitlab IDP, no user existing - auto register enabled - manual creation disabled, creation not possible", async ({user, page}) => {
@@ -124,7 +124,7 @@ test("login with Gitlab IDP, no user linked - auto link", async ({user, page}) =
     // User authenticates in Gitlab with user@zitadel.com
     // User is redirect to ZITADEL login
     // User is linked with existing user in ZITADEL
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 test("login with Gitlab IDP, no user linked, user doesn't exist - no auto link", async ({user, page}) => {
@@ -152,5 +152,5 @@ test("login with Gitlab IDP, no user linked, user doesn't exist - no auto link",
     // User is redirect to ZITADEL login
     // User with email address user@zitadel.com can not be found
     // User is prompted to link the account manually
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });

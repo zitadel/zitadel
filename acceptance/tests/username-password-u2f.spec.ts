@@ -33,7 +33,7 @@ test("username, password and u2f login", async ({user, page}) => {
     // User enters password
     // Popup for u2f is directly opened
     // User verifies u2f
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 
@@ -48,5 +48,5 @@ test("username, password and u2f login, multiple mfa options", async ({user, pag
     // User clicks button to use email otp as second factor
     // User receives an email with a verification code
     // User enters code in ui
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });

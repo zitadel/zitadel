@@ -33,7 +33,7 @@ test("username, password and email otp login, enter code manually", async ({user
     // User enters password
     // User receives an email with a verification code
     // User enters the code into the ui
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 
@@ -45,7 +45,7 @@ test("username, password and email otp login, click link in email", async ({user
     // User enters password
     // User receives an email with a verification code
     // User clicks link in the email
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 test("username, password and email otp login, resend code", async ({user, page}) => {
@@ -58,7 +58,7 @@ test("username, password and email otp login, resend code", async ({user, page})
     // User clicks resend code
     // User receives a new email with a verification code
     // User enters the new code in the ui
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 test("username, password and email otp login, wrong code", async ({user, page}) => {
@@ -82,5 +82,5 @@ test("username, password and email otp login, multiple mfa options", async ({use
     // User clicks button to use sms otp as second factor
     // User receives an sms with a verification code
     // User enters code in ui
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });

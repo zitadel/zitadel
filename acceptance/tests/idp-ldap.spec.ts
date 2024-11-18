@@ -31,7 +31,7 @@ test("login with LDAP IDP - auto redirect", async ({user, page}) => {
     // User is automatically redirected to LDAP
     // User authenticates in LDAP
     // User is redirect to ZITADEL login
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 
@@ -55,7 +55,7 @@ test("login with LDAP IDP", async ({user, page}) => {
     // User is redirected to LDAP
     // User authenticates in LDAP and gets an error
     // User is redirect to ZITADEL login automatically
-    // User is redirected to app automatically
+    // User is redirected to app automatically (default redirect url)
 });
 
  
@@ -81,7 +81,7 @@ test("login with LDAP IDP, no user existing - auto register", async ({user, page
     // User authenticates in LDAP
     // User is redirect to ZITADEL login
     // User is created in ZITADEL
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 test("login with LDAP IDP, no user existing - auto register not possible", async ({user, page}) => {
@@ -97,7 +97,7 @@ test("login with LDAP IDP, no user existing - auto register not possible", async
     // User fills missing information
     // User clicks register button
     // User is created in ZITADEL
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 test("login with LDAP IDP, no user existing - auto register enabled - manual creation disabled, creation not possible", async ({user, page}) => {
@@ -121,7 +121,7 @@ test("login with LDAP IDP, no user linked - auto link", async ({user, page}) => 
     // User authenticates in LDAP with user@zitadel.com
     // User is redirect to ZITADEL login
     // User is linked with existing user in ZITADEL
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 test("login with LDAP IDP, no user linked, user doesn't exist - no auto link", async ({user, page}) => {
@@ -147,5 +147,5 @@ test("login with LDAP IDP, no user linked, user doesn't exist - no auto link", a
     // User is redirect to ZITADEL login
     // User with email address user@zitadel.com can not be found
     // User is prompted to link the account manually
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });

@@ -42,7 +42,7 @@ test("username, password and sms otp login", async ({user, page}) => {
     // User enters password
     // User receives an sms with a verification code
     // User enters the code into the ui
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 
@@ -55,7 +55,7 @@ test("username, password and sms otp login, resend code", async ({user, page}) =
     // User receives an sms with a verification code
     // User clicks resend code
     // User receives a new sms with a verification code
-    // User is redirected to the app
+    // User is redirected to the app (default redirect url)
 });
 
 
