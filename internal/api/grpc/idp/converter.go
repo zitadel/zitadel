@@ -8,6 +8,7 @@ import (
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
+	zsaml "github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -659,6 +660,11 @@ func samlConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.SAMLI
 	if template.NameIDFormat.Valid {
 		nameIDFormat = nameIDToPb(template.NameIDFormat.V)
 	}
+	var metadataError *string
+	_, err := zsaml.ParseMetadata(template.Metadata)
+	if err != nil {
+		metadataError = gu.Ptr(err.Error())
+	}
 	providerConfig.Config = &idp_pb.ProviderConfig_Saml{
 		Saml: &idp_pb.SAMLConfig{
 			MetadataXml:                   template.Metadata,
@@ -666,6 +672,7 @@ func samlConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.SAMLI
 			WithSignedRequest:             template.WithSignedRequest,
 			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
+			MetadataError:                 metadataError,
 		},
 	}
 }

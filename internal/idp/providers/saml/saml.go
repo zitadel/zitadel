@@ -1,15 +1,18 @@
 package saml
 
 import (
+	"bytes"
 	"context"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/xml"
+	"io"
 	"net/url"
 
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
+	"golang.org/x/text/encoding/ianaindex"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
@@ -104,6 +107,23 @@ func WithEntityID(entityID string) ProviderOpts {
 	}
 }
 
+// ParseMetadata parses the metadata with the provided XML encoding and returns the EntityDescriptor
+func ParseMetadata(metadata []byte) (*saml.EntityDescriptor, error) {
+	entityDescriptor := new(saml.EntityDescriptor)
+	decoder := xml.NewDecoder(bytes.NewReader(metadata))
+	decoder.CharsetReader = func(charset string, reader io.Reader) (io.Reader, error) {
+		enc, err := ianaindex.IANA.Encoding(charset)
+		if err != nil {
+			return nil, err
+		}
+		return enc.NewDecoder().Reader(reader), nil
+	}
+	if err := decoder.Decode(entityDescriptor); err != nil {
+		return nil, err
+	}
+	return entityDescriptor, nil
+}
+
 func New(
 	name string,
 	rootURLStr string,
@@ -112,8 +132,8 @@ func New(
 	key []byte,
 	options ...ProviderOpts,
 ) (*Provider, error) {
-	entityDescriptor := new(saml.EntityDescriptor)
-	if err := xml.Unmarshal(metadata, entityDescriptor); err != nil {
+	entityDescriptor, err := ParseMetadata(metadata)
+	if err != nil {
 		return nil, err
 	}
 	keyPair, err := tls.X509KeyPair(certificate, key)
