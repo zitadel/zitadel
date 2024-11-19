@@ -1,28 +1,6 @@
-import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { OtpType, PasswordUserWithOTP } from "./user";
+import { test } from "@playwright/test";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
-
-const test = base.extend<{ user: PasswordUserWithOTP }>({
-  user: async ({ page }, use) => {
-    const user = new PasswordUserWithOTP({
-      email: "otp_sms@example.com",
-      firstName: "first",
-      lastName: "last",
-      password: "Password1!",
-      organization: "",
-      type: OtpType.email,
-    });
-
-    await user.ensure(page);
-    await use(user);
-  },
-});
-
-test("username, password and email otp login, enter code manually", async ({ user, page }) => {
+test("username, password and email otp login, enter code manually", async ({ page }) => {
   // Given email otp is enabled on the organizaiton of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -32,7 +10,7 @@ test("username, password and email otp login, enter code manually", async ({ use
   // User is redirected to the app (default redirect url)
 });
 
-test("username, password and email otp login, click link in email", async ({ user, page }) => {
+test("username, password and email otp login, click link in email", async ({ page }) => {
   // Given email otp is enabled on the organizaiton of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -42,7 +20,7 @@ test("username, password and email otp login, click link in email", async ({ use
   // User is redirected to the app (default redirect url)
 });
 
-test("username, password and email otp login, resend code", async ({ user, page }) => {
+test("username, password and email otp login, resend code", async ({ page }) => {
   // Given email otp is enabled on the organizaiton of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -54,7 +32,7 @@ test("username, password and email otp login, resend code", async ({ user, page 
   // User is redirected to the app (default redirect url)
 });
 
-test("username, password and email otp login, wrong code", async ({ user, page }) => {
+test("username, password and email otp login, wrong code", async ({ page }) => {
   // Given email otp is enabled on the organizaiton of the user
   // Given the user has only email otp configured as second factor
   // User enters username
@@ -64,7 +42,7 @@ test("username, password and email otp login, wrong code", async ({ user, page }
   // Error message - "Invalid code" is shown
 });
 
-test("username, password and email otp login, multiple mfa options", async ({ user, page }) => {
+test("username, password and email otp login, multiple mfa options", async ({ page }) => {
   // Given email otp and sms otp is enabled on the organizaiton of the user
   // Given the user has email and sms otp configured as second factor
   // User enters username

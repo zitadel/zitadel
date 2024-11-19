@@ -1,28 +1,6 @@
-import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { OtpType, PasswordUserWithOTP } from "./user";
+import { test } from "@playwright/test";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
-
-const test = base.extend<{ user: PasswordUserWithOTP }>({
-  user: async ({ page }, use) => {
-    const user = new PasswordUserWithOTP({
-      email: "otp_sms@example.com",
-      firstName: "first",
-      lastName: "last",
-      password: "Password1!",
-      organization: "",
-      type: OtpType.sms,
-    });
-
-    await user.ensure(page);
-    await use(user);
-  },
-});
-
-test("username, password and u2f login", async ({ user, page }) => {
+test("username, password and u2f login", async ({ page }) => {
   // Given u2f is enabled on the organizaiton of the user
   // Given the user has only u2f configured as second factor
   // User enters username
@@ -32,7 +10,7 @@ test("username, password and u2f login", async ({ user, page }) => {
   // User is redirected to the app (default redirect url)
 });
 
-test("username, password and u2f login, multiple mfa options", async ({ user, page }) => {
+test("username, password and u2f login, multiple mfa options", async ({ page }) => {
   // Given u2f and semailms otp is enabled on the organizaiton of the user
   // Given the user has u2f and email otp configured as second factor
   // User enters username

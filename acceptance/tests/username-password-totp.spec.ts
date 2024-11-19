@@ -1,28 +1,6 @@
-import { test as base } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-import { OtpType, PasswordUserWithOTP } from "./user";
+import { test } from "@playwright/test";
 
-// Read from ".env" file.
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
-
-const test = base.extend<{ user: PasswordUserWithOTP }>({
-  user: async ({ page }, use) => {
-    const user = new PasswordUserWithOTP({
-      email: "otp_sms@example.com",
-      firstName: "first",
-      lastName: "last",
-      password: "Password1!",
-      organization: "",
-      type: OtpType.sms,
-    });
-
-    await user.ensure(page);
-    await use(user);
-  },
-});
-
-test("username, password and totp login", async ({ user, page }) => {
+test("username, password and totp login", async ({ page }) => {
   // Given totp is enabled on the organizaiton of the user
   // Given the user has only totp configured as second factor
   // User enters username
@@ -32,7 +10,7 @@ test("username, password and totp login", async ({ user, page }) => {
   // User is redirected to the app (default redirect url)
 });
 
-test("username, password and totp otp login, wrong code", async ({ user, page }) => {
+test("username, password and totp otp login, wrong code", async ({ page }) => {
   // Given totp is enabled on the organizaiton of the user
   // Given the user has only totp configured as second factor
   // User enters username
@@ -42,7 +20,7 @@ test("username, password and totp otp login, wrong code", async ({ user, page })
   // Error message - "Invalid code" is shown
 });
 
-test("username, password and totp login, multiple mfa options", async ({ user, page }) => {
+test("username, password and totp login, multiple mfa options", async ({ page }) => {
   // Given totp and email otp is enabled on the organizaiton of the user
   // Given the user has totp and email otp configured as second factor
   // User enters username
