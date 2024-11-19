@@ -841,6 +841,30 @@ module.exports = {
       label: "Rate Limits (Cloud)", // The link label
       href: "/legal/policies/rate-limit-policy", // The internal path
     },
+    {
+      type: "category",
+      label: "Benchmarks",
+      collapsed: false,      
+      link: {
+        type: "doc",
+        id: "apis/benchmarks/index",
+      },
+      items: [
+        {
+          type: "category",
+          label: "v2.65.0",
+          link: {
+            title: "v2.65.0",
+            slug: "/apis/benchmarks/v2.65.0",
+            description:
+              "Benchmark results of Zitadel v2.65.0\n"
+          },
+          items: [
+            "apis/benchmarks/v2.65.0/machine_jwt_profile_grant/index",
+          ],
+        },
+      ],
+    },
   ],
   selfHosting: [
     {

@@ -1,9 +1,9 @@
 ---
 title: Caches
-sidebar_lable: Caches
+sidebar_label: Caches
 ---
 
-ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects. As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated. Another difference is that HTTP caches only cache the result of a complete request and the build-in cache stores objects needed for the internal business logic. For example, each request made to ZITADEL needs to retrieve and set [instance](/docs/concepts/structure/instance) information in middleware.
+ZITADEL supports the use of a caches to speed up the lookup of frequently needed objects. As opposed to HTTP caches which might reside between ZITADEL and end-user applications, the cache build into ZITADEL uses active invalidation when an object gets updated. Another difference is that HTTP caches only cache the result of a complete request and the built-in cache stores objects needed for the internal business logic. For example, each request made to ZITADEL needs to retrieve and set [instance](/docs/concepts/structure/instance) information in middleware.
 
 :::info
 Caches is currently an [experimental beta](/docs/support/software-release-cycles-support#beta) feature.
@@ -39,7 +39,7 @@ When no connector is specified for an object cache, then no caching is performed
 
 ### Auto prune
 
-Some connectors take an `AutoPrune` option. This is provided for caches which don't have build-in expiry and cleanup routines. The auto pruner is a routine launched by ZITADEL and scans and removes outdated objects in the cache. Pruning can take a cost as they typically involve some kind of scan. However, using a long interval can cause higher storage utilization.
+Some connectors take an `AutoPrune` option. This is provided for caches which don't have built-in expiry and cleanup routines. The auto pruner is a routine launched by ZITADEL and scans and removes outdated objects in the cache. Pruning can take a cost as they typically involve some kind of scan. However, using a long interval can cause higher storage utilization.
 
 ```yaml
 Caches:
@@ -61,7 +61,7 @@ Benefits:
 - Centralized cache with single source of truth
 - Consistent invalidation
 - Very fast when network latency is kept to a minimum
-- Build-in object expiry, no pruner required
+- Built-in object expiry, no pruner required
 
 Drawbacks:
 
@@ -95,7 +95,7 @@ Caches:
 
 ### PostgreSQL cache
 
-PostgreSQL can be used to store objects in unlogged tables. Unlogged tables do not write to the WAL log and are therefore faster than regular tables. If the PostgreSQL server crashes, the data from those tables are lost. ZITADEL always creates the cache schema in the `zitadel` database during setup. This connector requires a [pruner](#auto-prune) routine.
+PostgreSQL can be used to store objects in unlogged tables. [Unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) do not write to the WAL log and are therefore faster than regular tables. If the PostgreSQL server crashes, the data from those tables are lost. ZITADEL always creates the cache schema in the `zitadel` database during [setup](./updating_scaling#the-setup-phase). This connector requires a [pruner](#auto-prune) routine.
 
 Benefits:
 
@@ -135,7 +135,7 @@ If inconsistency is acceptable for short periods of time, one can choose to use 
 The following section describes the type of objects ZITADEL can currently cache. Objects are actively invalidated at the cache backend when one of their properties is changed. Each object cache defines:
 
 - `Connector`: Selects the used [connector](#connectors) back-end. Must be activated first.
-- `MaxAge`: the amount of time that an object is considered valid. When this age is passed the object is ignored (cache miss) and possibly cleaned up by the [pruner](#auto-prune) or other build-in garbage collection.
+- `MaxAge`: the amount of time that an object is considered valid. When this age is passed the object is ignored (cache miss) and possibly cleaned up by the [pruner](#auto-prune) or other built-in garbage collection.
 - `LastUsage`: defines usage based lifetime. Each time an object is used, its usage timestamp is updated. Popular objects remain cached, while unused objects are cleaned up. This option can be used to indirectly limit the size of the cache.
 - `Log`: allows specific log settings for the cache. This can be used to debug a certain cache without having to change the global log level.
 
@@ -157,7 +157,7 @@ Caches:
 
 ### Instance
 
-All HTTP and gRPC requests send to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/docs/apis/resources/system/system-service), the instance can be resolved by its ID. An instance object contains many of the [default settings](/docs/guides/manage/console/default-settings):
+All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/docs/apis/resources/system/system-service), the instance can be resolved by its ID. An instance object contains many of the [default settings](/docs/guides/manage/console/default-settings):
 
 - Instance [features](/docs/guides/manage/console/default-settings#features)
 - Instance domains: generated and [custom](/docs/guides/manage/cloud/instances#add-custom-domain)
