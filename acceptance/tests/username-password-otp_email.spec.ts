@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 
 test("username, password and email otp login, enter code manually", async ({ page }) => {
-  // Given email otp is enabled on the organizaiton of the user
+  // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
   // User enters password
@@ -11,7 +11,7 @@ test("username, password and email otp login, enter code manually", async ({ pag
 });
 
 test("username, password and email otp login, click link in email", async ({ page }) => {
-  // Given email otp is enabled on the organizaiton of the user
+  // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
   // User enters password
@@ -21,7 +21,7 @@ test("username, password and email otp login, click link in email", async ({ pag
 });
 
 test("username, password and email otp login, resend code", async ({ page }) => {
-  // Given email otp is enabled on the organizaiton of the user
+  // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
   // User enters password
@@ -33,7 +33,7 @@ test("username, password and email otp login, resend code", async ({ page }) => 
 });
 
 test("username, password and email otp login, wrong code", async ({ page }) => {
-  // Given email otp is enabled on the organizaiton of the user
+  // Given email otp is enabled on the organization of the user
   // Given the user has only email otp configured as second factor
   // User enters username
   // User enters password
@@ -43,7 +43,7 @@ test("username, password and email otp login, wrong code", async ({ page }) => {
 });
 
 test("username, password and email otp login, multiple mfa options", async ({ page }) => {
-  // Given email otp and sms otp is enabled on the organizaiton of the user
+  // Given email otp and sms otp is enabled on the organization of the user
   // Given the user has email and sms otp configured as second factor
   // User enters username
   // User enters password

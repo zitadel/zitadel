@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 
 test("username, password and totp login", async ({ page }) => {
-  // Given totp is enabled on the organizaiton of the user
+  // Given totp is enabled on the organization of the user
   // Given the user has only totp configured as second factor
   // User enters username
   // User enters password
@@ -11,7 +11,7 @@ test("username, password and totp login", async ({ page }) => {
 });
 
 test("username, password and totp otp login, wrong code", async ({ page }) => {
-  // Given totp is enabled on the organizaiton of the user
+  // Given totp is enabled on the organization of the user
   // Given the user has only totp configured as second factor
   // User enters username
   // User enters password
@@ -21,7 +21,7 @@ test("username, password and totp otp login, wrong code", async ({ page }) => {
 });
 
 test("username, password and totp login, multiple mfa options", async ({ page }) => {
-  // Given totp and email otp is enabled on the organizaiton of the user
+  // Given totp and email otp is enabled on the organization of the user
   // Given the user has totp and email otp configured as second factor
   // User enters username
   // User enters password
