@@ -73,7 +73,7 @@ test("login with mfa setup, force mfa - external user", async ({user, page}) => 
 });
 
 
-test("login with mfa setup, force mfa - external user", async ({user, page}) => {
+test("login with mfa setup, force mfa - local user, wrong password", async ({user, page}) => {
     // Given the organization has a password lockout policy set to 1 on the max password attempts
     // Given the user has only a password as auth methos
 

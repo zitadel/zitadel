@@ -58,7 +58,7 @@ test("login with Generic JWT IDP", async ({user, page}) => {
     // User is redirected to app automatically (default redirect url)
 });
 
- 
+
 test("login with Generic JWT IDP, error", async ({user, page}) => {
     // Given username password and idp Generic JWT is configure on the organization as authencation method
     // Given the user has username password and Generic JWT configured
@@ -124,7 +124,7 @@ test("login with Generic JWT IDP, no user linked - auto link", async ({user, pag
     // User is redirected to the app (default redirect url)
 });
 
-test("login with Generic JWT IDP, no user linked, user doesn't exist - no auto link", async ({user, page}) => {
+test("login with Generic JWT IDP, no user linked, linking not possible", async ({user, page}) => {
     // Given idp Generic JWT is configure on the organization as only authencation method
     // Given idp Generic JWT is configure with manually account linking  not allowed, and linking set to existing email
     // Given user with email address user@zitadel.com doesn't exists
@@ -137,7 +137,7 @@ test("login with Generic JWT IDP, no user linked, user doesn't exist - no auto l
 });
 
 
-test("login with Generic JWT IDP, no user linked, user doesn't exist - no auto link", async ({user, page}) => {
+test("login with Generic JWT IDP, no user linked, linking successful", async ({user, page}) => {
     // Given idp Generic JWT is configure on the organization as only authencation method
     // Given idp Generic JWT is configure with manually account linking allowed, and linking set to existing email
     // Given user with email address user@zitadel.com doesn't exists

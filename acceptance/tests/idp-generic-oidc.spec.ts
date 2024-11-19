@@ -126,7 +126,7 @@ test("login with Generic OIDC IDP, no user linked - auto link", async ({user, pa
     // User is redirected to the app (default redirect url)
 });
 
-test("login with Generic OIDC IDP, no user linked, user doesn't exist - no auto link", async ({user, page}) => {
+test("login with Generic OIDC IDP, no user linked, linking not possible", async ({user, page}) => {
     // Given idp Generic OIDC is configure on the organization as only authencation method
     // Given idp Generic OIDC is configure with manually account linking  not allowed, and linking set to existing email
     // Given user with email address user@zitadel.com doesn't exists
@@ -139,7 +139,7 @@ test("login with Generic OIDC IDP, no user linked, user doesn't exist - no auto 
 });
 
 
-test("login with Generic OIDC IDP, no user linked, user doesn't exist - no auto link", async ({user, page}) => {
+test("login with Generic OIDC IDP, no user linked, linking successful", async ({user, page}) => {
     // Given idp Generic OIDC is configure on the organization as only authencation method
     // Given idp Generic OIDC is configure with manually account linking allowed, and linking set to existing email
     // Given user with email address user@zitadel.com doesn't exists

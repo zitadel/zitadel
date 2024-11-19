@@ -128,7 +128,7 @@ test("login with SAML IDP, no user linked - auto link", async ({user, page}) => 
     // User is redirected to the app (default redirect url)
 });
 
-test("login with SAML IDP, no user linked, user doesn't exist - no auto link", async ({user, page}) => {
+test("login with SAML IDP, no user linked, linking not possible", async ({user, page}) => {
     // Given idp SAML is configure on the organization as only authencation method
     // Given idp SAML is configure with manually account linking  not allowed, and linking set to existing email
     // Given ZITADEL Action is added to autofill missing user information
@@ -142,7 +142,7 @@ test("login with SAML IDP, no user linked, user doesn't exist - no auto link", a
 });
 
 
-test("login with SAML IDP, no user linked, user doesn't exist - no auto link", async ({user, page}) => {
+test("login with SAML IDP, no user linked, linking successful", async ({user, page}) => {
     // Given idp SAML is configure on the organization as only authencation method
     // Given idp SAML is configure with manually account linking allowed, and linking set to existing email
     // Given ZITADEL Action is added to autofill missing user information
