@@ -11,7 +11,6 @@ import { getSession } from "./zitadel";
 const transport = (token: string) =>
   createServerTransport(token, {
     baseUrl: process.env.ZITADEL_API_URL!,
-    httpVersion: "2",
   });
 
 const sessionService = (sessionId: string) => {

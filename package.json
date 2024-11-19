@@ -5,6 +5,8 @@
   "scripts": {
     "generate": "turbo run generate",
     "build": "turbo run build",
+    "build:packages": "turbo run build --filter=./packages/*",
+    "build:apps": "turbo run build --filter=./apps/*",
     "test": "turbo run test",
     "start": "turbo run start",
     "start:built": "turbo run start:built",
