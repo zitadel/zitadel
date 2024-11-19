@@ -298,6 +298,10 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if err != nil {
 			return err
 		}
+		if !generatorInfo.GetSuccess() {
+			return u.commands.HumanPhoneVerificationCodeSendFailed(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo.GetErrorMessage())
+		}
+
 		return u.commands.PasswordCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
 	}), nil
 }
@@ -730,6 +734,10 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 			SendPhoneVerificationCode(ctx, code); err != nil {
 			return err
 		}
+		if !generatorInfo.GetSuccess() {
+			return u.commands.HumanPhoneVerificationCodeSendFailed(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo.GetErrorMessage())
+		}
+
 		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID, generatorInfo)
 	}), nil
 }

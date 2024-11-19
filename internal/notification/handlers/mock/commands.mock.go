@@ -113,6 +113,19 @@ func (mr *MockCommandsMockRecorder) HumanPasswordlessInitCodeSent(ctx, userID, r
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanPasswordlessInitCodeSent", reflect.TypeOf((*MockCommands)(nil).HumanPasswordlessInitCodeSent), ctx, userID, resourceOwner, codeID)
 }
 
+func (m *MockCommands) HumanPhoneVerificationCodeSendFailed(ctx context.Context, orgID, userID string, errorMessage string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HumanPhoneVerificationCodeSendFailed", ctx, orgID, userID, errorMessage)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// HumanPhoneVerificationCodeSendFailed mocks base method.
+func (mr *MockCommandsMockRecorder) HumanPhoneVerificationCodeSendFailed(ctx context.Context, orgID, userID string, errorMessage string) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HumanPhoneVerificationCodeSendFailed", reflect.TypeOf((*MockCommands)(nil).HumanPhoneVerificationCodeSendFailed), ctx, orgID, userID, errorMessage)
+}
+
 // HumanPhoneVerificationCodeSent mocks base method.
 func (m *MockCommands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) error {
 	m.ctrl.T.Helper()
@@ -120,6 +133,7 @@ func (m *MockCommands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID
 	ret0, _ := ret[0].(error)
 	return ret0
 }
+
 
 // HumanPhoneVerificationCodeSent indicates an expected call of HumanPhoneVerificationCodeSent.
 func (mr *MockCommandsMockRecorder) HumanPhoneVerificationCodeSent(ctx, orgID, userID, generatorInfo any) *gomock.Call {

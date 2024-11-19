@@ -20,6 +20,7 @@ const (
 	HumanPhoneVerificationFailedType = phoneEventPrefix + "verification.failed"
 	HumanPhoneCodeAddedType          = phoneEventPrefix + "code.added"
 	HumanPhoneCodeSentType           = phoneEventPrefix + "code.sent"
+	HumanPhoneCodeSendFailedType     = phoneEventPrefix + "code.send.failed"
 )
 
 type HumanPhoneChangedEvent struct {
@@ -238,5 +239,34 @@ func NewHumanPhoneCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggre
 			HumanPhoneCodeSentType,
 		),
 		GeneratorInfo: generatorInfo,
+	}
+}
+
+type HumanPhoneCodeSendFailedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	ErrorMessage string `json:"errorMessage,omitempty"`
+}
+
+func (e *HumanPhoneCodeSendFailedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
+
+func (e *HumanPhoneCodeSendFailedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *HumanPhoneCodeSendFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanPhoneCodeSendFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate, errorMessage string) *HumanPhoneCodeSendFailedEvent {
+	return &HumanPhoneCodeSendFailedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanPhoneCodeSendFailedType,
+		),
+		ErrorMessage: errorMessage,
 	}
 }

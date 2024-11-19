@@ -177,6 +177,27 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 	return writeModelToObjectDetails(&existingPhone.WriteModel), nil
 }
 
+func (c *Commands) HumanPhoneVerificationCodeSendFailed(ctx context.Context, orgID, userID string, error string) (err error) {
+	if userID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-3m9Fs", "Errors.User.UserIDMissing")
+	}
+
+	existingPhone, err := c.phoneWriteModelByID(ctx, userID, orgID)
+	if err != nil {
+		return err
+	}
+	if !existingPhone.UserState.Exists() {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-3M9fs", "Errors.User.NotFound")
+	}
+	if !existingPhone.State.Exists() {
+		return zerrors.ThrowNotFound(nil, "COMMAND-66n8J", "Errors.User.Phone.NotFound")
+	}
+
+	userAgg := UserAggregateFromWriteModel(&existingPhone.WriteModel)
+	_, err = c.eventstore.Push(ctx, user.NewHumanPhoneCodeSendFailedEvent(ctx, userAgg, error))
+	return err
+}
+
 func (c *Commands) HumanPhoneVerificationCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-3m9Fs", "Errors.User.UserIDMissing")

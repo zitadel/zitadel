@@ -30,6 +30,7 @@ const (
 	UserV1PhoneVerificationFailedType = userV1PhoneEventTypePrefix + "verification.failed"
 	UserV1PhoneCodeAddedType          = userV1PhoneEventTypePrefix + "code.added"
 	UserV1PhoneCodeSentType           = userV1PhoneEventTypePrefix + "code.sent"
+	UserV1PhoneCodeSendFailedType     = userV1PhoneEventTypePrefix + "code.send.failed"
 
 	userV1ProfileEventTypePrefix = userEventTypePrefix + "profile."
 	UserV1ProfileChangedType     = userV1ProfileEventTypePrefix + "changed"

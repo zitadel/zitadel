@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/zitadel/logging"
@@ -51,9 +52,18 @@ func generateSms(
 			TriggeringEvent:      triggeringEvent,
 		}
 		err = smsChannels.HandleMessage(message)
+
+		var twilioErr *messages.ErrTwilioSendNotification
+		if errors.As(err, &twilioErr) && twilioErr.Fatal {
+			generatorInfo.Success = false
+			generatorInfo.ErrorMessage = twilioErr.Error()
+			return nil
+		}
+
 		if err != nil {
 			return err
 		}
+
 		if config.TwilioConfig.VerifyServiceSID != "" {
 			generatorInfo.ID = config.ProviderConfig.ID
 			generatorInfo.VerificationID = *message.VerificationID
