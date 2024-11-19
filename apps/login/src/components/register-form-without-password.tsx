@@ -181,9 +181,14 @@ export function RegisterFormWithoutPassword({
           type="submit"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
-          onClick={handleSubmit((values) =>
-            submitAndContinue(values, !(selected.name === methods[0].name)),
-          )}
+          onClick={handleSubmit((values) => {
+            const usePasswordToContinue: boolean =
+              loginSettings?.allowUsernamePassword &&
+              loginSettings?.passkeysType === PasskeysType.ALLOWED
+                ? !!!(selected.name === methods[0].name)
+                : !!loginSettings?.allowUsernamePassword;
+            return submitAndContinue(values, usePasswordToContinue);
+          })}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("submit")}
