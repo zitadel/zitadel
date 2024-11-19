@@ -121,8 +121,9 @@ type ProjectGrantPreConditionReadModel struct {
 	ExistingRoleKeys []string
 }
 
-func NewProjectGrantPreConditionReadModel(projectID, grantedOrgID string) *ProjectGrantPreConditionReadModel {
+func NewProjectGrantPreConditionReadModel(projectID, grantedOrgID, resourceOwner string) *ProjectGrantPreConditionReadModel {
 	return &ProjectGrantPreConditionReadModel{
+		WriteModel:   eventstore.WriteModel{ResourceOwner: resourceOwner},
 		ProjectID:    projectID,
 		GrantedOrgID: grantedOrgID,
 	}
@@ -132,12 +133,24 @@ func (wm *ProjectGrantPreConditionReadModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *project.ProjectAddedEvent:
+			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+				continue
+			}
 			wm.ProjectExists = true
 		case *project.ProjectRemovedEvent:
+			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+				continue
+			}
 			wm.ProjectExists = false
 		case *project.RoleAddedEvent:
+			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+				continue
+			}
 			wm.ExistingRoleKeys = append(wm.ExistingRoleKeys, e.Key)
 		case *project.RoleRemovedEvent:
+			if e.Aggregate().ResourceOwner != wm.ResourceOwner {
+				continue
+			}
 			for i, key := range wm.ExistingRoleKeys {
 				if key == e.Key {
 					copy(wm.ExistingRoleKeys[i:], wm.ExistingRoleKeys[i+1:])

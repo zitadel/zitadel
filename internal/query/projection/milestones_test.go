@@ -4,13 +4,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
-	"github.com/zitadel/zitadel/internal/repository/oidcsession"
-	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -19,6 +17,8 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 		event func(t *testing.T) eventstore.Event
 	}
 	now := time.Now()
+	date, err := time.Parse(time.RFC3339, "2006-01-02T15:04:05Z")
+	require.NoError(t, err)
 	tests := []struct {
 		name   string
 		args   args
@@ -29,292 +29,54 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 			name: "reduceInstanceAdded",
 			args: args{
 				event: getEvent(timedTestEvent(
-					instance.InstanceAddedEventType,
-					instance.AggregateType,
-					[]byte(`{}`),
+					milestone.ReachedEventType,
+					milestone.AggregateType,
+					[]byte(`{"type": "InstanceCreated"}`),
 					now,
-				), instance.InstanceAddedEventMapper),
+					withVersion(milestone.AggregateVersion),
+				), milestone.ReachedEventMapper),
 			},
-			reduce: (&milestoneProjection{}).reduceInstanceAdded,
+			reduce: (&milestoneProjection{}).reduceReached,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
+				aggregateType: eventstore.AggregateType("milestone"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.milestones (instance_id, type, reached_date) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.milestones3 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								milestone.InstanceCreated,
 								now,
 							},
 						},
-						{
-							expectedStmt: "INSERT INTO projections.milestones (instance_id, type) VALUES ($1, $2)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								milestone.AuthenticationSucceededOnInstance,
-							},
-						},
-						{
-							expectedStmt: "INSERT INTO projections.milestones (instance_id, type) VALUES ($1, $2)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								milestone.ProjectCreated,
-							},
-						},
-						{
-							expectedStmt: "INSERT INTO projections.milestones (instance_id, type) VALUES ($1, $2)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								milestone.ApplicationCreated,
-							},
-						},
-						{
-							expectedStmt: "INSERT INTO projections.milestones (instance_id, type) VALUES ($1, $2)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								milestone.AuthenticationSucceededOnApplication,
-							},
-						},
-						{
-							expectedStmt: "INSERT INTO projections.milestones (instance_id, type) VALUES ($1, $2)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								milestone.InstanceDeleted,
-							},
-						},
 					},
 				},
 			},
 		},
 		{
-			name: "reduceInstancePrimaryDomainSet",
-			args: args{
-				event: getEvent(testEvent(
-					instance.InstanceDomainPrimarySetEventType,
-					instance.AggregateType,
-					[]byte(`{"domain": "my.domain"}`),
-				), instance.DomainPrimarySetEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceInstanceDomainPrimarySet,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.milestones SET primary_domain = $1 WHERE (instance_id = $2) AND (last_pushed_date IS NULL)",
-							expectedArgs: []interface{}{
-								"my.domain",
-								"instance-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceProjectAdded",
+			name: "reduceInstanceAdded with reached date",
 			args: args{
 				event: getEvent(timedTestEvent(
-					project.ProjectAddedType,
-					project.AggregateType,
-					[]byte(`{}`),
+					milestone.ReachedEventType,
+					milestone.AggregateType,
+					[]byte(`{"type": "InstanceCreated", "reachedDate":"2006-01-02T15:04:05Z"}`),
 					now,
-				), project.ProjectAddedEventMapper),
+					withVersion(milestone.AggregateVersion),
+				), milestone.ReachedEventMapper),
 			},
-			reduce: (&milestoneProjection{}).reduceProjectAdded,
+			reduce: (&milestoneProjection{}).reduceReached,
 			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
+				aggregateType: eventstore.AggregateType("milestone"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
+							expectedStmt: "INSERT INTO projections.milestones3 (instance_id, type, reached_date) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
-								now,
 								"instance-id",
-								milestone.ProjectCreated,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceApplicationAdded",
-			args: args{
-				event: getEvent(timedTestEvent(
-					project.ApplicationAddedType,
-					project.AggregateType,
-					[]byte(`{}`),
-					now,
-				), project.ApplicationAddedEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceApplicationAdded,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
-							expectedArgs: []interface{}{
-								now,
-								"instance-id",
-								milestone.ApplicationCreated,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceOIDCConfigAdded user event",
-			args: args{
-				event: getEvent(testEvent(
-					project.OIDCConfigAddedType,
-					project.AggregateType,
-					[]byte(`{}`),
-				), project.OIDCConfigAddedEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceOIDCConfigAdded,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
-				executer:      &testExecuter{},
-			},
-		},
-		{
-			name: "reduceOIDCConfigAdded system event",
-			args: args{
-				event: getEvent(toSystemEvent(testEvent(
-					project.OIDCConfigAddedType,
-					project.AggregateType,
-					[]byte(`{"clientId": "client-id"}`),
-				)), project.OIDCConfigAddedEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceOIDCConfigAdded,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.milestones SET ignore_client_ids = array_append(ignore_client_ids, $1) WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
-							expectedArgs: []interface{}{
-								"client-id",
-								"instance-id",
-								milestone.AuthenticationSucceededOnApplication,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceAPIConfigAdded user event",
-			args: args{
-				event: getEvent(testEvent(
-					project.APIConfigAddedType,
-					project.AggregateType,
-					[]byte(`{}`),
-				), project.APIConfigAddedEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceAPIConfigAdded,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
-				executer:      &testExecuter{},
-			},
-		},
-		{
-			name: "reduceAPIConfigAdded system event",
-			args: args{
-				event: getEvent(toSystemEvent(testEvent(
-					project.APIConfigAddedType,
-					project.AggregateType,
-					[]byte(`{"clientId": "client-id"}`),
-				)), project.APIConfigAddedEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceAPIConfigAdded,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("project"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.milestones SET ignore_client_ids = array_append(ignore_client_ids, $1) WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
-							expectedArgs: []interface{}{
-								"client-id",
-								"instance-id",
-								milestone.AuthenticationSucceededOnApplication,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceOIDCSessionAdded",
-			args: args{
-				event: getEvent(timedTestEvent(
-					oidcsession.AddedType,
-					oidcsession.AggregateType,
-					[]byte(`{"clientID": "client-id"}`),
-					now,
-				), eventstore.GenericEventMapper[oidcsession.AddedEvent]),
-			},
-			reduce: (&milestoneProjection{}).reduceOIDCSessionAdded,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("oidc_session"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
-							expectedArgs: []interface{}{
-								now,
-								"instance-id",
-								milestone.AuthenticationSucceededOnInstance,
-							},
-						},
-						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (NOT (ignore_client_ids @> $4)) AND (reached_date IS NULL)",
-							expectedArgs: []interface{}{
-								now,
-								"instance-id",
-								milestone.AuthenticationSucceededOnApplication,
-								database.TextArray[string]{"client-id"},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceInstanceRemoved",
-			args: args{
-				event: getEvent(timedTestEvent(
-					instance.InstanceRemovedEventType,
-					instance.AggregateType,
-					[]byte(`{}`),
-					now,
-				), instance.InstanceRemovedEventMapper),
-			},
-			reduce: (&milestoneProjection{}).reduceInstanceRemoved,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("instance"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
-							expectedArgs: []interface{}{
-								now,
-								"instance-id",
-								milestone.InstanceDeleted,
+								milestone.InstanceCreated,
+								date,
 							},
 						},
 					},
@@ -329,18 +91,48 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					milestone.AggregateType,
 					[]byte(`{"type": "ProjectCreated"}`),
 					now,
+					withVersion(milestone.AggregateVersion),
 				), milestone.PushedEventMapper),
 			},
-			reduce: (&milestoneProjection{}).reduceMilestonePushed,
+			reduce: (&milestoneProjection{}).reducePushed,
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("milestone"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.milestones SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
+							expectedStmt: "UPDATE projections.milestones3 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
 							expectedArgs: []interface{}{
 								now,
+								"instance-id",
+								milestone.ProjectCreated,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceMilestonePushed normal milestone with pushed date",
+			args: args{
+				event: getEvent(timedTestEvent(
+					milestone.PushedEventType,
+					milestone.AggregateType,
+					[]byte(`{"type": "ProjectCreated", "pushedDate":"2006-01-02T15:04:05Z"}`),
+					now,
+					withVersion(milestone.AggregateVersion),
+				), milestone.PushedEventMapper),
+			},
+			reduce: (&milestoneProjection{}).reducePushed,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("milestone"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.milestones3 SET last_pushed_date = $1 WHERE (instance_id = $2) AND (type = $3)",
+							expectedArgs: []interface{}{
+								date,
 								"instance-id",
 								milestone.ProjectCreated,
 							},
@@ -356,16 +148,17 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 					milestone.PushedEventType,
 					milestone.AggregateType,
 					[]byte(`{"type": "InstanceDeleted"}`),
+					withVersion(milestone.AggregateVersion),
 				), milestone.PushedEventMapper),
 			},
-			reduce: (&milestoneProjection{}).reduceMilestonePushed,
+			reduce: (&milestoneProjection{}).reducePushed,
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("milestone"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.milestones WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.milestones3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"instance-id",
 							},

@@ -216,16 +216,22 @@ func TestServer_GetTarget(t *testing.T) {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
 			}
-			got, getErr := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				assert.Error(t, getErr, "Error: "+getErr.Error())
-			} else {
-				assert.NoError(t, getErr)
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, 2*time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ttt, err, "Error: "+err.Error())
+					return
+				}
+				if !assert.NoError(ttt, err) {
+					return
+				}
+
 				wantTarget := tt.want.GetTarget()
 				gotTarget := got.GetTarget()
-				integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
-				assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
-			}
+				integration.AssertResourceDetails(ttt, wantTarget.GetDetails(), gotTarget.GetDetails())
+				assert.EqualExportedValues(ttt, wantTarget.GetConfig(), gotTarget.GetConfig())
+			}, retryDuration, tick, "timeout waiting for expected target result")
 		})
 	}
 }
@@ -474,31 +480,24 @@ func TestServer_ListTargets(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
-
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, listErr := instance.Client.ActionV3Alpha.SearchTargets(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assert.Error(ttt, listErr, "Error: "+listErr.Error())
-				} else {
-					assert.NoError(ttt, listErr)
-				}
-				if listErr != nil {
+					require.Error(ttt, listErr, "Error: "+listErr.Error())
 					return
 				}
+				require.NoError(ttt, listErr)
+
 				// always first check length, otherwise its failed anyway
-				if !assert.Len(ttt, got.Result, len(tt.want.Result)) {
-					return
-				}
-				for i := range tt.want.Result {
-					integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
-					assert.Equal(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
+				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
+					for i := range tt.want.Result {
+						integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
+						assert.EqualExportedValues(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
+					}
 				}
 				integration.AssertResourceListDetails(ttt, tt.want, got)
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
+			}, retryDuration, tick, "timeout waiting for expected execution result")
 		})
 	}
 }
@@ -866,32 +865,28 @@ func TestServer_SearchExecutions(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
-
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, listErr := instance.Client.ActionV3Alpha.SearchExecutions(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assert.Error(ttt, listErr, "Error: "+listErr.Error())
-				} else {
-					assert.NoError(ttt, listErr)
-				}
-				if listErr != nil {
+					require.Error(ttt, listErr, "Error: "+listErr.Error())
 					return
 				}
+				require.NoError(ttt, listErr)
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
-				for i := range tt.want.Result {
-					// as not sorted, all elements have to be checked
-					// workaround as oneof elements can only be checked with assert.EqualExportedValues()
-					if j, found := containExecution(got.Result, tt.want.Result[i]); found {
-						assert.EqualExportedValues(t, tt.want.Result[i], got.Result[j])
+				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
+					for i := range tt.want.Result {
+						// as not sorted, all elements have to be checked
+						// workaround as oneof elements can only be checked with assert.EqualExportedValues()
+						if j, found := containExecution(got.Result, tt.want.Result[i]); found {
+							integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[j].GetDetails())
+							got.Result[j].Details = tt.want.Result[i].GetDetails()
+							assert.EqualExportedValues(ttt, tt.want.Result[i], got.Result[j])
+						}
 					}
 				}
 				integration.AssertResourceListDetails(ttt, tt.want, got)
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
+			}, retryDuration, tick, "timeout waiting for expected execution result")
 		})
 	}
 }

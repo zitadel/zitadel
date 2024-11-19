@@ -215,18 +215,18 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 		logging.Error("no user agent id")
 		return zerrors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
-	userIDs, err := o.repo.UserSessionUserIDsByAgentID(ctx, userAgentID)
+	sessions, err := o.repo.UserSessionsByAgentID(ctx, userAgentID)
 	if err != nil {
 		logging.WithError(err).Error("error retrieving user sessions")
 		return err
 	}
-	if len(userIDs) == 0 {
+	if len(sessions) == 0 {
 		return nil
 	}
 	data := authz.CtxData{
 		UserID: userID,
 	}
-	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, userIDs)
+	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, sessions)
 	logging.OnError(err).Error("error signing out")
 	return err
 }
@@ -278,18 +278,18 @@ func (o *OPStorage) terminateV1Session(ctx context.Context, userID, sessionID st
 		if err != nil {
 			return err
 		}
-		return o.command.HumansSignOut(ctx, userAgentID, []string{userID})
+		return o.command.HumansSignOut(ctx, userAgentID, []command.HumanSignOutSession{{ID: sessionID, UserID: userID}})
 	}
 	// otherwise we search for all active sessions within the same user agent of the current session id
-	userAgentID, userIDs, err := o.repo.ActiveUserIDsBySessionID(ctx, sessionID)
+	userAgentID, sessions, err := o.repo.ActiveUserSessionsBySessionID(ctx, sessionID)
 	if err != nil {
 		logging.WithError(err).Error("error retrieving user sessions")
 		return err
 	}
-	if len(userIDs) == 0 {
+	if len(sessions) == 0 {
 		return nil
 	}
-	return o.command.HumansSignOut(ctx, userAgentID, userIDs)
+	return o.command.HumansSignOut(ctx, userAgentID, sessions)
 }
 
 func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) (err *oidc.Error) {
@@ -588,6 +588,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		authReq.UserID,
 		authReq.UserOrgID,
 		client.client.ClientID,
+		client.client.BackChannelLogoutURI,
 		scope,
 		authReq.Audience,
 		authReq.AuthMethods(),
@@ -599,6 +600,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 		authReq.SessionID,
+		authReq.oidc().ResponseType,
 	)
 	if err != nil {
 		op.AuthRequestError(w, r, authReq, err, authorizer)

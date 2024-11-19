@@ -43,6 +43,7 @@ type OIDCConfigAddedEvent struct {
 	ClockSkew                time.Duration              `json:"clockSkew,omitempty"`
 	AdditionalOrigins        []string                   `json:"additionalOrigins,omitempty"`
 	SkipNativeAppSuccessPage bool                       `json:"skipNativeAppSuccessPage,omitempty"`
+	BackChannelLogoutURI     string                     `json:"backChannelLogoutURI,omitempty"`
 }
 
 func (e *OIDCConfigAddedEvent) Payload() interface{} {
@@ -74,6 +75,7 @@ func NewOIDCConfigAddedEvent(
 	clockSkew time.Duration,
 	additionalOrigins []string,
 	skipNativeAppSuccessPage bool,
+	backChannelLogoutURI string,
 ) *OIDCConfigAddedEvent {
 	return &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -99,6 +101,7 @@ func NewOIDCConfigAddedEvent(
 		ClockSkew:                clockSkew,
 		AdditionalOrigins:        additionalOrigins,
 		SkipNativeAppSuccessPage: skipNativeAppSuccessPage,
+		BackChannelLogoutURI:     backChannelLogoutURI,
 	}
 }
 
@@ -184,7 +187,10 @@ func (e *OIDCConfigAddedEvent) Validate(cmd eventstore.Command) bool {
 			return false
 		}
 	}
-	return e.SkipNativeAppSuccessPage == c.SkipNativeAppSuccessPage
+	if e.SkipNativeAppSuccessPage != c.SkipNativeAppSuccessPage {
+		return false
+	}
+	return e.BackChannelLogoutURI == c.BackChannelLogoutURI
 }
 
 func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -219,6 +225,7 @@ type OIDCConfigChangedEvent struct {
 	ClockSkew                *time.Duration              `json:"clockSkew,omitempty"`
 	AdditionalOrigins        *[]string                   `json:"additionalOrigins,omitempty"`
 	SkipNativeAppSuccessPage *bool                       `json:"skipNativeAppSuccessPage,omitempty"`
+	BackChannelLogoutURI     *string                     `json:"backChannelLogoutURI,omitempty"`
 }
 
 func (e *OIDCConfigChangedEvent) Payload() interface{} {
@@ -342,6 +349,12 @@ func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigC
 func ChangeSkipNativeAppSuccessPage(skipNativeAppSuccessPage bool) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
 		e.SkipNativeAppSuccessPage = &skipNativeAppSuccessPage
+	}
+}
+
+func ChangeBackChannelLogoutURI(backChannelLogoutURI string) func(event *OIDCConfigChangedEvent) {
+	return func(e *OIDCConfigChangedEvent) {
+		e.BackChannelLogoutURI = &backChannelLogoutURI
 	}
 }
 

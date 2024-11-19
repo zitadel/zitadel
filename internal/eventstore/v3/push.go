@@ -13,11 +13,19 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+var appNamePrefix = dialect.DBPurposeEventPusher.AppName() + "_"
+
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	tx, err := es.client.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
@@ -27,18 +35,35 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 		sequences []*latestSequence
 	)
 
-	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		sequences, err = latestSequences(ctx, tx, commands)
+	// needs to be set like this because psql complains about parameters in the SET statement
+	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
+	if err != nil {
+		logging.WithError(err).Warn("failed to set application name")
+		return nil, err
+	}
+
+	// needs to be set like this because psql complains about parameters in the SET statement
+	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
+	if err != nil {
+		logging.WithError(err).Warn("failed to set application name")
+		return nil, err
+	}
+
+	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() (err error) {
+		inTxCtx, span := tracing.NewSpan(ctx)
+		defer func() { span.EndWithError(err) }()
+
+		sequences, err = latestSequences(inTxCtx, tx, commands)
 		if err != nil {
 			return err
 		}
 
-		events, err = insertEvents(ctx, tx, sequences, commands)
+		events, err = insertEvents(inTxCtx, tx, sequences, commands)
 		if err != nil {
 			return err
 		}
 
-		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+		if err = handleUniqueConstraints(inTxCtx, tx, commands); err != nil {
 			return err
 		}
 
@@ -51,7 +76,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			}
 		}
 
-		return handleFieldCommands(ctx, tx, commands)
+		return handleFieldCommands(inTxCtx, tx, commands)
 	})
 
 	if err != nil {

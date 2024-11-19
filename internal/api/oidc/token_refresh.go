@@ -54,6 +54,7 @@ func (s *Server) refreshTokenV1(ctx context.Context, client *Client, r *op.Clien
 		refreshToken.UserID,
 		refreshToken.ResourceOwner,
 		refreshToken.ClientID,
+		"", // backChannelLogoutURI is not in refresh token view
 		scope,
 		refreshToken.Audience,
 		AMRToAuthMethodTypes(refreshToken.AuthMethodsReferences),
@@ -68,6 +69,7 @@ func (s *Server) refreshTokenV1(ctx context.Context, client *Client, r *op.Clien
 		refreshToken.Actor,
 		true,
 		"",
+		domain.OIDCResponseTypeUnspecified,
 	)
 	if err != nil {
 		return nil, err
