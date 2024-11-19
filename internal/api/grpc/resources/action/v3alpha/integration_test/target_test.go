@@ -300,7 +300,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ctx: isolatedIAMOwnerCTX,
 				req: &action.PatchTargetRequest{
 					Target: &action.PatchTarget{
-						ExpirationSigningKey: durationpb.New(time.Minute),
+						ExpirationSigningKey: durationpb.New(0 * time.Second),
 					},
 				},
 			},
