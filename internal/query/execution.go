@@ -11,6 +11,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -175,6 +176,11 @@ func (q *Queries) TargetsByExecutionID(ctx context.Context, ids []string) (execu
 		instanceID,
 		database.TextArray[string](ids),
 	)
+	for i := range execution {
+		if err := execution[i].decryptSigningKey(q.targetEncryptionAlgorithm); err != nil {
+			return nil, err
+		}
+	}
 	return execution, err
 }
 
@@ -205,6 +211,11 @@ func (q *Queries) TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string
 		database.TextArray[string](ids1),
 		database.TextArray[string](ids2),
 	)
+	for i := range execution {
+		if err := execution[i].decryptSigningKey(q.targetEncryptionAlgorithm); err != nil {
+			return nil, err
+		}
+	}
 	return execution, err
 }
 
@@ -352,6 +363,7 @@ type ExecutionTarget struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+	signingKey       *crypto.CryptoValue
 	SigningKey       string
 }
 
@@ -377,6 +389,18 @@ func (e *ExecutionTarget) GetSigningKey() string {
 	return e.SigningKey
 }
 
+func (t *ExecutionTarget) decryptSigningKey(alg crypto.EncryptionAlgorithm) error {
+	if t.signingKey == nil {
+		return nil
+	}
+	keyValue, err := crypto.DecryptString(t.signingKey, alg)
+	if err != nil {
+		return zerrors.ThrowInternal(err, "QUERY-bxevy3YXwy", "Errors.Internal")
+	}
+	t.SigningKey = keyValue
+	return nil
+}
+
 func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 	targets := make([]*ExecutionTarget, 0)
 	for rows.Next() {
@@ -390,7 +414,7 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 			endpoint         = &sql.NullString{}
 			timeout          = &sql.NullInt64{}
 			interruptOnError = &sql.NullBool{}
-			signingKey       = &sql.NullString{}
+			signingKey       = &crypto.CryptoValue{}
 		)
 
 		err := rows.Scan(
@@ -415,7 +439,7 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 		target.Endpoint = endpoint.String
 		target.Timeout = time.Duration(timeout.Int64)
 		target.InterruptOnError = interruptOnError.Bool
-		target.SigningKey = signingKey.String
+		target.signingKey = signingKey
 
 		targets = append(targets, target)
 	}

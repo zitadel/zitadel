@@ -50,7 +50,7 @@ func (*targetProjection) Init() *old_handler.Check {
 			handler.NewColumn(TargetEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(TargetTimeoutCol, handler.ColumnTypeInt64),
 			handler.NewColumn(TargetInterruptOnErrorCol, handler.ColumnTypeBool),
-			handler.NewColumn(TargetSigningKey, handler.ColumnTypeJSONB),
+			handler.NewColumn(TargetSigningKey, handler.ColumnTypeJSONB, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(TargetInstanceIDCol, TargetIDCol),
 		),
