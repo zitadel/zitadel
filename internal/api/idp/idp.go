@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/crewjam/saml"
 	"github.com/gorilla/mux"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -49,6 +51,7 @@ const (
 	paramError            = "error"
 	paramErrorDescription = "error_description"
 	varIDPID              = "idpid"
+	paramInternalUI       = "internalUI"
 )
 
 type Handler struct {
@@ -187,21 +190,8 @@ func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
 	}
 	metadata := sp.ServiceProvider.Metadata()
 
-	for i, spDesc := range metadata.SPSSODescriptors {
-		spDesc.AssertionConsumerServices = append(
-			spDesc.AssertionConsumerServices,
-			saml.IndexedEndpoint{
-				Binding:  saml.HTTPPostBinding,
-				Location: h.loginSAMLRootURL(ctx),
-				Index:    len(spDesc.AssertionConsumerServices) + 1,
-			}, saml.IndexedEndpoint{
-				Binding:  saml.HTTPArtifactBinding,
-				Location: h.loginSAMLRootURL(ctx),
-				Index:    len(spDesc.AssertionConsumerServices) + 2,
-			},
-		)
-		metadata.SPSSODescriptors[i] = spDesc
-	}
+	internalUI, _ := strconv.ParseBool(r.URL.Query().Get(paramInternalUI))
+	h.assertionConsumerServices(ctx, metadata, internalUI)
 
 	buf, _ := xml.MarshalIndent(metadata, "", "  ")
 	w.Header().Set("Content-Type", "application/samlmetadata+xml")
@@ -209,6 +199,48 @@ func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	}
+}
+
+func (h *Handler) assertionConsumerServices(ctx context.Context, metadata *saml.EntityDescriptor, internalUI bool) {
+	if !internalUI {
+		for i, spDesc := range metadata.SPSSODescriptors {
+			spDesc.AssertionConsumerServices = append(
+				spDesc.AssertionConsumerServices,
+				saml.IndexedEndpoint{
+					Binding:  saml.HTTPPostBinding,
+					Location: h.loginSAMLRootURL(ctx),
+					Index:    len(spDesc.AssertionConsumerServices) + 1,
+				}, saml.IndexedEndpoint{
+					Binding:  saml.HTTPArtifactBinding,
+					Location: h.loginSAMLRootURL(ctx),
+					Index:    len(spDesc.AssertionConsumerServices) + 2,
+				},
+			)
+			metadata.SPSSODescriptors[i] = spDesc
+		}
+		return
+	}
+	for i, spDesc := range metadata.SPSSODescriptors {
+		acs := make([]saml.IndexedEndpoint, 0, len(spDesc.AssertionConsumerServices)+2)
+		acs = append(acs,
+			saml.IndexedEndpoint{
+				Binding:   saml.HTTPPostBinding,
+				Location:  h.loginSAMLRootURL(ctx),
+				Index:     0,
+				IsDefault: gu.Ptr(true),
+			},
+			saml.IndexedEndpoint{
+				Binding:  saml.HTTPArtifactBinding,
+				Location: h.loginSAMLRootURL(ctx),
+				Index:    1,
+			})
+		for i := 0; i < len(spDesc.AssertionConsumerServices); i++ {
+			spDesc.AssertionConsumerServices[i].Index = 2 + i
+			acs = append(acs, spDesc.AssertionConsumerServices[i])
+		}
+		spDesc.AssertionConsumerServices = acs
+		metadata.SPSSODescriptors[i] = spDesc
 	}
 }
 
