@@ -2,6 +2,10 @@
 
 import { registerUser } from "@/lib/server/register";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import {
+  LoginSettings,
+  PasskeysType,
+} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -32,6 +36,7 @@ type Props = {
   email?: string;
   organization?: string;
   authRequestId?: string;
+  loginSettings?: LoginSettings;
 };
 
 export function RegisterFormWithoutPassword({
@@ -41,6 +46,7 @@ export function RegisterFormWithoutPassword({
   lastname,
   organization,
   authRequestId,
+  loginSettings,
 }: Props) {
   const t = useTranslations("register");
 
@@ -99,7 +105,9 @@ export function RegisterFormWithoutPassword({
     }
 
     if (withPassword) {
-      return router.push(`/register?` + new URLSearchParams(registerParams));
+      return router.push(
+        `/register/password?` + new URLSearchParams(registerParams),
+      );
     } else {
       return submitAndRegister(value);
     }
@@ -143,29 +151,30 @@ export function RegisterFormWithoutPassword({
           />
         </div>
       </div>
-
       {legal && (
         <PrivacyPolicyCheckboxes
           legal={legal}
           onChange={setTosAndPolicyAccepted}
         />
       )}
-
       <p className="mt-4 ztdl-p mb-6 block text-left">{t("selectMethod")}</p>
-
-      <div className="pb-4">
-        <AuthenticationMethodRadio
-          selected={selected}
-          selectionChanged={setSelected}
-        />
-      </div>
+      {/* show chooser if both methods are allowed */}
+      {loginSettings &&
+        loginSettings.allowUsernamePassword &&
+        loginSettings.passkeysType === PasskeysType.ALLOWED && (
+          <div className="pb-4">
+            <AuthenticationMethodRadio
+              selected={selected}
+              selectionChanged={setSelected}
+            />
+          </div>
+        )}
 
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>
         </div>
       )}
-
       <div className="mt-8 flex w-full flex-row items-center justify-between">
         <BackButton />
         <Button

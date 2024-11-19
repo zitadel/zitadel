@@ -122,6 +122,14 @@
     }
   },
   "register": {
+    "disabled": {
+      "title": "Registro deshabilitado",
+      "description": "Registrarse está deshabilitado en este momento."
+    },
+    "missingdata": {
+      "title": "Datos faltantes",
+      "description": "No se proporcionaron datos suficientes para el registro."
+    },
     "title": "Registrarse",
     "description": "Crea tu cuenta ZITADEL.",
     "selectMethod": "Selecciona el método con el que deseas autenticarte",

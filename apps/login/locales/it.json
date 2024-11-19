@@ -122,6 +122,14 @@
     }
   },
   "register": {
+    "disabled": {
+      "title": "Registration disabled",
+      "description": "Registrazione disabilitata. Contatta l'amministratore di sistema per assistenza."
+    },
+    "missingdata": {
+      "title": "Registrazione",
+      "description": "Inserisci i tuoi dati per registrarti."
+    },
     "title": "Registrati",
     "description": "Crea il tuo account ZITADEL.",
     "selectMethod": "Seleziona il metodo con cui desideri autenticarti",

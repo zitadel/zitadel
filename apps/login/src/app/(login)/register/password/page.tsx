@@ -1,5 +1,5 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { RegisterFormWithoutPassword } from "@/components/register-form-without-password";
+import { SetRegisterPasswordForm } from "@/components/set-register-password-form";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -28,7 +28,7 @@ export default async function Page({
     }
   }
 
-  const setPassword = !!(firstname && lastname && email);
+  const missingData = !firstname || !lastname || !email;
 
   const legal = await getLegalAndSupportSettings(organization);
   const passwordComplexitySettings =
@@ -38,33 +38,33 @@ export default async function Page({
 
   const loginSettings = await getLoginSettings(organization);
 
-  if (!loginSettings?.allowRegister) {
-    return (
-      <DynamicTheme branding={branding}>
-        <div>{t("disabled.title")}</div>
-        <p className="ztdl-p">{t("disabled.description")}</p>
-      </DynamicTheme>
-    );
-  }
-
-  return (
+  return missingData ? (
+    <DynamicTheme branding={branding}>
+      <div>{t("missingdata.title")}</div>
+      <p className="ztdl-p">{t("missingdata.description")}</p>
+    </DynamicTheme>
+  ) : loginSettings?.allowRegister && loginSettings.allowUsernamePassword ? (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{t("title")}</h1>
+        <h1>{t("password.title")}</h1>
         <p className="ztdl-p">{t("description")}</p>
 
         {legal && passwordComplexitySettings && (
-          <RegisterFormWithoutPassword
-            legal={legal}
-            organization={organization}
+          <SetRegisterPasswordForm
+            passwordComplexitySettings={passwordComplexitySettings}
+            email={email}
             firstname={firstname}
             lastname={lastname}
-            email={email}
+            organization={organization}
             authRequestId={authRequestId}
-            loginSettings={loginSettings}
-          ></RegisterFormWithoutPassword>
+          ></SetRegisterPasswordForm>
         )}
       </div>
+    </DynamicTheme>
+  ) : (
+    <DynamicTheme branding={branding}>
+      <div>{t("disabled.title")}</div>
+      <p className="ztdl-p">{t("disabled.description")}</p>
     </DynamicTheme>
   );
 }

@@ -122,6 +122,14 @@
     }
   },
   "register": {
+    "disabled": {
+      "title": "Registration disabled",
+      "description": "The registration is disabled. Please contact your administrator."
+    },
+    "missingdata": {
+      "title": "Missing data",
+      "description": "Provide email, first and last name to register."
+    },
     "title": "Register",
     "description": "Create your ZITADEL account.",
     "selectMethod": "Select the method you would like to authenticate",
