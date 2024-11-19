@@ -1,7 +1,7 @@
 services:
   zitadel:
     user: "${ZITADEL_DEV_UID}"
-    image: "${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}"
+    image: ghcr.io/zitadel/zitadel:v2.65.0
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled --config /zitadel.yaml --steps /zitadel.yaml'
     ports:
       - "8080:8080"
@@ -14,7 +14,7 @@ services:
 
   db:
     restart: "always"
-    image: "${POSTGRES_IMAGE:-postgres:latest}"
+    image: postgres:17.0-alpine3.19
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel
@@ -44,9 +44,11 @@ services:
       PAT_FILE: /pat/zitadel-admin-sa.pat
       ZITADEL_API_INTERNAL_URL: http://zitadel:8080
       WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
+      WRITE_TEST_ENVIRONMENT_FILE: /acceptance/tests/.env.local
     volumes:
       - "./pat:/pat"
       - "../apps/login:/apps/login"
+      - "../acceptance/tests:/acceptance/tests"
     depends_on:
       wait_for_zitadel:
         condition: "service_completed_successfully"

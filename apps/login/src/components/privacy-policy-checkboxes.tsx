@@ -60,6 +60,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
               });
               onChange(checked && acceptanceState.privacyPolicyAccepted);
             }}
+            data-testid="privacy-policy-checkbox"
           />
 
           <div className="mr-4 w-[28rem]">
@@ -84,6 +85,7 @@ export function PrivacyPolicyCheckboxes({ legal, onChange }: Props) {
               });
               onChange(checked && acceptanceState.tosAccepted);
             }}
+            data-testid="tos-checkbox"
           />
 
           <div className="mr-4 w-[28rem]">

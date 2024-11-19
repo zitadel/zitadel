@@ -235,6 +235,7 @@ export function LoginPasskey({
                 "/password?" + new URLSearchParams(params), // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
               );
             }}
+            data-testid="password-button"
           >
             {t("verify.usePassword")}
           </Button>
@@ -272,6 +273,7 @@ export function LoginPasskey({
                 setLoading(false);
               });
           }}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("verify.submit")}

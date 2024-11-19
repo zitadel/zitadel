@@ -30,6 +30,7 @@ export function AuthenticationMethodRadio({
               <RadioGroup.Option
                 key={method.name}
                 value={method}
+                data-testid={method.name + "-radio"}
                 className={({ active, checked }) =>
                   `${
                     active
