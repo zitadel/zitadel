@@ -272,7 +272,19 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 	}
 
 	if query.AwaitOpenTransactions {
+		instanceIDs := make(database.TextArray[string], 0, 3)
+		if query.InstanceID != nil {
+			instanceIDs = append(instanceIDs, query.InstanceID.Value.(string))
+		} else if query.InstanceIDs != nil {
+			instanceIDs = append(instanceIDs, query.InstanceIDs.Value.(database.TextArray[string])...)
+		}
+
+		for i := range instanceIDs {
+			instanceIDs[i] = dialect.DBPurposeEventPusher.AppName() + "_" + instanceIDs[i]
+		}
+
 		clauses += awaitOpenTransactions(useV1)
+		args = append(args, instanceIDs)
 	}
 
 	if clauses == "" {
