@@ -54,10 +54,7 @@ const CACHE_REVALIDATION_INTERVAL_IN_SECONDS = process.env
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
-  {
-    baseUrl: process.env.ZITADEL_API_URL!,
-    httpVersion: "2",
-  },
+  { baseUrl: process.env.ZITADEL_API_URL! },
 );
 
 export const sessionService = createSessionServiceClient(transport);
@@ -652,7 +649,6 @@ export async function createPasskeyRegistrationLink(
 ) {
   // const transport = createServerTransport(token, {
   //   baseUrl: process.env.ZITADEL_API_URL!,
-  //   httpVersion: "2",
   // });
 
   // const service = createUserServiceClient(transport);
@@ -680,7 +676,6 @@ export async function registerU2F(
 ) {
   // const transport = createServerTransport(token, {
   //   baseUrl: process.env.ZITADEL_API_URL!,
-  //   httpVersion: "2",
   // });
 
   // const service = createUserServiceClient(transport);

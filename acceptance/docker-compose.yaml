@@ -45,6 +45,9 @@ services:
       ZITADEL_API_INTERNAL_URL: http://zitadel:8080
       WRITE_ENVIRONMENT_FILE: /apps/login/.env.local
       WRITE_TEST_ENVIRONMENT_FILE: /acceptance/tests/.env.local
+      SINK_EMAIL_INTERNAL_URL: http://sink:3333/email
+      SINK_SMS_INTERNAL_URL: http://sink:3333/sms
+      SINK_NOTIFICATION_URL: http://localhost:3333/notification
     volumes:
       - "./pat:/pat"
       - "../apps/login:/apps/login"
@@ -56,7 +59,7 @@ services:
   sink:
     image: golang:1.19-alpine
     container_name: sink
-    command: go run /sink/main.go -port 3333
+    command: go run /sink/main.go -port '3333' -email '/email' -sms '/sms' -notification '/notification'
     ports:
       - 3333:3333
     volumes:

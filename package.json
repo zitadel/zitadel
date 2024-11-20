@@ -5,6 +5,8 @@
   "scripts": {
     "generate": "turbo run generate",
     "build": "turbo run build",
+    "build:packages": "turbo run build --filter=./packages/*",
+    "build:apps": "turbo run build --filter=./apps/*",
     "test": "turbo run test",
     "start": "turbo run start",
     "start:built": "turbo run start:built",
@@ -22,7 +24,8 @@
     "version-packages": "changeset version",
     "release": "turbo run build --filter=login^... && changeset publish",
     "run-zitadel": "docker compose -f ./acceptance/docker-compose.yaml run setup",
-    "run-sink": "docker compose -f ./acceptance/docker-compose.yaml up -d sink"
+    "run-sink": "docker compose -f ./acceptance/docker-compose.yaml up -d sink",
+    "stop": "docker compose -f ./acceptance/docker-compose.yaml stop"
   },
   "pnpm": {
     "overrides": {

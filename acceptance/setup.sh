@@ -8,9 +8,9 @@ ZITADEL_API_DOMAIN="${ZITADEL_API_DOMAIN:-localhost}"
 ZITADEL_API_PORT="${ZITADEL_API_PORT:-8080}"
 ZITADEL_API_URL="${ZITADEL_API_URL:-${ZITADEL_API_PROTOCOL}://${ZITADEL_API_DOMAIN}:${ZITADEL_API_PORT}}"
 ZITADEL_API_INTERNAL_URL="${ZITADEL_API_INTERNAL_URL:-${ZITADEL_API_URL}}"
-SINK_EMAIL_URL="${SINK_EMAIL_URL:-"http://localhost:3333/email"}}"
-SINK_SMS_URL="${SINK_SMS_URL:-"http://localhost:3333/sms"}}"
-SINK_NOTIFICATION_URL="${SINK_SMS_URL:-"http://localhost:3333/notification"}}"
+SINK_EMAIL_INTERNAL_URL="${SINK_EMAIL_INTERNAL_URL:-"http://sink:3333/email"}"
+SINK_SMS_INTERNAL_URL="${SINK_SMS_INTERNAL_URL:-"http://sink:3333/sms"}"
+SINK_NOTIFICATION_URL="${SINK_NOTIFICATION_URL:-"http://localhost:3333/notification"}"
 
 if [ -z "${PAT}" ]; then
   echo "Reading PAT from file ${PAT_FILE}"
@@ -56,7 +56,7 @@ SMSHTTP_RESPONSE=$(curl -s --request POST \
       --header "Authorization: Bearer ${PAT}" \
       --header "Host: ${ZITADEL_API_DOMAIN}" \
       --header "Content-Type: application/json" \
-      -d "{\"endpoint\": \"${SINK_SMS_URL}\", \"description\": \"test\"}")
+      -d "{\"endpoint\": \"${SINK_SMS_INTERNAL_URL}\", \"description\": \"test\"}")
 echo "Received SMS HTTP response: ${SMSHTTP_RESPONSE}"
 
 SMSHTTP_ID=$(echo ${SMSHTTP_RESPONSE} | jq -r '. | .id')
@@ -78,7 +78,7 @@ EMAILHTTP_RESPONSE=$(curl -s --request POST \
       --header "Authorization: Bearer ${PAT}" \
       --header "Host: ${ZITADEL_API_DOMAIN}" \
       --header "Content-Type: application/json" \
-      -d "{\"endpoint\": \"${SINK_EMAIL_URL}\", \"description\": \"test\"}")
+      -d "{\"endpoint\": \"${SINK_EMAIL_INTERNAL_URL}\", \"description\": \"test\"}")
 echo "Received Email HTTP response: ${EMAILHTTP_RESPONSE}"
 
 EMAILHTTP_ID=$(echo ${EMAILHTTP_RESPONSE} | jq -r '. | .id')

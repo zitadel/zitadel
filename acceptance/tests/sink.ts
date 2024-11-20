@@ -3,7 +3,7 @@ import axios from "axios";
 export async function getCodeFromSink(key: string): Promise<any> {
   try {
     const response = await axios.post(
-      process.env.SINK_NOTIFICATION_URL,
+      process.env.SINK_NOTIFICATION_URL!,
       {
         recipient: key,
       },
