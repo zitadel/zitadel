@@ -127,6 +127,13 @@ export function SubProcessorTable() {
       country: country_list.us,
       enduserdata: false
     },
+    {
+      entity: "PostHog Inc.",
+      purpose: "Product Analytics",
+      hosting: country_list.eu,
+      country: country_list.us,
+      enduserdata: false
+    },
   ]
 
   return (
