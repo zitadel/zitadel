@@ -9,6 +9,7 @@ export interface userProps {
   lastName: string;
   organization: string;
   password: string;
+  phone: string;
 }
 
 class User {
@@ -35,6 +36,10 @@ class User {
         email: this.props.email,
         isVerified: true,
       },
+      phone: {
+        phone: this.props.phone!,
+        isVerified: true,
+      },
       password: {
         password: this.props.password!,
       },
@@ -53,6 +58,7 @@ class User {
         console.error(error);
         throw new Error(error);
       }
+      this.setUserId(response.data.userId);
     } catch (error) {
       console.error("Error making request:", error);
       throw error;
@@ -94,6 +100,10 @@ class User {
     return this.props.lastName;
   }
 
+  public getPhone() {
+    return this.props.phone;
+  }
+
   public getFullName() {
     return `${this.props.firstName} ${this.props.lastName}`;
   }
@@ -112,12 +122,12 @@ export interface otpUserProps {
   lastName: string;
   organization: string;
   password: string;
+  phone: string;
   type: OtpType;
 }
 
 export class PasswordUserWithOTP extends User {
   private type: OtpType;
-  private code: string;
 
   constructor(props: otpUserProps) {
     super({
@@ -126,6 +136,7 @@ export class PasswordUserWithOTP extends User {
       lastName: props.lastName,
       organization: props.organization,
       password: props.password,
+      phone: props.phone,
     });
     this.type = props.type;
   }
@@ -160,9 +171,6 @@ export class PasswordUserWithOTP extends User {
         console.error(error);
         throw new Error(error);
       }
-
-      // TODO: get code from SMS or Email provider
-      this.code = "";
     } catch (error) {
       console.error("Error making request:", error);
       throw error;
@@ -171,10 +179,6 @@ export class PasswordUserWithOTP extends User {
     // wait for projection of user
     await page.waitForTimeout(2000);
   }
-
-  public getCode() {
-    return this.code;
-  }
 }
 
 export interface passkeyUserProps {
@@ -182,6 +186,7 @@ export interface passkeyUserProps {
   firstName: string;
   lastName: string;
   organization: string;
+  phone: string;
 }
 
 export class PasskeyUser extends User {
@@ -194,6 +199,7 @@ export class PasskeyUser extends User {
       lastName: props.lastName,
       organization: props.organization,
       password: "",
+      phone: props.phone,
     });
   }
 

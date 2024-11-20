@@ -1,13 +1,19 @@
+import { faker } from "@faker-js/faker";
 import { test } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
 import { loginScreenExpect } from "./login";
 import { registerWithPasskey, registerWithPassword } from "./register";
 import { removeUserByUsername } from "./zitadel";
 
+// Read from ".env" file.
+dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+
 test("register with password", async ({ page }) => {
-  const username = "register-password@example.com";
+  const username = faker.internet.email();
   const password = "Password1!";
-  const firstname = "firstname";
-  const lastname = "lastname";
+  const firstname = faker.person.firstName();
+  const lastname = faker.person.lastName();
 
   await removeUserByUsername(username);
   await registerWithPassword(page, firstname, lastname, username, password, password);
@@ -15,9 +21,9 @@ test("register with password", async ({ page }) => {
 });
 
 test("register with passkey", async ({ page }) => {
-  const username = "register-passkey@example.com";
-  const firstname = "firstname";
-  const lastname = "lastname";
+  const username = faker.internet.email();
+  const firstname = faker.person.firstName();
+  const lastname = faker.person.lastName();
 
   await removeUserByUsername(username);
   await registerWithPasskey(page, firstname, lastname, username);

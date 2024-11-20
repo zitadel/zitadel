@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { codeFromSink } from "./code";
 import { loginname } from "./loginname";
 import { password } from "./password";
 
@@ -23,6 +24,12 @@ export async function loginScreenExpect(page: Page, fullName: string) {
   await expect(page.getByRole("heading")).toContainText(fullName);
 }
 
-export async function loginWithOTP(page: Page, username: string, password: string) {
+export async function loginWithPasswordAndEmailOTP(page: Page, username: string, password: string, email: string) {
   await loginWithPassword(page, username, password);
+  await codeFromSink(page, email);
+}
+
+export async function loginWithPasswordAndPhoneOTP(page: Page, username: string, password: string, phone: string) {
+  await loginWithPassword(page, username, password);
+  await codeFromSink(page, phone);
 }

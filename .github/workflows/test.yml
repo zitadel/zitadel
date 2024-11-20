@@ -76,7 +76,7 @@ jobs:
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Run ZITADEL
-        run: ZITADEL_DEV_UID=root pnpm run-zitadel
+        run: ZITADEL_DEV_UID=root pnpm run-sink
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Create Production Build
