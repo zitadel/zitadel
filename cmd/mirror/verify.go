@@ -5,13 +5,16 @@ import (
 	"database/sql"
 	_ "embed"
 	"fmt"
+	"slices"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	cryptoDatabase "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
+	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 func verifyCmd() *cobra.Command {
@@ -98,12 +101,22 @@ func getViews(ctx context.Context, dest *database.DB, schema string) (tables []s
 }
 
 func countEntries(ctx context.Context, client *database.DB, table string) (count int) {
+	instanceClause := instanceClause()
+	noInstanceIDColumn := []string{
+		projection.InstanceProjectionTable,
+		projection.SystemFeatureTable,
+		cryptoDatabase.EncryptionKeysTable,
+	}
+	if slices.Contains(noInstanceIDColumn, table) {
+		instanceClause = ""
+	}
+
 	err := client.QueryRowContext(
 		ctx,
 		func(r *sql.Row) error {
 			return r.Scan(&count)
 		},
-		fmt.Sprintf("SELECT COUNT(*) FROM %s %s", table, instanceClause()),
+		fmt.Sprintf("SELECT COUNT(*) FROM %s %s", table, instanceClause),
 	)
 	logging.WithFields("table", table, "db", client.DatabaseName()).OnError(err).Error("unable to count")
 

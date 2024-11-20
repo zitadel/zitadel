@@ -10,7 +10,7 @@ import TokenExchangeResponse from "../../apis/openidoauth/_token_exchange_respon
 The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. This guide will explain how token exchange is implemented inside ZITADEL and gives some usage examples.
 
 :::info
-Token Exchange is currently an experimental beta](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable it on the [feature API](#feature-api) before using it.
+Token Exchange is currently an [experimental beta](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable it on the [feature API](#feature-api) before using it.
 :::
 
 In this guide we assume that the application performing the token exchange is already in possession of tokens. You should already have a good understanding on the following topics before starting with this guide:
