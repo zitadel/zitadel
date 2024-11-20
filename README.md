@@ -9,7 +9,7 @@ Login UI.
 
 The scope of functionality of this repo and packages is under active development.
 
-The `@zitadel/client` and `@zitadel/node` packages are using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme) and its [2.0.0-alpha](https://github.com/connectrpc/connect-es/releases/tag/v2.0.0-alpha.1) release which might still change.
+The `@zitadel/client` and `@zitadel/node` packages are using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
 
 You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
 Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
