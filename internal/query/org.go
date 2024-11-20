@@ -111,11 +111,8 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	// Only get from cache if eventual consistency is acceptable
-	if !shouldTriggerBulk {
-		if org, ok := q.caches.org.Get(ctx, orgIndexByID, id); ok {
-			return org, nil
-		}
+	if org, ok := q.caches.org.Get(ctx, orgIndexByID, id); ok {
+		return org, nil
 	}
 	defer func() {
 		if err == nil && org != nil {
