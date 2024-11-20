@@ -50,6 +50,16 @@ func InviteUserLink(origin, userID, loginName, code, orgID string, authRequestID
 	return externalLink(origin) + EndpointInviteUser + "?" + v.Encode()
 }
 
+func InviteUserLink2(origin, userID, orgID string, authRequestID string) string {
+	v := url.Values{}
+	v.Set(queryInviteUserUserID, userID)
+	v.Set(queryInviteUserLoginName, "{{.LoginName}}")
+	v.Set(queryInviteUserCode, "{{.Code}}")
+	v.Set(queryOrgID, orgID)
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointInviteUser + "?" + v.Encode()
+}
+
 func (l *Login) handleInviteUser(w http.ResponseWriter, r *http.Request) {
 	authReq := l.checkOptionalAuthRequestOfEmailLinks(r)
 	userID := r.FormValue(queryInviteUserUserID)

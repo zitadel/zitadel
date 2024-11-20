@@ -2,6 +2,7 @@ package login
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"slices"
@@ -50,6 +51,19 @@ func MailVerificationLink(origin, userID, code, orgID, authRequestID string) str
 	v.Set(queryOrgID, orgID)
 	v.Set(QueryAuthRequestID, authRequestID)
 	return externalLink(origin) + EndpointMailVerification + "?" + v.Encode()
+}
+
+func MailVerificationLink2(origin, userID, orgID, authRequestID string) string {
+	//v := url.Values{}
+	//v.Set(queryUserID, userID)
+	//v.Set(queryCode, "")
+	//v.Set(queryOrgID, orgID)
+	//v.Set(QueryAuthRequestID, authRequestID)
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s", externalLink(origin), EndpointMailVerification,
+		queryUserID, userID,
+		queryCode, "{{.Code}}",
+		queryOrgID, orgID,
+		QueryAuthRequestID, authRequestID)
 }
 
 func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {

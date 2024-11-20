@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -45,6 +46,20 @@ func InitPasswordLink(origin, userID, code, orgID, authRequestID string) string 
 	v.Set(queryOrgID, orgID)
 	v.Set(QueryAuthRequestID, authRequestID)
 	return externalLink(origin) + EndpointInitPassword + "?" + v.Encode()
+}
+
+func InitPasswordLink2(origin, userID, orgID, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s", externalLink(origin), EndpointInitPassword,
+		queryInitPWUserID, userID,
+		queryInitPWCode, "{{.Code}}",
+		queryOrgID, orgID,
+		QueryAuthRequestID, authRequestID)
+	//v := url.Values{}
+	//v.Set(queryInitPWUserID, userID)
+	//v.Set(queryInitPWCode, "{{.Code}}")
+	//v.Set(queryOrgID, orgID)
+	//v.Set(QueryAuthRequestID, authRequestID)
+	//return externalLink(origin) + EndpointInitPassword + "?" + v.Encode()
 }
 
 func (l *Login) handleInitPassword(w http.ResponseWriter, r *http.Request) {

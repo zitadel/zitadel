@@ -3,12 +3,15 @@ package handlers
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 )
 
 type Commands interface {
+	RequestNotification(ctx context.Context, instanceID string, request *command.NotificationRequest) error
+	NotificationFailed(ctx context.Context, id, instanceID string, err error) error
 	HumanInitCodeSent(ctx context.Context, orgID, userID string) error
 	HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) error
 	PasswordCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) error
