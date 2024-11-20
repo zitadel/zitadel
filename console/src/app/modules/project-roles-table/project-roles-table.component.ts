@@ -47,7 +47,6 @@ export class ProjectRolesTableComponent implements OnInit {
     this.loadRolesPage();
     this.selection.select(...this.selectedKeys);
 
-    // TODO: Follow this
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
