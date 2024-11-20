@@ -203,7 +203,9 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *O
 		org, err = scan(row)
 		return err
 	}, query, args...)
-	q.caches.org.Set(ctx, org)
+	if err == nil {
+		q.caches.org.Set(ctx, org)
+	}
 	return org, err
 }
 
