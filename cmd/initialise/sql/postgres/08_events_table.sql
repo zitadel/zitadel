@@ -42,58 +42,52 @@ CREATE INDEX IF NOT EXISTS e_push_idx ON eventstore.events2(instance_id, aggrega
 
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 SELECT
-    c.instance_id,
-    c.aggregate_type,
-    c.aggregate_id,
-    c.command_type AS event_type,
-    cs.sequence + ROW_NUMBER() OVER (PARTITION BY c.instance_id, c.aggregate_type, c.aggregate_id) AS sequence,
-    c.revision,
-    c.created_at,
-    c.payload,
-    c.creator,
-    cs.owner,
-    c.position,
-    c.in_tx_order
-FROM (
-    SELECT
-        c.*,
-        NOW() AS created_at,
-        EXTRACT(EPOCH FROM clock_timestamp()) AS position,
-        ROW_NUMBER() OVER () AS in_tx_order
-    FROM UNNEST(commands) AS c
-) AS c
+    c.instance_id
+    , c.aggregate_type
+    , c.aggregate_id
+    , c.command_type AS event_type
+    , cs.sequence + ROW_NUMBER() OVER (PARTITION BY c.instance_id, c.aggregate_type, c.aggregate_id) AS sequence
+    , c.revision
+    , NOW() AS created_at
+    , c.payload
+    , c.creator
+    , cs.owner
+    , EXTRACT(EPOCH FROM NOW()) AS position
+    , ROW_NUMBER() OVER () AS in_tx_order   
+FROM 
+    UNNEST(commands) AS c
 JOIN (
     SELECT
-        a.instance_id,
-        a.aggregate_type,
-        a.aggregate_id,
-        CASE WHEN (e.owner <> '') THEN e.owner ELSE a.owner END AS owner,
-        COALESCE(MAX(e.sequence), 0) AS sequence
+        cmds.instance_id
+        , cmds.aggregate_type
+        , cmds.aggregate_id
+        , CASE WHEN (e.owner <> '') THEN e.owner ELSE cmds.owner END AS owner
+        , COALESCE(MAX(e.sequence), 0) AS sequence
     FROM (
         SELECT DISTINCT
-            instance_id,
-            aggregate_type,
-            aggregate_id,
-            owner
+            instance_id
+            , aggregate_type
+            , aggregate_id
+            , owner
         FROM UNNEST(commands)
-    ) AS a
+    ) AS cmds
     LEFT JOIN eventstore.events2 AS e
-        ON a.instance_id = e.instance_id
-        AND a.aggregate_type = e.aggregate_type
-        AND a.aggregate_id = e.aggregate_id
-        AND (a.owner = '' OR a.owner = e.owner)
+        ON cmds.instance_id = e.instance_id
+        AND cmds.aggregate_type = e.aggregate_type
+        AND cmds.aggregate_id = e.aggregate_id
+        AND (cmds.owner = '' OR cmds.owner = e.owner)
     GROUP BY
-        a.instance_id,
-        a.aggregate_type,
-        a.aggregate_id,
-        4
+        cmds.instance_id
+        , cmds.aggregate_type
+        , cmds.aggregate_id
+        , 4 -- owner
 ) AS cs
     ON c.instance_id = cs.instance_id
     AND c.aggregate_type = cs.aggregate_type
     AND c.aggregate_id = cs.aggregate_id
     AND (c.owner = '' OR cs.owner = c.owner)
 ORDER BY
-    c.in_tx_order;
+    in_tx_order;
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$

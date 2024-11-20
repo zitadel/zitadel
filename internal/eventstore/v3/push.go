@@ -54,13 +54,6 @@ func (es *Eventstore) writeCommands(ctx context.Context, commands []eventstore.C
 		return nil, err
 	}
 
-	// needs to be set like this because psql complains about parameters in the SET statement
-	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
-	if err != nil {
-		logging.WithError(err).Warn("failed to set application name")
-		return nil, err
-	}
-
 	defer func() {
 		if err != nil {
 			_ = tx.Rollback()
