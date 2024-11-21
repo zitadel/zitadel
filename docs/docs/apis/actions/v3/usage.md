@@ -68,6 +68,7 @@ The API documentation to create a target can be found [here](/apis/resources/act
 
 To give the option to check if the content of the request was messed with, the call contains a 'ZITADEL-Signature' in the headers.
 This header contains a HMAC value computed from the content of the request and a timestamp which can be used to timeout requests, through the logic provided in 'pkg/actions/signing.go'.
+The goal is that the HMAC value in the header and the HMAC value computed in the Target are equal, which proves that the sent and received request are equal.
 
 Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/apis/resources/action_service_v3/zitadel-actions-create-target),
 and can also be newly generated when a Target is [patched](/apis/resources/action_service_v3/zitadel-actions-patch-target).
