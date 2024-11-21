@@ -16,6 +16,7 @@ const (
 	PurposeUnspecified Purpose = iota
 	PurposeAuthzInstance
 	PurposeMilestones
+	PurposeOrganization
 )
 
 // Cache stores objects with a value of type `V`.
