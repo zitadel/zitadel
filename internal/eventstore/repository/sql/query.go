@@ -281,7 +281,7 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 			clauses += " AND "
 		}
 		// TODO: where to take the table name from?
-		clauses += "NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE" + excludeAggregateIDsClauses
+		clauses += "NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
 		args = append(args, excludeAggregateIDs...)
 	}
 

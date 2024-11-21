@@ -169,19 +169,20 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 			query.SubQueries[i] = append(query.SubQueries[i], filter)
 		}
 	}
-
-	for _, f := range []func(query *eventstore.ExclusionQuery) *Filter{
-		excludeAggregateTypeFilter,
-		excludeEventTypeFilter,
-	} {
-		filter := f(builder.ExcludeAggregateIDs())
-		if filter == nil {
-			continue
+	if excludeAggregateIDs := builder.GetExcludeAggregateIDs(); excludeAggregateIDs != nil {
+		for _, f := range []func(query *eventstore.ExclusionQuery) *Filter{
+			excludeAggregateTypeFilter,
+			excludeEventTypeFilter,
+		} {
+			filter := f(excludeAggregateIDs)
+			if filter == nil {
+				continue
+			}
+			if err := filter.Validate(); err != nil {
+				return nil, err
+			}
+			query.ExcludeAggregateIDs = append(query.ExcludeAggregateIDs, filter)
 		}
-		if err := filter.Validate(); err != nil {
-			return nil, err
-		}
-		query.ExcludeAggregateIDs = append(query.ExcludeAggregateIDs, filter)
 	}
 
 	return query, nil

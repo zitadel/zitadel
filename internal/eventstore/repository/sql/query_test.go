@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"reflect"
+	"regexp"
 	"strconv"
 	"testing"
 	"time"
@@ -834,6 +835,36 @@ func Test_query_events_mocked(t *testing.T) {
 				mock: newMockClient(t).expectQuery(t,
 					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \(aggregate_type = \$1 OR \(aggregate_type = \$2 AND aggregate_id = \$3\)\) AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$4\)\) ORDER BY event_sequence DESC LIMIT \$5`,
 					[]driver.Value{eventstore.AggregateType("user"), eventstore.AggregateType("org"), "asdf42", database.TextArray[string]{}, uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "aggregate / event type, position and exclusion",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderDesc().
+					Limit(5).
+					PositionAfter(123.456).
+					AddQuery().
+					AggregateTypes("notify").
+					EventTypes("notify.foo.bar").
+					Builder().
+					ExcludeAggregateIDs().
+					AggregateTypes("notify").
+					EventTypes("notification.failed", "notification.success").
+					Builder(),
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					regexp.QuoteMeta(
+						`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY event_sequence DESC LIMIT $9`,
+					),
+					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), 123.456, eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", 123.456, uint64(5)},
 				),
 			},
 			res: res{
