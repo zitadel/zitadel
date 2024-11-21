@@ -861,6 +861,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder().LockRowsDuringTx(nil, eventstore.LockOptionWait),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -882,6 +883,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder().LockRowsDuringTx(nil, eventstore.LockOptionNoWait),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -903,6 +905,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder().LockRowsDuringTx(nil, eventstore.LockOptionSkipLocked),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
