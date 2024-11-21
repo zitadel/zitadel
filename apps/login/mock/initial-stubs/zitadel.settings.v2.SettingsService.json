@@ -46,5 +46,17 @@
         }
       }
     }
+  },
+  {
+    "service": "zitadel.settings.v2.SettingsService",
+    "method": "GetLoginSettings",
+    "out": {
+      "data": {
+        "settings": {
+          "passkeysType": 1,
+          "defaultRedirectUri": ""
+        }
+      }
+    }
   }
 ]
