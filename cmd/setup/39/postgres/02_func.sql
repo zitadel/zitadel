@@ -11,9 +11,9 @@ SELECT
     , c.creator
     , cs.owner
     , EXTRACT(EPOCH FROM NOW()) AS position
-    , c.in_tx_order   
+    , c.in_tx_order
 FROM (
-    SELECT 
+    SELECT
         c.instance_id
         , c.aggregate_type
         , c.aggregate_id
@@ -23,7 +23,7 @@ FROM (
         , c.creator
         , c.owner
         , ROW_NUMBER() OVER () AS in_tx_order
-    FROM 
+    FROM
         UNNEST(commands) AS c
 ) AS c
 JOIN (
@@ -31,7 +31,7 @@ JOIN (
         cmds.instance_id
         , cmds.aggregate_type
         , cmds.aggregate_id
-        , CASE WHEN (e.owner <> '') THEN e.owner ELSE cmds.owner END AS owner
+        , CASE WHEN (e.owner <> '') THEN e.owner ELSE command_owners.owner END AS owner
         , COALESCE(MAX(e.sequence), 0) AS sequence
     FROM (
         SELECT DISTINCT
@@ -45,6 +45,23 @@ JOIN (
         ON cmds.instance_id = e.instance_id
         AND cmds.aggregate_type = e.aggregate_type
         AND cmds.aggregate_id = e.aggregate_id
+    JOIN (
+        SELECT
+            DISTINCT ON (
+                instance_id
+                , aggregate_type
+                , aggregate_id
+            )
+            instance_id
+            , aggregate_type
+            , aggregate_id
+            , owner
+        FROM
+            UNNEST(commands)
+    ) AS command_owners ON
+        cmds.instance_id = command_owners.instance_id
+        AND cmds.aggregate_type = command_owners.aggregate_type
+        AND cmds.aggregate_id = command_owners.aggregate_id
     GROUP BY
         cmds.instance_id
         , cmds.aggregate_type
