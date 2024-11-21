@@ -176,6 +176,16 @@ Milestones are reached upon the first time a certain action is performed. For ex
 As an extra optimization, once all milestones are reached by the instance, an in-memory flag is set and the milestone state is never queried again from the database nor cache.
 For single instance setups which fulfilled all milestone (*your next steps* in console) it is not needed to enable this cache. We mainly use it for ZITADEL cloud where there are many instances with *incomplete* milestones.
 
+### Organization
+
+Most resources like users, project and applications are part of an [organization](/docs/concepts/structure/organizations). Therefore many parts of the ZITADEL logic search for an organization by ID or by their primary domain.
+Organization objects are quite small and receive infrequent updates after they are created:
+
+- Change of organization name
+- Deactivation / Reactivation
+- Change of primary domain
+- Removal
+
 ## Examples
 
 Currently caches are in beta and disabled by default. However, if you want to give caching a try, the following sections contains some suggested configurations for different setups.
@@ -187,6 +197,9 @@ Caches:
   Memory:
     Enabled: true
   Instance:
+    Connector: "memory"
+    MaxAge: 1h
+  Organization:
     Connector: "memory"
     MaxAge: 1h
 ```
@@ -206,6 +219,9 @@ Caches:
     Connector: "postgres"
     MaxAge: 1h
     LastUsage: 10m
+  Organization:
+    Connector: "memory"
+    MaxAge: 1s
 ```
 
 When running many instances on multiple servers:
@@ -222,6 +238,10 @@ Caches:
     MaxAge: 1h
     LastUsage: 10m
   Milestones:
+    Connector: "redis"
+    MaxAge: 1h
+    LastUsage: 10m
+  Organization:
     Connector: "redis"
     MaxAge: 1h
     LastUsage: 10m
