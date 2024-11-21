@@ -113,6 +113,7 @@ export function SetRegisterPasswordForm({
             })}
             label="Password"
             error={errors.password?.message as string}
+            data-testid="password-text-input"
           />
         </div>
         <div className="">
@@ -125,6 +126,7 @@ export function SetRegisterPasswordForm({
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
+            data-testid="password-confirm-text-input"
           />
         </div>
       </div>
@@ -140,7 +142,7 @@ export function SetRegisterPasswordForm({
       {error && <Alert>{error}</Alert>}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton />
+        <BackButton data-testid="back-button" />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
@@ -151,6 +153,7 @@ export function SetRegisterPasswordForm({
             watchPassword !== watchConfirmPassword
           }
           onClick={handleSubmit(submitRegister)}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("password.submit")}

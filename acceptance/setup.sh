@@ -26,14 +26,18 @@ fi
 
 WRITE_ENVIRONMENT_FILE=${WRITE_ENVIRONMENT_FILE:-$(dirname "$0")/../apps/login/.env.local}
 echo "Writing environment file to ${WRITE_ENVIRONMENT_FILE} when done."
+WRITE_TEST_ENVIRONMENT_FILE=${WRITE_TEST_ENVIRONMENT_FILE:-$(dirname "$0")/../acceptance/tests/.env.local}
+echo "Writing environment file to ${WRITE_TEST_ENVIRONMENT_FILE} when done."
 
 echo "ZITADEL_API_URL=${ZITADEL_API_URL}
 ZITADEL_SERVICE_USER_ID=${ZITADEL_SERVICE_USER_ID}
 ZITADEL_SERVICE_USER_TOKEN=${PAT}
-DEBUG=true" > ${WRITE_ENVIRONMENT_FILE}
-
+DEBUG=true"| tee "${WRITE_ENVIRONMENT_FILE}" "${WRITE_TEST_ENVIRONMENT_FILE}" > /dev/null
 echo "Wrote environment file ${WRITE_ENVIRONMENT_FILE}"
 cat ${WRITE_ENVIRONMENT_FILE}
+
+echo "Wrote environment file ${WRITE_TEST_ENVIRONMENT_FILE}"
+cat ${WRITE_TEST_ENVIRONMENT_FILE}
 
 DEFAULTORG_RESPONSE_RESULTS=0
 # waiting for default organization

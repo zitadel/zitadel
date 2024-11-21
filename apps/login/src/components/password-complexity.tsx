@@ -65,7 +65,7 @@ export function PasswordComplexity({
   return (
     <div className="mb-4 grid grid-cols-2 gap-x-8 gap-y-2">
       {passwordComplexitySettings.minLength != undefined ? (
-        <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center" data-testid="length-check">
           {hasMinLength ? check : cross}
           <span className={desc}>
             Password length {passwordComplexitySettings.minLength.toString()}
@@ -74,23 +74,23 @@ export function PasswordComplexity({
       ) : (
         <span />
       )}
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center" data-testid="symbol-check">
         {hasSymbol ? check : cross}
         <span className={desc}>has Symbol</span>
       </div>
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center" data-testid="number-check">
         {hasNumber ? check : cross}
         <span className={desc}>has Number</span>
       </div>
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center" data-testid="uppercase-check">
         {hasUppercase ? check : cross}
         <span className={desc}>has uppercase</span>
       </div>
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center" data-testid="lowercase-check">
         {hasLowercase ? check : cross}
         <span className={desc}>has lowercase</span>
       </div>
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center" data-testid="equal-check">
         {equals ? check : cross}
         <span className={desc}>equals</span>
       </div>

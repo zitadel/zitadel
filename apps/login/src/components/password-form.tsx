@@ -126,6 +126,7 @@ export function PasswordForm({
           autoComplete="password"
           {...register("password", { required: "This field is required" })}
           label="Password"
+          data-testid="password-text-input"
         />
         {!loginSettings?.hidePasswordReset && (
           <button
@@ -155,13 +156,13 @@ export function PasswordForm({
       )}
 
       {error && (
-        <div className="py-4">
+        <div className="py-4" data-testid="error">
           <Alert>{error}</Alert>
         </div>
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        <BackButton />
+        <BackButton data-testid="back-button" />
         <span className="flex-grow"></span>
         <Button
           type="submit"
@@ -169,6 +170,7 @@ export function PasswordForm({
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
           onClick={handleSubmit(submitPassword)}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("verify.submit")}

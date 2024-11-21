@@ -128,6 +128,7 @@ export function RegisterFormWithoutPassword({
             {...register("firstname", { required: "This field is required" })}
             label="First name"
             error={errors.firstname?.message as string}
+            data-testid="firstname-text-input"
           />
         </div>
         <div className="">
@@ -138,6 +139,7 @@ export function RegisterFormWithoutPassword({
             {...register("lastname", { required: "This field is required" })}
             label="Last name"
             error={errors.lastname?.message as string}
+            data-testid="lastname-text-input"
           />
         </div>
         <div className="col-span-2">
@@ -148,6 +150,7 @@ export function RegisterFormWithoutPassword({
             {...register("email", { required: "This field is required" })}
             label="E-mail"
             error={errors.email?.message as string}
+            data-testid="email-text-input"
           />
         </div>
       </div>
@@ -176,7 +179,7 @@ export function RegisterFormWithoutPassword({
         </div>
       )}
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <BackButton />
+        <BackButton data-testid="back-button" />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
@@ -189,6 +192,7 @@ export function RegisterFormWithoutPassword({
                 : !!loginSettings?.allowUsernamePassword;
             return submitAndContinue(values, usePasswordToContinue);
           })}
+          data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           {t("submit")}
