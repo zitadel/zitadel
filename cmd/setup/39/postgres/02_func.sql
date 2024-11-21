@@ -31,7 +31,7 @@ JOIN (
         cmds.instance_id
         , cmds.aggregate_type
         , cmds.aggregate_id
-        , CASE WHEN (e.owner <> '') THEN e.owner ELSE command_owners.owner END AS owner
+        , CASE WHEN (e.owner IS NOT NULL OR e.owner <> '') THEN e.owner ELSE command_owners.owner END AS owner
         , COALESCE(MAX(e.sequence), 0) AS sequence
     FROM (
         SELECT DISTINCT

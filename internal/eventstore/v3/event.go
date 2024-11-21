@@ -61,14 +61,14 @@ func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *eve
 	}
 	return &event{
 		command: &command{
-			InstanceID:    cmd.Aggregate().InstanceID,
-			AggregateType: string(cmd.Aggregate().Type),
-			AggregateID:   cmd.Aggregate().ID,
+			InstanceID:    sequence.aggregate.InstanceID,
+			AggregateType: string(sequence.aggregate.Type),
+			AggregateID:   sequence.aggregate.ID,
 			CommandType:   string(cmd.Type()),
 			Revision:      uint16(revision),
 			Payload:       payload,
 			Creator:       cmd.Creator(),
-			Owner:         cmd.Aggregate().ResourceOwner,
+			Owner:         sequence.aggregate.ResourceOwner,
 		},
 		sequence: sequence.sequence,
 	}, nil
