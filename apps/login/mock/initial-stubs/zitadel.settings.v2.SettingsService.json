@@ -53,7 +53,7 @@
     "out": {
       "data": {
         "settings": {
-          "allowRegister": "true",
+          "allowRegister": true,
           "passkeysType": 1,
           "allowUsernamePassword": true,
           "defaultRedirectUri": ""
