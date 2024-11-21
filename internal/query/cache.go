@@ -12,6 +12,7 @@ import (
 
 type Caches struct {
 	instance cache.Cache[instanceIndex, string, *authzInstance]
+	org      cache.Cache[orgIndex, string, *Org]
 }
 
 func startCaches(background context.Context, connectors connector.Connectors) (_ *Caches, err error) {
@@ -20,7 +21,13 @@ func startCaches(background context.Context, connectors connector.Connectors) (_
 	if err != nil {
 		return nil, err
 	}
+	caches.org, err = connector.StartCache[orgIndex, string, *Org](background, orgIndexValues(), cache.PurposeOrganization, connectors.Config.Organization, connectors)
+	if err != nil {
+		return nil, err
+	}
+
 	caches.registerInstanceInvalidation()
+	caches.registerOrgInvalidation()
 	return caches, nil
 }
 

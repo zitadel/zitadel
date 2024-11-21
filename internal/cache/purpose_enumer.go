@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _PurposeName = "unspecifiedauthz_instancemilestones"
+const _PurposeName = "unspecifiedauthz_instancemilestonesorganization"
 
-var _PurposeIndex = [...]uint8{0, 11, 25, 35}
+var _PurposeIndex = [...]uint8{0, 11, 25, 35, 47}
 
-const _PurposeLowerName = "unspecifiedauthz_instancemilestones"
+const _PurposeLowerName = "unspecifiedauthz_instancemilestonesorganization"
 
 func (i Purpose) String() string {
 	if i < 0 || i >= Purpose(len(_PurposeIndex)-1) {
@@ -27,9 +27,10 @@ func _PurposeNoOp() {
 	_ = x[PurposeUnspecified-(0)]
 	_ = x[PurposeAuthzInstance-(1)]
 	_ = x[PurposeMilestones-(2)]
+	_ = x[PurposeOrganization-(3)]
 }
 
-var _PurposeValues = []Purpose{PurposeUnspecified, PurposeAuthzInstance, PurposeMilestones}
+var _PurposeValues = []Purpose{PurposeUnspecified, PurposeAuthzInstance, PurposeMilestones, PurposeOrganization}
 
 var _PurposeNameToValueMap = map[string]Purpose{
 	_PurposeName[0:11]:       PurposeUnspecified,
@@ -38,12 +39,15 @@ var _PurposeNameToValueMap = map[string]Purpose{
 	_PurposeLowerName[11:25]: PurposeAuthzInstance,
 	_PurposeName[25:35]:      PurposeMilestones,
 	_PurposeLowerName[25:35]: PurposeMilestones,
+	_PurposeName[35:47]:      PurposeOrganization,
+	_PurposeLowerName[35:47]: PurposeOrganization,
 }
 
 var _PurposeNames = []string{
 	_PurposeName[0:11],
 	_PurposeName[11:25],
 	_PurposeName[25:35],
+	_PurposeName[35:47],
 }
 
 // PurposeString retrieves an enum value from the enum constants string name.
