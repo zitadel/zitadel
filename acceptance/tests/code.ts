@@ -1,11 +1,11 @@
 import { Page } from "@playwright/test";
 import { codeScreen } from "./code-screen";
-import { getCodeFromSink } from "./sink";
+import { getOtpFromSink } from "./sink";
 
-export async function codeFromSink(page: Page, key: string) {
+export async function otpFromSink(page: Page, key: string) {
   // wait for send of the code
   await page.waitForTimeout(3000);
-  const c = await getCodeFromSink(key);
+  const c = await getOtpFromSink(key);
   await code(page, c);
 }
 

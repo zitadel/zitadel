@@ -77,7 +77,7 @@ export function LoginOTP({
 
     if (method === "sms") {
       challenges = create(RequestChallengesSchema, {
-        otpSms: { returnCode: true },
+        otpSms: {},
       });
     }
 

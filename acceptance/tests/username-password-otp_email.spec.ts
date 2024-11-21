@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
-import { code, codeFromSink, codeResend } from "./code";
+import { code, codeResend, otpFromSink } from "./code";
 import { codeScreenExpect } from "./code-screen";
 import { loginScreenExpect, loginWithPassword, loginWithPasswordAndEmailOTP } from "./login";
 import { OtpType, PasswordUserWithOTP } from "./user";
@@ -61,7 +61,7 @@ test("username, password and email otp login, resend code", async ({ user, page 
   // User is redirected to the app (default redirect url)
   await loginWithPassword(page, user.getUsername(), user.getPassword());
   await codeResend(page);
-  await codeFromSink(page, user.getUsername());
+  await otpFromSink(page, user.getUsername());
   await loginScreenExpect(page, user.getFullName());
 });
 

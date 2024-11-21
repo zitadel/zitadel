@@ -42,7 +42,7 @@ test("username and password changed login", async ({ user, page }) => {
      */
 });
 
-test("password not with desired complexity", async ({ user, page }) => {
+test("password change not with desired complexity", async ({ user, page }) => {
   const changedPw1 = "change";
   const changedPw2 = "chang";
   await loginWithPassword(page, user.getUsername(), user.getPassword());

@@ -21,8 +21,6 @@ class User {
   }
 
   async ensure(page: Page) {
-    await this.remove();
-
     const body = {
       username: this.props.email,
       organization: {
@@ -53,7 +51,7 @@ class User {
         },
       });
 
-      if (response.status >= 400 && response.status !== 409) {
+      if (response.status >= 400) {
         const error = `HTTP Error: ${response.status} - ${response.statusText}`;
         console.error(error);
         throw new Error(error);
@@ -65,7 +63,7 @@ class User {
     }
 
     // wait for projection of user
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(2000);
   }
 
   async remove() {
@@ -166,7 +164,7 @@ export class PasswordUserWithOTP extends User {
         },
       );
 
-      if (response.status >= 400 && response.status !== 409) {
+      if (response.status >= 400) {
         const error = `HTTP Error: ${response.status} - ${response.statusText}`;
         console.error(error);
         throw new Error(error);
@@ -204,16 +202,11 @@ export class PasskeyUser extends User {
   }
 
   public async ensure(page: Page) {
-    await this.remove();
     const authId = await registerWithPasskey(page, this.getFirstname(), this.getLastname(), this.getUsername());
     this.authenticatorId = authId;
 
     // wait for projection of user
     await page.waitForTimeout(2000);
-  }
-
-  public async remove() {
-    await super.remove();
   }
 
   public getAuthenticatorId(): string {

@@ -170,11 +170,15 @@ export function SetPasswordForm({
                 label="Code"
                 autoComplete="one-time-code"
                 error={errors.code?.message as string}
+                data-testid="code-text-input"
               />
             </div>
 
             <div className="ml-4 mb-1">
-              <Button variant={ButtonVariants.Secondary}>
+              <Button
+                variant={ButtonVariants.Secondary}
+                data-testid="resend-button"
+              >
                 {t("set.resend")}
               </Button>
             </div>
@@ -190,6 +194,7 @@ export function SetPasswordForm({
             })}
             label="New Password"
             error={errors.password?.message as string}
+            data-testid="password-text-input"
           />
         </div>
         <div className="">
@@ -202,6 +207,7 @@ export function SetPasswordForm({
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
+            data-testid="password-confirm-text-input"
           />
         </div>
       </div>

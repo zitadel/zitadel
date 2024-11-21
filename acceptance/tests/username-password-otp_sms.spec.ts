@@ -2,6 +2,9 @@ import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
+import { code } from "./code";
+import { codeScreenExpect } from "./code-screen";
+import { loginScreenExpect, loginWithPassword, loginWithPasswordAndPhoneOTP } from "./login";
 import { OtpType, PasswordUserWithOTP } from "./user";
 
 // Read from ".env" file.
@@ -14,7 +17,7 @@ const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       organization: "",
-      phone: faker.phone.number(),
+      phone: faker.phone.number({ style: "international" }),
       password: "Password1!",
       type: OtpType.sms,
     });
@@ -32,10 +35,8 @@ test("username, password and sms otp login, enter code manually", async ({ user,
   // User receives a sms with a verification code
   // User enters the code into the ui
   // User is redirected to the app (default redirect url)
-  /* TODO fix on login, that sms is sent
   await loginWithPasswordAndPhoneOTP(page, user.getUsername(), user.getPassword(), user.getPhone());
   await loginScreenExpect(page, user.getFullName());
-  */
 });
 
 test("username, password and sms otp login, resend code", async ({ user, page }) => {
@@ -47,11 +48,9 @@ test("username, password and sms otp login, resend code", async ({ user, page })
   // User clicks resend code
   // User receives a new sms with a verification code
   // User is redirected to the app (default redirect url)
-  /* TODO fix on login, that sms is sent
-await loginWithPassword(page, user.getUsername(), user.getPassword());
-await loginWithPasswordAndPhoneOTP(page, user.getUsername(), user.getPassword(), user.getPhone());
-await loginScreenExpect(page, user.getFullName());
- */
+  await loginWithPassword(page, user.getUsername(), user.getPassword());
+  await loginWithPasswordAndPhoneOTP(page, user.getUsername(), user.getPassword(), user.getPhone());
+  await loginScreenExpect(page, user.getFullName());
 });
 
 test("username, password and sms otp login, wrong code", async ({ user, page }) => {
@@ -62,10 +61,8 @@ test("username, password and sms otp login, wrong code", async ({ user, page }) 
   // User receives a sms with a verification code
   // User enters a wrong code
   // Error message - "Invalid code" is shown
-  /* TODO fix on login, that sms is sent
-const c = "wrongcode";
-await loginWithPassword(page, user.getUsername(), user.getPassword());
-await code(page, c);
-await codeScreenExpect(page, c);
- */
+  const c = "wrongcode";
+  await loginWithPassword(page, user.getUsername(), user.getPassword());
+  await code(page, c);
+  await codeScreenExpect(page, c);
 });
