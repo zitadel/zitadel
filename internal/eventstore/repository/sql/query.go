@@ -270,22 +270,22 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		clauses += additionalClauses
 		args = append(args, additionalArgs...)
 	}
-	excludeAggregateIDsClauses, excludeAggregateIDs := prepareQuery(criteria, useV1,
-		append(query.ExcludeAggregateIDs,
-			query.InstanceID,
-			query.InstanceIDs,
-			query.Position)...,
-	)
+
+	excludeAggregateIDs := query.ExcludeAggregateIDs
+	if len(excludeAggregateIDs) > 0 {
+		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position)
+	}
+	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
 	if excludeAggregateIDsClauses != "" {
 		if clauses != "" {
 			clauses += " AND "
 		}
 		if useV1 {
-			clauses += "NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
 		} else {
-			clauses += "NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
 		}
-		args = append(args, excludeAggregateIDs...)
+		args = append(args, excludeAggregateIDsArgs...)
 	}
 
 	if query.AwaitOpenTransactions {
