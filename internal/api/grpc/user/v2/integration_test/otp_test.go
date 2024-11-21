@@ -143,12 +143,12 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 	Instance.RegisterUserPasskey(CTX, userSelf.GetUserId())
 	_, sessionTokenSelf, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userSelf.GetUserId())
 	userSelfCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenSelf)
-	_, err = Instance.Client.UserV2.VerifyPhone(userSelfCtx, &user.VerifyPhoneRequest{
+	_, err = Instance.Client.UserV2.VerifyPhone(CTX, &user.VerifyPhoneRequest{
 		UserId:           userSelf.GetUserId(),
 		VerificationCode: userSelf.GetPhoneCode(),
 	})
 	require.NoError(t, err)
-	_, err = Instance.Client.UserV2.AddOTPSMS(userSelfCtx, &user.AddOTPSMSRequest{UserId: userSelf.GetUserId()})
+	_, err = Instance.Client.UserV2.AddOTPSMS(CTX, &user.AddOTPSMSRequest{UserId: userSelf.GetUserId()})
 	require.NoError(t, err)
 
 	type args struct {
@@ -176,7 +176,7 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 			args: args{
 				ctx: userSelfCtx,
 				req: &user.RemoveOTPSMSRequest{
-					UserId: userVerified.GetUserId(),
+					UserId: userSelf.GetUserId(),
 				},
 			},
 			want: &user.RemoveOTPSMSResponse{
@@ -345,12 +345,12 @@ func TestServer_RemoveOTPEmail(t *testing.T) {
 	Instance.RegisterUserPasskey(CTX, userSelf.GetUserId())
 	_, sessionTokenSelf, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userSelf.GetUserId())
 	userSelfCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenSelf)
-	_, err = Instance.Client.UserV2.VerifyEmail(userSelfCtx, &user.VerifyEmailRequest{
+	_, err = Instance.Client.UserV2.VerifyEmail(CTX, &user.VerifyEmailRequest{
 		UserId:           userSelf.GetUserId(),
 		VerificationCode: userSelf.GetEmailCode(),
 	})
 	require.NoError(t, err)
-	_, err = Instance.Client.UserV2.AddOTPEmail(userSelfCtx, &user.AddOTPEmailRequest{UserId: userSelf.GetUserId()})
+	_, err = Instance.Client.UserV2.AddOTPEmail(CTX, &user.AddOTPEmailRequest{UserId: userSelf.GetUserId()})
 	require.NoError(t, err)
 
 	type args struct {
