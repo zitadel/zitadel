@@ -296,11 +296,11 @@ func Test_commandsToEvents(t *testing.T) {
 						InstanceID:    "instance",
 						AggregateType: "type",
 						AggregateID:   "V3-Red9I",
+						Owner:         "ro",
 						CommandType:   "event.type",
 						Revision:      1,
 						Payload:       nil,
 						Creator:       "creator",
-						Owner:         "ro",
 					},
 				},
 				err: func(t *testing.T, err error) {
@@ -332,11 +332,11 @@ func Test_commandsToEvents(t *testing.T) {
 						InstanceID:    "instance from ctx",
 						AggregateType: "type",
 						AggregateID:   "V3-Red9I",
+						Owner:         "ro",
 						CommandType:   "event.type",
 						Revision:      1,
 						Payload:       nil,
 						Creator:       "creator",
-						Owner:         "ro",
 					},
 				},
 				err: func(t *testing.T, err error) {
@@ -368,11 +368,11 @@ func Test_commandsToEvents(t *testing.T) {
 						InstanceID:    "instance",
 						AggregateType: "type",
 						AggregateID:   "V3-Red9I",
+						Owner:         "ro",
 						CommandType:   "event.type",
 						Revision:      1,
 						Payload:       payloadMarshalled,
 						Creator:       "creator",
-						Owner:         "ro",
 					},
 				},
 				err: func(t *testing.T, err error) {
@@ -461,7 +461,22 @@ func Test_commandsToEvents(t *testing.T) {
 
 			tt.want.err(t, err)
 			assert.Equal(t, tt.want.events, gotEvents)
-			assert.Equal(t, tt.want.commands, gotCommands)
+			require.Len(t, gotCommands, len(tt.want.commands))
+			for i, wantCommand := range tt.want.commands {
+				assertCommand(t, wantCommand, gotCommands[i])
+			}
 		})
 	}
+}
+
+func assertCommand(t *testing.T, want, got *command) {
+	t.Helper()
+	assert.Equal(t, want.CommandType, got.CommandType)
+	assert.Equal(t, want.Payload, got.Payload)
+	assert.Equal(t, want.Creator, got.Creator)
+	assert.Equal(t, want.Owner, got.Owner)
+	assert.Equal(t, want.AggregateID, got.AggregateID)
+	assert.Equal(t, want.AggregateType, got.AggregateType)
+	assert.Equal(t, want.InstanceID, got.InstanceID)
+	assert.Equal(t, want.Revision, got.Revision)
 }

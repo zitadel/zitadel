@@ -175,11 +175,11 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 		)
 
 		args = append(args,
-			events[i].(*event).aggregate.InstanceID,
-			events[i].(*event).aggregate.ResourceOwner,
-			events[i].(*event).aggregate.Type,
-			events[i].(*event).aggregate.ID,
-			events[i].(*event).command.Revision,
+			events[i].(*event).command.InstanceID,
+			events[i].(*event).command.Owner,
+			events[i].(*event).command.AggregateType,
+			events[i].(*event).command.AggregateID,
+			events[i].(*event).Revision(),
 			events[i].(*event).command.Creator,
 			eventstore.EventType(events[i].(*event).command.CommandType),
 			Payload(events[i].(*event).command.Payload),

@@ -28,8 +28,18 @@ type command struct {
 	Owner         string
 }
 
+func (c *command) Aggregate() *eventstore.Aggregate {
+	return &eventstore.Aggregate{
+		ID:            c.AggregateID,
+		Type:          eventstore.AggregateType(c.AggregateType),
+		ResourceOwner: c.Owner,
+		InstanceID:    c.InstanceID,
+		Version:       eventstore.Version("v" + strconv.Itoa(int(c.Revision))),
+	}
+}
+
 type event struct {
-	aggregate *eventstore.Aggregate
+	// aggregate *eventstore.Aggregate
 	command   *command
 	createdAt time.Time
 	sequence  uint64
@@ -51,7 +61,6 @@ func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *eve
 		return nil, zerrors.ThrowInternal(err, "V3-hN3ki", "Errors.Internal")
 	}
 	return &event{
-		aggregate: sequence.aggregate,
 		command: &command{
 			InstanceID:    cmd.Aggregate().InstanceID,
 			AggregateType: string(cmd.Aggregate().Type),
@@ -104,8 +113,7 @@ func commandToEvent(cmd eventstore.Command) (_ eventstore.Event, err error) {
 	}
 
 	return &event{
-		aggregate: cmd.Aggregate(),
-		command:   command,
+		command: command,
 	}, nil
 }
 
@@ -121,7 +129,7 @@ func (e *event) EditorUser() string {
 
 // Aggregate implements [eventstore.Event]
 func (e *event) Aggregate() *eventstore.Aggregate {
-	return e.aggregate
+	return e.command.Aggregate()
 }
 
 // Creator implements [eventstore.Event]

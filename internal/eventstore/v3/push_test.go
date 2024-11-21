@@ -70,7 +70,7 @@ func Test_mapCommands(t *testing.T) {
 				args: []any{
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-VEIvq",
 					uint16(1),
 					"creator",
@@ -121,7 +121,7 @@ func Test_mapCommands(t *testing.T) {
 					// first event
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-VEIvq",
 					uint16(1),
 					"creator",
@@ -132,7 +132,7 @@ func Test_mapCommands(t *testing.T) {
 					// second event
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-VEIvq",
 					uint16(1),
 					"creator",
@@ -187,7 +187,7 @@ func Test_mapCommands(t *testing.T) {
 					// first event
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-VEIvq",
 					uint16(1),
 					"creator",
@@ -198,7 +198,7 @@ func Test_mapCommands(t *testing.T) {
 					// second event
 					"instance",
 					"ro",
-					eventstore.AggregateType("type"),
+					"type",
 					"V3-IT6VN",
 					uint16(1),
 					"creator",
