@@ -237,7 +237,7 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
-	if err := c.checkPermissionUpdateUserCredentials(ctx, existingOTP.ResourceOwner, userID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingOTP.ResourceOwner, userID); err != nil {
 		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
@@ -309,7 +309,7 @@ func (c *Commands) RemoveHumanOTPSMS(ctx context.Context, userID, resourceOwner 
 	if err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionUpdateUserCredentials(ctx, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
 		return nil, err
 	}
 	if !existingOTP.otpAdded {
@@ -439,7 +439,7 @@ func (c *Commands) RemoveHumanOTPEmail(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return nil, err
 	}
-	if err := c.checkPermissionUpdateUserCredentials(ctx, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
+	if err := c.checkPermissionUpdateUser(ctx, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
 		return nil, err
 	}
 	if !existingOTP.otpAdded {
