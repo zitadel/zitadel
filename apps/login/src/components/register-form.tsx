@@ -39,7 +39,7 @@ type Props = {
   loginSettings?: LoginSettings;
 };
 
-export function RegisterFormWithoutPassword({
+export function RegisterForm({
   legal,
   email,
   firstname,
@@ -104,6 +104,7 @@ export function RegisterFormWithoutPassword({
       registerParams.authRequestId = authRequestId;
     }
 
+    // redirect user to /register/password if password is chosen
     if (withPassword) {
       return router.push(
         `/register/password?` + new URLSearchParams(registerParams),
@@ -116,7 +117,7 @@ export function RegisterFormWithoutPassword({
   const { errors } = formState;
 
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
-
+  console.log(loginSettings);
   return (
     <form className="w-full">
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -188,8 +189,9 @@ export function RegisterFormWithoutPassword({
             const usePasswordToContinue: boolean =
               loginSettings?.allowUsernamePassword &&
               loginSettings?.passkeysType === PasskeysType.ALLOWED
-                ? !!!(selected.name === methods[0].name)
-                : !!loginSettings?.allowUsernamePassword;
+                ? !!!(selected.name === methods[0].name) // choose selection if both available
+                : !!loginSettings?.allowUsernamePassword; // if password is chosen
+            // set password as default if only password is allowed
             return submitAndContinue(values, usePasswordToContinue);
           })}
           data-testid="submit-button"

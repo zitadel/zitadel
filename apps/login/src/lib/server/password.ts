@@ -5,6 +5,7 @@ import {
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
 import {
+  getLoginSettings,
   getUserByID,
   listAuthenticationMethodTypes,
   listUsers,
@@ -20,6 +21,7 @@ import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 
 type ResetPasswordCommand = {
@@ -240,42 +242,34 @@ export async function sendPassword(command: UpdateSessionCommand) {
   //   return router.push(`/passkey/set?` + params);
   // }
   else if (command.authRequestId && session.id) {
-    const params = new URLSearchParams({
-      sessionId: session.id,
-      authRequest: command.authRequestId,
-    });
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    return { nextStep: `/login?${params}` };
-  }
-
-  // without OIDC flow
-  const params = new URLSearchParams(
-    command.authRequestId
-      ? {
-          loginName: session.factors.user.loginName,
-          authRequestId: command.authRequestId,
-          organization: session.factors.user.organizationId,
-        }
-      : {
-          loginName: session.factors.user.loginName,
-        },
-  );
-
-  if (command.organization || session.factors?.user?.organizationId) {
-    params.append(
-      "organization",
+    const loginSettings = await getLoginSettings(
       command.organization ?? session.factors?.user?.organizationId,
     );
+    const nextUrl = await getNextUrl(
+      {
+        sessionId: session.id,
+        authRequestId: command.authRequestId,
+        organization:
+          command.organization ?? session.factors?.user?.organizationId,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+
+    return redirect(nextUrl);
   }
 
-  return { nextStep: `/signedin?${params}` };
+  const loginSettings = await getLoginSettings(
+    command.organization ?? session.factors?.user?.organizationId,
+  );
+  const url = await getNextUrl(
+    {
+      loginName: session.factors.user.loginName,
+      organization: session.factors?.user?.organizationId,
+    },
+    loginSettings?.defaultRedirectUri,
+  );
+
+  return redirect(url);
 }
 
 export async function changePassword(command: {
