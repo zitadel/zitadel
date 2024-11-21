@@ -39,7 +39,6 @@ func (c *command) Aggregate() *eventstore.Aggregate {
 }
 
 type event struct {
-	// aggregate *eventstore.Aggregate
 	command   *command
 	createdAt time.Time
 	sequence  uint64

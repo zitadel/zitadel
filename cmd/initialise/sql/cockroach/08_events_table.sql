@@ -82,7 +82,6 @@ JOIN (
         ON cmds.instance_id = e.instance_id
         AND cmds.aggregate_type = e.aggregate_type
         AND cmds.aggregate_id = e.aggregate_id
-        AND (cmds.owner = '' OR cmds.owner = e.owner)
     GROUP BY
         cmds.instance_id
         , cmds.aggregate_type
@@ -92,7 +91,6 @@ JOIN (
     ON ("c").instance_id = cs.instance_id
     AND ("c").aggregate_type = cs.aggregate_type
     AND ("c").aggregate_id = cs.aggregate_id
-    AND (("c").owner = '' OR cs.owner = ("c").owner)
 ORDER BY
     in_tx_order
 $$ LANGUAGE SQL;
