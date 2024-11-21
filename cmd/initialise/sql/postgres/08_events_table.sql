@@ -46,16 +46,28 @@ SELECT
     , c.aggregate_type
     , c.aggregate_id
     , c.command_type AS event_type
-    , cs.sequence + ROW_NUMBER() OVER (PARTITION BY c.instance_id, c.aggregate_type, c.aggregate_id) AS sequence
+    , cs.sequence + ROW_NUMBER() OVER (PARTITION BY c.instance_id, c.aggregate_type, c.aggregate_id ORDER BY c.in_tx_order) AS sequence
     , c.revision
     , NOW() AS created_at
     , c.payload
     , c.creator
     , cs.owner
     , EXTRACT(EPOCH FROM NOW()) AS position
-    , ROW_NUMBER() OVER () AS in_tx_order   
-FROM 
-    UNNEST(commands) AS c
+    , c.in_tx_order   
+FROM (
+    SELECT 
+        c.instance_id
+        , c.aggregate_type
+        , c.aggregate_id
+        , c.command_type
+        , c.revision
+        , c.payload
+        , c.creator
+        , c.owner
+        , ROW_NUMBER() OVER () AS in_tx_order
+    FROM 
+        UNNEST(commands) AS c
+) AS c
 JOIN (
     SELECT
         cmds.instance_id
