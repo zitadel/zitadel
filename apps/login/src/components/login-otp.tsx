@@ -1,10 +1,11 @@
 "use client";
 
-import { finishFlow } from "@/lib/login";
+import { getNextUrl } from "@/lib/client";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -23,6 +24,7 @@ type Props = {
   organization?: string;
   method: string;
   code?: string;
+  loginSettings?: LoginSettings;
 };
 
 type Inputs = {
@@ -36,6 +38,7 @@ export function LoginOTP({
   organization,
   method,
   code,
+  loginSettings,
 }: Props) {
   const t = useTranslations("otp");
 
@@ -153,20 +156,31 @@ export function LoginOTP({
   }
 
   function setCodeAndContinue(values: Inputs, organization?: string) {
-    return submitCode(values, organization).then((response) => {
+    return submitCode(values, organization).then(async (response) => {
       if (response) {
-        return authRequestId && response.sessionId
-          ? finishFlow({
-              sessionId: response.sessionId,
-              authRequestId: authRequestId,
-              organization: response.factors?.user?.organizationId,
-            })
-          : response.factors?.user
-            ? finishFlow({
-                loginName: response.factors.user.loginName,
-                organization: response.factors?.user?.organizationId,
-              })
-            : null;
+        const url =
+          authRequestId && response.sessionId
+            ? await getNextUrl(
+                {
+                  sessionId: response.sessionId,
+                  authRequestId: authRequestId,
+                  organization: response.factors?.user?.organizationId,
+                },
+                loginSettings?.defaultRedirectUri,
+              )
+            : response.factors?.user
+              ? await getNextUrl(
+                  {
+                    loginName: response.factors.user.loginName,
+                    organization: response.factors?.user?.organizationId,
+                  },
+                  loginSettings?.defaultRedirectUri,
+                )
+              : null;
+
+        if (url) {
+          router.push(url);
+        }
       }
     });
   }

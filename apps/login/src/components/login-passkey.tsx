@@ -1,7 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import { finishFlow } from "@/lib/login";
+import { getNextUrl } from "@/lib/client";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import {
@@ -9,6 +9,7 @@ import {
   UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -25,6 +26,7 @@ type Props = {
   altPassword: boolean;
   login?: boolean;
   organization?: string;
+  loginSettings?: LoginSettings;
 };
 
 export function LoginPasskey({
@@ -34,6 +36,7 @@ export function LoginPasskey({
   altPassword,
   organization,
   login = true,
+  loginSettings,
 }: Props) {
   const t = useTranslations("passkey");
 
@@ -177,18 +180,29 @@ export function LoginPasskey({
         };
 
         return submitLogin(data).then(async (resp) => {
-          return authRequestId && resp?.sessionId
-            ? await finishFlow({
-                sessionId: resp.sessionId,
-                authRequestId: authRequestId,
-                organization: organization,
-              })
-            : resp?.factors?.user?.loginName
-              ? await finishFlow({
-                  loginName: resp.factors.user.loginName,
-                  organization: organization,
-                })
-              : null;
+          const url =
+            authRequestId && resp?.sessionId
+              ? await getNextUrl(
+                  {
+                    sessionId: resp.sessionId,
+                    authRequestId: authRequestId,
+                    organization: organization,
+                  },
+                  loginSettings?.defaultRedirectUri,
+                )
+              : resp?.factors?.user?.loginName
+                ? await getNextUrl(
+                    {
+                      loginName: resp.factors.user.loginName,
+                      organization: organization,
+                    },
+                    loginSettings?.defaultRedirectUri,
+                  )
+                : null;
+
+          if (url) {
+            router.push(url);
+          }
         });
       });
   }

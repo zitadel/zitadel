@@ -1,8 +1,9 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import { finishFlow } from "@/lib/login";
+import { getNextUrl } from "@/lib/client";
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -18,6 +19,7 @@ type Props = {
   authRequestId?: string;
   organization?: string;
   checkAfter: boolean;
+  loginSettings?: LoginSettings;
 };
 
 export function RegisterU2f({
@@ -26,6 +28,7 @@ export function RegisterU2f({
   organization,
   authRequestId,
   checkAfter,
+  loginSettings,
 }: Props) {
   const t = useTranslations("u2f");
 
@@ -165,18 +168,28 @@ export function RegisterU2f({
 
         return router.push(`/u2f?` + paramsToContinue);
       } else {
-        return authRequestId && sessionId
-          ? finishFlow({
-              sessionId: sessionId,
-              authRequestId: authRequestId,
-              organization: organization,
-            })
-          : loginName
-            ? finishFlow({
-                loginName: loginName,
-                organization: organization,
-              })
-            : null;
+        const url =
+          authRequestId && sessionId
+            ? await getNextUrl(
+                {
+                  sessionId: sessionId,
+                  authRequestId: authRequestId,
+                  organization: organization,
+                },
+                loginSettings?.defaultRedirectUri,
+              )
+            : loginName
+              ? await getNextUrl(
+                  {
+                    loginName: loginName,
+                    organization: organization,
+                  },
+                  loginSettings?.defaultRedirectUri,
+                )
+              : null;
+        if (url) {
+          return router.push(url);
+        }
       }
     }
   }

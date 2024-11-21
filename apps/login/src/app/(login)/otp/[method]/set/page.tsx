@@ -9,6 +9,7 @@ import {
   addOTPEmail,
   addOTPSMS,
   getBrandingSettings,
+  getLoginSettings,
   registerTOTP,
 } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -32,6 +33,8 @@ export default async function Page({
   const { method } = params;
 
   const branding = await getBrandingSettings(organization);
+  const loginSettings = await getLoginSettings(organization);
+
   const session = await loadMostRecentSession({
     loginName,
     organization,
@@ -137,6 +140,7 @@ export default async function Page({
                 authRequestId={authRequestId}
                 organization={organization}
                 checkAfter={checkAfter === "true"}
+                loginSettings={loginSettings}
               ></TotpRegister>
             </div>{" "}
           </>

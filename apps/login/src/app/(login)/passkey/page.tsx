@@ -4,7 +4,11 @@ import { LoginPasskey } from "@/components/login-passkey";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import {
+  getBrandingSettings,
+  getLoginSettings,
+  getSession,
+} from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
 
 export default async function Page({
@@ -37,6 +41,8 @@ export default async function Page({
 
   const branding = await getBrandingSettings(organization);
 
+  const loginSettings = await getLoginSettings(organization);
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
@@ -61,6 +67,7 @@ export default async function Page({
             authRequestId={authRequestId}
             altPassword={altPassword === "true"}
             organization={organization}
+            loginSettings={loginSettings}
           />
         )}
       </div>

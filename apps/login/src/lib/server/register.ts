@@ -1,7 +1,7 @@
 "use server";
 
 import { createSessionAndUpdateCookie } from "@/lib/server/cookie";
-import { addHumanUser } from "@/lib/zitadel";
+import { addHumanUser, getLoginSettings } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
@@ -9,7 +9,7 @@ import {
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { redirect } from "next/navigation";
-import { finishFlow } from "../login";
+import { getNextUrl } from "../client";
 
 type RegisterUserCommand = {
   email: string;
@@ -73,7 +73,11 @@ export async function registerUser(command: RegisterUserCommand) {
 
     return redirect("/passkey/set?" + params);
   } else {
-    return finishFlow(
+    const loginSettings = await getLoginSettings(
+      session.factors.user.organizationId,
+    );
+
+    const url = await getNextUrl(
       command.authRequestId && session.id
         ? {
             sessionId: session.id,
@@ -84,6 +88,9 @@ export async function registerUser(command: RegisterUserCommand) {
             loginName: session.factors.user.loginName,
             organization: session.factors.user.organizationId,
           },
+      loginSettings?.defaultRedirectUri,
     );
+
+    return redirect(url);
   }
 }

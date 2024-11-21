@@ -4,17 +4,22 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
-import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
+import {
+  deleteSession,
+  getLoginSettings,
+  listAuthenticationMethodTypes,
+} from "@/lib/zitadel";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { redirect } from "next/navigation";
+import { getNextUrl } from "../client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
-import { finishFlow } from "../login";
 
 type CreateNewSessionCommand = {
   userId: string;
@@ -43,7 +48,11 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
     return { error: "Could not create session" };
   }
 
-  return finishFlow(
+  const loginSettings = await getLoginSettings(
+    session.factors.user.organizationId,
+  );
+
+  const url = await getNextUrl(
     authRequestId && session.id
       ? {
           sessionId: session.id,
@@ -54,25 +63,44 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
           loginName: session.factors.user.loginName,
           organization: session.factors.user.organizationId,
         },
+    loginSettings?.defaultRedirectUri,
   );
+
+  if (url) {
+    return redirect(url);
+  }
 }
 
 export async function continueWithSession({
   authRequestId,
   ...session
 }: Session & { authRequestId?: string }) {
-  return authRequestId && session.id && session.factors?.user
-    ? finishFlow({
-        sessionId: session.id,
-        authRequestId: authRequestId,
-        organization: session.factors.user.organizationId,
-      })
-    : session.factors?.user
-      ? finishFlow({
-          loginName: session.factors.user.loginName,
-          organization: session.factors.user.organizationId,
-        })
-      : null;
+  const loginSettings = await getLoginSettings(
+    session.factors?.user?.organizationId,
+  );
+
+  const url =
+    authRequestId && session.id && session.factors?.user
+      ? await getNextUrl(
+          {
+            sessionId: session.id,
+            authRequestId: authRequestId,
+            organization: session.factors.user.organizationId,
+          },
+          loginSettings?.defaultRedirectUri,
+        )
+      : session.factors?.user
+        ? await getNextUrl(
+            {
+              loginName: session.factors.user.loginName,
+              organization: session.factors.user.organizationId,
+            },
+            loginSettings?.defaultRedirectUri,
+          )
+        : null;
+  if (url) {
+    return redirect(url);
+  }
 }
 
 export type UpdateSessionCommand = {
