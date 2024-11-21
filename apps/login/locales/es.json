@@ -122,6 +122,10 @@
     }
   },
   "register": {
+    "methods": {
+      "passkey": "Clave de acceso",
+      "password": "Contraseña"
+    },
     "disabled": {
       "title": "Registro deshabilitado",
       "description": "Registrarse está deshabilitado en este momento."

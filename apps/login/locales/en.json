@@ -122,6 +122,10 @@
     }
   },
   "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Password"
+    },
     "disabled": {
       "title": "Registration disabled",
       "description": "The registration is disabled. Please contact your administrator."

@@ -122,6 +122,10 @@
     }
   },
   "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Password"
+    },
     "disabled": {
       "title": "Registrierung deaktiviert",
       "description": "Die Registrierung ist deaktiviert. Bitte wenden Sie sich an den Administrator."

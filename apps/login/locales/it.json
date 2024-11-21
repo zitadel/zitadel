@@ -122,6 +122,10 @@
     }
   },
   "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Password"
+    },
     "disabled": {
       "title": "Registration disabled",
       "description": "Registrazione disabilitata. Contatta l'amministratore di sistema per assistenza."

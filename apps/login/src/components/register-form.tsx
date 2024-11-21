@@ -12,6 +12,7 @@ import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import {
+  AuthenticationMethod,
   AuthenticationMethodRadio,
   methods,
 } from "./authentication-method-radio";
@@ -60,7 +61,7 @@ export function RegisterForm({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [selected, setSelected] = useState(methods[0]);
+  const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
@@ -189,7 +190,7 @@ export function RegisterForm({
             const usePasswordToContinue: boolean =
               loginSettings?.allowUsernamePassword &&
               loginSettings?.passkeysType === PasskeysType.ALLOWED
-                ? !!!(selected.name === methods[0].name) // choose selection if both available
+                ? !!!(selected === methods[0]) // choose selection if both available
                 : !!loginSettings?.allowUsernamePassword; // if password is chosen
             // set password as default if only password is allowed
             return submitAndContinue(values, usePasswordToContinue);
