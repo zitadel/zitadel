@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -22,11 +23,24 @@ import (
 
 var appNamePrefix = dialect.DBPurposeEventPusher.AppName() + "_"
 
-func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+var pushTxOpts = &sql.TxOptions{
+	Isolation: sql.LevelReadCommitted,
+	ReadOnly:  false,
+}
+
+func (es *Eventstore) Push(ctx context.Context, client database.QueryExecuter, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	tx, err := es.client.BeginTx(ctx, nil)
+	var tx database.Tx
+	switch c := client.(type) {
+	case database.Tx:
+		tx = c
+	case database.Client:
+		tx, err = c.BeginTx(ctx, pushTxOpts)
+	default:
+		tx, err = es.client.BeginTx(ctx, pushTxOpts)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +48,6 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	var (
 		sequences []*latestSequence
 	)
-
-	// needs to be set like this because psql complains about parameters in the SET statement
-	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
-	if err != nil {
-		logging.WithError(err).Warn("failed to set application name")
-		return nil, err
-	}
 
 	// needs to be set like this because psql complains about parameters in the SET statement
 	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
@@ -89,7 +96,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 //go:embed push.sql
 var pushStmt string
 
-func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
+func insertEvents(ctx context.Context, tx database.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
 	events, placeholders, args, err := mapCommands(commands, sequences)
 	if err != nil {
 		return nil, err
@@ -186,7 +193,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 }
 
 type transaction struct {
-	*sql.Tx
+	database.Tx
 }
 
 var _ crdb.Tx = (*transaction)(nil)

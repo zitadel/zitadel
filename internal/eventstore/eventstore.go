@@ -85,6 +85,12 @@ func (es *Eventstore) Health(ctx context.Context) error {
 // Push pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
+	return es.PushWithClient(ctx, es.pusher.Client().DB, cmds...)
+}
+
+// Push pushes the events in a single transaction
+// an event needs at least an aggregate
+func (es *Eventstore) PushWithClient(ctx context.Context, client database.Client, cmds ...Command) ([]Event, error) {
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
@@ -100,7 +106,7 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 	// https://github.com/zitadel/zitadel/issues/7202
 retry:
 	for i := 0; i <= es.maxRetries; i++ {
-		events, err = es.pusher.Push(ctx, cmds...)
+		events, err = es.pusher.Push(ctx, nil, cmds...)
 		var pgErr *pgconn.PgError
 		if !errors.As(err, &pgErr) || pgErr.ConstraintName != "events2_pkey" || pgErr.SQLState() != "23505" {
 			break retry
@@ -283,7 +289,9 @@ type Pusher interface {
 	// Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
 	// Push stores the actions
-	Push(ctx context.Context, commands ...Command) (_ []Event, err error)
+	Push(ctx context.Context, client database.QueryExecuter, commands ...Command) (_ []Event, err error)
+	// Client returns the underlying database connection
+	Client() *database.DB
 }
 
 type FillFieldsEvent interface {
