@@ -118,7 +118,6 @@ export function RegisterForm({
   const { errors } = formState;
 
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
-  console.log(loginSettings);
   return (
     <form className="w-full">
       <div className="grid grid-cols-2 gap-4 mb-4">

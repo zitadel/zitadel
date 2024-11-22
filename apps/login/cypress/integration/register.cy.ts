@@ -10,6 +10,16 @@ describe("register", () => {
         result: [{ id: "256088834543534543" }],
       },
     });
+    stub("zitadel.settings.v2.SettingsService", "GetLoginSettings", {
+      data: {
+        settings: {
+          passkeysType: 1,
+          allowRegister: true,
+          allowUsernamePassword: true,
+          defaultRedirectUri: "",
+        },
+      },
+    });
     stub("zitadel.user.v2.UserService", "AddHumanUser", {
       data: {
         userId: "221394658884845598",
