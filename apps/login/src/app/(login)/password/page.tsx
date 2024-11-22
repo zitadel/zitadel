@@ -83,7 +83,7 @@ export default async function Page({
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
             loginSettings={loginSettings}
             promptPasswordless={
-              loginSettings?.passkeysType === PasskeysType.ALLOWED
+              loginSettings?.passkeysType == PasskeysType.ALLOWED
             }
             isAlternative={alt === "true"}
           />

@@ -165,7 +165,7 @@ export function RegisterForm({
       {/* show chooser if both methods are allowed */}
       {loginSettings &&
         loginSettings.allowUsernamePassword &&
-        loginSettings.passkeysType === PasskeysType.ALLOWED && (
+        loginSettings.passkeysType == PasskeysType.ALLOWED && (
           <div className="pb-4">
             <AuthenticationMethodRadio
               selected={selected}
@@ -188,7 +188,7 @@ export function RegisterForm({
           onClick={handleSubmit((values) => {
             const usePasswordToContinue: boolean =
               loginSettings?.allowUsernamePassword &&
-              loginSettings?.passkeysType === PasskeysType.ALLOWED
+              loginSettings?.passkeysType == PasskeysType.ALLOWED
                 ? !!!(selected === methods[0]) // choose selection if both available
                 : !!loginSettings?.allowUsernamePassword; // if password is chosen
             // set password as default if only password is allowed
