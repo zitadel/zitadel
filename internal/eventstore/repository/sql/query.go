@@ -105,6 +105,18 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " OFFSET ?"
 	}
 
+	if q.LockRows {
+		query += " FOR UPDATE"
+		switch q.LockOption {
+		case eventstore.LockOptionWait: // default behavior
+		case eventstore.LockOptionNoWait:
+			query += " NOWAIT"
+		case eventstore.LockOptionSkipLocked:
+			query += " SKIP LOCKED"
+
+		}
+	}
+
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {

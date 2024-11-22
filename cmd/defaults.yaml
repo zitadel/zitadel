@@ -328,6 +328,16 @@ Caches:
       AddSource: true
       Formatter:
         Format: text
+  # Organization cache, gettable by primary domain or ID.
+  Organization:
+    Connector: ""
+    MaxAge: 1h
+    LastUsage: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
 
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
