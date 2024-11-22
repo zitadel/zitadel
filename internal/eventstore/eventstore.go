@@ -107,11 +107,23 @@ func (es *Eventstore) PushWithClient(ctx context.Context, client database.Client
 retry:
 	for i := 0; i <= es.maxRetries; i++ {
 		events, err = es.pusher.Push(ctx, client, cmds...)
-		var pgErr *pgconn.PgError
-		if !errors.As(err, &pgErr) || pgErr.ConstraintName != "events2_pkey" || pgErr.SQLState() != "23505" {
+		// if there is a transaction passed the calling function needs to retry
+		if _, ok := client.(database.Tx); ok {
 			break retry
 		}
-		logging.WithError(err).Info("eventstore push retry")
+		var pgErr *pgconn.PgError
+		if !errors.As(err, &pgErr) {
+			break retry
+		}
+		if pgErr.ConstraintName == "events2_pkey" && pgErr.SQLState() == "23505" {
+			logging.WithError(err).Info("eventstore push retry")
+			continue
+		}
+		if pgErr.SQLState() == "CR000" || pgErr.SQLState() == "40001" {
+			logging.WithError(err).Info("eventstore push retry")
+			continue
+		}
+		break retry
 	}
 	if err != nil {
 		return nil, err
