@@ -85,7 +85,7 @@ func (es *Eventstore) Health(ctx context.Context) error {
 // Push pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
-	return es.PushWithClient(ctx, es.pusher.Client().DB, cmds...)
+	return es.PushWithClient(ctx, nil, cmds...)
 }
 
 // Push pushes the events in a single transaction
@@ -106,7 +106,7 @@ func (es *Eventstore) PushWithClient(ctx context.Context, client database.Client
 	// https://github.com/zitadel/zitadel/issues/7202
 retry:
 	for i := 0; i <= es.maxRetries; i++ {
-		events, err = es.pusher.Push(ctx, nil, cmds...)
+		events, err = es.pusher.Push(ctx, client, cmds...)
 		var pgErr *pgconn.PgError
 		if !errors.As(err, &pgErr) || pgErr.ConstraintName != "events2_pkey" || pgErr.SQLState() != "23505" {
 			break retry
