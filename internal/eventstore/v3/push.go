@@ -43,6 +43,9 @@ func (es *Eventstore) Push(ctx context.Context, client database.QueryExecuter, c
 			opts = pushTxOpts
 		}
 		tx, err = c.BeginTx(ctx, opts)
+		if err != nil {
+			return nil, err
+		}
 		defer func() {
 			err = database.CloseTransaction(tx, err)
 		}()
@@ -53,12 +56,12 @@ func (es *Eventstore) Push(ctx context.Context, client database.QueryExecuter, c
 			opts = pushTxOpts
 		}
 		tx, err = es.client.BeginTx(ctx, opts)
+		if err != nil {
+			return nil, err
+		}
 		defer func() {
 			err = database.CloseTransaction(tx, err)
 		}()
-	}
-	if err != nil {
-		return nil, err
 	}
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
