@@ -37,7 +37,7 @@ export async function registerPasskeyLink(
     sessionToken: sessionCookie.token,
   });
 
-  const host = headers().get("host");
+  const host = (await headers()).get("host");
 
   if (!host) {
     throw new Error("Could not get domain");
@@ -73,7 +73,7 @@ export async function verifyPasskey(command: VerifyPasskeyCommand) {
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
   if (!!!passkeyName) {
-    const headersList = headers();
+    const headersList = await headers();
     const userAgentStructure = { headers: headersList };
     const { browser, device, os } = userAgent(userAgentStructure);
 

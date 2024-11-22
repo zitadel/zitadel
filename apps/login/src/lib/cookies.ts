@@ -1,7 +1,7 @@
 "use server";
 
 import { timestampDate, timestampFromMs } from "@zitadel/client";
-import { cookies } from "next/headers";
+import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
 // TODO: improve this to handle overflow
@@ -21,7 +21,7 @@ export type Cookie = {
 type SessionCookie<T> = Cookie & T;
 
 function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
-  const cookiesList = cookies();
+  const cookiesList = (cookies() as unknown as UnsafeUnwrappedCookies);
 
   return cookiesList.set({
     name: "sessions",
@@ -32,7 +32,7 @@ function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
 }
 
 export async function setLanguageCookie(language: string) {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
 
   await cookiesList.set({
     name: LANGUAGE_COOKIE_NAME,
@@ -46,7 +46,7 @@ export async function addSessionToCookie<T>(
   session: SessionCookie<T>,
   cleanup: boolean = false,
 ): Promise<any> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   let currentSessions: SessionCookie<T>[] = stringifiedCookie?.value
@@ -90,7 +90,7 @@ export async function updateSessionCookie<T>(
   session: SessionCookie<T>,
   cleanup: boolean = false,
 ): Promise<any> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   const sessions: SessionCookie<T>[] = stringifiedCookie?.value
@@ -121,7 +121,7 @@ export async function removeSessionFromCookie<T>(
   session: SessionCookie<T>,
   cleanup: boolean = false,
 ): Promise<any> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   const sessions: SessionCookie<T>[] = stringifiedCookie?.value
@@ -143,7 +143,7 @@ export async function removeSessionFromCookie<T>(
 }
 
 export async function getMostRecentSessionCookie<T>(): Promise<any> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
@@ -166,7 +166,7 @@ export async function getSessionCookieById<T>({
   sessionId: string;
   organization?: string;
 }): Promise<SessionCookie<T>> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
@@ -194,7 +194,7 @@ export async function getSessionCookieByLoginName<T>({
   loginName?: string;
   organization?: string;
 }): Promise<SessionCookie<T>> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
@@ -222,7 +222,7 @@ export async function getSessionCookieByLoginName<T>({
 export async function getAllSessionCookieIds<T>(
   cleanup: boolean = false,
 ): Promise<any> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
@@ -253,7 +253,7 @@ export async function getAllSessionCookieIds<T>(
 export async function getAllSessions<T>(
   cleanup: boolean = false,
 ): Promise<SessionCookie<T>[]> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
@@ -287,7 +287,7 @@ export async function getMostRecentCookieWithLoginname<T>({
   loginName?: string;
   organization?: string;
 }): Promise<any> {
-  const cookiesList = cookies();
+  const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {

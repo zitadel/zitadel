@@ -12,13 +12,13 @@ const PROVIDER_NAME_MAPPING: {
   [IdentityProviderType.AZURE_AD]: "Microsoft",
 };
 
-export default async function Page({
-  searchParams,
-  params,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-  params: { provider: string };
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+    params: Promise<{ provider: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
 

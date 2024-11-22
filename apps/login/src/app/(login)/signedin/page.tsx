@@ -46,7 +46,8 @@ async function loadSession(loginName: string, authRequestId?: string) {
   );
 }
 
-export default async function Page({ searchParams }: { searchParams: any }) {
+export default async function Page(props: { searchParams: Promise<any> }) {
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "signedin" });
 

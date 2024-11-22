@@ -6,13 +6,14 @@ import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
 
-export default async function Page({
-  searchParams,
-  params,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-  params: Record<string | number | symbol, string | undefined>;
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+    params: Promise<Record<string | number | symbol, string | undefined>>;
+  }
+) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "otp" });
   const tError = await getTranslations({ locale, namespace: "error" });

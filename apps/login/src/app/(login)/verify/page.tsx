@@ -12,7 +12,8 @@ import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
-export default async function Page({ searchParams }: { searchParams: any }) {
+export default async function Page(props: { searchParams: Promise<any> }) {
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });
@@ -60,7 +61,7 @@ export default async function Page({ searchParams }: { searchParams: any }) {
   }
 
   return (
-    <DynamicTheme branding={branding}>
+    (<DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>{t("verify.title")}</h1>
         <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
@@ -92,14 +93,14 @@ export default async function Page({ searchParams }: { searchParams: any }) {
           />
         ) : (
           // check if auth methods are set
-          <VerifyForm
+          (<VerifyForm
             userId={userId}
             code={code}
             isInvite={invite === "true"}
             params={params}
-          />
+          />)
         )}
       </div>
-    </DynamicTheme>
+    </DynamicTheme>)
   );
 }

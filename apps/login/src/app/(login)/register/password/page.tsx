@@ -10,11 +10,12 @@ import {
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "register" });
 
@@ -40,8 +41,10 @@ export default async function Page({
 
   return missingData ? (
     <DynamicTheme branding={branding}>
-      <div>{t("missingdata.title")}</div>
-      <p className="ztdl-p">{t("missingdata.description")}</p>
+      <div className="flex flex-col items-center space-y-4">
+        <h1>{t("missingdata.title")}</h1>
+        <p className="ztdl-p">{t("missingdata.description")}</p>
+      </div>
     </DynamicTheme>
   ) : loginSettings?.allowRegister && loginSettings.allowUsernamePassword ? (
     <DynamicTheme branding={branding}>
@@ -63,8 +66,10 @@ export default async function Page({
     </DynamicTheme>
   ) : (
     <DynamicTheme branding={branding}>
-      <div>{t("disabled.title")}</div>
-      <p className="ztdl-p">{t("disabled.description")}</p>
+      <div className="flex flex-col items-center space-y-4">
+        <h1>{t("disabled.title")}</h1>
+        <p className="ztdl-p">{t("disabled.description")}</p>
+      </div>
     </DynamicTheme>
   );
 }

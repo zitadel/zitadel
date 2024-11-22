@@ -7,11 +7,12 @@ import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "invite" });
 

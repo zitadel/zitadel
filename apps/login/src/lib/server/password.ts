@@ -30,7 +30,7 @@ type ResetPasswordCommand = {
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
-  const host = headers().get("host");
+  const host = (await headers()).get("host");
 
   const users = await listUsers({
     loginName: command.loginName,

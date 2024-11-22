@@ -29,13 +29,14 @@ async function loginFailed(branding?: BrandingSettings) {
     </DynamicTheme>
   );
 }
-export default async function Page({
-  searchParams,
-  params,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-  params: { provider: string };
-}) {
+export default async function Page(
+  props: {
+    searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+    params: Promise<{ provider: string }>;
+  }
+) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
   const { id, token, authRequestId, organization } = searchParams;
@@ -137,12 +138,12 @@ export default async function Page({
       if (idpLink) {
         return (
           // TODO: possibily login user now
-          <DynamicTheme branding={branding}>
+          (<DynamicTheme branding={branding}>
             <div className="flex flex-col items-center space-y-4">
               <h1>{t("linkingSuccess.title")}</h1>
               <div>{t("linkingSuccess.description")}</div>
             </div>
-          </DynamicTheme>
+          </DynamicTheme>)
         );
       }
     }

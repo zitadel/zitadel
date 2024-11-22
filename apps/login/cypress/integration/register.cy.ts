@@ -63,9 +63,11 @@ describe("register", () => {
 
   it("should redirect a user who selects passwordless on register to /passkey/set", () => {
     cy.visit("/register");
-    cy.get('input[autocomplete="firstname"]').focus().type("John");
-    cy.get('input[autocomplete="lastname"]').focus().type("Doe");
-    cy.get('input[autocomplete="email"]').focus().type("john@zitadel.com");
+    cy.get('input[data-testid="firstname-text-input"]').focus().type("John");
+    cy.get('input[data-testid="lastname-text-input"]').focus().type("Doe");
+    cy.get('input[data-testid="email-text-input"]')
+      .focus()
+      .type("john@zitadel.com");
     cy.get('input[type="checkbox"][value="privacypolicy"]').check();
     cy.get('input[type="checkbox"][value="tos"]').check();
     cy.get('button[type="submit"]').click();
