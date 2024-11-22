@@ -37,9 +37,19 @@ func (es *Eventstore) Push(ctx context.Context, client database.QueryExecuter, c
 	case database.Tx:
 		tx = c
 	case database.Client:
-		tx, err = c.BeginTx(ctx, pushTxOpts)
+		// We cannot use READ COMMITTED on CockroachDB because we use cluster_logical_timestamp() which is not supported in this isolation level
+		var opts *sql.TxOptions
+		if es.client.Database.Type() == "postgres" {
+			opts = pushTxOpts
+		}
+		tx, err = c.BeginTx(ctx, opts)
 	default:
-		tx, err = es.client.BeginTx(ctx, pushTxOpts)
+		// We cannot use READ COMMITTED on CockroachDB because we use cluster_logical_timestamp() which is not supported in this isolation level
+		var opts *sql.TxOptions
+		if es.client.Database.Type() == "postgres" {
+			opts = pushTxOpts
+		}
+		tx, err = es.client.BeginTx(ctx, opts)
 	}
 	if err != nil {
 		return nil, err
