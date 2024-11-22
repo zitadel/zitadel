@@ -135,7 +135,7 @@ func (m *MockRepository) ExpectPushFailed(err error, expectedCommands []eventsto
 	m.MockPusher.ctrl.T.Helper()
 
 	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, commands ...eventstore.Command) ([]eventstore.Event, error) {
+		func(ctx context.Context, _ database.QueryExecuter, commands ...eventstore.Command) ([]eventstore.Event, error) {
 			if len(expectedCommands) != len(commands) {
 				return nil, fmt.Errorf("unexpected amount of commands: want %d, got %d", len(expectedCommands), len(commands))
 			}
@@ -197,7 +197,7 @@ func (e *mockEvent) CreatedAt() time.Time {
 
 func (m *MockRepository) ExpectRandomPush(expectedCommands []eventstore.Command) *MockRepository {
 	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any(), gomock.Any()).DoAndReturn(
-		func(ctx context.Context, commands ...eventstore.Command) ([]eventstore.Event, error) {
+		func(ctx context.Context, _ database.QueryExecuter, commands ...eventstore.Command) ([]eventstore.Event, error) {
 			assert.Len(m.MockPusher.ctrl.T, commands, len(expectedCommands))
 
 			events := make([]eventstore.Event, len(commands))
