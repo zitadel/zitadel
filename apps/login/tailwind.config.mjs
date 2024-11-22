@@ -35,7 +35,7 @@ types.forEach((type) => {
 });
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   presets: [sharedConfig],
   darkMode: "class",
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
