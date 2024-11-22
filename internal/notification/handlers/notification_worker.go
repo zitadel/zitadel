@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
@@ -35,26 +34,32 @@ type NotificationWorker struct {
 }
 
 type WorkerConfig struct {
-	//BulkLimit             uint16
-	RequeueEvery time.Duration
-	//RetryFailedAfter      time.Duration
+	BulkLimit             uint16
+	RequeueEvery          time.Duration
 	HandleActiveInstances time.Duration
 	TransactionDuration   time.Duration
 	MaxAttempts           uint8
 	MaxTtl                time.Duration
 	MinRetryDelay         time.Duration
 	MaxRetryDelay         time.Duration
+	RetryDelayFactor      float32
 }
-
-var sentHandlers map[eventstore.EventType]Sent
 
 // nowFunc makes [time.Now] mockable
 type nowFunc func() time.Time
 
 type Sent func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error
 
+var sentHandlers map[eventstore.EventType]Sent
+
+func RegisterSentHandler(eventType eventstore.EventType, sent Sent) {
+	if sentHandlers == nil {
+		sentHandlers = make(map[eventstore.EventType]Sent)
+	}
+	sentHandlers[eventType] = sent
+}
+
 func NewNotificationWorker(
-	ctx context.Context,
 	config WorkerConfig,
 	commands Commands,
 	queries *NotificationQueries,
@@ -62,6 +67,10 @@ func NewNotificationWorker(
 	client *database.DB,
 	channels types.ChannelChains,
 ) *NotificationWorker {
+	// make sure the delay does not get less
+	if config.RetryDelayFactor > 1 {
+		config.RetryDelayFactor = 1
+	}
 	return &NotificationWorker{
 		config:   config,
 		commands: commands,
@@ -77,15 +86,13 @@ func (w *NotificationWorker) Start(ctx context.Context) {
 	go w.schedule(ctx)
 }
 
-func RegisterSentHandler(eventType eventstore.EventType, sent Sent) {
-	if sentHandlers == nil {
-		sentHandlers = make(map[eventstore.EventType]Sent)
-	}
-	sentHandlers[eventType] = sent
-}
-
-func (w *NotificationWorker) reduceNotificationAdded(ctx context.Context, tx *sql.Tx, event *notification.RequestedEvent) (err error) {
+func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx *sql.Tx, event *notification.RequestedEvent) (err error) {
 	ctx = HandlerContext(event.Aggregate())
+
+	// if the notification is too old, we can directly cancel
+	if event.CreatedAt().Add(w.config.MaxTtl).After(w.now()) {
+		return w.commands.NotificationCanceled(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+	}
 
 	// Get the notify user first, so if anything fails afterward we have the current state of the user
 	// and can pass that to the retry request.
@@ -94,86 +101,78 @@ func (w *NotificationWorker) reduceNotificationAdded(ctx context.Context, tx *sq
 		return err
 	}
 
-	var code string
-	if event.Code != nil {
-		code, err = crypto.DecryptString(event.Code, w.queries.UserDataCrypto)
-		if err != nil {
-			// TODO: do we need to retry that?
-			return w.commands.NotificationCanceled(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
-		}
-	}
-
-	colors, err := w.queries.ActiveLabelPolicyByOrg(ctx, event.UserResourceOwner, false)
-	if err != nil {
-		return w.commands.NotificationRetryRequested(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), notificationEventToRequest(event.Request, notifyUser, w.backOff(0)), err)
-	}
-
-	translator, err := w.queries.GetTranslatorWithOrgTexts(ctx, event.UserResourceOwner, event.MessageType)
-	if err != nil {
-		return w.commands.NotificationRetryRequested(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), notificationEventToRequest(event.Request, notifyUser, w.backOff(0)), err)
-	}
-	err = w.sendNotification(ctx, event.Request, code, notifyUser, colors, translator, event)
+	err = w.sendNotification(ctx, event.Request, notifyUser, event)
 	if err != nil {
 		return w.commands.NotificationRetryRequested(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), notificationEventToRequest(event.Request, notifyUser, w.backOff(0)), err)
 	}
 	return nil
-}
-
-func (w *NotificationWorker) backOff(current time.Duration) time.Duration {
-	if current >= w.config.MaxRetryDelay {
-		return w.config.MaxRetryDelay
-	}
-	if current < w.config.MinRetryDelay {
-		current = w.config.MinRetryDelay
-	}
-	t := time.Duration(rand.Int64N(int64(1.5*float64(current.Nanoseconds()))-current.Nanoseconds()) + current.Nanoseconds())
-	if t > w.config.MaxRetryDelay {
-		return w.config.MaxRetryDelay
-	}
-	return t
 }
 
 func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sql.Tx, event *notification.RetryRequestedEvent) (err error) {
 	ctx = HandlerContext(event.Aggregate())
 
-	var code string
-	if event.Code != nil {
-		code, err = crypto.DecryptString(event.Code, w.queries.UserDataCrypto)
-		if err != nil {
-			// TODO: do we need to retry that?
-			return w.commands.NotificationCanceled(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
-		}
+	// if the notification is too old, we can directly cancel
+	if event.CreatedAt().Add(w.config.MaxTtl).After(w.now()) {
+		return w.commands.NotificationCanceled(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
 	}
 
-	colors, err := w.queries.ActiveLabelPolicyByOrg(ctx, event.UserResourceOwner, false)
-	if err != nil {
-		return err
+	if event.CreatedAt().Add(event.BackOff).After(w.now()) {
+		return nil
 	}
-
-	translator, err := w.queries.GetTranslatorWithOrgTexts(ctx, event.UserResourceOwner, event.MessageType)
-	if err != nil {
-		return err
+	err = w.sendNotification(ctx, event.Request, event.NotifyUser, event)
+	if err == nil {
+		return nil
 	}
-	err = w.sendNotification(ctx, event.Request, code, event.NotifyUser, colors, translator, event)
-	if err != nil {
-		if event.Sequence() > uint64(w.config.MaxAttempts) {
-			return w.commands.NotificationCanceled(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
-		}
-		return w.commands.NotificationRetryRequested(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), notificationEventToRequest(event.Request, event.NotifyUser, w.backOff(event.BackOff)), err)
+	// if the max attempts are reached, we cancel the notification
+	if event.Sequence() >= uint64(w.config.MaxAttempts) {
+		return w.commands.NotificationCanceled(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
 	}
-	return nil
+	// otherwise we retry after a backoff delay
+	return w.commands.NotificationRetryRequested(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(),
+		notificationEventToRequest(
+			event.Request,
+			event.NotifyUser,
+			w.backOff(event.BackOff),
+		), err)
 }
 
 func (w *NotificationWorker) sendNotification(
 	ctx context.Context,
 	request notification.Request,
-	code string,
 	notifyUser *query.NotifyUser,
-	colors *query.LabelPolicy,
-	translator *i18n.Translator,
 	e eventstore.Event,
 ) error {
 	ctx, err := enrichCtx(ctx, request.TriggeredAtOrigin)
+	if err != nil {
+		err := w.commands.NotificationCanceled(ctx, e.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
+			OnError(err).Error("could not cancel notification")
+		return nil
+	}
+
+	// check early that a "sent" handler exists, otherwise we can cancel early
+	sender, ok := sentHandlers[request.EventType]
+	if !ok {
+		err := w.commands.NotificationCanceled(ctx, e.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
+			OnError(err).Errorf(`no "sent" handler registered for %s`, request.EventType)
+		return nil
+	}
+
+	var code string
+	if request.Code != nil {
+		code, err = crypto.DecryptString(request.Code, w.queries.UserDataCrypto)
+		if err != nil {
+			return err
+		}
+	}
+
+	colors, err := w.queries.ActiveLabelPolicyByOrg(ctx, request.UserResourceOwner, false)
+	if err != nil {
+		return err
+	}
+
+	translator, err := w.queries.GetTranslatorWithOrgTexts(ctx, request.UserResourceOwner, request.MessageType)
 	if err != nil {
 		return err
 	}
@@ -206,14 +205,29 @@ func (w *NotificationWorker) sendNotification(
 	if err := notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel); err != nil {
 		return err
 	}
-	sender, ok := sentHandlers[request.EventType]
-	if !ok {
-		return nil //TODO: !
+	err = w.commands.NotificationSent(ctx, e.Aggregate().ID, authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
+			OnError(err).Error("could not set sent notification event")
 	}
-	if err := w.commands.NotificationSent(ctx, e.Aggregate().ID, authz.GetInstance(ctx).InstanceID()); err != nil {
-		return err
+	err = sender(ctx, w.commands, request.NotificationAggregateID(), request.NotificationAggregateResourceOwner(), generatorInfo, args)
+	logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
+		OnError(err).Error("could not set notification event on aggregate")
+	return nil
+}
+
+func (w *NotificationWorker) backOff(current time.Duration) time.Duration {
+	if current >= w.config.MaxRetryDelay {
+		return w.config.MaxRetryDelay
 	}
-	return sender(ctx, w.commands, request.NotificationAggregateID(), request.NotificationAggregateResourceOwner(), generatorInfo, args)
+	if current < w.config.MinRetryDelay {
+		current = w.config.MinRetryDelay
+	}
+	t := time.Duration(rand.Int64N(int64(w.config.RetryDelayFactor*float32(current.Nanoseconds()))-current.Nanoseconds()) + current.Nanoseconds())
+	if t > w.config.MaxRetryDelay {
+		return w.config.MaxRetryDelay
+	}
+	return t
 }
 
 func notificationEventToRequest(e notification.Request, notifyUser *query.NotifyUser, backoff time.Duration) *command.NotificationRetryRequest {
@@ -274,6 +288,95 @@ func (w *NotificationWorker) queryInstances(ctx context.Context) ([]string, erro
 	return w.es.InstanceIDs(ctx, w.config.RequeueEvery, false, query)
 }
 
+func (w *NotificationWorker) existingInstances(ctx context.Context) ([]string, error) {
+	ai := existingInstances{}
+	if err := w.es.FilterToQueryReducer(ctx, &ai); err != nil {
+		return nil, err
+	}
+
+	return ai, nil
+}
+
+func (w *NotificationWorker) triggerInstances(ctx context.Context, instances []string) {
+	for _, instance := range instances {
+		instanceCtx := authz.WithInstanceID(ctx, instance)
+
+		err := w.trigger(instanceCtx)
+		w.log().WithField("instance", instance).OnError(err).Info("trigger failed")
+	}
+}
+
+func (w *NotificationWorker) trigger(ctx context.Context) (err error) {
+	txCtx := ctx
+	if w.config.TransactionDuration > 0 {
+		var cancel, cancelTx func()
+		txCtx, cancelTx = context.WithCancel(ctx)
+		defer cancelTx()
+		ctx, cancel = context.WithTimeout(ctx, w.config.TransactionDuration)
+		defer cancel()
+	}
+	tx, err := w.client.BeginTx(txCtx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			rollbackErr := tx.Rollback()
+			w.log().OnError(rollbackErr).Debug("unable to rollback tx")
+			return
+		}
+	}()
+
+	// query events and lock them for update (with skip locked)
+	searchQuery := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		LockRowsDuringTx(tx, eventstore.LockOptionSkipLocked).
+		// Messages older than the MaxTTL, we can be ignored.
+		// The first attempt of a retry might still be older than the TTL and needs to be filtered out later on.
+		CreationDateAfter(w.now().Add(-1*w.config.MaxTtl)).
+		Limit(uint64(w.config.BulkLimit)).
+		AddQuery().
+		AggregateTypes(notification.AggregateType).
+		EventTypes(notification.RequestedType, notification.RetryRequestedType, notification.CanceledType, notification.SentType).
+		Builder()
+
+	events, err := w.es.Filter(ctx, searchQuery)
+	if err != nil {
+		return err
+	}
+
+	for i := len(events) - 1; i > 0; i-- {
+		if len(events)-1 < i {
+			continue
+		}
+		event := events[i]
+		if event != nil && (event.Type() != notification.RequestedType) {
+			events = slices.DeleteFunc(events, func(e eventstore.Event) bool {
+				if e.Aggregate().ID != event.Aggregate().ID {
+					return false
+				}
+				a := e.Sequence() < event.Sequence()
+				return a
+			})
+		}
+	}
+	// If there aren't any events or no unlocked event terminate early and start a new run.
+	if len(events) == 0 {
+		return nil
+	}
+
+	for _, event := range events {
+		var err error
+		switch e := event.(type) {
+		case *notification.RequestedEvent:
+			err = w.reduceNotificationRequested(ctx, tx, e)
+		case *notification.RetryRequestedEvent:
+			err = w.reduceNotificationRetry(ctx, tx, e)
+		}
+		w.log().OnError(err).Error("could not push notification event")
+	}
+	return nil
+}
+
 type existingInstances []string
 
 // AppendEvents implements eventstore.QueryReducer.
@@ -305,103 +408,5 @@ func (*existingInstances) Query() *eventstore.SearchQueryBuilder {
 // Reduce implements eventstore.QueryReducer.
 // reduce is not used as events are reduced during AppendEvents
 func (*existingInstances) Reduce() error {
-	return nil
-}
-
-func (w *NotificationWorker) existingInstances(ctx context.Context) ([]string, error) {
-	ai := existingInstances{}
-	if err := w.es.FilterToQueryReducer(ctx, &ai); err != nil {
-		return nil, err
-	}
-
-	return ai, nil
-}
-
-func (w *NotificationWorker) triggerInstances(ctx context.Context, instances []string /*triggerOpts ...TriggerOpt*/) {
-	for _, instance := range instances {
-		instanceCtx := authz.WithInstanceID(ctx, instance)
-
-		err := w.Trigger(instanceCtx /*triggerOpts...*/)
-		w.log().WithField("instance", instance).OnError(err).Info("trigger failed")
-	}
-}
-
-func (w *NotificationWorker) Trigger(ctx context.Context /*opts ...TriggerOpt*/) (err error) {
-	//config := new(triggerConfig)
-	//for _, opt := range opts {
-	//	opt(config)
-	//}
-
-	txCtx := ctx
-	if w.config.TransactionDuration > 0 {
-		var cancel, cancelTx func()
-		txCtx, cancelTx = context.WithCancel(ctx)
-		defer cancelTx()
-		ctx, cancel = context.WithTimeout(ctx, w.config.TransactionDuration)
-		defer cancel()
-	}
-	tx, err := w.client.BeginTx(txCtx, nil)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		//if err != nil {
-		rollbackErr := tx.Rollback()
-		w.log().OnError(rollbackErr).Debug("unable to rollback tx")
-		return
-		//}
-	}()
-
-	// query events with skip locked
-	searchQuery := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		SetTx(tx).
-		CreationDateAfter(w.now().Add(-1*w.config.MaxTtl)).
-		AddQuery().
-		AggregateTypes(notification.AggregateType).
-		EventTypes(notification.RequestedType, notification.RetryRequestedType, notification.CanceledType, notification.SentType).
-		Builder()
-
-	events, err := w.es.Filter(ctx, searchQuery)
-	if err != nil {
-		return err
-	}
-
-	for i := len(events) - 1; i > 0; i-- {
-		if len(events)-1 < i {
-			continue
-		}
-		event := events[i]
-		if event != nil && (event.Type() != notification.RequestedType) {
-			events = slices.DeleteFunc(events, func(e eventstore.Event) bool {
-				if e.Aggregate().ID != event.Aggregate().ID {
-					return false
-				}
-				a := e.Sequence() < event.Sequence()
-				return a
-			})
-		}
-	}
-	if len(events) == 0 {
-		return nil
-	}
-
-	w.log().Info("1")
-
-	for _, event := range events {
-		var err error
-		switch e := event.(type) {
-		case *notification.RequestedEvent:
-			err = w.reduceNotificationAdded(ctx, tx, e)
-		case *notification.RetryRequestedEvent:
-			if e.CreatedAt().Add(e.BackOff).After(time.Now()) {
-				continue
-			}
-			err = w.reduceNotificationRetry(ctx, tx, e)
-		}
-		if err != nil {
-			tt := w.commands.NotificationCanceled(ctx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
-			w.log().OnError(tt).Info("could not cancel notification")
-		}
-	}
 	return nil
 }

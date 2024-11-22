@@ -397,10 +397,12 @@ Notifications:
   MaxAttempts: 3
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
-  # Failed attempts are retried after with an exponential backoff delay.
-  # Set a minimum and maximum delay
+  # Failed attempts are retried after a confogired delay (with exponential backoff).
+  # Set a minimum and maximum delay and a factor for the backoff
   MinRetryDelay: 1s  # ZITADEL_NOTIFIACATIONS_MINRETRYDELAY
   MaxRetryDelay: 20s # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
+  # Any factor below 1 will be set to 1
+  RetryDelayFactor: 1.5 # ZITADEL_NOTIFIACATIONS_RETRYDELAYFACTOR
 
 # The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
