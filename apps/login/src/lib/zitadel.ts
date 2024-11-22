@@ -66,6 +66,8 @@ export async function getBrandingSettings(organization?: string) {
 
 export async function getLoginSettings(orgId?: string) {
   "use cache";
+  cacheLife("hours");
+
   return await settingsService
     .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -99,6 +101,8 @@ export async function registerTOTP(userId: string) {
 
 export async function getGeneralSettings() {
   "use cache";
+  cacheLife("hours");
+
   return settingsService
     .getGeneralSettings({}, {})
     .then((resp) => resp.supportedLanguages);
@@ -106,6 +110,8 @@ export async function getGeneralSettings() {
 
 export async function getLegalAndSupportSettings(organization?: string) {
   "use cache";
+  cacheLife("hours");
+
   return settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -113,6 +119,8 @@ export async function getLegalAndSupportSettings(organization?: string) {
 
 export async function getPasswordComplexitySettings(organization?: string) {
   "use cache";
+  cacheLife("hours");
+
   return settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
     .then((resp) => (resp.settings ? resp.settings : undefined));
