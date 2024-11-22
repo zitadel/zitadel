@@ -105,6 +105,18 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " OFFSET ?"
 	}
 
+	if q.LockRows {
+		query += " FOR UPDATE"
+		switch q.LockOption {
+		case eventstore.LockOptionWait: // default behavior
+		case eventstore.LockOptionNoWait:
+			query += " NOWAIT"
+		case eventstore.LockOptionSkipLocked:
+			query += " SKIP LOCKED"
+
+		}
+	}
+
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
@@ -272,7 +284,19 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 	}
 
 	if query.AwaitOpenTransactions {
+		instanceIDs := make(database.TextArray[string], 0, 3)
+		if query.InstanceID != nil {
+			instanceIDs = append(instanceIDs, query.InstanceID.Value.(string))
+		} else if query.InstanceIDs != nil {
+			instanceIDs = append(instanceIDs, query.InstanceIDs.Value.(database.TextArray[string])...)
+		}
+
+		for i := range instanceIDs {
+			instanceIDs[i] = dialect.DBPurposeEventPusher.AppName() + "_" + instanceIDs[i]
+		}
+
 		clauses += awaitOpenTransactions(useV1)
+		args = append(args, instanceIDs)
 	}
 
 	if clauses == "" {
