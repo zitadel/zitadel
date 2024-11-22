@@ -216,7 +216,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s35AddPositionToIndexEsWm,
 		steps.s36FillV2Milestones,
 		steps.s38BackChannelLogoutNotificationStart,
-		steps.s39DeleteStaleOrgFields,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -234,6 +233,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s32AddAuthSessionID,
 		steps.s33SMSConfigs3TwilioAddVerifyServiceSid,
 		steps.s37Apps7OIDConfigsBackChannelLogoutURI,
+		steps.s39DeleteStaleOrgFields,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
