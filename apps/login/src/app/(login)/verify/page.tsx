@@ -61,7 +61,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   }
 
   return (
-    (<DynamicTheme branding={branding}>
+    <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>{t("verify.title")}</h1>
         <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
@@ -93,14 +93,14 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           />
         ) : (
           // check if auth methods are set
-          (<VerifyForm
+          <VerifyForm
             userId={userId}
             code={code}
             isInvite={invite === "true"}
             params={params}
-          />)
+          />
         )}
       </div>
-    </DynamicTheme>)
+    </DynamicTheme>
   );
 }

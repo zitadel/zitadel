@@ -17,12 +17,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-export default async function Page(
-  props: {
-    searchParams: Promise<Record<string | number | symbol, string | undefined>>;
-    params: Promise<Record<string | number | symbol, string | undefined>>;
-  }
-) {
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+  params: Promise<Record<string | number | symbol, string | undefined>>;
+}) {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const locale = getLocale();

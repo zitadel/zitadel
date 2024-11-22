@@ -21,7 +21,7 @@ export type Cookie = {
 type SessionCookie<T> = Cookie & T;
 
 function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
-  const cookiesList = (cookies() as unknown as UnsafeUnwrappedCookies);
+  const cookiesList = cookies() as unknown as UnsafeUnwrappedCookies;
 
   return cookiesList.set({
     name: "sessions",
