@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/notification"
 )
 
@@ -25,6 +26,12 @@ type NotificationRequest struct {
 	AggregateID                   string
 	AggregateResourceOwner        string
 	IsOTP                         bool
+}
+
+type NotificationRetryRequest struct {
+	NotificationRequest
+	BackOff    time.Duration
+	NotifyUser *query.NotifyUser
 }
 
 func NewNotificationRequest(
@@ -103,9 +110,38 @@ func (c *Commands) RequestNotification(
 	return err
 }
 
-// NotificationFailed writes a new notification.RequestEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationFailed(ctx context.Context, id, instanceID string, err error) error {
-	_, err = c.eventstore.Push(ctx, notification.NewFailedEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
+// NotificationCanceled writes a new notification.CanceledEvent with the notification.Aggregate to the eventstore
+func (c *Commands) NotificationCanceled(ctx context.Context, id, instanceID string, err error) error {
+	_, err = c.eventstore.Push(ctx, notification.NewCanceledEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
+		err))
+	return err
+}
+
+// NotificationSent writes a new notification.SentEvent with the notification.Aggregate to the eventstore
+func (c *Commands) NotificationSent(ctx context.Context, id, instanceID string) error {
+	_, err := c.eventstore.Push(ctx, notification.NewSentEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate))
+	return err
+}
+
+// NotificationRetryRequested writes a new notification.RetryRequestEvent with the notification.Aggregate to the eventstore
+func (c *Commands) NotificationRetryRequested(ctx context.Context, id, instanceID string, request *NotificationRetryRequest, err error) error {
+	_, err = c.eventstore.Push(ctx, notification.NewRetryRequestedEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
+		request.UserID,
+		request.UserResourceOwner,
+		request.AggregateID,
+		request.AggregateResourceOwner,
+		request.TriggerOrigin,
+		request.URLTemplate,
+		request.Code,
+		request.CodeExpiry,
+		request.EventType,
+		request.NotificationType,
+		request.MessageType,
+		request.UnverifiedNotificationChannel,
+		request.IsOTP,
+		request.Args,
+		request.NotifyUser,
+		request.BackOff,
 		err))
 	return err
 }

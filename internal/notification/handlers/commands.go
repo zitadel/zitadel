@@ -11,7 +11,9 @@ import (
 
 type Commands interface {
 	RequestNotification(ctx context.Context, instanceID string, request *command.NotificationRequest) error
-	NotificationFailed(ctx context.Context, id, instanceID string, err error) error
+	NotificationCanceled(ctx context.Context, id, instanceID string, err error) error
+	NotificationRetryRequested(ctx context.Context, id, instanceID string, request *command.NotificationRetryRequest, err error) error
+	NotificationSent(ctx context.Context, id, instanceID string) error
 	HumanInitCodeSent(ctx context.Context, orgID, userID string) error
 	HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) error
 	PasswordCodeSent(ctx context.Context, orgID, userID string, generatorInfo *senders.CodeGeneratorInfo) error

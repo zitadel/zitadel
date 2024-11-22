@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -14,11 +15,15 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
-var projections []*handler.Handler
+var (
+	projections []*handler.Handler
+	worker      *handlers.NotificationWorker
+)
 
 func Register(
 	ctx context.Context,
 	userHandlerCustomConfig, quotaHandlerCustomConfig, telemetryHandlerCustomConfig, backChannelLogoutHandlerCustomConfig projection.CustomConfig,
+	notificationWorkerConfig handlers.WorkerConfig,
 	telemetryCfg handlers.TelemetryPusherConfig,
 	externalDomain string,
 	externalPort uint16,
@@ -29,6 +34,7 @@ func Register(
 	otpEmailTmpl, fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption, keysEncryptionAlg crypto.EncryptionAlgorithm,
 	tokenLifetime time.Duration,
+	client *database.DB,
 ) {
 	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
@@ -47,13 +53,14 @@ func Register(
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
-	projections = append(projections, handlers.NewNotificationHandler(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c)) // TODO: move to new worker
+	worker = handlers.NewNotificationWorker(ctx, notificationWorkerConfig, commands, q, es, client, c) // TODO: move to new worker
 }
 
 func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
+	worker.Start(ctx)
 }
 
 func ProjectInstance(ctx context.Context) error {

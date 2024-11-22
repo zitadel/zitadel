@@ -7,18 +7,18 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 const (
 	notificationEventPrefix = "notification.test2."
 	RequestedType           = notificationEventPrefix + "requested"
+	RetryRequestedType      = notificationEventPrefix + "retry.requested"
 	SentType                = notificationEventPrefix + "sent"
-	FailedType              = notificationEventPrefix + "failed"
+	CanceledType            = notificationEventPrefix + "canceled"
 )
 
-type RequestedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
+type Request struct {
 	UserID                        string                  `json:"userID"`
 	UserResourceOwner             string                  `json:"userResourceOwner"`
 	AggregateID                   string                  `json:"notificationAggregateID"`
@@ -35,22 +35,28 @@ type RequestedEvent struct {
 	Args                          map[string]any          `json:"args,omitempty"`
 }
 
-func (e *RequestedEvent) TriggerOrigin() string {
-	return e.TriggeredAtOrigin
-}
-
-func (e *RequestedEvent) NotificationAggregateID() string {
+func (e *Request) NotificationAggregateID() string {
 	if e.AggregateID == "" {
 		return e.UserID
 	}
 	return e.AggregateID
 }
 
-func (e *RequestedEvent) NotificationAggregateResourceOwner() string {
+func (e *Request) NotificationAggregateResourceOwner() string {
 	if e.AggregateResourceOwner == "" {
 		return e.UserResourceOwner
 	}
 	return e.AggregateResourceOwner
+}
+
+type RequestedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Request `json:"request"`
+}
+
+func (e *RequestedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
 }
 
 func (e *RequestedEvent) Payload() interface{} {
@@ -88,20 +94,22 @@ func NewRequestedEvent(ctx context.Context,
 			aggregate,
 			RequestedType,
 		),
-		UserID:                        userID,
-		UserResourceOwner:             userResourceOwner,
-		AggregateID:                   aggregateID,
-		AggregateResourceOwner:        aggregateResourceOwner,
-		TriggeredAtOrigin:             triggerOrigin,
-		EventType:                     eventType,
-		MessageType:                   messageType,
-		NotificationType:              notificationType,
-		URLTemplate:                   urlTemplate,
-		CodeExpiry:                    codeExpiry,
-		Code:                          code,
-		UnverifiedNotificationChannel: unverifiedNotificationChannel,
-		IsOTP:                         isOTP,
-		Args:                          args,
+		Request: Request{
+			UserID:                        userID,
+			UserResourceOwner:             userResourceOwner,
+			AggregateID:                   aggregateID,
+			AggregateResourceOwner:        aggregateResourceOwner,
+			TriggeredAtOrigin:             triggerOrigin,
+			EventType:                     eventType,
+			MessageType:                   messageType,
+			NotificationType:              notificationType,
+			URLTemplate:                   urlTemplate,
+			CodeExpiry:                    codeExpiry,
+			Code:                          code,
+			UnverifiedNotificationChannel: unverifiedNotificationChannel,
+			IsOTP:                         isOTP,
+			Args:                          args,
+		},
 	}
 }
 
@@ -133,30 +141,101 @@ func NewSentEvent(ctx context.Context,
 	}
 }
 
-type FailedEvent struct {
+type CanceledEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	Error                error `json:"error"`
+	//Error                error `json:"error"`
 }
 
-func (e *FailedEvent) Payload() interface{} {
+func (e *CanceledEvent) Payload() interface{} {
 	return e
 }
 
-func (e *FailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *CanceledEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func (e *FailedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+func (e *CanceledEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = *event
 }
 
-func NewFailedEvent(ctx context.Context, aggregate *eventstore.Aggregate, err error) *FailedEvent {
-	return &FailedEvent{
+func NewCanceledEvent(ctx context.Context, aggregate *eventstore.Aggregate, err error) *CanceledEvent {
+	return &CanceledEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			FailedType,
+			CanceledType,
 		),
-		Error: err,
+		//Error: err,
+	}
+}
+
+type RetryRequestedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	Request
+
+	//Error      error `json:"error"`
+	NotifyUser *query.NotifyUser `json:"notify_user"`
+	BackOff    time.Duration
+}
+
+func (e *RetryRequestedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *RetryRequestedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *RetryRequestedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewRetryRequestedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	userID,
+	userResourceOwner,
+	aggregateID,
+	aggregateResourceOwner,
+	triggerOrigin,
+	urlTemplate string,
+	code *crypto.CryptoValue,
+	codeExpiry time.Duration,
+	eventType eventstore.EventType,
+	notificationType domain.NotificationType,
+	messageType string,
+	unverifiedNotificationChannel,
+	isOTP bool,
+	args map[string]any,
+	notifyUser *query.NotifyUser,
+	backoff time.Duration,
+	err error,
+) *RetryRequestedEvent {
+	return &RetryRequestedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			RetryRequestedType,
+		),
+		Request: Request{
+			UserID:                        userID,
+			UserResourceOwner:             userResourceOwner,
+			AggregateID:                   aggregateID,
+			AggregateResourceOwner:        aggregateResourceOwner,
+			TriggeredAtOrigin:             triggerOrigin,
+			EventType:                     eventType,
+			MessageType:                   messageType,
+			NotificationType:              notificationType,
+			URLTemplate:                   urlTemplate,
+			CodeExpiry:                    codeExpiry,
+			Code:                          code,
+			UnverifiedNotificationChannel: unverifiedNotificationChannel,
+			IsOTP:                         isOTP,
+			Args:                          args,
+		},
+		NotifyUser: notifyUser,
+		BackOff:    backoff,
+		//Error: err,
 	}
 }

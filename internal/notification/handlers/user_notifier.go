@@ -12,11 +12,80 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func init() {
+	RegisterSentHandler(user.HumanInitialCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.HumanInitCodeSent(ctx, orgID, id)
+		},
+	)
+	RegisterSentHandler(user.HumanEmailCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.HumanEmailVerificationCodeSent(ctx, orgID, id)
+		},
+	)
+	RegisterSentHandler(user.HumanPasswordCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.PasswordCodeSent(ctx, orgID, id, generatorInfo)
+		},
+	)
+	RegisterSentHandler(user.HumanOTPSMSCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.HumanOTPSMSCodeSent(ctx, orgID, id, generatorInfo)
+		},
+	)
+	RegisterSentHandler(session.OTPSMSChallengedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.OTPSMSSent(ctx, orgID, id, generatorInfo)
+		},
+	)
+	RegisterSentHandler(user.HumanOTPEmailCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.HumanOTPEmailCodeSent(ctx, orgID, id)
+		},
+	)
+	RegisterSentHandler(session.OTPEmailChallengedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.OTPEmailSent(ctx, orgID, id)
+		},
+	)
+	RegisterSentHandler(user.UserDomainClaimedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.UserDomainClaimedSent(ctx, orgID, id)
+		},
+	)
+	RegisterSentHandler(user.HumanPasswordlessInitCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.HumanPasswordlessInitCodeSent(ctx, id, orgID, args["CodeID"].(string))
+		},
+	)
+	RegisterSentHandler(user.HumanPasswordChangedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.PasswordChangeSent(ctx, orgID, id)
+		},
+	)
+	RegisterSentHandler(user.HumanPhoneCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.HumanPhoneVerificationCodeSent(ctx, orgID, id, generatorInfo)
+		},
+	)
+	RegisterSentHandler(user.HumanInviteCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, _ *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.InviteCodeSent(ctx, orgID, id)
+		},
+	)
+	RegisterSentHandler(user.HumanPhoneCodeAddedType,
+		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
+			return commands.HumanPhoneVerificationCodeSent(ctx, orgID, id, generatorInfo)
+		},
+	)
+}
 
 const (
 	UserNotificationsProjectionTable = "projections.notifications"

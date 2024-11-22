@@ -372,6 +372,26 @@ AssetStorage:
     # 168h are 7 days
     SharedMaxAge: 168h # ZITADEL_ASSETSTORAGE_CACHE_SHAREDMAXAGE
 
+Notifications:
+  # Time interval between scheduled notifications
+  RequeueEvery: 2s
+  # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
+  # from HandleActiveInstances duration in the past until the projection's current time
+  # If set to 0 (default), every instance is always considered active
+  HandleActiveInstances: 0s # ZITADEL_NOTIFIACATIONS_HANDLEACTIVEINSTANCES
+  # The maximum duration a transaction remains open
+  # before it spots left folding additional events
+  # and updates the table.
+  TransactionDuration: 1m # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
+  # Automatically cancel the notification after the amount of failed attempts
+  MaxAttempts: 3
+  # Automatically cancel the notification if it cannot be handled within a specific time
+  MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
+  # Failed attempts are retried after with an exponential backoff delay.
+  # Set a minimum and maximum delay
+  MinRetryDelay: 1s  # ZITADEL_NOTIFIACATIONS_MINRETRYDELAY
+  MaxRetryDelay: 20s # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
+
 # The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
   # The maximum duration a transaction remains open
