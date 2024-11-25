@@ -95,7 +95,7 @@ func (w *NotificationWorker) Start(ctx context.Context) {
 }
 
 func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx *sql.Tx, event *notification.RequestedEvent) (err error) {
-	ctx = HandlerContext(event.Aggregate())
+	ctx = ContextWithNotifier(ctx, event.Aggregate())
 
 	// if the notification is too old, we can directly cancel
 	if event.CreatedAt().Add(w.config.MaxTtl).Before(w.now()) {
@@ -136,7 +136,7 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 }
 
 func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sql.Tx, event *notification.RetryRequestedEvent) (err error) {
-	ctx = HandlerContext(event.Aggregate())
+	ctx = ContextWithNotifier(ctx, event.Aggregate())
 
 	// if the notification is too old, we can directly cancel
 	if event.CreatedAt().Add(w.config.MaxTtl).Before(w.now()) {
@@ -358,11 +358,13 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int) (err err
 		EventTypes(notification.RequestedType, notification.RetryRequestedType, notification.CanceledType, notification.SentType).
 		Builder()
 
+	//nolint:staticcheck
 	events, err := w.es.Filter(ctx, searchQuery)
 	if err != nil {
 		return err
 	}
 
+	// TODO: replace as soon as NOT IN is ready
 	for i := len(events) - 1; i > 0; i-- {
 		if len(events)-1 < i {
 			continue
@@ -378,6 +380,8 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int) (err err
 			})
 		}
 	}
+	// TODO: end
+
 	// If there aren't any events or no unlocked event terminate early and start a new run.
 	if len(events) == 0 {
 		return nil

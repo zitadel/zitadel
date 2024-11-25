@@ -450,7 +450,6 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 		{
 			name: "external code",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-				//commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
 				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
@@ -1247,7 +1246,6 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					IsOTP:                  false,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
-				//commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -1311,7 +1309,6 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					IsOTP:                  false,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
-				//commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,
@@ -1330,7 +1327,6 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 							Code:         code,
 							Expiry:       1 * time.Hour,
 							CodeReturned: false,
-							//GeneratorID:  smsProviderID,
 						},
 					}, w
 			},
@@ -1367,7 +1363,6 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					IsOTP:                  false,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
-				//commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
 				return fields{
 						queries:  queries,
 						commands: commands,

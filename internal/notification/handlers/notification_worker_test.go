@@ -99,7 +99,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
 					Recipients: []string{lastEmail},
-					Subject:    fmt.Sprintf("Invitation to APP"),
+					Subject:    "Invitation to APP",
 					Content:    expectContent,
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
@@ -216,7 +216,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
 					Recipients: []string{verifiedEmail},
-					Subject:    fmt.Sprintf("Domain has been claimed"),
+					Subject:    "Domain has been claimed",
 					Content:    expectContent,
 				}
 				expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -270,7 +270,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
 					Recipients: []string{lastEmail},
-					Subject:    fmt.Sprintf("Invitation to APP"),
+					Subject:    "Invitation to APP",
 					Content:    expectContent,
 				}
 				w.sendError = sendError
@@ -360,7 +360,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
 					Recipients: []string{lastEmail},
-					Subject:    fmt.Sprintf("Invitation to APP"),
+					Subject:    "Invitation to APP",
 					Content:    expectContent,
 				}
 				w.sendError = sendError
@@ -560,7 +560,7 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
 					Recipients: []string{lastEmail},
-					Subject:    fmt.Sprintf("Invitation to APP"),
+					Subject:    "Invitation to APP",
 					Content:    expectContent,
 				}
 				codeAlg, code := cryptoValue(t, ctrl, "testcode")
@@ -627,7 +627,7 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
 					Recipients: []string{lastEmail},
-					Subject:    fmt.Sprintf("Invitation to APP"),
+					Subject:    "Invitation to APP",
 					Content:    expectContent,
 				}
 				w.sendError = sendError
@@ -728,7 +728,7 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 				expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
 				w.message = &messages.Email{
 					Recipients: []string{lastEmail},
-					Subject:    fmt.Sprintf("Invitation to APP"),
+					Subject:    "Invitation to APP",
 					Content:    expectContent,
 				}
 				w.sendError = sendError
