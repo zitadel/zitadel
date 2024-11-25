@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -111,21 +112,21 @@ func (c *Commands) RequestNotification(
 }
 
 // NotificationCanceled writes a new notification.CanceledEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationCanceled(ctx context.Context, id, instanceID string, err error) error {
-	_, err = c.eventstore.Push(ctx, notification.NewCanceledEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
+func (c *Commands) NotificationCanceled(ctx context.Context, tx *sql.Tx, id, instanceID string, err error) error {
+	_, err = c.eventstore.PushWithClient(ctx, tx, notification.NewCanceledEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
 		err))
 	return err
 }
 
 // NotificationSent writes a new notification.SentEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationSent(ctx context.Context, id, instanceID string) error {
-	_, err := c.eventstore.Push(ctx, notification.NewSentEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate))
+func (c *Commands) NotificationSent(ctx context.Context, tx *sql.Tx, id, instanceID string) error {
+	_, err := c.eventstore.PushWithClient(ctx, tx, notification.NewSentEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate))
 	return err
 }
 
 // NotificationRetryRequested writes a new notification.RetryRequestEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationRetryRequested(ctx context.Context, id, instanceID string, request *NotificationRetryRequest, err error) error {
-	_, err = c.eventstore.Push(ctx, notification.NewRetryRequestedEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
+func (c *Commands) NotificationRetryRequested(ctx context.Context, tx *sql.Tx, id, instanceID string, request *NotificationRetryRequest, err error) error {
+	_, err = c.eventstore.PushWithClient(ctx, tx, notification.NewRetryRequestedEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
 		request.UserID,
 		request.UserResourceOwner,
 		request.AggregateID,

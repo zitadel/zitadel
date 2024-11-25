@@ -53,7 +53,7 @@ func Register(
 	if telemetryCfg.Enabled {
 		projections = append(projections, handlers.NewTelemetryPusher(ctx, telemetryCfg, projection.ApplyCustomConfig(telemetryHandlerCustomConfig), commands, q, c))
 	}
-	worker = handlers.NewNotificationWorker(ctx, notificationWorkerConfig, commands, q, es, client, c) // TODO: move to new worker
+	worker = handlers.NewNotificationWorker(notificationWorkerConfig, commands, q, es, client, c)
 }
 
 func Start(ctx context.Context) {
