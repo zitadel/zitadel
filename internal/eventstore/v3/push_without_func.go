@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"errors"
 	"fmt"
@@ -12,12 +11,14 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type transaction struct {
-	*sql.Tx
+	database.Tx
 }
 
 var _ crdb.Tx = (*transaction)(nil)
@@ -42,8 +43,8 @@ func isSetupNotExecutedError(err error) bool {
 	}
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
-		return (pgErr.Code == "42704" && strings.Contains(pgErr.Message, "eventstore.command[]")) ||
-			(pgErr.Code == "42883" && strings.Contains(pgErr.Message, "eventstore.push()"))
+		return (pgErr.Code == "42704" && strings.Contains(pgErr.Message, "eventstore.command")) ||
+			(pgErr.Code == "42883" && strings.Contains(pgErr.Message, "eventstore.push"))
 	}
 	return errors.Is(err, errTypesNotFound)
 }
@@ -55,43 +56,49 @@ var (
 
 // pushWithoutFunc implements pushing events before setup step 39 was introduced.
 // TODO: remove with v3
-func (es *Eventstore) pushWithoutFunc(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
-	tx, err := es.client.BeginTx(ctx, nil)
+func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.ContextQueryExecuter, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	tx, closeTx, err := es.pushTx(ctx, client)
 	if err != nil {
 		return nil, err
 	}
+	defer closeTx(err)
+
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
 	)
 
-	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		sequences, err = latestSequences(ctx, tx, commands)
+	// needs to be set like this because psql complains about parameters in the SET statement
+	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
+	if err != nil {
+		logging.WithError(err).Warn("failed to set application name")
+		return nil, err
+	}
+
+	sequences, err = latestSequences(ctx, tx, commands)
+	if err != nil {
+		return nil, err
+	}
+
+	events, err = es.writeEventsOld(ctx, tx, sequences, commands)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+		return nil, err
+	}
+
+	// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
+	// Thats why we enable it manually
+	if es.client.Type() == "cockroach" {
+		_, err = tx.ExecContext(ctx, "SET enable_multiple_modifications_of_table = on")
 		if err != nil {
-			return err
+			return nil, err
 		}
+	}
 
-		events, err = es.writeEventsOld(ctx, tx, sequences, commands)
-		if err != nil {
-			return err
-		}
-
-		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
-			return err
-		}
-
-		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
-		// Thats why we enable it manually
-		if es.client.Type() == "cockroach" {
-			_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
-			if err != nil {
-				return err
-			}
-		}
-
-		return handleFieldCommands(ctx, tx, commands)
-	})
-
+	err = handleFieldCommands(ctx, tx, commands)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +106,7 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, commands ...eventstor
 	return events, nil
 }
 
-func (es *Eventstore) writeEventsOld(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
+func (es *Eventstore) writeEventsOld(ctx context.Context, tx database.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
 	events, placeholders, args, err := mapCommands(commands, sequences)
 	if err != nil {
 		return nil, err
@@ -179,10 +186,10 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 			events[i].(*event).command.Owner,
 			events[i].(*event).command.AggregateType,
 			events[i].(*event).command.AggregateID,
-			events[i].(*event).Revision(),
+			events[i].(*event).command.Revision,
 			events[i].(*event).command.Creator,
-			eventstore.EventType(events[i].(*event).command.CommandType),
-			Payload(events[i].(*event).command.Payload),
+			events[i].(*event).command.CommandType,
+			events[i].(*event).command.Payload,
 			events[i].(*event).sequence,
 			i,
 		)

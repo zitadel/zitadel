@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -55,17 +54,13 @@ func commandToEventOld(sequence *latestSequence, cmd eventstore.Command) (_ *eve
 			return nil, zerrors.ThrowInternal(err, "V3-MInPK", "Errors.Internal")
 		}
 	}
-	revision, err := strconv.Atoi(strings.TrimPrefix(string(cmd.Aggregate().Version), "v"))
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "V3-hN3ki", "Errors.Internal")
-	}
 	return &event{
 		command: &command{
 			InstanceID:    sequence.aggregate.InstanceID,
 			AggregateType: string(sequence.aggregate.Type),
 			AggregateID:   sequence.aggregate.ID,
 			CommandType:   string(cmd.Type()),
-			Revision:      uint16(revision),
+			Revision:      cmd.Revision(),
 			Payload:       payload,
 			Creator:       cmd.Creator(),
 			Owner:         sequence.aggregate.ResourceOwner,
