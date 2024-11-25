@@ -1,12 +1,8 @@
-const colors = require("tailwindcss/colors");
+import colors from "tailwindcss/colors";
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./page/**/*.{js,ts,jsx,tsx}",
-    "./ui/**/*.{js,ts,jsx,tsx}",
-  ],
+export default {
+  content: ["./app/**/*.{js,ts,jsx,tsx}", "./page/**/*.{js,ts,jsx,tsx}", "./ui/**/*.{js,ts,jsx,tsx}"],
   future: {
     hoverOnlyWhenSupported: true,
   },
@@ -48,10 +44,10 @@ module.exports = {
       },
       backgroundImage: ({ theme }) => ({
         "dark-vc-border-gradient": `radial-gradient(at left top, ${theme(
-          "colors.gray.800"
+          "colors.gray.800",
         )}, 50px, ${theme("colors.gray.800")} 50%)`,
         "vc-border-gradient": `radial-gradient(at left top, ${theme(
-          "colors.gray.200"
+          "colors.gray.200",
         )}, 50px, ${theme("colors.gray.300")} 50%)`,
       }),
       keyframes: ({ theme }) => ({

@@ -1,4 +1,4 @@
-const sharedConfig = require("zitadel-tailwind-config/tailwind.config.mjs");
+import sharedConfig from "zitadel-tailwind-config/tailwind.config.mjs";
 
 let colors = {
   background: { light: { contrast: {} }, dark: { contrast: {} } },

@@ -6,6 +6,8 @@ settings:
 
 overrides:
   '@typescript-eslint/parser': ^7.9.0
+  '@types/react': npm:types-react@19.0.0-rc.1
+  '@types/react-dom': npm:types-react-dom@19.0.0-rc.1
 
 importers:
 
@@ -1508,8 +1510,8 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@testing-library/dom': ^10.0.0
-      '@types/react': ^18.0.0
-      '@types/react-dom': ^18.0.0
+      '@types/react': npm:types-react@19.0.0-rc.1
+      '@types/react-dom': npm:types-react-dom@19.0.0-rc.1
       react: ^18.0.0
       react-dom: ^18.0.0
     peerDependenciesMeta:
