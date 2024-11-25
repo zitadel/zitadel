@@ -18,13 +18,11 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
-	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
 	"github.com/zitadel/zitadel/internal/notification/channels/set"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
@@ -159,8 +157,8 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 						},
 					}, w
 			},
-		}}
-	// TODO: Why don't we have an url template on user.HumanInitialCodeAddedEvent?
+		},
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
@@ -1715,31 +1713,36 @@ type fields struct {
 	userDataCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto crypto.EncryptionAlgorithm
 }
+type fieldsWorker struct {
+	queries        *mock.MockQueries
+	commands       *mock.MockCommands
+	es             *eventstore.Eventstore
+	userDataCrypto crypto.EncryptionAlgorithm
+	SMSTokenCrypto crypto.EncryptionAlgorithm
+	now            nowFunc
+	backOff        func(current time.Duration) time.Duration
+	maxAttempts    uint8
+}
 type args struct {
+	event eventstore.Event
+}
+type argsWorker struct {
 	event eventstore.Event
 }
 type want struct {
 	noOperation bool
 	err         assert.ErrorAssertionFunc
 }
+type wantWorker struct {
+	message    *messages.Email
+	messageSMS *messages.SMS
+	sendError  error
+	err        assert.ErrorAssertionFunc
+}
 
 func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields, a args, w want) *userNotifier {
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
-	channel := channel_mock.NewMockNotificationChannel(ctrl)
-	//if w.err == nil {
-	//	if w.message != nil {
-	//		w.message.TriggeringEvent = a.event
-	//		channel.EXPECT().HandleMessage(w.message).Return(nil)
-	//	}
-	//	if w.messageSMS != nil {
-	//		w.messageSMS.TriggeringEvent = a.event
-	//		channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
-	//			message.VerificationID = gu.Ptr(verificationID)
-	//			return nil
-	//		})
-	//	}
-	//}
 	return &userNotifier{
 		commands: f.commands,
 		queries: NewNotificationQueries(
@@ -1754,39 +1757,6 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			f.SMSTokenCrypto,
 		),
 		otpEmailTmpl: defaultOTPEmailTemplate,
-		channels: &channels{
-			Chain: *senders.ChainChannels(channel),
-			EmailConfig: &email.Config{
-				ProviderConfig: &email.Provider{
-					ID:          "emailProviderID",
-					Description: "description",
-				},
-				SMTPConfig: &smtp.Config{
-					SMTP: smtp.SMTP{
-						Host:     "host",
-						User:     "user",
-						Password: "password",
-					},
-					Tls:            true,
-					From:           "from",
-					FromName:       "fromName",
-					ReplyToAddress: "replyToAddress",
-				},
-				WebhookConfig: nil,
-			},
-			SMSConfig: &sms.Config{
-				ProviderConfig: &sms.Provider{
-					ID:          "smsProviderID",
-					Description: "description",
-				},
-				TwilioConfig: &twilio.Config{
-					SID:              "sid",
-					Token:            "token",
-					SenderNumber:     "senderNumber",
-					VerifyServiceSID: "verifyServiceSID",
-				},
-			},
-		},
 	}
 }
 
@@ -1825,6 +1795,11 @@ func expectTemplateQueries(queries *mock.MockQueries, template string) {
 		},
 	}, nil)
 	queries.EXPECT().MailTemplateByOrg(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.MailTemplate{Template: []byte(template)}, nil)
+	queries.EXPECT().GetDefaultLanguage(gomock.Any()).Return(language.English)
+	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)
+}
+
+func expectTemplateWithNotifyUserQueries(queries *mock.MockQueries, template string) {
 	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{
 		ID:                 userID,
 		ResourceOwner:      orgID,
@@ -1834,11 +1809,19 @@ func expectTemplateQueries(queries *mock.MockQueries, template string) {
 		LastPhone:          lastPhone,
 		VerifiedPhone:      verifiedPhone,
 	}, nil)
-	queries.EXPECT().GetDefaultLanguage(gomock.Any()).Return(language.English)
-	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)
+	expectTemplateQueries(queries, template)
 }
 
-func expectTemplateQueriesSMS(queries *mock.MockQueries, template string) {
+func expectTemplateWithNotifyUserQueriesSMS(queries *mock.MockQueries) {
+	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{
+		ID:                 userID,
+		ResourceOwner:      orgID,
+		LastEmail:          lastEmail,
+		VerifiedEmail:      verifiedEmail,
+		PreferredLoginName: preferredLoginName,
+		LastPhone:          lastPhone,
+		VerifiedPhone:      verifiedPhone,
+	}, nil)
 	queries.EXPECT().GetInstanceRestrictions(gomock.Any()).Return(query.Restrictions{
 		AllowedLanguages: []language.Tag{language.English},
 	}, nil)
@@ -1847,15 +1830,6 @@ func expectTemplateQueriesSMS(queries *mock.MockQueries, template string) {
 		Light: query.Theme{
 			LogoURL: logoURL,
 		},
-	}, nil)
-	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{
-		ID:                 userID,
-		ResourceOwner:      orgID,
-		LastEmail:          lastEmail,
-		VerifiedEmail:      verifiedEmail,
-		PreferredLoginName: preferredLoginName,
-		LastPhone:          lastPhone,
-		VerifiedPhone:      verifiedPhone,
 	}, nil)
 	queries.EXPECT().GetDefaultLanguage(gomock.Any()).Return(language.English)
 	queries.EXPECT().CustomTextListByTemplate(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(2).Return(&query.CustomTexts{}, nil)

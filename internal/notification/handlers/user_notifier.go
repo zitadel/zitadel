@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/senders"
-	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -37,22 +36,22 @@ func init() {
 	)
 	RegisterSentHandler(user.HumanOTPSMSCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanOTPSMSCodeSent(ctx, orgID, id, generatorInfo)
+			return commands.HumanOTPSMSCodeSent(ctx, id, orgID, generatorInfo)
 		},
 	)
 	RegisterSentHandler(session.OTPSMSChallengedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.OTPSMSSent(ctx, orgID, id, generatorInfo)
+			return commands.OTPSMSSent(ctx, id, orgID, generatorInfo)
 		},
 	)
 	RegisterSentHandler(user.HumanOTPEmailCodeAddedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanOTPEmailCodeSent(ctx, orgID, id)
+			return commands.HumanOTPEmailCodeSent(ctx, id, orgID)
 		},
 	)
 	RegisterSentHandler(session.OTPEmailChallengedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.OTPEmailSent(ctx, orgID, id)
+			return commands.OTPEmailSent(ctx, id, orgID)
 		},
 	)
 	RegisterSentHandler(user.UserDomainClaimedType,
@@ -94,7 +93,6 @@ const (
 type userNotifier struct {
 	commands     Commands
 	queries      *NotificationQueries
-	channels     types.ChannelChains
 	otpEmailTmpl string
 }
 

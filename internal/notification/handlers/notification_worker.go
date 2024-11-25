@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"database/sql"
+	"maps"
 	"math/rand/v2"
 	"slices"
 	"strings"
@@ -32,6 +33,7 @@ type NotificationWorker struct {
 	channels types.ChannelChains
 	config   WorkerConfig
 	now      nowFunc
+	backOff  func(current time.Duration) time.Duration
 }
 
 type WorkerConfig struct {
@@ -73,7 +75,7 @@ func NewNotificationWorker(
 	if config.RetryDelayFactor < 1 {
 		config.RetryDelayFactor = 1
 	}
-	return &NotificationWorker{
+	w := &NotificationWorker{
 		config:   config,
 		commands: commands,
 		queries:  queries,
@@ -82,6 +84,8 @@ func NewNotificationWorker(
 		channels: channels,
 		now:      time.Now,
 	}
+	w.backOff = w.exponentialBackOff
+	return w
 }
 
 func (w *NotificationWorker) Start(ctx context.Context) {
@@ -95,7 +99,7 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 
 	// if the notification is too old, we can directly cancel
 	if event.CreatedAt().Add(w.config.MaxTtl).Before(w.now()) {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), nil)
 	}
 
 	// Get the notify user first, so if anything fails afterward we have the current state of the user
@@ -113,17 +117,22 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 	}
 
 	err = w.sendNotification(ctx, tx, event.Request, notifyUser, event)
-	if err != nil {
-		return w.commands.NotificationRetryRequested(
-			ctx,
-			tx,
-			event.Aggregate().ID,
-			authz.GetInstance(ctx).InstanceID(),
-			notificationEventToRequest(event.Request, notifyUser, w.backOff(0)),
-			err,
-		)
+	if err == nil {
+		return nil
 	}
-	return nil
+	// if the max attempts are reached, we cancel the notification
+	if event.Sequence() >= uint64(w.config.MaxAttempts) {
+		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+	}
+	// otherwise we retry after a backoff delay
+	return w.commands.NotificationRetryRequested(
+		ctx,
+		tx,
+		event.Aggregate().ID,
+		authz.GetInstance(ctx).InstanceID(),
+		notificationEventToRequest(event.Request, notifyUser, w.backOff(0)),
+		err,
+	)
 }
 
 func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sql.Tx, event *notification.RetryRequestedEvent) (err error) {
@@ -202,16 +211,14 @@ func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, r
 		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, e, generatorInfo)
 	}
 
-	args := request.Args
+	args := maps.Clone(request.Args)
 	if len(args) == 0 {
 		args = make(map[string]any)
 	}
-	if code != "" {
-		args["Code"] = code
-		// existing notifications use `OTP` as argument for the code
-		if request.IsOTP {
-			args["OTP"] = code
-		}
+	args["Code"] = code
+	// existing notifications use `OTP` as argument for the code
+	if request.IsOTP {
+		args["OTP"] = code
 	}
 
 	if err := notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel); err != nil {
@@ -228,7 +235,7 @@ func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, r
 	return nil
 }
 
-func (w *NotificationWorker) backOff(current time.Duration) time.Duration {
+func (w *NotificationWorker) exponentialBackOff(current time.Duration) time.Duration {
 	if current >= w.config.MaxRetryDelay {
 		return w.config.MaxRetryDelay
 	}
