@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	notificationEventPrefix = "notification.test2."
+	notificationEventPrefix = "notification.test3." //TODO: !
 	RequestedType           = notificationEventPrefix + "requested"
 	RetryRequestedType      = notificationEventPrefix + "retry.requested"
 	SentType                = notificationEventPrefix + "sent"
@@ -32,6 +32,7 @@ type Request struct {
 	Code                          *crypto.CryptoValue     `json:"code,omitempty"`
 	UnverifiedNotificationChannel bool                    `json:"unverifiedNotificationChannel,omitempty"`
 	IsOTP                         bool                    `json:"isOTP,omitempty"`
+	RequiresPreviousDomain        bool                    `json:"RequiresPreviousDomain,omitempty"`
 	Args                          map[string]any          `json:"args,omitempty"`
 }
 
@@ -85,7 +86,8 @@ func NewRequestedEvent(ctx context.Context,
 	notificationType domain.NotificationType,
 	messageType string,
 	unverifiedNotificationChannel,
-	isOTP bool,
+	isOTP,
+	requiresPreviousDomain bool,
 	args map[string]any,
 ) *RequestedEvent {
 	return &RequestedEvent{
@@ -108,6 +110,7 @@ func NewRequestedEvent(ctx context.Context,
 			Code:                          code,
 			UnverifiedNotificationChannel: unverifiedNotificationChannel,
 			IsOTP:                         isOTP,
+			RequiresPreviousDomain:        requiresPreviousDomain,
 			Args:                          args,
 		},
 	}
@@ -143,7 +146,8 @@ func NewSentEvent(ctx context.Context,
 
 type CanceledEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	//Error                error `json:"error"`
+
+	Error string `json:"error"`
 }
 
 func (e *CanceledEvent) Payload() interface{} {
@@ -165,18 +169,17 @@ func NewCanceledEvent(ctx context.Context, aggregate *eventstore.Aggregate, err 
 			aggregate,
 			CanceledType,
 		),
-		//Error: err,
+		Error: err.Error(),
 	}
 }
 
 type RetryRequestedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Request
-
-	//Error      error `json:"error"`
-	NotifyUser *query.NotifyUser `json:"notify_user"`
-	BackOff    time.Duration
+	Request    `json:"request"`
+	Error      string            `json:"error"`
+	NotifyUser *query.NotifyUser `json:"notifyUser"`
+	BackOff    time.Duration     `json:"backOff"`
 }
 
 func (e *RetryRequestedEvent) Payload() interface{} {
@@ -236,6 +239,6 @@ func NewRetryRequestedEvent(
 		},
 		NotifyUser: notifyUser,
 		BackOff:    backoff,
-		//Error: err,
+		Error:      err.Error(),
 	}
 }

@@ -27,6 +27,7 @@ type NotificationRequest struct {
 	AggregateID                   string
 	AggregateResourceOwner        string
 	IsOTP                         bool
+	RequiresPreviousDomain        bool
 }
 
 type NotificationRetryRequest struct {
@@ -83,6 +84,11 @@ func (r *NotificationRequest) WithOTP() *NotificationRequest {
 	return r
 }
 
+func (r *NotificationRequest) WithPreviousDomain() *NotificationRequest {
+	r.RequiresPreviousDomain = true
+	return r
+}
+
 // RequestNotification writes a new notification.RequestEvent with the notification.Aggregate to the eventstore
 func (c *Commands) RequestNotification(
 	ctx context.Context,
@@ -107,6 +113,7 @@ func (c *Commands) RequestNotification(
 		request.MessageType,
 		request.UnverifiedNotificationChannel,
 		request.IsOTP,
+		request.RequiresPreviousDomain,
 		request.Args))
 	return err
 }

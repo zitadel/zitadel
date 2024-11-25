@@ -103,14 +103,12 @@ func NewUserNotifier(
 	config handler.Config,
 	commands Commands,
 	queries *NotificationQueries,
-	channels types.ChannelChains,
 	otpEmailTmpl string,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &userNotifier{
 		commands:     commands,
 		queries:      queries,
 		otpEmailTmpl: otpEmailTmpl,
-		channels:     channels,
 	})
 }
 
@@ -446,6 +444,10 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if err != nil {
 			return err
 		}
+		urlTmpl := e.TriggeredAtOrigin + u.otpEmailTmpl
+		if e.URLTmpl != "" {
+			urlTmpl = e.URLTmpl
+		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				s.UserFactor.UserID,
@@ -456,7 +458,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 				domain.VerifyEmailOTPMessageType,
 			).
 				WithAggregate(e.Aggregate().ID, e.Aggregate().ResourceOwner).
-				WithURLTemplate(e.URLTmpl).
+				WithURLTemplate(urlTmpl).
 				WithCode(e.Code, e.Expiry).
 				WithArgs(otpArgs(ctx, e.Expiry)),
 		)
@@ -500,9 +502,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 				WithUnverifiedChannel().
 				WithArgs(map[string]any{
 					"TempUsername": e.UserName,
-					// TODO: "Domain": lastmail?
-				},
-				),
+				}),
 		)
 	}), nil
 }

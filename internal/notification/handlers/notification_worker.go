@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"math/rand/v2"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -69,7 +70,7 @@ func NewNotificationWorker(
 	channels types.ChannelChains,
 ) *NotificationWorker {
 	// make sure the delay does not get less
-	if config.RetryDelayFactor > 1 {
+	if config.RetryDelayFactor < 1 {
 		config.RetryDelayFactor = 1
 	}
 	return &NotificationWorker{
@@ -102,6 +103,13 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 	notifyUser, err := w.queries.GetNotifyUserByID(ctx, true, event.UserID)
 	if err != nil {
 		return err
+	}
+
+	// The domain claimed event requires the domain as argument, but lacks the user when creating the request event.
+	// Since we set it into the request arguments, it will be passed into a potential retry event.
+	if _, ok := event.Request.Args["Domain"]; !ok && event.RequiresPreviousDomain {
+		index := strings.LastIndex(notifyUser.LastEmail, "@")
+		event.Request.Args["Domain"] = notifyUser.LastEmail[index+1:]
 	}
 
 	err = w.sendNotification(ctx, tx, event.Request, notifyUser, event)
