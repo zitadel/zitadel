@@ -91,16 +91,7 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 		return nil, err
 	}
 
-	// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
-	// Thats why we enable it manually
-	if es.client.Type() == "cockroach" {
-		_, err = tx.ExecContext(ctx, "SET enable_multiple_modifications_of_table = on")
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	err = handleFieldCommands(ctx, tx, commands)
+	err = es.handleFieldCommands(ctx, tx, commands)
 	if err != nil {
 		return nil, err
 	}

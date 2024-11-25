@@ -143,7 +143,16 @@ func buildSearchCondition(builder *strings.Builder, index int, conditions map[ev
 	return args
 }
 
-func handleFieldCommands(ctx context.Context, tx database.Tx, commands []eventstore.Command) error {
+func (es *Eventstore) handleFieldCommands(ctx context.Context, tx database.Tx, commands []eventstore.Command) error {
+	// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
+	// Thats why we enable it manually
+	if es.client.Type() == "cockroach" {
+		_, err := tx.ExecContext(ctx, "SET enable_multiple_modifications_of_table = on")
+		if err != nil {
+			return err
+		}
+	}
+
 	for _, command := range commands {
 		if len(command.Fields()) > 0 {
 			if err := handleFieldOperations(ctx, tx, command.Fields()); err != nil {
