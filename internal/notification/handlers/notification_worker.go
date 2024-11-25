@@ -396,18 +396,43 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int) (err err
 		var err error
 		switch e := event.(type) {
 		case *notification.RequestedEvent:
+			w.createSavepoint(ctx, event, workerID)
 			err = w.reduceNotificationRequested(ctx, tx, e)
 		case *notification.RetryRequestedEvent:
+			w.createSavepoint(ctx, event, workerID)
 			err = w.reduceNotificationRetry(ctx, tx, e)
 		}
-		w.log(workerID).OnError(err).
-			WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
-			WithField("notificationID", event.Aggregate().ID).
-			WithField("sequence", event.Sequence()).
-			WithField("type", event.Type()).
-			Error("could not push notification event")
+		if err != nil {
+			w.log(workerID).OnError(err).
+				WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
+				WithField("notificationID", event.Aggregate().ID).
+				WithField("sequence", event.Sequence()).
+				WithField("type", event.Type()).
+				Error("could not push notification event")
+			w.rollbackToSavepoint(ctx, event, workerID)
+		}
 	}
-	return database.CloseTransaction(tx, nil) //TODO: do we need to rollback on an error?
+	return database.CloseTransaction(tx, nil)
+}
+
+func (w *NotificationWorker) createSavepoint(ctx context.Context, event eventstore.Event, workerID int) {
+	_, err := w.client.ExecContext(ctx, "SAVEPOINT notification_send")
+	w.log(workerID).OnError(err).
+		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
+		WithField("notificationID", event.Aggregate().ID).
+		WithField("sequence", event.Sequence()).
+		WithField("type", event.Type()).
+		Error("could not create savepoint for notification event")
+}
+
+func (w *NotificationWorker) rollbackToSavepoint(ctx context.Context, event eventstore.Event, workerID int) {
+	_, err := w.client.ExecContext(ctx, "ROLLBACK TO SAVEPOINT notification_sent")
+	w.log(workerID).OnError(err).
+		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
+		WithField("notificationID", event.Aggregate().ID).
+		WithField("sequence", event.Sequence()).
+		WithField("type", event.Type()).
+		Error("could not rollback to savepoint for notification event")
 }
 
 type existingInstances []string

@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -419,7 +420,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
 			err := newNotificationWorker(t, ctrl, queries, f, a, w).reduceNotificationRequested(
-				context.Background(),
+				authz.WithInstanceID(context.Background(), instanceID),
 				&sql.Tx{},
 				a.event.(*notification.RequestedEvent))
 			if w.err != nil {
@@ -797,7 +798,7 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
 			err := newNotificationWorker(t, ctrl, queries, f, a, w).reduceNotificationRetry(
-				context.Background(),
+				authz.WithInstanceID(context.Background(), instanceID),
 				&sql.Tx{},
 				a.event.(*notification.RetryRequestedEvent))
 			if w.err != nil {
