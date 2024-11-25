@@ -86,7 +86,7 @@ func (e *Event) Type() eventstore.EventType {
 
 // Revision implements [eventstore.Event]
 func (e *Event) Revision() uint16 {
-	revision, err := strconv.Atoi(strings.TrimPrefix(string(e.Version), "v"))
+	revision, err := strconv.ParseUint(strings.TrimPrefix(string(e.Version), "v"), 10, 16)
 	logging.OnError(err).Debug("failed to parse event revision")
 	return uint16(revision)
 }
