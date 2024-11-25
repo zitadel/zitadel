@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/url"
 	"slices"
 
 	"github.com/zitadel/logging"
@@ -44,22 +43,9 @@ type mailVerificationData struct {
 	HasSymbol    string
 }
 
-func MailVerificationLink(origin, userID, code, orgID, authRequestID string) string {
-	v := url.Values{}
-	v.Set(queryUserID, userID)
-	v.Set(queryCode, code)
-	v.Set(queryOrgID, orgID)
-	v.Set(QueryAuthRequestID, authRequestID)
-	return externalLink(origin) + EndpointMailVerification + "?" + v.Encode()
-}
-
-func MailVerificationLink2(origin, userID, orgID, authRequestID string) string {
-	//v := url.Values{}
-	//v.Set(queryUserID, userID)
-	//v.Set(queryCode, "")
-	//v.Set(queryOrgID, orgID)
-	//v.Set(QueryAuthRequestID, authRequestID)
-	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s", externalLink(origin), EndpointMailVerification,
+func MailVerificationLinkTemplate(origin, userID, orgID, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s",
+		externalLink(origin), EndpointMailVerification,
 		queryUserID, userID,
 		queryCode, "{{.Code}}",
 		queryOrgID, orgID,

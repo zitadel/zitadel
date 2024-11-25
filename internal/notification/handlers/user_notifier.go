@@ -223,7 +223,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 				domain.NotificationTypeEmail,
 				domain.InitCodeMessageType,
 			).
-				WithURLTemplate(login.InitUserLink2(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)).
+				WithURLTemplate(login.InitUserLinkTemplate(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)).
 				WithCode(e.Code, e.Expiry).
 				WithUnverifiedChannel(),
 		)
@@ -253,7 +253,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		}
 		urlTmpl := e.URLTemplate
 		if urlTmpl == "" {
-			urlTmpl = login.MailVerificationLink2(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
+			urlTmpl = login.MailVerificationLinkTemplate(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
@@ -293,7 +293,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		}
 		urlTmpl := e.URLTemplate
 		if urlTmpl == "" {
-			urlTmpl = login.InitPasswordLink2(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
+			urlTmpl = login.InitPasswordLinkTemplate(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
@@ -414,7 +414,7 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 				domain.NotificationTypeEmail,
 				domain.VerifyEmailOTPMessageType,
 			).
-				WithURLTemplate(login.OTPLink2(e.TriggeredAtOrigin, authRequestID, domain.MFATypeOTPEmail)).
+				WithURLTemplate(login.OTPLinkTemplate(e.TriggeredAtOrigin, authRequestID, domain.MFATypeOTPEmail)).
 				WithCode(e.Code, e.Expiry).
 				WithArgs(otpArgs(ctx, e.Expiry)),
 		)
@@ -525,6 +525,10 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		if alreadyHandled {
 			return nil
 		}
+		urlTmpl := e.URLTemplate
+		if urlTmpl == "" {
+			urlTmpl = domain.PasswordlessInitCodeLinkTemplate(e.TriggeredAtOrigin+login.HandlerPrefix+login.EndpointPasswordlessRegistration, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
+		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
@@ -534,7 +538,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 				domain.NotificationTypeEmail,
 				domain.PasswordlessRegistrationMessageType,
 			).
-				WithURLTemplate(domain.PasswordlessInitCodeLink2(e.TriggeredAtOrigin+login.HandlerPrefix+login.EndpointPasswordlessRegistration, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)).
+				WithURLTemplate(urlTmpl).
 				WithCode(e.Code, e.Expiry),
 		)
 	}), nil
@@ -650,7 +654,7 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 		}
 		urlTmpl := e.URLTemplate
 		if urlTmpl == "" {
-			urlTmpl = login.InviteUserLink2(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
+			urlTmpl = login.InviteUserLinkTemplate(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(

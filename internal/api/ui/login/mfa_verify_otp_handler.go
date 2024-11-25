@@ -27,11 +27,7 @@ type mfaOTPFormData struct {
 	Provider         domain.MFAType `schema:"provider"`
 }
 
-func OTPLink(origin, authRequestID, code string, provider domain.MFAType) string {
-	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%d", externalLink(origin), EndpointMFAOTPVerify, QueryAuthRequestID, authRequestID, queryCode, code, querySelectedProvider, provider)
-}
-
-func OTPLink2(origin, authRequestID string, provider domain.MFAType) string {
+func OTPLinkTemplate(origin, authRequestID string, provider domain.MFAType) string {
 	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%d", externalLink(origin), EndpointMFAOTPVerify, QueryAuthRequestID, authRequestID, queryCode, "{{.Code}}", querySelectedProvider, provider)
 }
 

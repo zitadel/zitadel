@@ -3,7 +3,6 @@ package login
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -39,17 +38,9 @@ type initPasswordData struct {
 	HasSymbol    string
 }
 
-func InitPasswordLink(origin, userID, code, orgID, authRequestID string) string {
-	v := url.Values{}
-	v.Set(queryInitPWUserID, userID)
-	v.Set(queryInitPWCode, code)
-	v.Set(queryOrgID, orgID)
-	v.Set(QueryAuthRequestID, authRequestID)
-	return externalLink(origin) + EndpointInitPassword + "?" + v.Encode()
-}
-
-func InitPasswordLink2(origin, userID, orgID, authRequestID string) string {
-	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s", externalLink(origin), EndpointInitPassword,
+func InitPasswordLinkTemplate(origin, userID, orgID, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s",
+		externalLink(origin), EndpointInitPassword,
 		queryInitPWUserID, userID,
 		queryInitPWCode, "{{.Code}}",
 		queryOrgID, orgID,

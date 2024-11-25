@@ -1,8 +1,8 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
-	"net/url"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -40,24 +40,14 @@ type inviteUserData struct {
 	HasSymbol    string
 }
 
-func InviteUserLink(origin, userID, loginName, code, orgID string, authRequestID string) string {
-	v := url.Values{}
-	v.Set(queryInviteUserUserID, userID)
-	v.Set(queryInviteUserLoginName, loginName)
-	v.Set(queryInviteUserCode, code)
-	v.Set(queryOrgID, orgID)
-	v.Set(QueryAuthRequestID, authRequestID)
-	return externalLink(origin) + EndpointInviteUser + "?" + v.Encode()
-}
-
-func InviteUserLink2(origin, userID, orgID string, authRequestID string) string {
-	v := url.Values{}
-	v.Set(queryInviteUserUserID, userID)
-	v.Set(queryInviteUserLoginName, "{{.LoginName}}")
-	v.Set(queryInviteUserCode, "{{.Code}}")
-	v.Set(queryOrgID, orgID)
-	v.Set(QueryAuthRequestID, authRequestID)
-	return externalLink(origin) + EndpointInviteUser + "?" + v.Encode()
+func InviteUserLinkTemplate(origin, userID, orgID string, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
+		externalLink(origin), EndpointInviteUser,
+		queryInviteUserUserID, userID,
+		queryInviteUserLoginName, "{{.LoginName}}",
+		queryInviteUserCode, "{{.Code}}",
+		queryOrgID, orgID,
+		QueryAuthRequestID, authRequestID)
 }
 
 func (l *Login) handleInviteUser(w http.ResponseWriter, r *http.Request) {
