@@ -61,7 +61,9 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 	if err != nil {
 		return nil, err
 	}
-	defer closeTx(err)
+	defer func() {
+		err = closeTx(err)
+	}()
 
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (

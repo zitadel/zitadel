@@ -46,7 +46,9 @@ func (es *Eventstore) writeCommands(ctx context.Context, commands []eventstore.C
 	if err != nil {
 		return nil, err
 	}
-	defer close(err)
+	defer func() {
+		err = close(err)
+	}()
 
 	events, err := writeEvents(ctx, tx, commands)
 	if err != nil {
