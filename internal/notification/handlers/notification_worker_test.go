@@ -25,8 +25,9 @@ func TestNotificationWorker_backOff(t *testing.T) {
 			name: "less than min, min - 1.5*min",
 			fields: fields{
 				config: WorkerConfig{
-					MinRetryDelay: 1 * time.Second,
-					MaxRetryDelay: 5 * time.Second,
+					MinRetryDelay:    1 * time.Second,
+					MaxRetryDelay:    5 * time.Second,
+					RetryDelayFactor: 1.5,
 				},
 			},
 			args: args{
@@ -39,8 +40,9 @@ func TestNotificationWorker_backOff(t *testing.T) {
 			name: "current, 1.5*current - max",
 			fields: fields{
 				config: WorkerConfig{
-					MinRetryDelay: 1 * time.Second,
-					MaxRetryDelay: 5 * time.Second,
+					MinRetryDelay:    1 * time.Second,
+					MaxRetryDelay:    5 * time.Second,
+					RetryDelayFactor: 1.5,
 				},
 			},
 			args: args{
@@ -53,8 +55,9 @@ func TestNotificationWorker_backOff(t *testing.T) {
 			name: "max, max",
 			fields: fields{
 				config: WorkerConfig{
-					MinRetryDelay: 1 * time.Second,
-					MaxRetryDelay: 5 * time.Second,
+					MinRetryDelay:    1 * time.Second,
+					MaxRetryDelay:    5 * time.Second,
+					RetryDelayFactor: 1.5,
 				},
 			},
 			args: args{
