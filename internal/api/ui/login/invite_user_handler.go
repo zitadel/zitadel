@@ -41,7 +41,7 @@ type inviteUserData struct {
 }
 
 func InviteUserLinkTemplate(origin, userID, orgID string, authRequestID string) string {
-	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
 		externalLink(origin), EndpointInviteUser,
 		queryInviteUserUserID, userID,
 		queryInviteUserLoginName, "{{.LoginName}}",

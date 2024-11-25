@@ -212,18 +212,23 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 		if alreadyHandled {
 			return nil
 		}
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
 		return u.commands.RequestNotification(
 			ctx,
 			authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				domain.NotificationTypeEmail,
 				domain.InitCodeMessageType,
 			).
-				WithURLTemplate(login.InitUserLinkTemplate(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)).
+				WithURLTemplate(login.InitUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)).
 				WithCode(e.Code, e.Expiry).
 				WithUnverifiedChannel(),
 		)
@@ -251,15 +256,20 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		if alreadyHandled {
 			return nil
 		}
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
 		urlTmpl := e.URLTemplate
 		if urlTmpl == "" {
-			urlTmpl = login.MailVerificationLinkTemplate(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
+			urlTmpl = login.MailVerificationLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				domain.NotificationTypeEmail,
 				domain.VerifyEmailMessageType,
@@ -291,15 +301,20 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if alreadyHandled {
 			return nil
 		}
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
 		urlTmpl := e.URLTemplate
 		if urlTmpl == "" {
-			urlTmpl = login.InitPasswordLinkTemplate(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
+			urlTmpl = login.InitPasswordLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				e.NotificationType,
 				domain.PasswordResetMessageType,
@@ -328,11 +343,15 @@ func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.S
 		if alreadyHandled {
 			return nil
 		}
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				http_util.DomainContext(ctx).Origin(),
 				e.EventType,
 				domain.NotificationTypeSms,
 				domain.VerifySMSOTPMessageType,
@@ -368,11 +387,17 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 		if err != nil {
 			return err
 		}
+
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				s.UserFactor.UserID,
 				s.UserFactor.ResourceOwner,
-				e.TriggeredAtOrigin,
+				http_util.DomainContext(ctx).Origin(),
 				e.EventType,
 				domain.NotificationTypeSms,
 				domain.VerifySMSOTPMessageType,
@@ -401,6 +426,12 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 		if alreadyHandled {
 			return nil
 		}
+
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
 		var authRequestID string
 		if e.AuthRequestInfo != nil {
 			authRequestID = e.AuthRequestInfo.ID
@@ -409,12 +440,12 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				domain.NotificationTypeEmail,
 				domain.VerifyEmailOTPMessageType,
 			).
-				WithURLTemplate(login.OTPLinkTemplate(e.TriggeredAtOrigin, authRequestID, domain.MFATypeOTPEmail)).
+				WithURLTemplate(login.OTPLinkTemplate(origin, authRequestID, domain.MFATypeOTPEmail)).
 				WithCode(e.Code, e.Expiry).
 				WithArgs(otpArgs(ctx, e.Expiry)),
 		)
@@ -444,7 +475,14 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if err != nil {
 			return err
 		}
-		urlTmpl := e.TriggeredAtOrigin + u.otpEmailTmpl
+
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
+
+		urlTmpl := origin + u.otpEmailTmpl
 		if e.URLTmpl != "" {
 			urlTmpl = e.URLTmpl
 		}
@@ -452,7 +490,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 			command.NewNotificationRequest(
 				s.UserFactor.UserID,
 				s.UserFactor.ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				domain.NotificationTypeEmail,
 				domain.VerifyEmailOTPMessageType,
@@ -489,17 +527,23 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 		if alreadyHandled {
 			return nil
 		}
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				domain.NotificationTypeEmail,
 				domain.DomainClaimedMessageType,
 			).
-				WithURLTemplate(login.LoginLink(e.TriggeredAtOrigin, e.Aggregate().ResourceOwner)).
+				WithURLTemplate(login.LoginLink(origin, e.Aggregate().ResourceOwner)).
 				WithUnverifiedChannel().
+				WithPreviousDomain().
 				WithArgs(map[string]any{
 					"TempUsername": e.UserName,
 				}),
@@ -525,15 +569,20 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		if alreadyHandled {
 			return nil
 		}
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
 		urlTmpl := e.URLTemplate
 		if urlTmpl == "" {
-			urlTmpl = domain.PasswordlessInitCodeLinkTemplate(e.TriggeredAtOrigin+login.HandlerPrefix+login.EndpointPasswordlessRegistration, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
+			urlTmpl = domain.PasswordlessInitCodeLinkTemplate(origin+login.HandlerPrefix+login.EndpointPasswordlessRegistration, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
 		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				domain.NotificationTypeEmail,
 				domain.PasswordlessRegistrationMessageType,
@@ -561,10 +610,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		}
 
 		notificationPolicy, err := u.queries.NotificationPolicyByOrg(ctx, true, e.Aggregate().ResourceOwner, false)
-		if zerrors.IsNotFound(err) {
-			return nil
-		}
-		if err != nil {
+		if err != nil && !zerrors.IsNotFound(err) {
 			return err
 		}
 
@@ -572,16 +618,22 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 			return nil
 		}
 
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
+
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				domain.NotificationTypeEmail,
 				domain.PasswordChangeMessageType,
 			).
-				WithURLTemplate(console.LoginHintLink(e.TriggeredAtOrigin, "{{.PreferredLoginName}}")).
+				WithURLTemplate(console.LoginHintLink(origin, "{{.PreferredLoginName}}")).
 				WithUnverifiedChannel(),
 		)
 	}), nil
@@ -607,15 +659,17 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if alreadyHandled {
 			return nil
 		}
-		ctx, err = enrichCtx(ctx, e.TriggeredAtOrigin)
+
+		ctx, err = u.queries.Origin(ctx, e)
 		if err != nil {
 			return err
 		}
+
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				http_util.DomainContext(ctx).Origin(),
 				e.EventType,
 				domain.NotificationTypeSms,
 				domain.VerifyPhoneMessageType,
@@ -648,19 +702,26 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 		if alreadyHandled {
 			return nil
 		}
+
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		origin := http_util.DomainContext(ctx).Origin()
+
 		applicationName := e.ApplicationName
 		if applicationName == "" {
 			applicationName = "ZITADEL"
 		}
 		urlTmpl := e.URLTemplate
 		if urlTmpl == "" {
-			urlTmpl = login.InviteUserLinkTemplate(e.TriggeredAtOrigin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
+			urlTmpl = login.InviteUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
 		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
-				e.TriggeredAtOrigin,
+				origin,
 				e.EventType,
 				domain.NotificationTypeEmail,
 				domain.InviteUserMessageType,
