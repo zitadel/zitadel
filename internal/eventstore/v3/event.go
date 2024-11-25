@@ -22,7 +22,7 @@ type command struct {
 	AggregateID   string
 	CommandType   string
 	Revision      uint16
-	Payload       []byte
+	Payload       Payload
 	Creator       string
 	Owner         string
 }
@@ -161,7 +161,7 @@ func (e *event) Unmarshal(ptr any) error {
 	if len(e.command.Payload) == 0 {
 		return nil
 	}
-	if err := json.Unmarshal(Payload(e.command.Payload), ptr); err != nil {
+	if err := json.Unmarshal(e.command.Payload, ptr); err != nil {
 		return zerrors.ThrowInternal(err, "V3-u8qVo", "Errors.Internal")
 	}
 
