@@ -89,7 +89,7 @@ func (e *BaseEvent) DataAsBytes() []byte {
 
 // Revision implements action
 func (e *BaseEvent) Revision() uint16 {
-	revision, err := strconv.Atoi(strings.TrimPrefix(string(e.Agg.Version), "v"))
+	revision, err := strconv.ParseUint(strings.TrimPrefix(string(e.Agg.Version), "v"), 10, 16)
 	logging.OnError(err).Debug("failed to parse event revision")
 	return uint16(revision)
 }
