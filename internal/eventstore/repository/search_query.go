@@ -14,6 +14,8 @@ type SearchQuery struct {
 
 	SubQueries            [][]*Filter
 	Tx                    *sql.Tx
+	LockRows              bool
+	LockOption            eventstore.LockOption
 	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
 	Limit                 uint64
@@ -130,6 +132,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
 		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
 	}
+	query.LockRows, query.LockOption = builder.GetLockRows()
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{
 		instanceIDFilter,
