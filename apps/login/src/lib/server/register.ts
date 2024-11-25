@@ -1,7 +1,7 @@
 "use server";
 
 import { createSessionAndUpdateCookie } from "@/lib/server/cookie";
-import { addHumanUser } from "@/lib/zitadel";
+import { addHumanUser, getLoginSettings } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
@@ -9,6 +9,7 @@ import {
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { redirect } from "next/navigation";
+import { getNextUrl } from "../client";
 
 type RegisterUserCommand = {
   email: string;
@@ -72,18 +73,24 @@ export async function registerUser(command: RegisterUserCommand) {
 
     return redirect("/passkey/set?" + params);
   } else {
-    const params = new URLSearchParams({
-      loginName: session.factors.user.loginName,
-      organization: session.factors.user.organizationId,
-    });
+    const loginSettings = await getLoginSettings(
+      session.factors.user.organizationId,
+    );
 
-    if (command.authRequestId && session.factors.user.id) {
-      params.append("authRequest", command.authRequestId);
-      params.append("sessionId", session.id);
+    const url = await getNextUrl(
+      command.authRequestId && session.id
+        ? {
+            sessionId: session.id,
+            authRequestId: command.authRequestId,
+            organization: session.factors.user.organizationId,
+          }
+        : {
+            loginName: session.factors.user.loginName,
+            organization: session.factors.user.organizationId,
+          },
+      loginSettings?.defaultRedirectUri,
+    );
 
-      return redirect("/login?" + params);
-    } else {
-      return redirect("/signedin?" + params);
-    }
+    return redirect(url);
   }
 }

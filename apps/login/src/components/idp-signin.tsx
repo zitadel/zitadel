@@ -35,28 +35,6 @@ export function IdpSignin({
       },
       authRequestId,
     })
-      .then((session) => {
-        if (authRequestId && session && session.id) {
-          return router.push(
-            `/login?` +
-              new URLSearchParams({
-                sessionId: session.id,
-                authRequest: authRequestId,
-              }),
-          );
-        } else {
-          const params = new URLSearchParams({});
-          if (session.factors?.user?.loginName) {
-            params.set("loginName", session.factors?.user?.loginName);
-          }
-
-          if (authRequestId) {
-            params.set("authRequestId", authRequestId);
-          }
-
-          return router.push(`/signedin?` + params);
-        }
-      })
       .catch((error) => {
         setError(error.message);
         return;

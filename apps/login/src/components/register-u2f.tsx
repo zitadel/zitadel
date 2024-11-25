@@ -1,7 +1,9 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
+import { getNextUrl } from "@/lib/client";
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -17,6 +19,7 @@ type Props = {
   authRequestId?: string;
   organization?: string;
   checkAfter: boolean;
+  loginSettings?: LoginSettings;
 };
 
 export function RegisterU2f({
@@ -25,6 +28,7 @@ export function RegisterU2f({
   organization,
   authRequestId,
   checkAfter,
+  loginSettings,
 }: Props) {
   const t = useTranslations("u2f");
 
@@ -62,7 +66,7 @@ export function RegisterU2f({
     return response;
   }
 
-  async function submitRegisterAndContinue(): Promise<boolean | void> {
+  async function submitRegisterAndContinue(): Promise<boolean | void | null> {
     setError("");
     setLoading(true);
     const response = await addU2F({
@@ -146,38 +150,47 @@ export function RegisterU2f({
         return;
       }
 
-      const paramsToContinue = new URLSearchParams({});
-      let urlToContinue = "/accounts";
-
-      if (sessionId) {
-        paramsToContinue.append("sessionId", sessionId);
-      }
-
-      if (loginName) {
-        paramsToContinue.append("loginName", loginName);
-      }
-      if (organization) {
-        paramsToContinue.append("organization", organization);
-      }
-
       if (checkAfter) {
-        if (authRequestId) {
-          paramsToContinue.append("authRequestId", authRequestId);
-        }
-        urlToContinue = `/u2f?` + paramsToContinue;
-      } else if (authRequestId && sessionId) {
-        if (authRequestId) {
-          paramsToContinue.append("authRequest", authRequestId);
-        }
-        urlToContinue = `/login?` + paramsToContinue;
-      } else if (loginName) {
-        if (authRequestId) {
-          paramsToContinue.append("authRequestId", authRequestId);
-        }
-        urlToContinue = `/signedin?` + paramsToContinue;
-      }
+        const paramsToContinue = new URLSearchParams({});
 
-      router.push(urlToContinue);
+        if (sessionId) {
+          paramsToContinue.append("sessionId", sessionId);
+        }
+        if (loginName) {
+          paramsToContinue.append("loginName", loginName);
+        }
+        if (organization) {
+          paramsToContinue.append("organization", organization);
+        }
+        if (authRequestId) {
+          paramsToContinue.append("authRequestId", authRequestId);
+        }
+
+        return router.push(`/u2f?` + paramsToContinue);
+      } else {
+        const url =
+          authRequestId && sessionId
+            ? await getNextUrl(
+                {
+                  sessionId: sessionId,
+                  authRequestId: authRequestId,
+                  organization: organization,
+                },
+                loginSettings?.defaultRedirectUri,
+              )
+            : loginName
+              ? await getNextUrl(
+                  {
+                    loginName: loginName,
+                    organization: organization,
+                  },
+                  loginSettings?.defaultRedirectUri,
+                )
+              : null;
+        if (url) {
+          return router.push(url);
+        }
+      }
     }
   }
 

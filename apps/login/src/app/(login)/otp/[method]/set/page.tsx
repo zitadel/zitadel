@@ -9,6 +9,7 @@ import {
   addOTPEmail,
   addOTPSMS,
   getBrandingSettings,
+  getLoginSettings,
   registerTOTP,
 } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
@@ -16,13 +17,12 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-export default async function Page({
-  searchParams,
-  params,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-  params: Record<string | number | symbol, string | undefined>;
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+  params: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "otp" });
   const tError = await getTranslations({ locale, namespace: "error" });
@@ -32,6 +32,8 @@ export default async function Page({
   const { method } = params;
 
   const branding = await getBrandingSettings(organization);
+  const loginSettings = await getLoginSettings(organization);
+
   const session = await loadMostRecentSession({
     loginName,
     organization,
@@ -137,6 +139,7 @@ export default async function Page({
                 authRequestId={authRequestId}
                 organization={organization}
                 checkAfter={checkAfter === "true"}
+                loginSettings={loginSettings}
               ></TotpRegister>
             </div>{" "}
           </>

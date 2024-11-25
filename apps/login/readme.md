@@ -116,7 +116,7 @@ If the user has set up an additional **single** second factor, it is redirected 
 
 **NO MFA, FORCE MFA:** If no MFA method is available, and the settings force MFA, the user is sent to `/mfa/set` which prompts to setup a second factor.
 
-**PROMPT PASSKEY** If the settings do not enforce MFA, we check if passkeys are allowed with `loginSettings?.passkeysType === PasskeysType.ALLOWED` and redirect the user to `/passkey/set` if no passkeys are setup. This step can be skipped.
+**PROMPT PASSKEY** If the settings do not enforce MFA, we check if passkeys are allowed with `loginSettings?.passkeysType == PasskeysType.ALLOWED` and redirect the user to `/passkey/set` if no passkeys are setup. This step can be skipped.
 
 If none of the previous conditions apply, we continue to sign in.
 
@@ -386,3 +386,11 @@ In future, self service options to jump to are shown below, like:
 - logout
 
 > NOTE: This page has to be explicitly enabled or act as a fallback if no default redirect is set.
+
+## Currently NOT Supported
+
+- loginSettings.disableLoginWithEmail
+- loginSettings.disableLoginWithPhone
+- loginSettings.allowExternalIdp - this will be deprecated with the new login as it can be determined by the available IDPs
+- loginSettings.forceMfaLocalOnly
+- loginSettings lifetimes - all besides Multifactor Init Check can be implemented. for the Init Check, an external storage or a timestamp has to be implemented which keeps track of the last verification

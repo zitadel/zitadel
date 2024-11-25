@@ -4,9 +4,16 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
-import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
+import {
+  deleteSession,
+  getLoginSettings,
+  listAuthenticationMethodTypes,
+} from "@/lib/zitadel";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { redirect } from "next/navigation";
+import { getNextUrl } from "../client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -31,7 +38,69 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
   if (!userId || !idpIntent) {
     throw new Error("No userId or loginName provided");
   }
-  return createSessionForIdpAndUpdateCookie(userId, idpIntent, authRequestId);
+  const session = await createSessionForIdpAndUpdateCookie(
+    userId,
+    idpIntent,
+    authRequestId,
+  );
+
+  if (!session || !session.factors?.user) {
+    return { error: "Could not create session" };
+  }
+
+  const loginSettings = await getLoginSettings(
+    session.factors.user.organizationId,
+  );
+
+  const url = await getNextUrl(
+    authRequestId && session.id
+      ? {
+          sessionId: session.id,
+          authRequestId: authRequestId,
+          organization: session.factors.user.organizationId,
+        }
+      : {
+          loginName: session.factors.user.loginName,
+          organization: session.factors.user.organizationId,
+        },
+    loginSettings?.defaultRedirectUri,
+  );
+
+  if (url) {
+    return redirect(url);
+  }
+}
+
+export async function continueWithSession({
+  authRequestId,
+  ...session
+}: Session & { authRequestId?: string }) {
+  const loginSettings = await getLoginSettings(
+    session.factors?.user?.organizationId,
+  );
+
+  const url =
+    authRequestId && session.id && session.factors?.user
+      ? await getNextUrl(
+          {
+            sessionId: session.id,
+            authRequestId: authRequestId,
+            organization: session.factors.user.organizationId,
+          },
+          loginSettings?.defaultRedirectUri,
+        )
+      : session.factors?.user
+        ? await getNextUrl(
+            {
+              loginName: session.factors.user.loginName,
+              organization: session.factors.user.organizationId,
+            },
+            loginSettings?.defaultRedirectUri,
+          )
+        : null;
+  if (url) {
+    return redirect(url);
+  }
 }
 
 export type UpdateSessionCommand = {

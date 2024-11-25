@@ -1,11 +1,11 @@
 "use client";
 
-import { cleanupSession } from "@/lib/server/session";
+import { sendLoginname } from "@/lib/server/loginname";
+import { cleanupSession, continueWithSession } from "@/lib/server/session";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
-import Link from "next/link";
 import { useState } from "react";
 import { Avatar } from "./avatar";
 
@@ -56,42 +56,21 @@ export function SessionItem({
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <Link
-      prefetch={false}
-      href={
-        valid && authRequestId
-          ? `/login?` +
-            new URLSearchParams({
-              // loginName: session.factors?.user?.loginName as string,
-              sessionId: session.id,
-              authRequest: authRequestId,
-            })
-          : !valid
-            ? `/loginname?` +
-              new URLSearchParams(
-                authRequestId
-                  ? {
-                      loginName: session.factors?.user?.loginName as string,
-                      submit: "true",
-                      authRequestId,
-                    }
-                  : {
-                      loginName: session.factors?.user?.loginName as string,
-                      submit: "true",
-                    },
-              )
-            : "/signedin?" +
-              new URLSearchParams(
-                authRequestId
-                  ? {
-                      loginName: session.factors?.user?.loginName as string,
-                      authRequestId,
-                    }
-                  : {
-                      loginName: session.factors?.user?.loginName as string,
-                    },
-              )
-      }
+    <button
+      onClick={() => {
+        if (valid && session?.factors?.user) {
+          return continueWithSession({
+            ...session,
+            authRequestId: authRequestId,
+          });
+        } else if (session.factors?.user) {
+          return sendLoginname({
+            loginName: session.factors?.user?.loginName,
+            organization: session.factors.user.organizationId,
+            authRequestId: authRequestId,
+          });
+        }
+      }}
       className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
     >
       <div className="pr-4">
@@ -132,6 +111,6 @@ export function SessionItem({
           }}
         />
       </div>
-    </Link>
+    </button>
   );
 }

@@ -44,7 +44,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (identityProviders.length === 1) {
-      const host = headers().get("host");
+      const host = (await headers()).get("host");
       const identityProviderType = identityProviders[0].type;
 
       const provider = idpTypeToSlug(identityProviderType);
@@ -81,7 +81,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (identityProviders.length === 1) {
-      const host = headers().get("host");
+      const host = (await headers()).get("host");
       const identityProviderId = identityProviders[0].idpId;
 
       const idp = await getIDPByID(identityProviderId);
@@ -170,6 +170,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         const paramsVerify = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
           userId: session.factors?.user?.id, // verify needs user id
+          invite: "true", // TODO: check - set this to true as we dont expect old email verification method here
         });
 
         if (command.organization || session.factors?.user?.organizationId) {

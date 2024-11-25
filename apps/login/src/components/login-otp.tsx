@@ -1,9 +1,11 @@
 "use client";
 
+import { getNextUrl } from "@/lib/client";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +24,7 @@ type Props = {
   organization?: string;
   method: string;
   code?: string;
+  loginSettings?: LoginSettings;
 };
 
 type Inputs = {
@@ -35,6 +38,7 @@ export function LoginOTP({
   organization,
   method,
   code,
+  loginSettings,
 }: Props) {
   const t = useTranslations("otp");
 
@@ -152,41 +156,30 @@ export function LoginOTP({
   }
 
   function setCodeAndContinue(values: Inputs, organization?: string) {
-    return submitCode(values, organization).then((response) => {
+    return submitCode(values, organization).then(async (response) => {
       if (response) {
-        if (authRequestId && response && response.sessionId) {
-          const params = new URLSearchParams({
-            sessionId: response.sessionId,
-            authRequest: authRequestId,
-          });
+        const url =
+          authRequestId && response.sessionId
+            ? await getNextUrl(
+                {
+                  sessionId: response.sessionId,
+                  authRequestId: authRequestId,
+                  organization: response.factors?.user?.organizationId,
+                },
+                loginSettings?.defaultRedirectUri,
+              )
+            : response.factors?.user
+              ? await getNextUrl(
+                  {
+                    loginName: response.factors.user.loginName,
+                    organization: response.factors?.user?.organizationId,
+                  },
+                  loginSettings?.defaultRedirectUri,
+                )
+              : null;
 
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          if (authRequestId) {
-            params.append("authRequest", authRequestId);
-          }
-
-          if (sessionId) {
-            params.append("sessionId", sessionId);
-          }
-
-          return router.push(`/login?` + params);
-        } else {
-          const params = new URLSearchParams();
-          if (response?.factors?.user?.loginName) {
-            params.append("loginName", response.factors.user.loginName);
-          }
-          if (authRequestId) {
-            params.append("authRequestId", authRequestId);
-          }
-
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          return router.push(`/signedin?` + params);
+        if (url) {
+          router.push(url);
         }
       }
     });

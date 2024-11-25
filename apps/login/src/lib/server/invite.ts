@@ -20,7 +20,7 @@ export type RegisterUserResponse = {
 };
 
 export async function inviteUser(command: InviteUserCommand) {
-  const host = headers().get("host");
+  const host = (await headers()).get("host");
 
   const human = await addHumanUser({
     email: command.email,

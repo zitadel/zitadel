@@ -1,6 +1,7 @@
 "use server";
 
 import { startIdentityProviderFlow } from "@/lib/zitadel";
+import { redirect } from "next/navigation";
 
 export type StartIDPFlowCommand = {
   idpId: string;
@@ -15,5 +16,13 @@ export async function startIDPFlow(command: StartIDPFlowCommand) {
       successUrl: command.successUrl,
       failureUrl: command.failureUrl,
     },
+  }).then((response) => {
+    if (
+      response &&
+      response.nextStep.case === "authUrl" &&
+      response?.nextStep.value
+    ) {
+      return redirect(response.nextStep.value);
+    }
   });
 }
