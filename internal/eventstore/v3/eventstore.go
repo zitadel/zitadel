@@ -89,15 +89,15 @@ func checkExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 }
 
 func (es *Eventstore) pushTx(ctx context.Context, client database.ContextQueryExecuter) (tx database.Tx, deferrable func(err error) error, err error) {
-	var beginner database.Beginner
-	switch c := client.(type) {
-	case database.Tx:
-		return c, nil, nil
-	case database.Client:
-		beginner = c
-	default:
+	tx, ok := client.(database.Tx)
+	if ok {
+		return tx, nil, nil
+	}
+	beginner, ok := client.(database.Beginner)
+	if !ok {
 		beginner = es.client
 	}
+
 	isolationLevel := sql.LevelReadCommitted
 	// cockroach requires serializable to execute the push function
 	// because we use [cluster_logical_timestamp()](https://www.cockroachlabs.com/docs/stable/functions-and-operators#system-info-functions)

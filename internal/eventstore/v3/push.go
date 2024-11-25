@@ -24,7 +24,7 @@ func (es *Eventstore) Push(ctx context.Context, client database.ContextQueryExec
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	events, err = es.writeCommands(ctx, commands)
+	events, err = es.writeCommands(ctx, client, commands)
 	if isSetupNotExecutedError(err) {
 		return es.pushWithoutFunc(ctx, client, commands...)
 	}
@@ -32,17 +32,26 @@ func (es *Eventstore) Push(ctx context.Context, client database.ContextQueryExec
 	return events, err
 }
 
-func (es *Eventstore) writeCommands(ctx context.Context, commands []eventstore.Command) (_ []eventstore.Event, err error) {
-	conn, err := es.client.Conn(ctx)
+func (es *Eventstore) writeCommands(ctx context.Context, client database.ContextQueryExecuter, commands []eventstore.Command) (_ []eventstore.Event, err error) {
+	var conn *sql.Conn
+	switch c := client.(type) {
+	case database.Client:
+		conn, err = c.Conn(ctx)
+	case nil:
+		conn, err = es.client.Conn(ctx)
+		client = conn
+	}
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
-	if err = checkExecutionPlan(ctx, conn); err != nil {
-		return nil, err
+	if conn != nil {
+		defer conn.Close()
+		if err = checkExecutionPlan(ctx, conn); err != nil {
+			return nil, err
+		}
 	}
 
-	tx, close, err := es.pushTx(ctx, conn)
+	tx, close, err := es.pushTx(ctx, client)
 	if err != nil {
 		return nil, err
 	}

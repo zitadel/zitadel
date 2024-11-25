@@ -28,11 +28,11 @@ type ContextQueryExecuter interface {
 type Client interface {
 	ContextQueryExecuter
 	Beginner
+	Conn(ctx context.Context) (*sql.Conn, error)
 }
 
 type Beginner interface {
 	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
-	Begin() (*sql.Tx, error)
 }
 
 type Tx interface {
