@@ -56,8 +56,10 @@ export const orgService = createOrganizationServiceClient(transport);
 export const settingsService = createSettingsServiceClient(transport);
 
 export async function getBrandingSettings(organization?: string) {
-  "use cache";
-  cacheLife("hours");
+  if (process.env.DEBUG !== "true") {
+    ("use cache");
+    cacheLife("hours");
+  }
 
   return settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
@@ -65,8 +67,10 @@ export async function getBrandingSettings(organization?: string) {
 }
 
 export async function getLoginSettings(orgId?: string) {
-  "use cache";
-  cacheLife("hours");
+  if (process.env.DEBUG !== "true") {
+    ("use cache");
+    cacheLife("hours");
+  }
 
   return await settingsService
     .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
@@ -100,8 +104,10 @@ export async function registerTOTP(userId: string) {
 }
 
 export async function getGeneralSettings() {
-  "use cache";
-  cacheLife("hours");
+  if (process.env.DEBUG !== "true") {
+    ("use cache");
+    cacheLife("hours");
+  }
 
   return settingsService
     .getGeneralSettings({}, {})
@@ -109,8 +115,10 @@ export async function getGeneralSettings() {
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
-  "use cache";
-  cacheLife("hours");
+  if (process.env.DEBUG !== "true") {
+    ("use cache");
+    cacheLife("hours");
+  }
 
   return settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
@@ -118,8 +126,10 @@ export async function getLegalAndSupportSettings(organization?: string) {
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
-  "use cache";
-  cacheLife("hours");
+  if (process.env.DEBUG !== "true") {
+    ("use cache");
+    cacheLife("hours");
+  }
 
   return settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
