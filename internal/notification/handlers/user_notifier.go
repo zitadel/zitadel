@@ -78,11 +78,6 @@ func init() {
 			return commands.InviteCodeSent(ctx, orgID, id)
 		},
 	)
-	RegisterSentHandler(user.HumanPhoneCodeAddedType,
-		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
-			return commands.HumanPhoneVerificationCodeSent(ctx, orgID, id, generatorInfo)
-		},
-	)
 }
 
 const (
