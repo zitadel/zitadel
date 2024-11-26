@@ -6,7 +6,7 @@ import {
   IdentityProvider,
   IdentityProviderType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { Alert } from "./alert";
 import { SignInWithApple } from "./idps/sign-in-with-apple";
@@ -63,7 +63,7 @@ export function SignInWithIdp({
       });
 
     if (response && "redirect" in response && response?.redirect) {
-      redirect(response.redirect);
+      return router.push(response.redirect);
     }
   }
 

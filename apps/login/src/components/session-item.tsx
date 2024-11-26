@@ -6,7 +6,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
 
@@ -57,6 +57,8 @@ export function SessionItem({
 
   const [error, setError] = useState<string | null>(null);
 
+  const router = useRouter();
+
   return (
     <button
       onClick={async () => {
@@ -81,7 +83,7 @@ export function SessionItem({
             });
 
           if (res?.redirect) {
-            redirect(res.redirect);
+            return router.push(res.redirect);
           }
 
           if (res?.error) {

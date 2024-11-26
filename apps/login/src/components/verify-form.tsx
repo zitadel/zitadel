@@ -3,7 +3,7 @@
 import { Alert } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/email";
 import { useTranslations } from "next-intl";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariants } from "./button";
@@ -23,6 +23,8 @@ type Props = {
 
 export function VerifyForm({ userId, code, isInvite, params }: Props) {
   const t = useTranslations("verify");
+
+  const router = useRouter();
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -79,7 +81,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
       }
 
       if (response?.redirect) {
-        redirect(response?.redirect);
+        return router.push(response?.redirect);
       }
     },
     [isInvite, userId],

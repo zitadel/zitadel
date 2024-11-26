@@ -1,7 +1,7 @@
 "use client";
 
 import { createNewSessionForIdp } from "@/lib/server/session";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Alert } from "./alert";
 import { Spinner } from "./spinner";
@@ -42,7 +42,7 @@ export function IdpSignin({
         }
 
         if (response && "redirect" in response && response?.redirect) {
-          redirect(response.redirect);
+          return router.push(response.redirect);
         }
       })
       .catch(() => {
