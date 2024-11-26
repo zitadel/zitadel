@@ -68,6 +68,7 @@ export function SetRegisterPasswordForm({
     })
       .catch(() => {
         setError("Could not register user");
+        return;
       })
       .finally(() => {
         setLoading(false);

@@ -10,7 +10,6 @@ import {
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { redirect } from "next/navigation";
 import { createSessionAndUpdateCookie } from "./cookie";
 
 type VerifyUserByEmailCommand = {
@@ -74,7 +73,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     if (session.factors?.user?.loginName) {
       params.set("loginName", session.factors?.user?.loginName);
     }
-    return redirect(`/authenticator/set?${params}`);
+    return { redirect: `/authenticator/set?${params}` };
   }
 }
 
@@ -134,6 +133,6 @@ export async function sendVerificationRedirectWithoutCheck(command: {
     if (session.factors?.user?.loginName) {
       params.set("loginName", session.factors?.user?.loginName);
     }
-    return redirect(`/authenticator/set?${params}`);
+    return { redirect: `/authenticator/set?${params}` };
   }
 }

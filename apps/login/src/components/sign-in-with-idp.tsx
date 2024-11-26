@@ -56,6 +56,7 @@ export function SignInWithIdp({
     })
       .catch(() => {
         setError("Could not start IDP flow");
+        return;
       })
       .finally(() => {
         setLoading(false);

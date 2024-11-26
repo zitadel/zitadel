@@ -64,6 +64,7 @@ export function ChangePasswordForm({
     })
       .catch(() => {
         setError("Could not change password");
+        return;
       })
       .finally(() => {
         setLoading(false);

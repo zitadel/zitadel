@@ -67,6 +67,7 @@ export function LoginPasskey({
           return submitLoginAndContinue(pK)
             .catch((error) => {
               setError(error);
+              return;
             })
             .finally(() => {
               setLoading(false);
@@ -74,6 +75,7 @@ export function LoginPasskey({
         })
         .catch((error) => {
           setError(error);
+          return;
         })
         .finally(() => {
           setLoading(false);
@@ -102,6 +104,7 @@ export function LoginPasskey({
     })
       .catch(() => {
         setError("Could not request passkey challenge");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -123,6 +126,7 @@ export function LoginPasskey({
     })
       .catch(() => {
         setError("Could not verify passkey");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -151,7 +155,6 @@ export function LoginPasskey({
       })
       .then((assertedCredential: any) => {
         if (!assertedCredential) {
-          setLoading(false);
           setError("An error on retrieving passkey");
           return;
         }
@@ -204,6 +207,9 @@ export function LoginPasskey({
             router.push(url);
           }
         });
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }
 
@@ -275,6 +281,7 @@ export function LoginPasskey({
             return submitLoginAndContinue(pK)
               .catch((error) => {
                 setError(error);
+                return;
               })
               .finally(() => {
                 setLoading(false);

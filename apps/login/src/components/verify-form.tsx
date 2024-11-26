@@ -3,6 +3,7 @@
 import { Alert } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/email";
 import { useTranslations } from "next-intl";
+import { redirect } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariants } from "./button";
@@ -59,7 +60,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
     ): Promise<boolean | void> {
       setLoading(true);
 
-      await sendVerification({
+      const response = await sendVerification({
         code: value.code,
         userId,
         isInvite: isInvite,
@@ -71,6 +72,15 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
         .finally(() => {
           setLoading(false);
         });
+
+      if (response?.error) {
+        setError(response.error);
+        return;
+      }
+
+      if (response?.redirect) {
+        redirect(response?.redirect);
+      }
     },
     [isInvite, userId],
   );

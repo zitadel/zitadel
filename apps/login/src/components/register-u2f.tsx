@@ -54,6 +54,7 @@ export function RegisterU2f({
     })
       .catch(() => {
         setError("An error on verifying passkey occurred");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -61,6 +62,7 @@ export function RegisterU2f({
 
     if (response && "error" in response && response?.error) {
       setError(response?.error);
+      return;
     }
 
     return response;
@@ -74,6 +76,7 @@ export function RegisterU2f({
     })
       .catch(() => {
         setError("An error on registering passkey");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -81,6 +84,7 @@ export function RegisterU2f({
 
     if (response && "error" in response && response?.error) {
       setError(response?.error);
+      return;
     }
 
     if (!response || !("u2fId" in response)) {

@@ -44,6 +44,7 @@ export function SessionItem({
     })
       .catch((error) => {
         setError(error.message);
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -73,6 +74,7 @@ export function SessionItem({
           })
             .catch(() => {
               setError("An internal error occurred");
+              return;
             })
             .finally(() => {
               setLoading(false);
@@ -84,6 +86,7 @@ export function SessionItem({
 
           if (res?.error) {
             setError(res.error);
+            return;
           }
         }
       }}

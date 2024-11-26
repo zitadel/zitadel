@@ -98,6 +98,7 @@ export function TotpRegister({
       })
       .catch((e) => {
         setError(e.message);
+        return;
       })
       .finally(() => {
         setLoading(false);

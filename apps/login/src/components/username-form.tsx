@@ -55,6 +55,7 @@ export function UsernameForm({
     })
       .catch(() => {
         setError("An internal error occurred");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -66,6 +67,7 @@ export function UsernameForm({
 
     if (res?.error) {
       setError(res.error);
+      return;
     }
 
     return res;

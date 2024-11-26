@@ -63,6 +63,7 @@ export function LoginOTP({
       updateSessionForOTPChallenge()
         .catch((error) => {
           setError(error);
+          return;
         })
         .finally(() => {
           setLoading(false);
@@ -95,6 +96,7 @@ export function LoginOTP({
     })
       .catch((error) => {
         setError(error.message ?? "Could not request OTP challenge");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -202,6 +204,7 @@ export function LoginOTP({
                 updateSessionForOTPChallenge()
                   .catch((error) => {
                     setError(error);
+                    return;
                   })
                   .finally(() => {
                     setLoading(false);
