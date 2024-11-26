@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	notificationEventPrefix = "notification.test3." //TODO: !
+	notificationEventPrefix = "notification."
 	RequestedType           = notificationEventPrefix + "requested"
 	RetryRequestedType      = notificationEventPrefix + "retry.requested"
 	SentType                = notificationEventPrefix + "sent"
