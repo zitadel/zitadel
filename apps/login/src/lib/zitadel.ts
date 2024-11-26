@@ -54,7 +54,9 @@ export const idpService = createIdpServiceClient(transport);
 export const orgService = createOrganizationServiceClient(transport);
 export const settingsService = createSettingsServiceClient(transport);
 
-async function cacheWrapper(callback: Promise<unknown>) {
+const useCache = process.env.DEBUG !== "true";
+
+async function cacheWrapper<T>(callback: Promise<T>) {
   "use cache";
   cacheLife("hours");
 
@@ -62,8 +64,6 @@ async function cacheWrapper(callback: Promise<unknown>) {
 }
 
 export async function getBrandingSettings(organization?: string) {
-  const useCache = process.env.DEBUG !== "true";
-
   const callback = settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -72,8 +72,6 @@ export async function getBrandingSettings(organization?: string) {
 }
 
 export async function getLoginSettings(orgId?: string) {
-  const useCache = process.env.DEBUG !== "true";
-
   const callback = settingsService
     .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -108,8 +106,6 @@ export async function registerTOTP(userId: string) {
 }
 
 export async function getGeneralSettings() {
-  const useCache = process.env.DEBUG !== "true";
-
   const callback = settingsService
     .getGeneralSettings({}, {})
     .then((resp) => resp.supportedLanguages);
@@ -118,8 +114,6 @@ export async function getGeneralSettings() {
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
-  const useCache = process.env.DEBUG !== "true";
-
   const callback = settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -128,8 +122,6 @@ export async function getLegalAndSupportSettings(organization?: string) {
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
-  const useCache = process.env.DEBUG !== "true";
-
   const callback = settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
     .then((resp) => (resp.settings ? resp.settings : undefined));

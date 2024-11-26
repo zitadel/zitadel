@@ -1,5 +1,6 @@
 import "@/styles/globals.scss";
 
+import { Alert, AlertType } from "@/components/alert";
 import { LanguageProvider } from "@/components/language-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Theme } from "@/components/theme";
@@ -23,7 +24,13 @@ export default async function RootLayout({
       <head />
       <body>
         <ThemeProvider>
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense
+            fallback={
+              <div className="flex flex-row items-center justify-center py-4">
+                <Alert type={AlertType.INFO}>Loading...</Alert>
+              </div>
+            }
+          >
             <LanguageProvider>
               <div
                 className={`relative min-h-screen bg-background-light-600 dark:bg-background-dark-600 flex flex-col justify-center`}
