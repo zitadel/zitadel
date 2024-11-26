@@ -450,7 +450,7 @@ func (w *NotificationWorker) createSavepoint(ctx context.Context, tx *sql.Tx, ev
 }
 
 func (w *NotificationWorker) rollbackToSavepoint(ctx context.Context, tx *sql.Tx, event eventstore.Event, workerID int, retry bool) {
-	_, err := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT notification_sent")
+	_, err := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT notification_send")
 	w.log(workerID, retry).OnError(err).
 		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
 		WithField("notificationID", event.Aggregate().ID).
