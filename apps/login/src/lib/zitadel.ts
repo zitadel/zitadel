@@ -52,31 +52,33 @@ export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
 export const idpService = createIdpServiceClient(transport);
 export const orgService = createOrganizationServiceClient(transport);
-
 export const settingsService = createSettingsServiceClient(transport);
 
-export async function getBrandingSettings(organization?: string) {
-  if (process.env.DEBUG !== "true") {
-    // @ts-ignore
-    `${"use cache"}`;
-    cacheLife("hours");
-  }
+async function cacheWrapper(callback: Promise<unknown>) {
+  "use cache";
+  cacheLife("hours");
 
-  return settingsService
+  return callback;
+}
+
+export async function getBrandingSettings(organization?: string) {
+  const useCache = process.env.DEBUG !== "true";
+
+  const callback = settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLoginSettings(orgId?: string) {
-  if (process.env.DEBUG !== "true") {
-    // @ts-ignore
-    `${"use cache"}`;
-    cacheLife("hours");
-  }
+  const useCache = process.env.DEBUG !== "true";
 
-  return await settingsService
+  const callback = settingsService
     .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function listIDPLinks(userId: string) {
@@ -106,39 +108,33 @@ export async function registerTOTP(userId: string) {
 }
 
 export async function getGeneralSettings() {
-  if (process.env.DEBUG !== "true") {
-    // @ts-ignore
-    `${"use cache"}`;
-    cacheLife("hours");
-  }
+  const useCache = process.env.DEBUG !== "true";
 
-  return settingsService
+  const callback = settingsService
     .getGeneralSettings({}, {})
     .then((resp) => resp.supportedLanguages);
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
-  if (process.env.DEBUG !== "true") {
-    // @ts-ignore
-    `${"use cache"}`;
-    cacheLife("hours");
-  }
+  const useCache = process.env.DEBUG !== "true";
 
-  return settingsService
+  const callback = settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
-  if (process.env.DEBUG !== "true") {
-    // @ts-ignore
-    `${"use cache"}`;
-    cacheLife("hours");
-  }
+  const useCache = process.env.DEBUG !== "true";
 
-  return settingsService
+  const callback = settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
     .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function createSessionFromChecks(
