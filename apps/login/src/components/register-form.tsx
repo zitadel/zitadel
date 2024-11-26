@@ -50,7 +50,6 @@ export function RegisterForm({
   loginSettings,
 }: Props) {
   const t = useTranslations("register");
-  console.log(loginSettings);
 
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",

@@ -41,7 +41,6 @@ export default async function Page(props: {
         <div className="flex flex-col items-center space-y-4">
           <h1>{t("disabled.title")}</h1>
           <p className="ztdl-p">{t("disabled.description")}</p>
-          {JSON.stringify(loginSettings)}
         </div>
       </DynamicTheme>
     );
