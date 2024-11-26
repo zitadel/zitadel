@@ -472,7 +472,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create/Import User (Human)";
-            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 AddHumanUser"
+            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [AddHumanUser](apis/resources/user_service_v2/user-service-add-human-user.api.mdx)"
             tags: "Users";
             tags: "User Human"
             deprecated: true;

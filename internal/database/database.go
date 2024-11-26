@@ -18,6 +18,42 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+type QueryExecuter interface {
+	Query(query string, args ...any) (*sql.Rows, error)
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	Exec(query string, args ...any) (sql.Result, error)
+	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+}
+
+type Client interface {
+	QueryExecuter
+	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+	Begin() (*sql.Tx, error)
+}
+
+type Tx interface {
+	QueryExecuter
+	Commit() error
+	Rollback() error
+}
+
+var (
+	_ Client = (*sql.DB)(nil)
+	_ Tx     = (*sql.Tx)(nil)
+)
+
+func CloseTransaction(tx Tx, err error) error {
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		logging.OnError(rollbackErr).Error("failed to rollback transaction")
+		return err
+	}
+
+	commitErr := tx.Commit()
+	logging.OnError(commitErr).Error("failed to commit transaction")
+	return commitErr
+}
+
 type Config struct {
 	Dialects                   map[string]interface{} `mapstructure:",remain"`
 	EventPushConnRatio         float64
