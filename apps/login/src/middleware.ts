@@ -23,7 +23,7 @@ export function middleware(request: NextRequest) {
   // this is a workaround for the next.js server not forwarding the host header
   requestHeaders.set(
     "x-zitadel-instance-host",
-    `${INSTANCE}`.replace("https://", ""),
+    `${INSTANCE}`.replace(/^https?:\/\//, ""),
   );
 
   const responseHeaders = new Headers();
