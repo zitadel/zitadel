@@ -57,7 +57,8 @@ export const settingsService = createSettingsServiceClient(transport);
 
 export async function getBrandingSettings(organization?: string) {
   if (process.env.DEBUG !== "true") {
-    ("use cache");
+    // @ts-ignore
+    `${"use cache"}`;
     cacheLife("hours");
   }
 
@@ -68,7 +69,8 @@ export async function getBrandingSettings(organization?: string) {
 
 export async function getLoginSettings(orgId?: string) {
   if (process.env.DEBUG !== "true") {
-    ("use cache");
+    // @ts-ignore
+    `${"use cache"}`;
     cacheLife("hours");
   }
 
@@ -105,7 +107,8 @@ export async function registerTOTP(userId: string) {
 
 export async function getGeneralSettings() {
   if (process.env.DEBUG !== "true") {
-    ("use cache");
+    // @ts-ignore
+    `${"use cache"}`;
     cacheLife("hours");
   }
 
@@ -116,7 +119,8 @@ export async function getGeneralSettings() {
 
 export async function getLegalAndSupportSettings(organization?: string) {
   if (process.env.DEBUG !== "true") {
-    ("use cache");
+    // @ts-ignore
+    `${"use cache"}`;
     cacheLife("hours");
   }
 
@@ -127,7 +131,8 @@ export async function getLegalAndSupportSettings(organization?: string) {
 
 export async function getPasswordComplexitySettings(organization?: string) {
   if (process.env.DEBUG !== "true") {
-    ("use cache");
+    // @ts-ignore
+    `${"use cache"}`;
     cacheLife("hours");
   }
 
