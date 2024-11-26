@@ -77,7 +77,7 @@ jobs:
       go_version: "1.22"
       node_version: "18"
       buf_version: "latest"
-      go_lint_version: "v1.55.2"
+      go_lint_version: "v1.62.2"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
 
