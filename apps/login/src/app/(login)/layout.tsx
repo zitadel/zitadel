@@ -1,8 +1,8 @@
 import "@/styles/globals.scss";
 
-import { Alert, AlertType } from "@/components/alert";
 import { LanguageProvider } from "@/components/language-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { Skeleton } from "@/components/skeleton";
 import { Theme } from "@/components/theme";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from "@vercel/analytics/react";
@@ -26,8 +26,17 @@ export default async function RootLayout({
         <ThemeProvider>
           <Suspense
             fallback={
-              <div className="flex flex-row items-center justify-center py-4">
-                <Alert type={AlertType.INFO}>Loading...</Alert>
+              <div
+                className={`relative min-h-screen bg-background-light-600 dark:bg-background-dark-600 flex flex-col justify-center`}
+              >
+                <div className="relative mx-auto max-w-[440px] py-8 w-full">
+                  <Skeleton>
+                    <div className="h-40"></div>
+                  </Skeleton>
+                  <div className="flex flex-row justify-end py-4 items-center space-x-4">
+                    <Theme />
+                  </div>
+                </div>
               </div>
             }
           >
@@ -43,11 +52,10 @@ export default async function RootLayout({
                   </div>
                 </div>
               </div>
-
-              <Analytics />
             </LanguageProvider>
           </Suspense>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
