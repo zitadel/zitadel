@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -217,7 +216,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 		origin := http_util.DomainContext(ctx).Origin()
 		return u.commands.RequestNotification(
 			ctx,
-			authz.GetInstance(ctx).InstanceID(),
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -263,7 +262,8 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		if urlTmpl == "" {
 			urlTmpl = login.MailVerificationLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -308,7 +308,8 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if urlTmpl == "" {
 			urlTmpl = login.InitPasswordLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -345,7 +346,8 @@ func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.S
 		if err != nil {
 			return err
 		}
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -391,7 +393,8 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 			return err
 		}
 
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			s.UserFactor.ResourceOwner,
 			command.NewNotificationRequest(
 				s.UserFactor.UserID,
 				s.UserFactor.ResourceOwner,
@@ -434,7 +437,8 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 		if e.AuthRequestInfo != nil {
 			authRequestID = e.AuthRequestInfo.ID
 		}
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -484,7 +488,8 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if e.URLTmpl != "" {
 			urlTmpl = e.URLTmpl
 		}
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			s.UserFactor.ResourceOwner,
 			command.NewNotificationRequest(
 				s.UserFactor.UserID,
 				s.UserFactor.ResourceOwner,
@@ -530,7 +535,8 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -576,7 +582,8 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		if urlTmpl == "" {
 			urlTmpl = domain.PasswordlessInitCodeLinkTemplate(origin+login.HandlerPrefix+login.EndpointPasswordlessRegistration, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
 		}
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -622,7 +629,8 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		}
 		origin := http_util.DomainContext(ctx).Origin()
 
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -663,7 +671,8 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,
@@ -715,7 +724,8 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 		if urlTmpl == "" {
 			urlTmpl = login.InviteUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 		}
-		return u.commands.RequestNotification(ctx, authz.GetInstance(ctx).InstanceID(),
+		return u.commands.RequestNotification(ctx,
+			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
 				e.Aggregate().ID,
 				e.Aggregate().ResourceOwner,

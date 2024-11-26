@@ -104,7 +104,7 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 
 	// if the notification is too old, we can directly cancel
 	if event.CreatedAt().Add(w.config.MaxTtl).Before(w.now()) {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), nil)
+		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, nil)
 	}
 
 	// Get the notify user first, so if anything fails afterward we have the current state of the user
@@ -127,14 +127,14 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 	}
 	// if retries are disabled, we cancel the notification
 	if w.config.MaxAttempts <= 1 {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 	// otherwise we retry after a backoff delay
 	return w.commands.NotificationRetryRequested(
 		ctx,
 		tx,
 		event.Aggregate().ID,
-		authz.GetInstance(ctx).InstanceID(),
+		event.Aggregate().ResourceOwner,
 		notificationEventToRequest(event.Request, notifyUser, w.backOff(0)),
 		err,
 	)
@@ -145,7 +145,7 @@ func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sq
 
 	// if the notification is too old, we can directly cancel
 	if event.CreatedAt().Add(w.config.MaxTtl).Before(w.now()) {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 
 	if event.CreatedAt().Add(event.BackOff).After(w.now()) {
@@ -157,10 +157,10 @@ func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sq
 	}
 	// if the max attempts are reached, we cancel the notification
 	if event.Sequence() >= uint64(w.config.MaxAttempts) {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 	// otherwise we retry after a backoff delay
-	return w.commands.NotificationRetryRequested(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), notificationEventToRequest(
+	return w.commands.NotificationRetryRequested(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, notificationEventToRequest(
 		event.Request,
 		event.NotifyUser,
 		w.backOff(event.BackOff),
@@ -170,7 +170,7 @@ func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sq
 func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, request notification.Request, notifyUser *query.NotifyUser, e eventstore.Event) error {
 	ctx, err := enrichCtx(ctx, request.TriggeredAtOrigin)
 	if err != nil {
-		err := w.commands.NotificationCanceled(ctx, tx, e.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+		err := w.commands.NotificationCanceled(ctx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner, err)
 		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
 			OnError(err).Error("could not cancel notification")
 		return nil
@@ -179,7 +179,7 @@ func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, r
 	// check early that a "sent" handler exists, otherwise we can cancel early
 	sender, ok := sentHandlers[request.EventType]
 	if !ok {
-		err := w.commands.NotificationCanceled(ctx, tx, e.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
+		err := w.commands.NotificationCanceled(ctx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner, err)
 		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
 			OnError(err).Errorf(`no "sent" handler registered for %s`, request.EventType)
 		return nil
@@ -229,7 +229,7 @@ func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, r
 	if err := notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel); err != nil {
 		return err
 	}
-	err = w.commands.NotificationSent(ctx, tx, e.Aggregate().ID, authz.GetInstance(ctx).InstanceID())
+	err = w.commands.NotificationSent(ctx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
 	if err != nil {
 		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
 			OnError(err).Error("could not set sent notification event")

@@ -67,7 +67,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 			name: "with event trigger",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
 					TriggerOrigin:     eventOrigin,
@@ -118,7 +118,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
 					TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -190,7 +190,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 			name: "with event trigger",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
 					TriggerOrigin:     eventOrigin,
@@ -244,7 +244,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 					}},
 				}, nil)
 
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
 					TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -352,7 +352,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 			name: "with event trigger",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
 					TriggerOrigin:     eventOrigin,
@@ -405,7 +405,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
 					TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -450,7 +450,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 		{
 			name: "external code",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
 					TriggerOrigin:     eventOrigin,
@@ -561,7 +561,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 	}{{
 		name: "with event trigger",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+			commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 				UserID:            userID,
 				UserResourceOwner: orgID,
 				TriggerOrigin:     eventOrigin,
@@ -608,7 +608,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 					IsPrimary: true,
 				}},
 			}, nil)
-			commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+			commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 				UserID:            userID,
 				UserResourceOwner: orgID,
 				TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -677,7 +677,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 			name: "with event trigger",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,
@@ -729,7 +729,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -838,7 +838,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 				queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(&query.NotificationPolicy{
 					PasswordChange: true,
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,
@@ -887,7 +887,7 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:            userID,
 					UserResourceOwner: orgID,
 					TriggerOrigin:     fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -988,7 +988,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,
@@ -1051,7 +1051,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -1135,7 +1135,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,
@@ -1225,7 +1225,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,
@@ -1288,7 +1288,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -1342,7 +1342,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 						ResourceOwner: orgID,
 					},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,
@@ -1450,7 +1450,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 			name: "with event trigger",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,
@@ -1504,7 +1504,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
@@ -1581,7 +1581,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 			name: "url template",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,
@@ -1629,7 +1629,7 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 			name: "application name",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testcode")
-				commands.EXPECT().RequestNotification(gomock.Any(), instanceID, &command.NotificationRequest{
+				commands.EXPECT().RequestNotification(gomock.Any(), orgID, &command.NotificationRequest{
 					UserID:                        userID,
 					UserResourceOwner:             orgID,
 					TriggerOrigin:                 eventOrigin,

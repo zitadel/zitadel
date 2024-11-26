@@ -92,14 +92,14 @@ func (r *NotificationRequest) WithPreviousDomain() *NotificationRequest {
 // RequestNotification writes a new notification.RequestEvent with the notification.Aggregate to the eventstore
 func (c *Commands) RequestNotification(
 	ctx context.Context,
-	instanceID string,
+	resourceOwner string,
 	request *NotificationRequest,
 ) error {
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return err
 	}
-	_, err = c.eventstore.Push(ctx, notification.NewRequestedEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
+	_, err = c.eventstore.Push(ctx, notification.NewRequestedEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate,
 		request.UserID,
 		request.UserResourceOwner,
 		request.AggregateID,
@@ -119,21 +119,21 @@ func (c *Commands) RequestNotification(
 }
 
 // NotificationCanceled writes a new notification.CanceledEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationCanceled(ctx context.Context, tx *sql.Tx, id, instanceID string, err error) error {
-	_, err = c.eventstore.PushWithClient(ctx, tx, notification.NewCanceledEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
+func (c *Commands) NotificationCanceled(ctx context.Context, tx *sql.Tx, id, resourceOwner string, err error) error {
+	_, err = c.eventstore.PushWithClient(ctx, tx, notification.NewCanceledEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate,
 		err))
 	return err
 }
 
 // NotificationSent writes a new notification.SentEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationSent(ctx context.Context, tx *sql.Tx, id, instanceID string) error {
-	_, err := c.eventstore.PushWithClient(ctx, tx, notification.NewSentEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate))
+func (c *Commands) NotificationSent(ctx context.Context, tx *sql.Tx, id, resourceOwner string) error {
+	_, err := c.eventstore.PushWithClient(ctx, tx, notification.NewSentEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate))
 	return err
 }
 
 // NotificationRetryRequested writes a new notification.RetryRequestEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationRetryRequested(ctx context.Context, tx *sql.Tx, id, instanceID string, request *NotificationRetryRequest, err error) error {
-	_, err = c.eventstore.PushWithClient(ctx, tx, notification.NewRetryRequestedEvent(ctx, &notification.NewAggregate(id, instanceID).Aggregate,
+func (c *Commands) NotificationRetryRequested(ctx context.Context, tx *sql.Tx, id, resourceOwner string, request *NotificationRetryRequest, err error) error {
+	_, err = c.eventstore.PushWithClient(ctx, tx, notification.NewRetryRequestedEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate,
 		request.UserID,
 		request.UserResourceOwner,
 		request.AggregateID,
