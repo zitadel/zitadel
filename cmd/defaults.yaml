@@ -449,14 +449,20 @@ Projections:
       RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
 
 Notifications:
-  # The amount of workers processing the notification events.
-  # If set to 0, no notification events will be handled. This can be useful when running in
+  # The amount of workers processing the notification request events.
+  # If set to 0, no notification request events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
   Workers: 1 # ZITADEL_NOTIFIACATIONS_WORKERS
   # The amount of events a single worker will process in a run.
   BulkLimit: 10 # ZITADEL_NOTIFIACATIONS_BULKLIMIT
-  # Time interval between scheduled notifications
+  # Time interval between scheduled notifications for request events
   RequeueEvery: 2s # ZITADEL_NOTIFIACATIONS_REQUEUEEVERY
+  # The amount of workers processing the notification retry events.
+  # If set to 0, no notification retry events will be handled. This can be useful when running in
+  # multi binary / pod setup and allowing only certain executables to process the events.
+  RetryWorkers: 1 # ZITADEL_NOTIFIACATIONS_RETRYWORKERS
+  # Time interval between scheduled notifications for retry events
+  RetryRequeueEvery: 2s # ZITADEL_NOTIFIACATIONS_RETRYREQUEUEEVERY
   # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
   # from HandleActiveInstances duration in the past until the projection's current time
   # If set to 0 (default), every instance is always considered active

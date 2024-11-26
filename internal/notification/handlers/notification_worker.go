@@ -38,9 +38,10 @@ type NotificationWorker struct {
 
 type WorkerConfig struct {
 	Workers               uint8
-	RetryWorkers          uint8
 	BulkLimit             uint16
 	RequeueEvery          time.Duration
+	RetryWorkers          uint8
+	RetryRequeueEvery     time.Duration
 	HandleActiveInstances time.Duration
 	TransactionDuration   time.Duration
 	MaxAttempts           uint8
@@ -286,10 +287,14 @@ func (w *NotificationWorker) schedule(ctx context.Context, workerID int, retry b
 			w.log(workerID, retry).Info("scheduler stopped")
 			return
 		case <-t.C:
-			instances, err := w.queryInstances(ctx)
+			instances, err := w.queryInstances(ctx, retry)
 			w.log(workerID, retry).OnError(err).Error("unable to query instances")
 
 			w.triggerInstances(call.WithTimestamp(ctx), instances, workerID, retry)
+			if retry {
+				t.Reset(w.config.RetryRequeueEvery)
+				continue
+			}
 			t.Reset(w.config.RequeueEvery)
 		}
 	}
@@ -299,7 +304,7 @@ func (w *NotificationWorker) log(workerID int, retry bool) *logging.Entry {
 	return logging.WithFields("notification worker", workerID, "retries", retry)
 }
 
-func (w *NotificationWorker) queryInstances(ctx context.Context) ([]string, error) {
+func (w *NotificationWorker) queryInstances(ctx context.Context, retry bool) ([]string, error) {
 	if w.config.HandleActiveInstances == 0 {
 		return w.existingInstances(ctx)
 	}
@@ -309,7 +314,11 @@ func (w *NotificationWorker) queryInstances(ctx context.Context) ([]string, erro
 		AllowTimeTravel().
 		CreationDateAfter(w.now().Add(-1 * w.config.HandleActiveInstances))
 
-	return w.es.InstanceIDs(ctx, w.config.RequeueEvery, false, query)
+	maxAge := w.config.RequeueEvery
+	if retry {
+		maxAge = w.config.RetryRequeueEvery
+	}
+	return w.es.InstanceIDs(ctx, maxAge, false, query)
 }
 
 func (w *NotificationWorker) existingInstances(ctx context.Context) ([]string, error) {
