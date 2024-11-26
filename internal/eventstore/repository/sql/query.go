@@ -105,6 +105,18 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " OFFSET ?"
 	}
 
+	if q.LockRows {
+		query += " FOR UPDATE"
+		switch q.LockOption {
+		case eventstore.LockOptionWait: // default behavior
+		case eventstore.LockOptionNoWait:
+			query += " NOWAIT"
+		case eventstore.LockOptionSkipLocked:
+			query += " SKIP LOCKED"
+
+		}
+	}
+
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
@@ -269,6 +281,23 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		}
 		clauses += additionalClauses
 		args = append(args, additionalArgs...)
+	}
+
+	excludeAggregateIDs := query.ExcludeAggregateIDs
+	if len(excludeAggregateIDs) > 0 {
+		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position)
+	}
+	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
+	if excludeAggregateIDsClauses != "" {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		if useV1 {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
+		} else {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
+		}
+		args = append(args, excludeAggregateIDsArgs...)
 	}
 
 	if query.AwaitOpenTransactions {
