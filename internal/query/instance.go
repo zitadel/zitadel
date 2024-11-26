@@ -522,9 +522,9 @@ func (i *authzInstance) Keys(index instanceIndex) []string {
 		return []string{i.ID}
 	case instanceIndexByHost:
 		return i.ExternalDomains
-	default:
-		return nil
+	case instanceIndexUnspecified:
 	}
+	return nil
 }
 
 func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
@@ -587,9 +587,10 @@ func (c *Caches) registerInstanceInvalidation() {
 	projection.InstanceTrustedDomainProjection.RegisterCacheInvalidation(invalidate)
 	projection.SecurityPolicyProjection.RegisterCacheInvalidation(invalidate)
 
-	// limits uses own aggregate ID, invalidate using resource owner.
+	// These projections have their own aggregate ID, invalidate using resource owner.
 	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
 	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
+	projection.RestrictionsProjection.RegisterCacheInvalidation(invalidate)
 
 	// System feature update should invalidate all instances, so Truncate the cache.
 	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {

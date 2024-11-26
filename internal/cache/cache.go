@@ -6,8 +6,17 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+)
 
-	"github.com/zitadel/zitadel/internal/database/postgres"
+// Purpose describes which object types are stored by a cache.
+type Purpose int
+
+//go:generate enumer -type Purpose -transform snake -trimprefix Purpose
+const (
+	PurposeUnspecified Purpose = iota
+	PurposeAuthzInstance
+	PurposeMilestones
+	PurposeOrganization
 )
 
 // Cache stores objects with a value of type `V`.
@@ -72,18 +81,19 @@ type Entry[I, K comparable] interface {
 	Keys(index I) (key []K)
 }
 
-type CachesConfig struct {
-	Connectors struct {
-		Memory   MemoryConnectorConfig
-		Postgres PostgresConnectorConfig
-		// Redis redis.Config?
-	}
-	Instance   *CacheConfig
-	Milestones *CacheConfig
-}
+type Connector int
 
-type CacheConfig struct {
-	Connector string
+//go:generate enumer -type Connector -transform snake -trimprefix Connector -linecomment -text
+const (
+	// Empty line comment ensures empty string for unspecified value
+	ConnectorUnspecified Connector = iota //
+	ConnectorMemory
+	ConnectorPostgres
+	ConnectorRedis
+)
+
+type Config struct {
+	Connector Connector
 
 	// Age since an object was added to the cache,
 	// after which the object is considered invalid.
@@ -98,15 +108,4 @@ type CacheConfig struct {
 	// Log allows logging of the specific cache.
 	// By default only errors are logged to stdout.
 	Log *logging.Config
-}
-
-type MemoryConnectorConfig struct {
-	Enabled   bool
-	AutoPrune AutoPruneConfig
-}
-
-type PostgresConnectorConfig struct {
-	Enabled    bool
-	AutoPrune  AutoPruneConfig
-	Connection postgres.Config
 }

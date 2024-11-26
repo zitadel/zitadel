@@ -10,8 +10,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/cache"
-	"github.com/zitadel/zitadel/internal/cache/gomap"
-	"github.com/zitadel/zitadel/internal/cache/noop"
+	"github.com/zitadel/zitadel/internal/cache/connector/gomap"
+	"github.com/zitadel/zitadel/internal/cache/connector/noop"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 )
@@ -183,7 +183,7 @@ func TestCommands_GetMilestonesReached(t *testing.T) {
 			cache := gomap.NewCache[milestoneIndex, string, *MilestonesReached](
 				context.Background(),
 				[]milestoneIndex{milestoneIndexInstanceID},
-				cache.CacheConfig{Connector: "memory"},
+				cache.Config{Connector: cache.ConnectorMemory},
 			)
 			cache.Set(context.Background(), cached)
 

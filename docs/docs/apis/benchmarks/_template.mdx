@@ -1,0 +1,77 @@
+<!--
+query data from output.csv:
+
+Note: you might need to adjust the WHERE clause to only filter the required trends and the current placeholders
+Warning: it's currently only possible to show data of one endpoint
+
+```
+copy (SELECT
+      metric_name
+      , to_timestamp(timestamp::DOUBLE) as timestamp
+      , approx_quantile(metric_value, 0.50) AS p50
+      , approx_quantile(metric_value, 0.95) AS p95
+      , approx_quantile(metric_value, 0.99) AS p99
+  FROM 
+      read_csv('/path/to/k6-output.csv', auto_detect=false, delim=',', quote='"', escape='"', new_line='\n', skip=0, comment='', header=true, columns={'metric_name': 'VARCHAR', 'timestamp': 'BIGINT', 'metric_value': 'DOUBLE', 'check': 'VARCHAR', 'error': 'VARCHAR', 'error_code': 'VARCHAR', 'expected_response': 'BOOLEAN', 'group': 'VARCHAR', 'method': 'VARCHAR', 'name': 'VARCHAR', 'proto': 'VARCHAR', 'scenario': 'VARCHAR', 'service': 'VARCHAR', 'status': 'BIGINT', 'subproto': 'VARCHAR', 'tls_version': 'VARCHAR', 'url': 'VARCHAR', 'extra_tags': 'VARCHAR', 'metadata': 'VARCHAR'})
+  WHERE
+      metric_name LIKE '%_duration'
+  GROUP BY
+      metric_name
+      , timestamp
+  ORDER BY
+      metric_name
+      , timestamp
+  ) to 'output.json' (ARRAY);
+```
+
+-->
+
+## Summary
+
+TODO: describe the outcome of the test?
+
+## Performance test results
+
+| Metric                                | Value |
+|-:-------------------------------------|-:-----|
+| Baseline                              | none  |
+| Purpose                               |       |
+| Test start                            | UTC |
+| Test duration                         | 30min |
+| Executed test                         |       |
+| k6 version                            |       |
+| VUs                                   |       |
+| Client location                       |       |
+| Client machine specification          | vCPU: <br/> memory: Gb |
+| ZITADEL location                      |       |
+| ZITADEL container specification       | vCPU: <br/> Memory: Gb <br/>Container count: |
+| ZITADEL Version                       |       |
+| ZITADEL Configuration                 |       |
+| ZITADEL feature flags                 |       |
+| Database                              | type: crdb / psql<br />version: |
+| Database location                     |       |
+| Database specification                | vCPU: <br/> memory: Gb |
+| ZITADEL metrics during test           |       |
+| Observed errors                       |       |
+| Top 3 most expensive database queries |       |
+| Database metrics during test          |       |
+| k6 Iterations per second              |       |
+| k6 overview                           |       |
+| k6 output                             |       |
+| flowchart outcome                     |       |
+
+
+## Endpoint latencies
+
+import OutputSource from "!!raw-loader!./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+TODO: add summary of k6
+```
+
