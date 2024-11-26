@@ -38,6 +38,7 @@ type NotificationWorker struct {
 
 type WorkerConfig struct {
 	Workers               uint8
+	RetryWorkers          uint8
 	BulkLimit             uint16
 	RequeueEvery          time.Duration
 	HandleActiveInstances time.Duration
@@ -90,7 +91,10 @@ func NewNotificationWorker(
 
 func (w *NotificationWorker) Start(ctx context.Context) {
 	for i := 0; i < int(w.config.Workers); i++ {
-		go w.schedule(ctx, i)
+		go w.schedule(ctx, i, false)
+	}
+	for i := 0; i < int(w.config.RetryWorkers); i++ {
+		go w.schedule(ctx, i, true)
 	}
 }
 
@@ -120,8 +124,8 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 	if err == nil {
 		return nil
 	}
-	// if the max attempts are reached, we cancel the notification
-	if event.Sequence() >= uint64(w.config.MaxAttempts) {
+	// if retries are disabled, we cancel the notification
+	if w.config.MaxAttempts <= 1 {
 		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, authz.GetInstance(ctx).InstanceID(), err)
 	}
 	// otherwise we retry after a backoff delay
@@ -272,26 +276,27 @@ func notificationEventToRequest(e notification.Request, notifyUser *query.Notify
 	}
 }
 
-func (w *NotificationWorker) schedule(ctx context.Context, workerID int) {
+func (w *NotificationWorker) schedule(ctx context.Context, workerID int, retry bool) {
 	t := time.NewTimer(0)
 
 	for {
 		select {
 		case <-ctx.Done():
 			t.Stop()
+			w.log(workerID, retry).Info("scheduler stopped")
 			return
 		case <-t.C:
 			instances, err := w.queryInstances(ctx)
-			w.log(workerID).OnError(err).Debug("unable to query instances")
+			w.log(workerID, retry).OnError(err).Error("unable to query instances")
 
-			w.triggerInstances(call.WithTimestamp(ctx), instances, workerID)
+			w.triggerInstances(call.WithTimestamp(ctx), instances, workerID, retry)
 			t.Reset(w.config.RequeueEvery)
 		}
 	}
 }
 
-func (w *NotificationWorker) log(workerID int) *logging.Entry {
-	return logging.WithFields("notification worker", workerID)
+func (w *NotificationWorker) log(workerID int, retry bool) *logging.Entry {
+	return logging.WithFields("notification worker", workerID, "retries", retry)
 }
 
 func (w *NotificationWorker) queryInstances(ctx context.Context) ([]string, error) {
@@ -316,16 +321,16 @@ func (w *NotificationWorker) existingInstances(ctx context.Context) ([]string, e
 	return ai, nil
 }
 
-func (w *NotificationWorker) triggerInstances(ctx context.Context, instances []string, workerID int) {
+func (w *NotificationWorker) triggerInstances(ctx context.Context, instances []string, workerID int, retry bool) {
 	for _, instance := range instances {
 		instanceCtx := authz.WithInstanceID(ctx, instance)
 
-		err := w.trigger(instanceCtx, workerID)
-		w.log(workerID).WithField("instance", instance).OnError(err).Info("trigger failed")
+		err := w.trigger(instanceCtx, workerID, retry)
+		w.log(workerID, retry).WithField("instance", instance).OnError(err).Info("trigger failed")
 	}
 }
 
-func (w *NotificationWorker) trigger(ctx context.Context, workerID int) (err error) {
+func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bool) (err error) {
 	txCtx := ctx
 	if w.config.TransactionDuration > 0 {
 		var cancel, cancelTx func()
@@ -338,56 +343,48 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int) (err err
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			w.log(workerID).OnError(rollbackErr).Debug("unable to rollback tx")
-			return
-		}
-	}()
+
+	eventType := eventstore.EventType(notification.RequestedType)
+	exclude := []eventstore.EventType{notification.RetryRequestedType, notification.CanceledType, notification.SentType}
+	if retry {
+		eventType = notification.RetryRequestedType
+		exclude = []eventstore.EventType{notification.CanceledType, notification.SentType}
+	}
 
 	// query events and lock them for update (with skip locked)
 	searchQuery := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		LockRowsDuringTx(tx, eventstore.LockOptionSkipLocked).
 		// Messages older than the MaxTTL, we can be ignored.
 		// The first attempt of a retry might still be older than the TTL and needs to be filtered out later on.
-		CreationDateAfter(w.now().Add(-1*w.config.MaxTtl)).
-		Limit(uint64(w.config.BulkLimit)).
+		CreationDateAfter(w.now().Add(-1 * w.config.MaxTtl)).
 		AddQuery().
 		AggregateTypes(notification.AggregateType).
-		EventTypes(notification.RequestedType, notification.RetryRequestedType, notification.CanceledType, notification.SentType).
+		EventTypes(eventType).
+		Builder().
+		ExcludeAggregateIDs().
+		EventTypes(exclude...).
 		Builder()
-
+	if !retry {
+		// in case of retries we need to make sure we get all the events
+		// to find out the most recent of each notification aggregate
+		searchQuery = searchQuery.Limit(uint64(w.config.BulkLimit))
+	}
 	//nolint:staticcheck
 	events, err := w.es.Filter(ctx, searchQuery)
 	if err != nil {
 		return err
 	}
 
-	// TODO: replace as soon as NOT IN is ready
-	for i := len(events) - 1; i > 0; i-- {
-		if len(events)-1 < i {
-			continue
-		}
-		event := events[i]
-		if event != nil && (event.Type() != notification.RequestedType) {
-			events = slices.DeleteFunc(events, func(e eventstore.Event) bool {
-				if e.Aggregate().ID != event.Aggregate().ID {
-					return false
-				}
-				a := e.Sequence() < event.Sequence()
-				return a
-			})
-		}
+	if retry {
+		events = w.latestRetries(events)
 	}
-	// TODO: end
 
 	// If there aren't any events or no unlocked event terminate early and start a new run.
 	if len(events) == 0 {
 		return nil
 	}
 
-	w.log(workerID).
+	w.log(workerID, retry).
 		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
 		WithField("events", len(events)).
 		Info("handling notification events")
@@ -396,28 +393,43 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int) (err err
 		var err error
 		switch e := event.(type) {
 		case *notification.RequestedEvent:
-			w.createSavepoint(ctx, event, workerID)
+			w.createSavepoint(ctx, tx, event, workerID, retry)
 			err = w.reduceNotificationRequested(ctx, tx, e)
 		case *notification.RetryRequestedEvent:
-			w.createSavepoint(ctx, event, workerID)
+			w.createSavepoint(ctx, tx, event, workerID, retry)
 			err = w.reduceNotificationRetry(ctx, tx, e)
 		}
 		if err != nil {
-			w.log(workerID).OnError(err).
+			w.log(workerID, retry).OnError(err).
 				WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
 				WithField("notificationID", event.Aggregate().ID).
 				WithField("sequence", event.Sequence()).
 				WithField("type", event.Type()).
 				Error("could not push notification event")
-			w.rollbackToSavepoint(ctx, event, workerID)
+			w.rollbackToSavepoint(ctx, tx, event, workerID, retry)
 		}
 	}
 	return database.CloseTransaction(tx, nil)
 }
 
-func (w *NotificationWorker) createSavepoint(ctx context.Context, event eventstore.Event, workerID int) {
-	_, err := w.client.ExecContext(ctx, "SAVEPOINT notification_send")
-	w.log(workerID).OnError(err).
+func (w *NotificationWorker) latestRetries(events []eventstore.Event) []eventstore.Event {
+	for i := len(events) - 1; i > 0; i-- {
+		// since we delete during the iteration, we need to make sure we don't panic
+		if len(events) <= i {
+			continue
+		}
+		// delete all the previous retries of the same notification
+		events = slices.DeleteFunc(events, func(e eventstore.Event) bool {
+			return e.Aggregate().ID == events[i].Aggregate().ID &&
+				e.Sequence() < events[i].Sequence()
+		})
+	}
+	return events
+}
+
+func (w *NotificationWorker) createSavepoint(ctx context.Context, tx *sql.Tx, event eventstore.Event, workerID int, retry bool) {
+	_, err := tx.ExecContext(ctx, "SAVEPOINT notification_send")
+	w.log(workerID, retry).OnError(err).
 		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
 		WithField("notificationID", event.Aggregate().ID).
 		WithField("sequence", event.Sequence()).
@@ -425,9 +437,9 @@ func (w *NotificationWorker) createSavepoint(ctx context.Context, event eventsto
 		Error("could not create savepoint for notification event")
 }
 
-func (w *NotificationWorker) rollbackToSavepoint(ctx context.Context, event eventstore.Event, workerID int) {
-	_, err := w.client.ExecContext(ctx, "ROLLBACK TO SAVEPOINT notification_sent")
-	w.log(workerID).OnError(err).
+func (w *NotificationWorker) rollbackToSavepoint(ctx context.Context, tx *sql.Tx, event eventstore.Event, workerID int, retry bool) {
+	_, err := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT notification_sent")
+	w.log(workerID, retry).OnError(err).
 		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
 		WithField("notificationID", event.Aggregate().ID).
 		WithField("sequence", event.Sequence()).
