@@ -7,7 +7,7 @@ import {
   PasskeysType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
@@ -84,9 +84,13 @@ export function RegisterForm({
         setLoading(false);
       });
 
-    if (response && "error" in response) {
+    if (response && "error" in response && response.error) {
       setError(response.error);
       return;
+    }
+
+    if (response && "redirect" in response && response.redirect) {
+      redirect(response.redirect);
     }
 
     return response;

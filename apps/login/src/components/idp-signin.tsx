@@ -1,7 +1,7 @@
 "use client";
 
 import { createNewSessionForIdp } from "@/lib/server/session";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Alert } from "./alert";
 import { Spinner } from "./spinner";
@@ -35,8 +35,18 @@ export function IdpSignin({
       },
       authRequestId,
     })
-      .catch((error) => {
-        setError(error.message);
+      .then((response) => {
+        if (response && "error" in response && response?.error) {
+          setError(response?.error);
+          return;
+        }
+
+        if (response && "redirect" in response && response?.redirect) {
+          redirect(response.redirect);
+        }
+      })
+      .catch(() => {
+        setError("An internal error occurred");
         return;
       })
       .finally(() => {

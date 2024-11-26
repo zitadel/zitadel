@@ -8,7 +8,6 @@ import {
   ChecksJson,
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
 
 type RegisterUserCommand = {
@@ -71,7 +70,7 @@ export async function registerUser(command: RegisterUserCommand) {
       params.append("authRequestId", command.authRequestId);
     }
 
-    return redirect("/passkey/set?" + params);
+    return { redirect: "/passkey/set?" + params };
   } else {
     const loginSettings = await getLoginSettings(
       session.factors.user.organizationId,
@@ -91,6 +90,6 @@ export async function registerUser(command: RegisterUserCommand) {
       loginSettings?.defaultRedirectUri,
     );
 
-    return redirect(url);
+    return { redirect: url };
   }
 }

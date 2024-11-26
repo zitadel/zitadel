@@ -67,7 +67,7 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
   );
 
   if (url) {
-    return redirect(url);
+    return { redirect: url };
   }
 }
 

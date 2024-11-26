@@ -20,7 +20,6 @@ import {
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 
@@ -155,13 +154,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
     const factor = availableSecondFactors[0];
     // if passwordless is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
-      return redirect(`/otp/time-based?` + params);
+      return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.OTP_SMS) {
-      return redirect(`/otp/sms?` + params);
+      return { redirect: `/otp/sms?` + params };
     } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
-      return redirect(`/otp/email?` + params);
+      return { redirect: `/otp/email?` + params };
     } else if (factor === AuthenticationMethodType.U2F) {
-      return redirect(`/u2f?` + params);
+      return { redirect: `/u2f?` + params };
     }
   } else if (availableSecondFactors?.length >= 1) {
     const params = new URLSearchParams({
@@ -179,7 +178,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       );
     }
 
-    return redirect(`/mfa?` + params);
+    return { redirect: `/mfa?` + params };
   } else if (user.state === UserState.INITIAL) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
@@ -196,7 +195,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       );
     }
 
-    return redirect(`/password/change?` + params);
+    return { redirect: `/password/change?` + params };
   } else if (command.forceMfa && !availableSecondFactors.length) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
@@ -216,7 +215,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
 
     // TODO: provide a way to setup passkeys on mfa page?
-    return redirect(`/mfa/set?` + params);
+    return { redirect: `/mfa/set?` + params };
   }
   // TODO: implement passkey setup
 
@@ -255,7 +254,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       loginSettings?.defaultRedirectUri,
     );
 
-    return redirect(nextUrl);
+    return { redirect: nextUrl };
   }
 
   const loginSettings = await getLoginSettings(
@@ -269,7 +268,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     loginSettings?.defaultRedirectUri,
   );
 
-  return redirect(url);
+  return { redirect: url };
 }
 
 export async function changePassword(command: {
