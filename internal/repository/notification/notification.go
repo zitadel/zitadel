@@ -162,14 +162,14 @@ func (e *CanceledEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = *event
 }
 
-func NewCanceledEvent(ctx context.Context, aggregate *eventstore.Aggregate, err error) *CanceledEvent {
+func NewCanceledEvent(ctx context.Context, aggregate *eventstore.Aggregate, errorMessage string) *CanceledEvent {
 	return &CanceledEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			CanceledType,
 		),
-		Error: err.Error(),
+		Error: errorMessage,
 	}
 }
 
@@ -213,7 +213,7 @@ func NewRetryRequestedEvent(
 	args map[string]any,
 	notifyUser *query.NotifyUser,
 	backoff time.Duration,
-	err error,
+	errorMessage string,
 ) *RetryRequestedEvent {
 	return &RetryRequestedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -239,6 +239,6 @@ func NewRetryRequestedEvent(
 		},
 		NotifyUser: notifyUser,
 		BackOff:    backoff,
-		Error:      err.Error(),
+		Error:      errorMessage,
 	}
 }

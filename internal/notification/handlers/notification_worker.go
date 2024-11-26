@@ -352,6 +352,9 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 	if err != nil {
 		return err
 	}
+	defer func() {
+		err = database.CloseTransaction(tx, err)
+	}()
 
 	eventType := eventstore.EventType(notification.RequestedType)
 	exclude := []eventstore.EventType{notification.RetryRequestedType, notification.CanceledType, notification.SentType}
@@ -418,7 +421,7 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 			w.rollbackToSavepoint(ctx, tx, event, workerID, retry)
 		}
 	}
-	return database.CloseTransaction(tx, nil)
+	return nil
 }
 
 func (w *NotificationWorker) latestRetries(events []eventstore.Event) []eventstore.Event {

@@ -119,9 +119,12 @@ func (c *Commands) RequestNotification(
 }
 
 // NotificationCanceled writes a new notification.CanceledEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationCanceled(ctx context.Context, tx *sql.Tx, id, resourceOwner string, err error) error {
-	_, err = c.eventstore.PushWithClient(ctx, tx, notification.NewCanceledEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate,
-		err))
+func (c *Commands) NotificationCanceled(ctx context.Context, tx *sql.Tx, id, resourceOwner string, requestError error) error {
+	var errorMessage string
+	if requestError != nil {
+		errorMessage = requestError.Error()
+	}
+	_, err := c.eventstore.PushWithClient(ctx, tx, notification.NewCanceledEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate, errorMessage))
 	return err
 }
 
@@ -132,8 +135,12 @@ func (c *Commands) NotificationSent(ctx context.Context, tx *sql.Tx, id, resourc
 }
 
 // NotificationRetryRequested writes a new notification.RetryRequestEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationRetryRequested(ctx context.Context, tx *sql.Tx, id, resourceOwner string, request *NotificationRetryRequest, err error) error {
-	_, err = c.eventstore.PushWithClient(ctx, tx, notification.NewRetryRequestedEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate,
+func (c *Commands) NotificationRetryRequested(ctx context.Context, tx *sql.Tx, id, resourceOwner string, request *NotificationRetryRequest, requestError error) error {
+	var errorMessage string
+	if requestError != nil {
+		errorMessage = requestError.Error()
+	}
+	_, err := c.eventstore.PushWithClient(ctx, tx, notification.NewRetryRequestedEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate,
 		request.UserID,
 		request.UserResourceOwner,
 		request.AggregateID,
@@ -150,6 +157,6 @@ func (c *Commands) NotificationRetryRequested(ctx context.Context, tx *sql.Tx, i
 		request.Args,
 		request.NotifyUser,
 		request.BackOff,
-		err))
+		errorMessage))
 	return err
 }
