@@ -2,7 +2,7 @@
 
 import { sendLoginname } from "@/lib/server/loginname";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "./alert";
@@ -59,6 +59,10 @@ export function UsernameForm({
       .finally(() => {
         setLoading(false);
       });
+
+    if (res?.redirect) {
+      redirect(res.redirect);
+    }
 
     if (res?.error) {
       setError(res.error);

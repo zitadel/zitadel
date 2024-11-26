@@ -1,7 +1,7 @@
 "use server";
 
 import { timestampDate, timestampFromMs } from "@zitadel/client";
-import { cookies, type UnsafeUnwrappedCookies } from "next/headers";
+import { cookies } from "next/headers";
 import { LANGUAGE_COOKIE_NAME } from "./i18n";
 
 // TODO: improve this to handle overflow
@@ -20,8 +20,8 @@ export type Cookie = {
 
 type SessionCookie<T> = Cookie & T;
 
-function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
-  const cookiesList = cookies() as unknown as UnsafeUnwrappedCookies;
+async function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
+  const cookiesList = await cookies();
 
   return cookiesList.set({
     name: "sessions",

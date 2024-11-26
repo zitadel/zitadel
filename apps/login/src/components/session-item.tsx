@@ -6,6 +6,7 @@ import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
 
@@ -57,18 +58,33 @@ export function SessionItem({
 
   return (
     <button
-      onClick={() => {
+      onClick={async () => {
         if (valid && session?.factors?.user) {
           return continueWithSession({
             ...session,
             authRequestId: authRequestId,
           });
         } else if (session.factors?.user) {
-          return sendLoginname({
+          setLoading(true);
+          const res = await sendLoginname({
             loginName: session.factors?.user?.loginName,
             organization: session.factors.user.organizationId,
             authRequestId: authRequestId,
-          });
+          })
+            .catch(() => {
+              setError("An internal error occurred");
+            })
+            .finally(() => {
+              setLoading(false);
+            });
+
+          if (res?.redirect) {
+            redirect(res.redirect);
+          }
+
+          if (res?.error) {
+            setError(res.error);
+          }
         }
       }}
       className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
