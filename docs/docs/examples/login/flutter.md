@@ -75,8 +75,8 @@ To install run:
 
 ```bash
 flutter pub add http
-flutter pub add flutter_web_auth_2
-flutter pub add flutter_secure_storage
+flutter pub add oidc
+flutter pub add oidc_default_store
 ```
 
 #### Setup for Android
