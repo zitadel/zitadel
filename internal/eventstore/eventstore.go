@@ -85,6 +85,12 @@ func (es *Eventstore) Health(ctx context.Context) error {
 // Push pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
+	return es.PushWithClient(ctx, nil, cmds...)
+}
+
+// PushWithClient pushes the events in a single transaction using the provided database client
+// an event needs at least an aggregate
+func (es *Eventstore) PushWithClient(ctx context.Context, client database.QueryExecuter, cmds ...Command) ([]Event, error) {
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
@@ -100,12 +106,24 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 	// https://github.com/zitadel/zitadel/issues/7202
 retry:
 	for i := 0; i <= es.maxRetries; i++ {
-		events, err = es.pusher.Push(ctx, cmds...)
-		var pgErr *pgconn.PgError
-		if !errors.As(err, &pgErr) || pgErr.ConstraintName != "events2_pkey" || pgErr.SQLState() != "23505" {
+		events, err = es.pusher.Push(ctx, client, cmds...)
+		// if there is a transaction passed the calling function needs to retry
+		if _, ok := client.(database.Tx); ok {
 			break retry
 		}
-		logging.WithError(err).Info("eventstore push retry")
+		var pgErr *pgconn.PgError
+		if !errors.As(err, &pgErr) {
+			break retry
+		}
+		if pgErr.ConstraintName == "events2_pkey" && pgErr.SQLState() == "23505" {
+			logging.WithError(err).Info("eventstore push retry")
+			continue
+		}
+		if pgErr.SQLState() == "CR000" || pgErr.SQLState() == "40001" {
+			logging.WithError(err).Info("eventstore push retry")
+			continue
+		}
+		break retry
 	}
 	if err != nil {
 		return nil, err
@@ -283,7 +301,9 @@ type Pusher interface {
 	// Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
 	// Push stores the actions
-	Push(ctx context.Context, commands ...Command) (_ []Event, err error)
+	Push(ctx context.Context, client database.QueryExecuter, commands ...Command) (_ []Event, err error)
+	// Client returns the underlying database connection
+	Client() *database.DB
 }
 
 type FillFieldsEvent interface {

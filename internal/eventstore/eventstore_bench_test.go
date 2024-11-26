@@ -69,7 +69,7 @@ func Benchmark_Push_SameAggregate(b *testing.B) {
 				b.StartTimer()
 
 				for n := 0; n < b.N; n++ {
-					_, err := store.Push(ctx, cmds...)
+					_, err := store.Push(ctx, store.Client().DB, cmds...)
 					if err != nil {
 						b.Error(err)
 					}
@@ -149,7 +149,7 @@ func Benchmark_Push_MultipleAggregate_Parallel(b *testing.B) {
 				b.RunParallel(func(p *testing.PB) {
 					for p.Next() {
 						i++
-						_, err := store.Push(ctx, commandCreator(strconv.Itoa(i))...)
+						_, err := store.Push(ctx, store.Client().DB, commandCreator(strconv.Itoa(i))...)
 						if err != nil {
 							b.Error(err)
 						}
