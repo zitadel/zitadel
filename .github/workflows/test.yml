@@ -4,7 +4,7 @@ on:
   pull_request:
   schedule:
     # All 1 minutes
-    - cron: '*/1 * * * *'
+    - cron: '* * * * *'
 
 jobs:
   matrix:
