@@ -1,8 +1,28 @@
 name: Quality
 
-on: pull_request
+on:
+  pull_request:
+  schedule:
+    # All 5 minutes
+    - cron: '*/5 * * * *'
 
 jobs:
+  matrix:
+    # If the workflow is triggered by a schedule event, only the acceptance tests run against QA and Prod.
+    name: Preparte Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.prepare-matrix.outputs.matrix }}
+    steps:
+      - name: Prepare Matrix
+        id: prepare-matrix
+        run: |
+          if [ -z "${{ github.event.schedule }}" ]; then
+            echo "::set-output name=matrix::['test:acceptance:qa', 'test:acceptance:prod']"
+          else
+            echo "::set-output name=matrix::['format --check', 'lint', 'test:unit', 'test:integration', 'test:acceptance']"
+          fi
+
   quality:
     name: Ensure Quality
 
@@ -16,12 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        command:
-          - format --check
-          - lint
-          - test:unit
-          - test:integration
-          - test:acceptance
+        command: ${{fromJson(needs.prepare-matrix.outputs.matrix)}}
 
     steps:
       - name: Checkout Repo
@@ -55,7 +70,7 @@ jobs:
         # We can cache the Playwright binary independently from the pnpm cache, because we install it separately.
         # After pnpm install --frozen-lockfile, we can get the version so we only have to download the binary once per version.
       - run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
-        if: ${{ matrix.command == 'test:acceptance' }}
+        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
 
       - uses: actions/cache@v4.0.2
         name: Setup Playwright binary cache
@@ -65,11 +80,11 @@ jobs:
           key: ${{ runner.os }}-playwright-binary-${{ env.PLAYWRIGHT_VERSION }}
           restore-keys: |
             ${{ runner.os }}-playwright-binary-
-        if: ${{ matrix.command == 'test:acceptance' }}
+        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
 
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
-        if: ${{ matrix.command == 'test:acceptance' && steps.playwright-cache.outputs.cache-hit != 'true' }}
+        if: ${{ startsWith(matrix.command, 'test:acceptance') && steps.playwright-cache.outputs.cache-hit != 'true' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -83,6 +98,14 @@ jobs:
         run: pnpm build
         if: ${{ matrix.command == 'test:acceptance' }}
 
+      - name: Create Production Build
+        run: pnpm build
+        if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
+        env:
+          ZITADEL_API_URL: ${{ secrets.E2E_QA_ZITADEL_API_URL }}
+          ZITADEL_SERVICE_USER_ID: ${{ secrets.E2E_QA_ZITADEL_SERVICE_USER_ID }}
+          ZITADEL_SERVICE_USER_TOKEN: ${{ secrets.E2E_QA_ZITADEL_SERVICE_USER_TOKEN }}
+
       - name: Check
         id: check
-        run: pnpm ${{ matrix.command }}
+        run: pnpm ${{ contains(matrix.command, 'test:acceptance') && 'test:acceptance' || matrix.command }}
