@@ -119,6 +119,19 @@ func ParseMetadata(metadata []byte) (*saml.EntityDescriptor, error) {
 		return enc.NewDecoder().Reader(reader), nil
 	}
 	if err := decoder.Decode(entityDescriptor); err != nil {
+		if err.Error() == "expected element type <EntityDescriptor> but have <EntitiesDescriptor>" {
+			entities := &saml.EntitiesDescriptor{}
+			if err := xml.Unmarshal(metadata, entities); err != nil {
+				return nil, err
+			}
+
+			for i, e := range entities.EntityDescriptors {
+				if len(e.IDPSSODescriptors) > 0 {
+					return &entities.EntityDescriptors[i], nil
+				}
+			}
+			return nil, zerrors.ThrowInternal(nil, "SAML-Ejoi3r2", "no entity found with IDPSSODescriptor")
+		}
 		return nil, err
 	}
 	return entityDescriptor, nil
