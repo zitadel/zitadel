@@ -143,8 +143,6 @@ func refreshTokenVerifier(ctx context.Context, provider rp.RelyingParty, subject
 }
 
 func TestServer_TokenExchange(t *testing.T) {
-	t.Parallel()
-
 	instance := integration.NewInstance(CTX)
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userResp := instance.CreateHumanUser(ctx)
@@ -365,8 +363,6 @@ func TestServer_TokenExchange(t *testing.T) {
 }
 
 func TestServer_TokenExchangeImpersonation(t *testing.T) {
-	t.Parallel()
-
 	instance := integration.NewInstance(CTX)
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userResp := instance.CreateHumanUser(ctx)
@@ -581,8 +577,6 @@ func TestServer_TokenExchangeImpersonation(t *testing.T) {
 // This test tries to call the zitadel API with an impersonated token,
 // which should fail.
 func TestImpersonation_API_Call(t *testing.T) {
-	t.Parallel()
-
 	instance := integration.NewInstance(CTX)
 	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
