@@ -17,8 +17,6 @@ import (
 )
 
 func TestServer_RegisterU2F(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
 
@@ -108,8 +106,6 @@ func TestServer_RegisterU2F(t *testing.T) {
 }
 
 func TestServer_VerifyU2FRegistration(t *testing.T) {
-	t.Parallel()
-
 	ctx, userID, pkr := ctxFromNewUserWithRegisteredU2F(t)
 
 	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
@@ -215,8 +211,6 @@ func ctxFromNewUserWithVerifiedU2F(t *testing.T) (context.Context, string, strin
 }
 
 func TestServer_RemoveU2F(t *testing.T) {
-	t.Parallel()
-
 	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
 	ctxRegistered, userIDRegistered, pkrRegistered := ctxFromNewUserWithRegisteredU2F(t)
 	_, userIDVerified, u2fVerified := ctxFromNewUserWithVerifiedU2F(t)

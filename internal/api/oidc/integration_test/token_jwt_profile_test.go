@@ -21,8 +21,6 @@ import (
 )
 
 func TestServer_JWTProfile(t *testing.T) {
-	t.Parallel()
-
 	user, name, keyData, err := Instance.CreateOIDCJWTProfileClient(CTX)
 	require.NoError(t, err)
 

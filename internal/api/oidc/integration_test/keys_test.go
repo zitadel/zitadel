@@ -24,8 +24,6 @@ import (
 )
 
 func TestServer_Keys(t *testing.T) {
-	t.Parallel()
-
 	instance := integration.NewInstance(CTX)
 	ctxLogin := instance.WithAuthorization(CTX, integration.UserTypeLogin)
 
