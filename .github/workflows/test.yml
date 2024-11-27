@@ -3,8 +3,8 @@ name: Quality
 on:
   pull_request:
   schedule:
-    # All 5 minutes
-    - cron: '*/5 * * * *'
+    # All 1 minutes
+    - cron: '*/1 * * * *'
 
 jobs:
   matrix:
