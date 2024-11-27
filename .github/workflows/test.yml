@@ -46,7 +46,7 @@ jobs:
             echo 'matrix=["format --check", "lint", "test:unit", "test:integration", "test:acceptance"]' >> $GITHUB_OUTPUT
           fi
       - name: Show Matrix
-        run: echo '${{ steps.prepare-matrix.outputs.matrix }}' | jq
+        run: echo '${{ fromJson( steps.prepare-matrix.outputs.matrix ) }}'
 
   quality:
     name: Ensure Quality
