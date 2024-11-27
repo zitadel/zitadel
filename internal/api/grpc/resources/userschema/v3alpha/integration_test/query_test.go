@@ -20,7 +20,6 @@ import (
 )
 
 func TestServer_ListUserSchemas(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -214,7 +213,6 @@ func TestServer_ListUserSchemas(t *testing.T) {
 }
 
 func TestServer_GetUserSchema(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)

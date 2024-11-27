@@ -15,8 +15,6 @@ import (
 )
 
 func TestServer_AddOTPSMS(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
@@ -123,8 +121,6 @@ func TestServer_AddOTPSMS(t *testing.T) {
 }
 
 func TestServer_RemoveOTPSMS(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
@@ -191,8 +187,6 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 }
 
 func TestServer_AddOTPEmail(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
@@ -301,8 +295,6 @@ func TestServer_AddOTPEmail(t *testing.T) {
 }
 
 func TestServer_RemoveOTPEmail(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)

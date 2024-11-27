@@ -19,7 +19,6 @@ import (
 )
 
 func TestServer_SetContactEmail(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -365,7 +364,6 @@ func TestServer_SetContactEmail(t *testing.T) {
 }
 
 func TestServer_VerifyContactEmail(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -555,7 +553,6 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 }
 
 func TestServer_ResendContactEmailCode(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
