@@ -18,17 +18,11 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { create, fromJson, toJson } from "@zitadel/client";
+import { create } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { BrandingSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
-import { LegalAndSupportSettingsSchema } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
-import {
-  IdentityProviderType,
-  LoginSettingsSchema,
-} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { PasswordComplexitySettingsSchema } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
@@ -43,14 +37,10 @@ import {
   User,
   UserState,
 } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { unstable_cache } from "next/cache";
+import { unstable_cacheLife as cacheLife } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
-const CACHE_REVALIDATION_INTERVAL_IN_SECONDS = process.env
-  .CACHE_REVALIDATION_INTERVAL_IN_SECONDS
-  ? Number(process.env.CACHE_REVALIDATION_INTERVAL_IN_SECONDS)
-  : 3600;
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
@@ -62,47 +52,31 @@ export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
 export const idpService = createIdpServiceClient(transport);
 export const orgService = createOrganizationServiceClient(transport);
-
 export const settingsService = createSettingsServiceClient(transport);
 
+const useCache = process.env.DEBUG !== "true";
+
+async function cacheWrapper<T>(callback: Promise<T>) {
+  "use cache";
+  cacheLife("hours");
+
+  return callback;
+}
+
 export async function getBrandingSettings(organization?: string) {
-  return unstable_cache(
-    async () => {
-      return await settingsService
-        .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-        .then((resp) =>
-          resp.settings
-            ? toJson(BrandingSettingsSchema, resp.settings)
-            : undefined,
-        );
-    },
-    ["brandingSettings", organization ?? "default"],
-    {
-      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
-      tags: ["brandingSettings"],
-    },
-  )().then((resp) =>
-    resp ? fromJson(BrandingSettingsSchema, resp) : undefined,
-  );
+  const callback = settingsService
+    .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLoginSettings(orgId?: string) {
-  return unstable_cache(
-    async () => {
-      return await settingsService
-        .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
-        .then((resp) =>
-          resp.settings
-            ? toJson(LoginSettingsSchema, resp.settings)
-            : undefined,
-        );
-    },
-    ["loginSettings", orgId ?? "default"],
-    {
-      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
-      tags: ["loginSettings"],
-    },
-  )().then((resp) => (resp ? fromJson(LoginSettingsSchema, resp) : undefined));
+  const callback = settingsService
+    .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function listIDPLinks(userId: string) {
@@ -132,51 +106,27 @@ export async function registerTOTP(userId: string) {
 }
 
 export async function getGeneralSettings() {
-  return settingsService
+  const callback = settingsService
     .getGeneralSettings({}, {})
     .then((resp) => resp.supportedLanguages);
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
-  return unstable_cache(
-    async () => {
-      return await settingsService
-        .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-        .then((resp) =>
-          resp.settings
-            ? toJson(LegalAndSupportSettingsSchema, resp.settings)
-            : undefined,
-        );
-    },
-    ["legalAndSupportSettings", organization ?? "default"],
-    {
-      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
-      tags: ["legalAndSupportSettings"],
-    },
-  )().then((resp) =>
-    resp ? fromJson(LegalAndSupportSettingsSchema, resp) : undefined,
-  );
+  const callback = settingsService
+    .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
-  return unstable_cache(
-    async () => {
-      return await settingsService
-        .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-        .then((resp) =>
-          resp.settings
-            ? toJson(PasswordComplexitySettingsSchema, resp.settings)
-            : undefined,
-        );
-    },
-    ["complexitySettings", organization ?? "default"],
-    {
-      revalidate: CACHE_REVALIDATION_INTERVAL_IN_SECONDS,
-      tags: ["complexitySettings"],
-    },
-  )().then((resp) =>
-    resp ? fromJson(PasswordComplexitySettingsSchema, resp) : undefined,
-  );
+  const callback = settingsService
+    .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function createSessionFromChecks(

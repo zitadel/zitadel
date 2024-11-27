@@ -122,6 +122,18 @@
     }
   },
   "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Password"
+    },
+    "disabled": {
+      "title": "Registrierung deaktiviert",
+      "description": "Die Registrierung ist deaktiviert. Bitte wenden Sie sich an den Administrator."
+    },
+    "missingdata": {
+      "title": "Registrierung fehlgeschlagen",
+      "description": "Einige Daten fehlen. Bitte überprüfen Sie Ihre Eingaben."
+    },
     "title": "Registrieren",
     "description": "Erstellen Sie Ihr ZITADEL-Konto.",
     "selectMethod": "Wählen Sie die Methode, mit der Sie sich authentifizieren möchten",
@@ -151,7 +163,8 @@
   },
   "signedin": {
     "title": "Willkommen {user}!",
-    "description": "Sie sind angemeldet."
+    "description": "Sie sind angemeldet.",
+    "continue": "Weiter"
   },
   "verify": {
     "userIdMissing": "Keine Benutzer-ID angegeben!",

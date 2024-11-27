@@ -122,6 +122,18 @@
     }
   },
   "register": {
+    "methods": {
+      "passkey": "Clave de acceso",
+      "password": "Contraseña"
+    },
+    "disabled": {
+      "title": "Registro deshabilitado",
+      "description": "Registrarse está deshabilitado en este momento."
+    },
+    "missingdata": {
+      "title": "Datos faltantes",
+      "description": "No se proporcionaron datos suficientes para el registro."
+    },
     "title": "Registrarse",
     "description": "Crea tu cuenta ZITADEL.",
     "selectMethod": "Selecciona el método con el que deseas autenticarte",
@@ -151,7 +163,8 @@
   },
   "signedin": {
     "title": "¡Bienvenido {user}!",
-    "description": "Has iniciado sesión."
+    "description": "Has iniciado sesión.",
+    "continue": "Continuar"
   },
   "verify": {
     "userIdMissing": "¡No se proporcionó userId!",

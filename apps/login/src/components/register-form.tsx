@@ -2,12 +2,17 @@
 
 import { registerUser } from "@/lib/server/register";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import {
+  LoginSettings,
+  PasskeysType,
+} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
 import {
+  AuthenticationMethod,
   AuthenticationMethodRadio,
   methods,
 } from "./authentication-method-radio";
@@ -32,15 +37,17 @@ type Props = {
   email?: string;
   organization?: string;
   authRequestId?: string;
+  loginSettings?: LoginSettings;
 };
 
-export function RegisterFormWithoutPassword({
+export function RegisterForm({
   legal,
   email,
   firstname,
   lastname,
   organization,
   authRequestId,
+  loginSettings,
 }: Props) {
   const t = useTranslations("register");
 
@@ -54,7 +61,7 @@ export function RegisterFormWithoutPassword({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [selected, setSelected] = useState(methods[0]);
+  const [selected, setSelected] = useState<AuthenticationMethod>(methods[0]);
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
@@ -76,9 +83,13 @@ export function RegisterFormWithoutPassword({
         setLoading(false);
       });
 
-    if (response && "error" in response) {
+    if (response && "error" in response && response.error) {
       setError(response.error);
       return;
+    }
+
+    if (response && "redirect" in response && response.redirect) {
+      return router.push(response.redirect);
     }
 
     return response;
@@ -98,8 +109,11 @@ export function RegisterFormWithoutPassword({
       registerParams.authRequestId = authRequestId;
     }
 
+    // redirect user to /register/password if password is chosen
     if (withPassword) {
-      return router.push(`/register?` + new URLSearchParams(registerParams));
+      return router.push(
+        `/register/password?` + new URLSearchParams(registerParams),
+      );
     } else {
       return submitAndRegister(value);
     }
@@ -108,7 +122,6 @@ export function RegisterFormWithoutPassword({
   const { errors } = formState;
 
   const [tosAndPolicyAccepted, setTosAndPolicyAccepted] = useState(false);
-
   return (
     <form className="w-full">
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -146,38 +159,45 @@ export function RegisterFormWithoutPassword({
           />
         </div>
       </div>
-
       {legal && (
         <PrivacyPolicyCheckboxes
           legal={legal}
           onChange={setTosAndPolicyAccepted}
         />
       )}
-
       <p className="mt-4 ztdl-p mb-6 block text-left">{t("selectMethod")}</p>
-
-      <div className="pb-4">
-        <AuthenticationMethodRadio
-          selected={selected}
-          selectionChanged={setSelected}
-        />
-      </div>
+      {/* show chooser if both methods are allowed */}
+      {loginSettings &&
+        loginSettings.allowUsernamePassword &&
+        loginSettings.passkeysType == PasskeysType.ALLOWED && (
+          <div className="pb-4">
+            <AuthenticationMethodRadio
+              selected={selected}
+              selectionChanged={setSelected}
+            />
+          </div>
+        )}
 
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>
         </div>
       )}
-
       <div className="mt-8 flex w-full flex-row items-center justify-between">
         <BackButton data-testid="back-button" />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid || !tosAndPolicyAccepted}
-          onClick={handleSubmit((values) =>
-            submitAndContinue(values, !(selected.name === methods[0].name)),
-          )}
+          onClick={handleSubmit((values) => {
+            const usePasswordToContinue: boolean =
+              loginSettings?.allowUsernamePassword &&
+              loginSettings?.passkeysType == PasskeysType.ALLOWED
+                ? !!!(selected === methods[0]) // choose selection if both available
+                : !!loginSettings?.allowUsernamePassword; // if password is chosen
+            // set password as default if only password is allowed
+            return submitAndContinue(values, usePasswordToContinue);
+          })}
           data-testid="submit-button"
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}

@@ -53,6 +53,7 @@ export function RegisterPasskey({
     })
       .catch(() => {
         setError("Could not verify Passkey");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -68,6 +69,7 @@ export function RegisterPasskey({
     })
       .catch(() => {
         setError("Could not register passkey");
+        return;
       })
       .finally(() => {
         setLoading(false);

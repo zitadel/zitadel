@@ -1,6 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
+import { getNextUrl } from "@/lib/client";
 import { updateSession } from "@/lib/server/session";
 import { create } from "@zitadel/client";
 import {
@@ -8,6 +9,7 @@ import {
   UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -24,6 +26,7 @@ type Props = {
   altPassword: boolean;
   login?: boolean;
   organization?: string;
+  loginSettings?: LoginSettings;
 };
 
 export function LoginPasskey({
@@ -33,6 +36,7 @@ export function LoginPasskey({
   altPassword,
   organization,
   login = true,
+  loginSettings,
 }: Props) {
   const t = useTranslations("passkey");
 
@@ -63,6 +67,7 @@ export function LoginPasskey({
           return submitLoginAndContinue(pK)
             .catch((error) => {
               setError(error);
+              return;
             })
             .finally(() => {
               setLoading(false);
@@ -70,6 +75,7 @@ export function LoginPasskey({
         })
         .catch((error) => {
           setError(error);
+          return;
         })
         .finally(() => {
           setLoading(false);
@@ -98,6 +104,7 @@ export function LoginPasskey({
     })
       .catch(() => {
         setError("Could not request passkey challenge");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -119,6 +126,7 @@ export function LoginPasskey({
     })
       .catch(() => {
         setError("Could not verify passkey");
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -147,7 +155,6 @@ export function LoginPasskey({
       })
       .then((assertedCredential: any) => {
         if (!assertedCredential) {
-          setLoading(false);
           setError("An error on retrieving passkey");
           return;
         }
@@ -175,28 +182,34 @@ export function LoginPasskey({
           },
         };
 
-        return submitLogin(data).then((resp) => {
-          if (authRequestId && resp && resp.sessionId) {
-            return router.push(
-              `/login?` +
-                new URLSearchParams({
-                  sessionId: resp.sessionId,
-                  authRequest: authRequestId,
-                }),
-            );
-          } else {
-            const params = new URLSearchParams({});
+        return submitLogin(data).then(async (resp) => {
+          const url =
+            authRequestId && resp?.sessionId
+              ? await getNextUrl(
+                  {
+                    sessionId: resp.sessionId,
+                    authRequestId: authRequestId,
+                    organization: organization,
+                  },
+                  loginSettings?.defaultRedirectUri,
+                )
+              : resp?.factors?.user?.loginName
+                ? await getNextUrl(
+                    {
+                      loginName: resp.factors.user.loginName,
+                      organization: organization,
+                    },
+                    loginSettings?.defaultRedirectUri,
+                  )
+                : null;
 
-            if (authRequestId) {
-              params.set("authRequestId", authRequestId);
-            }
-            if (resp?.factors?.user?.loginName) {
-              params.set("loginName", resp.factors.user.loginName);
-            }
-
-            return router.push(`/signedin?` + params);
+          if (url) {
+            router.push(url);
           }
         });
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }
 
@@ -268,6 +281,7 @@ export function LoginPasskey({
             return submitLoginAndContinue(pK)
               .catch((error) => {
                 setError(error);
+                return;
               })
               .finally(() => {
                 setLoading(false);
