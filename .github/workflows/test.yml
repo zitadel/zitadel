@@ -113,7 +113,9 @@ jobs:
         if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
 
       - name: DEBUG
-        run: head -c 25 apps/login/.env.local
+        run: |
+          head -c 54 apps/login/.env.local
+          wc -l apps/login/.env.local
         if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
 
       - name: Create Production Build
