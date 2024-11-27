@@ -12,7 +12,8 @@ import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
-export default async function Page({ searchParams }: { searchParams: any }) {
+export default async function Page(props: { searchParams: Promise<any> }) {
+  const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });

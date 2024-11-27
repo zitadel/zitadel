@@ -5,12 +5,12 @@ const passwordConfirmField = "password-confirm-text-input";
 
 export async function registerUserScreenPassword(page: Page, firstname: string, lastname: string, email: string) {
   await registerUserScreen(page, firstname, lastname, email);
-  await page.getByTestId("Password-radio").click();
+  await page.getByTestId("password-radio").click();
 }
 
 export async function registerUserScreenPasskey(page: Page, firstname: string, lastname: string, email: string) {
   await registerUserScreen(page, firstname, lastname, email);
-  await page.getByTestId("Passkeys-radio").click();
+  await page.getByTestId("passkey-radio").click();
 }
 
 export async function registerPasswordScreen(page: Page, password1: string, password2: string) {

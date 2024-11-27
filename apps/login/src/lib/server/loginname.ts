@@ -5,7 +5,6 @@ import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
 import {
@@ -44,7 +43,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (identityProviders.length === 1) {
-      const host = headers().get("host");
+      const host = (await headers()).get("host");
       const identityProviderType = identityProviders[0].type;
 
       const provider = idpTypeToSlug(identityProviderType);
@@ -70,7 +69,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
 
       if (resp?.nextStep.case === "authUrl") {
-        return redirect(resp.nextStep.value);
+        return { redirect: resp.nextStep.value };
       }
     }
   };
@@ -81,7 +80,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (identityProviders.length === 1) {
-      const host = headers().get("host");
+      const host = (await headers()).get("host");
       const identityProviderId = identityProviders[0].idpId;
 
       const idp = await getIDPByID(identityProviderId);
@@ -115,7 +114,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       });
 
       if (resp?.nextStep.case === "authUrl") {
-        return redirect(resp.nextStep.value);
+        return { redirect: resp.nextStep.value };
       }
     }
   };
@@ -154,7 +153,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.append("authRequestid", command.authRequestId);
       }
 
-      return redirect("/password/set?" + params);
+      return { redirect: "/password/set?" + params };
     }
 
     const methods = await listAuthenticationMethodTypes(
@@ -170,6 +169,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         const paramsVerify = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
           userId: session.factors?.user?.id, // verify needs user id
+          invite: "true", // TODO: check - set this to true as we dont expect old email verification method here
         });
 
         if (command.organization || session.factors?.user?.organizationId) {
@@ -183,7 +183,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           paramsVerify.append("authRequestId", command.authRequestId);
         }
 
-        redirect("/verify?" + paramsVerify);
+        return { redirect: "/verify?" + paramsVerify };
       }
 
       const paramsAuthenticatorSetup = new URLSearchParams({
@@ -202,7 +202,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         paramsAuthenticatorSetup.append("authRequestId", command.authRequestId);
       }
 
-      redirect("/authenticator/set?" + paramsAuthenticatorSetup);
+      return { redirect: "/authenticator/set?" + paramsAuthenticatorSetup };
     }
 
     if (methods.authMethodTypes.length == 1) {
@@ -224,7 +224,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             paramsPassword.authRequestId = command.authRequestId;
           }
 
-          return redirect("/password?" + new URLSearchParams(paramsPassword));
+          return {
+            redirect: "/password?" + new URLSearchParams(paramsPassword),
+          };
+
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
           const paramsPasskey: any = { loginName: command.loginName };
           if (command.authRequestId) {
@@ -236,7 +239,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
               command.organization ?? session.factors?.user?.organizationId;
           }
 
-          return redirect("/passkey?" + new URLSearchParams(paramsPasskey));
+          return { redirect: "/passkey?" + new URLSearchParams(paramsPasskey) };
       }
     } else {
       // prefer passkey in favor of other methods
@@ -255,7 +258,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             command.organization ?? session.factors?.user?.organizationId;
         }
 
-        return redirect("/passkey?" + new URLSearchParams(passkeyParams));
+        return { redirect: "/passkey?" + new URLSearchParams(passkeyParams) };
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.IDP)
       ) {
@@ -275,9 +278,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
             command.organization ?? session.factors?.user?.organizationId;
         }
 
-        return redirect(
-          "/password?" + new URLSearchParams(paramsPasswordDefault),
-        );
+        return {
+          redirect: "/password?" + new URLSearchParams(paramsPasswordDefault),
+        };
       }
     }
   }
@@ -325,7 +328,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         params.set("loginName", command.loginName);
       }
 
-      return redirect("/register?" + params);
+      return { redirect: "/register?" + params };
     }
   }
 
@@ -342,7 +345,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       paramsPasswordDefault.append("organization", command.organization);
     }
 
-    return redirect("/password?" + paramsPasswordDefault);
+    return { redirect: "/password?" + paramsPasswordDefault };
   }
 
   // fallbackToPassword

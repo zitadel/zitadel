@@ -1,16 +1,16 @@
 "use client";
 
 import { RadioGroup } from "@headlessui/react";
+import { useTranslations } from "next-intl";
+
+export enum AuthenticationMethod {
+  Passkey = "passkey",
+  Password = "password",
+}
 
 export const methods = [
-  {
-    name: "Passkeys",
-    description: "Authenticate with your device.",
-  },
-  {
-    name: "Password",
-    description: "Authenticate with a password",
-  },
+  AuthenticationMethod.Passkey,
+  AuthenticationMethod.Password,
 ];
 
 export function AuthenticationMethodRadio({
@@ -20,58 +20,68 @@ export function AuthenticationMethodRadio({
   selected: any;
   selectionChanged: (value: any) => void;
 }) {
+  const t = useTranslations("register");
+
   return (
     <div className="w-full">
       <div className="mx-auto w-full max-w-md">
         <RadioGroup value={selected} onChange={selectionChanged}>
           <RadioGroup.Label className="sr-only">Server size</RadioGroup.Label>
-          <div className="grid grid-cols-2 space-x-2">
+          <div className="flex flex-row space-x-4">
             {methods.map((method) => (
               <RadioGroup.Option
-                key={method.name}
+                key={method}
                 value={method}
-                data-testid={method.name + "-radio"}
+                data-testid={method + "-radio"}
                 className={({ active, checked }) =>
                   `${
                     active
-                      ? "h-full ring-2 ring-opacity-60 ring-primary-light-500 dark:ring-white/20"
-                      : "h-full "
+                      ? "ring-2 ring-opacity-60 ring-primary-light-500 dark:ring-white/20"
+                      : ""
                   }
                     ${
                       checked
-                        ? "bg-background-light-400 dark:bg-background-dark-400"
+                        ? "bg-background-light-400 dark:bg-background-dark-400 ring-2 ring-primary-light-500 dark:ring-primary-dark-500"
                         : "bg-background-light-400 dark:bg-background-dark-400"
                     }
-                      relative border boder-divider-light dark:border-divider-dark flex cursor-pointer rounded-lg px-5 py-4 focus:outline-none hover:shadow-lg dark:hover:bg-white/10`
+                     h-full flex-1 relative border boder-divider-light dark:border-divider-dark flex cursor-pointer rounded-lg px-5 py-4 focus:outline-none hover:shadow-lg dark:hover:bg-white/10`
                 }
               >
                 {({ active, checked }) => (
                   <>
-                    <div className="flex w-full items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="text-sm">
-                          <RadioGroup.Label
-                            as="p"
-                            className={`font-medium  ${checked ? "" : ""}`}
-                          >
-                            {method.name}
-                          </RadioGroup.Label>
-                          <RadioGroup.Description
-                            as="span"
-                            className={`text-xs text-opacity-80 dark:text-opacity-80 inline ${
-                              checked ? "" : ""
-                            }`}
-                          >
-                            {method.description}
-                            <span aria-hidden="true">&middot;</span>{" "}
-                          </RadioGroup.Description>
-                        </div>
-                      </div>
-                      {checked && (
-                        <div className="shrink-0 text-white">
-                          <CheckIcon className="h-6 w-6" />
-                        </div>
+                    <div className="flex flex-col items-center w-full text-sm">
+                      {method === "passkey" && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          className="w-8 h-8 mb-3"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33"
+                          />
+                        </svg>
                       )}
+                      {method === "password" && (
+                        <svg
+                          className="w-8 h-8 mb-3 fill-current"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                        >
+                          <title>form-textbox-password</title>
+                          <path d="M17,7H22V17H17V19A1,1 0 0,0 18,20H20V22H17.5C16.95,22 16,21.55 16,21C16,21.55 15.05,22 14.5,22H12V20H14A1,1 0 0,0 15,19V5A1,1 0 0,0 14,4H12V2H14.5C15.05,2 16,2.45 16,3C16,2.45 16.95,2 17.5,2H20V4H18A1,1 0 0,0 17,5V7M2,7H13V9H4V15H13V17H2V7M20,15V9H17V15H20M8.5,12A1.5,1.5 0 0,0 7,10.5A1.5,1.5 0 0,0 5.5,12A1.5,1.5 0 0,0 7,13.5A1.5,1.5 0 0,0 8.5,12M13,10.89C12.39,10.33 11.44,10.38 10.88,11C10.32,11.6 10.37,12.55 11,13.11C11.55,13.63 12.43,13.63 13,13.11V10.89Z" />
+                        </svg>
+                      )}
+                      <RadioGroup.Label
+                        as="p"
+                        className={`font-medium  ${checked ? "" : ""}`}
+                      >
+                        {t(`methods.${method}`)}
+                      </RadioGroup.Label>
                     </div>
                   </>
                 )}
@@ -81,26 +91,5 @@ export function AuthenticationMethodRadio({
         </RadioGroup>
       </div>
     </div>
-  );
-}
-
-function CheckIcon(props: any) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" {...props}>
-      <circle
-        className="fill-current text-black/50 dark:text-white/50"
-        cx={12}
-        cy={12}
-        r={12}
-        opacity="0.2"
-      />
-      <path
-        d="M7 13l3 3 7-7"
-        className="stroke-black dark:stroke-white"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
