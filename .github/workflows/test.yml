@@ -109,7 +109,11 @@ jobs:
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Create Cloud Env File
-        run: echo "${{ matrix.command == 'test:acceptance:prod' && secrets.ENV_FILE_CONTENT_ACCEPTANCE_PROD || secrets.ENV_FILE_CONTENT_ACCEPTANCE_QA }}" >> apps/login/.env.local
+        run: echo "${{ matrix.command == 'test:acceptance:prod' && secrets.ENV_FILE_CONTENT_ACCEPTANCE_PROD || secrets.ENV_FILE_CONTENT_ACCEPTANCE_QA }}" > apps/login/.env.local
+        if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
+
+      - name: DEBUG
+        run: head -c 25 apps/login/.env.local
         if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
 
       - name: Create Production Build
