@@ -26,9 +26,9 @@ on:
         required: false
 
 jobs:
-  matrix:
+  prepare-matrix:
     # If the workflow is triggered by a schedule event, only the acceptance tests run against QA and Prod.
-    name: Preparte Matrix
+    name: Prepare Matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.prepare-matrix.outputs.matrix }}
@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        command: ${{ needs.prepare-matrix.outputs.matrix }}
+        command: ${{ fromJson( needs.prepare-matrix.outputs.matrix ) }}
 
     steps:
       - name: Checkout Repo
