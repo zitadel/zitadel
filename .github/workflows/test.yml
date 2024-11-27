@@ -9,7 +9,12 @@ on:
     inputs:
       zitadel-env:
         description: 'ZITADEL ENVIRONMENT'
-        required: false
+        required: true
+        type: choice
+        options:
+          - 'qa'
+          - 'prod'
+          - 'custom'
       zitadel-api-url:
         description: 'ZITADEL API URL'
         required: false
