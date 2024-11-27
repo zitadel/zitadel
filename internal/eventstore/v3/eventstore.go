@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
@@ -75,6 +76,9 @@ var errTypesNotFound = errors.New("types not found")
 
 func CheckExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 	return conn.Raw(func(driverConn any) error {
+		if _, ok := driverConn.(sqlmock.SqlmockCommon); ok {
+			return nil
+		}
 		conn, ok := driverConn.(*stdlib.Conn)
 		if !ok {
 			return errTypesNotFound
