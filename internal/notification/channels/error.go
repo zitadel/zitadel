@@ -2,24 +2,24 @@ package channels
 
 import "errors"
 
-type ErrCancel struct {
+type CancelError struct {
 	Err error
 }
 
-func (e *ErrCancel) Error() string {
+func (e *CancelError) Error() string {
 	return e.Err.Error()
 }
 
-func NewErrCancel(err error) error {
-	return &ErrCancel{
+func NewCancelError(err error) error {
+	return &CancelError{
 		Err: err,
 	}
 }
 
-func (e *ErrCancel) Is(target error) bool {
+func (e *CancelError) Is(target error) bool {
 	return errors.As(target, &e)
 }
 
-func (e *ErrCancel) Unwrap() error {
+func (e *CancelError) Unwrap() error {
 	return e.Err
 }

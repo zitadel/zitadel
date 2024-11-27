@@ -37,7 +37,7 @@ func InitChannel(config Config) channels.NotificationChannel {
 				// Instead, let the user initiate the verification again (e.g. using "resend code")
 				// https://www.twilio.com/docs/api/errors/60203
 				logging.WithFields("error", twilioErr.Message, "code", twilioErr.Code).Warn("twilio create verification error")
-				return channels.NewErrCancel(twilioErr)
+				return channels.NewCancelError(twilioErr)
 			}
 
 			if err != nil {

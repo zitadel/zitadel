@@ -133,7 +133,7 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 		return nil
 	}
 	// if retries are disabled or if the error explicitly specifies, we cancel the notification
-	if w.config.MaxAttempts <= 1 || errors.Is(err, &channels.ErrCancel{}) {
+	if w.config.MaxAttempts <= 1 || errors.Is(err, &channels.CancelError{}) {
 		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 	// otherwise we retry after a backoff delay
@@ -163,7 +163,7 @@ func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sq
 		return nil
 	}
 	// if the max attempts are reached or if the error explicitly specifies, we cancel the notification
-	if event.Sequence() >= uint64(w.config.MaxAttempts) || errors.Is(err, &channels.ErrCancel{}) {
+	if event.Sequence() >= uint64(w.config.MaxAttempts) || errors.Is(err, &channels.CancelError{}) {
 		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 	// otherwise we retry after a backoff delay
