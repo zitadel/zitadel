@@ -7,7 +7,7 @@ import {
   getSession,
   setSession,
 } from "@/lib/zitadel";
-import { timestampMs } from "@zitadel/client";
+import { Duration, timestampMs } from "@zitadel/client";
 import {
   Challenges,
   RequestChallenges,
@@ -30,6 +30,7 @@ export async function createSessionAndUpdateCookie(
   checks: Checks,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
+  lifetime?: Duration,
 ): Promise<Session> {
   const createdSession = await createSessionFromChecks(checks, challenges);
 
@@ -82,10 +83,12 @@ export async function createSessionForIdpAndUpdateCookie(
     idpIntentToken?: string | undefined;
   },
   authRequestId: string | undefined,
+  lifetime?: Duration,
 ): Promise<Session> {
   const createdSession = await createSessionForUserIdAndIdpIntent(
     userId,
     idpIntent,
+    lifetime,
   );
 
   if (createdSession) {
@@ -140,12 +143,14 @@ export async function setSessionAndUpdateCookie(
   checks?: Checks,
   challenges?: RequestChallenges,
   authRequestId?: string,
+  lifetime?: Duration,
 ) {
   return setSession(
     recentCookie.id,
     recentCookie.token,
     challenges,
     checks,
+    lifetime,
   ).then((updatedSession) => {
     if (updatedSession) {
       const sessionCookie: CustomCookieData = {

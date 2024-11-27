@@ -18,7 +18,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { create } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
@@ -39,8 +39,6 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
-
-const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
@@ -132,15 +130,13 @@ export async function getPasswordComplexitySettings(organization?: string) {
 export async function createSessionFromChecks(
   checks: Checks,
   challenges: RequestChallenges | undefined,
+  lifetime?: Duration,
 ) {
   return sessionService.createSession(
     {
       checks: checks,
       challenges,
-      lifetime: {
-        seconds: BigInt(SESSION_LIFETIME_S),
-        nanos: 0,
-      },
+      lifetime,
     },
     {},
   );
@@ -152,6 +148,7 @@ export async function createSessionForUserIdAndIdpIntent(
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   },
+  lifetime?: Duration,
 ) {
   return sessionService.createSession({
     checks: {
@@ -163,10 +160,7 @@ export async function createSessionForUserIdAndIdpIntent(
       },
       idpIntent,
     },
-    // lifetime: {
-    //   seconds: 300,
-    //   nanos: 0,
-    // },
+    lifetime,
   });
 }
 
@@ -175,6 +169,7 @@ export async function setSession(
   sessionToken: string,
   challenges: RequestChallenges | undefined,
   checks?: Checks,
+  lifetime?: Duration,
 ) {
   return sessionService.setSession(
     {
@@ -183,6 +178,7 @@ export async function setSession(
       challenges,
       checks: checks ? checks : {},
       metadata: {},
+      lifetime,
     },
     {},
   );
