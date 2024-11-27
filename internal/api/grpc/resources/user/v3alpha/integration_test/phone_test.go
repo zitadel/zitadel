@@ -18,7 +18,6 @@ import (
 )
 
 func TestServer_SetContactPhone(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -292,7 +291,6 @@ func TestServer_SetContactPhone(t *testing.T) {
 }
 
 func TestServer_VerifyContactPhone(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -484,7 +482,6 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 }
 
 func TestServer_ResendContactPhoneCode(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)

@@ -21,7 +21,6 @@ import (
 )
 
 func TestServer_CreateUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -230,7 +229,6 @@ func TestServer_CreateUser(t *testing.T) {
 }
 
 func TestServer_PatchUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -650,7 +648,6 @@ func TestServer_PatchUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -868,7 +865,6 @@ func unmarshalJSON(data string) *structpb.Struct {
 }
 
 func TestServer_LockUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -1070,7 +1066,6 @@ func TestServer_LockUser(t *testing.T) {
 }
 
 func TestServer_UnlockUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -1253,7 +1248,6 @@ func TestServer_UnlockUser(t *testing.T) {
 }
 
 func TestServer_DeactivateUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -1455,7 +1449,6 @@ func TestServer_DeactivateUser(t *testing.T) {
 }
 
 func TestServer_ActivateUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)

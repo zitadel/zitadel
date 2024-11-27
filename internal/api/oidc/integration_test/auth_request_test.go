@@ -28,8 +28,6 @@ var (
 )
 
 func TestOPStorage_CreateAuthRequest(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 
 	id := createAuthRequest(t, Instance, clientID, redirectURI)
@@ -37,8 +35,6 @@ func TestOPStorage_CreateAuthRequest(t *testing.T) {
 }
 
 func TestOPStorage_CreateAccessToken_code(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
@@ -78,8 +74,6 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 }
 
 func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
-	t.Parallel()
-
 	clientID := createImplicitClient(t)
 	authRequestID := createAuthRequestImplicit(t, clientID, redirectURIImplicit)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
@@ -130,8 +124,6 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 }
 
 func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
@@ -155,8 +147,6 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 }
 
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
@@ -193,8 +183,6 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 }
 
 func TestOPStorage_RevokeToken_access_token(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
@@ -238,8 +226,6 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 }
 
 func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
@@ -277,8 +263,6 @@ func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T
 }
 
 func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
@@ -322,8 +306,6 @@ func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 }
 
 func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
@@ -361,8 +343,6 @@ func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.
 }
 
 func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
@@ -393,8 +373,6 @@ func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 }
 
 func TestOPStorage_TerminateSession(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
@@ -432,8 +410,6 @@ func TestOPStorage_TerminateSession(t *testing.T) {
 }
 
 func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
@@ -478,8 +454,6 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 }
 
 func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
-	t.Parallel()
-
 	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
