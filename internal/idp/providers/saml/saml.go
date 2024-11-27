@@ -213,6 +213,7 @@ func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	if p.binding != "" {
 		sp.Binding = p.binding
 	}
+	sp.ServiceProvider.MetadataValidDuration = sp.ServiceProvider.Certificate.NotAfter.Sub(time.Now())
 	return sp, nil
 }
 
