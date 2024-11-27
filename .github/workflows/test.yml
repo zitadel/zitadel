@@ -51,6 +51,8 @@ jobs:
   debug:
     name: Debug matrix
     runs-on: ubuntu-latest
+    needs:
+      - matrix
     steps:
       - name: Debug matrix
         run: echo ${{ needs.matrix.outputs.matrix }}
@@ -67,6 +69,9 @@ jobs:
 
     permissions:
       contents: "read"
+
+    needs:
+      - matrix
 
     strategy:
       fail-fast: false
