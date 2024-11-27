@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 var (
@@ -26,12 +27,20 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 	if err != nil {
 		return err
 	}
+	conn, err := mig.dbClient.Conn(ctx)
+	if err != nil {
+		return err
+	}
+
 	for _, stmt := range statements {
 		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
-		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
+		if _, err := conn.ExecContext(ctx, stmt.query); err != nil {
 			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
 		}
 	}
+	err = es_v3.CheckExecutionPlan(ctx, conn)
+	logging.OnError(err).Debug("unable to register eventstore types")
+
 	return nil
 }
 

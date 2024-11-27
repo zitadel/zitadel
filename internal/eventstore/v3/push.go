@@ -46,9 +46,6 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 	}
 	if conn != nil {
 		defer conn.Close()
-		if err = checkExecutionPlan(ctx, conn); err != nil {
-			return nil, err
-		}
 	}
 
 	tx, close, err := es.pushTx(ctx, client)

@@ -73,7 +73,7 @@ func (es *Eventstore) Health(ctx context.Context) error {
 
 var errTypesNotFound = errors.New("types not found")
 
-func checkExecutionPlan(ctx context.Context, conn *sql.Conn) error {
+func CheckExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 	return conn.Raw(func(driverConn any) error {
 		conn, ok := driverConn.(*stdlib.Conn)
 		if !ok {

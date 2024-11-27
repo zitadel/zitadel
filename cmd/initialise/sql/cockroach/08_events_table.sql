@@ -32,9 +32,6 @@ CREATE TYPE IF NOT EXISTS eventstore.command AS (
     , owner TEXT
 );
 
--- index is used for filtering for the current sequence of the aggregate
-CREATE INDEX IF NOT EXISTS e_push_idx ON eventstore.events2(instance_id, aggregate_type, aggregate_id, "sequence" DESC);
-
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 SELECT
     ("c").instance_id
