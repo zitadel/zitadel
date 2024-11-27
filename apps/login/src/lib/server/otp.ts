@@ -12,6 +12,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
+import { getLoginSettings } from "../zitadel";
 
 export type SetOTPCommand = {
   loginName?: string;
@@ -23,49 +24,52 @@ export type SetOTPCommand = {
 };
 
 export async function setOTP(command: SetOTPCommand) {
-  const recentPromise = command.sessionId
-    ? getSessionCookieById({ sessionId: command.sessionId }).catch((error) => {
-        return Promise.reject(error);
-      })
+  const recentSession = command.sessionId
+    ? await getSessionCookieById({ sessionId: command.sessionId }).catch(
+        (error) => {
+          return Promise.reject(error);
+        },
+      )
     : command.loginName
-      ? getSessionCookieByLoginName({
+      ? await getSessionCookieByLoginName({
           loginName: command.loginName,
           organization: command.organization,
         }).catch((error) => {
           return Promise.reject(error);
         })
-      : getMostRecentSessionCookie().catch((error) => {
+      : await getMostRecentSessionCookie().catch((error) => {
           return Promise.reject(error);
         });
 
-  return recentPromise.then((recent) => {
-    const checks = create(ChecksSchema, {});
+  const checks = create(ChecksSchema, {});
 
-    if (command.method === "time-based") {
-      checks.totp = create(CheckTOTPSchema, {
-        code: command.code,
-      });
-    } else if (command.method === "sms") {
-      checks.otpSms = create(CheckOTPSchema, {
-        code: command.code,
-      });
-    } else if (command.method === "email") {
-      checks.otpEmail = create(CheckOTPSchema, {
-        code: command.code,
-      });
-    }
-
-    return setSessionAndUpdateCookie(
-      recent,
-      checks,
-      undefined,
-      command.authRequestId,
-    ).then((session) => {
-      return {
-        sessionId: session.id,
-        factors: session.factors,
-        challenges: session.challenges,
-      };
+  if (command.method === "time-based") {
+    checks.totp = create(CheckTOTPSchema, {
+      code: command.code,
     });
+  } else if (command.method === "sms") {
+    checks.otpSms = create(CheckOTPSchema, {
+      code: command.code,
+    });
+  } else if (command.method === "email") {
+    checks.otpEmail = create(CheckOTPSchema, {
+      code: command.code,
+    });
+  }
+
+  const loginSettings = await getLoginSettings(command.organization);
+
+  return setSessionAndUpdateCookie(
+    recentSession,
+    checks,
+    undefined,
+    command.authRequestId,
+    loginSettings?.secondFactorCheckLifetime,
+  ).then((session) => {
+    return {
+      sessionId: session.id,
+      factors: session.factors,
+      challenges: session.challenges,
+    };
   });
 }

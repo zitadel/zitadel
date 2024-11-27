@@ -37,6 +37,8 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: "Could not create user" };
   }
 
+  const loginSettings = await getLoginSettings(command.organization);
+
   let checkPayload: any = {
     user: { search: { case: "userId", value: human.userId } },
   };
@@ -54,6 +56,7 @@ export async function registerUser(command: RegisterUserCommand) {
     checks,
     undefined,
     command.authRequestId,
+    command.password ? loginSettings?.passwordCheckLifetime : undefined,
   );
 
   if (!session || !session.factors?.user) {
@@ -72,10 +75,6 @@ export async function registerUser(command: RegisterUserCommand) {
 
     return { redirect: "/passkey/set?" + params };
   } else {
-    const loginSettings = await getLoginSettings(
-      session.factors.user.organizationId,
-    );
-
     const url = await getNextUrl(
       command.authRequestId && session.id
         ? {
