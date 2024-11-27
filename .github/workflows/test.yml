@@ -5,6 +5,20 @@ on:
   schedule:
     # All 1 minutes
     - cron: '* * * * *'
+  workflow_dispatch:
+    inputs:
+      zitadel-api-url:
+        description: 'ZITADEL API URL'
+        required: true
+        default: ${{ secrets.E2E_QA_ZITADEL_API_URL }}
+      zitadel-service-user-id:
+        description: 'ZITADEL SERVICE USER ID'
+        required: true
+        default: ${{ secrets.E2E_QA_ZITADEL_SERVICE_USER_ID }}
+      zitadel-service-user-token:
+        description: 'ZITADEL SERVICE USER TOKEN'
+        required: true
+        default: ${{ secrets.E2E_QA_ZITADEL_SERVICE_USER_TOKEN }}
 
 jobs:
   matrix:
@@ -19,6 +33,8 @@ jobs:
         run: |
           if [ -z "${{ github.event.schedule }}" ]; then
             echo "matrix=$(echo '[\"test:acceptance:qa\", \"test:acceptance:prod\"]' | jq -R .)" >> $GITHUB_OUTPUT
+          else if [ -z "${{ github.event.inputs.zitadel-api-url }}" ]; then
+            echo "matrix=$(echo '[\"test:acceptance:custom\"]' | jq -R .)" >> $GITHUB_OUTPUT
           else
             echo "matrix=$(echo '[\"format --check\", \"lint\", \"test:unit\", \"test:integration\", \"test:acceptance\"]' | jq -R .)" >> $GITHUB_OUTPUT
           fi
@@ -100,11 +116,11 @@ jobs:
 
       - name: Create Production Build
         run: pnpm build
-        if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
+        if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' || matrix.command == 'test:acceptance:custom' }}
         env:
-          ZITADEL_API_URL: ${{ secrets.E2E_QA_ZITADEL_API_URL }}
-          ZITADEL_SERVICE_USER_ID: ${{ secrets.E2E_QA_ZITADEL_SERVICE_USER_ID }}
-          ZITADEL_SERVICE_USER_TOKEN: ${{ secrets.E2E_QA_ZITADEL_SERVICE_USER_TOKEN }}
+          ZITADEL_API_URL: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-api-url || secrets.E2E_QA_ZITADEL_API_URL }}
+          ZITADEL_SERVICE_USER_ID: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-service-user-id || secrets.E2E_QA_ZITADEL_SERVICE_USER_ID }}
+          ZITADEL_SERVICE_USER_TOKEN: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-service-user-token || secrets.E2E_QA_ZITADEL_SERVICE_USER_TOKEN }}
 
       - name: Check
         id: check
