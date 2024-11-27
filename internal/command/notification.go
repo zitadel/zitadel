@@ -23,7 +23,7 @@ type NotificationRequest struct {
 	NotificationType              domain.NotificationType
 	MessageType                   string
 	UnverifiedNotificationChannel bool
-	Args                          map[string]any
+	Args                          *domain.NotificationArguments
 	AggregateID                   string
 	AggregateResourceOwner        string
 	IsOTP                         bool
@@ -68,7 +68,7 @@ func (r *NotificationRequest) WithUnverifiedChannel() *NotificationRequest {
 	return r
 }
 
-func (r *NotificationRequest) WithArgs(args map[string]interface{}) *NotificationRequest {
+func (r *NotificationRequest) WithArgs(args *domain.NotificationArguments) *NotificationRequest {
 	r.Args = args
 	return r
 }

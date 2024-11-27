@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"database/sql"
-	"maps"
+	"errors"
 	"math/rand/v2"
 	"slices"
 	"strings"
@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
@@ -131,8 +132,8 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 	if err == nil {
 		return nil
 	}
-	// if retries are disabled, we cancel the notification
-	if w.config.MaxAttempts <= 1 {
+	// if retries are disabled or if the error explicitly specifies, we cancel the notification
+	if w.config.MaxAttempts <= 1 || errors.Is(err, &channels.ErrCancel{}) {
 		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 	// otherwise we retry after a backoff delay
@@ -161,8 +162,8 @@ func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sq
 	if err == nil {
 		return nil
 	}
-	// if the max attempts are reached, we cancel the notification
-	if event.Sequence() >= uint64(w.config.MaxAttempts) {
+	// if the max attempts are reached or if the error explicitly specifies, we cancel the notification
+	if event.Sequence() >= uint64(w.config.MaxAttempts) || errors.Is(err, &channels.ErrCancel{}) {
 		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 	// otherwise we retry after a backoff delay
