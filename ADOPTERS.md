@@ -1,9 +1,15 @@
 ## Adopters
 
-We are grateful to the organizations and individuals who are using ZITADEL. If you are using ZITADEL, please consider adding your name to this list by submitting a pull request.
+Sharing experiences and learning from other users is essential. We are frequently asked who is using a particular feature of Zitadel so people can get in touch with other users to share experiences and best practices. People also often want to know if a specific product or platform has integrated Zitadel. While the Zitadel Discord Community allows users to get in touch, it can be challenging to find this information quickly.
+
+The following is a directory of adopters to help identify users of individual features. The users themselves directly maintain the list.
+
+### Adding yourself as a user
+
+If you are using Zitadel, please consider adding yourself as a user with a quick description of your use case by opening a pull request to this file and adding a section describing your usage of Zitadel.
 
 | Organization/Individual | Contact Information                                      | Description of Usage                            |
 | ----------------------- | -------------------------------------------------------- | ----------------------------------------------- |
-| ZITADEL                 | [@fforootd](https://github.com/fforootd) (and many more) | ZITADEL Cloud makes heavy use of of ZITADEL ;-) |
-| Organization Name       | contact@example.com                                      | Description of how they use ZITADEL             |
-| Individual Name         | contact@example.com                                      | Description of how they use ZITADEL             |
+| Zitadel                 | [@fforootd](https://github.com/fforootd) (and many more) | Zitadel Cloud makes heavy use of of Zitadel ;-) |
+| Organization Name       | contact@example.com                                      | Description of how they use Zitadel             |
+| Individual Name         | contact@example.com                                      | Description of how they use Zitadel             |

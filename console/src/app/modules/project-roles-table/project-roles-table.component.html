@@ -35,8 +35,8 @@
               [disabled]="disabled"
               color="primary"
               (change)="$event ? masterToggle() : null"
-              [checked]="selection.hasValue() && isAllSelected()"
-              [indeterminate]="selection.hasValue() && !isAllSelected()"
+              [checked]="isAnySelected() && isAllSelected()"
+              [indeterminate]="isAnySelected() && !isAllSelected()"
             >
             </mat-checkbox>
           </div>
@@ -76,7 +76,7 @@
             class="role state"
             [ngClass]="{ 'no-selection': !selectionAllowed }"
             *ngIf="role.group"
-            (click)="selectionAllowed ? selectAllOfGroup(role.group) : openDetailDialog(role)"
+            (click)="selectionAllowed ? groupMasterToggle(role.group) : openDetailDialog(role)"
             [matTooltip]="selectionAllowed ? ('PROJECT.ROLE.SELECTGROUPTOOLTIP' | translate: role) : null"
             >{{ role.group }}</span
           >
@@ -135,7 +135,7 @@
     #paginator
     [timestamp]="dataSource.viewTimestamp"
     [length]="dataSource.totalResult"
-    [pageSize]="50"
+    [pageSize]="INITIAL_PAGE_SIZE"
     (page)="changePage()"
     [pageSizeOptions]="[25, 50, 100, 250]"
   >
