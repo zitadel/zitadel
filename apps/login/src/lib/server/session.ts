@@ -14,6 +14,7 @@ import { Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
 import {
@@ -144,8 +145,7 @@ export async function updateSession(options: UpdateSessionCommand) {
           return Promise.reject(error);
         });
 
-  // TODO remove ports from host header for URL with port
-  const host = "localhost";
+  const host = (await headers()).get("host");
 
   if (
     host &&
@@ -154,6 +154,7 @@ export async function updateSession(options: UpdateSessionCommand) {
     !challenges.webAuthN.domain
   ) {
     const [hostname, port] = host.split(":");
+
     challenges.webAuthN.domain = hostname;
   }
 
