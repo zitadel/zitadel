@@ -50,6 +50,15 @@ export class PaginatorComponent {
     return temp <= this.length / this.pageSize;
   }
 
+  get startIndex(): number {
+    return this.pageIndex * this.pageSize;
+  }
+
+  get endIndex(): number {
+    const max = this.startIndex + this.pageSize;
+    return this.length < max ? this.length : max;
+  }
+
   public emitChange(): void {
     this.page.emit({
       length: this.length,
@@ -57,5 +66,11 @@ export class PaginatorComponent {
       pageIndex: this.pageIndex,
       pageSizeOptions: this.pageSizeOptions,
     });
+  }
+
+  public updatePageSize(newSize: number): void {
+    this.pageSize = newSize;
+    this.pageIndex = 0;
+    this.emitChange();
   }
 }
