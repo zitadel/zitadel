@@ -543,6 +543,9 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 }
 
 func (c *Commands) tokenTokenLifetimes(ctx context.Context) (accessTokenLifetime time.Duration, refreshTokenLifetime time.Duration, refreshTokenIdleLifetime time.Duration, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	oidcSettings := NewInstanceOIDCSettingsWriteModel(ctx)
 	err = c.eventstore.FilterToQueryReducer(ctx, oidcSettings)
 	if err != nil {
