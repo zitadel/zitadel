@@ -85,8 +85,8 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 						},
@@ -140,8 +140,8 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 						},
@@ -200,10 +200,10 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								UnverifiedNotificationChannel: false,
 								IsOTP:                         true,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"Origin": eventOrigin,
-									"Domain": eventOriginDomain,
-									"Expiry": expiry,
+								Args: &domain.NotificationArguments{
+									Origin: eventOrigin,
+									Domain: eventOriginDomain,
+									Expiry: expiry,
 								},
 							},
 						},
@@ -256,8 +256,8 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								UnverifiedNotificationChannel: false,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        true,
-								Args: map[string]any{
-									"TempUsername": "tempUsername",
+								Args: &domain.NotificationArguments{
+									TempUsername: "tempUsername",
 								},
 							},
 						},
@@ -294,8 +294,8 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 							UnverifiedNotificationChannel: true,
 							IsOTP:                         false,
 							RequiresPreviousDomain:        false,
-							Args: map[string]any{
-								"ApplicationName": "APP",
+							Args: &domain.NotificationArguments{
+								ApplicationName: "APP",
 							},
 						},
 						BackOff: 1 * time.Second,
@@ -346,8 +346,8 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 						},
@@ -404,8 +404,8 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 						},
@@ -480,8 +480,8 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 							BackOff: 1 * time.Second,
@@ -536,8 +536,8 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 							BackOff: 10 * time.Second,
@@ -603,8 +603,8 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 							BackOff: 1 * time.Second,
@@ -651,8 +651,8 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 							UnverifiedNotificationChannel: true,
 							IsOTP:                         false,
 							RequiresPreviousDomain:        false,
-							Args: map[string]any{
-								"ApplicationName": "APP",
+							Args: &domain.NotificationArguments{
+								ApplicationName: "APP",
 							},
 						},
 						BackOff: 1 * time.Second,
@@ -704,8 +704,8 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 							BackOff: 1 * time.Second,
@@ -772,8 +772,8 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 								UnverifiedNotificationChannel: true,
 								IsOTP:                         false,
 								RequiresPreviousDomain:        false,
-								Args: map[string]any{
-									"ApplicationName": "APP",
+								Args: &domain.NotificationArguments{
+									ApplicationName: "APP",
 								},
 							},
 							BackOff: 1 * time.Second,
@@ -840,7 +840,7 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			smtpAlg,
 			f.SMSTokenCrypto,
 		),
-		channels: &channels{
+		channels: &notificationChannels{
 			Chain: *senders.ChainChannels(channel),
 			EmailConfig: &email.Config{
 				ProviderConfig: &email.Provider{

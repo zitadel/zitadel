@@ -123,9 +123,9 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 
 	// The domain claimed event requires the domain as argument, but lacks the user when creating the request event.
 	// Since we set it into the request arguments, it will be passed into a potential retry event.
-	if _, ok := event.Request.Args[Domain]; !ok && event.RequiresPreviousDomain {
+	if event.RequiresPreviousDomain && event.Request.Args != nil && event.Request.Args.Domain == "" {
 		index := strings.LastIndex(notifyUser.LastEmail, "@")
-		event.Request.Args[Domain] = notifyUser.LastEmail[index+1:]
+		event.Request.Args.Domain = notifyUser.LastEmail[index+1:]
 	}
 
 	err = w.sendNotification(ctx, tx, event.Request, notifyUser, event)
@@ -223,10 +223,7 @@ func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, r
 		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, e, generatorInfo)
 	}
 
-	args := maps.Clone(request.Args)
-	if len(args) == 0 {
-		args = make(map[string]any)
-	}
+	args := request.Args.ToMap()
 	args[Code] = code
 	// existing notifications use `OTP` as argument for the code
 	if request.IsOTP {

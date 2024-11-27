@@ -19,21 +19,21 @@ const (
 )
 
 type Request struct {
-	UserID                        string                  `json:"userID"`
-	UserResourceOwner             string                  `json:"userResourceOwner"`
-	AggregateID                   string                  `json:"notificationAggregateID"`
-	AggregateResourceOwner        string                  `json:"notificationAggregateResourceOwner"`
-	TriggeredAtOrigin             string                  `json:"triggeredAtOrigin"`
-	EventType                     eventstore.EventType    `json:"eventType"`
-	MessageType                   string                  `json:"messageType"`
-	NotificationType              domain.NotificationType `json:"notificationType"`
-	URLTemplate                   string                  `json:"urlTemplate,omitempty"`
-	CodeExpiry                    time.Duration           `json:"codeExpiry,omitempty"`
-	Code                          *crypto.CryptoValue     `json:"code,omitempty"`
-	UnverifiedNotificationChannel bool                    `json:"unverifiedNotificationChannel,omitempty"`
-	IsOTP                         bool                    `json:"isOTP,omitempty"`
-	RequiresPreviousDomain        bool                    `json:"RequiresPreviousDomain,omitempty"`
-	Args                          map[string]any          `json:"args,omitempty"`
+	UserID                        string                        `json:"userID"`
+	UserResourceOwner             string                        `json:"userResourceOwner"`
+	AggregateID                   string                        `json:"notificationAggregateID"`
+	AggregateResourceOwner        string                        `json:"notificationAggregateResourceOwner"`
+	TriggeredAtOrigin             string                        `json:"triggeredAtOrigin"`
+	EventType                     eventstore.EventType          `json:"eventType"`
+	MessageType                   string                        `json:"messageType"`
+	NotificationType              domain.NotificationType       `json:"notificationType"`
+	URLTemplate                   string                        `json:"urlTemplate,omitempty"`
+	CodeExpiry                    time.Duration                 `json:"codeExpiry,omitempty"`
+	Code                          *crypto.CryptoValue           `json:"code,omitempty"`
+	UnverifiedNotificationChannel bool                          `json:"unverifiedNotificationChannel,omitempty"`
+	IsOTP                         bool                          `json:"isOTP,omitempty"`
+	RequiresPreviousDomain        bool                          `json:"RequiresPreviousDomain,omitempty"`
+	Args                          *domain.NotificationArguments `json:"args,omitempty"`
 }
 
 func (e *Request) NotificationAggregateID() string {
@@ -88,7 +88,7 @@ func NewRequestedEvent(ctx context.Context,
 	unverifiedNotificationChannel,
 	isOTP,
 	requiresPreviousDomain bool,
-	args map[string]any,
+	args *domain.NotificationArguments,
 ) *RequestedEvent {
 	return &RequestedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -210,7 +210,7 @@ func NewRetryRequestedEvent(
 	messageType string,
 	unverifiedNotificationChannel,
 	isOTP bool,
-	args map[string]any,
+	args *domain.NotificationArguments,
 	notifyUser *query.NotifyUser,
 	backoff time.Duration,
 	errorMessage string,

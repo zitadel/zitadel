@@ -79,7 +79,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.InitCodeMessageType,
 					UnverifiedNotificationChannel: true,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -130,7 +130,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.InitCodeMessageType,
 					UnverifiedNotificationChannel: true,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -202,7 +202,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.VerifyEmailMessageType,
 					UnverifiedNotificationChannel: true,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -256,7 +256,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.VerifyEmailMessageType,
 					UnverifiedNotificationChannel: true,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -364,7 +364,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.PasswordResetMessageType,
 					UnverifiedNotificationChannel: true,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -417,7 +417,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.PasswordResetMessageType,
 					UnverifiedNotificationChannel: true,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -462,7 +462,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeSms,
 					MessageType:                   domain.PasswordResetMessageType,
 					UnverifiedNotificationChannel: true,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{AuthRequestID: authRequestID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -573,7 +573,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 				NotificationType:              domain.NotificationTypeEmail,
 				MessageType:                   domain.DomainClaimedMessageType,
 				UnverifiedNotificationChannel: true,
-				Args:                          map[string]any{"TempUsername": "newUsername"},
+				Args:                          &domain.NotificationArguments{TempUsername: "newUsername"},
 				AggregateID:                   "",
 				AggregateResourceOwner:        "",
 				IsOTP:                         false,
@@ -620,7 +620,7 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 				NotificationType:              domain.NotificationTypeEmail,
 				MessageType:                   domain.DomainClaimedMessageType,
 				UnverifiedNotificationChannel: true,
-				Args:                          map[string]any{"TempUsername": "newUsername"},
+				Args:                          &domain.NotificationArguments{TempUsername: "newUsername"},
 				AggregateID:                   "",
 				AggregateResourceOwner:        "",
 				IsOTP:                         false,
@@ -688,7 +688,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.PasswordlessRegistrationMessageType,
 					UnverifiedNotificationChannel: false,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{CodeID: codeID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -740,7 +740,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.PasswordlessRegistrationMessageType,
 					UnverifiedNotificationChannel: false,
-					Args:                          nil,
+					Args:                          &domain.NotificationArguments{CodeID: codeID},
 					AggregateID:                   "",
 					AggregateResourceOwner:        "",
 					IsOTP:                         false,
@@ -999,14 +999,15 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.VerifyEmailOTPMessageType,
 					UnverifiedNotificationChannel: false,
-					Args: map[string]any{
-						"Domain": eventOriginDomain,
-						"Expiry": 1 * time.Hour,
-						"Origin": eventOrigin,
+					Args: &domain.NotificationArguments{
+						Domain:    eventOriginDomain,
+						Expiry:    1 * time.Hour,
+						Origin:    eventOrigin,
+						SessionID: sessionID,
 					},
 					AggregateID:            sessionID,
 					AggregateResourceOwner: instanceID,
-					IsOTP:                  false,
+					IsOTP:                  true,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
 				return fields{
@@ -1062,14 +1063,15 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.VerifyEmailOTPMessageType,
 					UnverifiedNotificationChannel: false,
-					Args: map[string]any{
-						"Domain": instancePrimaryDomain,
-						"Expiry": 1 * time.Hour,
-						"Origin": fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+					Args: &domain.NotificationArguments{
+						Domain:    instancePrimaryDomain,
+						Expiry:    1 * time.Hour,
+						Origin:    fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						SessionID: sessionID,
 					},
 					AggregateID:            sessionID,
 					AggregateResourceOwner: instanceID,
-					IsOTP:                  false,
+					IsOTP:                  true,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
 				return fields{
@@ -1146,14 +1148,15 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.VerifyEmailOTPMessageType,
 					UnverifiedNotificationChannel: false,
-					Args: map[string]any{
-						"Domain": eventOriginDomain,
-						"Expiry": 1 * time.Hour,
-						"Origin": eventOrigin,
+					Args: &domain.NotificationArguments{
+						Domain:    eventOriginDomain,
+						Expiry:    1 * time.Hour,
+						Origin:    eventOrigin,
+						SessionID: sessionID,
 					},
 					AggregateID:            sessionID,
 					AggregateResourceOwner: instanceID,
-					IsOTP:                  false,
+					IsOTP:                  true,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
 				return fields{
@@ -1236,14 +1239,15 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					NotificationType:              domain.NotificationTypeSms,
 					MessageType:                   domain.VerifySMSOTPMessageType,
 					UnverifiedNotificationChannel: false,
-					Args: map[string]any{
-						"Domain": eventOriginDomain,
-						"Expiry": 1 * time.Hour,
-						"Origin": eventOrigin,
+					Args: &domain.NotificationArguments{
+						Domain:    eventOriginDomain,
+						Expiry:    1 * time.Hour,
+						Origin:    eventOrigin,
+						SessionID: sessionID,
 					},
 					AggregateID:            sessionID,
 					AggregateResourceOwner: instanceID,
-					IsOTP:                  false,
+					IsOTP:                  true,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
 				return fields{
@@ -1299,14 +1303,15 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					NotificationType:              domain.NotificationTypeSms,
 					MessageType:                   domain.VerifySMSOTPMessageType,
 					UnverifiedNotificationChannel: false,
-					Args: map[string]any{
-						"Domain": instancePrimaryDomain,
-						"Expiry": 1 * time.Hour,
-						"Origin": fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+					Args: &domain.NotificationArguments{
+						Domain:    instancePrimaryDomain,
+						Expiry:    1 * time.Hour,
+						Origin:    fmt.Sprintf("%s://%s:%d", externalProtocol, instancePrimaryDomain, externalPort),
+						SessionID: sessionID,
 					},
 					AggregateID:            sessionID,
 					AggregateResourceOwner: instanceID,
-					IsOTP:                  false,
+					IsOTP:                  true,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
 				return fields{
@@ -1353,14 +1358,15 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 					NotificationType:              domain.NotificationTypeSms,
 					MessageType:                   domain.VerifySMSOTPMessageType,
 					UnverifiedNotificationChannel: false,
-					Args: map[string]any{
-						"Domain": eventOriginDomain,
-						"Expiry": 0 * time.Hour,
-						"Origin": eventOrigin,
+					Args: &domain.NotificationArguments{
+						Domain:    eventOriginDomain,
+						Expiry:    0 * time.Hour,
+						Origin:    eventOrigin,
+						SessionID: sessionID,
 					},
 					AggregateID:            sessionID,
 					AggregateResourceOwner: instanceID,
-					IsOTP:                  false,
+					IsOTP:                  true,
 					RequiresPreviousDomain: false,
 				}).Return(nil)
 				return fields{
@@ -1461,8 +1467,9 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.InviteUserMessageType,
 					UnverifiedNotificationChannel: true,
-					Args: map[string]any{
-						"ApplicationName": "ZITADEL",
+					Args: &domain.NotificationArguments{
+						ApplicationName: "ZITADEL",
+						AuthRequestID:   authRequestID,
 					},
 					AggregateID:            "",
 					AggregateResourceOwner: "",
@@ -1515,8 +1522,9 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.InviteUserMessageType,
 					UnverifiedNotificationChannel: true,
-					Args: map[string]any{
-						"ApplicationName": "ZITADEL",
+					Args: &domain.NotificationArguments{
+						ApplicationName: "ZITADEL",
+						AuthRequestID:   authRequestID,
 					},
 					AggregateID:            "",
 					AggregateResourceOwner: "",
@@ -1592,8 +1600,9 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.InviteUserMessageType,
 					UnverifiedNotificationChannel: true,
-					Args: map[string]any{
-						"ApplicationName": "ZITADEL",
+					Args: &domain.NotificationArguments{
+						ApplicationName: "ZITADEL",
+						AuthRequestID:   authRequestID,
 					},
 					AggregateID:            "",
 					AggregateResourceOwner: "",
@@ -1640,8 +1649,9 @@ func Test_userNotifier_reduceInviteCodeAdded(t *testing.T) {
 					NotificationType:              domain.NotificationTypeEmail,
 					MessageType:                   domain.InviteUserMessageType,
 					UnverifiedNotificationChannel: true,
-					Args: map[string]any{
-						"ApplicationName": "APP",
+					Args: &domain.NotificationArguments{
+						ApplicationName: "APP",
+						AuthRequestID:   authRequestID,
 					},
 					AggregateID:            "",
 					AggregateResourceOwner: "",
@@ -1755,27 +1765,27 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 	}
 }
 
-var _ types.ChannelChains = (*channels)(nil)
+var _ types.ChannelChains = (*notificationChannels)(nil)
 
-type channels struct {
+type notificationChannels struct {
 	senders.Chain
 	EmailConfig *email.Config
 	SMSConfig   *sms.Config
 }
 
-func (c *channels) Email(context.Context) (*senders.Chain, *email.Config, error) {
+func (c *notificationChannels) Email(context.Context) (*senders.Chain, *email.Config, error) {
 	return &c.Chain, c.EmailConfig, nil
 }
 
-func (c *channels) SMS(context.Context) (*senders.Chain, *sms.Config, error) {
+func (c *notificationChannels) SMS(context.Context) (*senders.Chain, *sms.Config, error) {
 	return &c.Chain, c.SMSConfig, nil
 }
 
-func (c *channels) Webhook(context.Context, webhook.Config) (*senders.Chain, error) {
+func (c *notificationChannels) Webhook(context.Context, webhook.Config) (*senders.Chain, error) {
 	return &c.Chain, nil
 }
 
-func (c *channels) SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error) {
+func (c *notificationChannels) SecurityTokenEvent(context.Context, set.Config) (*senders.Chain, error) {
 	return &c.Chain, nil
 }
 

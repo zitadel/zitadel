@@ -58,7 +58,7 @@ func init() {
 			return commands.UserDomainClaimedSent(ctx, orgID, id)
 		},
 	)
-	RegisterSentHandler(user.HumanPasswordlessInitCodeAddedType,
+	RegisterSentHandler(user.HumanPasswordlessInitCodeRequestedType,
 		func(ctx context.Context, commands Commands, id, orgID string, generatorInfo *senders.CodeGeneratorInfo, args map[string]any) error {
 			return commands.HumanPasswordlessInitCodeSent(ctx, id, orgID, args["CodeID"].(string))
 		},
@@ -222,6 +222,9 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 			).
 				WithURLTemplate(login.InitUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)).
 				WithCode(e.Code, e.Expiry).
+				WithArgs(&domain.NotificationArguments{
+					AuthRequestID: e.AuthRequestID,
+				}).
 				WithUnverifiedChannel(),
 		)
 	}), nil
@@ -269,6 +272,9 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 			).
 				WithURLTemplate(urlTmpl).
 				WithCode(e.Code, e.Expiry).
+				WithArgs(&domain.NotificationArguments{
+					AuthRequestID: e.AuthRequestID,
+				}).
 				WithUnverifiedChannel(),
 		)
 	}), nil
@@ -315,6 +321,9 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 			).
 				WithURLTemplate(urlTmpl).
 				WithCode(e.Code, e.Expiry).
+				WithArgs(&domain.NotificationArguments{
+					AuthRequestID: e.AuthRequestID,
+				}).
 				WithUnverifiedChannel(),
 		)
 	}), nil
@@ -388,6 +397,8 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 			return err
 		}
 
+		args := otpArgs(ctx, e.Expiry)
+		args.SessionID = e.Aggregate().ID
 		return u.commands.RequestNotification(ctx,
 			s.UserFactor.ResourceOwner,
 			command.NewNotificationRequest(
@@ -400,7 +411,8 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 			).
 				WithAggregate(e.Aggregate().ID, e.Aggregate().ResourceOwner).
 				WithCode(e.Code, e.Expiry).
-				WithArgs(otpArgs(ctx, e.Expiry)),
+				WithOTP().
+				WithArgs(args),
 		)
 	}), nil
 }
@@ -432,6 +444,8 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 		if e.AuthRequestInfo != nil {
 			authRequestID = e.AuthRequestInfo.ID
 		}
+		args := otpArgs(ctx, e.Expiry)
+		args.AuthRequestID = authRequestID
 		return u.commands.RequestNotification(ctx,
 			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
@@ -444,7 +458,8 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 			).
 				WithURLTemplate(login.OTPLinkTemplate(origin, authRequestID, domain.MFATypeOTPEmail)).
 				WithCode(e.Code, e.Expiry).
-				WithArgs(otpArgs(ctx, e.Expiry)),
+				WithOTP().
+				WithArgs(args),
 		)
 	}), nil
 }
@@ -483,6 +498,8 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if e.URLTmpl != "" {
 			urlTmpl = e.URLTmpl
 		}
+		args := otpArgs(ctx, e.Expiry)
+		args.SessionID = e.Aggregate().ID
 		return u.commands.RequestNotification(ctx,
 			s.UserFactor.ResourceOwner,
 			command.NewNotificationRequest(
@@ -496,18 +513,19 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 				WithAggregate(e.Aggregate().ID, e.Aggregate().ResourceOwner).
 				WithURLTemplate(urlTmpl).
 				WithCode(e.Code, e.Expiry).
-				WithArgs(otpArgs(ctx, e.Expiry)),
+				WithOTP().
+				WithArgs(args),
 		)
 	}), nil
 }
 
-func otpArgs(ctx context.Context, expiry time.Duration) map[string]interface{} {
+func otpArgs(ctx context.Context, expiry time.Duration) *domain.NotificationArguments {
 	domainCtx := http_util.DomainContext(ctx)
-	args := make(map[string]interface{})
-	args["Origin"] = domainCtx.Origin()
-	args["Domain"] = domainCtx.RequestedDomain()
-	args["Expiry"] = expiry
-	return args
+	return &domain.NotificationArguments{
+		Origin: domainCtx.Origin(),
+		Domain: domainCtx.RequestedDomain(),
+		Expiry: expiry,
+	}
 }
 
 func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
@@ -543,8 +561,8 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 				WithURLTemplate(login.LoginLink(origin, e.Aggregate().ResourceOwner)).
 				WithUnverifiedChannel().
 				WithPreviousDomain().
-				WithArgs(map[string]any{
-					"TempUsername": e.UserName,
+				WithArgs(&domain.NotificationArguments{
+					TempUsername: e.UserName,
 				}),
 		)
 	}), nil
@@ -588,7 +606,10 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 				domain.PasswordlessRegistrationMessageType,
 			).
 				WithURLTemplate(urlTmpl).
-				WithCode(e.Code, e.Expiry),
+				WithCode(e.Code, e.Expiry).
+				WithArgs(&domain.NotificationArguments{
+					CodeID: e.ID,
+				}),
 		)
 	}), nil
 }
@@ -678,8 +699,8 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 			).
 				WithCode(e.Code, e.Expiry).
 				WithUnverifiedChannel().
-				WithArgs(map[string]any{
-					"Domain": http_util.DomainContext(ctx).RequestedDomain(),
+				WithArgs(&domain.NotificationArguments{
+					Domain: http_util.DomainContext(ctx).RequestedDomain(),
 				}),
 		)
 	}), nil
@@ -732,8 +753,9 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 				WithURLTemplate(urlTmpl).
 				WithCode(e.Code, e.Expiry).
 				WithUnverifiedChannel().
-				WithArgs(map[string]any{
-					"ApplicationName": applicationName,
+				WithArgs(&domain.NotificationArguments{
+					AuthRequestID:   e.AuthRequestID,
+					ApplicationName: applicationName,
 				}),
 		)
 	}), nil
