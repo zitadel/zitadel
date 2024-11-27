@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 		logging.WithFields("error", err).Fatal("unable to start db")
 	}
 
-	testCRDBClient, err = sql.Open("postgres", ts.PGURL().String())
+	testCRDBClient, err = sql.Open("pgx", ts.PGURL().String())
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to connect to db")
 	}
@@ -42,14 +42,14 @@ func TestMain(m *testing.M) {
 		ts.Stop()
 	}()
 
-	if err = initDB(&database.DB{DB: testCRDBClient, Database: &cockroach.Config{Database: "zitadel"}}); err != nil {
+	if err = initDB(context.Background(), &database.DB{DB: testCRDBClient, Database: &cockroach.Config{Database: "zitadel"}}); err != nil {
 		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 
 	os.Exit(m.Run())
 }
 
-func initDB(db *database.DB) error {
+func initDB(ctx context.Context, db *database.DB) error {
 	config := new(database.Config)
 	config.SetConnector(&cockroach.Config{User: cockroach.User{Username: "zitadel"}, Database: "zitadel"})
 
@@ -57,7 +57,7 @@ func initDB(db *database.DB) error {
 		return err
 	}
 
-	err := initialise.Init(db,
+	err := initialise.Init(ctx, db,
 		initialise.VerifyUser(config.Username(), ""),
 		initialise.VerifyDatabase(config.DatabaseName()),
 		initialise.VerifyGrant(config.DatabaseName(), config.Username()),

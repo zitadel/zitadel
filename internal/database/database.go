@@ -18,9 +18,17 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type ContextQueryExecuter interface {
+type ContextQuerier interface {
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+}
+
+type ContextExecuter interface {
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+}
+
+type ContextQueryExecuter interface {
+	ContextQuerier
+	ContextExecuter
 }
 
 type Client interface {
