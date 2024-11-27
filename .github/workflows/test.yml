@@ -18,9 +18,9 @@ jobs:
         id: prepare-matrix
         run: |
           if [ -z "${{ github.event.schedule }}" ]; then
-            echo "::set-output name=matrix::['test:acceptance:qa', 'test:acceptance:prod']"
+            echo '::set-output name=matrix::["test:acceptance:qa", "test:acceptance:prod"]'
           else
-            echo "::set-output name=matrix::['format --check', 'lint', 'test:unit', 'test:integration', 'test:acceptance']"
+            echo '::set-output name=matrix::["format --check", "lint", "test:unit", "test:integration", "test:acceptance"]'
           fi
 
   quality:
@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        command: ${{fromJson(needs.prepare-matrix.outputs.matrix)}}
+        command: ${{ fromJson( needs.prepare-matrix.outputs.matrix ) }}
 
     steps:
       - name: Checkout Repo
