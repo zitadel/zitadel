@@ -3,27 +3,17 @@ name: Quality
 on:
   pull_request:
   schedule:
-    # All 1 minutes
-    - cron: '* * * * *'
+    # Every morning at 6:00 AM CET
+    - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
-      zitadel-env:
-        description: 'ZITADEL ENVIRONMENT'
+      target-env:
+        description: 'Zitadel target environment to run the acceptance tests against.'
         required: true
         type: choice
         options:
           - 'qa'
           - 'prod'
-          - 'custom'
-      zitadel-api-url:
-        description: 'ZITADEL API URL'
-        required: false
-      zitadel-service-user-id:
-        description: 'ZITADEL SERVICE USER ID'
-        required: false
-      zitadel-service-user-token:
-        description: 'ZITADEL SERVICE USER TOKEN'
-        required: false
 
 jobs:
   matrix:
@@ -38,27 +28,11 @@ jobs:
         run: |
           if [ -n "${{ github.event.schedule }}" ]; then
             echo 'matrix=["test:acceptance:qa", "test:acceptance:prod"]' >> $GITHUB_OUTPUT
-          elif [ -n "${{ github.event.inputs.zitadel-env }}" ]; then
-            echo 'matrix=["test:acceptance:${{ github.event.inputs.zitadel-env }}"]' >> $GITHUB_OUTPUT
-          elif [ -n "${{ github.event.inputs.zitadel-api-url }}" ]; then
-            echo 'matrix=["test:acceptance:custom"]' >> $GITHUB_OUTPUT
+          elif [ -n "${{ github.event.inputs.target-env }}" ]; then
+            echo 'matrix=["test:acceptance:${{ github.event.inputs.target-env }}"]' >> $GITHUB_OUTPUT
           else
             echo 'matrix=["format --check", "lint", "test:unit", "test:integration", "test:acceptance"]' >> $GITHUB_OUTPUT
           fi
-      - name: Show Matrix
-        run: echo '${{ steps.matrix.outputs.matrix }}'
-
-  debug:
-    name: Debug matrix
-    runs-on: ubuntu-latest
-    needs:
-      - matrix
-    steps:
-      - name: Debug matrix
-        run: echo ${{ needs.matrix.outputs.matrix }}
-      - name: Debug fromJson
-        run: echo ${{ fromJson(needs.matrix.outputs.matrix) }}
-
 
   quality:
     name: Ensure Quality
@@ -134,17 +108,13 @@ jobs:
         run: ZITADEL_DEV_UID=root pnpm run-zitadel
         if: ${{ matrix.command == 'test:acceptance' }}
 
-      - name: Create Production Build
-        run: pnpm build
-        if: ${{ matrix.command == 'test:acceptance' }}
+      - name: Create Cloud Env File
+        run: echo "${{ matrix.command == 'test:acceptance:prod' && secrets.ENV_FILE_CONTENT_ACCEPTANCE_PROD || secrets.ENV_FILE_CONTENT_ACCEPTANCE_QA }}" >> apps/login/.env.local
+        if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
 
       - name: Create Production Build
         run: pnpm build
-        if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' || matrix.command == 'test:acceptance:custom' }}
-        env:
-          ZITADEL_API_URL: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-api-url || matrix.command == 'test:acceptance:qa' && secrets.ACCEPTANCE_QA_ZITADEL_API_URL || secrets.ACCEPTANCE_PROD_ZITADEL_API_URL }}
-          ZITADEL_SERVICE_USER_ID: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-service-user-id  || matrix.command == 'test:acceptance:qa' && secrets.ACCEPTANCE_QA_ZITADEL_SERVICE_USER_ID || secrets.ACCEPTANCE_PROD_ZITADEL_SERVICE_USER_ID}}
-          ZITADEL_SERVICE_USER_TOKEN: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-service-user-token || matrix.command == 'test:acceptance:qa' && secrets.ACCEPTANCE_QA_ZITADEL_SERVICE_USER_TOKEN || secrets.ACCEPTANCE_PROD_ZITADEL_SERVICE_USER_TOKEN}}
+        if: ${{ startsWith(matrix.command, 'test:acceptance') }}
 
       - name: Check
         id: check
