@@ -17,6 +17,7 @@ import {
   Checks,
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
@@ -66,6 +67,8 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   let session;
   let user: User;
+  let loginSettings: LoginSettings | undefined;
+
   if (!sessionCookie) {
     const users = await listUsers({
       loginName: command.loginName,
@@ -80,10 +83,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
         password: { password: command.checks.password?.password },
       });
 
+      loginSettings = await getLoginSettings(command.organization);
+
       session = await createSessionAndUpdateCookie(
         checks,
         undefined,
         command.authRequestId,
+        loginSettings?.passwordCheckLifetime,
       );
     }
 
@@ -95,6 +101,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       command.checks,
       undefined,
       command.authRequestId,
+      loginSettings?.passwordCheckLifetime,
     );
 
     if (!session?.factors?.user?.id) {
@@ -108,6 +115,12 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
 
     user = userResponse.user;
+  }
+
+  if (!loginSettings) {
+    loginSettings = await getLoginSettings(
+      command.organization ?? session.factors?.user?.organizationId,
+    );
   }
 
   if (!session?.factors?.user?.id || !sessionCookie) {
@@ -241,9 +254,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
   //   return router.push(`/passkey/set?` + params);
   // }
   else if (command.authRequestId && session.id) {
-    const loginSettings = await getLoginSettings(
-      command.organization ?? session.factors?.user?.organizationId,
-    );
     const nextUrl = await getNextUrl(
       {
         sessionId: session.id,
@@ -257,9 +267,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { redirect: nextUrl };
   }
 
-  const loginSettings = await getLoginSettings(
-    command.organization ?? session.factors?.user?.organizationId,
-  );
   const url = await getNextUrl(
     {
       loginName: session.factors.user.loginName,

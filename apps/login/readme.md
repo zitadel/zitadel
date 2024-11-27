@@ -393,4 +393,3 @@ In future, self service options to jump to are shown below, like:
 - loginSettings.disableLoginWithPhone
 - loginSettings.allowExternalIdp - this will be deprecated with the new login as it can be determined by the available IDPs
 - loginSettings.forceMfaLocalOnly
-- loginSettings lifetimes - all besides Multifactor Init Check can be implemented. for the Init Check, an external storage or a timestamp has to be implemented which keeps track of the last verification
