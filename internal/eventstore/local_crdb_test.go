@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/initialise"
@@ -39,10 +41,17 @@ func TestMain(m *testing.M) {
 	testCRDBClient = &database.DB{
 		Database: new(testDB),
 	}
-	testCRDBClient.DB, err = sql.Open("pgx", ts.PGURL().String())
+
+	connConfig, err := pgxpool.ParseConfig(ts.PGURL().String())
 	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to connect to db")
+		logging.WithFields("error", err).Fatal("unable to parse db url")
 	}
+	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
+	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
+	if err != nil {
+		logging.WithFields("error", err).Fatal("unable to create db pool")
+	}
+	testCRDBClient.DB = stdlib.OpenDBFromPool(pool)
 	if err = testCRDBClient.Ping(); err != nil {
 		logging.WithFields("error", err).Fatal("unable to ping db")
 	}
@@ -208,15 +217,15 @@ func withTestData(data any) func(e *testEvent) {
 
 func cleanupEventstore(client *database.DB) func() {
 	return func() {
-		_, err := client.Exec("TRUNCATE eventstore.events")
+		_, err := client.Exec("DELETE FROM eventstore.events WHERE 1 = 1")
 		if err != nil {
 			logging.Warnf("unable to truncate events: %v", err)
 		}
-		_, err = client.Exec("TRUNCATE eventstore.events2")
+		_, err = client.Exec("DELETE FROM eventstore.events2 WHERE 1 = 1")
 		if err != nil {
 			logging.Warnf("unable to truncate events: %v", err)
 		}
-		_, err = client.Exec("TRUNCATE eventstore.unique_constraints")
+		_, err = client.Exec("DELETE FROM eventstore.unique_constraints WHERE 1 = 1")
 		if err != nil {
 			logging.Warnf("unable to truncate unique constraints: %v", err)
 		}

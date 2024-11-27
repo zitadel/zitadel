@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	dialect.RegisterAfterConnect(registerEventstoreTypes)
+	dialect.RegisterAfterConnect(RegisterEventstoreTypes)
 }
 
 var (
@@ -32,7 +32,7 @@ type Eventstore struct {
 	client *database.DB
 }
 
-func registerEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
+func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
 	types, err := conn.LoadTypes(ctx, []string{
 		"eventstore._command",
 		"eventstore.command",
@@ -88,7 +88,7 @@ func CheckExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 		if _, ok := conn.Conn().TypeMap().TypeForValue(cmd); ok {
 			return nil
 		}
-		return registerEventstoreTypes(ctx, conn.Conn())
+		return RegisterEventstoreTypes(ctx, conn.Conn())
 	})
 }
 
