@@ -142,9 +142,9 @@ jobs:
         run: pnpm build
         if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' || matrix.command == 'test:acceptance:custom' }}
         env:
-          ZITADEL_API_URL: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-api-url || matrix.command == 'test:acceptance:qa' && secrets.E2E_QA_ZITADEL_API_URL || secrets.E2E_PROD_ZITADEL_API_URL }}
-          ZITADEL_SERVICE_USER_ID: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-service-user-id  || matrix.command == 'test:acceptance:qa' && secrets.E2E_QA_ZITADEL_SERVICE_USER_ID || secrets.E2E_PROD_ZITADEL_SERVICE_USER_ID}}
-          ZITADEL_SERVICE_USER_TOKEN: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-service-user-token || matrix.command == 'test:acceptance:qa' && secrets.E2E_QA_ZITADEL_SERVICE_USER_TOKEN || secrets.E2E_PROD_ZITADEL_SERVICE_USER_TOKEN}}
+          ZITADEL_API_URL: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-api-url || matrix.command == 'test:acceptance:qa' && secrets.ACCEPTANCE_QA_ZITADEL_API_URL || secrets.ACCEPTANCE_PROD_ZITADEL_API_URL }}
+          ZITADEL_SERVICE_USER_ID: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-service-user-id  || matrix.command == 'test:acceptance:qa' && secrets.ACCEPTANCE_QA_ZITADEL_SERVICE_USER_ID || secrets.ACCEPTANCE_PROD_ZITADEL_SERVICE_USER_ID}}
+          ZITADEL_SERVICE_USER_TOKEN: ${{ matrix.command == 'test:acceptance:custom' && github.event.inputs.zitadel-service-user-token || matrix.command == 'test:acceptance:qa' && secrets.ACCEPTANCE_QA_ZITADEL_SERVICE_USER_TOKEN || secrets.ACCEPTANCE_PROD_ZITADEL_SERVICE_USER_TOKEN}}
 
       - name: Check
         id: check
