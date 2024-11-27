@@ -217,15 +217,15 @@ func withTestData(data any) func(e *testEvent) {
 
 func cleanupEventstore(client *database.DB) func() {
 	return func() {
-		_, err := client.Exec("DELETE FROM eventstore.events WHERE 1 = 1")
+		_, err := client.Exec("TRUNCATE eventstore.events")
 		if err != nil {
 			logging.Warnf("unable to truncate events: %v", err)
 		}
-		_, err = client.Exec("DELETE FROM eventstore.events2 WHERE 1 = 1")
+		_, err = client.Exec("TRUNCATE eventstore.events2")
 		if err != nil {
 			logging.Warnf("unable to truncate events: %v", err)
 		}
-		_, err = client.Exec("DELETE FROM eventstore.unique_constraints WHERE 1 = 1")
+		_, err = client.Exec("TRUNCATE eventstore.unique_constraints")
 		if err != nil {
 			logging.Warnf("unable to truncate unique constraints: %v", err)
 		}
