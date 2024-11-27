@@ -5,6 +5,7 @@ import {
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
 import {
+  getLoginSettings,
   getUserByID,
   listAuthenticationMethodTypes,
   listUsers,
@@ -16,10 +17,11 @@ import {
   Checks,
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
 
 type ResetPasswordCommand = {
@@ -28,7 +30,7 @@ type ResetPasswordCommand = {
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
-  const host = headers().get("host");
+  const host = (await headers()).get("host");
 
   const users = await listUsers({
     loginName: command.loginName,
@@ -65,6 +67,8 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   let session;
   let user: User;
+  let loginSettings: LoginSettings | undefined;
+
   if (!sessionCookie) {
     const users = await listUsers({
       loginName: command.loginName,
@@ -79,10 +83,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
         password: { password: command.checks.password?.password },
       });
 
+      loginSettings = await getLoginSettings(command.organization);
+
       session = await createSessionAndUpdateCookie(
         checks,
         undefined,
         command.authRequestId,
+        loginSettings?.passwordCheckLifetime,
       );
     }
 
@@ -94,6 +101,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       command.checks,
       undefined,
       command.authRequestId,
+      loginSettings?.passwordCheckLifetime,
     );
 
     if (!session?.factors?.user?.id) {
@@ -107,6 +115,12 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
 
     user = userResponse.user;
+  }
+
+  if (!loginSettings) {
+    loginSettings = await getLoginSettings(
+      command.organization ?? session.factors?.user?.organizationId,
+    );
   }
 
   if (!session?.factors?.user?.id || !sessionCookie) {
@@ -153,13 +167,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
     const factor = availableSecondFactors[0];
     // if passwordless is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
-      return redirect(`/otp/time-based?` + params);
+      return { redirect: `/otp/time-based?` + params };
     } else if (factor === AuthenticationMethodType.OTP_SMS) {
-      return redirect(`/otp/sms?` + params);
+      return { redirect: `/otp/sms?` + params };
     } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
-      return redirect(`/otp/email?` + params);
+      return { redirect: `/otp/email?` + params };
     } else if (factor === AuthenticationMethodType.U2F) {
-      return redirect(`/u2f?` + params);
+      return { redirect: `/u2f?` + params };
     }
   } else if (availableSecondFactors?.length >= 1) {
     const params = new URLSearchParams({
@@ -177,7 +191,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       );
     }
 
-    return redirect(`/mfa?` + params);
+    return { redirect: `/mfa?` + params };
   } else if (user.state === UserState.INITIAL) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
@@ -194,7 +208,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       );
     }
 
-    return redirect(`/password/change?` + params);
+    return { redirect: `/password/change?` + params };
   } else if (command.forceMfa && !availableSecondFactors.length) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
@@ -214,7 +228,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
 
     // TODO: provide a way to setup passkeys on mfa page?
-    return redirect(`/mfa/set?` + params);
+    return { redirect: `/mfa/set?` + params };
   }
   // TODO: implement passkey setup
 
@@ -240,41 +254,28 @@ export async function sendPassword(command: UpdateSessionCommand) {
   //   return router.push(`/passkey/set?` + params);
   // }
   else if (command.authRequestId && session.id) {
-    const params = new URLSearchParams({
-      sessionId: session.id,
-      authRequest: command.authRequestId,
-    });
+    const nextUrl = await getNextUrl(
+      {
+        sessionId: session.id,
+        authRequestId: command.authRequestId,
+        organization:
+          command.organization ?? session.factors?.user?.organizationId,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
 
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    return { nextStep: `/login?${params}` };
+    return { redirect: nextUrl };
   }
 
-  // without OIDC flow
-  const params = new URLSearchParams(
-    command.authRequestId
-      ? {
-          loginName: session.factors.user.loginName,
-          authRequestId: command.authRequestId,
-        }
-      : {
-          loginName: session.factors.user.loginName,
-        },
+  const url = await getNextUrl(
+    {
+      loginName: session.factors.user.loginName,
+      organization: session.factors?.user?.organizationId,
+    },
+    loginSettings?.defaultRedirectUri,
   );
 
-  if (command.organization || session.factors?.user?.organizationId) {
-    params.append(
-      "organization",
-      command.organization ?? session.factors?.user?.organizationId,
-    );
-  }
-
-  return redirect(`/signedin?` + params);
+  return { redirect: url };
 }
 
 export async function changePassword(command: {

@@ -1,11 +1,12 @@
 "use client";
 
-import { cleanupSession } from "@/lib/server/session";
+import { sendLoginname } from "@/lib/server/loginname";
+import { cleanupSession, continueWithSession } from "@/lib/server/session";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import moment from "moment";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar } from "./avatar";
 
@@ -43,6 +44,7 @@ export function SessionItem({
     })
       .catch((error) => {
         setError(error.message);
+        return;
       })
       .finally(() => {
         setLoading(false);
@@ -55,43 +57,41 @@ export function SessionItem({
 
   const [error, setError] = useState<string | null>(null);
 
+  const router = useRouter();
+
   return (
-    <Link
-      prefetch={false}
-      href={
-        valid && authRequestId
-          ? `/login?` +
-            new URLSearchParams({
-              // loginName: session.factors?.user?.loginName as string,
-              sessionId: session.id,
-              authRequest: authRequestId,
+    <button
+      onClick={async () => {
+        if (valid && session?.factors?.user) {
+          return continueWithSession({
+            ...session,
+            authRequestId: authRequestId,
+          });
+        } else if (session.factors?.user) {
+          setLoading(true);
+          const res = await sendLoginname({
+            loginName: session.factors?.user?.loginName,
+            organization: session.factors.user.organizationId,
+            authRequestId: authRequestId,
+          })
+            .catch(() => {
+              setError("An internal error occurred");
+              return;
             })
-          : !valid
-            ? `/loginname?` +
-              new URLSearchParams(
-                authRequestId
-                  ? {
-                      loginName: session.factors?.user?.loginName as string,
-                      submit: "true",
-                      authRequestId,
-                    }
-                  : {
-                      loginName: session.factors?.user?.loginName as string,
-                      submit: "true",
-                    },
-              )
-            : "/signedin?" +
-              new URLSearchParams(
-                authRequestId
-                  ? {
-                      loginName: session.factors?.user?.loginName as string,
-                      authRequestId,
-                    }
-                  : {
-                      loginName: session.factors?.user?.loginName as string,
-                    },
-              )
-      }
+            .finally(() => {
+              setLoading(false);
+            });
+
+          if (res?.redirect) {
+            return router.push(res.redirect);
+          }
+
+          if (res?.error) {
+            setError(res.error);
+            return;
+          }
+        }
+      }}
       className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
     >
       <div className="pr-4">
@@ -132,6 +132,6 @@ export function SessionItem({
           }}
         />
       </div>
-    </Link>
+    </button>
   );
 }

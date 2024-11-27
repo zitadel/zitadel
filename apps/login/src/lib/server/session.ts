@@ -4,9 +4,19 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
-import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
+import {
+  deleteSession,
+  getLoginSettings,
+  getUserByID,
+  listAuthenticationMethodTypes,
+} from "@/lib/zitadel";
+import { Duration } from "@zitadel/client";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getNextUrl } from "../client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -31,7 +41,75 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
   if (!userId || !idpIntent) {
     throw new Error("No userId or loginName provided");
   }
-  return createSessionForIdpAndUpdateCookie(userId, idpIntent, authRequestId);
+
+  const user = await getUserByID(userId);
+
+  if (!user) {
+    return { error: "Could not find user" };
+  }
+
+  const loginSettings = await getLoginSettings(user.details?.resourceOwner);
+
+  const session = await createSessionForIdpAndUpdateCookie(
+    userId,
+    idpIntent,
+    authRequestId,
+    loginSettings?.externalLoginCheckLifetime,
+  );
+
+  if (!session || !session.factors?.user) {
+    return { error: "Could not create session" };
+  }
+
+  const url = await getNextUrl(
+    authRequestId && session.id
+      ? {
+          sessionId: session.id,
+          authRequestId: authRequestId,
+          organization: session.factors.user.organizationId,
+        }
+      : {
+          loginName: session.factors.user.loginName,
+          organization: session.factors.user.organizationId,
+        },
+    loginSettings?.defaultRedirectUri,
+  );
+
+  if (url) {
+    return { redirect: url };
+  }
+}
+
+export async function continueWithSession({
+  authRequestId,
+  ...session
+}: Session & { authRequestId?: string }) {
+  const loginSettings = await getLoginSettings(
+    session.factors?.user?.organizationId,
+  );
+
+  const url =
+    authRequestId && session.id && session.factors?.user
+      ? await getNextUrl(
+          {
+            sessionId: session.id,
+            authRequestId: authRequestId,
+            organization: session.factors.user.organizationId,
+          },
+          loginSettings?.defaultRedirectUri,
+        )
+      : session.factors?.user
+        ? await getNextUrl(
+            {
+              loginName: session.factors.user.loginName,
+              organization: session.factors.user.organizationId,
+            },
+            loginSettings?.defaultRedirectUri,
+          )
+        : null;
+  if (url) {
+    return redirect(url);
+  }
 }
 
 export type UpdateSessionCommand = {
@@ -41,6 +119,7 @@ export type UpdateSessionCommand = {
   checks?: Checks;
   authRequestId?: string;
   challenges?: RequestChallenges;
+  lifetime?: Duration;
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
@@ -52,22 +131,21 @@ export async function updateSession(options: UpdateSessionCommand) {
     authRequestId,
     challenges,
   } = options;
-  const sessionPromise = sessionId
-    ? getSessionCookieById({ sessionId }).catch((error) => {
+  const recentSession = sessionId
+    ? await getSessionCookieById({ sessionId }).catch((error) => {
         return Promise.reject(error);
       })
     : loginName
-      ? getSessionCookieByLoginName({ loginName, organization }).catch(
+      ? await getSessionCookieByLoginName({ loginName, organization }).catch(
           (error) => {
             return Promise.reject(error);
           },
         )
-      : getMostRecentSessionCookie().catch((error) => {
+      : await getMostRecentSessionCookie().catch((error) => {
           return Promise.reject(error);
         });
 
-  // TODO remove ports from host header for URL with port
-  const host = "localhost";
+  const host = (await headers()).get("host");
 
   if (
     host &&
@@ -76,16 +154,24 @@ export async function updateSession(options: UpdateSessionCommand) {
     !challenges.webAuthN.domain
   ) {
     const [hostname, port] = host.split(":");
+
     challenges.webAuthN.domain = hostname;
   }
 
-  const recent = await sessionPromise;
+  const loginSettings = await getLoginSettings(organization);
+
+  const lifetime = checks?.webAuthN
+    ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
+    : checks?.otpEmail || checks?.otpSms
+      ? loginSettings?.secondFactorCheckLifetime
+      : undefined;
 
   const session = await setSessionAndUpdateCookie(
-    recent,
+    recentSession,
     checks,
     challenges,
     authRequestId,
+    lifetime,
   );
 
   // if password, check if user has MFA methods
