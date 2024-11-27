@@ -18,9 +18,9 @@ jobs:
         id: prepare-matrix
         run: |
           if [ -z "${{ github.event.schedule }}" ]; then
-            echo '::set-output name=matrix::["test:acceptance:qa", "test:acceptance:prod"]'
+            echo 'matrix=["test:acceptance:qa", "test:acceptance:prod"]' >> $GITHUB_OUTPUT
           else
-            echo '::set-output name=matrix::["format --check", "lint", "test:unit", "test:integration", "test:acceptance"]'
+            echo 'matrix=["format --check", "lint", "test:unit", "test:integration", "test:acceptance"]' >> $GITHUB_OUTPUT
           fi
 
   quality:
