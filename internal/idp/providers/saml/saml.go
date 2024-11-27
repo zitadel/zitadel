@@ -9,6 +9,7 @@ import (
 	"encoding/xml"
 	"io"
 	"net/url"
+	"time"
 
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
