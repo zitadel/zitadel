@@ -28,7 +28,7 @@ on:
 jobs:
   matrix:
     # If the workflow is triggered by a schedule event, only the acceptance tests run against QA and Prod.
-    name: Preparte Matrix
+    name: Prepare Matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.prepare-matrix.outputs.matrix }}
@@ -46,7 +46,7 @@ jobs:
             echo 'matrix=["format --check", "lint", "test:unit", "test:integration", "test:acceptance"]' >> $GITHUB_OUTPUT
           fi
       - name: Show Matrix
-        run: echo ${{ steps.prepare-matrix.outputs.matrix }} | jq
+        run: echo '${{ steps.prepare-matrix.outputs.matrix }}' | jq
 
   quality:
     name: Ensure Quality
