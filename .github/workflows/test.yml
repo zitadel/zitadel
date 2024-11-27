@@ -39,7 +39,7 @@ jobs:
           if [ -z "${{ github.event.schedule }}" ]; then
             echo 'matrix=["test:acceptance:qa", "test:acceptance:prod"]' >> $GITHUB_OUTPUT
           elif [ -n "${{ github.event.inputs.zitadel-env }}" ]; then
-            echo "matrix=[\"test:acceptance:${{ github.event.inputs.zitadel-env }}\"]" >> $GITHUB_OUTPUT
+            echo 'matrix=["test:acceptance:${{ github.event.inputs.zitadel-env }}"]' >> $GITHUB_OUTPUT
           elif [ -n "${{ github.event.inputs.zitadel-api-url }}" ]; then
             echo 'matrix=["test:acceptance:custom"]' >> $GITHUB_OUTPUT
           else
