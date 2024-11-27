@@ -256,10 +256,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		urlTmpl := e.URLTemplate
-		if urlTmpl == "" {
-			urlTmpl = login.MailVerificationLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
-		}
+
 		return u.commands.RequestNotification(ctx,
 			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
@@ -270,7 +267,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 				domain.NotificationTypeEmail,
 				domain.VerifyEmailMessageType,
 			).
-				WithURLTemplate(urlTmpl).
+				WithURLTemplate(u.emailCodeTemplate(origin, e)).
 				WithCode(e.Code, e.Expiry).
 				WithArgs(&domain.NotificationArguments{
 					AuthRequestID: e.AuthRequestID,
@@ -278,6 +275,13 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 				WithUnverifiedChannel(),
 		)
 	}), nil
+}
+
+func (u *userNotifier) emailCodeTemplate(origin string, e *user.HumanEmailCodeAddedEvent) string {
+	if e.URLTemplate != "" {
+		return e.URLTemplate
+	}
+	return login.MailVerificationLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 }
 
 func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -305,10 +309,6 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		urlTmpl := e.URLTemplate
-		if urlTmpl == "" {
-			urlTmpl = login.InitPasswordLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
-		}
 		return u.commands.RequestNotification(ctx,
 			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
@@ -319,7 +319,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 				e.NotificationType,
 				domain.PasswordResetMessageType,
 			).
-				WithURLTemplate(urlTmpl).
+				WithURLTemplate(u.passwordCodeTemplate(origin, e)).
 				WithCode(e.Code, e.Expiry).
 				WithArgs(&domain.NotificationArguments{
 					AuthRequestID: e.AuthRequestID,
@@ -327,6 +327,13 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 				WithUnverifiedChannel(),
 		)
 	}), nil
+}
+
+func (u *userNotifier) passwordCodeTemplate(origin string, e *user.HumanPasswordCodeAddedEvent) string {
+	if e.URLTemplate != "" {
+		return e.URLTemplate
+	}
+	return login.InitPasswordLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 }
 
 func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -494,10 +501,6 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		}
 		origin := http_util.DomainContext(ctx).Origin()
 
-		urlTmpl := origin + u.otpEmailTmpl
-		if e.URLTmpl != "" {
-			urlTmpl = e.URLTmpl
-		}
 		args := otpArgs(ctx, e.Expiry)
 		args.SessionID = e.Aggregate().ID
 		return u.commands.RequestNotification(ctx,
@@ -511,12 +514,19 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 				domain.VerifyEmailOTPMessageType,
 			).
 				WithAggregate(e.Aggregate().ID, e.Aggregate().ResourceOwner).
-				WithURLTemplate(urlTmpl).
+				WithURLTemplate(u.otpEmailTemplate(origin, e)).
 				WithCode(e.Code, e.Expiry).
 				WithOTP().
 				WithArgs(args),
 		)
 	}), nil
+}
+
+func (u *userNotifier) otpEmailTemplate(origin string, e *session.OTPEmailChallengedEvent) string {
+	if e.URLTmpl != "" {
+		return e.URLTmpl
+	}
+	return origin + u.otpEmailTmpl
 }
 
 func otpArgs(ctx context.Context, expiry time.Duration) *domain.NotificationArguments {
@@ -591,10 +601,6 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		urlTmpl := e.URLTemplate
-		if urlTmpl == "" {
-			urlTmpl = domain.PasswordlessInitCodeLinkTemplate(origin+login.HandlerPrefix+login.EndpointPasswordlessRegistration, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
-		}
 		return u.commands.RequestNotification(ctx,
 			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
@@ -605,13 +611,20 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 				domain.NotificationTypeEmail,
 				domain.PasswordlessRegistrationMessageType,
 			).
-				WithURLTemplate(urlTmpl).
+				WithURLTemplate(u.passwordlessCodeTemplate(origin, e)).
 				WithCode(e.Code, e.Expiry).
 				WithArgs(&domain.NotificationArguments{
 					CodeID: e.ID,
 				}),
 		)
 	}), nil
+}
+
+func (u *userNotifier) passwordlessCodeTemplate(origin string, e *user.HumanPasswordlessInitCodeRequestedEvent) string {
+	if e.URLTemplate != "" {
+		return e.URLTemplate
+	}
+	return domain.PasswordlessInitCodeLinkTemplate(origin+login.HandlerPrefix+login.EndpointPasswordlessRegistration, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.ID)
 }
 
 func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.Statement, error) {
@@ -736,10 +749,6 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 		if applicationName == "" {
 			applicationName = "ZITADEL"
 		}
-		urlTmpl := e.URLTemplate
-		if urlTmpl == "" {
-			urlTmpl = login.InviteUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
-		}
 		return u.commands.RequestNotification(ctx,
 			e.Aggregate().ResourceOwner,
 			command.NewNotificationRequest(
@@ -750,7 +759,7 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 				domain.NotificationTypeEmail,
 				domain.InviteUserMessageType,
 			).
-				WithURLTemplate(urlTmpl).
+				WithURLTemplate(u.inviteCodeTemplate(origin, e)).
 				WithCode(e.Code, e.Expiry).
 				WithUnverifiedChannel().
 				WithArgs(&domain.NotificationArguments{
@@ -759,6 +768,13 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 				}),
 		)
 	}), nil
+}
+
+func (u *userNotifier) inviteCodeTemplate(origin string, e *user.HumanInviteCodeAddedEvent) string {
+	if e.URLTemplate != "" {
+		return e.URLTemplate
+	}
+	return login.InviteUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)
 }
 
 func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, event eventstore.Event, expiry time.Duration, data map[string]interface{}, eventTypes ...eventstore.EventType) (bool, error) {
