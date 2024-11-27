@@ -18,6 +18,7 @@ import { ProjectRolesDataSource } from './project-roles-table-datasource';
   styleUrls: ['./project-roles-table.component.scss'],
 })
 export class ProjectRolesTableComponent implements OnInit {
+  public INITIAL_PAGE_SIZE: number = 50;
   @Input() public projectId: string = '';
   @Input() public grantId: string = '';
   @Input() public disabled: boolean = false;
@@ -43,41 +44,58 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.dataSource.loadRoles(this.projectId, this.grantId, 0, 25, 'asc');
-
-    this.dataSource.rolesSubject.subscribe((roles) => {
-      const selectedRoles: Role.AsObject[] = roles.filter((role) => this.selectedKeys.includes(role.key));
-      this.selection.select(...selectedRoles.map((r) => r.key));
-    });
+    this.loadRolesPage();
+    this.selection.select(...this.selectedKeys);
 
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
   }
 
-  public selectAllOfGroup(group: string): void {
-    const groupRoles: Role.AsObject[] = this.dataSource.rolesSubject.getValue().filter((role) => role.group === group);
-    this.selection.select(...groupRoles.map((r) => r.key));
-  }
-
   private loadRolesPage(): void {
-    this.dataSource.loadRoles(this.projectId, this.grantId, this.paginator?.pageIndex ?? 0, this.paginator?.pageSize ?? 25);
+    this.dataSource.loadRoles(
+      this.projectId,
+      this.grantId,
+      this.paginator?.pageIndex ?? 0,
+      this.paginator?.pageSize ?? this.INITIAL_PAGE_SIZE,
+    );
   }
 
   public changePage(): void {
     this.loadRolesPage();
   }
 
-  public isAllSelected(): boolean {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.totalResult;
-    return numSelected === numRows;
+  private listIsAllSelected(list: string[]): boolean {
+    return list.findIndex((key) => !this.selection.isSelected(key)) == -1;
+  }
+
+  private listIsAnySelected(list: string[]): boolean {
+    return list.findIndex((key) => this.selection.isSelected(key)) != -1;
+  }
+
+  private listMasterToggle(list: string[]): void {
+    if (this.listIsAllSelected(list)) this.selection.deselect(...list);
+    else this.selection.select(...list);
+  }
+
+  private compilePageKeys(): string[] {
+    return this.dataSource.rolesSubject.value.map((role) => role.key);
   }
 
   public masterToggle(): void {
-    this.isAllSelected()
-      ? this.selection.clear()
-      : this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row.key));
+    this.listMasterToggle(this.compilePageKeys());
+  }
+
+  public isAllSelected(): boolean {
+    return this.listIsAllSelected(this.compilePageKeys());
+  }
+
+  public isAnySelected(): boolean {
+    return this.listIsAnySelected(this.compilePageKeys());
+  }
+
+  public groupMasterToggle(group: string): void {
+    this.listMasterToggle(this.dataSource.rolesSubject.value.filter((role) => role.group == group).map((role) => role.key));
   }
 
   public deleteRole(role: Role.AsObject): void {
@@ -93,45 +111,28 @@ export class ProjectRolesTableComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        const index = this.dataSource.rolesSubject.value.findIndex((iter) => iter.key === role.key);
-
         this.mgmtService.removeProjectRole(this.projectId, role.key).then(() => {
           this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
-
-          if (index > -1) {
-            this.dataSource.rolesSubject.value.splice(index, 1);
-            this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
-          }
+          this.loadRolesPage();
         });
       }
     });
   }
 
-  public removeRole(role: Role.AsObject, index: number): void {
-    this.mgmtService
-      .removeProjectRole(this.projectId, role.key)
-      .then(() => {
-        this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
-        this.dataSource.rolesSubject.value.splice(index, 1);
-        this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
   public openDetailDialog(role: Role.AsObject): void {
-    this.dialog.open(ProjectRoleDetailDialogComponent, {
+    const dialogRef = this.dialog.open(ProjectRoleDetailDialogComponent, {
       data: {
         role,
         projectId: this.projectId,
       },
       width: '400px',
     });
+
+    dialogRef.afterClosed().subscribe(() => this.loadRolesPage());
   }
 
   public refreshPage(): void {
-    this.dataSource.loadRoles(this.projectId, this.grantId, this.paginator?.pageIndex ?? 0, this.paginator?.pageSize ?? 25);
+    this.loadRolesPage();
   }
 
   public get selectionAllowed(): boolean {
