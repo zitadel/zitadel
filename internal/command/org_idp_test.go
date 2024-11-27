@@ -5348,12 +5348,13 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		resourceOwner string
-		provider      SAMLProvider
+		provider      *SAMLProvider
 	}
 	type res struct {
-		id   string
-		want *domain.ObjectDetails
-		err  func(error) bool
+		id            string
+		want          *domain.ObjectDetails
+		metadataError *string
+		err           func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -5370,7 +5371,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider:      SAMLProvider{},
+				provider:      &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5379,7 +5380,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata",
+			"no metadata",
 			fields{
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5387,13 +5388,34 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name: "name",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-78isv6m53a", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata, fail on error",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				provider: &SAMLProvider{
+					Name:                "name",
+					Metadata:            []byte("metadata"),
+					FailOnMetadataError: true,
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat"))
 				},
 			},
 		},
@@ -5428,14 +5450,15 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
 					Metadata: []byte("metadata"),
 				},
 			},
 			res: res{
-				id:   "id1",
-				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+				id:            "id1",
+				want:          &domain.ObjectDetails{ResourceOwner: "org1"},
+				metadataError: gu.Ptr("EOF"),
 			},
 		},
 		{
@@ -5475,7 +5498,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:                          "name",
 					Metadata:                      []byte("metadata"),
 					Binding:                       "binding",
@@ -5491,8 +5514,9 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				id:   "id1",
-				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+				id:            "id1",
+				want:          &domain.ObjectDetails{ResourceOwner: "org1"},
+				metadataError: gu.Ptr("EOF"),
 			},
 		},
 	}
@@ -5504,7 +5528,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
-			id, got, err := c.AddOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			id, got, gotMetadataError, err := c.AddOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -5514,6 +5538,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
 				assertObjectDetails(t, tt.res.want, got)
+				assert.Equal(t, tt.res.metadataError, gotMetadataError)
 			}
 		})
 	}
@@ -5528,11 +5553,12 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		ctx           context.Context
 		resourceOwner string
 		id            string
-		provider      SAMLProvider
+		provider      *SAMLProvider
 	}
 	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
+		want          *domain.ObjectDetails
+		metadataError *string
+		err           func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -5548,7 +5574,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				resourceOwner: "org1",
-				provider:      SAMLProvider{},
+				provider:      &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5565,7 +5591,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider:      SAMLProvider{},
+				provider:      &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5574,7 +5600,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata",
+			"no metadata",
 			fields{
 				eventstore: expectEventstore(),
 			},
@@ -5582,13 +5608,34 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name: "name",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-j6spncd74m", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata, fail on error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				id:            "id1",
+				provider: &SAMLProvider{
+					Name:                "name",
+					FailOnMetadataError: true,
+					Metadata:            []byte("metadata"),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SFqqh42", "Errors.Project.App.SAMLMetadataFormat"))
 				},
 			},
 		},
@@ -5603,7 +5650,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
 					Metadata: []byte("metadata"),
 				},
@@ -5644,13 +5691,14 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
 					Metadata: []byte("metadata"),
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+				want:          &domain.ObjectDetails{ResourceOwner: "org1"},
+				metadataError: gu.Ptr("EOF"),
 			},
 		},
 		{
@@ -5707,7 +5755,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				id:            "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:                          "new name",
 					Metadata:                      []byte("new metadata"),
 					Binding:                       "new binding",
@@ -5723,7 +5771,8 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{ResourceOwner: "org1"},
+				want:          &domain.ObjectDetails{ResourceOwner: "org1"},
+				metadataError: gu.Ptr("EOF"),
 			},
 		},
 	}
@@ -5733,7 +5782,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			got, err := c.UpdateOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
+			got, gotMetadataError, err := c.UpdateOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -5742,6 +5791,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, got)
+				assert.Equal(t, tt.res.metadataError, gotMetadataError)
 			}
 		})
 	}

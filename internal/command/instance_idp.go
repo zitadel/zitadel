@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/saml/pkg/provider/xml"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -11,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -511,32 +513,32 @@ func (c *Commands) UpdateInstanceAppleProvider(ctx context.Context, id string, p
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddInstanceSAMLProvider(ctx context.Context, provider SAMLProvider) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddInstanceSAMLProvider(ctx context.Context, provider *SAMLProvider) (id string, details *domain.ObjectDetails, metadataError *string, err error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err = c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 	writeModel := NewSAMLInstanceIDPWriteModel(instanceID, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddInstanceSAMLProvider(instanceAgg, writeModel, provider))
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
-	return id, pushedEventsToObjectDetails(pushedEvents), nil
+	return id, pushedEventsToObjectDetails(pushedEvents), provider.MetadataError, nil
 }
 
-func (c *Commands) UpdateInstanceSAMLProvider(ctx context.Context, id string, provider SAMLProvider) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateInstanceSAMLProvider(ctx context.Context, id string, provider *SAMLProvider) (details *domain.ObjectDetails, metadataError *string, err error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
 	writeModel := NewSAMLInstanceIDPWriteModel(instanceID, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateInstanceSAMLProvider(instanceAgg, writeModel, provider))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
@@ -544,13 +546,13 @@ func (c *Commands) UpdateInstanceSAMLProvider(ctx context.Context, id string, pr
 			Sequence:      writeModel.ProcessedSequence,
 			EventDate:     writeModel.ChangeDate,
 			ResourceOwner: writeModel.ResourceOwner,
-		}, nil
+		}, provider.MetadataError, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return pushedEventsToObjectDetails(pushedEvents), nil
+	return pushedEventsToObjectDetails(pushedEvents), provider.MetadataError, nil
 }
 
 func (c *Commands) RegenerateInstanceSAMLProviderCertificate(ctx context.Context, id string) (*domain.ObjectDetails, error) {
@@ -1719,7 +1721,7 @@ func (c *Commands) prepareUpdateInstanceAppleProvider(a *instance.Aggregate, wri
 	}
 }
 
-func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeModel *InstanceSAMLIDPWriteModel, provider SAMLProvider) preparation.Validation {
+func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeModel *InstanceSAMLIDPWriteModel, provider *SAMLProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-o07zjotgnd", "Errors.Invalid.Argument")
@@ -1733,6 +1735,13 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 		}
 		if len(provider.Metadata) == 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument")
+		}
+		_, err := saml.ParseMetadata(provider.Metadata)
+		if err != nil {
+			if provider.FailOnMetadataError {
+				return nil, zerrors.ThrowInvalidArgument(err, "INST-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat")
+			}
+			provider.MetadataError = gu.Ptr(err.Error())
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1772,7 +1781,7 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 	}
 }
 
-func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writeModel *InstanceSAMLIDPWriteModel, provider SAMLProvider) preparation.Validation {
+func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writeModel *InstanceSAMLIDPWriteModel, provider *SAMLProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-7o3rq1owpm", "Errors.Invalid.Argument")
@@ -1789,6 +1798,13 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 				return nil, zerrors.ThrowInvalidArgument(err, "INST-iijz4h01if", "Errors.Project.App.SAMLMetadataMissing")
 			}
 			provider.Metadata = data
+		}
+		_, err := saml.ParseMetadata(provider.Metadata)
+		if err != nil {
+			if provider.FailOnMetadataError {
+				return nil, zerrors.ThrowInvalidArgument(err, "INST-dsfj3kl2", "Errors.Project.App.SAMLMetadataFormat")
+			}
+			provider.MetadataError = gu.Ptr(err.Error())
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

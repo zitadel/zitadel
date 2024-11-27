@@ -120,6 +120,10 @@ type SAMLProvider struct {
 	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
 	IDPOptions                    idp.Options
+	FailOnMetadataError           bool
+
+	// MetadataError will be set by command
+	MetadataError *string
 }
 
 type AppleProvider struct {

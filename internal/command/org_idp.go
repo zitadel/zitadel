@@ -4,12 +4,14 @@ import (
 	"context"
 	"strings"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/saml/pkg/provider/xml"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -446,30 +448,30 @@ func (c *Commands) UpdateOrgLDAPProvider(ctx context.Context, resourceOwner, id 
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddOrgSAMLProvider(ctx context.Context, resourceOwner string, provider SAMLProvider) (string, *domain.ObjectDetails, error) {
+func (c *Commands) AddOrgSAMLProvider(ctx context.Context, resourceOwner string, provider *SAMLProvider) (id string, details *domain.ObjectDetails, metadataError *string, err error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err = c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 	writeModel := NewSAMLOrgIDPWriteModel(resourceOwner, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgSAMLProvider(orgAgg, writeModel, provider))
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, err
+		return "", nil, nil, err
 	}
-	return id, pushedEventsToObjectDetails(pushedEvents), nil
+	return id, pushedEventsToObjectDetails(pushedEvents), provider.MetadataError, nil
 }
 
-func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id string, provider SAMLProvider) (*domain.ObjectDetails, error) {
+func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id string, provider *SAMLProvider) (details *domain.ObjectDetails, metadataError *string, err error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	writeModel := NewSAMLOrgIDPWriteModel(resourceOwner, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgSAMLProvider(orgAgg, writeModel, provider))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
@@ -477,13 +479,13 @@ func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id 
 			Sequence:      writeModel.ProcessedSequence,
 			EventDate:     writeModel.ChangeDate,
 			ResourceOwner: writeModel.ResourceOwner,
-		}, nil
+		}, provider.MetadataError, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return pushedEventsToObjectDetails(pushedEvents), nil
+	return pushedEventsToObjectDetails(pushedEvents), provider.MetadataError, nil
 }
 
 func (c *Commands) RegenerateOrgSAMLProviderCertificate(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
@@ -1703,7 +1705,7 @@ func (c *Commands) prepareUpdateOrgAppleProvider(a *org.Aggregate, writeModel *O
 	}
 }
 
-func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel, provider SAMLProvider) preparation.Validation {
+func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel, provider *SAMLProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if provider.Name = strings.TrimSpace(provider.Name); provider.Name == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-957lr0f8u3", "Errors.Invalid.Argument")
@@ -1717,6 +1719,13 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 				return nil, zerrors.ThrowInvalidArgument(err, "ORG-ipzxvf3cv2", "Errors.Project.App.SAMLMetadataMissing")
 			}
 			provider.Metadata = data
+		}
+		_, err := saml.ParseMetadata(provider.Metadata)
+		if err != nil {
+			if provider.FailOnMetadataError {
+				return nil, zerrors.ThrowInvalidArgument(err, "ORG-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat")
+			}
+			provider.MetadataError = gu.Ptr(err.Error())
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1755,7 +1764,7 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 	}
 }
 
-func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel, provider SAMLProvider) preparation.Validation {
+func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSAMLIDPWriteModel, provider *SAMLProvider) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if writeModel.ID = strings.TrimSpace(writeModel.ID); writeModel.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-wwdwdlaya0", "Errors.Invalid.Argument")
@@ -1772,6 +1781,13 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 		}
 		if provider.Metadata == nil {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-j6spncd74m", "Errors.Invalid.Argument")
+		}
+		_, err := saml.ParseMetadata(provider.Metadata)
+		if err != nil {
+			if provider.FailOnMetadataError {
+				return nil, zerrors.ThrowInvalidArgument(err, "ORG-SFqqh42", "Errors.Project.App.SAMLMetadataFormat")
+			}
+			provider.MetadataError = gu.Ptr(err.Error())
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

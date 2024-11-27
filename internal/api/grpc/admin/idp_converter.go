@@ -469,12 +469,12 @@ func updateAppleProviderToCommand(req *admin_pb.UpdateAppleProviderRequest) comm
 	}
 }
 
-func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) command.SAMLProvider {
+func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) *command.SAMLProvider {
 	var nameIDFormat *domain.SAMLNameIDFormat
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
-	return command.SAMLProvider{
+	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
@@ -483,15 +483,16 @@ func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) command.SAML
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
+		FailOnMetadataError:           req.GetFailOnMetadataError(),
 	}
 }
 
-func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) command.SAMLProvider {
+func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) *command.SAMLProvider {
 	var nameIDFormat *domain.SAMLNameIDFormat
 	if req.NameIdFormat != nil {
 		nameIDFormat = gu.Ptr(idp_grpc.SAMLNameIDFormatToDomain(req.GetNameIdFormat()))
 	}
-	return command.SAMLProvider{
+	return &command.SAMLProvider{
 		Name:                          req.Name,
 		Metadata:                      req.GetMetadataXml(),
 		MetadataURL:                   req.GetMetadataUrl(),
@@ -500,6 +501,7 @@ func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) comman
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
+		FailOnMetadataError:           req.GetFailOnMetadataError(),
 	}
 }
 

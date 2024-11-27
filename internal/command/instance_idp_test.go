@@ -5180,12 +5180,13 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 	}
 	type args struct {
 		ctx      context.Context
-		provider SAMLProvider
+		provider *SAMLProvider
 	}
 	type res struct {
-		id   string
-		want *domain.ObjectDetails
-		err  func(error) bool
+		id            string
+		want          *domain.ObjectDetails
+		metadataError *string
+		err           func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -5201,7 +5202,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{},
+				provider: &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5210,20 +5211,40 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata",
+			"no metadata",
 			fields{
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name: "name",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
+			"invalid metadata, fail on error",
+			fields{
+				eventstore:  expectEventstore(),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: &SAMLProvider{
+					Name:                "name",
+					Metadata:            []byte("metadata"),
+					FailOnMetadataError: true,
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat"))
 				},
 			},
 		},
@@ -5258,14 +5279,15 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
 					Metadata: []byte("metadata"),
 				},
 			},
 			res: res{
-				id:   "id1",
-				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+				id:            "id1",
+				want:          &domain.ObjectDetails{ResourceOwner: "instance1"},
+				metadataError: gu.Ptr("EOF"),
 			},
 		},
 		{
@@ -5304,7 +5326,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:                          "name",
 					Metadata:                      []byte("metadata"),
 					Binding:                       "binding",
@@ -5320,8 +5342,9 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				id:   "id1",
-				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+				id:            "id1",
+				want:          &domain.ObjectDetails{ResourceOwner: "instance1"},
+				metadataError: gu.Ptr("EOF"),
 			},
 		},
 	}
@@ -5333,7 +5356,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
-			id, got, err := c.AddInstanceSAMLProvider(tt.args.ctx, tt.args.provider)
+			id, got, gotMetadataError, err := c.AddInstanceSAMLProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -5343,6 +5366,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
 				assertObjectDetails(t, tt.res.want, got)
+				assert.Equal(t, tt.res.metadataError, gotMetadataError)
 			}
 		})
 	}
@@ -5356,11 +5380,12 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 	type args struct {
 		ctx      context.Context
 		id       string
-		provider SAMLProvider
+		provider *SAMLProvider
 	}
 	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
+		want              *domain.ObjectDetails
+		wantMetadataError *string
+		err               func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -5375,7 +5400,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
-				provider: SAMLProvider{},
+				provider: &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5391,7 +5416,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
 				id:       "id1",
-				provider: SAMLProvider{},
+				provider: &SAMLProvider{},
 			},
 			res{
 				err: func(err error) bool {
@@ -5400,20 +5425,40 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata",
+			"no metadata",
 			fields{
 				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name: "name",
 				},
 			},
 			res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-iw1rxnf4sf", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata, fail on error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: &SAMLProvider{
+					Name:                "name",
+					Metadata:            []byte("metadata"),
+					FailOnMetadataError: true,
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dsfj3kl2", "Errors.Project.App.SAMLMetadataFormat"))
 				},
 			},
 		},
@@ -5427,7 +5472,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
 					Metadata: []byte("metadata"),
 				},
@@ -5465,13 +5510,14 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:     "name",
 					Metadata: []byte("metadata"),
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+				want:              &domain.ObjectDetails{ResourceOwner: "instance1"},
+				wantMetadataError: gu.Ptr("EOF"),
 			},
 		},
 		{
@@ -5527,7 +5573,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				id:  "id1",
-				provider: SAMLProvider{
+				provider: &SAMLProvider{
 					Name:                          "new name",
 					Metadata:                      []byte("new metadata"),
 					Binding:                       "new binding",
@@ -5543,7 +5589,8 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+				want:              &domain.ObjectDetails{ResourceOwner: "instance1"},
+				wantMetadataError: gu.Ptr("EOF"),
 			},
 		},
 	}
@@ -5553,7 +5600,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			got, err := c.UpdateInstanceSAMLProvider(tt.args.ctx, tt.args.id, tt.args.provider)
+			got, gotMetadataError, err := c.UpdateInstanceSAMLProvider(tt.args.ctx, tt.args.id, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -5562,6 +5609,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, got)
+				assert.Equal(t, tt.res.wantMetadataError, gotMetadataError)
 			}
 		})
 	}
