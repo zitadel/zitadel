@@ -40,8 +40,6 @@ import {
 import { unstable_cacheLife as cacheLife } from "next/cache";
 import { PROVIDER_MAPPING } from "./idp";
 
-const SESSION_LIFETIME_S = 3600; // TODO load from oidc settings
-
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
   { baseUrl: process.env.ZITADEL_API_URL! },
