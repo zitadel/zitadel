@@ -34,7 +34,11 @@ func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project
 	if existingProject.State != domain.ProjectStateUnspecified {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-opamwu", "Errors.Project.AlreadyExisting")
 	}
-	return c.addProjectWithID(ctx, project, resourceOwner, projectID)
+	project, err = c.addProjectWithID(ctx, project, resourceOwner, projectID)
+	if err != nil {
+		return nil, err
+	}
+	return project, nil
 }
 
 func (c *Commands) AddProject(ctx context.Context, project *domain.Project, resourceOwner, ownerUserID string) (_ *domain.Project, err error) {
@@ -53,7 +57,11 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 		return nil, err
 	}
 
-	return c.addProjectWithIDWithOwner(ctx, project, resourceOwner, ownerUserID, projectID)
+	project, err = c.addProjectWithIDWithOwner(ctx, project, resourceOwner, ownerUserID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	return project, nil
 }
 
 func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {
@@ -71,11 +79,15 @@ func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Proj
 			projectAdd.HasProjectCheck,
 			projectAdd.PrivateLabelingSetting),
 	}
-
+	postCommit, err := c.projectCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedProject, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -103,11 +115,15 @@ func (c *Commands) addProjectWithIDWithOwner(ctx context.Context, projectAdd *do
 			projectAdd.PrivateLabelingSetting),
 		project.NewProjectMemberAddedEvent(ctx, projectAgg, ownerUserID, projectRole),
 	}
-
+	postCommit, err := c.projectCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedProject, pushedEvents...)
 	if err != nil {
 		return nil, err

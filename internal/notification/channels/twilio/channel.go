@@ -1,7 +1,10 @@
 package twilio
 
 import (
-	newTwilio "github.com/twilio/twilio-go"
+	"errors"
+
+	"github.com/twilio/twilio-go"
+	twilioClient "github.com/twilio/twilio-go/client"
 	openapi "github.com/twilio/twilio-go/rest/api/v2010"
 	verify "github.com/twilio/twilio-go/rest/verify/v2"
 	"github.com/zitadel/logging"
@@ -12,7 +15,7 @@ import (
 )
 
 func InitChannel(config Config) channels.NotificationChannel {
-	client := newTwilio.NewRestClientWithParams(newTwilio.ClientParams{Username: config.SID, Password: config.Token})
+	client := twilio.NewRestClientWithParams(twilio.ClientParams{Username: config.SID, Password: config.Token})
 	logging.Debug("successfully initialized twilio sms channel")
 
 	return channels.HandleMessageFunc(func(message channels.Message) error {
@@ -26,6 +29,17 @@ func InitChannel(config Config) channels.NotificationChannel {
 			params.SetChannel("sms")
 
 			resp, err := client.VerifyV2.CreateVerification(config.VerifyServiceSID, params)
+
+			var twilioErr *twilioClient.TwilioRestError
+			if errors.As(err, &twilioErr) && twilioErr.Code == 60203 {
+				// If there were too many attempts to send a verification code (more than 5 times)
+				// without a verification check, even retries with backoff might not solve the problem.
+				// Instead, let the user initiate the verification again (e.g. using "resend code")
+				// https://www.twilio.com/docs/api/errors/60203
+				logging.WithFields("error", twilioErr.Message, "code", twilioErr.Code).Warn("twilio create verification error")
+				return channels.NewCancelError(twilioErr)
+			}
+
 			if err != nil {
 				return zerrors.ThrowInternal(err, "TWILI-0s9f2", "could not send verification")
 			}

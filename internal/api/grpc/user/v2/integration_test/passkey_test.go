@@ -19,8 +19,6 @@ import (
 )
 
 func TestServer_RegisterPasskey(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
@@ -156,8 +154,6 @@ func TestServer_RegisterPasskey(t *testing.T) {
 }
 
 func TestServer_VerifyPasskeyRegistration(t *testing.T) {
-	t.Parallel()
-
 	userID, pkr := userWithPasskeyRegistered(t)
 
 	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
@@ -234,8 +230,6 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 }
 
 func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	type args struct {
@@ -369,8 +363,6 @@ func passkeyVerify(t *testing.T, userID string, pkr *user.RegisterPasskeyRespons
 }
 
 func TestServer_RemovePasskey(t *testing.T) {
-	t.Parallel()
-
 	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
 	userIDRegistered, pkrRegistered := userWithPasskeyRegistered(t)
 	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
@@ -476,8 +468,6 @@ func TestServer_RemovePasskey(t *testing.T) {
 }
 
 func TestServer_ListPasskeys(t *testing.T) {
-	t.Parallel()
-
 	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
 	userIDRegistered, _ := userWithPasskeyRegistered(t)
 	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)

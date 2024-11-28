@@ -517,7 +517,9 @@ func NewHumanInviteCheckFailedEvent(ctx context.Context, aggregate *eventstore.A
 type HumanSignedOutEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserAgentID string `json:"userAgentID"`
+	UserAgentID       string `json:"userAgentID"`
+	SessionID         string `json:"sessionID,omitempty"`
+	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
 }
 
 func (e *HumanSignedOutEvent) Payload() interface{} {
@@ -528,10 +530,15 @@ func (e *HumanSignedOutEvent) UniqueConstraints() []*eventstore.UniqueConstraint
 	return nil
 }
 
+func (e *HumanSignedOutEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
 func NewHumanSignedOutEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userAgentID string,
+	userAgentID,
+	sessionID string,
 ) *HumanSignedOutEvent {
 	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -539,7 +546,9 @@ func NewHumanSignedOutEvent(
 			aggregate,
 			HumanSignedOutType,
 		),
-		UserAgentID: userAgentID,
+		UserAgentID:       userAgentID,
+		SessionID:         sessionID,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 

@@ -69,6 +69,7 @@ import (
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
 	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
@@ -177,6 +178,10 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}))
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+	cacheConnectors, err := connector.StartConnectors(config.Caches, queryDBClient)
+	if err != nil {
+		return fmt.Errorf("unable to start caches: %w", err)
+	}
 
 	queries, err := query.StartQueries(
 		ctx,
@@ -184,7 +189,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
-		config.Caches,
+		cacheConnectors,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,
@@ -222,8 +227,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
-	commands, err := command.StartCommands(
+	commands, err := command.StartCommands(ctx,
 		eventstoreClient,
+		cacheConnectors,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		storage,
@@ -269,7 +275,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
+		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
+		config.Notifications,
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -282,6 +290,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
+		keys.OIDC,
+		config.OIDC.DefaultBackChannelLogoutLifetime,
+		queryDBClient,
 	)
 	notification.Start(ctx)
 
