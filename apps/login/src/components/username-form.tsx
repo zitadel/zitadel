@@ -55,13 +55,19 @@ export function UsernameForm({
     })
       .catch(() => {
         setError("An internal error occurred");
+        return;
       })
       .finally(() => {
         setLoading(false);
       });
 
+    if (res?.redirect) {
+      return router.push(res.redirect);
+    }
+
     if (res?.error) {
       setError(res.error);
+      return;
     }
 
     return res;

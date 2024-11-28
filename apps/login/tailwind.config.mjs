@@ -1,4 +1,4 @@
-const sharedConfig = require("zitadel-tailwind-config/tailwind.config.mjs");
+import sharedConfig from "zitadel-tailwind-config/tailwind.config.mjs";
 
 let colors = {
   background: { light: { contrast: {} }, dark: { contrast: {} } },
@@ -35,7 +35,7 @@ types.forEach((type) => {
 });
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   presets: [sharedConfig],
   darkMode: "class",
   content: ["./src/**/*.{js,ts,jsx,tsx}"],

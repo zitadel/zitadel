@@ -32,7 +32,7 @@ export async function addU2F(command: RegisterU2FCommand) {
     sessionToken: sessionCookie.token,
   });
 
-  const domain = headers().get("host");
+  const domain = (await headers()).get("host");
 
   if (!domain) {
     return { error: "Could not get domain" };
@@ -54,7 +54,7 @@ export async function addU2F(command: RegisterU2FCommand) {
 export async function verifyU2F(command: VerifyU2FCommand) {
   let passkeyName = command.passkeyName;
   if (!!!passkeyName) {
-    const headersList = headers();
+    const headersList = await headers();
     const userAgentStructure = { headers: headersList };
     const { browser, device, os } = userAgent(userAgentStructure);
 

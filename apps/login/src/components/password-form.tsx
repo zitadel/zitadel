@@ -74,8 +74,8 @@ export function PasswordForm({
       return;
     }
 
-    if (response && response.nextStep) {
-      return router.push(response.nextStep);
+    if (response && "redirect" in response && response.redirect) {
+      return router.push(response.redirect);
     }
   }
 
