@@ -2,7 +2,15 @@
   {
     "service": "zitadel.settings.v2.SettingsService",
     "method": "GetBrandingSettings",
-    "out": {}
+    "out": {
+      "data": {
+        "settings": {
+          "darkTheme": {
+            "backgroundColor": "#ff0000"
+          }
+        }
+      }
+    }
   },
   {
     "service": "zitadel.settings.v2.SettingsService",

@@ -1,5 +1,7 @@
 "use client";
+import { getNextUrl } from "@/lib/client";
 import { verifyTOTP } from "@/lib/server-actions";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,6 +26,7 @@ type Props = {
   authRequestId?: string;
   organization?: string;
   checkAfter?: boolean;
+  loginSettings?: LoginSettings;
 };
 export function TotpRegister({
   uri,
@@ -33,6 +36,7 @@ export function TotpRegister({
   authRequestId,
   organization,
   checkAfter,
+  loginSettings,
 }: Props) {
   const t = useTranslations("otp");
 
@@ -50,7 +54,7 @@ export function TotpRegister({
   async function continueWithCode(values: Inputs) {
     setLoading(true);
     return verifyTOTP(values.code, loginName, organization)
-      .then((response) => {
+      .then(async () => {
         // if attribute is set, validate MFA after it is setup, otherwise proceed as usual (when mfa is enforced to login)
         if (checkAfter) {
           const params = new URLSearchParams({});
@@ -67,35 +71,34 @@ export function TotpRegister({
 
           return router.push(`/otp/time-based?` + params);
         } else {
-          if (authRequestId && sessionId) {
-            const params = new URLSearchParams({
-              sessionId: sessionId,
-              authRequest: authRequestId,
-            });
+          const url =
+            authRequestId && sessionId
+              ? await getNextUrl(
+                  {
+                    sessionId: sessionId,
+                    authRequestId: authRequestId,
+                    organization: organization,
+                  },
+                  loginSettings?.defaultRedirectUri,
+                )
+              : loginName
+                ? await getNextUrl(
+                    {
+                      loginName: loginName,
+                      organization: organization,
+                    },
+                    loginSettings?.defaultRedirectUri,
+                  )
+                : null;
 
-            if (organization) {
-              params.append("organization", organization);
-            }
-
-            return router.push(`/login?` + params);
-          } else if (loginName) {
-            const params = new URLSearchParams({
-              loginName,
-            });
-
-            if (authRequestId) {
-              params.append("authRequestId", authRequestId);
-            }
-            if (organization) {
-              params.append("organization", organization);
-            }
-
-            return router.push(`/signedin?` + params);
+          if (url) {
+            return router.push(url);
           }
         }
       })
       .catch((e) => {
         setError(e.message);
+        return;
       })
       .finally(() => {
         setLoading(false);

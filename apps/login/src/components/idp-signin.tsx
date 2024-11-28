@@ -35,30 +35,18 @@ export function IdpSignin({
       },
       authRequestId,
     })
-      .then((session) => {
-        if (authRequestId && session && session.id) {
-          return router.push(
-            `/login?` +
-              new URLSearchParams({
-                sessionId: session.id,
-                authRequest: authRequestId,
-              }),
-          );
-        } else {
-          const params = new URLSearchParams({});
-          if (session.factors?.user?.loginName) {
-            params.set("loginName", session.factors?.user?.loginName);
-          }
+      .then((response) => {
+        if (response && "error" in response && response?.error) {
+          setError(response?.error);
+          return;
+        }
 
-          if (authRequestId) {
-            params.set("authRequestId", authRequestId);
-          }
-
-          return router.push(`/signedin?` + params);
+        if (response && "redirect" in response && response?.redirect) {
+          return router.push(response.redirect);
         }
       })
-      .catch((error) => {
-        setError(error.message);
+      .catch(() => {
+        setError("An internal error occurred");
         return;
       })
       .finally(() => {

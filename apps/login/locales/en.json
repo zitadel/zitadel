@@ -122,6 +122,18 @@
     }
   },
   "register": {
+    "methods": {
+      "passkey": "Passkey",
+      "password": "Password"
+    },
+    "disabled": {
+      "title": "Registration disabled",
+      "description": "The registration is disabled. Please contact your administrator."
+    },
+    "missingdata": {
+      "title": "Missing data",
+      "description": "Provide email, first and last name to register."
+    },
     "title": "Register",
     "description": "Create your ZITADEL account.",
     "selectMethod": "Select the method you would like to authenticate",
@@ -151,7 +163,8 @@
   },
   "signedin": {
     "title": "Welcome {user}!",
-    "description": "You are signed in."
+    "description": "You are signed in.",
+    "continue": "Continue"
   },
   "verify": {
     "userIdMissing": "No userId provided!",

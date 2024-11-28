@@ -10,6 +10,16 @@ describe("register", () => {
         result: [{ id: "256088834543534543" }],
       },
     });
+    stub("zitadel.settings.v2.SettingsService", "GetLoginSettings", {
+      data: {
+        settings: {
+          passkeysType: 1,
+          allowRegister: true,
+          allowUsernamePassword: true,
+          defaultRedirectUri: "",
+        },
+      },
+    });
     stub("zitadel.user.v2.UserService", "AddHumanUser", {
       data: {
         userId: "221394658884845598",
@@ -53,9 +63,11 @@ describe("register", () => {
 
   it("should redirect a user who selects passwordless on register to /passkey/set", () => {
     cy.visit("/register");
-    cy.get('input[autocomplete="firstname"]').focus().type("John");
-    cy.get('input[autocomplete="lastname"]').focus().type("Doe");
-    cy.get('input[autocomplete="email"]').focus().type("john@zitadel.com");
+    cy.get('input[data-testid="firstname-text-input"]').focus().type("John");
+    cy.get('input[data-testid="lastname-text-input"]').focus().type("Doe");
+    cy.get('input[data-testid="email-text-input"]')
+      .focus()
+      .type("john@zitadel.com");
     cy.get('input[type="checkbox"][value="privacypolicy"]').check();
     cy.get('input[type="checkbox"][value="tos"]').check();
     cy.get('button[type="submit"]').click();

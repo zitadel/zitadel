@@ -7,10 +7,11 @@
     "access": "public"
   },
   "dependencies": {
-    "eslint-config-next": "^14.2.3",
     "@typescript-eslint/parser": "^7.9.0",
+    "eslint-config-next": "^14.2.18",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-config-turbo": "^2.0.9",
     "eslint-plugin-react": "^7.34.1",
-    "eslint-config-turbo": "^2.0.9"
+    "@babel/eslint-parser": "^7.25.9"
   }
 }

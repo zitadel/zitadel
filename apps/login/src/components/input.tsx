@@ -1,4 +1,5 @@
 "use client";
+
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { clsx } from "clsx";
 import {
@@ -64,6 +65,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           {label} {required && "*"}
         </span>
         <input
+          suppressHydrationWarning
           ref={ref}
           className={styles(!!error, !!disabled)}
           defaultValue={defaultValue}
