@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/pkg/actions"
 )
 
 type ContextInfo interface {
@@ -28,6 +29,7 @@ type Target interface {
 	GetEndpoint() string
 	GetTargetType() domain.TargetType
 	GetTimeout() time.Duration
+	GetSigningKey() string
 }
 
 // CallTargets call a list of targets in order with handling of error and responses
@@ -72,13 +74,13 @@ func CallTarget(
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case domain.TargetTypeWebhook:
-		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
+		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
 	// get request, return response and error
 	case domain.TargetTypeCall:
-		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey())
 	case domain.TargetTypeAsync:
 		go func(target Target, info ContextInfoRequest) {
-			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody()); err != nil {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody(), target.GetSigningKey()); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
 		}(target, info)
@@ -89,13 +91,13 @@ func CallTarget(
 }
 
 // webhook call a webhook, ignore the response but return the errror
-func webhook(ctx context.Context, url string, timeout time.Duration, body []byte) error {
-	_, err := Call(ctx, url, timeout, body)
+func webhook(ctx context.Context, url string, timeout time.Duration, body []byte, signingKey string) error {
+	_, err := Call(ctx, url, timeout, body, signingKey)
 	return err
 }
 
 // Call function to do a post HTTP request to a desired url with timeout
-func Call(ctx context.Context, url string, timeout time.Duration, body []byte) (_ []byte, err error) {
+func Call(ctx context.Context, url string, timeout time.Duration, body []byte, signingKey string) (_ []byte, err error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
@@ -108,6 +110,9 @@ func Call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+	if signingKey != "" {
+		req.Header.Set(actions.SigningHeader, actions.ComputeSignatureHeader(time.Now(), body, signingKey))
+	}
 
 	client := http.DefaultClient
 	resp, err := client.Do(req)
