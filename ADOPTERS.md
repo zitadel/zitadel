@@ -8,8 +8,9 @@ The following is a directory of adopters to help identify users of individual fe
 
 If you are using Zitadel, please consider adding yourself as a user with a quick description of your use case by opening a pull request to this file and adding a section describing your usage of Zitadel.
 
-| Organization/Individual | Contact Information                                      | Description of Usage                            |
-| ----------------------- | -------------------------------------------------------- | ----------------------------------------------- |
-| Zitadel                 | [@fforootd](https://github.com/fforootd) (and many more) | Zitadel Cloud makes heavy use of of Zitadel ;-) |
+| Organization/Individual | Contact Information                                                  | Description of Usage                            |
+| ----------------------- | -------------------------------------------------------------------- | ----------------------------------------------- |
+| Zitadel                 | [@fforootd](https://github.com/fforootd) (and many more)             | Zitadel Cloud makes heavy use of of Zitadel ;-) |
+| Rawkode Academy         | [@RawkodeAcademy](https://github.com/RawkodeAcademy)                 | Rawkode Academy Platform & Zulip use Zitadel for all user and M2M authentication |
 | Organization Name       | contact@example.com                                      | Description of how they use Zitadel             |
 | Individual Name         | contact@example.com                                      | Description of how they use Zitadel             |
