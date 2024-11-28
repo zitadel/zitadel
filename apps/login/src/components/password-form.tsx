@@ -59,7 +59,6 @@ export function PasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
-      forceMfa: loginSettings?.forceMfa,
     })
       .catch(() => {
         setError("Could not verify password");

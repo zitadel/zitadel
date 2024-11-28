@@ -54,7 +54,6 @@ export type UpdateSessionCommand = {
   organization?: string;
   checks: Checks;
   authRequestId?: string;
-  forceMfa?: boolean;
 };
 
 export async function sendPassword(command: UpdateSessionCommand) {
@@ -209,7 +208,10 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
 
     return { redirect: `/password/change?` + params };
-  } else if (command.forceMfa && !availableSecondFactors.length) {
+  } else if (
+    (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
+    !availableSecondFactors.length
+  ) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
       force: "true", // this defines if the mfa is forced in the settings
