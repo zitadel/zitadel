@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -22,13 +23,45 @@ import (
 
 var appNamePrefix = dialect.DBPurposeEventPusher.AppName() + "_"
 
-func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+var pushTxOpts = &sql.TxOptions{
+	Isolation: sql.LevelReadCommitted,
+	ReadOnly:  false,
+}
+
+func (es *Eventstore) Push(ctx context.Context, client database.QueryExecuter, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	tx, err := es.client.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
+	var tx database.Tx
+	switch c := client.(type) {
+	case database.Tx:
+		tx = c
+	case database.Client:
+		// We cannot use READ COMMITTED on CockroachDB because we use cluster_logical_timestamp() which is not supported in this isolation level
+		var opts *sql.TxOptions
+		if es.client.Database.Type() == "postgres" {
+			opts = pushTxOpts
+		}
+		tx, err = c.BeginTx(ctx, opts)
+		if err != nil {
+			return nil, err
+		}
+		defer func() {
+			err = database.CloseTransaction(tx, err)
+		}()
+	default:
+		// We cannot use READ COMMITTED on CockroachDB because we use cluster_logical_timestamp() which is not supported in this isolation level
+		var opts *sql.TxOptions
+		if es.client.Database.Type() == "postgres" {
+			opts = pushTxOpts
+		}
+		tx, err = es.client.BeginTx(ctx, opts)
+		if err != nil {
+			return nil, err
+		}
+		defer func() {
+			err = database.CloseTransaction(tx, err)
+		}()
 	}
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
@@ -42,43 +75,30 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 		return nil, err
 	}
 
-	// needs to be set like this because psql complains about parameters in the SET statement
-	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
+	sequences, err = latestSequences(ctx, tx, commands)
 	if err != nil {
-		logging.WithError(err).Warn("failed to set application name")
 		return nil, err
 	}
 
-	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() (err error) {
-		inTxCtx, span := tracing.NewSpan(ctx)
-		defer func() { span.EndWithError(err) }()
+	events, err = insertEvents(ctx, tx, sequences, commands)
+	if err != nil {
+		return nil, err
+	}
 
-		sequences, err = latestSequences(inTxCtx, tx, commands)
+	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+		return nil, err
+	}
+
+	// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
+	// Thats why we enable it manually
+	if es.client.Type() == "cockroach" {
+		_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
 		if err != nil {
-			return err
+			return nil, err
 		}
+	}
 
-		events, err = insertEvents(inTxCtx, tx, sequences, commands)
-		if err != nil {
-			return err
-		}
-
-		if err = handleUniqueConstraints(inTxCtx, tx, commands); err != nil {
-			return err
-		}
-
-		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
-		// Thats why we enable it manually
-		if es.client.Type() == "cockroach" {
-			_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
-			if err != nil {
-				return err
-			}
-		}
-
-		return handleFieldCommands(inTxCtx, tx, commands)
-	})
-
+	err = handleFieldCommands(ctx, tx, commands)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +109,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 //go:embed push.sql
 var pushStmt string
 
-func insertEvents(ctx context.Context, tx *sql.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
+func insertEvents(ctx context.Context, tx database.Tx, sequences []*latestSequence, commands []eventstore.Command) ([]eventstore.Event, error) {
 	events, placeholders, args, err := mapCommands(commands, sequences)
 	if err != nil {
 		return nil, err
@@ -186,7 +206,7 @@ func mapCommands(commands []eventstore.Command, sequences []*latestSequence) (ev
 }
 
 type transaction struct {
-	*sql.Tx
+	database.Tx
 }
 
 var _ crdb.Tx = (*transaction)(nil)

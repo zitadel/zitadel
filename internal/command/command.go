@@ -54,6 +54,7 @@ type Commands struct {
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
+	targetEncryption                crypto.EncryptionAlgorithm
 	userPasswordHasher              *crypto.Hasher
 	secretHasher                    *crypto.Hasher
 	machineKeySize                  int
@@ -108,7 +109,7 @@ func StartCommands(
 	externalDomain string,
 	externalSecure bool,
 	externalPort uint16,
-	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, smtpEncryption, smsEncryption, userEncryption, domainVerificationEncryption, oidcEncryption, samlEncryption, targetEncryption crypto.EncryptionAlgorithm,
 	httpClient *http.Client,
 	permissionCheck domain.PermissionCheck,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
@@ -153,6 +154,7 @@ func StartCommands(
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
 		userEncryption:                  userEncryption,
+		targetEncryption:                targetEncryption,
 		userPasswordHasher:              userPasswordHasher,
 		secretHasher:                    secretHasher,
 		machineKeySize:                  int(defaults.SecretGenerators.MachineKeySize),

@@ -22,7 +22,6 @@ import (
 )
 
 func TestServer_GetTarget(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -63,6 +62,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -93,6 +93,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -123,6 +124,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -155,6 +157,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -187,6 +190,7 @@ func TestServer_GetTarget(t *testing.T) {
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
 					response.Target.Details = resp.GetDetails()
+					response.Target.SigningKey = resp.GetSigningKey()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -231,13 +235,13 @@ func TestServer_GetTarget(t *testing.T) {
 				gotTarget := got.GetTarget()
 				integration.AssertResourceDetails(ttt, wantTarget.GetDetails(), gotTarget.GetDetails())
 				assert.EqualExportedValues(ttt, wantTarget.GetConfig(), gotTarget.GetConfig())
+				assert.Equal(ttt, wantTarget.GetSigningKey(), gotTarget.GetSigningKey())
 			}, retryDuration, tick, "timeout waiting for expected target result")
 		})
 	}
 }
 
 func TestServer_ListTargets(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -494,6 +498,7 @@ func TestServer_ListTargets(t *testing.T) {
 					for i := range tt.want.Result {
 						integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
 						assert.EqualExportedValues(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
+						assert.NotEmpty(ttt, got.Result[i].GetSigningKey())
 					}
 				}
 				integration.AssertResourceListDetails(ttt, tt.want, got)
@@ -503,7 +508,6 @@ func TestServer_ListTargets(t *testing.T) {
 }
 
 func TestServer_SearchExecutions(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)

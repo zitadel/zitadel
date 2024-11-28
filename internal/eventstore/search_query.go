@@ -21,6 +21,7 @@ type SearchQueryBuilder struct {
 	instanceIDs           []string
 	editorUser            string
 	queries               []*SearchQuery
+	excludeAggregateIDs   *ExclusionQuery
 	tx                    *sql.Tx
 	lockRows              bool
 	lockOption            LockOption
@@ -66,6 +67,10 @@ func (b *SearchQueryBuilder) GetEditorUser() string {
 
 func (b *SearchQueryBuilder) GetQueries() []*SearchQuery {
 	return b.queries
+}
+
+func (b *SearchQueryBuilder) GetExcludeAggregateIDs() *ExclusionQuery {
+	return b.excludeAggregateIDs
 }
 
 func (b *SearchQueryBuilder) GetTx() *sql.Tx {
@@ -134,6 +139,20 @@ func (q SearchQuery) GetEventData() map[string]interface{} {
 
 func (q SearchQuery) GetPositionAfter() float64 {
 	return q.positionAfter
+}
+
+type ExclusionQuery struct {
+	builder        *SearchQueryBuilder
+	aggregateTypes []AggregateType
+	eventTypes     []EventType
+}
+
+func (q ExclusionQuery) GetAggregateTypes() []AggregateType {
+	return q.aggregateTypes
+}
+
+func (q ExclusionQuery) GetEventTypes() []EventType {
+	return q.eventTypes
 }
 
 // Columns defines which fields of the event are needed for the query
@@ -346,6 +365,16 @@ func (builder *SearchQueryBuilder) AddQuery() *SearchQuery {
 	return query
 }
 
+// ExcludeAggregateIDs excludes events from the aggregate IDs returned by the [ExclusionQuery].
+// There can be only 1 exclusion query. Subsequent calls overwrite previous definitions.
+func (builder *SearchQueryBuilder) ExcludeAggregateIDs() *ExclusionQuery {
+	query := &ExclusionQuery{
+		builder: builder,
+	}
+	builder.excludeAggregateIDs = query
+	return query
+}
+
 // Or creates a new sub query on the search query builder
 func (query SearchQuery) Or() *SearchQuery {
 	return query.builder.AddQuery()
@@ -397,4 +426,21 @@ func (query *SearchQuery) matches(command Command) bool {
 		return false
 	}
 	return true
+}
+
+// AggregateTypes filters for events with the given aggregate types
+func (query *ExclusionQuery) AggregateTypes(types ...AggregateType) *ExclusionQuery {
+	query.aggregateTypes = types
+	return query
+}
+
+// EventTypes filters for events with the given event types
+func (query *ExclusionQuery) EventTypes(types ...EventType) *ExclusionQuery {
+	query.eventTypes = types
+	return query
+}
+
+// Builder returns the SearchQueryBuilder of the sub query
+func (query *ExclusionQuery) Builder() *SearchQueryBuilder {
+	return query.builder
 }

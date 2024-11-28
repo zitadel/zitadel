@@ -19,7 +19,6 @@ import (
 )
 
 func TestServer_CreateUserSchema(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -304,7 +303,6 @@ func TestServer_CreateUserSchema(t *testing.T) {
 }
 
 func TestServer_UpdateUserSchema(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -596,7 +594,6 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 }
 
 func TestServer_DeactivateUserSchema(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -678,7 +675,6 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 }
 
 func TestServer_ReactivateUserSchema(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -760,7 +756,6 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 }
 
 func TestServer_DeleteUserSchema(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
