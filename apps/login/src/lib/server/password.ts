@@ -27,6 +27,7 @@ import { getSessionCookieByLoginName } from "../cookies";
 type ResetPasswordCommand = {
   loginName: string;
   organization?: string;
+  authRequestId?: string;
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
@@ -46,7 +47,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
   const userId = users.result[0].userId;
 
-  return passwordReset(userId, host);
+  return passwordReset(userId, host, command.authRequestId);
 }
 
 export type UpdateSessionCommand = {

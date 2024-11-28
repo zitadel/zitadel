@@ -25,6 +25,7 @@ type Props = {
   method: string;
   code?: string;
   loginSettings?: LoginSettings;
+  host: string | null;
 };
 
 type Inputs = {
@@ -39,6 +40,7 @@ export function LoginOTP({
   method,
   code,
   loginSettings,
+  host,
 }: Props) {
   const t = useTranslations("otp");
 
@@ -76,7 +78,18 @@ export function LoginOTP({
 
     if (method === "email") {
       challenges = create(RequestChallengesSchema, {
-        otpEmail: { deliveryType: { case: "sendCode", value: {} } },
+        otpEmail: {
+          deliveryType: {
+            case: "sendCode",
+            value: host
+              ? {
+                  urlTemplate:
+                    `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}&organization={{.OrgID}}` +
+                    (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+                }
+              : {},
+          },
+        },
       });
     }
 

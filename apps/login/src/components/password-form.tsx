@@ -86,6 +86,7 @@ export function PasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
+      authRequestId,
     })
       .catch(() => {
         setError("Could not reset password");

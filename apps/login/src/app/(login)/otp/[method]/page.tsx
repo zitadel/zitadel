@@ -5,6 +5,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getLoginSettings } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -29,6 +30,8 @@ export default async function Page(props: {
   const branding = await getBrandingSettings(organization);
 
   const loginSettings = await getLoginSettings(organization);
+
+  const host = (await headers()).get("host");
 
   return (
     <DynamicTheme branding={branding}>
@@ -67,6 +70,8 @@ export default async function Page(props: {
             organization={organization}
             method={method}
             loginSettings={loginSettings}
+            host={host}
+            code={code}
           ></LoginOTP>
         )}
       </div>
