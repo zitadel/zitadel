@@ -27,7 +27,7 @@ type querier interface {
 	eventQuery(useV1 bool) string
 	maxSequenceQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
-	db() *database.DB
+	Client() *database.DB
 	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
 	dialect.Database
 }
@@ -105,12 +105,24 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " OFFSET ?"
 	}
 
+	if q.LockRows {
+		query += " FOR UPDATE"
+		switch q.LockOption {
+		case eventstore.LockOptionWait: // default behavior
+		case eventstore.LockOptionNoWait:
+			query += " NOWAIT"
+		case eventstore.LockOptionSkipLocked:
+			query += " SKIP LOCKED"
+
+		}
+	}
+
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
 		QueryContext(context.Context, func(rows *sql.Rows) error, string, ...interface{}) error
 	}
-	contextQuerier = criteria.db()
+	contextQuerier = criteria.Client()
 	if q.Tx != nil {
 		contextQuerier = &tx{Tx: q.Tx}
 	}
@@ -271,8 +283,37 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		args = append(args, additionalArgs...)
 	}
 
+	excludeAggregateIDs := query.ExcludeAggregateIDs
+	if len(excludeAggregateIDs) > 0 {
+		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position)
+	}
+	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
+	if excludeAggregateIDsClauses != "" {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		if useV1 {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
+		} else {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
+		}
+		args = append(args, excludeAggregateIDsArgs...)
+	}
+
 	if query.AwaitOpenTransactions {
+		instanceIDs := make(database.TextArray[string], 0, 3)
+		if query.InstanceID != nil {
+			instanceIDs = append(instanceIDs, query.InstanceID.Value.(string))
+		} else if query.InstanceIDs != nil {
+			instanceIDs = append(instanceIDs, query.InstanceIDs.Value.(database.TextArray[string])...)
+		}
+
+		for i := range instanceIDs {
+			instanceIDs[i] = dialect.DBPurposeEventPusher.AppName() + "_" + instanceIDs[i]
+		}
+
 		clauses += awaitOpenTransactions(useV1)
+		args = append(args, instanceIDs)
 	}
 
 	if clauses == "" {

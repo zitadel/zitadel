@@ -2,7 +2,6 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
 	_ "embed"
 	"errors"
 	"fmt"
@@ -11,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -24,7 +24,7 @@ var (
 	addConstraintStmt string
 )
 
-func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) error {
+func handleUniqueConstraints(ctx context.Context, tx database.Tx, commands []eventstore.Command) error {
 	deletePlaceholders := make([]string, 0)
 	deleteArgs := make([]any, 0)
 

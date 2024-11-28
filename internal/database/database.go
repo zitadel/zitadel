@@ -18,6 +18,42 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+type QueryExecuter interface {
+	Query(query string, args ...any) (*sql.Rows, error)
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	Exec(query string, args ...any) (sql.Result, error)
+	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
+}
+
+type Client interface {
+	QueryExecuter
+	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+	Begin() (*sql.Tx, error)
+}
+
+type Tx interface {
+	QueryExecuter
+	Commit() error
+	Rollback() error
+}
+
+var (
+	_ Client = (*sql.DB)(nil)
+	_ Tx     = (*sql.Tx)(nil)
+)
+
+func CloseTransaction(tx Tx, err error) error {
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		logging.OnError(rollbackErr).Error("failed to rollback transaction")
+		return err
+	}
+
+	commitErr := tx.Commit()
+	logging.OnError(commitErr).Error("failed to commit transaction")
+	return commitErr
+}
+
 type Config struct {
 	Dialects                   map[string]interface{} `mapstructure:",remain"`
 	EventPushConnRatio         float64
@@ -40,20 +76,7 @@ func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error
 }
 
 func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
-			return
-		}
-		err = tx.Commit()
-	}()
-
-	rows, err := tx.QueryContext(ctx, query, args...)
+	rows, err := db.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		return err
 	}
@@ -73,20 +96,7 @@ func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (er
 }
 
 func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
-			return
-		}
-		err = tx.Commit()
-	}()
-
-	row := tx.QueryRowContext(ctx, query, args...)
+	row := db.DB.QueryRowContext(ctx, query, args...)
 	logging.OnError(row.Err()).Error("unexpected query error")
 
 	err = scan(row)

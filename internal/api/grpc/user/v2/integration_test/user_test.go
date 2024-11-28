@@ -53,8 +53,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
-	t.Parallel()
-
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
@@ -681,8 +679,6 @@ func TestServer_AddHumanUser(t *testing.T) {
 }
 
 func TestServer_AddHumanUser_Permission(t *testing.T) {
-	t.Parallel()
-
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	type args struct {
@@ -876,8 +872,6 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 }
 
 func TestServer_UpdateHumanUser(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
 		ctx context.Context
 		req *user.UpdateHumanUserRequest
@@ -1239,8 +1233,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 }
 
 func TestServer_UpdateHumanUser_Permission(t *testing.T) {
-	t.Parallel()
-
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
@@ -1324,8 +1316,6 @@ func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 }
 
 func TestServer_LockUser(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
 		ctx     context.Context
 		req     *user.LockUserRequest
@@ -1434,8 +1424,6 @@ func TestServer_LockUser(t *testing.T) {
 }
 
 func TestServer_UnLockUser(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
 		ctx     context.Context
 		req     *user.UnlockUserRequest
@@ -1544,8 +1532,6 @@ func TestServer_UnLockUser(t *testing.T) {
 }
 
 func TestServer_DeactivateUser(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
 		ctx     context.Context
 		req     *user.DeactivateUserRequest
@@ -1655,8 +1641,6 @@ func TestServer_DeactivateUser(t *testing.T) {
 }
 
 func TestServer_ReactivateUser(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
 		ctx     context.Context
 		req     *user.ReactivateUserRequest
@@ -1765,8 +1749,6 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	t.Parallel()
-
 	projectResp, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)
 	type args struct {
@@ -1866,8 +1848,6 @@ func TestServer_DeleteUser(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
-	t.Parallel()
-
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg-%s", gofakeit.AppName()), gofakeit.Email())
@@ -2131,9 +2111,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 
 /*
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-	t.Parallel()
-
-	idpID := Instance.AddGenericOAuthProvider(t, CTX)
+		idpID := Instance.AddGenericOAuthProvider(t, CTX)
 	intentID := Instance.CreateIntent(t, CTX, idpID)
 	successfulID, token, changeDate, sequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
 	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
@@ -2421,8 +2399,6 @@ func ctxFromNewUserWithVerifiedPasswordlessLegacy(t *testing.T) (context.Context
 }
 
 func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
-	t.Parallel()
-
 	userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
 
 	userIDWithPasskey := Instance.CreateHumanUser(CTX).GetUserId()
@@ -2654,8 +2630,6 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 }
 
 func TestServer_CreateInviteCode(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
 		ctx     context.Context
 		req     *user.CreateInviteCodeRequest
@@ -2787,8 +2761,6 @@ func TestServer_CreateInviteCode(t *testing.T) {
 }
 
 func TestServer_ResendInviteCode(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
 		ctx     context.Context
 		req     *user.ResendInviteCodeRequest
@@ -2878,8 +2850,6 @@ func TestServer_ResendInviteCode(t *testing.T) {
 }
 
 func TestServer_VerifyInviteCode(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
 		ctx     context.Context
 		req     *user.VerifyInviteCodeRequest

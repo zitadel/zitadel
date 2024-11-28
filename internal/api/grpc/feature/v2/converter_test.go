@@ -80,6 +80,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: true,
 		},
+		EnableBackChannelLogout: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetSystemFeaturesResponse{
 		Details: &object.Details{
@@ -123,6 +127,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
+		EnableBackChannelLogout: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
 	}
 	got := systemFeaturesToPb(arg)
 	assert.Equal(t, want, got)
@@ -140,6 +148,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		WebKey:                              gu.Ptr(true),
 		DebugOidcParentError:                gu.Ptr(true),
 		OidcSingleV1SessionTermination:      gu.Ptr(true),
+		EnableBackChannelLogout:             gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -152,6 +161,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		WebKey:                          gu.Ptr(true),
 		DebugOIDCParentError:            gu.Ptr(true),
 		OIDCSingleV1SessionTermination:  gu.Ptr(true),
+		EnableBackChannelLogout:         gu.Ptr(true),
 	}
 	got := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -197,6 +207,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Value: true,
 		},
 		OIDCSingleV1SessionTermination: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
+		EnableBackChannelLogout: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
 		},
@@ -250,6 +264,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		DisableUserTokenEvent: &feature_pb.FeatureFlag{
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
+		EnableBackChannelLogout: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 	}
 	got := instanceFeaturesToPb(arg)

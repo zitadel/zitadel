@@ -472,7 +472,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create/Import User (Human)";
-            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 AddHumanUser"
+            description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [AddHumanUser](apis/resources/user_service_v2/user-service-add-human-user.api.mdx)"
             tags: "Users";
             tags: "User Human"
             deprecated: true;
@@ -9802,6 +9802,12 @@ message AddOIDCAppRequest {
             description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
         }
     ];
+    string back_channel_logout_uri = 18 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://example.com/auth/backchannel\"]";
+            description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
+        }
+    ];
 }
 
 message AddOIDCAppResponse {
@@ -9975,6 +9981,12 @@ message UpdateOIDCAppConfigRequest {
     bool skip_native_app_success_page = 16 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "Skip the successful login page on native apps and directly redirect the user to the callback.";
+        }
+    ];
+    string back_channel_logout_uri = 17 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"https://example.com/auth/backchannel\"]";
+            description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
         }
     ];
 }

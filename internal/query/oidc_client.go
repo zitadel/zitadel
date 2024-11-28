@@ -21,6 +21,7 @@ type OIDCClient struct {
 	AppID                    string                     `json:"app_id,omitempty"`
 	State                    domain.AppState            `json:"state,omitempty"`
 	ClientID                 string                     `json:"client_id,omitempty"`
+	BackChannelLogoutURI     string                     `json:"back_channel_logout_uri,omitempty"`
 	HashedSecret             string                     `json:"client_secret,omitempty"`
 	RedirectURIs             []string                   `json:"redirect_uris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"response_types,omitempty"`

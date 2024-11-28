@@ -24,8 +24,6 @@ import (
 )
 
 func TestServer_Introspect(t *testing.T) {
-	t.Parallel()
-
 	project, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)
 	app, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
@@ -143,8 +141,6 @@ func TestServer_Introspect(t *testing.T) {
 }
 
 func TestServer_Introspect_invalid_auth_invalid_token(t *testing.T) {
-	t.Parallel()
-
 	// ensure that when an invalid authentication and token is sent, the authentication error is returned
 	// https://github.com/zitadel/zitadel/pull/8133
 	resourceServer, err := Instance.CreateResourceServerClientCredentials(CTX, "xxxxx", "xxxxx")
@@ -191,8 +187,6 @@ func assertIntrospection(
 // TestServer_VerifyClient tests verification by running code flow tests
 // with clients that have different authentication methods.
 func TestServer_VerifyClient(t *testing.T) {
-	t.Parallel()
-
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	project, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)

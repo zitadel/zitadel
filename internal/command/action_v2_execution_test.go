@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/execution"
@@ -172,6 +173,12 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 								"https://example.com",
 								time.Second,
 								true,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 					),
@@ -221,6 +228,12 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 								"https://example.com",
 								time.Second,
 								true,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 					),
@@ -270,6 +283,12 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 								"https://example.com",
 								time.Second,
 								true,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 					),
@@ -836,6 +855,12 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 							"https://example.com",
 							time.Second,
 							true,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
 						),
 					),
 					expectPushFailed(
@@ -930,6 +955,12 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 								"https://example.com",
 								time.Second,
 								true,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("12345678"),
+								},
 							),
 						),
 					),
