@@ -19,6 +19,7 @@ const test = base.extend<{ user: PasskeyUser }>({
     });
     await user.ensure(page);
     await use(user);
+    await user.cleanup();
   },
 });
 

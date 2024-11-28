@@ -24,6 +24,7 @@ const test = base.extend<{ user: PasswordUser }>({
     });
     await user.ensure(page);
     await use(user);
+    await user.cleanup();
   },
 });
 

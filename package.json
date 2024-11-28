@@ -33,6 +33,9 @@
     }
   },
   "devDependencies": {
+    "@otplib/core": "^12.0.0",
+    "@otplib/plugin-thirty-two": "^12.0.0",
+    "@otplib/plugin-crypto": "^12.0.0",
     "@faker-js/faker": "^9.2.0",
     "@changesets/cli": "^2.27.9",
     "@playwright/test": "^1.48.2",
