@@ -1,7 +1,8 @@
 import { expect, Page } from "@playwright/test";
-import { otpFromSink } from "./code";
+import { code, otpFromSink } from "./code";
 import { loginname } from "./loginname";
 import { password } from "./password";
+import { totp } from "./zitadel";
 
 export async function startLogin(page: Page) {
   await page.goto("/loginname");
@@ -32,4 +33,9 @@ export async function loginWithPasswordAndEmailOTP(page: Page, username: string,
 export async function loginWithPasswordAndPhoneOTP(page: Page, username: string, password: string, phone: string) {
   await loginWithPassword(page, username, password);
   await otpFromSink(page, phone);
+}
+
+export async function loginWithPasswordAndTOTP(page: Page, username: string, password: string, secret: string) {
+  await loginWithPassword(page, username, password);
+  await code(page, totp(secret));
 }

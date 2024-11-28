@@ -1,7 +1,6 @@
 import { Page } from "@playwright/test";
-import axios from "axios";
 import { registerWithPasskey } from "./register";
-import { getUserByUsername, removeUser } from "./zitadel";
+import { activateOTP, addTOTP, addUser, getUserByUsername, removeUser } from "./zitadel";
 
 export interface userProps {
   email: string;
@@ -21,47 +20,9 @@ class User {
   }
 
   async ensure(page: Page) {
-    const body = {
-      username: this.props.email,
-      organization: {
-        orgId: this.props.organization,
-      },
-      profile: {
-        givenName: this.props.firstName,
-        familyName: this.props.lastName,
-      },
-      email: {
-        email: this.props.email,
-        isVerified: true,
-      },
-      phone: {
-        phone: this.props.phone!,
-        isVerified: true,
-      },
-      password: {
-        password: this.props.password!,
-      },
-    };
+    const response = await addUser(this.props);
 
-    try {
-      const response = await axios.post(`${process.env.ZITADEL_API_URL}/v2/users/human`, body, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
-        },
-      });
-
-      if (response.status >= 400) {
-        const error = `HTTP Error: ${response.status} - ${response.statusText}`;
-        console.error(error);
-        throw new Error(error);
-      }
-      this.setUserId(response.data.userId);
-    } catch (error) {
-      console.error("Error making request:", error);
-      throw error;
-    }
-
+    this.setUserId(response.userId);
     // wait for projection of user
     await page.waitForTimeout(2000);
   }
@@ -142,40 +103,27 @@ export class PasswordUserWithOTP extends User {
   async ensure(page: Page) {
     await super.ensure(page);
 
-    let url = "otp_";
-    switch (this.type) {
-      case OtpType.sms:
-        url = url + "sms";
-        break;
-      case OtpType.email:
-        url = url + "email";
-        break;
-    }
-
-    try {
-      const response = await axios.post(
-        `${process.env.ZITADEL_API_URL}/v2/users/${this.getUserId()}/${url}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
-          },
-        },
-      );
-
-      if (response.status >= 400) {
-        const error = `HTTP Error: ${response.status} - ${response.statusText}`;
-        console.error(error);
-        throw new Error(error);
-      }
-    } catch (error) {
-      console.error("Error making request:", error);
-      throw error;
-    }
+    await activateOTP(this.getUserId(), this.type);
 
     // wait for projection of user
     await page.waitForTimeout(2000);
+  }
+}
+
+export class PasswordUserWithTOTP extends User {
+  private secret: string;
+
+  async ensure(page: Page) {
+    await super.ensure(page);
+
+    this.secret = await addTOTP(this.getUserId());
+
+    // wait for projection of user
+    await page.waitForTimeout(2000);
+  }
+
+  public getSecret(): string {
+    return this.secret;
   }
 }
 

@@ -48,7 +48,6 @@ test("username, password and sms otp login, resend code", async ({ user, page })
   // User clicks resend code
   // User receives a new sms with a verification code
   // User is redirected to the app (default redirect url)
-  await loginWithPassword(page, user.getUsername(), user.getPassword());
   await loginWithPasswordAndPhoneOTP(page, user.getUsername(), user.getPassword(), user.getPhone());
   await loginScreenExpect(page, user.getFullName());
 });
