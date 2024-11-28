@@ -366,6 +366,7 @@ func initProjections(
 		keys.OTP,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -422,6 +423,7 @@ func initProjections(
 		keys.DomainVerification,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		&http.Client{},
 		permissionCheck,
 		sessionTokenVerifier,
