@@ -8,12 +8,9 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
-
-var appNamePrefix = dialect.DBPurposeEventPusher.AppName() + "_"
 
 var pushTxOpts = &sql.TxOptions{
 	Isolation: sql.LevelReadCommitted,
