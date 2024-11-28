@@ -3,6 +3,7 @@ package cockroach
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
@@ -97,6 +99,18 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 				}
 			}
 			return nil
+		}
+	}
+
+	// For the pusher we set the app name with the instance ID
+	if purpose == dialect.DBPurposeEventPusher {
+		config.BeforeAcquire = func(ctx context.Context, conn *pgx.Conn) bool {
+			return setAppNameWithID(ctx, conn, purpose, authz.GetInstance(ctx).InstanceID())
+		}
+		config.AfterRelease = func(conn *pgx.Conn) bool {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			return setAppNameWithID(ctx, conn, purpose, "IDLE")
 		}
 	}
 
@@ -217,4 +231,12 @@ func (c Config) String(useAdmin bool, appName string) string {
 	}
 
 	return strings.Join(fields, " ")
+}
+
+func setAppNameWithID(ctx context.Context, conn *pgx.Conn, purpose dialect.DBPurpose, id string) bool {
+	// needs to be set like this because psql complains about parameters in the SET statement
+	query := fmt.Sprintf("SET application_name = '%s_%s'", purpose.AppName(), id)
+	_, err := conn.Exec(ctx, query)
+	logging.OnError(err).Warn("failed to set application name")
+	return err == nil
 }

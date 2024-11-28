@@ -11,7 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -69,14 +68,6 @@ func (es *Eventstore) pushWithoutFunc(ctx context.Context, client database.Conte
 	var (
 		sequences []*latestSequence
 	)
-
-	// needs to be set like this because psql complains about parameters in the SET statement
-	_, err = tx.ExecContext(ctx, "SET application_name = '"+appNamePrefix+authz.GetInstance(ctx).InstanceID()+"'")
-	if err != nil {
-		logging.WithError(err).Warn("failed to set application name")
-		return nil, err
-	}
-
 	sequences, err = latestSequences(ctx, tx, commands)
 	if err != nil {
 		return nil, err
