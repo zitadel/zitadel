@@ -269,7 +269,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	clockSkew time.Duration,
 	additionalOrigins []string,
 	skipNativeAppSuccessPage bool,
-	skipNativeAppSuccessPage bool,
+	backChannelLogoutURI string,
 	loginVersion domain.LoginVersion,
 	loginBaseURI string,
 ) (*project.OIDCConfigChangedEvent, bool, error) {
