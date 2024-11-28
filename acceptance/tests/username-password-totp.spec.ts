@@ -23,6 +23,7 @@ const test = base.extend<{ user: PasswordUserWithTOTP; sink: any }>({
 
     await user.ensure(page);
     await use(user);
+    await user.cleanup();
   },
 });
 

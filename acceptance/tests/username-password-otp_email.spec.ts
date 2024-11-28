@@ -24,6 +24,7 @@ const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
 
     await user.ensure(page);
     await use(user);
+    await user.cleanup();
   },
 });
 

@@ -23,16 +23,10 @@ class User {
     const response = await addUser(this.props);
 
     this.setUserId(response.userId);
-    // wait for projection of user
-    await page.waitForTimeout(2000);
   }
 
-  async remove() {
-    const resp: any = await getUserByUsername(this.getUsername());
-    if (!resp || !resp.result || !resp.result[0]) {
-      return;
-    }
-    await removeUser(resp.result[0].userId);
+  async cleanup() {
+    await removeUser(this.getUserId());
   }
 
   public setUserId(userId: string) {
@@ -68,7 +62,13 @@ class User {
   }
 }
 
-export class PasswordUser extends User {}
+export class PasswordUser extends User {
+  async ensure(page: Page) {
+    await super.ensure(page);
+    // wait for projection of user
+    await page.waitForTimeout(2000);
+  }
+}
 
 export enum OtpType {
   sms = "sms",
@@ -155,6 +155,14 @@ export class PasskeyUser extends User {
 
     // wait for projection of user
     await page.waitForTimeout(2000);
+  }
+
+  async cleanup() {
+    const resp: any = await getUserByUsername(this.getUsername());
+    if (!resp || !resp.result || !resp.result[0]) {
+      return;
+    }
+    await removeUser(resp.result[0].userId);
   }
 
   public getAuthenticatorId(): string {

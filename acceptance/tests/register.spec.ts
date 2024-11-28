@@ -15,9 +15,12 @@ test("register with password", async ({ page }) => {
   const firstname = faker.person.firstName();
   const lastname = faker.person.lastName();
 
-  await removeUserByUsername(username);
   await registerWithPassword(page, firstname, lastname, username, password, password);
   await loginScreenExpect(page, firstname + " " + lastname);
+
+  // wait for projection of user
+  await page.waitForTimeout(2000);
+  await removeUserByUsername(username);
 });
 
 test("register with passkey", async ({ page }) => {
@@ -25,9 +28,12 @@ test("register with passkey", async ({ page }) => {
   const firstname = faker.person.firstName();
   const lastname = faker.person.lastName();
 
-  await removeUserByUsername(username);
   await registerWithPasskey(page, firstname, lastname, username);
   await loginScreenExpect(page, firstname + " " + lastname);
+
+  // wait for projection of user
+  await page.waitForTimeout(2000);
+  await removeUserByUsername(username);
 });
 
 test("register with username and password - only password enabled", async ({ page }) => {
