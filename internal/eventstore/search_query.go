@@ -21,7 +21,10 @@ type SearchQueryBuilder struct {
 	instanceIDs           []string
 	editorUser            string
 	queries               []*SearchQuery
+	excludeAggregateIDs   *ExclusionQuery
 	tx                    *sql.Tx
+	lockRows              bool
+	lockOption            LockOption
 	allowTimeTravel       bool
 	positionAfter         float64
 	awaitOpenTransactions bool
@@ -66,6 +69,10 @@ func (b *SearchQueryBuilder) GetQueries() []*SearchQuery {
 	return b.queries
 }
 
+func (b *SearchQueryBuilder) GetExcludeAggregateIDs() *ExclusionQuery {
+	return b.excludeAggregateIDs
+}
+
 func (b *SearchQueryBuilder) GetTx() *sql.Tx {
 	return b.tx
 }
@@ -92,6 +99,10 @@ func (q SearchQueryBuilder) GetCreationDateAfter() time.Time {
 
 func (q SearchQueryBuilder) GetCreationDateBefore() time.Time {
 	return q.creationDateBefore
+}
+
+func (q SearchQueryBuilder) GetLockRows() (bool, LockOption) {
+	return q.lockRows, q.lockOption
 }
 
 // ensureInstanceID makes sure that the instance id is always set
@@ -128,6 +139,20 @@ func (q SearchQuery) GetEventData() map[string]interface{} {
 
 func (q SearchQuery) GetPositionAfter() float64 {
 	return q.positionAfter
+}
+
+type ExclusionQuery struct {
+	builder        *SearchQueryBuilder
+	aggregateTypes []AggregateType
+	eventTypes     []EventType
+}
+
+func (q ExclusionQuery) GetAggregateTypes() []AggregateType {
+	return q.aggregateTypes
+}
+
+func (q ExclusionQuery) GetEventTypes() []EventType {
+	return q.eventTypes
 }
 
 // Columns defines which fields of the event are needed for the query
@@ -307,6 +332,27 @@ func (builder *SearchQueryBuilder) CreationDateBefore(creationDate time.Time) *S
 	return builder
 }
 
+type LockOption int
+
+const (
+	// Wait until the previous lock on all of the selected rows is released (default)
+	LockOptionWait LockOption = iota
+	// With NOWAIT, the statement reports an error, rather than waiting, if a selected row cannot be locked immediately.
+	LockOptionNoWait
+	// With SKIP LOCKED, any selected rows that cannot be immediately locked are skipped.
+	LockOptionSkipLocked
+)
+
+// LockRowsDuringTx locks the found rows for the duration of the transaction,
+// using the [`FOR UPDATE`](https://www.postgresql.org/docs/17/sql-select.html#SQL-FOR-UPDATE-SHARE) lock strength.
+// The lock is removed on transaction commit or rollback.
+func (builder *SearchQueryBuilder) LockRowsDuringTx(tx *sql.Tx, option LockOption) *SearchQueryBuilder {
+	builder.tx = tx
+	builder.lockRows = true
+	builder.lockOption = option
+	return builder
+}
+
 // AddQuery creates a new sub query.
 // All fields in the sub query are AND-connected in the storage request.
 // Multiple sub queries are OR-connected in the storage request.
@@ -316,6 +362,16 @@ func (builder *SearchQueryBuilder) AddQuery() *SearchQuery {
 	}
 	builder.queries = append(builder.queries, query)
 
+	return query
+}
+
+// ExcludeAggregateIDs excludes events from the aggregate IDs returned by the [ExclusionQuery].
+// There can be only 1 exclusion query. Subsequent calls overwrite previous definitions.
+func (builder *SearchQueryBuilder) ExcludeAggregateIDs() *ExclusionQuery {
+	query := &ExclusionQuery{
+		builder: builder,
+	}
+	builder.excludeAggregateIDs = query
 	return query
 }
 
@@ -370,4 +426,21 @@ func (query *SearchQuery) matches(command Command) bool {
 		return false
 	}
 	return true
+}
+
+// AggregateTypes filters for events with the given aggregate types
+func (query *ExclusionQuery) AggregateTypes(types ...AggregateType) *ExclusionQuery {
+	query.aggregateTypes = types
+	return query
+}
+
+// EventTypes filters for events with the given event types
+func (query *ExclusionQuery) EventTypes(types ...EventType) *ExclusionQuery {
+	query.eventTypes = types
+	return query
+}
+
+// Builder returns the SearchQueryBuilder of the sub query
+func (query *ExclusionQuery) Builder() *SearchQueryBuilder {
+	return query.builder
 }

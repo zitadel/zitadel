@@ -14,6 +14,10 @@ func HandlerContext(event *eventstore.Aggregate) context.Context {
 	return authz.SetCtxData(ctx, authz.CtxData{UserID: NotifyUserID, OrgID: event.ResourceOwner})
 }
 
+func ContextWithNotifier(ctx context.Context, aggregate *eventstore.Aggregate) context.Context {
+	return authz.SetCtxData(ctx, authz.CtxData{UserID: NotifyUserID, OrgID: aggregate.ResourceOwner})
+}
+
 func (n *NotificationQueries) HandlerContext(event *eventstore.Aggregate) (context.Context, error) {
 	ctx := context.Background()
 	instance, err := n.InstanceByID(ctx, event.InstanceID)

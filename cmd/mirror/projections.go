@@ -69,6 +69,7 @@ func projectionsCmd() *cobra.Command {
 type ProjectionsConfig struct {
 	Destination    database.Config
 	Projections    projection.Config
+	Notifications  handlers.WorkerConfig
 	EncryptionKeys *encryption.EncryptionKeyConfig
 	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config
@@ -207,6 +208,7 @@ func projections(
 		config.Projections.Customizations["notificationsquotas"],
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
+		config.Notifications,
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -221,6 +223,7 @@ func projections(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
+		client,
 	)
 
 	config.Auth.Spooler.Client = client

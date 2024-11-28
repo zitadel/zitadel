@@ -1,0 +1,111 @@
+---
+title: Benchmarks
+sidebar_label: Benchmarks
+---
+
+import DocCardList from '@theme/DocCardList';
+
+Benchmarks are crucial to understand if ZITADEL fulfills your expected workload and what resources it needs to do so.
+
+This document explains the process and goals of load-testing zitadel in a cloud environment.
+
+The results can be found on sub pages.
+
+## Goals
+
+The primary goal is to assess if ZITADEL can scale to required proportion. The goals might change over time and maturity of ZITADEL. At the moment the goal is to assess how the application’s performance scales. There are some concrete goals we have to meet:
+
+1. [https://github.com/zitadel/zitadel/issues/8352](https://github.com/zitadel/zitadel/issues/8352) defines 1000 JWT profile auth/sec  
+2. [https://github.com/zitadel/zitadel/issues/4424](https://github.com/zitadel/zitadel/issues/4424) defines 1200 logins / sec.
+
+## Procedure
+
+First we determine the “target” of our load-test. The target is expressed as a make recipe in the load-test [Makefile](https://github.com/zitadel/zitadel/blob/main/load-test/Makefile). See also the load-test [readme](https://github.com/zitadel/zitadel/blob/main/load-test/README.md) on how to configure and run load-tests.  
+A target should be tested for longer periods of time, as it might take time for certain metrics to show up. For example, cloud SQL samples query insights. A runtime of at least **30 minutes** is advised at the moment.
+
+After each iteration of load-test, we should consult the [After test procedure](#after-test-procedure) to conclude an outcome:
+
+1. Scale  
+2. Log potential issuer and scale  
+3. Terminate testing and resolve issues
+
+
+## Methodology
+
+### Benchmark definition
+
+Tests are implemented in the ecosystem of [k6](https://k6.io). The tests are publicly available in the [zitadel repository](https://github.com/zitadel/zitadel/tree/main/load-test). Custom extensions of k6 are implemented in the [xk6-modules repository](https://github.com/zitadel/xk6-modules).  
+The tests must at least measure the request duration for each API call. This gives an indication on how zitadel behaves over the duration of the load test.
+
+### Metrics
+
+The following metrics must be collected for each test iteration. The metrics are used to follow the decision path of the [After test procedure](https://drive.google.com/open?id=1WVr7aA8dGgV1zd2jUg1y1h_o37mkZF2O6M5Mhafn_NM):
+
+| Metric | Type | Description | Unit |
+| :---- | :---- | :---- | :---- |
+| Baseline | Comparison | Defines the baseline the test is compared against. If not specified the baseline defined in this document is used. | Link to test result |
+| Purpose | Description | Description what should been proved with this test run | text
+| Test start | Setup | Timestamp when the test started. This is useful for gathering additional data like metrics or logs later | Date |
+| Test duration | Setup | Duration of the test | Duration |
+| Executed test | Setup | Name of the make recipe executed. Further information about specific test cases can be found [here](?tab=t.0#heading=h.xav4f3s5r2f3). | Name of the make recipe |
+| k6 version | Setup | Version of the test client (k6) used | semantic version |
+| VUs | Setup | Virtual Users which execute the test scenario in parallel | Number |
+| Client location | Setup | Region or location of the machine which executed the test client. If not further specified the hoster is Google Cloud | Location / Region |
+| Client machine specification | Setup | Definition of the client machine the test client ran on. The resources of the machine could be maxed out during tests therefore we collect this metric as well. The description must at least clarify the following metrics: vCPU Memory egress bandwidth | **vCPU**: Amount of threads ([additional info](https://cloud.google.com/compute/docs/cpu-platforms)) **memory**: GB **egress bandwidth**:Gbps  |
+| ZITADEL location | Setup | Region or location of the deployment of zitadel. If not further specified the hoster is Google Cloud | Location / Region |
+| ZITADEL container specification | Setup | As ZITADEL is mainly run in cloud environments it should also be run as a container during the load tests. The description must at least clarify the following metrics: vCPU Memory egress bandwidth Scale | **vCPU**: Amount of threads ([additional info](https://cloud.google.com/compute/docs/cpu-platforms)) **memory**: GB **egress bandwidth**:Gbps **scale**: The amount of containers running during the test. The amount must not vary during the tests |
+| ZITADEL Version | Setup | The version of zitadel deployed | Semantic version or commit  |
+| ZITADEL Configuration | Setup | Configuration of zitadel which deviates from the defaults and is not secret | yaml |
+| ZITADEL feature flags | Setup | Changed feature flags | yaml |
+| Database  | Setup | Database type and version | **type**: crdb / psql **version**: semantic version |
+| Database location | Setup | Region or location of the deployment of the database. If not further specified the hoster is Google Cloud SQL | Location / Region |
+| Database specification | Setup | The description must at least clarify the following metrics: vCPU, Memory and egress bandwidth (Scale) | **vCPU**: Amount of threads ([additional info](https://cloud.google.com/compute/docs/cpu-platforms)) **memory**: GB **egress bandwidth**:Gbps **scale**: Amount of crdb nodes if crdb is used |
+| ZITADEL metrics during test | Result | This metric helps understanding the bottlenecks of the executed test. At least the following metrics must be provided: CPU usage Memory usage | **CPU usage** in percent **Memory usage** in percent |
+| Observed errors | Result | Errors worth mentioning, mostly unexpected errors | description |
+| Top 3 most expensive database queries | Result | The execution plan of the top 3 most expensive database queries during the test execution | database execution plan |
+| Database metrics during test | Result | This metric helps understanding the bottlenecks of the executed test. At least the following metrics must be provided: CPU usage Memory usage | **CPU usage** in percent **Memory usage** in percent |
+| k6 Iterations per second | Result | How many test iterations were done per second | Number |
+| k6 overview | Result | Shows some basic metrics aggregated over the test run At least the following metrics must be included: duration per request (min, max, avg, p50, p95, p99) VUS For simplicity just add the whole test result printed to the terminal | terminal output |
+| k6 output | Result | Trends and metrics generated during the test, this contains detailed information for each step executed during each iteration | csv |
+
+### Test setup
+
+#### Make recipes
+
+Details about the tests implemented can be found in [this readme](https://github.com/zitadel/zitadel/blob/main/load-test/README.md#test).
+
+### Test conclusion
+
+After each iteration of load-test, we should consult the [Flowchart](#after-test-procedure) to conclude an outcome:
+
+1. [Scale](#scale)  
+2. [Log potential issue and scale](#potential-issues)  
+3. [Terminate testing](#termination) and resolve issues
+
+#### Scale {#scale}
+
+An outcome of scale means that the service hit some kind of resource limit, like CPU or RAM which can be increased. In such cases we increase the suggested parameter and rerun the load-test for the same target. On the next test we should analyse if the increase in scale resulted in a performance improvement proportional to the scale parameter. For example if we scale from 1 to 2 containers, it might be reasonable to expect a doubling of iterations / sec. If such an increase is not noticed, there might be another bottleneck or unlying issue, such as locking.
+
+#### Potential issues {#potential-issues}
+
+A potential issue has an impact on performance, but does not prevent us to scale. Such issues must be logged in GH issues and load-testing can continue. The issue can be resolved at a later time and the load-tests repeated when it is. This is primarily for issues which require big changes to ZITADEL.
+
+#### Termination {#termination}
+
+Scaling no longer improves iterations / second, or some kind of critical error or bug is experienced. The root cause of the issue must be resolved before we can continue with increasing scale.
+
+### After test procedure
+
+This flowchart shows the procedure after running a test.
+
+![Flowchart](/img/benchmark/Flowchart.svg)
+
+## Baseline
+
+Will be established as soon as the goal described above is reached.
+
+## Test results
+
+This chapter provides a table linking to the detailed test results.
+
+<DocCardList />
