@@ -739,6 +739,7 @@ github.com/zenazn/goji v1.0.1 h1:4lbD8Mx2h7IvloP7r2C0D6ltZP6Ufip8Hn0wmSK5LR8=
 github.com/zenazn/goji v1.0.1/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 github.com/zitadel/logging v0.6.2-0.20241128222642-711905ab995b h1:CWfvy15tGabH4CE2PpYjOkykzNBKPbS7pEl0sH0l6pY=
 github.com/zitadel/logging v0.6.2-0.20241128222642-711905ab995b/go.mod h1:DyabloyDEDPGVRXGHKzWuX8wBBs7w4qo6WyTC5Xs7UQ=
+github.com/zitadel/logging v0.6.2-0.20241128235432-e4276c762137/go.mod h1:DyabloyDEDPGVRXGHKzWuX8wBBs7w4qo6WyTC5Xs7UQ=
 github.com/zitadel/oidc/v3 v3.32.0 h1:Mw0EPZRC6h+OXAuT0Uk2BZIjJQNHLqUpaJCm6c3IByc=
 github.com/zitadel/oidc/v3 v3.32.0/go.mod h1:DyE/XClysRK/ozFaZSqlYamKVnTh4l6Ln25ihSNI03w=
 github.com/zitadel/passwap v0.6.0 h1:m9F3epFC0VkBXu25rihSLGyHvWiNlCzU5kk8RoI+SXQ=

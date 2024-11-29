@@ -3,6 +3,7 @@ package integration
 import (
 	"bytes"
 	_ "embed"
+	"log/slog"
 	"os/exec"
 	"path/filepath"
 
@@ -49,5 +50,8 @@ func init() {
 	if err := loadedConfig.Log.SetLogger(); err != nil {
 		panic(err)
 	}
+
+	slog.SetDefault(loadedConfig.Log.Slog())
+
 	SystemToken = systemUserToken()
 }

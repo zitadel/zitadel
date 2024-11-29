@@ -2,6 +2,7 @@ package mirror
 
 import (
 	_ "embed"
+	"log/slog"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -40,6 +41,8 @@ func mustNewMigrationConfig(v *viper.Viper) *Migration {
 	err := config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 
+	slog.SetDefault(config.Log.Slog())
+
 	id.Configure(config.Machine)
 
 	return config
@@ -51,6 +54,8 @@ func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
 
 	err := config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
+
+	slog.SetDefault(config.Log.Slog())
 
 	id.Configure(config.Machine)
 

@@ -1,6 +1,7 @@
 package ready
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -34,6 +35,8 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
+
+	slog.SetDefault(config.Log.Slog())
 
 	return config
 }

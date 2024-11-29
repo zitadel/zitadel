@@ -1,6 +1,8 @@
 package initialise
 
 import (
+	"log/slog"
+
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -27,6 +29,8 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
+
+	slog.SetDefault(config.Log.Slog())
 
 	id.Configure(config.Machine)
 
