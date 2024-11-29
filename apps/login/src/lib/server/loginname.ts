@@ -2,7 +2,6 @@
 
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
@@ -136,25 +135,29 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return { error: "Could not create session for user" };
     }
 
-    if (users.result[0].state === UserState.INITIAL) {
-      const params = new URLSearchParams({
-        loginName: session.factors?.user?.loginName,
-        initial: "true", // this does not require a code to be set
-      });
+    // TODO: check if handling of userstate INITIAL is needed
 
-      if (command.organization || session.factors?.user?.organizationId) {
-        params.append(
-          "organization",
-          command.organization ?? session.factors?.user?.organizationId,
-        );
-      }
+    // if (
+    //   users.result[0].state === UserState.INITIAL
+    // ) {
+    //   const params = new URLSearchParams({
+    //     loginName: session.factors?.user?.loginName,
+    //     initial: "true", // this does not require a code to be set
+    //   });
 
-      if (command.authRequestId) {
-        params.append("authRequestid", command.authRequestId);
-      }
+    //   if (command.organization || session.factors?.user?.organizationId) {
+    //     params.append(
+    //       "organization",
+    //       command.organization ?? session.factors?.user?.organizationId,
+    //     );
+    //   }
 
-      return { redirect: "/password/set?" + params };
-    }
+    //   if (command.authRequestId) {
+    //     params.append("authRequestId", command.authRequestId);
+    //   }
+
+    //   return { redirect: "/password/set?" + params };
+    // }
 
     const methods = await listAuthenticationMethodTypes(
       session.factors?.user?.id,
