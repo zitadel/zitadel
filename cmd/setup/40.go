@@ -9,7 +9,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
 var (
@@ -31,6 +30,12 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 	if err != nil {
 		return err
 	}
+	defer func() {
+		closeErr := conn.Close()
+		logging.OnError(closeErr).Debug("failed to release connection")
+		// Force the pool to reopen connections to apply the new types
+		mig.dbClient.Pool.Reset()
+	}()
 
 	for _, stmt := range statements {
 		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
@@ -38,8 +43,6 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
 		}
 	}
-	err = es_v3.CheckExecutionPlan(ctx, conn)
-	logging.OnError(err).Debug("unable to register eventstore types")
 
 	return nil
 }
