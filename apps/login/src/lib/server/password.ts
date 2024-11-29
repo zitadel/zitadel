@@ -149,6 +149,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   );
 
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
+  console.log("humanUser", humanUser);
   if (
     availableSecondFactors?.length == 0 &&
     humanUser?.passwordChangeRequired

@@ -2,10 +2,12 @@ import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
 import { ChooseAuthenticatorToSetup } from "@/components/choose-authenticator-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
 import {
+  getActiveIdentityProviders,
   getBrandingSettings,
   getLoginSettings,
   getSession,
@@ -74,6 +76,10 @@ export default async function Page(props: {
     });
   }
 
+  if (!sessionWithData) {
+    return <Alert>{tError("unknownContext")}</Alert>;
+  }
+
   const branding = await getBrandingSettings(
     sessionWithData.factors?.user?.organizationId,
   );
@@ -82,21 +88,31 @@ export default async function Page(props: {
     sessionWithData.factors?.user?.organizationId,
   );
 
+  const identityProviders = await getActiveIdentityProviders(
+    sessionWithData.factors?.user?.organizationId,
+  ).then((resp) => {
+    return resp.identityProviders;
+  });
+
   const params = new URLSearchParams({
     initial: "true", // defines that a code is not required and is therefore not shown in the UI
   });
 
-  if (loginName) {
-    params.set("loginName", loginName);
+  if (sessionWithData.factors?.user?.loginName) {
+    params.set("loginName", sessionWithData.factors?.user?.loginName);
   }
 
-  if (organization) {
-    params.set("organization", organization);
+  if (sessionWithData.factors?.user?.organizationId) {
+    params.set("organization", sessionWithData.factors?.user?.organizationId);
   }
 
   if (authRequestId) {
     params.set("authRequestId", authRequestId);
   }
+
+  const host = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
 
   return (
     <DynamicTheme branding={branding}>
@@ -105,23 +121,33 @@ export default async function Page(props: {
 
         <p className="ztdl-p">{t("description")}</p>
 
-        {sessionWithData && (
-          <UserAvatar
-            loginName={loginName ?? sessionWithData.factors?.user?.loginName}
-            displayName={sessionWithData.factors?.user?.displayName}
-            showDropdown
-            searchParams={searchParams}
-          ></UserAvatar>
-        )}
+        <UserAvatar
+          loginName={sessionWithData.factors?.user?.loginName}
+          displayName={sessionWithData.factors?.user?.displayName}
+          showDropdown
+          searchParams={searchParams}
+        ></UserAvatar>
 
-        {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
-
-        {loginSettings && sessionWithData && (
+        {loginSettings && (
           <ChooseAuthenticatorToSetup
             authMethods={sessionWithData.authMethods}
             loginSettings={loginSettings}
             params={params}
           ></ChooseAuthenticatorToSetup>
+        )}
+
+        <p className="ztdl-p text-center">
+          or sign in with an Identity Provider
+        </p>
+
+        {loginSettings?.allowExternalIdp && identityProviders && (
+          <SignInWithIdp
+            host={host}
+            identityProviders={identityProviders}
+            authRequestId={authRequestId}
+            organization={sessionWithData.factors?.user?.organizationId}
+            linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
+          ></SignInWithIdp>
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">

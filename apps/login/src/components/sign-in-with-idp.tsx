@@ -22,6 +22,7 @@ export interface SignInWithIDPProps {
   identityProviders: IdentityProvider[];
   authRequestId?: string;
   organization?: string;
+  linkOnly?: boolean;
 }
 
 export function SignInWithIdp({
@@ -29,6 +30,7 @@ export function SignInWithIdp({
   identityProviders,
   authRequestId,
   organization,
+  linkOnly,
 }: SignInWithIDPProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -38,6 +40,10 @@ export function SignInWithIdp({
     setLoading(true);
 
     const params = new URLSearchParams();
+
+    if (linkOnly) {
+      params.set("link", "true");
+    }
 
     if (authRequestId) {
       params.set("authRequestId", authRequestId);
@@ -70,121 +76,134 @@ export function SignInWithIdp({
   return (
     <div className="flex flex-col w-full space-y-2 text-sm">
       {identityProviders &&
-        identityProviders.map((idp, i) => {
-          switch (idp.type) {
-            case IdentityProviderType.APPLE:
-              return (
-                <SignInWithApple
-                  key={`idp-${i}`}
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(idp.id, idpTypeToSlug(IdentityProviderType.APPLE))
-                  }
-                ></SignInWithApple>
-              );
-            case IdentityProviderType.OAUTH:
-              return (
-                <SignInWithGeneric
-                  key={`idp-${i}`}
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(idp.id, idpTypeToSlug(IdentityProviderType.OAUTH))
-                  }
-                ></SignInWithGeneric>
-              );
-            case IdentityProviderType.OIDC:
-              return (
-                <SignInWithGeneric
-                  key={`idp-${i}`}
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(idp.id, idpTypeToSlug(IdentityProviderType.OIDC))
-                  }
-                ></SignInWithGeneric>
-              );
-            case IdentityProviderType.GITHUB:
-              return (
-                <SignInWithGithub
-                  key={`idp-${i}`}
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GITHUB),
-                    )
-                  }
-                ></SignInWithGithub>
-              );
-            case IdentityProviderType.GITHUB_ES:
-              return (
-                <SignInWithGithub
-                  key={`idp-${i}`}
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GITHUB_ES),
-                    )
-                  }
-                ></SignInWithGithub>
-              );
-            case IdentityProviderType.AZURE_AD:
-              return (
-                <SignInWithAzureAd
-                  key={`idp-${i}`}
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.AZURE_AD),
-                    )
-                  }
-                ></SignInWithAzureAd>
-              );
-            case IdentityProviderType.GOOGLE:
-              return (
-                <SignInWithGoogle
-                  key={`idp-${i}`}
-                  e2e="google"
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GOOGLE),
-                    )
-                  }
-                ></SignInWithGoogle>
-              );
-            case IdentityProviderType.GITLAB:
-              return (
-                <SignInWithGitlab
-                  key={`idp-${i}`}
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GITLAB),
-                    )
-                  }
-                ></SignInWithGitlab>
-              );
-            case IdentityProviderType.GITLAB_SELF_HOSTED:
-              return (
-                <SignInWithGitlab
-                  key={`idp-${i}`}
-                  name={idp.name}
-                  onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GITLAB_SELF_HOSTED),
-                    )
-                  }
-                ></SignInWithGitlab>
-              );
-            default:
-              return null;
-          }
-        })}
+        identityProviders
+          //   .filter((idp) =>
+          //     linkOnly ? idp.config?.options.isLinkingAllowed : true,
+          //   )
+          .map((idp, i) => {
+            switch (idp.type) {
+              case IdentityProviderType.APPLE:
+                return (
+                  <SignInWithApple
+                    key={`idp-${i}`}
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.APPLE),
+                      )
+                    }
+                  ></SignInWithApple>
+                );
+              case IdentityProviderType.OAUTH:
+                return (
+                  <SignInWithGeneric
+                    key={`idp-${i}`}
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.OAUTH),
+                      )
+                    }
+                  ></SignInWithGeneric>
+                );
+              case IdentityProviderType.OIDC:
+                return (
+                  <SignInWithGeneric
+                    key={`idp-${i}`}
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.OIDC),
+                      )
+                    }
+                  ></SignInWithGeneric>
+                );
+              case IdentityProviderType.GITHUB:
+                return (
+                  <SignInWithGithub
+                    key={`idp-${i}`}
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.GITHUB),
+                      )
+                    }
+                  ></SignInWithGithub>
+                );
+              case IdentityProviderType.GITHUB_ES:
+                return (
+                  <SignInWithGithub
+                    key={`idp-${i}`}
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.GITHUB_ES),
+                      )
+                    }
+                  ></SignInWithGithub>
+                );
+              case IdentityProviderType.AZURE_AD:
+                return (
+                  <SignInWithAzureAd
+                    key={`idp-${i}`}
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.AZURE_AD),
+                      )
+                    }
+                  ></SignInWithAzureAd>
+                );
+              case IdentityProviderType.GOOGLE:
+                return (
+                  <SignInWithGoogle
+                    key={`idp-${i}`}
+                    e2e="google"
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.GOOGLE),
+                      )
+                    }
+                  ></SignInWithGoogle>
+                );
+              case IdentityProviderType.GITLAB:
+                return (
+                  <SignInWithGitlab
+                    key={`idp-${i}`}
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.GITLAB),
+                      )
+                    }
+                  ></SignInWithGitlab>
+                );
+              case IdentityProviderType.GITLAB_SELF_HOSTED:
+                return (
+                  <SignInWithGitlab
+                    key={`idp-${i}`}
+                    name={idp.name}
+                    onClick={() =>
+                      startFlow(
+                        idp.id,
+                        idpTypeToSlug(IdentityProviderType.GITLAB_SELF_HOSTED),
+                      )
+                    }
+                  ></SignInWithGitlab>
+                );
+              default:
+                return null;
+            }
+          })}
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>
