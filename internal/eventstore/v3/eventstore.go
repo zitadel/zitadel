@@ -3,10 +3,12 @@ package eventstore
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
@@ -32,20 +34,108 @@ type Eventstore struct {
 	client *database.DB
 }
 
-func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
-	types, err := conn.LoadTypes(ctx, []string{
-		"eventstore._command",
-		"eventstore.command",
-		"eventstore.push",
-	})
-	if err != nil {
-		logging.WithError(err).Debug("unable to load types")
-		return nil
+var (
+	textType = &pgtype.Type{
+		Name:  "text",
+		OID:   pgtype.TextOID,
+		Codec: pgtype.TextCodec{},
 	}
+	commandType = &pgtype.Type{
+		Codec: &pgtype.CompositeCodec{
+			Fields: []pgtype.CompositeCodecField{
+				{
+					Name: "instance_id",
+					Type: textType,
+				},
+				{
+					Name: "aggregate_type",
+					Type: textType,
+				},
+				{
+					Name: "aggregate_id",
+					Type: textType,
+				},
+				{
+					Name: "command_type",
+					Type: textType,
+				},
+				{
+					Name: "revision",
+					Type: &pgtype.Type{
+						Name:  "int2",
+						OID:   pgtype.Int2OID,
+						Codec: pgtype.Int2Codec{},
+					},
+				},
+				{
+					Name: "payload",
+					Type: &pgtype.Type{
+						Name: "jsonb",
+						OID:  pgtype.JSONBOID,
+						Codec: &pgtype.JSONBCodec{
+							Marshal:   json.Marshal,
+							Unmarshal: json.Unmarshal,
+						},
+					},
+				},
+				{
+					Name: "creator",
+					Type: textType,
+				},
+				{
+					Name: "owner",
+					Type: textType,
+				},
+			},
+		},
+	}
+	commandArrayCodec = &pgtype.Type{
+		Codec: &pgtype.ArrayCodec{
+			ElementType: commandType,
+		},
+	}
+)
+
+func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
 	m := conn.TypeMap()
 
-	m.RegisterTypes(types)
+	if commandType.OID == 0 || commandArrayCodec.OID == 0 {
+		err := conn.QueryRow(ctx, "select oid, typarray from pg_type where typname = $1 and typnamespace = (select oid from pg_namespace where nspname = $2)", "command", "eventstore").
+			Scan(&commandType.OID, &commandArrayCodec.OID)
+		if err != nil {
+			logging.WithError(err).Debug("failed to get oid for command type")
+			return nil
+		}
+		if commandType.OID == 0 || commandArrayCodec.OID == 0 {
+			logging.Debug("oid for command type not found")
+			return nil
+		}
+	}
+
+	m.RegisterTypes([]*pgtype.Type{
+		{
+			Name:  "eventstore.command",
+			Codec: commandType.Codec,
+			OID:   commandType.OID,
+		},
+		{
+			Name:  "command",
+			Codec: commandType.Codec,
+			OID:   commandType.OID,
+		},
+		{
+			Name:  "eventstore._command",
+			Codec: commandArrayCodec.Codec,
+			OID:   commandArrayCodec.OID,
+		},
+		{
+			Name:  "_command",
+			Codec: commandArrayCodec.Codec,
+			OID:   commandArrayCodec.OID,
+		},
+	})
 	dialect.RegisterDefaultPgTypeVariants[command](m, "eventstore.command", "eventstore._command")
+	dialect.RegisterDefaultPgTypeVariants[command](m, "command", "_command")
 
 	return nil
 }
