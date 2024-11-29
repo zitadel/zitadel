@@ -18,7 +18,7 @@ import {
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
@@ -215,26 +215,9 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { redirect: `/mfa?` + params };
   }
   // TODO: check if handling of userstate INITIAL is needed
-
-  //    else if (user.state === UserState.INITIAL) {
-  //     const params = new URLSearchParams({
-  //       loginName: session.factors.user.loginName,
-  //     });
-
-  //     if (command.authRequestId) {
-  //       params.append("authRequestId", command.authRequestId);
-  //     }
-
-  //     if (command.organization || session.factors?.user?.organizationId) {
-  //       params.append(
-  //         "organization",
-  //         command.organization ?? session.factors?.user?.organizationId,
-  //       );
-  //     }
-
-  //     return { redirect: `/password/change?` + params };
-  //   }
-  else if (
+  else if (user.state === UserState.INITIAL) {
+    return { error: "Initial User not supported" };
+  } else if (
     (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
     !availableSecondFactors.length
   ) {
