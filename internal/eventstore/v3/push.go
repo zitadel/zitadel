@@ -49,9 +49,11 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		err = close(err)
-	}()
+	if close != nil {
+		defer func() {
+			err = close(err)
+		}()
+	}
 
 	events, err := writeEvents(ctx, tx, commands)
 	if err != nil {
