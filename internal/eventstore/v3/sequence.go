@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -22,7 +23,7 @@ type latestSequence struct {
 //go:embed sequences_query.sql
 var latestSequencesStmt string
 
-func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Command) ([]*latestSequence, error) {
+func latestSequences(ctx context.Context, tx database.Tx, commands []eventstore.Command) ([]*latestSequence, error) {
 	sequences := commandsToSequences(ctx, commands)
 
 	conditions, args := sequencesToSql(sequences)

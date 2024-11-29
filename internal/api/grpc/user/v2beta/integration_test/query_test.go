@@ -29,8 +29,6 @@ func detailsV2ToV2beta(obj *object.Details) *object_v2beta.Details {
 }
 
 func TestServer_GetUserByID(t *testing.T) {
-	t.Parallel()
-
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	type args struct {
 		ctx context.Context
@@ -197,8 +195,6 @@ func TestServer_GetUserByID(t *testing.T) {
 }
 
 func TestServer_GetUserByID_Permission(t *testing.T) {
-	t.Parallel()
-
 	timeNow := time.Now().UTC()
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
@@ -347,8 +343,6 @@ type userAttr struct {
 }
 
 func TestServer_ListUsers(t *testing.T) {
-	t.Parallel()
-
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg-%s", gofakeit.AppName()), gofakeit.Email())
 	userResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email())
 	type args struct {

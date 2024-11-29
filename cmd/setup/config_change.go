@@ -53,6 +53,7 @@ func (mig *externalConfigChange) Execute(ctx context.Context, _ eventstore.Event
 		nil,
 		nil,
 		nil,
+		nil,
 		0,
 		0,
 		0,

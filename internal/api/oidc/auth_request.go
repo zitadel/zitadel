@@ -600,6 +600,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 		authReq.SessionID,
+		authReq.oidc().ResponseType,
 	)
 	if err != nil {
 		op.AuthRequestError(w, r, authReq, err, authorizer)

@@ -199,7 +199,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 		},
 		{
-			name: "change, ok",
+			name: "change, ok 1",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -232,7 +232,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 		},
 		{
-			name: "change, ok",
+			name: "change, ok 2",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
