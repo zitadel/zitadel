@@ -24,6 +24,9 @@ func (n *NotificationQueries) GetActiveSMSConfig(ctx context.Context) (*sms.Conf
 		Description: config.Description,
 	}
 	if config.TwilioConfig != nil {
+		if config.TwilioConfig.Token == nil {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-SFefsd", "Errors.SMS.Twilio.NotFound")
+		}
 		token, err := crypto.DecryptString(config.TwilioConfig.Token, n.SMSTokenCrypto)
 		if err != nil {
 			return nil, err

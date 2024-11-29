@@ -42,6 +42,7 @@ type Config struct {
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
 	Projections     projection.Config
+	Notifications   handlers.WorkerConfig
 	Eventstore      *eventstore.Config
 
 	InitProjections InitProjections
