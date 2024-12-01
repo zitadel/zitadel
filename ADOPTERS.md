@@ -12,5 +12,7 @@ If you are using Zitadel, please consider adding yourself as a user with a quick
 | ----------------------- | -------------------------------------------------------------------- | ----------------------------------------------- |
 | Zitadel                 | [@fforootd](https://github.com/fforootd) (and many more)             | Zitadel Cloud makes heavy use of of Zitadel ;-) |
 | Rawkode Academy         | [@RawkodeAcademy](https://github.com/RawkodeAcademy)                 | Rawkode Academy Platform & Zulip use Zitadel for all user and M2M authentication |
+| CNAP.tech               | [@cnap-tech](https://github.com/cnap-tech)                           | Using Zitadel for authentication and authorization in cloud-native applications |
+| Minekube                | [@minekube](https://github.com/minekube)                             | Leveraging Zitadel for secure user authentication in gaming infrastructure |
 | Organization Name       | contact@example.com                                      | Description of how they use Zitadel             |
 | Individual Name         | contact@example.com                                      | Description of how they use Zitadel             |
