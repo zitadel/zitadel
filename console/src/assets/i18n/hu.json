@@ -1384,7 +1384,8 @@
         "nl": "Holland",
         "sv": "Svéd",
         "id": "Indonéz",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1619,7 +1620,8 @@
         "ru": "Orosz",
         "nl": "Holland",
         "sv": "Svéd",
-        "id": "Indonéz"
+        "id": "Indonéz",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail ellenőrzés kész",

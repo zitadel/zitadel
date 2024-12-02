@@ -1,0 +1,521 @@
+Login:
+  Title: 다시 오신 것을 환영합니다!
+  Description: 로그인 정보를 입력하세요.
+  TitleLinking: 사용자 연결을 위한 로그인
+  DescriptionLinking: 외부 사용자를 연결하려면 로그인 정보를 입력하세요.
+  LoginNameLabel: 로그인 이름
+  UsernamePlaceHolder: 사용자 이름
+  LoginnamePlaceHolder: username@domain
+  ExternalUserDescription: 외부 사용자로 로그인하세요.
+  MustBeMemberOfOrg: 사용자는 {{.OrgName}} 조직의 멤버여야 합니다.
+  RegisterButtonText: 등록
+  NextButtonText: 다음
+
+LDAP:
+  Title: 로그인
+  Description: 로그인 정보를 입력하세요.
+  LoginNameLabel: 로그인 이름
+  PasswordLabel: 비밀번호
+  NextButtonText: 다음
+
+SelectAccount:
+  Title: 계정 선택
+  Description: 계정을 사용하세요
+  TitleLinking: 사용자 연결을 위한 계정 선택
+  DescriptionLinking: 외부 사용자와 연결할 계정을 선택하세요.
+  OtherUser: 다른 사용자
+  SessionState0: 활성
+  SessionState1: 로그아웃됨
+  MustBeMemberOfOrg: 사용자는 {{.OrgName}} 조직의 멤버여야 합니다.
+
+Password:
+  Title: 비밀번호
+  Description: 로그인 정보를 입력하세요.
+  PasswordLabel: 비밀번호
+  MinLength: 최소 길이는
+  MinLengthp2: 자 이상이어야 합니다.
+  MaxLength: 70자 미만이어야 합니다.
+  HasUppercase: 대문자가 포함되어야 합니다.
+  HasLowercase: 소문자가 포함되어야 합니다.
+  HasNumber: 숫자가 포함되어야 합니다.
+  HasSymbol: 기호가 포함되어야 합니다.
+  Confirmation: 비밀번호가 일치합니다.
+  ResetLinkText: 비밀번호 재설정
+  BackButtonText: 뒤로
+  NextButtonText: 다음
+
+UsernameChange:
+  Title: 사용자 이름 변경
+  Description: 새 사용자 이름을 설정하세요
+  UsernameLabel: 사용자 이름
+  CancelButtonText: 취소
+  NextButtonText: 다음
+
+UsernameChangeDone:
+  Title: 사용자 이름 변경 완료
+  Description: 사용자 이름이 성공적으로 변경되었습니다.
+  NextButtonText: 다음
+
+InitPassword:
+  Title: 비밀번호 설정
+  Description: 아래 양식에 새 비밀번호를 설정하기 위해 받은 코드를 입력하세요.
+  CodeLabel: 코드
+  NewPasswordLabel: 새 비밀번호
+  NewPasswordConfirmLabel: 비밀번호 확인
+  ResendButtonText: 코드 재전송
+  NextButtonText: 다음
+
+InitPasswordDone:
+  Title: 비밀번호 설정 완료
+  Description: 비밀번호가 성공적으로 설정되었습니다.
+  NextButtonText: 다음
+  CancelButtonText: 취소
+
+InitUser:
+  Title: 사용자 활성화
+  Description: 아래 코드를 통해 이메일을 인증하고 비밀번호를 설정하세요.
+  CodeLabel: 코드
+  NewPasswordLabel: 새 비밀번호
+  NewPasswordConfirm: 비밀번호 확인
+  NextButtonText: 다음
+  ResendButtonText: 코드 재전송
+
+InitUserDone:
+  Title: 사용자 활성화 완료
+  Description: 이메일이 인증되었으며 비밀번호가 성공적으로 설정되었습니다.
+  NextButtonText: 다음
+  CancelButtonText: 취소
+
+InviteUser:
+  Title: 사용자 활성화
+  Description: 아래 코드를 통해 이메일을 인증하고 비밀번호를 설정하세요.
+  CodeLabel: 코드
+  NewPasswordLabel: 새 비밀번호
+  NewPasswordConfirm: 비밀번호 확인
+  NextButtonText: 다음
+  ResendButtonText: 코드 재전송
+
+InitMFAPrompt:
+  Title: 2단계 인증 설정
+  Description: 2단계 인증은 사용자 계정에 추가 보안을 제공합니다. 이를 통해 계정 접근이 본인에게만 허용됩니다.
+  Provider0: "인증 앱 (예: Google/Microsoft Authenticator, Authy)"
+  Provider1: "장치 종속 (예: FaceID, Windows Hello, 지문)"
+  Provider3: OTP SMS
+  Provider4: OTP 이메일
+  NextButtonText: 다음
+  SkipButtonText: 건너뛰기
+
+InitMFAOTP:
+  Title: 2단계 인증
+  Description: 2단계 인증을 설정하세요. 인증 앱이 없으면 다운로드하세요.
+  OTPDescription: "인증 앱으로 코드를 스캔하거나 비밀을 복사하여 아래에 생성된 코드를 입력하세요 (예: Google/Microsoft Authenticator, Authy)."
+  SecretLabel: 비밀
+  CodeLabel: 코드
+  NextButtonText: 다음
+  CancelButtonText: 취소
+
+InitMFAOTPSMS:
+  Title: 2단계 인증
+  DescriptionPhone: 2단계 인증을 설정하세요. 전화번호를 입력하여 인증하세요.
+  DescriptionCode: 2단계 인증을 설정하세요. 받은 코드를 입력하여 전화번호를 인증하세요.
+  PhoneLabel: 전화번호
+  CodeLabel: 코드
+  EditButtonText: 수정
+  ResendButtonText: 코드 재전송
+  NextButtonText: 다음
+
+InitMFAU2F:
+  Title: 보안 키 추가
+  Description: 보안 키는 휴대폰에 내장되거나, 블루투스 또는 컴퓨터 USB 포트에 직접 연결할 수 있는 인증 방법입니다.
+  TokenNameLabel: 보안 키/장치 이름
+  NotSupported: "WebAuthN이 브라우저에서 지원되지 않습니다. 최신 상태인지 확인하거나 다른 브라우저를 사용하세요 (예: Chrome, Safari, Firefox)."
+  RegisterTokenButtonText: 보안 키 추가
+  ErrorRetry: 다시 시도, 새 챌린지 생성 또는 다른 방법 선택.
+
+InitMFADone:
+  Title: 2단계 인증 완료
+  Description: 축하합니다! 2단계 인증을 성공적으로 설정하여 계정을 더욱 안전하게 보호했습니다. 로그인 시마다 이 인증이 필요합니다.
+  NextButtonText: 다음
+  CancelButtonText: 취소
+
+MFAProvider:
+  Provider0: "인증 앱 (예: Google/Microsoft Authenticator, Authy)"
+  Provider1: "장치 종속 (예: FaceID, Windows Hello, 지문)"
+  Provider3: OTP SMS
+  Provider4: OTP 이메일
+  ChooseOther: 다른 옵션 선택
+
+VerifyMFAOTP:
+  Title: 2단계 인증 확인
+  Description: 2단계 인증을 확인하세요
+  CodeLabel: 코드
+  NextButtonText: 다음
+
+VerifyOTP:
+  Title: 2단계 인증 확인
+  Description: 2단계 인증을 확인하세요
+  CodeLabel: 코드
+  ResendButtonText: 코드 재전송
+  NextButtonText: 다음
+
+VerifyMFAU2F:
+  Title: 2단계 인증
+  Description: "등록된 장치로 2단계 인증을 진행하세요 (예: FaceID, Windows Hello, 지문)"
+  NotSupported: "WebAuthN이 브라우저에서 지원되지 않습니다. 최신 버전을 사용하거나 지원되는 다른 브라우저로 변경하세요 (예: Chrome, Safari, Firefox)."
+  ErrorRetry: 다시 시도, 새 요청 생성 또는 다른 방법 선택.
+  ValidateTokenButtonText: 2단계 인증
+
+Passwordless:
+  Title: 비밀번호 없이 로그인
+  Description: "FaceID, Windows Hello, 지문과 같은 장치에서 제공하는 인증 방법으로 로그인하세요."
+  NotSupported: "WebAuthN이 브라우저에서 지원되지 않습니다. 최신 상태인지 확인하거나 다른 브라우저를 사용하세요 (예: Chrome, Safari, Firefox)."
+  ErrorRetry: 다시 시도, 새 챌린지 생성 또는 다른 방법 선택.
+  LoginWithPwButtonText: 비밀번호로 로그인
+  ValidateTokenButtonText: 비밀번호 없이 로그인
+
+PasswordlessPrompt:
+  Title: 비밀번호 없는 로그인 설정
+  Description: "비밀번호 없는 로그인을 설정하시겠습니까? (FaceID, Windows Hello, 지문과 같은 장치 인증 방법)"
+  DescriptionInit: 비밀번호 없는 로그인을 설정해야 합니다. 기기 등록을 위해 제공된 링크를 사용하세요.
+  PasswordlessButtonText: 비밀번호 없이 사용
+  NextButtonText: 다음
+  SkipButtonText: 건너뛰기
+
+PasswordlessRegistration:
+  Title: 비밀번호 없는 로그인 설정
+  Description: "장치 이름을 입력한 후 아래의 '비밀번호 없이 등록' 버튼을 클릭하여 인증을 추가하세요 (예: 내 휴대폰, MacBook 등)."
+  TokenNameLabel: 장치 이름
+  NotSupported: "WebAuthN이 브라우저에서 지원되지 않습니다. 최신 상태인지 확인하거나 다른 브라우저를 사용하세요 (예: Chrome, Safari, Firefox)."
+  RegisterTokenButtonText: 비밀번호 없이 등록
+  ErrorRetry: 다시 시도, 새 챌린지 생성 또는 다른 방법 선택.
+
+PasswordlessRegistrationDone:
+  Title: 비밀번호 없는 로그인 설정 완료
+  Description: 비밀번호 없는 장치가 성공적으로 추가되었습니다.
+  DescriptionClose: 이제 이 창을 닫을 수 있습니다.
+  NextButtonText: 다음
+  CancelButtonText: 취소
+
+PasswordChange:
+  Title: 비밀번호 변경
+  Description: 비밀번호를 변경하세요. 기존 비밀번호와 새 비밀번호를 입력하세요.
+  ExpiredDescription: 비밀번호가 만료되어 변경이 필요합니다. 기존 비밀번호와 새 비밀번호를 입력하세요.
+  OldPasswordLabel: 기존 비밀번호
+  NewPasswordLabel: 새 비밀번호
+  NewPasswordConfirmLabel: 비밀번호 확인
+  CancelButtonText: 취소
+  NextButtonText: 다음
+  Footer: 푸터
+
+PasswordChangeDone:
+  Title: 비밀번호 변경 완료
+  Description: 비밀번호가 성공적으로 변경되었습니다.
+  NextButtonText: 다음
+
+PasswordResetDone:
+  Title: 비밀번호 재설정 링크 발송됨
+  Description: 비밀번호를 재설정하려면 이메일을 확인하세요.
+  NextButtonText: 다음
+
+EmailVerification:
+  Title: 이메일 인증
+  Description: 이메일 인증을 위해 전송된 코드를 아래 양식에 입력하세요.
+  CodeLabel: 코드
+  NextButtonText: 다음
+  ResendButtonText: 코드 재전송
+
+EmailVerificationDone:
+  Title: 이메일 인증 완료
+  Description: 이메일 주소가 성공적으로 인증되었습니다.
+  NextButtonText: 다음
+  CancelButtonText: 취소
+  LoginButtonText: 로그인
+
+RegisterOption:
+  Title: 등록 옵션
+  Description: 등록 방법을 선택하세요
+  RegisterUsernamePasswordButtonText: 사용자 이름과 비밀번호로 등록
+  ExternalLoginDescription: 또는 외부 사용자로 등록
+  LoginButtonText: 로그인
+
+RegistrationUser:
+  Title: 등록
+  Description: 사용자 정보를 입력하세요. 이메일 주소는 로그인 이름으로 사용됩니다.
+  DescriptionOrgRegister: 사용자 정보를 입력하세요.
+  EmailLabel: 이메일
+  UsernameLabel: 사용자 이름
+  FirstnameLabel: 이름
+  LastnameLabel: 성
+  LanguageLabel: 언어
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  GenderLabel: 성별
+  Female: 여성
+  Male: 남성
+  Diverse: 기타 / X
+  PasswordLabel: 비밀번호
+  PasswordConfirmLabel: 비밀번호 확인
+  TosAndPrivacyLabel: 동의사항
+  TosConfirm: 이용 약관에 동의합니다.
+  TosLinkText: 이용 약관
+  PrivacyConfirm: 개인정보 수집 및 이용에 동의합니다.
+  PrivacyLinkText: 개인정보처리방침
+  ExternalLogin: 또는 외부 사용자로 등록
+  BackButtonText: 로그인
+  NextButtonText: 다음
+
+ExternalRegistrationUserOverview:
+  Title: 외부 사용자 등록
+  Description: 선택한 제공자에서 사용자 정보를 가져왔습니다. 이제 정보를 수정하거나 완성할 수 있습니다.
+  EmailLabel: 이메일
+  UsernameLabel: 사용자 이름
+  FirstnameLabel: 이름
+  LastnameLabel: 성
+  NicknameLabel: 닉네임
+  PhoneLabel: 전화번호
+  LanguageLabel: 언어
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  TosAndPrivacyLabel: 동의사항
+  TosConfirm: 이용 약관에 동의합니다.
+  TosLinkText: 이용 약관
+  PrivacyConfirm: 개인정보 수집 및 이용에 동의합니다.
+  PrivacyLinkText: 개인정보처리방침
+  ExternalLogin: 또는 외부 사용자로 등록
+  BackButtonText: 뒤로
+  NextButtonText: 저장
+
+RegistrationOrg:
+  Title: 조직 등록
+  Description: 조직 이름과 사용자 정보를 입력하세요.
+  OrgNameLabel: 조직 이름
+  EmailLabel: 이메일
+  UsernameLabel: 사용자 이름
+  FirstnameLabel: 이름
+  LastnameLabel: 성
+  PasswordLabel: 비밀번호
+  PasswordConfirmLabel: 비밀번호 확인
+  TosAndPrivacyLabel: 동의사항
+  TosConfirm: 이용 약관에 동의합니다.
+  TosLinkText: 이용 약관
+  PrivacyConfirm: 개인정보 수집 및 이용에 동의합니다.
+  PrivacyLinkText: 개인정보처리방침
+  SaveButtonText: 조직 생성
+
+LoginSuccess:
+  Title: 로그인 성공
+  AutoRedirectDescription: 자동으로 애플리케이션으로 리디렉션됩니다. 그렇지 않으면 아래 버튼을 클릭하세요. 이후 창을 닫아도 됩니다.
+  RedirectedDescription: 이제 이 창을 닫을 수 있습니다.
+  NextButtonText: 다음
+
+LogoutDone:
+  Title: 로그아웃 완료
+  Description: 성공적으로 로그아웃되었습니다.
+  LoginButtonText: 로그인
+
+LinkingUserPrompt:
+  Title: 기존 사용자 발견
+  Description: "기존 계정을 연결하시겠습니까:"
+  LinkButtonText: 연결
+  OtherButtonText: 다른 옵션
+
+LinkingUsersDone:
+  Title: 사용자 연결
+  Description: 사용자가 연결되었습니다.
+  CancelButtonText: 취소
+  NextButtonText: 다음
+
+ExternalNotFound:
+  Title: 외부 사용자 찾을 수 없음
+  Description: 외부 사용자를 찾을 수 없습니다. 사용자 계정을 연결하거나 새 계정을 자동 등록하시겠습니까?
+  LinkButtonText: 연결
+  AutoRegisterButtonText: 등록
+  TosAndPrivacyLabel: 동의사항
+  TosConfirm: 이용 약관에 동의합니다.
+  TosLinkText: 이용 약관
+  PrivacyConfirm: 개인정보 수집 및 이용에 동의합니다.
+  PrivacyLinkText: 개인정보처리방침
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+DeviceAuth:
+  Title: 기기 인증
+  UserCode:
+    Label: 사용자 코드
+    Description: 기기에서 표시된 사용자 코드를 입력하세요.
+    ButtonNext: 다음
+  Action:
+    Description: 기기 접근 권한을 부여하세요.
+    GrantDevice: 기기에게 권한을 부여하려고 합니다
+    AccessToScopes: 다음 범위에 접근 권한이 있습니다
+    Button:
+      Allow: 허용
+      Deny: 거부
+  Done:
+    Description: 완료.
+    Approved: 기기 인증이 승인되었습니다. 이제 기기로 돌아가세요.
+    Denied: 기기 인증이 거부되었습니다. 이제 기기로 돌아가세요.
+
+Footer:
+  PoweredBy: 제공자
+  Tos: 이용 약관
+  PrivacyPolicy: 개인정보처리방침
+  Help: 도움말
+  SupportEmail: 지원 이메일
+
+SignIn: "{{.Provider}}로 로그인"
+
+Errors:
+  Internal: 내부 오류가 발생했습니다
+  AuthRequest:
+    NotFound: 인증 요청을 찾을 수 없습니다
+    UserAgentNotCorresponding: 사용자 에이전트가 일치하지 않습니다
+    UserAgentNotFound: 사용자 에이전트 ID를 찾을 수 없습니다
+    TokenNotFound: 토큰을 찾을 수 없습니다
+    RequestTypeNotSupported: 요청 유형이 지원되지 않습니다
+    MissingParameters: 필수 매개변수가 없습니다
+  User:
+    NotFound: 사용자를 찾을 수 없습니다
+    AlreadyExists: 사용자가 이미 존재합니다
+    Inactive: 사용자가 비활성화되었습니다
+    NotFoundOnOrg: 선택된 조직에서 사용자를 찾을 수 없습니다
+    NotAllowedOrg: 사용자는 필수 조직의 멤버가 아닙니다
+    NotMatchingUserID: 사용자와 인증 요청의 사용자가 일치하지 않습니다
+    UserIDMissing: 사용자 ID가 비어 있습니다
+    Invalid: 잘못된 사용자 데이터입니다
+    DomainNotAllowedAsUsername: 도메인이 이미 예약되어 사용할 수 없습니다
+    NotAllowedToLink: 외부 로그인 제공자와 연결할 수 없습니다
+    Profile:
+      NotFound: 프로필을 찾을 수 없습니다
+      NotChanged: 프로필이 변경되지 않았습니다
+      Empty: 프로필이 비어 있습니다
+      FirstNameEmpty: 프로필에 이름이 비어 있습니다
+      LastNameEmpty: 프로필에 성이 비어 있습니다
+      IDMissing: 프로필 ID가 없습니다
+    Email:
+      NotFound: 이메일을 찾을 수 없습니다
+      Invalid: 잘못된 이메일입니다
+      AlreadyVerified: 이메일이 이미 인증되었습니다
+      NotChanged: 이메일이 변경되지 않았습니다
+      Empty: 이메일이 비어 있습니다
+      IDMissing: 이메일 ID가 없습니다
+    Phone:
+      NotFound: 전화번호를 찾을 수 없습니다
+      Invalid: 잘못된 전화번호입니다
+      AlreadyVerified: 전화번호가 이미 인증되었습니다
+      Empty: 전화번호가 비어 있습니다
+      NotChanged: 전화번호가 변경되지 않았습니다
+    Address:
+      NotFound: 주소를 찾을 수 없습니다
+      NotChanged: 주소가 변경되지 않았습니다
+    Username:
+      AlreadyExists: 사용자 이름이 이미 사용 중입니다
+      Reserved: 사용자 이름이 이미 예약되었습니다
+      Empty: 사용자 이름이 비어 있습니다
+    Password:
+      ConfirmationWrong: 비밀번호 확인이 일치하지 않습니다
+      Empty: 비밀번호가 비어 있습니다
+      Invalid: 잘못된 비밀번호입니다
+      InvalidAndLocked: 비밀번호가 잘못되었고 사용자가 잠겼습니다. 관리자에게 문의하세요.
+      NotChanged: 새 비밀번호는 현재 비밀번호와 다르게 설정해야 합니다
+    UsernameOrPassword:
+      Invalid: 사용자 이름 또는 비밀번호가 잘못되었습니다
+    PasswordComplexityPolicy:
+      NotFound: 비밀번호 정책을 찾을 수 없습니다
+      MinLength: 비밀번호가 너무 짧습니다
+      HasLower: 비밀번호에 소문자가 포함되어야 합니다
+      HasUpper: 비밀번호에 대문자가 포함되어야 합니다
+      HasNumber: 비밀번호에 숫자가 포함되어야 합니다
+      HasSymbol: 비밀번호에 기호가 포함되어야 합니다
+    Code:
+      Expired: 코드가 만료되었습니다
+      Invalid: 잘못된 코드입니다
+      Empty: 코드가 비어 있습니다
+      CryptoCodeNil: 암호화 코드가 없습니다
+      NotFound: 코드를 찾을 수 없습니다
+      GeneratorAlgNotSupported: 지원되지 않는 생성 알고리즘입니다
+    EmailVerify:
+      UserIDEmpty: 사용자 ID가 비어 있습니다
+    ExternalData:
+      CouldNotRead: 외부 데이터를 올바르게 읽을 수 없습니다
+    MFA:
+      NoProviders: 사용 가능한 다중 인증 제공자가 없습니다
+      OTP:
+        AlreadyReady: 다중 인증 OTP(일회용 비밀번호)가 이미 설정되었습니다
+        NotExisting: 다중 인증 OTP(일회용 비밀번호)가 존재하지 않습니다
+        InvalidCode: 잘못된 코드입니다
+        NotReady: 다중 인증 OTP(일회용 비밀번호)가 준비되지 않았습니다
+    Locked: 사용자가 잠겼습니다
+    SomethingWentWrong: 문제가 발생했습니다
+    NotActive: 사용자가 활성 상태가 아닙니다
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP 유형이 구현되지 않았습니다
+      NotAllowed: 외부 로그인 제공자가 허용되지 않습니다
+      IDPConfigIDEmpty: ID 제공자 ID가 비어 있습니다
+      ExternalUserIDEmpty: 외부 사용자 ID가 비어 있습니다
+      UserDisplayNameEmpty: 사용자 표시 이름이 비어 있습니다
+      NoExternalUserData: 외부 사용자 데이터를 받을 수 없습니다
+      CreationNotAllowed: 이 제공자에서는 새 사용자 생성을 허용하지 않습니다
+      LinkingNotAllowed: 이 제공자에서는 사용자를 연결할 수 없습니다
+      NoOptionAllowed: 이 제공자에서는 생성과 연결이 모두 허용되지 않습니다. 관리자에게 문의하세요.
+    GrantRequired: 로그인 불가. 사용자는 애플리케이션에서 최소한 하나의 권한이 필요합니다. 관리자에게 문의하세요.
+    ProjectRequired: 로그인 불가. 사용자의 조직이 프로젝트에 허가되어야 합니다. 관리자에게 문의하세요.
+  IdentityProvider:
+    InvalidConfig: ID 제공자 설정이 잘못되었습니다
+  IAM:
+    LockoutPolicy:
+      NotExisting: 잠금 정책이 존재하지 않습니다
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: 등록이 허용되지 않습니다
+  DeviceAuth:
+    NotExisting: 사용자 코드가 존재하지 않습니다
+
+optional: (선택 사항)
