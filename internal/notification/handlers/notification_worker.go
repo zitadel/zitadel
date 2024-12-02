@@ -178,19 +178,14 @@ func (w *NotificationWorker) reduceNotificationRetry(ctx, txCtx context.Context,
 func (w *NotificationWorker) sendNotification(ctx, txCtx context.Context, tx *sql.Tx, request notification.Request, notifyUser *query.NotifyUser, e eventstore.Event) error {
 	ctx, err := enrichCtx(ctx, request.TriggeredAtOrigin)
 	if err != nil {
-		err := w.commands.NotificationCanceled(ctx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner, err)
-		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
-			OnError(err).Error("could not cancel notification")
-		return nil
+		return channels.NewCancelError(err)
 	}
 
 	// check early that a "sent" handler exists, otherwise we can cancel early
 	sentHandler, ok := sentHandlers[request.EventType]
 	if !ok {
-		err := w.commands.NotificationCanceled(ctx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner, err)
-		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
-			OnError(err).Errorf(`no "sent" handler registered for %s`, request.EventType)
-		return nil
+		logging.Errorf(`no "sent" handler registered for %s`, request.EventType)
+		return channels.NewCancelError(err)
 	}
 
 	var code string
@@ -400,11 +395,15 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 			// we use the txCtx to make sure we can rollback the transaction in case the ctx is canceled
 			w.rollbackToSavepoint(txCtx, tx, event, workerID, retry)
 		}
+		// if the context is canceled, we stop the processing
+		if ctx.Err() != nil {
+			return nil
+		}
 	}
 	return nil
 }
 
-func (w *NotificationWorker) latestRetries(events []eventstore.Event) {
+func (w *NotificationWorker) latestRetries(events []eventstore.Event) []eventstore.Event {
 	for i := len(events) - 1; i > 0; i-- {
 		// since we delete during the iteration, we need to make sure we don't panic
 		if len(events) <= i {
@@ -416,6 +415,7 @@ func (w *NotificationWorker) latestRetries(events []eventstore.Event) {
 				e.Sequence() < events[i].Sequence()
 		})
 	}
+	return events
 }
 
 func (w *NotificationWorker) createSavepoint(ctx context.Context, tx *sql.Tx, event eventstore.Event, workerID int, retry bool) {
@@ -479,8 +479,7 @@ func (w *NotificationWorker) searchRetryEvents(ctx context.Context, tx *sql.Tx) 
 	if err != nil {
 		return nil, err
 	}
-	w.latestRetries(events)
-	return events, nil
+	return w.latestRetries(events), nil
 }
 
 type existingInstances []string
