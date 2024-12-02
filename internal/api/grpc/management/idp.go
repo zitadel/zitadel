@@ -419,25 +419,23 @@ func (s *Server) UpdateAppleProvider(ctx context.Context, req *mgmt_pb.UpdateApp
 }
 
 func (s *Server) AddSAMLProvider(ctx context.Context, req *mgmt_pb.AddSAMLProviderRequest) (*mgmt_pb.AddSAMLProviderResponse, error) {
-	id, details, metadataError, err := s.command.AddOrgSAMLProvider(ctx, authz.GetCtxData(ctx).OrgID, addSAMLProviderToCommand(req))
+	id, details, err := s.command.AddOrgSAMLProvider(ctx, authz.GetCtxData(ctx).OrgID, addSAMLProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddSAMLProviderResponse{
-		Id:            id,
-		Details:       object_pb.DomainToAddDetailsPb(details),
-		MetadataError: metadataError,
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) UpdateSAMLProvider(ctx context.Context, req *mgmt_pb.UpdateSAMLProviderRequest) (*mgmt_pb.UpdateSAMLProviderResponse, error) {
-	details, metadataError, err := s.command.UpdateOrgSAMLProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateSAMLProviderToCommand(req))
+	details, err := s.command.UpdateOrgSAMLProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateSAMLProviderToCommand(req))
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.UpdateSAMLProviderResponse{
-		Details:       object_pb.DomainToChangeDetailsPb(details),
-		MetadataError: metadataError,
+		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/muhlemmer/gu"
 	"github.com/zitadel/saml/pkg/provider/xml"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -448,30 +447,30 @@ func (c *Commands) UpdateOrgLDAPProvider(ctx context.Context, resourceOwner, id 
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddOrgSAMLProvider(ctx context.Context, resourceOwner string, provider *SAMLProvider) (id string, details *domain.ObjectDetails, metadataError *string, err error) {
+func (c *Commands) AddOrgSAMLProvider(ctx context.Context, resourceOwner string, provider *SAMLProvider) (id string, details *domain.ObjectDetails, err error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	id, err = c.idGenerator.Next()
 	if err != nil {
-		return "", nil, nil, err
+		return "", nil, err
 	}
 	writeModel := NewSAMLOrgIDPWriteModel(resourceOwner, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgSAMLProvider(orgAgg, writeModel, provider))
 	if err != nil {
-		return "", nil, nil, err
+		return "", nil, err
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return "", nil, nil, err
+		return "", nil, err
 	}
-	return id, pushedEventsToObjectDetails(pushedEvents), provider.MetadataError, nil
+	return id, pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id string, provider *SAMLProvider) (details *domain.ObjectDetails, metadataError *string, err error) {
+func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id string, provider *SAMLProvider) (details *domain.ObjectDetails, err error) {
 	orgAgg := org.NewAggregate(resourceOwner)
 	writeModel := NewSAMLOrgIDPWriteModel(resourceOwner, id)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareUpdateOrgSAMLProvider(orgAgg, writeModel, provider))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if len(cmds) == 0 {
 		// no change, so return directly
@@ -479,13 +478,13 @@ func (c *Commands) UpdateOrgSAMLProvider(ctx context.Context, resourceOwner, id 
 			Sequence:      writeModel.ProcessedSequence,
 			EventDate:     writeModel.ChangeDate,
 			ResourceOwner: writeModel.ResourceOwner,
-		}, provider.MetadataError, nil
+		}, nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	return pushedEventsToObjectDetails(pushedEvents), provider.MetadataError, nil
+	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
 func (c *Commands) RegenerateOrgSAMLProviderCertificate(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
@@ -1720,12 +1719,8 @@ func (c *Commands) prepareAddOrgSAMLProvider(a *org.Aggregate, writeModel *OrgSA
 			}
 			provider.Metadata = data
 		}
-		_, err := saml.ParseMetadata(provider.Metadata)
-		if err != nil {
-			if provider.FailOnMetadataError {
-				return nil, zerrors.ThrowInvalidArgument(err, "ORG-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat")
-			}
-			provider.MetadataError = gu.Ptr(err.Error())
+		if _, err := saml.ParseMetadata(provider.Metadata); err != nil {
+			return nil, zerrors.ThrowInvalidArgument(err, "ORG-SF3rwhgh", "Errors.Project.App.SAMLMetadataFormat")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())
@@ -1782,12 +1777,8 @@ func (c *Commands) prepareUpdateOrgSAMLProvider(a *org.Aggregate, writeModel *Or
 		if provider.Metadata == nil {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-j6spncd74m", "Errors.Invalid.Argument")
 		}
-		_, err := saml.ParseMetadata(provider.Metadata)
-		if err != nil {
-			if provider.FailOnMetadataError {
-				return nil, zerrors.ThrowInvalidArgument(err, "ORG-SFqqh42", "Errors.Project.App.SAMLMetadataFormat")
-			}
-			provider.MetadataError = gu.Ptr(err.Error())
+		if _, err := saml.ParseMetadata(provider.Metadata); err != nil {
+			return nil, zerrors.ThrowInvalidArgument(err, "ORG-SFqqh42", "Errors.Project.App.SAMLMetadataFormat")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

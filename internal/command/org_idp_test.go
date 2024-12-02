@@ -5351,10 +5351,9 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 		provider      *SAMLProvider
 	}
 	type res struct {
-		id            string
-		want          *domain.ObjectDetails
-		metadataError *string
-		err           func(error) bool
+		id   string
+		want *domain.ObjectDetails
+		err  func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -5408,9 +5407,8 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				provider: &SAMLProvider{
-					Name:                "name",
-					Metadata:            []byte("metadata"),
-					FailOnMetadataError: true,
+					Name:     "name",
+					Metadata: []byte("metadata"),
 				},
 			},
 			res{
@@ -5428,7 +5426,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 							"id1",
 							"name",
-							[]byte("metadata"),
+							validSAMLMetadata,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -5452,13 +5450,12 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				resourceOwner: "org1",
 				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
-				id:            "id1",
-				want:          &domain.ObjectDetails{ResourceOwner: "org1"},
-				metadataError: gu.Ptr("EOF"),
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 		{
@@ -5470,7 +5467,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 							"id1",
 							"name",
-							[]byte("metadata"),
+							validSAMLMetadata,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -5500,7 +5497,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				resourceOwner: "org1",
 				provider: &SAMLProvider{
 					Name:                          "name",
-					Metadata:                      []byte("metadata"),
+					Metadata:                      validSAMLMetadata,
 					Binding:                       "binding",
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
@@ -5514,9 +5511,8 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				id:            "id1",
-				want:          &domain.ObjectDetails{ResourceOwner: "org1"},
-				metadataError: gu.Ptr("EOF"),
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 	}
@@ -5528,7 +5524,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
-			id, got, gotMetadataError, err := c.AddOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			id, got, err := c.AddOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -5538,7 +5534,6 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, id)
 				assertObjectDetails(t, tt.res.want, got)
-				assert.Equal(t, tt.res.metadataError, gotMetadataError)
 			}
 		})
 	}
@@ -5556,9 +5551,8 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		provider      *SAMLProvider
 	}
 	type res struct {
-		want          *domain.ObjectDetails
-		metadataError *string
-		err           func(error) bool
+		want *domain.ObjectDetails
+		err  func(error) bool
 	}
 	tests := []struct {
 		name   string
@@ -5619,7 +5613,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 		},
 		{
-			"invalid metadata, fail on error",
+			"invalid metadata, error",
 			fields{
 				eventstore: expectEventstore(),
 			},
@@ -5628,9 +5622,8 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				resourceOwner: "org1",
 				id:            "id1",
 				provider: &SAMLProvider{
-					Name:                "name",
-					FailOnMetadataError: true,
-					Metadata:            []byte("metadata"),
+					Name:     "name",
+					Metadata: []byte("metadata"),
 				},
 			},
 			res{
@@ -5652,7 +5645,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				id:            "id1",
 				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
@@ -5670,7 +5663,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
 								"id1",
 								"name",
-								[]byte("metadata"),
+								validSAMLMetadata,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
 									Algorithm:  "enc",
@@ -5693,12 +5686,11 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				id:            "id1",
 				provider: &SAMLProvider{
 					Name:     "name",
-					Metadata: []byte("metadata"),
+					Metadata: validSAMLMetadata,
 				},
 			},
 			res: res{
-				want:          &domain.ObjectDetails{ResourceOwner: "org1"},
-				metadataError: gu.Ptr("EOF"),
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 		{
@@ -5732,7 +5724,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 								"id1",
 								[]idp.SAMLIDPChanges{
 									idp.ChangeSAMLName("new name"),
-									idp.ChangeSAMLMetadata([]byte("new metadata")),
+									idp.ChangeSAMLMetadata(validSAMLMetadata),
 									idp.ChangeSAMLBinding("new binding"),
 									idp.ChangeSAMLWithSignedRequest(true),
 									idp.ChangeSAMLNameIDFormat(gu.Ptr(domain.SAMLNameIDFormatTransient)),
@@ -5757,7 +5749,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				id:            "id1",
 				provider: &SAMLProvider{
 					Name:                          "new name",
-					Metadata:                      []byte("new metadata"),
+					Metadata:                      validSAMLMetadata,
 					Binding:                       "new binding",
 					WithSignedRequest:             true,
 					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
@@ -5771,8 +5763,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				want:          &domain.ObjectDetails{ResourceOwner: "org1"},
-				metadataError: gu.Ptr("EOF"),
+				want: &domain.ObjectDetails{ResourceOwner: "org1"},
 			},
 		},
 	}
@@ -5782,7 +5773,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			got, gotMetadataError, err := c.UpdateOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
+			got, err := c.UpdateOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -5791,7 +5782,6 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assertObjectDetails(t, tt.res.want, got)
-				assert.Equal(t, tt.res.metadataError, gotMetadataError)
 			}
 		})
 	}

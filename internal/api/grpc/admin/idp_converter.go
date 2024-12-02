@@ -483,7 +483,6 @@ func addSAMLProviderToCommand(req *admin_pb.AddSAMLProviderRequest) *command.SAM
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
-		FailOnMetadataError:           req.GetFailOnMetadataError(),
 	}
 }
 
@@ -501,7 +500,6 @@ func updateSAMLProviderToCommand(req *admin_pb.UpdateSAMLProviderRequest) *comma
 		NameIDFormat:                  nameIDFormat,
 		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
 		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
-		FailOnMetadataError:           req.GetFailOnMetadataError(),
 	}
 }
 

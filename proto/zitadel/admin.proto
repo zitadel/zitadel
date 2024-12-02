@@ -7015,16 +7015,11 @@ message AddSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 8;
-    // Optionally, you can prevent the creation of the provider if the parsing and processing of the metadata
-    // passed as XML or via URL fails. This is useful to prevent some user facing errors during authentication.
-    optional bool fail_on_metadata_error = 9;
 }
 
 message AddSAMLProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
     string id = 2;
-    // In case the metadata could not be processed, the corresponding error will be returned.
-    optional string metadata_error = 3;
 }
 
 message UpdateSAMLProviderRequest {
@@ -7054,15 +7049,10 @@ message UpdateSAMLProviderRequest {
     // Optionally specify the name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 9;
-    // Optionally, you can prevent the creation of the provider if the parsing and processing of the metadata
-    // passed as XML or via URL fails. This is useful to prevent some user facing errors during authentication.
-    optional bool fail_on_metadata_error = 10;
 }
 
 message UpdateSAMLProviderResponse {
     zitadel.v1.ObjectDetails details = 1;
-    // In case the metadata could not be processed, the corresponding error will be returned.
-    optional string metadata_error = 2;
 }
 
 message RegenerateSAMLProviderCertificateRequest {
