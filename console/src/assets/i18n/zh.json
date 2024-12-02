@@ -1384,7 +1384,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1620,7 +1621,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -2563,7 +2565,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "添加管理者",
