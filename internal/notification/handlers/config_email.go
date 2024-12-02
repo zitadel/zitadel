@@ -23,6 +23,9 @@ func (n *NotificationQueries) GetActiveEmailConfig(ctx context.Context) (*email.
 		Description: config.Description,
 	}
 	if config.SMTPConfig != nil {
+		if config.SMTPConfig.Password == nil {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-Wrs3gw", "Errors.SMTPConfig.NotFound")
+		}
 		password, err := crypto.DecryptString(config.SMTPConfig.Password, n.SMTPPasswordCrypto)
 		if err != nil {
 			return nil, err

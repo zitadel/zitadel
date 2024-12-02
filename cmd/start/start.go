@@ -196,6 +196,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.OTP,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -245,6 +246,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.DomainVerification,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		&http.Client{},
 		permissionCheck,
 		sessionTokenVerifier,
@@ -277,6 +279,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.Projections.Customizations["notificationsquotas"],
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
+		config.Notifications,
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -291,6 +294,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
+		queryDBClient,
 	)
 	notification.Start(ctx)
 

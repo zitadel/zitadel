@@ -17,8 +17,6 @@ import (
 )
 
 func TestServer_RegisterU2F(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
 
@@ -108,8 +106,6 @@ func TestServer_RegisterU2F(t *testing.T) {
 }
 
 func TestServer_VerifyU2FRegistration(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	Instance.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
