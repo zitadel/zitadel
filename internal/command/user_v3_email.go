@@ -40,7 +40,7 @@ func (c *Commands) ChangeSchemaUserEmail(ctx context.Context, user *ChangeSchema
 		return nil, err
 	}
 
-	writeModel, err := c.getSchemaUserEmailWriteModelByID(ctx, user.ResourceOwner, user.ID)
+	writeModel, err := c.getSchemaUserWMForEmail(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Commands) VerifySchemaUserEmail(ctx context.Context, resourceOwner, id,
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-y3n4Sdu8j5", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserEmailWriteModelByID(ctx, resourceOwner, id)
+	writeModel, err := c.getSchemaUserWMForEmail(ctx, resourceOwner, id)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSc
 	if user.ID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-KvPc5o9GeJ", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserEmailWriteModelByID(ctx, user.ResourceOwner, user.ID)
+	writeModel, err := c.getSchemaUserWMForEmail(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -112,4 +112,12 @@ func (c *Commands) ResendSchemaUserEmailCode(ctx context.Context, user *ResendSc
 		user.PlainCode = &plainCode
 	}
 	return c.pushAppendAndReduceDetails(ctx, writeModel, events...)
+}
+
+func (c *Commands) getSchemaUserWMForEmail(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
+	writeModel := NewUserV3EmailWriteModel(resourceOwner, id, c.checkPermission)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
 }

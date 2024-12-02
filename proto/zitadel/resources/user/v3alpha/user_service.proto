@@ -570,7 +570,7 @@ service ZITADELUsers {
 
   // Set a password
   //
-  // Add, update or reset a user's password with either a verification code or the current password.
+  // Add or update a user's password with either a verification code, the current password or sufficient permissions.
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/users/{id}/password"
@@ -613,6 +613,128 @@ service ZITADELUsers {
         key: "200"
         value: {
           description: "Password reset successfully requested";
+        }
+      };
+    };
+  }
+
+  // Remove a password
+  //
+  // Remove a user's password. The user will not be able to login with a password anymore and is required to use another authentication method such as an identity provider.
+  rpc RemovePassword (RemovePasswordRequest) returns (RemovePasswordResponse) {
+    option (google.api.http) = {
+      delete: "/resources/v3alpha/users/{id}/password"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Password successfully removed";
+        }
+      };
+    };
+  }
+
+  // Add a public key
+  //
+  // Add a new public key to a user. The public key will be used to verify the user's identity on authentication.
+  rpc AddPublicKey (AddPublicKeyRequest) returns (AddPublicKeyResponse) {
+    option (google.api.http) = {
+      post: "/resources/v3alpha/users/{id}/public_key"
+      body: "public_key"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Public key successfully added";
+        }
+      };
+    };
+  }
+
+  // Remove a public key
+  //
+  // Remove an existing public key of a user, so it cannot be used for authentication anymore.
+  rpc RemovePublicKey (RemovePublicKeyRequest) returns (RemovePublicKeyResponse) {
+    option (google.api.http) = {
+      delete: "/resources/v3alpha/users/{id}/public_key/{public_key_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Public key successfully removed";
+        }
+      };
+    };
+  }
+
+  // Add a personal access token
+  //
+  // Add a new personal access token to a user. The personal access token can be used to access granted resources including the ZITADEL API.
+  rpc AddPersonalAccessToken (AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      post: "/resources/v3alpha/users/{id}/personal_access_token"
+      body: "personal_access_token"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Personal Access Token successfully added";
+        }
+      };
+    };
+  }
+
+  // Remove a personal access token
+  //
+  // Remove an existing personal access token of a user, so it cannot be used to for authorization anymore.
+  rpc RemovePersonalAccessToken (RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      delete: "/resources/v3alpha/users/{id}/personal_access_token/{personal_access_token_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Personal Access Token successfully removed";
         }
       };
     };
@@ -1595,6 +1717,164 @@ message RequestPasswordResetResponse {
       example: "\"SKJd342k\"";
     }
   ];
+}
+
+message RemovePasswordRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  // Optionally expect the user to be in this organization.
+  optional zitadel.object.v3alpha.Organization organization = 2;
+  // unique identifier of the user.
+  string id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemovePasswordResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+}
+
+message AddPublicKeyRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  // Optionally expect the user to be in this organization.
+  optional zitadel.object.v3alpha.Organization organization = 2;
+  // unique identifier of the user.
+  string id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // Add a user's new public key.
+  SetPublicKey public_key = 4;
+}
+
+message AddPublicKeyResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+  // unique identifier of the public key.
+  string public_key_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+  bytes private_key = 3;
+}
+
+message RemovePublicKeyRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  // Optionally expect the user to be in this organization.
+  optional zitadel.object.v3alpha.Organization organization = 2;
+  // unique identifier of the user.
+  string id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // unique identifier of the public key.
+  string public_key_id = 4 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message RemovePublicKeyResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+}
+
+message AddPersonalAccessTokenRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  // Optionally expect the user to be in this organization.
+  optional zitadel.object.v3alpha.Organization organization = 2;
+  // unique identifier of the user.
+  string id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // Add a user's new personal access token.
+  SetPersonalAccessToken personal_access_token = 4;
+}
+
+message AddPersonalAccessTokenResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+  // unique identifier of the public key.
+  string personal_access_token_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+  string personal_access_token = 3;
+}
+
+message RemovePersonalAccessTokenRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  // Optionally expect the user to be in this organization.
+  optional zitadel.object.v3alpha.Organization organization = 2;
+  // unique identifier of the user.
+  string id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // unique identifier of the personal access token.
+  string personal_access_token_id = 4 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message RemovePersonalAccessTokenResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message StartWebAuthNRegistrationRequest {

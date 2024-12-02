@@ -26,9 +26,11 @@ message Authenticators {
   // A list of the user's one-time password (OTP) Email authenticators.
   repeated OTPEmail otp_email = 6;
   // A list of the user's authentication keys. They can be used to authenticate e.g. by JWT Profile.
-  repeated AuthenticationKey authentication_keys = 7;
+  repeated PublicKey public_keys = 7;
   // A list of the user's linked identity providers (IDPs).
   repeated IdentityProvider identity_providers = 8;
+  // A list of the user's personal access tokens.
+  repeated PersonalAccessToken personal_access_tokens = 9;
 }
 
 message Username {
@@ -50,29 +52,6 @@ message Username {
   // - gigi-giraffe@zitadel.com (unique across organizations)
   // - gigi-giraffe (unique only inside the ZITADEL organization)
   bool is_organization_specific = 3;
-}
-
-message SetUsername {
-  // Set the user's username. This will be used for identification during authentication.
-  string username = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
-      example: "\"gigi-giraffe\"";
-    }
-  ];
-  // By default username must be unique across all organizations in an instance.
-  // This option allow to restrict the uniqueness to the user's own organization.
-  // As a result, this username can only be used if the authentication is limited
-  // to the corresponding organization.
-  //
-  // This can be useful if you provide multiple usernames for a single user, where one
-  // if specific to your organization, e.g.:
-  // - gigi-giraffe@zitadel.com (unique across organizations)
-  // - gigi-giraffe (unique only inside the ZITADEL organization)
-  bool is_organization_specific = 2;
 }
 
 message Password {
@@ -204,16 +183,16 @@ message TOTP {
   bool is_verified = 3;
 }
 
-message AuthenticationKey {
-  // ID is the read-only unique identifier of the authentication key.
-  string authentication_key_id = 1 [
+message PublicKey {
+  // ID is the read-only unique identifier of the public key.
+  string public_key_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
     }
   ];
   zitadel.resources.object.v3alpha.Details details = 2;
   // the file type of the key
-  AuthNKeyType type = 3 [
+  PublicKeyType type = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"KEY_TYPE_JSON\"";
     }
@@ -226,9 +205,9 @@ message AuthenticationKey {
   ];
 }
 
-enum AuthNKeyType {
-  AUTHN_KEY_TYPE_UNSPECIFIED = 0;
-  AUTHN_KEY_TYPE_JSON = 1;
+enum PublicKeyType {
+  PUBLIC_KEY_TYPE_UNSPECIFIED = 0;
+  PUBLIC_KEY_TYPE_JSON = 1;
 }
 
 message IdentityProvider {
@@ -259,9 +238,50 @@ message IdentityProvider {
   ];
 }
 
+message PersonalAccessToken {
+  // ID is the read-only unique identifier of the personal access token.
+  string personal_access_token_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+  zitadel.resources.object.v3alpha.Details details = 2;
+  // After the expiration date, the personal access token will no longer be usable for authorization.
+  google.protobuf.Timestamp expiration_date = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"3019-04-01T08:45:00.000000Z\"";
+    }
+  ];
+}
+
 message SetAuthenticators {
   repeated SetUsername usernames = 1;
   SetPassword password = 2;
+  repeated SetPublicKey public_key = 3;
+  repeated SetPersonalAccessToken personal_access_token = 4;
+}
+
+message SetUsername {
+  // Add a user's username. This will be used for identification during authentication.
+  string username = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"gigi-giraffe\"";
+    }
+  ];
+  // By default username must be unique across all organizations in an instance.
+  // This option allow to restrict the uniqueness to the user's own organization.
+  // As a result, this username can only be used if the authentication is limited
+  // to the corresponding organization.
+  //
+  // This can be useful if you provide multiple usernames for a single user, where one
+  // if specific to your organization, e.g.:
+  // - gigi-giraffe@zitadel.com (unique across organizations)
+  // - gigi-giraffe (unique only inside the ZITADEL organization)
+  bool is_organization_specific = 2;
 }
 
 message SetPassword {
@@ -314,6 +334,46 @@ message SetPassword {
       }
     ];
   }
+}
+
+message SetPublicKey {
+  // After the expiration date, the key will no longer be usable for authentication.
+  optional google.protobuf.Timestamp expiration_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"3019-04-01T08:45:00.000000Z\"";
+    }
+  ];
+
+  oneof type {
+    option (validate.required) = true;
+    // Let ZITADEL generate the key and return the private key.
+    GenerateKey generate_key = 2;
+    // Let ZITADEL use the public key directly, from generated key outside of ZITADEL.
+    ProvidedPublicKey public_key = 3;
+  }
+}
+
+message GenerateKey {}
+message ProvidedPublicKey {
+  // Public key provided to persist. Supported formats are defined in RFC2459 with the RSA, DSA, ECDSA, ED25519 and ECDH packages, provided by the X509 Golang package.
+  optional bytes public_key = 2 [
+    (validate.rules).bytes = {min_len: 1, max_len: 4048},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 4048;
+      example: "\"AAAAC3NzaC1lZDI1NTE5AAAAIGmP5kqmZFDw/FbYr+//2bC7OVSTqPqUKet8539icStf\"";
+    }
+  ];
+}
+
+message SetPersonalAccessToken {
+  // After the expiration date, the personal access token will no longer be usable for authorization.
+  optional google.protobuf.Timestamp expiration_date = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"3019-04-01T08:45:00.000000Z\"";
+    }
+  ];
 }
 
 message SendPasswordResetEmail {
