@@ -11,8 +11,10 @@ package mock
 
 import (
 	context "context"
+	sql "database/sql"
 	reflect "reflect"
 
+	command "github.com/zitadel/zitadel/internal/command"
 	senders "github.com/zitadel/zitadel/internal/notification/senders"
 	milestone "github.com/zitadel/zitadel/internal/repository/milestone"
 	quota "github.com/zitadel/zitadel/internal/repository/quota"
@@ -155,6 +157,48 @@ func (mr *MockCommandsMockRecorder) MilestonePushed(ctx, instanceID, msType, end
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MilestonePushed", reflect.TypeOf((*MockCommands)(nil).MilestonePushed), ctx, instanceID, msType, endpoints)
 }
 
+// NotificationCanceled mocks base method.
+func (m *MockCommands) NotificationCanceled(ctx context.Context, tx *sql.Tx, id, resourceOwner string, err error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NotificationCanceled", ctx, tx, id, resourceOwner, err)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NotificationCanceled indicates an expected call of NotificationCanceled.
+func (mr *MockCommandsMockRecorder) NotificationCanceled(ctx, tx, id, resourceOwner, err any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationCanceled", reflect.TypeOf((*MockCommands)(nil).NotificationCanceled), ctx, tx, id, resourceOwner, err)
+}
+
+// NotificationRetryRequested mocks base method.
+func (m *MockCommands) NotificationRetryRequested(ctx context.Context, tx *sql.Tx, id, resourceOwner string, request *command.NotificationRetryRequest, err error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NotificationRetryRequested", ctx, tx, id, resourceOwner, request, err)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NotificationRetryRequested indicates an expected call of NotificationRetryRequested.
+func (mr *MockCommandsMockRecorder) NotificationRetryRequested(ctx, tx, id, resourceOwner, request, err any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationRetryRequested", reflect.TypeOf((*MockCommands)(nil).NotificationRetryRequested), ctx, tx, id, resourceOwner, request, err)
+}
+
+// NotificationSent mocks base method.
+func (m *MockCommands) NotificationSent(ctx context.Context, tx *sql.Tx, id, instanceID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NotificationSent", ctx, tx, id, instanceID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NotificationSent indicates an expected call of NotificationSent.
+func (mr *MockCommandsMockRecorder) NotificationSent(ctx, tx, id, instanceID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationSent", reflect.TypeOf((*MockCommands)(nil).NotificationSent), ctx, tx, id, instanceID)
+}
+
 // OTPEmailSent mocks base method.
 func (m *MockCommands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner string) error {
 	m.ctrl.T.Helper()
@@ -209,6 +253,20 @@ func (m *MockCommands) PasswordCodeSent(ctx context.Context, orgID, userID strin
 func (mr *MockCommandsMockRecorder) PasswordCodeSent(ctx, orgID, userID, generatorInfo any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PasswordCodeSent", reflect.TypeOf((*MockCommands)(nil).PasswordCodeSent), ctx, orgID, userID, generatorInfo)
+}
+
+// RequestNotification mocks base method.
+func (m *MockCommands) RequestNotification(ctx context.Context, instanceID string, request *command.NotificationRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RequestNotification", ctx, instanceID, request)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RequestNotification indicates an expected call of RequestNotification.
+func (mr *MockCommandsMockRecorder) RequestNotification(ctx, instanceID, request any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RequestNotification", reflect.TypeOf((*MockCommands)(nil).RequestNotification), ctx, instanceID, request)
 }
 
 // UsageNotificationSent mocks base method.

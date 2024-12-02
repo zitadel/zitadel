@@ -23,7 +23,7 @@ var (
 	getProjectedMilestones string
 )
 
-type FillV2Milestones struct {
+type FillV3Milestones struct {
 	dbClient   *database.DB
 	eventstore *eventstore.Eventstore
 }
@@ -34,7 +34,7 @@ type instanceMilestone struct {
 	Pushed  *time.Time
 }
 
-func (mig *FillV2Milestones) Execute(ctx context.Context, _ eventstore.Event) error {
+func (mig *FillV3Milestones) Execute(ctx context.Context, _ eventstore.Event) error {
 	im, err := mig.getProjectedMilestones(ctx)
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func (mig *FillV2Milestones) Execute(ctx context.Context, _ eventstore.Event) er
 	return mig.pushEventsByInstance(ctx, im)
 }
 
-func (mig *FillV2Milestones) getProjectedMilestones(ctx context.Context) (map[string][]instanceMilestone, error) {
+func (mig *FillV3Milestones) getProjectedMilestones(ctx context.Context) (map[string][]instanceMilestone, error) {
 	type row struct {
 		InstanceID string
 		Type       milestone.Type
@@ -73,7 +73,7 @@ func (mig *FillV2Milestones) getProjectedMilestones(ctx context.Context) (map[st
 
 // pushEventsByInstance creates the v2 milestone events by instance.
 // This prevents we will try to push 6*N(instance) events in one push.
-func (mig *FillV2Milestones) pushEventsByInstance(ctx context.Context, milestoneMap map[string][]instanceMilestone) error {
+func (mig *FillV3Milestones) pushEventsByInstance(ctx context.Context, milestoneMap map[string][]instanceMilestone) error {
 	// keep a deterministic order by instance ID.
 	order := make([]string, 0, len(milestoneMap))
 	for k := range milestoneMap {
@@ -81,8 +81,8 @@ func (mig *FillV2Milestones) pushEventsByInstance(ctx context.Context, milestone
 	}
 	slices.Sort(order)
 
-	for _, instanceID := range order {
-		logging.WithFields("instance_id", instanceID, "migration", mig.String()).Info("filter existing milestone events")
+	for i, instanceID := range order {
+		logging.WithFields("instance_id", instanceID, "migration", mig.String(), "progress", fmt.Sprintf("%d/%d", i+1, len(order))).Info("filter existing milestone events")
 
 		// because each Push runs in a separate TX, we need to make sure that events
 		// from a partially executed migration are pushed again.
@@ -113,6 +113,6 @@ func (mig *FillV2Milestones) pushEventsByInstance(ctx context.Context, milestone
 	return nil
 }
 
-func (mig *FillV2Milestones) String() string {
-	return "36_fill_v2_milestones"
+func (mig *FillV3Milestones) String() string {
+	return "36_fill_v3_milestones"
 }

@@ -66,6 +66,39 @@ func TestCRDB_Filter(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "exclude aggregate type and event type",
+			args: args{
+				searchQuery: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					AddQuery().
+					AggregateTypes(eventstore.AggregateType(t.Name())).
+					Builder().
+					ExcludeAggregateIDs().
+					EventTypes("test.updated").
+					AggregateTypes(eventstore.AggregateType(t.Name())).
+					Builder(),
+			},
+			fields: fields{
+				existingEvents: []eventstore.Command{
+					generateCommand(eventstore.AggregateType(t.Name()), "306"),
+					generateCommand(
+						eventstore.AggregateType(t.Name()),
+						"306",
+						func(te *testEvent) {
+							te.EventType = "test.updated"
+						},
+					),
+					generateCommand(
+						eventstore.AggregateType(t.Name()),
+						"308",
+					),
+				},
+			},
+			res: res{
+				eventCount: 1,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		for querierName, querier := range queriers {

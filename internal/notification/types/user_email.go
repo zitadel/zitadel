@@ -74,6 +74,8 @@ func mapNotifyUserToArgs(user *query.NotifyUser, args map[string]interface{}) ma
 	if args == nil {
 		args = make(map[string]interface{})
 	}
+	args["UserID"] = user.ID
+	args["OrgID"] = user.ResourceOwner
 	args["UserName"] = user.Username
 	args["FirstName"] = user.FirstName
 	args["LastName"] = user.LastName
@@ -84,6 +86,7 @@ func mapNotifyUserToArgs(user *query.NotifyUser, args map[string]interface{}) ma
 	args["LastPhone"] = user.LastPhone
 	args["VerifiedPhone"] = user.VerifiedPhone
 	args["PreferredLoginName"] = user.PreferredLoginName
+	args["LoginName"] = user.PreferredLoginName // some endpoint promoted LoginName instead of PreferredLoginName
 	args["LoginNames"] = user.LoginNames
 	args["ChangeDate"] = user.ChangeDate
 	args["CreationDate"] = user.CreationDate

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -11,10 +12,17 @@ var (
 	pushPlaceholderFmt string
 	// uniqueConstraintPlaceholderFmt defines the format of the unique constraint error returned from the database
 	uniqueConstraintPlaceholderFmt string
+
+	_ eventstore.Pusher = (*Eventstore)(nil)
 )
 
 type Eventstore struct {
 	client *database.DB
+}
+
+// Client implements the [eventstore.Pusher]
+func (es *Eventstore) Client() *database.DB {
+	return es.client
 }
 
 func NewEventstore(client *database.DB) *Eventstore {

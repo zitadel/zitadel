@@ -17,7 +17,7 @@
     "generate:grpc": "buf generate ../proto",
     "generate:apidocs": "docusaurus gen-api-docs all",
     "generate:configdocs": "cp -r ../cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/",
-    "generate:re-gen": "yarn clean-all && yarn gen-all",
+    "generate:re-gen": "yarn generate:clean-all && yarn generate",
     "generate:clean-all": "docusaurus clean-api-docs all"
   },
   "dependencies": {
@@ -44,6 +44,7 @@
     "react": "^18.2.0",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",
+    "react-google-charts": "^5.2.1",
     "react-player": "^2.15.1",
     "sitemap": "7.1.1",
     "swc-loader": "^0.2.3",

@@ -522,9 +522,9 @@ func (i *authzInstance) Keys(index instanceIndex) []string {
 		return []string{i.ID}
 	case instanceIndexByHost:
 		return i.ExternalDomains
-	default:
-		return nil
+	case instanceIndexUnspecified:
 	}
+	return nil
 }
 
 func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
