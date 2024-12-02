@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	TargetTable               = "projections.targets1"
+	TargetTable               = "projections.targets2"
 	TargetIDCol               = "id"
 	TargetCreationDateCol     = "creation_date"
 	TargetChangeDateCol       = "change_date"
@@ -23,6 +23,7 @@ const (
 	TargetEndpointCol         = "endpoint"
 	TargetTimeoutCol          = "timeout"
 	TargetInterruptOnErrorCol = "interrupt_on_error"
+	TargetSigningKey          = "signing_key"
 )
 
 type targetProjection struct{}
@@ -49,6 +50,7 @@ func (*targetProjection) Init() *old_handler.Check {
 			handler.NewColumn(TargetEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(TargetTimeoutCol, handler.ColumnTypeInt64),
 			handler.NewColumn(TargetInterruptOnErrorCol, handler.ColumnTypeBool),
+			handler.NewColumn(TargetSigningKey, handler.ColumnTypeJSONB, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(TargetInstanceIDCol, TargetIDCol),
 		),
@@ -105,6 +107,7 @@ func (p *targetProjection) reduceTargetAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(TargetTargetType, e.TargetType),
 			handler.NewCol(TargetTimeoutCol, e.Timeout),
 			handler.NewCol(TargetInterruptOnErrorCol, e.InterruptOnError),
+			handler.NewCol(TargetSigningKey, e.SigningKey),
 		},
 	), nil
 }
@@ -133,6 +136,9 @@ func (p *targetProjection) reduceTargetChanged(event eventstore.Event) (*handler
 	}
 	if e.InterruptOnError != nil {
 		values = append(values, handler.NewCol(TargetInterruptOnErrorCol, *e.InterruptOnError))
+	}
+	if e.SigningKey != nil {
+		values = append(values, handler.NewCol(TargetSigningKey, e.SigningKey))
 	}
 	return handler.NewUpdateStatement(
 		e,
