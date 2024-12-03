@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
@@ -89,8 +90,13 @@ func TestAdd_MachineUser(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = Client.GetUserByID(OrgCTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
-	require.NoError(t, err)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(OrgCTX, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		resp, err := Client.GetUserByID(OrgCTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
+		assert.NoError(tt, err)
+		assert.Equal(tt, res.GetUserId(), resp.GetUser().GetId())
+	}, retryDuration, tick, "awaiting successful TestAdd_MachineUser failed",
+	)
 }
 
 func TestAdd_MachineUserCustomID(t *testing.T) {
@@ -105,9 +111,13 @@ func TestAdd_MachineUserCustomID(t *testing.T) {
 		AccessTokenType: 0,
 	})
 	require.NoError(t, err)
-
-	_, err = Client.GetUserByID(OrgCTX, &management.GetUserByIDRequest{Id: id})
-	require.NoError(t, err)
-
 	require.Equal(t, id, res.GetUserId())
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(OrgCTX, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		resp, err := Client.GetUserByID(OrgCTX, &management.GetUserByIDRequest{Id: id})
+		assert.NoError(tt, err)
+		assert.Equal(tt, id, resp.GetUser().GetId())
+	}, retryDuration, tick, "awaiting successful TestAdd_MachineUser failed",
+	)
 }
