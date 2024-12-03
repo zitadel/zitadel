@@ -111,7 +111,8 @@ func WithEntityID(entityID string) ProviderOpts {
 // ParseMetadata parses the metadata with the provided XML encoding and returns the EntityDescriptor
 func ParseMetadata(metadata []byte) (*saml.EntityDescriptor, error) {
 	entityDescriptor := new(saml.EntityDescriptor)
-	decoder := xml.NewDecoder(bytes.NewReader(metadata))
+	reader := bytes.NewReader(metadata)
+	decoder := xml.NewDecoder(reader)
 	decoder.CharsetReader = func(charset string, reader io.Reader) (io.Reader, error) {
 		enc, err := ianaindex.IANA.Encoding(charset)
 		if err != nil {
@@ -121,8 +122,12 @@ func ParseMetadata(metadata []byte) (*saml.EntityDescriptor, error) {
 	}
 	if err := decoder.Decode(entityDescriptor); err != nil {
 		if err.Error() == "expected element type <EntityDescriptor> but have <EntitiesDescriptor>" {
+			// reset reader to start of metadata so we can try to parse it as an EntitiesDescriptor
+			if _, err := reader.Seek(0, io.SeekStart); err != nil {
+				return nil, err
+			}
 			entities := &saml.EntitiesDescriptor{}
-			if err := xml.Unmarshal(metadata, entities); err != nil {
+			if err := decoder.Decode(entities); err != nil {
 				return nil, err
 			}
 
