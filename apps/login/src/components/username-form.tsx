@@ -61,8 +61,6 @@ export function UsernameForm({
         setLoading(false);
       });
 
-    console.log(res, "res");
-
     if (res?.redirect) {
       return router.push(res.redirect);
     }

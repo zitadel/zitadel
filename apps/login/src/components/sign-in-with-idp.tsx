@@ -78,6 +78,8 @@ export function SignInWithIdp({
     <div className="flex flex-col w-full space-y-2 text-sm">
       {identityProviders &&
         identityProviders
+          /* - TODO: Implement after https://github.com/zitadel/zitadel/issues/8981  */
+
           //   .filter((idp) =>
           //     linkOnly ? idp.config?.options.isLinkingAllowed : true,
           //   )

@@ -86,6 +86,8 @@ export default async function Page(props: {
     sessionWithData.factors?.user?.organizationId,
   );
 
+  /* - TODO: Implement after https://github.com/zitadel/zitadel/issues/8981  */
+
   //   const identityProviders = await getActiveIdentityProviders(
   //     sessionWithData.factors?.user?.organizationId,
   //   ).then((resp) => {
@@ -133,6 +135,8 @@ export default async function Page(props: {
             params={params}
           ></ChooseAuthenticatorToSetup>
         )}
+
+        {/* - TODO: Implement after https://github.com/zitadel/zitadel/issues/8981  */}
 
         {/* <p className="ztdl-p text-center">
           or sign in with an Identity Provider
