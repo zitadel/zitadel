@@ -232,6 +232,15 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 		},
 	})
 	logging.OnError(err).Panic("create org")
+	// wait until organization is projected, as organization is used as resourceowner in the permission handling
+	if err := await(func() error {
+		_, err := i.Client.Admin.GetOrgByID(ctx, &admin.GetOrgByIDRequest{
+			Id: resp.GetOrganizationId(),
+		})
+		return err
+	}); err != nil {
+		logging.OnError(err).Panic("await org")
+	}
 	return resp
 }
 
