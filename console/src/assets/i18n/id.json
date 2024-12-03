@@ -1262,7 +1262,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1486,7 +1487,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifikasi email selesai",
@@ -1585,8 +1587,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Login konvensional dengan nama pengguna dan kata sandi diperbolehkan.",
       "ALLOWEXTERNALIDP_DESC": "Login diperbolehkan untuk penyedia identitas yang mendasarinya",
       "ALLOWREGISTER_DESC": "Jika opsi ini dipilih, langkah tambahan untuk mendaftarkan pengguna akan muncul di login.",
-      "FORCEMFA": "Paksa MFA",
-      "FORCEMFALOCALONLY": "Paksa MFA untuk pengguna lokal yang diautentikasi",
+      "FORCEMFA": "Memaksa MFA untuk semua pengguna",
+      "FORCEMFALOCALONLY": "Memaksa MFA hanya untuk pengguna yang diautentikasi lokal",
       "FORCEMFALOCALONLY_DESC": "Jika opsi ini dipilih, pengguna yang diautentikasi lokal harus mengonfigurasi faktor kedua untuk login.",
       "HIDEPASSWORDRESET_DESC": "Jika opsi ini dipilih, pengguna tidak dapat mengatur ulang kata sandinya dalam proses login.",
       "HIDELOGINNAMESUFFIX": "Sembunyikan akhiran Nama Login",
@@ -2272,7 +2274,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Tambahkan Manajer",
