@@ -40,7 +40,7 @@ export async function registerPasskeyLink(
   const host = (await headers()).get("host");
 
   if (!host) {
-    throw new Error("Could not get domain");
+    throw new Error("Could not get host");
   }
 
   const [hostname, port] = host.split(":");

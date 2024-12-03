@@ -53,10 +53,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (identityProviders.length === 1) {
-      const host = (await headers()).get("host");
+      const origin = (await headers()).get("origin");
 
-      if (!host) {
-        return { error: "Could not get host" };
+      if (!origin) {
+        return { error: "Could not get origin" };
       }
 
       const identityProviderType = identityProviders[0].type;
@@ -77,11 +77,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         idpId: identityProviders[0].id,
         urls: {
           successUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/success?` +
-            new URLSearchParams(params),
+            `${origin}/idp/${provider}/success?` + new URLSearchParams(params),
           failureUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/failure?` +
-            new URLSearchParams(params),
+            `${origin}/idp/${provider}/failure?` + new URLSearchParams(params),
         },
       });
 
@@ -97,10 +95,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (identityProviders.length === 1) {
-      const host = (await headers()).get("host");
+      const origin = (await headers()).get("origin");
 
-      if (!host) {
-        return { error: "Could not get host" };
+      if (!origin) {
+        return { error: "Could not get origin" };
       }
 
       const identityProviderId = identityProviders[0].idpId;
@@ -130,11 +128,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         idpId: idp.id,
         urls: {
           successUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/success?` +
-            new URLSearchParams(params),
+            `${origin}/idp/${provider}/success?` + new URLSearchParams(params),
           failureUrl:
-            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/failure?` +
-            new URLSearchParams(params),
+            `${origin}/idp/${provider}/failure?` + new URLSearchParams(params),
         },
       });
 

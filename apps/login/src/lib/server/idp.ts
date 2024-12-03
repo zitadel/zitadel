@@ -10,17 +10,17 @@ export type StartIDPFlowCommand = {
 };
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
-  const host = (await headers()).get("host");
+  const origin = (await headers()).get("origin");
 
-  if (!host) {
-    return { error: "Could not get host" };
+  if (!origin) {
+    return { error: "Could not get origin" };
   }
 
   return startIdentityProviderFlow({
     idpId: command.idpId,
     urls: {
-      successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.successUrl}`,
-      failureUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.failureUrl}`,
+      successUrl: `${origin}${command.successUrl}`,
+      failureUrl: `${origin}${command.failureUrl}`,
     },
   }).then((response) => {
     if (

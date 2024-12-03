@@ -31,7 +31,7 @@ type ResetPasswordCommand = {
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
-  const host = (await headers()).get("host");
+  const origin = (await headers()).get("origin");
 
   const users = await listUsers({
     loginName: command.loginName,
@@ -47,7 +47,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
   const userId = users.result[0].userId;
 
-  return passwordReset(userId, host, command.authRequestId);
+  return passwordReset(userId, origin, command.authRequestId);
 }
 
 export type UpdateSessionCommand = {

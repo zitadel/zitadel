@@ -31,7 +31,7 @@ export default async function Page(props: {
 
   const loginSettings = await getLoginSettings(organization);
 
-  const host = (await headers()).get("host");
+  const origin = (await headers()).get("origin");
 
   return (
     <DynamicTheme branding={branding}>
@@ -70,7 +70,7 @@ export default async function Page(props: {
             organization={organization}
             method={method}
             loginSettings={loginSettings}
-            host={host}
+            origin={origin}
             code={code}
           ></LoginOTP>
         )}
