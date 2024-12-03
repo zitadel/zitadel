@@ -2,12 +2,10 @@ import { Alert } from "@/components/alert";
 import { BackButton } from "@/components/back-button";
 import { ChooseAuthenticatorToSetup } from "@/components/choose-authenticator-to-setup";
 import { DynamicTheme } from "@/components/dynamic-theme";
-import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
 import {
-  getActiveIdentityProviders,
   getBrandingSettings,
   getLoginSettings,
   getSession,
@@ -88,11 +86,11 @@ export default async function Page(props: {
     sessionWithData.factors?.user?.organizationId,
   );
 
-  const identityProviders = await getActiveIdentityProviders(
-    sessionWithData.factors?.user?.organizationId,
-  ).then((resp) => {
-    return resp.identityProviders;
-  });
+  //   const identityProviders = await getActiveIdentityProviders(
+  //     sessionWithData.factors?.user?.organizationId,
+  //   ).then((resp) => {
+  //     return resp.identityProviders;
+  //   });
 
   const params = new URLSearchParams({
     initial: "true", // defines that a code is not required and is therefore not shown in the UI
@@ -136,7 +134,7 @@ export default async function Page(props: {
           ></ChooseAuthenticatorToSetup>
         )}
 
-        <p className="ztdl-p text-center">
+        {/* <p className="ztdl-p text-center">
           or sign in with an Identity Provider
         </p>
 
@@ -148,7 +146,7 @@ export default async function Page(props: {
             organization={sessionWithData.factors?.user?.organizationId}
             linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
           ></SignInWithIdp>
-        )}
+        )} */}
 
         <div className="mt-8 flex w-full flex-row items-center">
           <BackButton />
