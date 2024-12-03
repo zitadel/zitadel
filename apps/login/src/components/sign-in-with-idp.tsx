@@ -6,7 +6,6 @@ import {
   IdentityProvider,
   IdentityProviderType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { headers } from "next/headers";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { Alert } from "./alert";
@@ -52,14 +51,10 @@ export function SignInWithIdp({
       params.set("organization", organization);
     }
 
-    const host = (await headers()).get("host");
-
     const response = await startIDPFlow({
       idpId,
-      successUrl:
-        `${host}/idp/${provider}/success?` + new URLSearchParams(params),
-      failureUrl:
-        `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
+      successUrl: `/idp/${provider}/success?` + new URLSearchParams(params),
+      failureUrl: `/idp/${provider}/failure?` + new URLSearchParams(params),
     })
       .catch(() => {
         setError("Could not start IDP flow");

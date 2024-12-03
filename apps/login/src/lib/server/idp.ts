@@ -1,6 +1,7 @@
 "use server";
 
 import { startIdentityProviderFlow } from "@/lib/zitadel";
+import { headers } from "next/headers";
 
 export type StartIDPFlowCommand = {
   idpId: string;
@@ -9,11 +10,13 @@ export type StartIDPFlowCommand = {
 };
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
+  const host = (await headers()).get("host");
+
   return startIdentityProviderFlow({
     idpId: command.idpId,
     urls: {
-      successUrl: command.successUrl,
-      failureUrl: command.failureUrl,
+      successUrl: `${host}${command.successUrl}`,
+      failureUrl: `${host}${command.failureUrl}`,
     },
   }).then((response) => {
     if (
