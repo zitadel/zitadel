@@ -127,6 +127,16 @@ func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner,
 	return nil
 }
 
+func (c *Commands) checkPermissionUpdateUserCredentials(ctx context.Context, resourceOwner, userID string) error {
+	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
+		return nil
+	}
+	if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, resourceOwner, userID); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
 	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
 		return nil
