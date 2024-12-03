@@ -1,4 +1,4 @@
-package oidc
+package saml
 
 import (
 	"google.golang.org/grpc"

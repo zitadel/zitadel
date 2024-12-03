@@ -169,7 +169,7 @@ message CreateCallbackRequest {
   string auth_request_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the SAML Request.";
+      description: "ID of the Auth Request.";
       example: "\"163840776835432705\"";
     }
   ];

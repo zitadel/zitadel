@@ -19,7 +19,7 @@ const (
 type AddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	LoginClient   string `json:"loginClient,omitempty"`
+	LoginClient   string `json:"login_client,omitempty"`
 	ApplicationID string `json:"application_id,omitempty"`
 	ACSURL        string `json:"acs_url,omitempty"`
 	RelayState    string `json:"relay_state,omitempty"`
