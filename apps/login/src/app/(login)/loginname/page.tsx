@@ -2,22 +2,13 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UsernameForm } from "@/components/username-form";
 import {
+  getActiveIdentityProviders,
   getBrandingSettings,
   getDefaultOrg,
   getLoginSettings,
-  settingsService,
 } from "@/lib/zitadel";
-import { makeReqCtx } from "@zitadel/client/v2";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
-
-function getIdentityProviders(orgId?: string) {
-  return settingsService
-    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => {
-      return resp.identityProviders;
-    });
-}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -39,17 +30,15 @@ export default async function Page(props: {
     }
   }
 
-  const host = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
-
   const loginSettings = await getLoginSettings(
     organization ?? defaultOrganization,
   );
 
-  const identityProviders = await getIdentityProviders(
+  const identityProviders = await getActiveIdentityProviders(
     organization ?? defaultOrganization,
-  );
+  ).then((resp) => {
+    return resp.identityProviders;
+  });
 
   const branding = await getBrandingSettings(
     organization ?? defaultOrganization,
@@ -68,9 +57,8 @@ export default async function Page(props: {
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
         >
-          {identityProviders && process.env.ZITADEL_API_URL && (
+          {identityProviders && (
             <SignInWithIdp
-              host={host}
               identityProviders={identityProviders}
               authRequestId={authRequestId}
               organization={organization ?? defaultOrganization} // use the organization from the searchParams here otherwise fallback to the default organization

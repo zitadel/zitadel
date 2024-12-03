@@ -24,10 +24,6 @@ export default async function Page(props: {
 
   const identityProviders = await getIdentityProviders(organization);
 
-  const host = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
-
   const branding = await getBrandingSettings(organization);
 
   return (
@@ -38,7 +34,6 @@ export default async function Page(props: {
 
         {identityProviders && (
           <SignInWithIdp
-            host={host}
             identityProviders={identityProviders}
             authRequestId={authRequestId}
             organization={organization}

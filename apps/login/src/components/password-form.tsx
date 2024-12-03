@@ -59,7 +59,6 @@ export function PasswordForm({
         password: { password: values.password },
       }),
       authRequestId,
-      forceMfa: loginSettings?.forceMfa,
     })
       .catch(() => {
         setError("Could not verify password");
@@ -87,6 +86,7 @@ export function PasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
+      authRequestId,
     })
       .catch(() => {
         setError("Could not reset password");

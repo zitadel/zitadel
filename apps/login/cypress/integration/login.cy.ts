@@ -49,6 +49,7 @@ describe("login", () => {
       data: {
         settings: {
           passkeysType: 1,
+          allowUsernamePassword: true,
         },
       },
     });
