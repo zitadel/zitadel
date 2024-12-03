@@ -21,6 +21,13 @@ jobs:
           # to the issue
           project-url: https://github.com/orgs/zitadel/projects/2
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      - name: add "thumbs up reaction
+        if: ${{ github.event_name == 'issues' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { issue: { number: issueNumber }, repository: { owner: { login: owner }, name: repo } } = context.payload;
+            await github.reactions.createForIssue({ owner, repo, issue_number: issueNumber, content: "+1" });
       - uses: tspascoal/get-user-teams-membership@v3
         id: checkUserMember
         if: github.actor != 'dependabot[bot]'

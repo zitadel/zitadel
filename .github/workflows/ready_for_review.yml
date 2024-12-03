@@ -13,6 +13,7 @@ jobs:
 
             How urgent is this PR review for you? Please select one of the following levels:
 
+            - [ ] I don't know
             - [ ] Low (shoud be reviewed on best effort)
             - [ ] Medium (should be reviewed within 14 days)
             - [ ] High (should be reviewed within 2 days)

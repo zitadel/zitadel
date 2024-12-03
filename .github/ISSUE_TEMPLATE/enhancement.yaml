@@ -13,10 +13,13 @@ body:
       label: Urgency
       description: How urgent is this proposal?
       options:
+      - I don't know
       - Low (it can wait)
       - Medium (it should be backlogged)
       - High (it should be prioritized)
       - Critical (it should be worked on immediately)
+    validations:
+      required: true
   - type: checkboxes
     id: preflight
     attributes:
@@ -63,3 +66,9 @@ body:
     attributes:
       label: Additional Context
       description: Please add any other infos that could be useful.
+  - type: markdown
+    attributes:
+        value: |
+            ## Vote for this issue
+            If you come accross this issue and would like to see it taken care of, please vote with a thumbs up 👍.
+            If you have any additional thoughts or use cases, please leave a comment.

@@ -15,6 +15,7 @@ body:
     label: Severity
     description: How severe is the bug?
     options:
+    - I don't know
     - Low (it can wait)
     - Medium (it should be backlogged)
     - High (it should be prioritized)
@@ -110,3 +111,9 @@ body:
   attributes:
     label: Additional Context
     description: Please add any other infos that could be useful.
+- type: markdown
+  attributes:
+    value: |
+      ## Vote for this issue
+      If you come accross this issue and would like to see it taken care of, please vote with a thumbs up 👍.
+      If you have any additional thoughts or use cases, please leave a comment.
