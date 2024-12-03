@@ -267,15 +267,15 @@ export async function resendInviteCode(userId: string) {
   return userService.resendInviteCode({ userId }, {});
 }
 
-export async function createInviteCode(userId: string, origin: string | null) {
+export async function createInviteCode(userId: string, host: string | null) {
   let medium = create(SendInviteCodeSchema, {
     applicationName: "Typescript Login",
   });
 
-  if (origin) {
+  if (host) {
     medium = {
       ...medium,
-      urlTemplate: `${origin}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
+      urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
     };
   }
 
@@ -506,18 +506,18 @@ export function createUser(
  */
 export async function passwordReset(
   userId: string,
-  origin: string | null,
+  host: string | null,
   authRequestId?: string,
 ) {
   let medium = create(SendPasswordResetLinkSchema, {
     notificationType: NotificationType.Email,
   });
 
-  if (origin) {
+  if (host) {
     medium = {
       ...medium,
       urlTemplate:
-        `${origin}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+        `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
         (authRequestId ? `&authRequestId=${authRequestId}` : ""),
     };
   }

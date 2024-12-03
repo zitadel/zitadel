@@ -110,6 +110,10 @@ export default async function Page(props: {
     params.set("authRequestId", authRequestId);
   }
 
+  const host = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">

@@ -20,7 +20,7 @@ export type RegisterUserResponse = {
 };
 
 export async function inviteUser(command: InviteUserCommand) {
-  const origin = (await headers()).get("origin");
+  const host = (await headers()).get("host");
 
   const human = await addHumanUser({
     email: command.email,
@@ -34,7 +34,7 @@ export async function inviteUser(command: InviteUserCommand) {
     return { error: "Could not create user" };
   }
 
-  const codeResponse = await createInviteCode(human.userId, origin);
+  const codeResponse = await createInviteCode(human.userId, host);
 
   if (!codeResponse || !human) {
     return { error: "Could not create invite code" };

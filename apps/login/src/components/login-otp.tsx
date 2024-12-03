@@ -25,7 +25,7 @@ type Props = {
   method: string;
   code?: string;
   loginSettings?: LoginSettings;
-  origin: string | null;
+  host: string | null;
 };
 
 type Inputs = {
@@ -40,7 +40,7 @@ export function LoginOTP({
   method,
   code,
   loginSettings,
-  origin,
+  host,
 }: Props) {
   const t = useTranslations("otp");
 
@@ -81,10 +81,10 @@ export function LoginOTP({
         otpEmail: {
           deliveryType: {
             case: "sendCode",
-            value: origin
+            value: host
               ? {
                   urlTemplate:
-                    `${origin}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}&organization={{.OrgID}}` +
+                    `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}&organization={{.OrgID}}` +
                     (authRequestId ? `&authRequestId=${authRequestId}` : ""),
                 }
               : {},
