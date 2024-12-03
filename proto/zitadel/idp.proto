@@ -470,8 +470,6 @@ message SAMLConfig {
     // Optional name of the attribute, which will be used to map the user
     // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
     optional string transient_mapping_attribute_name = 5;
-    // In case the metadata could not be processed, the corresponding error will be returned.
-    optional string metadata_error = 6;
 }
 
 message AzureADConfig {
