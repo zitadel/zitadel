@@ -9,6 +9,18 @@ body:
     value: |
       Thanks for taking the time to fill out this bug report!  
       Learn more in our [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management) on how we will process your issue.
+- type: dropdown
+  id: severity
+  attributes:
+    label: Severity
+    description: How severe is the bug?
+    options:
+    - Low (it can wait)
+    - Medium (it should be backlogged)
+    - High (it should be prioritized)
+    - Critical (it should be worked on immediately)
+  validations:
+    required: true
 - type: checkboxes
   id: preflight
   attributes:

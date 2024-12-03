@@ -7,6 +7,16 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this proposal / feature reqeust
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency
+      description: How urgent is this proposal?
+      options:
+      - Low (it can wait)
+      - Medium (it should be backlogged)
+      - High (it should be prioritized)
+      - Critical (it should be worked on immediately)
   - type: checkboxes
     id: preflight
     attributes:
