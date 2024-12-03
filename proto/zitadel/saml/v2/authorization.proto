@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package zitadel.saml.v2;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/saml/v2;saml";
+
+message SAMLRequest{
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    external_docs: {
+      url: "https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest";
+      description: "Find out more about SAML Auth Request parameters";
+    }
+  };
+  
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the authorization request";
+    }
+  ];
+
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Time when the auth request was created";
+    }
+  ];
+
+  string issuer = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "SAML entity ID of the application that created the auth request";
+    }
+  ];
+  
+  string assertion_consumer_url = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Base URI that points back to the application";
+    }
+  ];
+
+  string relay_state = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "RelayState provided by the application for the request";
+    }
+  ];
+
+  string binding = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Binding used by the application for the request";
+    }
+  ];
+}
+
+message AuthorizationError {
+  ErrorReason error = 1;
+  optional string error_description = 2;
+  optional string error_uri = 3;
+}
+
+enum ErrorReason {
+  ERROR_REASON_UNSPECIFIED = 0;
+  
+  // Error states from https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2.1
+  ERROR_REASON_INVALID_REQUEST = 1;
+  ERROR_REASON_UNAUTHORIZED_CLIENT = 2;
+  ERROR_REASON_ACCESS_DENIED = 3;
+  ERROR_REASON_UNSUPPORTED_RESPONSE_TYPE = 4;
+  ERROR_REASON_INVALID_SCOPE = 5;
+  ERROR_REASON_SERVER_ERROR = 6;
+  ERROR_REASON_TEMPORARY_UNAVAILABLE = 7;
+
+  // Error states from https://openid.net/specs/openid-connect-core-1_0.html#AuthError
+  ERROR_REASON_INTERACTION_REQUIRED = 8;
+  ERROR_REASON_LOGIN_REQUIRED = 9;
+  ERROR_REASON_ACCOUNT_SELECTION_REQUIRED = 10;
+  ERROR_REASON_CONSENT_REQUIRED = 11;
+  ERROR_REASON_INVALID_REQUEST_URI = 12;
+  ERROR_REASON_INVALID_REQUEST_OBJECT = 13;
+  ERROR_REASON_REQUEST_NOT_SUPPORTED = 14;
+  ERROR_REASON_REQUEST_URI_NOT_SUPPORTED = 15;
+  ERROR_REASON_REGISTRATION_NOT_SUPPORTED = 16;
+}

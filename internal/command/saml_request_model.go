@@ -1,0 +1,94 @@
+package command
+
+import (
+	"context"
+	"time"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/authrequest"
+	"github.com/zitadel/zitadel/internal/repository/samlrequest"
+	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+type SAMLRequestWriteModel struct {
+	eventstore.WriteModel
+	aggregate *eventstore.Aggregate
+
+	ApplicationID string
+	ACSURL        string
+	RelayState    string
+	RequestID     string
+	Binding       string
+	Issuer        string
+	IssuerName    string
+	Destination   string
+
+	SessionID        string
+	UserID           string
+	AuthTime         time.Time
+	AuthMethods      []domain.UserAuthMethodType
+	SAMLRequestState domain.SAMLRequestState
+}
+
+func NewSAMLRequestWriteModel(ctx context.Context, id string) *SAMLRequestWriteModel {
+	return &SAMLRequestWriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID: id,
+		},
+		aggregate: &authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
+	}
+}
+
+func (m *SAMLRequestWriteModel) Reduce() error {
+	for _, event := range m.Events {
+		switch e := event.(type) {
+		case *samlrequest.AddedEvent:
+			m.ApplicationID = e.ApplicationID
+			m.ACSURL = e.ACSURL
+			m.RelayState = e.RelayState
+			m.RequestID = e.RequestID
+			m.Binding = e.Binding
+			m.Issuer = e.Issuer
+			m.IssuerName = e.IssuerName
+			m.Destination = e.Destination
+			m.SAMLRequestState = domain.SAMLRequestStateAdded
+		case *samlrequest.SessionLinkedEvent:
+			m.SessionID = e.SessionID
+			m.UserID = e.UserID
+			m.AuthTime = e.AuthTime
+			m.AuthMethods = e.AuthMethods
+		case *samlrequest.FailedEvent:
+			m.SAMLRequestState = domain.SAMLRequestStateFailed
+		case *samlrequest.SucceededEvent:
+			m.SAMLRequestState = domain.SAMLRequestStateSucceeded
+		}
+	}
+	return m.WriteModel.Reduce()
+}
+
+func (m *SAMLRequestWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(samlrequest.AggregateType).
+		AggregateIDs(m.AggregateID).
+		Builder()
+}
+
+// CheckAuthenticated checks that the auth request exists, a session must have been linked
+func (m *SAMLRequestWriteModel) CheckAuthenticated() error {
+	if m.SessionID == "" {
+		return zerrors.ThrowPreconditionFailed(nil, "AUTHR-SF2r2", "Errors.SAMLRequest.NotAuthenticated")
+	}
+	// in case of OIDC Code Flow, the code must have been exchanged
+	if m.ResponseType == domain.OIDCResponseTypeCode && m.AuthRequestState == domain.AuthRequestStateCodeExchanged {
+		return nil
+	}
+	// in case of OIDC Implicit Flow, check that the requests exists, but has not succeeded yet
+	if (m.ResponseType == domain.OIDCResponseTypeIDToken || m.ResponseType == domain.OIDCResponseTypeIDTokenToken) &&
+		m.AuthRequestState == domain.AuthRequestStateAdded {
+		return nil
+	}
+	return zerrors.ThrowPreconditionFailed(nil, "AUTHR-sajk3", "Errors.SAMLRequest.NotAuthenticated")
+}
