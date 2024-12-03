@@ -64,6 +64,11 @@ export function SignInWithIdp({
         setLoading(false);
       });
 
+    if (response && "error" in response && response?.error) {
+      setError(response.error);
+      return;
+    }
+
     if (response && "redirect" in response && response?.redirect) {
       return router.push(response.redirect);
     }
