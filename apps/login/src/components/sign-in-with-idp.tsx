@@ -6,6 +6,7 @@ import {
   IdentityProvider,
   IdentityProviderType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { headers } from "next/headers";
 import { useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { Alert } from "./alert";
@@ -18,7 +19,6 @@ import { SignInWithGoogle } from "./idps/sign-in-with-google";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
-  host: string;
   identityProviders: IdentityProvider[];
   authRequestId?: string;
   organization?: string;
@@ -26,7 +26,6 @@ export interface SignInWithIDPProps {
 }
 
 export function SignInWithIdp({
-  host,
   identityProviders,
   authRequestId,
   organization,
@@ -52,6 +51,8 @@ export function SignInWithIdp({
     if (organization) {
       params.set("organization", organization);
     }
+
+    const host = (await headers()).get("host");
 
     const response = await startIDPFlow({
       idpId,

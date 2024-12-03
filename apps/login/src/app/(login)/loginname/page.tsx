@@ -30,10 +30,6 @@ export default async function Page(props: {
     }
   }
 
-  const host = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
-
   const loginSettings = await getLoginSettings(
     organization ?? defaultOrganization,
   );
@@ -63,7 +59,6 @@ export default async function Page(props: {
         >
           {identityProviders && (
             <SignInWithIdp
-              host={host}
               identityProviders={identityProviders}
               authRequestId={authRequestId}
               organization={organization ?? defaultOrganization} // use the organization from the searchParams here otherwise fallback to the default organization
