@@ -1385,7 +1385,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1622,7 +1623,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Е-поштата е верифицирана",
@@ -1722,8 +1724,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Дозволена е конвенционална најава со корисничко име и лозинка.",
       "ALLOWEXTERNALIDP_DESC": "Најавата е дозволена за поддржуваните IDPs",
       "ALLOWREGISTER_DESC": "Доколку е избрана опцијата, се прикажува дополнителен чекор за регистрирање на корисник во најавата.",
-      "FORCEMFA": "Задолжителна MFA",
-      "FORCEMFALOCALONLY": "Force MFA за локални корисници",
+      "FORCEMFA": "Наметнете MFA за сите корисници",
+      "FORCEMFALOCALONLY": "Наметнете MFA само за локално автентифицирани корисници",
       "FORCEMFALOCALONLY_DESC": "Ако е избрана опцијата, локалните автентицирани корисници треба да конфигурираат втор фактор за најавување.",
       "HIDEPASSWORDRESET_DESC": "Доколку е избрана опцијата, корисникот нема да може да ја ресетира својата лозинка во процесот на најава.",
       "HIDELOGINNAMESUFFIX": "Сокриј го суфиксот на корисничкото име",
@@ -2560,7 +2562,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Додај Менаџер",
