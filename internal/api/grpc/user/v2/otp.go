@@ -13,7 +13,6 @@ func (s *Server) AddOTPSMS(ctx context.Context, req *user.AddOTPSMSRequest) (*us
 		return nil, err
 	}
 	return &user.AddOTPSMSResponse{Details: object.DomainToDetailsPb(details)}, nil
-
 }
 
 func (s *Server) RemoveOTPSMS(ctx context.Context, req *user.RemoveOTPSMSRequest) (*user.RemoveOTPSMSResponse, error) {

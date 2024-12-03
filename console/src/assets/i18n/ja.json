@@ -1384,7 +1384,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1617,7 +1618,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1716,8 +1718,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "ユーザー名とパスワードを使用した従来のログインを許可します。",
       "ALLOWEXTERNALIDP_DESC": "基礎となるIDプロバイダーにログインを許可します。",
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
-      "FORCEMFA": "MFAを強制する",
-      "FORCEMFALOCALONLY": "ローカル ユーザーに MFA を強制する",
+      "FORCEMFA": "すべてのユーザーに MFA を強制する",
+      "FORCEMFALOCALONLY": "ローカル認証ユーザーのみに MFA を強制する",
       "FORCEMFALOCALONLY_DESC": "オプションが選択されている場合、ローカル認証されたユーザーはログインの 2 番目の要素を構成する必要があります。",
       "HIDEPASSWORDRESET_DESC": "このオプションが選択されている場合、ユーザーはログイン過程ででパスワードをリセットできません。",
       "HIDELOGINNAMESUFFIX": "ログイン名の接尾辞を非表示にする",
@@ -2554,7 +2556,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",
