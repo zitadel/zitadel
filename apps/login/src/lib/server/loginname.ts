@@ -54,6 +54,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const host = (await headers()).get("host");
+
+      if (!host) {
+        return { error: "Could not get host" };
+      }
+
       const identityProviderType = identityProviders[0].type;
 
       const provider = idpTypeToSlug(identityProviderType);
@@ -72,9 +77,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         idpId: identityProviders[0].id,
         urls: {
           successUrl:
-            `${host}/idp/${provider}/success?` + new URLSearchParams(params),
+            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/success?` +
+            new URLSearchParams(params),
           failureUrl:
-            `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
+            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/failure?` +
+            new URLSearchParams(params),
         },
       });
 
@@ -91,6 +98,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const host = (await headers()).get("host");
+
+      if (!host) {
+        return { error: "Could not get host" };
+      }
+
       const identityProviderId = identityProviders[0].idpId;
 
       const idp = await getIDPByID(identityProviderId);
@@ -118,9 +130,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
         idpId: idp.id,
         urls: {
           successUrl:
-            `${host}/idp/${provider}/success?` + new URLSearchParams(params),
+            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/success?` +
+            new URLSearchParams(params),
           failureUrl:
-            `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
+            `${host.includes("localhost") ? "http://" : "https://"}${host}/idp/${provider}/failure?` +
+            new URLSearchParams(params),
         },
       });
 
