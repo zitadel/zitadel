@@ -27,6 +27,7 @@ import { getSessionCookieByLoginName } from "../cookies";
 type ResetPasswordCommand = {
   loginName: string;
   organization?: string;
+  authRequestId?: string;
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
@@ -46,7 +47,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
   const userId = users.result[0].userId;
 
-  return passwordReset(userId, host);
+  return passwordReset(userId, host, command.authRequestId);
 }
 
 export type UpdateSessionCommand = {
@@ -54,7 +55,6 @@ export type UpdateSessionCommand = {
   organization?: string;
   checks: Checks;
   authRequestId?: string;
-  forceMfa?: boolean;
 };
 
 export async function sendPassword(command: UpdateSessionCommand) {
@@ -148,6 +148,27 @@ export async function sendPassword(command: UpdateSessionCommand) {
       m !== AuthenticationMethodType.PASSKEY,
   );
 
+  const humanUser = user.type.case === "human" ? user.type.value : undefined;
+  console.log("humanUser", humanUser);
+  if (
+    availableSecondFactors?.length == 0 &&
+    humanUser?.passwordChangeRequired
+  ) {
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName,
+    });
+
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append("organization", session.factors?.user?.organizationId);
+    }
+
+    if (command.authRequestId) {
+      params.append("authRequestId", command.authRequestId);
+    }
+
+    return { redirect: "/password/change?" + params };
+  }
+
   if (availableSecondFactors?.length == 1) {
     const params = new URLSearchParams({
       loginName: session.factors?.user.loginName,
@@ -192,24 +213,14 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
 
     return { redirect: `/mfa?` + params };
-  } else if (user.state === UserState.INITIAL) {
-    const params = new URLSearchParams({
-      loginName: session.factors.user.loginName,
-    });
-
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    return { redirect: `/password/change?` + params };
-  } else if (command.forceMfa && !availableSecondFactors.length) {
+  }
+  // TODO: check if handling of userstate INITIAL is needed
+  else if (user.state === UserState.INITIAL) {
+    return { error: "Initial User not supported" };
+  } else if (
+    (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
+    !availableSecondFactors.length
+  ) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
       force: "true", // this defines if the mfa is forced in the settings

@@ -2,11 +2,12 @@
 
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
+import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import {
   getActiveIdentityProviders,
   getIDPByID,
@@ -34,6 +35,15 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   });
 
   const loginSettings = await getLoginSettings(command.organization);
+
+  const potentialUsers = users.result.filter((u) => {
+    const human = u.type.case === "human" ? u.type.value : undefined;
+    return loginSettings?.disableLoginWithEmail
+      ? human?.email?.isVerified && human?.email?.email !== command.loginName
+      : loginSettings?.disableLoginWithPhone
+        ? human?.phone?.isVerified && human?.phone?.phone !== command.loginName
+        : true;
+  });
 
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders(
@@ -84,6 +94,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const identityProviderId = identityProviders[0].idpId;
 
       const idp = await getIDPByID(identityProviderId);
+
       const idpType = idp?.type;
 
       if (!idp || !idpType) {
@@ -119,8 +130,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   };
 
-  if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
-    const userId = users.result[0].userId;
+  if (potentialUsers.length == 1 && potentialUsers[0].userId) {
+    const userId = potentialUsers[0].userId;
 
     const checks = create(ChecksSchema, {
       user: { search: { case: "userId", value: userId } },
@@ -136,24 +147,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return { error: "Could not create session for user" };
     }
 
-    if (users.result[0].state === UserState.INITIAL) {
-      const params = new URLSearchParams({
-        loginName: session.factors?.user?.loginName,
-        initial: "true", // this does not require a code to be set
-      });
-
-      if (command.organization || session.factors?.user?.organizationId) {
-        params.append(
-          "organization",
-          command.organization ?? session.factors?.user?.organizationId,
-        );
-      }
-
-      if (command.authRequestId) {
-        params.append("authRequestid", command.authRequestId);
-      }
-
-      return { redirect: "/password/set?" + params };
+    // TODO: check if handling of userstate INITIAL is needed
+    if (potentialUsers[0].state === UserState.INITIAL) {
+      return { error: "Initial User not supported" };
     }
 
     const methods = await listAuthenticationMethodTypes(
@@ -162,9 +158,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
       if (
-        users.result[0].type.case === "human" &&
-        users.result[0].type.value.email &&
-        !users.result[0].type.value.email.isVerified
+        potentialUsers[0].type.case === "human" &&
+        potentialUsers[0].type.value.email &&
+        !potentialUsers[0].type.value.email.isVerified
       ) {
         const paramsVerify = new URLSearchParams({
           loginName: session.factors?.user?.loginName,
@@ -209,6 +205,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const method = methods.authMethodTypes[0];
       switch (method) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
+          if (!loginSettings?.allowUsernamePassword) {
+            return {
+              error:
+                "Username Password not allowed! Contact your administrator for more information.",
+            };
+          }
+
           const paramsPassword: any = {
             loginName: session.factors?.user?.loginName,
           };
@@ -229,6 +232,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
+          if (loginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
+            return {
+              error:
+                "Passkeys not allowed! Contact your administrator for more information.",
+            };
+          }
+
           const paramsPasskey: any = { loginName: command.loginName };
           if (command.authRequestId) {
             paramsPasskey.authRequestId = command.authRequestId;
@@ -262,7 +272,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.IDP)
       ) {
-        await redirectUserToIDP(userId);
+        return redirectUserToIDP(userId);
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)
       ) {
@@ -288,8 +298,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // user not found, check if register is enabled on organization
   if (loginSettings?.allowRegister && !loginSettings?.allowUsernamePassword) {
     // TODO: do we need to handle login hints for IDPs here?
-    await redirectUserToSingleIDPIfAvailable();
-
+    const resp = await redirectUserToSingleIDPIfAvailable();
+    if (resp) {
+      return resp;
+    }
     return { error: "Could not find user" };
   } else if (
     loginSettings?.allowRegister &&

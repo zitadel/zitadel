@@ -102,7 +102,7 @@ export function SessionItem({
         />
       </div>
 
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col items-start overflow-hidden">
         <span className="">{session.factors?.user?.displayName}</span>
         <span className="text-xs opacity-80 text-ellipsis">
           {session.factors?.user?.loginName}
