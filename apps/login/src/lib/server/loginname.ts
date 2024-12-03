@@ -94,6 +94,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const identityProviderId = identityProviders[0].idpId;
 
       const idp = await getIDPByID(identityProviderId);
+
       const idpType = idp?.type;
 
       if (!idp || !idpType) {
@@ -271,7 +272,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.IDP)
       ) {
-        await redirectUserToIDP(userId);
+        return redirectUserToIDP(userId);
       } else if (
         methods.authMethodTypes.includes(AuthenticationMethodType.PASSWORD)
       ) {
@@ -297,8 +298,10 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   // user not found, check if register is enabled on organization
   if (loginSettings?.allowRegister && !loginSettings?.allowUsernamePassword) {
     // TODO: do we need to handle login hints for IDPs here?
-    await redirectUserToSingleIDPIfAvailable();
-
+    const resp = await redirectUserToSingleIDPIfAvailable();
+    if (resp) {
+      return resp;
+    }
     return { error: "Could not find user" };
   } else if (
     loginSettings?.allowRegister &&
