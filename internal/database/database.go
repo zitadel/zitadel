@@ -18,21 +18,31 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type QueryExecuter interface {
-	Query(query string, args ...any) (*sql.Rows, error)
+type ContextQuerier interface {
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
-	Exec(query string, args ...any) (sql.Result, error)
+}
+
+type ContextExecuter interface {
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
 }
 
+type ContextQueryExecuter interface {
+	ContextQuerier
+	ContextExecuter
+}
+
 type Client interface {
-	QueryExecuter
+	ContextQueryExecuter
+	Beginner
+	Conn(ctx context.Context) (*sql.Conn, error)
+}
+
+type Beginner interface {
 	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
-	Begin() (*sql.Tx, error)
 }
 
 type Tx interface {
-	QueryExecuter
+	ContextQueryExecuter
 	Commit() error
 	Rollback() error
 }
