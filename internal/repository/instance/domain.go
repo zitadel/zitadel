@@ -54,8 +54,9 @@ func (e *DomainAddedEvent) Fields() []*eventstore.FieldOperation {
 			domainSearchObject(e.Domain),
 			InstanceDomainSearchField,
 			&eventstore.Value{
-				Value:        e.Domain,
-				MustBeUnique: true,
+				Value: e.Domain,
+				// TODO: (adlerhurst) ensure uniqueness if we go with fields table: https://github.com/zitadel/zitadel/issues/9009
+				MustBeUnique: false,
 				ShouldIndex:  true,
 			},
 
