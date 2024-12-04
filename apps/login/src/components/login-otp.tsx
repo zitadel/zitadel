@@ -76,6 +76,13 @@ export function LoginOTP({
   async function updateSessionForOTPChallenge() {
     let challenges;
 
+    if (host) {
+      console.log(
+        `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}&organization={{.OrgID}}` +
+          (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+      );
+    }
+
     if (method === "email") {
       challenges = create(RequestChallengesSchema, {
         otpEmail: {
@@ -107,13 +114,18 @@ export function LoginOTP({
       challenges,
       authRequestId,
     })
-      .catch((error) => {
-        setError(error.message ?? "Could not request OTP challenge");
+      .catch(() => {
+        setError("Could not request OTP challenge");
         return;
       })
       .finally(() => {
         setLoading(false);
       });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
 
     return response;
   }
@@ -166,6 +178,11 @@ export function LoginOTP({
       .finally(() => {
         setLoading(false);
       });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
 
     return response;
   }

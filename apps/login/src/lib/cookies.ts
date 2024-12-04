@@ -142,7 +142,7 @@ export async function removeSessionFromCookie<T>(
   }
 }
 
-export async function getMostRecentSessionCookie<T>(): Promise<any> {
+export async function getMostRecentSessionCookie<T>(): Promise<Cookie> {
   const cookiesList = await cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
