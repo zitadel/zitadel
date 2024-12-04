@@ -38,9 +38,6 @@ func mustNewMigrationConfig(v *viper.Viper) *Migration {
 	config := new(Migration)
 	mustNewConfig(v, config)
 
-	err := config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
 	slog.SetDefault(config.Log.Slog())
 
 	id.Configure(config.Machine)
@@ -51,9 +48,6 @@ func mustNewMigrationConfig(v *viper.Viper) *Migration {
 func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
 	config := new(ProjectionsConfig)
 	mustNewConfig(v, config)
-
-	err := config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
 
 	slog.SetDefault(config.Log.Slog())
 

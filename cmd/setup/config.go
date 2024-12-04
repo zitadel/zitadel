@@ -83,9 +83,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 	)
 	logging.OnError(err).Fatal("unable to read default config")
 
-	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
 	slog.SetDefault(config.Log.Slog())
 
 	id.Configure(config.Machine)
