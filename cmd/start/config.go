@@ -76,6 +76,7 @@ type Config struct {
 	LogStore            *logstore.Configs
 	Quotas              *QuotasConfig
 	Telemetry           *handlers.TelemetryPusherConfig
+	TimeoutTest         test
 }
 
 type QuotasConfig struct {
