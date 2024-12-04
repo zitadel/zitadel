@@ -9,6 +9,8 @@ import (
 
 	"github.com/zitadel/logging"
 	"sigs.k8s.io/yaml"
+
+	"github.com/zitadel/zitadel/cmd/build"
 )
 
 type Config struct {
@@ -47,8 +49,10 @@ func init() {
 	if err := yaml.Unmarshal(clientYAML, &loadedConfig); err != nil {
 		panic(err)
 	}
-	if err := loadedConfig.Log.SetLogger(); err != nil {
-		panic(err)
+
+	loadedConfig.Log.Formatter.Data = map[string]interface{}{
+		"service": "zitadel",
+		"version": build.Version(),
 	}
 
 	slog.SetDefault(loadedConfig.Log.Slog())
