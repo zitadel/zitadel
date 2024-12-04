@@ -76,13 +76,6 @@ export function LoginOTP({
   async function updateSessionForOTPChallenge() {
     let challenges;
 
-    if (host) {
-      console.log(
-        `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}&organization={{.OrgID}}` +
-          (authRequestId ? `&authRequestId=${authRequestId}` : ""),
-      );
-    }
-
     if (method === "email") {
       challenges = create(RequestChallengesSchema, {
         otpEmail: {
@@ -91,7 +84,7 @@ export function LoginOTP({
             value: host
               ? {
                   urlTemplate:
-                    `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}&organization={{.OrgID}}` +
+                    `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
                     (authRequestId ? `&authRequestId=${authRequestId}` : ""),
                 }
               : {},
