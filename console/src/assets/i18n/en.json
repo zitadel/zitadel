@@ -1384,7 +1384,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1621,7 +1622,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1721,8 +1723,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
-      "FORCEMFA": "Force MFA",
-      "FORCEMFALOCALONLY": "Force MFA for local authenticated users",
+      "FORCEMFA": "Force MFA for all users",
+      "FORCEMFALOCALONLY": "Force MFA for local authenticated users only",
       "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login.",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
@@ -2588,7 +2590,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

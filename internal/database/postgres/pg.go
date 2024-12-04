@@ -3,15 +3,18 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
@@ -81,6 +84,27 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
 	if err != nil {
 		return nil, nil, err
+	}
+
+	config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		for _, f := range connConfig.AfterConnect {
+			if err := f(ctx, conn); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	// For the pusher we set the app name with the instance ID
+	if purpose == dialect.DBPurposeEventPusher {
+		config.BeforeAcquire = func(ctx context.Context, conn *pgx.Conn) bool {
+			return setAppNameWithID(ctx, conn, purpose, authz.GetInstance(ctx).InstanceID())
+		}
+		config.AfterRelease = func(conn *pgx.Conn) bool {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			return setAppNameWithID(ctx, conn, purpose, "IDLE")
+		}
 	}
 
 	if connConfig.MaxOpenConns != 0 {
@@ -208,4 +232,12 @@ func (c Config) String(useAdmin bool, appName string) string {
 	}
 
 	return strings.Join(fields, " ")
+}
+
+func setAppNameWithID(ctx context.Context, conn *pgx.Conn, purpose dialect.DBPurpose, id string) bool {
+	// needs to be set like this because psql complains about parameters in the SET statement
+	query := fmt.Sprintf("SET application_name = '%s_%s'", purpose.AppName(), id)
+	_, err := conn.Exec(ctx, query)
+	logging.OnError(err).Warn("failed to set application name")
+	return err == nil
 }

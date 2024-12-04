@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -146,10 +145,8 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, 
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err = c.checkPermission(ctx, domain.PermissionUserCredentialWrite, user.ResourceOwner, userID); err != nil {
-			return nil, nil, nil, err
-		}
+	if err := c.checkPermissionUpdateUserCredentials(ctx, user.ResourceOwner, userID); err != nil {
+		return nil, nil, nil, err
 	}
 	org, err := c.getOrg(ctx, user.ResourceOwner)
 	if err != nil {
@@ -603,10 +600,9 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 	if existingWebAuthN.State == domain.MFAStateUnspecified || existingWebAuthN.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-DAfb2", "Errors.User.WebAuthN.NotFound")
 	}
-	if userID != authz.GetCtxData(ctx).UserID {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingWebAuthN.ResourceOwner, existingWebAuthN.AggregateID); err != nil {
-			return nil, err
-		}
+
+	if err := c.checkPermissionUpdateUser(ctx, existingWebAuthN.ResourceOwner, existingWebAuthN.AggregateID); err != nil {
+		return nil, err
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)
