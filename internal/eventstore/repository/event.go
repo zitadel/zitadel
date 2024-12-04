@@ -3,7 +3,11 @@ package repository
 import (
 	"database/sql"
 	"encoding/json"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -82,7 +86,9 @@ func (e *Event) Type() eventstore.EventType {
 
 // Revision implements [eventstore.Event]
 func (e *Event) Revision() uint16 {
-	return 0
+	revision, err := strconv.ParseUint(strings.TrimPrefix(string(e.Version), "v"), 10, 16)
+	logging.OnError(err).Debug("failed to parse event revision")
+	return uint16(revision)
 }
 
 // Sequence implements [eventstore.Event]
