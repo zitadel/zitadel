@@ -23,7 +23,7 @@ type Config struct {
 	Handlers              map[string]*ConfigOverwrites
 
 	ActiveInstancer interface {
-		ActiveInstances(string) []string
+		ActiveInstances() []string
 	}
 }
 

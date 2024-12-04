@@ -15,7 +15,7 @@ type Config struct {
 	MaxActiveInstances    uint32
 	TransactionDuration   time.Duration
 	ActiveInstancer       interface {
-		ActiveInstances(string) []string
+		ActiveInstances() []string
 	}
 }
 

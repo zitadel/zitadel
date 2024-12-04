@@ -143,7 +143,7 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) ActiveInstances(projection string) []string {
+func (q *Queries) ActiveInstances() []string {
 	return q.caches.activeInstances.Keys()
 }
 

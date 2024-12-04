@@ -43,7 +43,7 @@ type Config struct {
 	TriggerWithoutEvents Reduce
 
 	ActiveInstancer interface {
-		ActiveInstances(projectionName string) []string
+		ActiveInstances() []string
 	}
 }
 
@@ -174,7 +174,7 @@ func NewHandler(
 		txDuration:             config.TransactionDuration,
 		queryInstances: func() ([]string, error) {
 			if config.ActiveInstancer != nil {
-				return config.ActiveInstancer.ActiveInstances((projection.Name())), nil
+				return config.ActiveInstancer.ActiveInstances(), nil
 			}
 			return nil, nil
 		},

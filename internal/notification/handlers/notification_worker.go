@@ -311,7 +311,7 @@ func (w *NotificationWorker) log(workerID int, retry bool) *logging.Entry {
 }
 
 func (w *NotificationWorker) queryInstances(ctx context.Context, retry bool) ([]string, error) {
-	return w.queries.ActiveInstances("notification worker"), nil
+	return w.queries.ActiveInstances(), nil
 }
 
 func (w *NotificationWorker) triggerInstances(ctx context.Context, instances []string, workerID int, retry bool) {

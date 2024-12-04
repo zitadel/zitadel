@@ -32,7 +32,7 @@ type Queries interface {
 	GetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error)
 	ActivePrivateSigningKey(ctx context.Context, t time.Time) (keys *query.PrivateKeys, err error)
 
-	ActiveInstances(string) []string
+	ActiveInstances() []string
 }
 
 type NotificationQueries struct {

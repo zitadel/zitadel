@@ -21,7 +21,7 @@ type Config struct {
 	TransactionDuration   time.Duration
 	Handlers              map[string]*ConfigOverwrites
 	ActiveInstancer       interface {
-		ActiveInstances(string) []string
+		ActiveInstances() []string
 	}
 }
 
