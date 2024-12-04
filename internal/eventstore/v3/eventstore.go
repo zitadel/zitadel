@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"sync"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jackc/pgx/v5"
@@ -96,8 +97,19 @@ var (
 	}
 )
 
+var typeMu sync.Mutex
+
 func RegisterEventstoreTypes(ctx context.Context, conn *pgx.Conn) error {
+	// conn.TypeMap is not thread safe
+	typeMu.Lock()
+	defer typeMu.Unlock()
+
 	m := conn.TypeMap()
+
+	var cmd *command
+	if _, ok := m.TypeForValue(cmd); ok {
+		return nil
+	}
 
 	if commandType.OID == 0 || commandArrayCodec.OID == 0 {
 		err := conn.QueryRow(ctx, "select oid, typarray from pg_type where typname = $1 and typnamespace = (select oid from pg_namespace where nspname = $2)", "command", "eventstore").
@@ -174,10 +186,6 @@ func CheckExecutionPlan(ctx context.Context, conn *sql.Conn) error {
 			return errTypesNotFound
 		}
 
-		var cmd *command
-		if _, ok := conn.Conn().TypeMap().TypeForValue(cmd); ok {
-			return nil
-		}
 		return RegisterEventstoreTypes(ctx, conn.Conn())
 	})
 }
