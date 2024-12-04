@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -74,10 +73,8 @@ func (c *Commands) ResendInviteCode(ctx context.Context, userID, resourceOwner, 
 	if err != nil {
 		return nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingCode.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUser(ctx, existingCode.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if !existingCode.UserState.Exists() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-H3b2a", "Errors.User.NotFound")
