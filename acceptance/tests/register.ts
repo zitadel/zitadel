@@ -24,6 +24,6 @@ export async function registerWithPasskey(page: Page, firstname: string, lastnam
 
   // wait for projection of user
   await page.waitForTimeout(2000);
-  
+
   return await passkeyRegister(page);
 }
