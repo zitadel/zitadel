@@ -559,13 +559,14 @@ func startAPIs(
 }
 
 type test struct {
-	IdleTimeout time.Duration
-	ReadTimeout time.Duration
+	IdleTimeout  time.Duration
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
 }
 
 func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown <-chan os.Signal, test test) error {
 	http2Server := &http2.Server{IdleTimeout: test.IdleTimeout}
-	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig, ReadTimeout: test.ReadTimeout, IdleTimeout: test.IdleTimeout}
+	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server), TLSConfig: tlsConfig, ReadTimeout: test.ReadTimeout, IdleTimeout: test.IdleTimeout, WriteTimeout: test.WriteTimeout}
 
 	lc := net.ListenConfig()
 	lis, err := lc.Listen(ctx, "tcp", fmt.Sprintf(":%d", port))
