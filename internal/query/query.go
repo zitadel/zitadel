@@ -84,16 +84,25 @@ func StartQueries(
 
 	repo.checkPermission = permissionCheck(repo)
 
+	repo.caches, err = startCaches(
+		ctx,
+		cacheConnectors,
+		ActiveInstanceConfig{
+			MaxEntries: int(projections.MaxActiveInstances),
+			TTL:        projections.HandleActiveInstances,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	projections.ActiveInstancer = repo
 	err = projection.Create(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
 	if err != nil {
 		return nil, err
 	}
 	if startProjections {
 		projection.Start(ctx)
-	}
-	repo.caches, err = startCaches(ctx, cacheConnectors)
-	if err != nil {
-		return nil, err
 	}
 
 	return repo, nil

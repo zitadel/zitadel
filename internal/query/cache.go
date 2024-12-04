@@ -2,7 +2,9 @@ package query
 
 import (
 	"context"
+	"time"
 
+	"github.com/hashicorp/golang-lru/v2/expirable"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/cache"
@@ -13,9 +15,16 @@ import (
 type Caches struct {
 	instance cache.Cache[instanceIndex, string, *authzInstance]
 	org      cache.Cache[orgIndex, string, *Org]
+
+	activeInstances *expirable.LRU[string, bool]
 }
 
-func startCaches(background context.Context, connectors connector.Connectors) (_ *Caches, err error) {
+type ActiveInstanceConfig struct {
+	MaxEntries int
+	TTL        time.Duration
+}
+
+func startCaches(background context.Context, connectors connector.Connectors, instanceConfig ActiveInstanceConfig) (_ *Caches, err error) {
 	caches := new(Caches)
 	caches.instance, err = connector.StartCache[instanceIndex, string, *authzInstance](background, instanceIndexValues(), cache.PurposeAuthzInstance, connectors.Config.Instance, connectors)
 	if err != nil {
@@ -25,6 +34,8 @@ func startCaches(background context.Context, connectors connector.Connectors) (_
 	if err != nil {
 		return nil, err
 	}
+
+	caches.activeInstances = expirable.NewLRU[string, bool](instanceConfig.MaxEntries, nil, instanceConfig.TTL)
 
 	caches.registerInstanceInvalidation()
 	caches.registerOrgInvalidation()
