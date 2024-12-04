@@ -2,6 +2,7 @@ package setup
 
 import (
 	"bytes"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
@@ -82,8 +84,12 @@ func MustNewConfig(v *viper.Viper) *Config {
 	)
 	logging.OnError(err).Fatal("unable to read default config")
 
-	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
+	config.Log.Formatter.Data = map[string]interface{}{
+		"service": "zitadel",
+		"version": build.Version(),
+	}
+
+	slog.SetDefault(config.Log.Slog())
 
 	id.Configure(config.Machine)
 

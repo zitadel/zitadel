@@ -2,12 +2,14 @@ package mirror
 
 import (
 	_ "embed"
+	"log/slog"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -37,8 +39,12 @@ func mustNewMigrationConfig(v *viper.Viper) *Migration {
 	config := new(Migration)
 	mustNewConfig(v, config)
 
-	err := config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
+	config.Log.Formatter.Data = map[string]interface{}{
+		"service": "zitadel",
+		"version": build.Version(),
+	}
+
+	slog.SetDefault(config.Log.Slog())
 
 	id.Configure(config.Machine)
 
@@ -49,8 +55,12 @@ func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
 	config := new(ProjectionsConfig)
 	mustNewConfig(v, config)
 
-	err := config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
+	config.Log.Formatter.Data = map[string]interface{}{
+		"service": "zitadel",
+		"version": build.Version(),
+	}
+
+	slog.SetDefault(config.Log.Slog())
 
 	id.Configure(config.Machine)
 
