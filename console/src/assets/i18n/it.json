@@ -1384,7 +1384,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1621,7 +1622,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1721,8 +1723,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Autenticazione classica con nome utente e password è permessa.",
       "ALLOWEXTERNALIDP_DESC": "Il login è permesso per gli IDP sottostanti",
       "ALLOWREGISTER_DESC": "Se l'opzione è selezionata, nel login apparirà un passo aggiuntivo per la registrazione di un utente.",
-      "FORCEMFA": "Forza MFA",
-      "FORCEMFALOCALONLY": "Forza MFA per gli utenti locali",
+      "FORCEMFA": "Forzare MFA per tutti gli utenti",
+      "FORCEMFALOCALONLY": "Forzare MFA solo per gli utenti autenticati localmente",
       "FORCEMFALOCALONLY_DESC": "Se l'opzione è selezionata, gli utenti locali autenticati devono configurare un secondo fattore per l'accesso.",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione è selezionata, l'utente non può resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
@@ -2564,7 +2566,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

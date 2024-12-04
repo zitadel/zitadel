@@ -15,8 +15,6 @@ import (
 )
 
 func TestServer_ListInstances(t *testing.T) {
-	t.Parallel()
-
 	isoInstance := integration.NewInstance(CTX)
 
 	tests := []struct {

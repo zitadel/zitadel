@@ -1384,7 +1384,8 @@
         "nl": "Holland",
         "sv": "Svéd",
         "id": "Indonéz",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1619,7 +1620,8 @@
         "ru": "Orosz",
         "nl": "Holland",
         "sv": "Svéd",
-        "id": "Indonéz"
+        "id": "Indonéz",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail ellenőrzés kész",
@@ -1719,8 +1721,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "A hagyományos bejelentkezés felhasználónévvel és jelszóval engedélyezett.",
       "ALLOWEXTERNALIDP_DESC": "A bejelentkezés engedélyezett az alapul szolgáló identitásszolgáltatóknál",
       "ALLOWREGISTER_DESC": "Ha ezt az opciót választod, egy további lépés jelenik meg a bejelentkezés során a felhasználói regisztrációhoz.",
-      "FORCEMFA": "MFA kényszerítése",
-      "FORCEMFALOCALONLY": "Kényszerítsd az MFA-t a helyileg hitelesített felhasználókra",
+      "FORCEMFA": "MFA kikényszerítése minden felhasználó számára",
+      "FORCEMFALOCALONLY": "MFA kikényszerítése csak helyi hitelesített felhasználók számára",
       "FORCEMFALOCALONLY_DESC": "Ha ezt az opciót választod, a helyileg hitelesített felhasználóknak be kell állítaniuk egy második faktor a bejelentkezéshez.",
       "HIDEPASSWORDRESET_DESC": "Ha ezt az opciót választod, a felhasználó nem tudja visszaállítani a jelszavát a bejelentkezési folyamat során.",
       "HIDELOGINNAMESUFFIX": "Bejelentkezési név utótag elrejtése",

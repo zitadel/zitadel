@@ -264,6 +264,7 @@ RegistrationUser:
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -306,6 +307,7 @@ ExternalRegistrationUserOverview:
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -382,6 +384,7 @@ ExternalNotFound:
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
+  Korean: 한국어
   
 Footer:
   PoweredBy: Powered By

@@ -69,6 +69,7 @@ func projectionsCmd() *cobra.Command {
 type ProjectionsConfig struct {
 	Destination    database.Config
 	Projections    projection.Config
+	Notifications  handlers.WorkerConfig
 	EncryptionKeys *encryption.EncryptionKeyConfig
 	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config
@@ -144,6 +145,7 @@ func projections(
 		keys.OTP,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -182,6 +184,7 @@ func projections(
 		keys.DomainVerification,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		&http.Client{},
 		func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 			return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
@@ -205,6 +208,7 @@ func projections(
 		config.Projections.Customizations["notificationsquotas"],
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
+		config.Notifications,
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -219,6 +223,7 @@ func projections(
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
+		client,
 	)
 
 	config.Auth.Spooler.Client = client

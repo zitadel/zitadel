@@ -1385,7 +1385,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1622,7 +1623,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -1722,7 +1724,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "O login convencional com nome de usuário e senha é permitido.",
       "ALLOWEXTERNALIDP_DESC": "O login é permitido para os provedores de identidade subjacentes",
       "ALLOWREGISTER_DESC": "Se a opção estiver selecionada, uma etapa adicional para registrar um usuário aparecerá no login.",
-      "FORCEMFA": "Forçar MFA",
+      "FORCEMFA": "Forçar MFA para todos os utilizadores",
+      "FORCEMFALOCALONLY": "Forçar MFA apenas para utilizadores autenticados localmente",
       "HIDEPASSWORDRESET_DESC": "Se a opção estiver selecionada, o usuário não poderá redefinir sua senha no processo de login.",
       "HIDELOGINNAMESUFFIX": "Ocultar sufixo do nome de login",
       "HIDELOGINNAMESUFFIX_DESC": "Oculta o sufixo do nome de login na interface de login",
@@ -2558,7 +2561,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

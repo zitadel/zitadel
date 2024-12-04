@@ -134,7 +134,7 @@ func TestSession_FetchUser(t *testing.T) {
 				requestID: "id-b22c90db88bf01d82ffb0a7b6fe25ac9fcb2c679",
 			},
 			want: want{
-				err: zerrors.ThrowInvalidArgument(nil, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "SAML-ajl3irfs", "Errors.Intent.ResponseInvalid"),
 			},
 		},
 		{

@@ -136,6 +136,20 @@ func (m *MockPusher) EXPECT() *MockPusherMockRecorder {
 	return m.recorder
 }
 
+// Client mocks base method.
+func (m *MockPusher) Client() *database.DB {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Client")
+	ret0, _ := ret[0].(*database.DB)
+	return ret0
+}
+
+// Client indicates an expected call of Client.
+func (mr *MockPusherMockRecorder) Client() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Client", reflect.TypeOf((*MockPusher)(nil).Client))
+}
+
 // Health mocks base method.
 func (m *MockPusher) Health(arg0 context.Context) error {
 	m.ctrl.T.Helper()
@@ -151,10 +165,10 @@ func (mr *MockPusherMockRecorder) Health(arg0 any) *gomock.Call {
 }
 
 // Push mocks base method.
-func (m *MockPusher) Push(arg0 context.Context, arg1 ...eventstore.Command) ([]eventstore.Event, error) {
+func (m *MockPusher) Push(arg0 context.Context, arg1 database.ContextQueryExecuter, arg2 ...eventstore.Command) ([]eventstore.Event, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0}
-	for _, a := range arg1 {
+	varargs := []any{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Push", varargs...)
@@ -164,8 +178,8 @@ func (m *MockPusher) Push(arg0 context.Context, arg1 ...eventstore.Command) ([]e
 }
 
 // Push indicates an expected call of Push.
-func (mr *MockPusherMockRecorder) Push(arg0 any, arg1 ...any) *gomock.Call {
+func (mr *MockPusherMockRecorder) Push(arg0, arg1 any, arg2 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0}, arg1...)
+	varargs := append([]any{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockPusher)(nil).Push), varargs...)
 }
