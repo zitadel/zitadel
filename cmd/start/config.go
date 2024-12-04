@@ -1,7 +1,6 @@
 package start
 
 import (
-	"errors"
 	"log/slog"
 	"time"
 
@@ -112,12 +111,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 	)
 	logging.OnError(err).Fatal("unable to read config")
 
-	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
 	slog.SetDefault(config.Log.Slog())
-
-	logging.WithError(errors.New("the original error")).Error("log error message")
 
 	err = config.Tracing.NewTracer()
 	logging.OnError(err).Fatal("unable to set tracer")
