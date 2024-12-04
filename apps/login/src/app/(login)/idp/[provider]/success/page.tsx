@@ -37,7 +37,7 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
-  const { id, token, authRequestId, organization } = searchParams;
+  const { id, token, authRequestId, organization, link } = searchParams;
   const { provider } = params;
 
   const branding = await getBrandingSettings(organization);
@@ -50,7 +50,8 @@ export default async function Page(props: {
 
   const { idpInformation, userId } = intent;
 
-  if (userId) {
+  // sign in user. If user should be linked continue
+  if (userId && !link) {
     // TODO: update user if idp.options.isAutoUpdate is true
 
     return (
