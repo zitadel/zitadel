@@ -171,6 +171,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: esPusherDBClient, esClient: eventstoreClient}
 	steps.s39DeleteStaleOrgFields = &DeleteStaleOrgFields{dbClient: esPusherDBClient}
 	steps.s40InitPushFunc = &InitPushFunc{dbClient: esPusherDBClient}
+	steps.s41FillFieldsForInstanceDomains = &FillFieldsForInstanceDomains{eventstore: eventstoreClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -218,6 +219,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s35AddPositionToIndexEsWm,
 		steps.s36FillV2Milestones,
 		steps.s38BackChannelLogoutNotificationStart,
+		steps.s41FillFieldsForInstanceDomains,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
