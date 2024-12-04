@@ -214,4 +214,9 @@ message CreateCallbackResponse {
       example: "\"https://client.example.org/cb\""
     }
   ];
+  oneof binding {
+    option (validate.required) = true;
+    bool redirect = 3;
+    string post = 4;
+  }
 }

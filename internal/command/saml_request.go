@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/samlrequest"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -17,7 +16,6 @@ type SAMLRequest struct {
 	LoginClient string
 
 	ApplicationID string
-	EntityID      string
 	ACSURL        string
 	RelayState    string
 	RequestID     string
@@ -50,7 +48,7 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, samlrequest.NewAddedEvent(
 		ctx,
-		&authrequest.NewAggregate(samlRequest.ID, authz.GetInstance(ctx).InstanceID()).Aggregate,
+		&samlrequest.NewAggregate(samlRequest.ID, authz.GetInstance(ctx).InstanceID()).Aggregate,
 		samlRequest.LoginClient,
 		samlRequest.ApplicationID,
 		samlRequest.ACSURL,

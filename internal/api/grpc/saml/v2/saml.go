@@ -4,13 +4,10 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v3/pkg/op"
 	"github.com/zitadel/saml/pkg/provider"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -19,7 +16,7 @@ import (
 )
 
 func (s *Server) GetAuthRequest(ctx context.Context, req *saml_pb.GetSAMLRequestRequest) (*saml_pb.GetSAMLRequestResponse, error) {
-	authRequest, err := s.query.AuthRequestByID(ctx, true, req.GetSamlRequestId(), true)
+	authRequest, err := s.query.SamlRequestByID(ctx, true, req.GetSamlRequestId(), true)
 	if err != nil {
 		logging.WithError(err).Error("query samlRequest by ID")
 		return nil, err
@@ -29,7 +26,7 @@ func (s *Server) GetAuthRequest(ctx context.Context, req *saml_pb.GetSAMLRequest
 	}, nil
 }
 
-func samlRequestToPb(a *query.AuthRequest) *saml_pb.SAMLRequest {
+func samlRequestToPb(a *query.SamlRequest) *saml_pb.SAMLRequest {
 	return &saml_pb.SAMLRequest{
 		Id:           a.ID,
 		CreationDate: timestamppb.New(a.CreationDate),
@@ -39,21 +36,21 @@ func samlRequestToPb(a *query.AuthRequest) *saml_pb.SAMLRequest {
 func (s *Server) CreateCallback(ctx context.Context, req *saml_pb.CreateCallbackRequest) (*saml_pb.CreateCallbackResponse, error) {
 	switch v := req.GetCallbackKind().(type) {
 	case *saml_pb.CreateCallbackRequest_Error:
-		return s.failAuthRequest(ctx, req.GetSamlRequestId(), v.Error)
+		return s.failSAMLRequest(ctx, req.GetSamlRequestId(), v.Error)
 	case *saml_pb.CreateCallbackRequest_Session:
-		return s.linkSessionToAuthRequest(ctx, req.GetSamlRequestId(), v.Session)
+		return s.linkSessionToSAMLRequest(ctx, req.GetSamlRequestId(), v.Session)
 	default:
 		return nil, zerrors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
 	}
 }
 
-func (s *Server) failAuthRequest(ctx context.Context, samlRequestID string, ae *saml_pb.AuthorizationError) (*saml_pb.CreateCallbackResponse, error) {
+func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *saml_pb.AuthorizationError) (*saml_pb.CreateCallbackResponse, error) {
 	details, aar, err := s.command.FailSAMLRequest(ctx, samlRequestID, errorReasonToDomain(ae.GetError()))
 	if err != nil {
 		return nil, err
 	}
 	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
-	callback, err := saml.CreateErrorCallbackURL(authReq, errorReasonToSAML(ae.GetError()), ae.GetErrorDescription(), ae.GetErrorUri())
+	callback, err := saml.CreateErrorResponse(authReq, errorReasonToSAML(ae.GetError()), ae.GetErrorDescription(), ae.GetErrorUri())
 	if err != nil {
 		return nil, err
 	}
@@ -63,25 +60,18 @@ func (s *Server) failAuthRequest(ctx context.Context, samlRequestID string, ae *
 	}, nil
 }
 
-func (s *Server) linkSessionToAuthRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*saml_pb.CreateCallbackResponse, error) {
-	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken(), true)
+func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*saml_pb.CreateCallbackResponse, error) {
+	details, _, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}
-	authReq := &oidc.AuthRequestV2{CurrentAuthRequest: aar}
-	ctx = op.ContextWithIssuer(ctx, http.DomainContext(ctx).Origin())
-	var callback string
-	if aar.ResponseType == domain.OIDCResponseTypeCode {
-		callback, err = oidc.CreateCodeCallbackURL(ctx, authReq, s.op.Provider())
-	} else {
-		callback, err = s.op.CreateTokenCallbackURL(ctx, authReq)
-	}
-	if err != nil {
-		return nil, err
-	}
+	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
+
+	saml.CreateResponse(authReq)
+
 	return &saml_pb.CreateCallbackResponse{
 		Details:     object.DomainToDetailsPb(details),
-		CallbackUrl: callback,
+		CallbackUrl: "",
 	}, nil
 }
 

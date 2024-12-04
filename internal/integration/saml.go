@@ -2,37 +2,105 @@ package integration
 
 import (
 	"context"
+	"crypto/rsa"
+	"crypto/tls"
+	"crypto/x509"
+	"encoding/xml"
 	"fmt"
+	"io"
+	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func (i *Instance) CreateSAMLClient(ctx context.Context, projectID, entityID, acsURL, logoutURL string) (*management.AddSAMLAppResponse, error) {
-	samlSPMetadata := `<?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
-                     validUntil="2024-12-05T17:23:27Z"
-                     cacheDuration="PT604800S"
-                     entityID="` + entityID + `">
-    <md:SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-                                Location="` + logoutURL + `" />
-        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-                                     Location="` + acsURL + `"
-                                     index="1" />
-    </md:SPSSODescriptor>
-</md:EntityDescriptor>`
+const spCertificate = `-----BEGIN CERTIFICATE-----
+MIIDITCCAgmgAwIBAgIUUo5urYkuUHAe7LQ9sZSL+xXAqBwwDQYJKoZIhvcNAQEL
+BQAwIDEeMBwGA1UEAwwVbXlzZXJ2aWNlLmV4YW1wbGUuY29tMB4XDTI0MTIwNDEz
+MTE1MFoXDTI1MDEwMzEzMTE1MFowIDEeMBwGA1UEAwwVbXlzZXJ2aWNlLmV4YW1w
+bGUuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoACwbGIh8udK
+Um1r+yQoPtfswEX6Cb6Y1KwR6WZDYgzHdMyUC5Sy8Bg1H2puUZZukDLuyu6Pqvum
+8kfnzhjUR6nNCoUlidwE+yz020w5oOBofRKgJK/FVUuWD3k6kjdP9CrBFLG0PQQ3
+N2e4wilP4czCxizKero2a0e7Eq8OjHAPf8gjM+GWFZgVAbV8uf2Mjt1O2Vfbx5PZ
+sLuBZtl5jokx3NiC7my/yj81MbGEDPcQo0emeVBz3J3nVG6Yr4kdCKkvv2dhJ26C
+5cL7NIIUY4IQomJNwYC2NaYgSpQOxJHL/HsOPusO4Ia2WtUTXEZUFkxn1u0YuoSx
+CkGehF/1OwIDAQABo1MwUTAdBgNVHQ4EFgQUr6S0wA2l3MdfnvfveWDueQtaoJMw
+HwYDVR0jBBgwFoAUr6S0wA2l3MdfnvfveWDueQtaoJMwDwYDVR0TAQH/BAUwAwEB
+/zANBgkqhkiG9w0BAQsFAAOCAQEAH3Q9obyWJaMKFuGJDkIp1RFot79RWTVcAcwA
+XTJNfCseLONRIs4MkRxOn6GQBwV2IEqs1+hFG80dcd/c6yYyJ8bziKEyNMtPWrl6
+fdVD+1WnWcD1ZYrS8hgdz0FxXxl/+GjA8Pu6icmnhKgUDTYWns6Rj/gtQtZS8ZoA
+JY+T/1mGze2+Xx6pjuArZ7+hnH6EWwo+ckcmXAKyhnkhX7xIo1UFvNY2VWaGl2wU
+K2yyJA4Lu/NNmqPnpAcRDsnGP6r4frMhjnPq/ifC3B+6FT3p8dubV9PA0y86bAy5
+0yIgNje4DyWLy/DM9EpdPfJmvUAL6hOtyb8Aa9hR+a8stu7h6g==
+-----END CERTIFICATE-----`
+const spKey = `-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCgALBsYiHy50pS
+bWv7JCg+1+zARfoJvpjUrBHpZkNiDMd0zJQLlLLwGDUfam5Rlm6QMu7K7o+q+6by
+R+fOGNRHqc0KhSWJ3AT7LPTbTDmg4Gh9EqAkr8VVS5YPeTqSN0/0KsEUsbQ9BDc3
+Z7jCKU/hzMLGLMp6ujZrR7sSrw6McA9/yCMz4ZYVmBUBtXy5/YyO3U7ZV9vHk9mw
+u4Fm2XmOiTHc2ILubL/KPzUxsYQM9xCjR6Z5UHPcnedUbpiviR0IqS+/Z2EnboLl
+wvs0ghRjghCiYk3BgLY1piBKlA7Ekcv8ew4+6w7ghrZa1RNcRlQWTGfW7Ri6hLEK
+QZ6EX/U7AgMBAAECggEAD1aRkwpDO+BdORKhP9WDACc93F647fc1+mk2XFv/yKX1
+9uXnqUaLcsW3TfgrdCnKFouzZYPCBP+TzPUErTanHumRrNj/tLwBRDzWijE/8wKg
+MaE39dxdu+P/kiMqcLrZsMvqb3vrjc/aJTcNuJsyO7Cf2VSQ4nv4XIdnUQ60A9VR
+OmUp//VULZxImnPx/R304/p5VfOhyXfzBeoxUPogBurjtzkyXVG0EG2enJMMiTix
+900fTDez0TQ8V6O59vM04fhtPXvH51OkMTW/HU1QQvlnAJuX06I7k4CaBpF3xPII
+QpEbFILq5y6yAQJWELRGWzeoxK6kn6bNfI8S0+oKqQKBgQDg2UM7ruMASpY7B4zj
+XNztGDOx9BCdYyHH1O05r+ILmltBC7jFImwIYrHbaX+dg52l0PPImZuBz852IqrC
+VAEF30yBn2gWyVzIdo7W3mw9Jgqc4LrhStaJxOuXVoT2/PAuDBF8TJMNH9oLNqiD
+aPAI0cVn9BRV7AziEsrMlDLLiQKBgQC2K4Z/caAvwx/AescsN6lp+/m7MeLUpZzQ
+myZt44bnR5LouUo3vCYl+Bk8wu6PTd41LUYW/SW26HDDFTKgkBb1zVHfk5QRApaB
+VPwZnhcUvNapPOnDp75Qoq238wpfayQlKF1xCawS3N5AWkDaEdfzuH7umFJxVss2
+1tfDsn01owKBgAYWG3nMHBzv5+0lIS0uYFSSqSOSBbkc69cq7lj3Z9kEjp/OH2xG
+qEH52fKkgm3TGDta0p6Fee4jn+UWvySPfY+ZIcsIc5raTIaonuk2EBv/oZ3pf2WF
+zxTfnbj1AJhm9GFqtjZ1JC3gxNg03I7iEk1K0FsmAj7pKtgbxh2PjWhxAoGBAKBx
+BSwJbwOh3r0vZWvUOilV+0SbUyPmGI7Blr8BvTbFGuZNCsi7tP2L3O5e4Kzl7+b1
+0N0+Z5EIdwfaC5TOUup5wroeyDGTDesqZj5JthpVltnHBDuF6WArZsS0EVaojlUL
+kACWfC7AyB31X1iwjnng7CpHjZS01JWf8rgw44XxAoGAQ5YYd4WmGYZoJJak7zhb
+xnYG7hU7nS7pBPGob1FvjYMw1x/htuJCjxLh08dlzJGM6SFlDn7HVM9ou99w5n+d
+xtqmbthw2E9VjSk3zSYb4uFc6mv0C/kRPTDUFH+9CpQTBBx/O016hmcatxlBS6JL
+VAV6oE8sEJYHtR6YdZiMWWo=
+-----END PRIVATE KEY-----`
+
+func CreateSAMLSP(root string, idpMetadata *saml.EntityDescriptor) (*samlsp.Middleware, error) {
+	rootURL, err := url.Parse(root)
+	if err != nil {
+		return nil, err
+	}
+	keyPair, err := tls.X509KeyPair([]byte(spCertificate), []byte(spKey))
+	if err != nil {
+		return nil, err
+	}
+	keyPair.Leaf, err = x509.ParseCertificate(keyPair.Certificate[0])
+	if err != nil {
+		return nil, err
+	}
+
+	return samlsp.New(samlsp.Options{
+		URL:         *rootURL,
+		Key:         keyPair.PrivateKey.(*rsa.PrivateKey),
+		Certificate: keyPair.Leaf,
+		IDPMetadata: idpMetadata,
+	})
+}
+
+func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *samlsp.Middleware) (*management.AddSAMLAppResponse, error) {
+	spMetadata, err := xml.MarshalIndent(m.ServiceProvider.Metadata(), "", "  ")
+	if err != nil {
+		return nil, err
+	}
 
 	resp, err := i.Client.Mgmt.AddSAMLApp(ctx, &management.AddSAMLAppRequest{
 		ProjectId: projectID,
 		Name:      fmt.Sprintf("app-%s", gofakeit.AppName()),
-		Metadata:  &management.AddSAMLAppRequest_MetadataXml{MetadataXml: []byte(samlSPMetadata)},
+		Metadata:  &management.AddSAMLAppRequest_MetadataXml{MetadataXml: spMetadata},
 	})
 	if err != nil {
 		return nil, err
@@ -52,24 +120,8 @@ func (i *Instance) CreateSAMLClient(ctx context.Context, projectID, entityID, ac
 	})
 }
 
-func (i *Instance) CreateSAMLAuthRequest(ctx context.Context, entityID, loginClient, acsURL, relayState string) (authRequestID string, err error) {
-	binding := saml.HTTPRedirectBinding
-	entityDescriptor := new(saml.EntityDescriptor)
-	rootURL, err := url.Parse(entityID)
-	if err != nil {
-		return "", err
-	}
-
-	m, _ := samlsp.New(samlsp.Options{
-		URL: *rootURL,
-		/* TODO
-		Key:            keyPair.PrivateKey.(*rsa.PrivateKey),
-		Certificate:    keyPair.Leaf,
-		*/
-		IDPMetadata: entityDescriptor,
-	})
-
-	authReq, err := m.ServiceProvider.MakeAuthenticationRequest(acsURL, binding, m.ResponseBinding)
+func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState string) (authRequestID string, err error) {
+	authReq, err := m.ServiceProvider.MakeAuthenticationRequest(acs.Location, acs.Binding, m.ResponseBinding)
 	if err != nil {
 		return "", err
 	}
@@ -89,6 +141,55 @@ func (i *Instance) CreateSAMLAuthRequest(ctx context.Context, entityID, loginCli
 		return "", fmt.Errorf("check redirect: %w", err)
 	}
 
-	//TODO get id from loc
-	return loc.String(), nil
+	prefixWithHost := i.Issuer() + "/ui/login/login?authRequestID="
+	if !strings.HasPrefix(loc.String(), prefixWithHost) {
+		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
+	}
+	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
+}
+
+func (i *Instance) GetSAMLIDPMetadata() (*saml.EntityDescriptor, error) {
+	idpEntityID := http_util.BuildHTTP(i.Domain, i.Config.Port, i.Config.Secure) + "/saml/v2/metadata"
+	resp, err := http.Get(idpEntityID)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	entityDescriptor := new(saml.EntityDescriptor)
+	if err := xml.Unmarshal(data, entityDescriptor); err != nil {
+		return nil, err
+	}
+
+	return entityDescriptor, nil
+}
+
+func (i *Instance) Issuer() string {
+	return http_util.BuildHTTP(i.Domain, i.Config.Port, i.Config.Secure)
+}
+
+func (i *Instance) getSAMLSPCertificate() (*saml.EntityDescriptor, error) {
+	idpEntityID := i.Issuer() + "/saml/v2/metadata"
+	resp, err := http.Get(idpEntityID)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	entityDescriptor := new(saml.EntityDescriptor)
+	if err := xml.Unmarshal(data, entityDescriptor); err != nil {
+		return nil, err
+	}
+
+	return entityDescriptor, nil
 }

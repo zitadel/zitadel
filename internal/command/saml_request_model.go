@@ -81,13 +81,8 @@ func (m *SAMLRequestWriteModel) CheckAuthenticated() error {
 	if m.SessionID == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "AUTHR-SF2r2", "Errors.SAMLRequest.NotAuthenticated")
 	}
-	// in case of OIDC Code Flow, the code must have been exchanged
-	if m.ResponseType == domain.OIDCResponseTypeCode && m.AuthRequestState == domain.AuthRequestStateCodeExchanged {
-		return nil
-	}
-	// in case of OIDC Implicit Flow, check that the requests exists, but has not succeeded yet
-	if (m.ResponseType == domain.OIDCResponseTypeIDToken || m.ResponseType == domain.OIDCResponseTypeIDTokenToken) &&
-		m.AuthRequestState == domain.AuthRequestStateAdded {
+	// check that the requests exists, but has not succeeded yet
+	if m.SAMLRequestState == domain.SAMLRequestStateAdded {
 		return nil
 	}
 	return zerrors.ThrowPreconditionFailed(nil, "AUTHR-sajk3", "Errors.SAMLRequest.NotAuthenticated")

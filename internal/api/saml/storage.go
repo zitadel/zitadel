@@ -104,7 +104,7 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
-		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
+		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
 	}
 
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -120,7 +120,7 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	return AuthRequestFromBusiness(resp)
 }
 
-func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID string) (models.AuthRequestInt, error) {
+func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID, loginClient string) (models.AuthRequestInt, error) {
 	samlRequest := &command.SAMLRequest{
 		ApplicationID: applicationID,
 		ACSURL:        acsUrl,
@@ -130,6 +130,7 @@ func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.A
 		Issuer:        req.Issuer.Text,
 		IssuerName:    req.Issuer.SPProvidedID,
 		Destination:   req.Destination,
+		LoginClient:   loginClient,
 	}
 
 	aar, err := p.command.AddSAMLRequest(ctx, samlRequest)
@@ -157,7 +158,12 @@ func (p *Storage) createAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	return AuthRequestFromBusiness(resp)
 }
 
-func CreateErrorCallbackURL(authReq models.AuthRequestInt, reason, description, uri string) (string, error) {
+func CreateErrorResponse(authReq models.AuthRequestInt, reason, description, uri string) (string, error) {
+	// TODO handling for errors
+	return "", nil
+}
+
+func CreateResponse(authReq models.AuthRequestInt) (string, error) {
 	// TODO handling for errors
 	return "", nil
 }
