@@ -33,8 +33,6 @@ export default async function Page(props: {
 
   const host = (await headers()).get("host");
 
-  console.log("host", host);
-
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
