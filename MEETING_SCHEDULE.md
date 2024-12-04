@@ -3,6 +3,31 @@
 Dear community!
 We're excited to announce bi-weekly office hours.
 
+## #7 Feature demo - Back-channel Logout 
+
+Our dev team has been hard at work developing new features for you to explore. What's been cooking? 🧑🏾‍🍳 Back-channel logout! We're inviting to you join our swiss army knife dev Livio on Wednesday, December 11th, 2024 at 11:00 AM (EST) as he walks you through back-channel logout on the ZITADEL platform & answers your questions!
+
+🦒 **What to expect**
+
+A demo session - You'll get the chance to learn more about an upcoming feature through a comprehensive walkthrough led by Livio.
+Brief Q&A - Post-demo, there will be space to share your questions & feedback on the back-channel logout feature.
+
+🗒️ **Details**
+
+Topic: Feature demo - Back-channel logout
+Date & time: Wednesday, December 11th, 2024 at 11:00 AM (EST)
+Duration: ~1 hour
+Platform: ZITADEL’s Discord stage channel
+
+**Register for this event here** ➡️ https://discord.gg/bnuAe2RX?event=1308899625041924127
+
+🗓️ **Add this to your calendar** ➡️ [Google Calendar](https://calendar.google.com/calendar/u/0/r/eventedit?dates=20241211T110000/20241211T110000&details=Our+dev+team+has+been+hard+at+work+developing+new+features+for+you+to+explore.+What%27s+been+cooking?+%F0%9F%A7%91%F0%9F%8F%BD%E2%80%8D%F0%9F%8D%B3+Back-channel+logout!+We%27re+inviting+to+you+join+our+swiss+army+knife+dev+Livio+on+Wednesday,+December+11,+2024+at+11:00+AM+as+he+walks+you+through+implementing+back-channel+logout+on+the+ZITADEL+platform+%26+answers+your+questions!&location=Discord:+ZITADEL+server,+office+hours&text=Feature+Demo+-+Back-Channel+Logout)
+
+If you have any questions prior to the live session, be sure to share them in the (office hours stage chat)[https://discord.com/channels/927474939156643850/1243281463554605058]
+
+Looking forward to seeing you there! Share this with other ZITADEL users & people who might be interested in ZITADEL! It’s appreciated  🫶 
+
+
 ## #6 Q&A 
 
 Hey folks!

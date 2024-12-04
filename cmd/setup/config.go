@@ -126,7 +126,9 @@ type Steps struct {
 	s36FillV2Milestones                     *FillV3Milestones
 	s37Apps7OIDConfigsBackChannelLogoutURI  *Apps7OIDConfigsBackChannelLogoutURI
 	s38BackChannelLogoutNotificationStart   *BackChannelLogoutNotificationStart
+	s40InitPushFunc                         *InitPushFunc
 	s39DeleteStaleOrgFields                 *DeleteStaleOrgFields
+	s41FillFieldsForInstanceDomains         *FillFieldsForInstanceDomains
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
