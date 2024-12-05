@@ -84,7 +84,7 @@ export function LoginOTP({
             value: host
               ? {
                   urlTemplate:
-                    `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}&organization={{.OrgID}}` +
+                    `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/method=${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
                     (authRequestId ? `&authRequestId=${authRequestId}` : ""),
                 }
               : {},
@@ -107,13 +107,18 @@ export function LoginOTP({
       challenges,
       authRequestId,
     })
-      .catch((error) => {
-        setError(error.message ?? "Could not request OTP challenge");
+      .catch(() => {
+        setError("Could not request OTP challenge");
         return;
       })
       .finally(() => {
         setLoading(false);
       });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
 
     return response;
   }
@@ -166,6 +171,11 @@ export function LoginOTP({
       .finally(() => {
         setLoading(false);
       });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
 
     return response;
   }

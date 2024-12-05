@@ -110,6 +110,11 @@ export function LoginPasskey({
         setLoading(false);
       });
 
+    if (session && "error" in session && session.error) {
+      setError(session.error);
+      return;
+    }
+
     return session;
   }
 
@@ -131,6 +136,11 @@ export function LoginPasskey({
       .finally(() => {
         setLoading(false);
       });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
 
     return response;
   }
