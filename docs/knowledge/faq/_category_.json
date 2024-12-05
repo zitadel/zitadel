@@ -1,0 +1,10 @@
+{
+    "label": "FAQ",
+    "collapsible": true,
+    "collapsed": false,
+    "className": "red",
+    "link": {
+      "type": "generated-index",
+      "title": "Account"
+    }
+  }

@@ -91,12 +91,6 @@ module.exports = {
           position: "left",
         },
         {
-          type: "doc",
-          docId: "legal",
-          label: "Legal",
-          position: "right",
-        },
-        {
           type: "html",
           position: "right",
           value:
@@ -153,6 +147,14 @@ module.exports = {
             {
               label: "Privacy Policy",
               href: "/legal/policies/privacy-policy",
+            },
+            {
+              label: "Legal Center",
+              href: "/legal/",
+            },
+            {
+              label: "Trust Center",
+              href: "https://zitadel.com/trust",
             },
           ],
         },
@@ -373,6 +375,16 @@ module.exports = {
             },
           },
         },
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'knowledge',
+        path: 'knowledge',
+        routeBasePath: 'knowledge',
+        sidebarPath: './sidebarsKnowledge.js',
+        // ... other options
       },
     ],
     require.resolve("docusaurus-plugin-image-zoom"),
