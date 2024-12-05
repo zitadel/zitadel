@@ -91,10 +91,9 @@ module.exports = {
           position: "left",
         },
         {
-          type: "html",
-          position: "right",
-          value:
-            '<a href="https://github.com/zitadel/zitadel/discussions" style="text-decoration: none; width: 20px; height: 24px; display: flex"><i class="las la-comments"></i></a>',
+          to: 'knowledge',
+          label: "Knowledge Base",
+          position: "left",
         },
         {
           type: "html",
