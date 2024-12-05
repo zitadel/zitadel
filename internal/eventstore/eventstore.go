@@ -90,7 +90,7 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 
 // PushWithClient pushes the events in a single transaction using the provided database client
 // an event needs at least an aggregate
-func (es *Eventstore) PushWithClient(ctx context.Context, client database.QueryExecuter, cmds ...Command) ([]Event, error) {
+func (es *Eventstore) PushWithClient(ctx context.Context, client database.ContextQueryExecuter, cmds ...Command) ([]Event, error) {
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
@@ -301,7 +301,7 @@ type Pusher interface {
 	// Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
 	// Push stores the actions
-	Push(ctx context.Context, client database.QueryExecuter, commands ...Command) (_ []Event, err error)
+	Push(ctx context.Context, client database.ContextQueryExecuter, commands ...Command) (_ []Event, err error)
 	// Client returns the underlying database connection
 	Client() *database.DB
 }

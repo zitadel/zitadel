@@ -421,6 +421,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 			f, a, w := tt.test(ctrl, queries, commands)
 			err := newNotificationWorker(t, ctrl, queries, f, a, w).reduceNotificationRequested(
 				authz.WithInstanceID(context.Background(), instanceID),
+				authz.WithInstanceID(context.Background(), instanceID),
 				&sql.Tx{},
 				a.event.(*notification.RequestedEvent))
 			if w.err != nil {
@@ -799,8 +800,10 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 			f, a, w := tt.test(ctrl, queries, commands)
 			err := newNotificationWorker(t, ctrl, queries, f, a, w).reduceNotificationRetry(
 				authz.WithInstanceID(context.Background(), instanceID),
+				authz.WithInstanceID(context.Background(), instanceID),
 				&sql.Tx{},
-				a.event.(*notification.RetryRequestedEvent))
+				a.event.(*notification.RetryRequestedEvent),
+			)
 			if w.err != nil {
 				w.err(t, err)
 			} else {

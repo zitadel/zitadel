@@ -1,25 +1,3 @@
-CREATE TABLE IF NOT EXISTS eventstore.events2 (
-    instance_id TEXT NOT NULL
-    , aggregate_type TEXT NOT NULL
-    , aggregate_id TEXT NOT NULL
-    
-    , event_type TEXT NOT NULL
-    , "sequence" BIGINT NOT NULL
-    , revision SMALLINT NOT NULL
-    , created_at TIMESTAMPTZ NOT NULL
-    , payload JSONB
-    , creator TEXT NOT NULL
-    , "owner" TEXT NOT NULL
-    
-    , "position" DECIMAL NOT NULL
-    , in_tx_order INTEGER NOT NULL
-
-    , PRIMARY KEY (instance_id, aggregate_type, aggregate_id, "sequence")
-	, INDEX es_active_instances (created_at DESC) STORING ("position")
-    , INDEX es_wm (aggregate_id, instance_id, aggregate_type, event_type)
-    , INDEX es_projection (instance_id, aggregate_type, event_type, "position" DESC)
-);
-
 -- represents an event to be created.
 CREATE TYPE IF NOT EXISTS eventstore.command AS (
     instance_id TEXT
@@ -31,6 +9,19 @@ CREATE TYPE IF NOT EXISTS eventstore.command AS (
     , creator TEXT
     , owner TEXT
 );
+
+/*
+select * from eventstore.commands_to_events(
+ARRAY[
+    ROW('', 'system', 'SYSTEM', 'ct1', 1, '{"key": "value"}', 'c1', 'SYSTEM')
+    , ROW('', 'system', 'SYSTEM', 'ct2', 1, '{"key": "value"}', 'c1', 'SYSTEM')
+    , ROW('289525561255060732', 'org', '289575074711790844', 'ct3', 1, '{"key": "value"}', 'c1', '289575074711790844')
+    , ROW('289525561255060732', 'user', '289575075164906748', 'ct3', 1, '{"key": "value"}', 'c1', '289575074711790844')
+    , ROW('289525561255060732', 'oidc_session', 'V2_289575178579535100', 'ct3', 1, '{"key": "value"}', 'c1', '289575074711790844')
+    , ROW('', 'system', 'SYSTEM', 'ct3', 1, '{"key": "value"}', 'c1', 'SYSTEM')
+]::eventstore.command[]
+);
+*/
 
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 SELECT
@@ -65,7 +56,7 @@ JOIN (
         cmds.instance_id
         , cmds.aggregate_type
         , cmds.aggregate_id
-        , CASE WHEN (e.owner IS NOT NULL OR e.owner <> '') THEN e.owner ELSE command_owners.owner END AS owner
+        , CASE WHEN (e.owner <> '') THEN e.owner ELSE command_owners.owner END AS owner
         , COALESCE(MAX(e.sequence), 0) AS sequence
     FROM (
         SELECT DISTINCT

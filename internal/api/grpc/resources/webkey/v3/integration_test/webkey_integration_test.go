@@ -216,6 +216,7 @@ func assertFeatureDisabledError(t *testing.T, err error) {
 }
 
 func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integration.Instance, nKeys int, expectActiveKeyID string, config any, creationDate *timestamppb.Timestamp) {
+	t.Helper()
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
 	assert.EventuallyWithT(t, func(collect *assert.CollectT) {

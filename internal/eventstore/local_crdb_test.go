@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/initialise"
@@ -39,10 +41,17 @@ func TestMain(m *testing.M) {
 	testCRDBClient = &database.DB{
 		Database: new(testDB),
 	}
-	testCRDBClient.DB, err = sql.Open("postgres", ts.PGURL().String())
+
+	connConfig, err := pgxpool.ParseConfig(ts.PGURL().String())
 	if err != nil {
-		logging.WithFields("error", err).Fatal("unable to connect to db")
+		logging.WithFields("error", err).Fatal("unable to parse db url")
 	}
+	connConfig.AfterConnect = new_es.RegisterEventstoreTypes
+	pool, err := pgxpool.NewWithConfig(context.Background(), connConfig)
+	if err != nil {
+		logging.WithFields("error", err).Fatal("unable to create db pool")
+	}
+	testCRDBClient.DB = stdlib.OpenDBFromPool(pool)
 	if err = testCRDBClient.Ping(); err != nil {
 		logging.WithFields("error", err).Fatal("unable to ping db")
 	}
@@ -55,7 +64,7 @@ func TestMain(m *testing.M) {
 	clients["v3(inmemory)"] = testCRDBClient
 
 	if localDB, err := connectLocalhost(); err == nil {
-		if err = initDB(localDB); err != nil {
+		if err = initDB(context.Background(), localDB); err != nil {
 			logging.WithFields("error", err).Fatal("migrations failed")
 		}
 		pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
@@ -69,14 +78,14 @@ func TestMain(m *testing.M) {
 		ts.Stop()
 	}()
 
-	if err = initDB(testCRDBClient); err != nil {
+	if err = initDB(context.Background(), testCRDBClient); err != nil {
 		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 
 	os.Exit(m.Run())
 }
 
-func initDB(db *database.DB) error {
+func initDB(ctx context.Context, db *database.DB) error {
 	initialise.ReadStmts("cockroach")
 	config := new(database.Config)
 	config.SetConnector(&cockroach.Config{
@@ -85,7 +94,7 @@ func initDB(db *database.DB) error {
 		},
 		Database: "zitadel",
 	})
-	err := initialise.Init(db,
+	err := initialise.Init(ctx, db,
 		initialise.VerifyUser(config.Username(), ""),
 		initialise.VerifyDatabase(config.DatabaseName()),
 		initialise.VerifyGrant(config.DatabaseName(), config.Username()),
@@ -93,7 +102,7 @@ func initDB(db *database.DB) error {
 	if err != nil {
 		return err
 	}
-	err = initialise.VerifyZitadel(context.Background(), db, *config)
+	err = initialise.VerifyZitadel(ctx, db, *config)
 	if err != nil {
 		return err
 	}
