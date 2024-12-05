@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
         const idp = identityProviders.find((idp) => idp.id === idpId);
 
         if (idp) {
-          const host = request.nextUrl.origin;
+          const origin = request.nextUrl.origin;
 
           const identityProviderType = identityProviders[0].type;
           let provider = idpTypeToSlug(identityProviderType);
@@ -193,10 +193,10 @@ export async function GET(request: NextRequest) {
             idpId,
             urls: {
               successUrl:
-                `${host}/idp/${provider}/success?` +
+                `${origin}/idp/${provider}/success?` +
                 new URLSearchParams(params),
               failureUrl:
-                `${host}/idp/${provider}/failure?` +
+                `${origin}/idp/${provider}/failure?` +
                 new URLSearchParams(params),
             },
           }).then((resp) => {

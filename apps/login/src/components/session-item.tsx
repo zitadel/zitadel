@@ -16,12 +16,14 @@ export function isSessionValid(session: Partial<Session>): {
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const validIDP = session?.factors?.intent?.verifiedAt;
+
   const stillValid = session.expirationDate
     ? timestampDate(session.expirationDate) > new Date()
     : true;
 
-  const verifiedAt = validPassword || validPasskey;
-  const valid = !!((validPassword || validPasskey) && stillValid);
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
 
   return { valid, verifiedAt };
 }
@@ -102,14 +104,20 @@ export function SessionItem({
         />
       </div>
 
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col items-start overflow-hidden">
         <span className="">{session.factors?.user?.displayName}</span>
         <span className="text-xs opacity-80 text-ellipsis">
           {session.factors?.user?.loginName}
         </span>
-        {valid && (
+        {valid ? (
           <span className="text-xs opacity-80 text-ellipsis">
             {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
+          </span>
+        ) : (
+          <span className="text-xs opacity-80 text-ellipsis">
+            expired{" "}
+            {session.expirationDate &&
+              moment(timestampDate(session.expirationDate)).fromNow()}
           </span>
         )}
       </div>

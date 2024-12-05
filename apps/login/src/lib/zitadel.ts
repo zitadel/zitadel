@@ -504,7 +504,11 @@ export function createUser(
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function passwordReset(userId: string, host: string | null) {
+export async function passwordReset(
+  userId: string,
+  host: string | null,
+  authRequestId?: string,
+) {
   let medium = create(SendPasswordResetLinkSchema, {
     notificationType: NotificationType.Email,
   });
@@ -512,7 +516,9 @@ export async function passwordReset(userId: string, host: string | null) {
   if (host) {
     medium = {
       ...medium,
-      urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}`,
+      urlTemplate:
+        `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+        (authRequestId ? `&authRequestId=${authRequestId}` : ""),
     };
   }
 
