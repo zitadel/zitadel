@@ -109,7 +109,12 @@ jobs:
         if: ${{ matrix.command == 'test:acceptance' }}
 
       - name: Create Cloud Env File
-        run: echo "${{ matrix.command == 'test:acceptance:prod' && secrets.ENV_FILE_CONTENT_ACCEPTANCE_PROD || secrets.ENV_FILE_CONTENT_ACCEPTANCE_QA }}" | tee apps/login/.env.local acceptance/tests/.env.local > /dev/null
+        run: |
+          if [ "${{ matrix.command }}" == "test:acceptance:prod" ]; then
+            echo "${{ secrets.ENV_FILE_CONTENT_ACCEPTANCE_PROD }}" | tee apps/login/.env.local acceptance/tests/.env.local > /dev/null
+          else
+            echo "${{ secrets.ENV_FILE_CONTENT_ACCEPTANCE_QA }}" | tee apps/login/.env.local acceptance/tests/.env.local > /dev/null
+          fi
         if: ${{ matrix.command == 'test:acceptance:qa' || matrix.command == 'test:acceptance:prod' }}
 
       - name: Create Production Build
