@@ -456,13 +456,13 @@ Notifications:
   # The amount of events a single worker will process in a run.
   BulkLimit: 10 # ZITADEL_NOTIFIACATIONS_BULKLIMIT
   # Time interval between scheduled notifications for request events
-  RequeueEvery: 2s # ZITADEL_NOTIFIACATIONS_REQUEUEEVERY
+  RequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_REQUEUEEVERY
   # The amount of workers processing the notification retry events.
   # If set to 0, no notification retry events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
   RetryWorkers: 1 # ZITADEL_NOTIFIACATIONS_RETRYWORKERS
   # Time interval between scheduled notifications for retry events
-  RetryRequeueEvery: 2s # ZITADEL_NOTIFIACATIONS_RETRYREQUEUEEVERY
+  RetryRequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_RETRYREQUEUEEVERY
   # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
   # from HandleActiveInstances duration in the past until the projection's current time
   # If set to 0 (default), every instance is always considered active
@@ -470,15 +470,15 @@ Notifications:
   # The maximum duration a transaction remains open
   # before it spots left folding additional events
   # and updates the table.
-  TransactionDuration: 1m # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
+  TransactionDuration: 10s # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
   # Automatically cancel the notification after the amount of failed attempts
   MaxAttempts: 3 # ZITADEL_NOTIFIACATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
   MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
   # Failed attempts are retried after a confogired delay (with exponential backoff).
   # Set a minimum and maximum delay and a factor for the backoff
-  MinRetryDelay: 1s  # ZITADEL_NOTIFIACATIONS_MINRETRYDELAY
-  MaxRetryDelay: 20s # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
+  MinRetryDelay: 5s  # ZITADEL_NOTIFIACATIONS_MINRETRYDELAY
+  MaxRetryDelay: 1m # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
   # Any factor below 1 will be set to 1
   RetryDelayFactor: 1.5 # ZITADEL_NOTIFIACATIONS_RETRYDELAYFACTOR
 
@@ -633,6 +633,9 @@ EncryptionKeys:
   User:
     EncryptionKeyID: "userKey" # ZITADEL_ENCRYPTIONKEYS_USER_ENCRYPTIONKEYID
     DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_USER_DECRYPTIONKEYIDS (comma separated list)
+  Target:
+    EncryptionKeyID: "targetKey" # ZITADEL_ENCRYPTIONKEYS_TARGET_ENCRYPTIONKEYID
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_TARGET_DECRYPTIONKEYIDS (comma separated list)
   CSRFCookieKeyID: "csrfCookieKey" # ZITADEL_ENCRYPTIONKEYS_CSRFCOOKIEKEYID
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
@@ -910,6 +913,12 @@ DefaultInstance:
       IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEUPPERLETTERS
       IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEDIGITS
       IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDESYMBOLS
+    SigningKey:
+      Length: 36 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_LENGTH
+      IncludeLowerLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDELOWERLETTERS
+      IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDEUPPERLETTERS
+      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDEDIGITS
+      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDESYMBOLS
   PasswordComplexityPolicy:
     MinLength: 8 # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_MINLENGTH
     HasLowercase: true # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_HASLOWERCASE

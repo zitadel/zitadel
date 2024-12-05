@@ -143,7 +143,7 @@ func buildSearchCondition(builder *strings.Builder, index int, conditions map[ev
 	return args
 }
 
-func handleFieldCommands(ctx context.Context, tx database.Tx, commands []eventstore.Command) error {
+func (es *Eventstore) handleFieldCommands(ctx context.Context, tx database.Tx, commands []eventstore.Command) error {
 	for _, command := range commands {
 		if len(command.Fields()) > 0 {
 			if err := handleFieldOperations(ctx, tx, command.Fields()); err != nil {

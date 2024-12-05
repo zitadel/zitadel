@@ -165,7 +165,7 @@ func (mr *MockPusherMockRecorder) Health(arg0 any) *gomock.Call {
 }
 
 // Push mocks base method.
-func (m *MockPusher) Push(arg0 context.Context, arg1 database.QueryExecuter, arg2 ...eventstore.Command) ([]eventstore.Event, error) {
+func (m *MockPusher) Push(arg0 context.Context, arg1 database.ContextQueryExecuter, arg2 ...eventstore.Command) ([]eventstore.Event, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {

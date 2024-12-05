@@ -7,7 +7,6 @@ import (
 	"github.com/pquerna/otp"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -79,10 +78,8 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-SqyJz", "Errors.User.NotFound")
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, human.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUserCredentials(ctx, human.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	org, err := c.getOrg(ctx, human.ResourceOwner)
 	if err != nil {
@@ -139,10 +136,8 @@ func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, use
 	if err != nil {
 		return nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, existingOTP.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUserCredentials(ctx, existingOTP.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting")
@@ -242,10 +237,8 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
-	if userID != authz.GetCtxData(ctx).UserID {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUser(ctx, existingOTP.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
@@ -286,10 +279,8 @@ func (c *Commands) addHumanOTPSMS(ctx context.Context, userID, resourceOwner str
 	if err != nil {
 		return nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, otpWriteModel.ResourceOwner(), userID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUserCredentials(ctx, otpWriteModel.ResourceOwner(), userID); err != nil {
+		return nil, err
 	}
 	if otpWriteModel.otpAdded {
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady")
@@ -318,10 +309,8 @@ func (c *Commands) RemoveHumanOTPSMS(ctx context.Context, userID, resourceOwner 
 	if err != nil {
 		return nil, err
 	}
-	if userID != authz.GetCtxData(ctx).UserID {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUser(ctx, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if !existingOTP.otpAdded {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting")
@@ -420,10 +409,8 @@ func (c *Commands) addHumanOTPEmail(ctx context.Context, userID, resourceOwner s
 	if err != nil {
 		return nil, err
 	}
-	if authz.GetCtxData(ctx).UserID != userID {
-		if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, otpWriteModel.ResourceOwner(), userID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUserCredentials(ctx, otpWriteModel.ResourceOwner(), userID); err != nil {
+		return nil, err
 	}
 	if otpWriteModel.otpAdded {
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady")
@@ -452,10 +439,8 @@ func (c *Commands) RemoveHumanOTPEmail(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		return nil, err
 	}
-	if userID != authz.GetCtxData(ctx).UserID {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
-			return nil, err
-		}
+	if err := c.checkPermissionUpdateUser(ctx, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
+		return nil, err
 	}
 	if !existingOTP.otpAdded {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting")
