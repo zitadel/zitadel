@@ -3,6 +3,7 @@ package login
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -42,6 +43,17 @@ type initUserData struct {
 	HasLowercase string
 	HasNumber    string
 	HasSymbol    string
+}
+
+func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet bool, authRequestID string) string {
+	v := url.Values{}
+	v.Set(queryInitUserUserID, userID)
+	v.Set(queryInitUserLoginName, loginName)
+	v.Set(queryInitUserCode, code)
+	v.Set(queryOrgID, orgID)
+	v.Set(queryInitUserPassword, strconv.FormatBool(passwordSet))
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointInitUser + "?" + v.Encode()
 }
 
 func InitUserLinkTemplate(origin, userID, orgID, authRequestID string) string {
