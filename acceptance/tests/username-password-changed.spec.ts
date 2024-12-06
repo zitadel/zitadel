@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
@@ -12,14 +13,16 @@ dotenv.config({ path: path.resolve(__dirname, ".env.local") });
 const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {
     const user = new PasswordUser({
-      email: "password-changed@example.com",
-      firstName: "first",
-      lastName: "last",
-      password: "Password1!",
+      email: faker.internet.email(),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
       organization: "",
+      phone: faker.phone.number(),
+      password: "Password1!",
     });
     await user.ensure(page);
     await use(user);
+    await user.cleanup();
   },
 });
 
@@ -40,7 +43,7 @@ test("username and password changed login", async ({ user, page }) => {
      */
 });
 
-test("password not with desired complexity", async ({ user, page }) => {
+test("password change not with desired complexity", async ({ user, page }) => {
   const changedPw1 = "change";
   const changedPw2 = "chang";
   await loginWithPassword(page, user.getUsername(), user.getPassword());

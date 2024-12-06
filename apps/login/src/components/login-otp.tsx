@@ -95,7 +95,7 @@ export function LoginOTP({
 
     if (method === "sms") {
       challenges = create(RequestChallengesSchema, {
-        otpSms: { returnCode: true },
+        otpSms: {},
       });
     }
 
@@ -233,6 +233,7 @@ export function LoginOTP({
                     setLoading(false);
                   });
               }}
+              data-testid="resend-button"
             >
               {t("verify.resendCode")}
             </button>
@@ -245,11 +246,12 @@ export function LoginOTP({
           {...register("code", { required: "This field is required" })}
           label="Code"
           autoComplete="one-time-code"
+          data-testid="code-text-input"
         />
       </div>
 
       {error && (
-        <div className="py-4">
+        <div className="py-4" data-testid="error">
           <Alert>{error}</Alert>
         </div>
       )}
