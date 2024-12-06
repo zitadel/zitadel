@@ -405,6 +405,7 @@ func startAPIs(
 
 	config.Auth.Spooler.Client = dbClient
 	config.Auth.Spooler.Eventstore = eventstore
+	config.Auth.Spooler.ActiveInstancer = queries
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {
 		return nil, fmt.Errorf("error starting auth repo: %w", err)
@@ -412,7 +413,8 @@ func startAPIs(
 
 	config.Admin.Spooler.Client = dbClient
 	config.Admin.Spooler.Eventstore = eventstore
-	err = admin_es.Start(ctx, config.Admin, store, dbClient)
+	config.Admin.Spooler.ActiveInstancer = queries
+	err = admin_es.Start(ctx, config.Admin, store, dbClient, queries)
 	if err != nil {
 		return nil, fmt.Errorf("error starting admin repo: %w", err)
 	}
