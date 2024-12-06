@@ -6,6 +6,38 @@ This website is built using [Docusaurus 2](https://v2.docusaurus.io/), a modern 
 
 To add a new site to the already existing structure simply save the `md` file into the corresponding folder and append the sites id int the file `sidebars.js`.
 
+## Knowledge Base Articles
+
+Create a new .md file in the folder `/knowledge`
+
+```md
+---
+description: "Add a description"
+tags:
+    - FAQ
+    - subscription
+    - downgrade
+    - account-details
+---
+
+# Heading 1
+
+## Overview
+
+Provide an overview of the solution
+
+## Solution
+
+Normal Markdown text.
+**Bold Text**
+`code format``
+[example@examplemail.com](mailto:example@examplemail.com)
+```
+
+Add images to `/src/img/knowledge`
+
+Create a new category by creating a new folder. Add a `_category_.json` inside that folder and change the category title and other details.
+
 ## Installation
 
 Install dependencies with
