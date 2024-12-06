@@ -1,7 +1,6 @@
 import { Page } from "@playwright/test";
-import axios from "axios";
 import { registerWithPasskey } from "./register";
-import { getUserByUsername, removeUser } from "./zitadel";
+import { activateOTP, addTOTP, addUser, getUserByUsername, removeUser } from "./zitadel";
 
 export interface userProps {
   email: string;
@@ -9,6 +8,7 @@ export interface userProps {
   lastName: string;
   organization: string;
   password: string;
+  phone: string;
 }
 
 class User {
@@ -20,54 +20,13 @@ class User {
   }
 
   async ensure(page: Page) {
-    await this.remove();
+    const response = await addUser(this.props);
 
-    const body = {
-      username: this.props.email,
-      organization: {
-        orgId: this.props.organization,
-      },
-      profile: {
-        givenName: this.props.firstName,
-        familyName: this.props.lastName,
-      },
-      email: {
-        email: this.props.email,
-        isVerified: true,
-      },
-      password: {
-        password: this.props.password!,
-      },
-    };
-
-    try {
-      const response = await axios.post(`${process.env.ZITADEL_API_URL}/v2/users/human`, body, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
-        },
-      });
-
-      if (response.status >= 400 && response.status !== 409) {
-        const error = `HTTP Error: ${response.status} - ${response.statusText}`;
-        console.error(error);
-        throw new Error(error);
-      }
-    } catch (error) {
-      console.error("Error making request:", error);
-      throw error;
-    }
-
-    // wait for projection of user
-    await page.waitForTimeout(3000);
+    this.setUserId(response.userId);
   }
 
-  async remove() {
-    const resp: any = await getUserByUsername(this.getUsername());
-    if (!resp || !resp.result || !resp.result[0]) {
-      return;
-    }
-    await removeUser(resp.result[0].userId);
+  async cleanup() {
+    await removeUser(this.getUserId());
   }
 
   public setUserId(userId: string) {
@@ -94,12 +53,22 @@ class User {
     return this.props.lastName;
   }
 
+  public getPhone() {
+    return this.props.phone;
+  }
+
   public getFullName() {
     return `${this.props.firstName} ${this.props.lastName}`;
   }
 }
 
-export class PasswordUser extends User {}
+export class PasswordUser extends User {
+  async ensure(page: Page) {
+    await super.ensure(page);
+    // wait for projection of user
+    await page.waitForTimeout(2000);
+  }
+}
 
 export enum OtpType {
   sms = "sms",
@@ -112,12 +81,12 @@ export interface otpUserProps {
   lastName: string;
   organization: string;
   password: string;
+  phone: string;
   type: OtpType;
 }
 
 export class PasswordUserWithOTP extends User {
   private type: OtpType;
-  private code: string;
 
   constructor(props: otpUserProps) {
     super({
@@ -126,6 +95,7 @@ export class PasswordUserWithOTP extends User {
       lastName: props.lastName,
       organization: props.organization,
       password: props.password,
+      phone: props.phone,
     });
     this.type = props.type;
   }
@@ -133,47 +103,27 @@ export class PasswordUserWithOTP extends User {
   async ensure(page: Page) {
     await super.ensure(page);
 
-    let url = "otp_";
-    switch (this.type) {
-      case OtpType.sms:
-        url = url + "sms";
-        break;
-      case OtpType.email:
-        url = url + "email";
-        break;
-    }
+    await activateOTP(this.getUserId(), this.type);
 
-    try {
-      const response = await axios.post(
-        `${process.env.ZITADEL_API_URL}/v2/users/${this.getUserId()}/${url}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.ZITADEL_SERVICE_USER_TOKEN}`,
-          },
-        },
-      );
+    // wait for projection of user
+    await page.waitForTimeout(2000);
+  }
+}
 
-      if (response.status >= 400 && response.status !== 409) {
-        const error = `HTTP Error: ${response.status} - ${response.statusText}`;
-        console.error(error);
-        throw new Error(error);
-      }
+export class PasswordUserWithTOTP extends User {
+  private secret: string;
 
-      // TODO: get code from SMS or Email provider
-      this.code = "";
-    } catch (error) {
-      console.error("Error making request:", error);
-      throw error;
-    }
+  async ensure(page: Page) {
+    await super.ensure(page);
+
+    this.secret = await addTOTP(this.getUserId());
 
     // wait for projection of user
     await page.waitForTimeout(2000);
   }
 
-  public getCode() {
-    return this.code;
+  public getSecret(): string {
+    return this.secret;
   }
 }
 
@@ -182,6 +132,7 @@ export interface passkeyUserProps {
   firstName: string;
   lastName: string;
   organization: string;
+  phone: string;
 }
 
 export class PasskeyUser extends User {
@@ -194,11 +145,11 @@ export class PasskeyUser extends User {
       lastName: props.lastName,
       organization: props.organization,
       password: "",
+      phone: props.phone,
     });
   }
 
   public async ensure(page: Page) {
-    await this.remove();
     const authId = await registerWithPasskey(page, this.getFirstname(), this.getLastname(), this.getUsername());
     this.authenticatorId = authId;
 
@@ -206,8 +157,12 @@ export class PasskeyUser extends User {
     await page.waitForTimeout(2000);
   }
 
-  public async remove() {
-    await super.remove();
+  async cleanup() {
+    const resp: any = await getUserByUsername(this.getUsername());
+    if (!resp || !resp.result || !resp.result[0]) {
+      return;
+    }
+    await removeUser(resp.result[0].userId);
   }
 
   public getAuthenticatorId(): string {
