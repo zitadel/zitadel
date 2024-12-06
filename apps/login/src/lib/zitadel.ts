@@ -291,19 +291,24 @@ export async function createInviteCode(userId: string, host: string | null) {
   );
 }
 
-export async function listUsers({
-  loginName,
-  userName,
-  email,
-  organizationId,
-}: {
+export type ListUsersCommand = {
   loginName?: string;
   userName?: string;
   email?: string;
+  phone?: string;
   organizationId?: string;
-}) {
+};
+
+export async function listUsers({
+  loginName,
+  userName,
+  phone,
+  email,
+  organizationId,
+}: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
+  // either loginName or userName and email or phone are required
   if (loginName) {
     queries.push(
       create(SearchQuerySchema, {
@@ -316,9 +321,57 @@ export async function listUsers({
         },
       }),
     );
-  }
+  } else if (userName && (email || phone)) {
+    const userNameQuery = create(SearchQuerySchema, {
+      query: {
+        case: "userNameQuery",
+        value: {
+          userName: userName,
+          method: TextQueryMethod.EQUALS,
+        },
+      },
+    });
 
-  if (userName) {
+    const orQueries: SearchQuery[] = [userNameQuery];
+
+    if (email) {
+      const emailQuery = create(SearchQuerySchema, {
+        query: {
+          case: "emailQuery",
+          value: {
+            emailAddress: email,
+            method: TextQueryMethod.EQUALS,
+          },
+        },
+      });
+      orQueries.push(emailQuery);
+    }
+
+    if (phone) {
+      // TODO add after https://github.com/zitadel/zitadel/issues/9016 is merged
+      // const phoneQuery = create(SearchQuerySchema, {
+      //   query: {
+      //     case: "phoneQuery",
+      //     value: {
+      //       emailAddress: email,
+      //       method: TextQueryMethod.EQUALS,
+      //     },
+      //   },
+      // });
+      // orQueries.push(phoneQuery);
+    }
+
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "orQuery",
+          value: {
+            queries: orQueries,
+          },
+        },
+      }),
+    );
+  } else if (userName) {
     queries.push(
       create(SearchQuerySchema, {
         query: {
@@ -339,19 +392,6 @@ export async function listUsers({
           case: "organizationIdQuery",
           value: {
             organizationId,
-          },
-        },
-      }),
-    );
-  }
-
-  if (email) {
-    queries.push(
-      create(SearchQuerySchema, {
-        query: {
-          case: "emailQuery",
-          value: {
-            emailAddress: email,
           },
         },
       }),
