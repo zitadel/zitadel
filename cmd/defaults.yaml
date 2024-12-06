@@ -449,6 +449,11 @@ Projections:
       RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
 
 Notifications:
+  # Notifications can be processed by either a sequential mode (legacy) or a new parallel mode.
+  # The parallel mode is currently only recommended for Postgres databases.
+  # For CockroachDB, the sequential mode is recommended, see: https://github.com/zitadel/zitadel/issues/9002
+  # If legacy mode is enabled, the worker config below is ignored.
+  LegacyEnabled: true # ZITADEL_NOTIFICATIONS_LEGACYENABLED
   # The amount of workers processing the notification request events.
   # If set to 0, no notification request events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
