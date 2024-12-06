@@ -82,7 +82,7 @@ Features in General Availability are not marked explicitly.
 
 All release channels receive regular updates and bug fixes.
 However, the timing and frequency of updates may differ between the channels.
-The choice between the "release candidate", "latest" and "stable" release channels depends on the specific requirements, preferences, and risk tolerance of the users.
+The choice between the "release candidate", "latest" and stable release channels depends on the specific requirements, preferences, and risk tolerance of the users.
 
 [List of all releases](https://github.com/zitadel/zitadel/releases)
 
@@ -99,19 +99,6 @@ Release candidates are accessible for our open source community, but will not be
 The "latest" release channel is designed for users who prefer to access the most recent updates, features, and enhancements as soon as they become available.
 It provides early access to new functionalities and improvements but may involve a higher degree of risk as it is the most actively developed version.
 Users opting for the latest release channel should be aware that occasional bugs or issues may arise due to the ongoing development process.
-
-### Stable
-
-The "stable" release channel is intended for users seeking a more reliable and production-ready version of the software.
-It offers a well-tested and validated release with fewer known issues and a higher level of stability.
-The stable release channel undergoes rigorous quality assurance and testing processes to ensure that it meets the highest standards of reliability and performance.
-It is recommended for users who prioritize stability over immediate access to the latest features.
-
-Current Stable Version:
-
-```yaml reference
-https://github.com/zitadel/zitadel/blob/main/release-channels.yaml
-```
 
 ## Maintenance
 
