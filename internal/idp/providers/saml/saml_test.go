@@ -1,6 +1,7 @@
 package saml
 
 import (
+	"encoding/xml"
 	"testing"
 
 	"github.com/crewjam/saml"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestProvider_Options(t *testing.T) {
@@ -167,6 +169,114 @@ func TestProvider_Options(t *testing.T) {
 				a.Equal(tt.want.requesttracker, provider.requestTracker)
 				a.Equal(tt.want.entityID, provider.spOptions.EntityID)
 			}
+		})
+	}
+}
+
+func TestParseMetadata(t *testing.T) {
+	type args struct {
+		metadata []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *saml.EntityDescriptor
+		wantErr error
+	}{
+		{
+			"invalid",
+			args{
+				metadata: []byte(`<Test></Test>`),
+			},
+			nil,
+			xml.UnmarshalError("expected element type <EntityDescriptor> but have <Test>"),
+		},
+		{
+			"valid entity descriptor",
+			args{
+				metadata: []byte(`<?xml version="1.0" encoding="UTF-8"?><EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://localhost:8000/metadata"><IDPSSODescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:8000/sso"></SingleSignOnService></IDPSSODescriptor></EntityDescriptor>`),
+			},
+			&saml.EntityDescriptor{
+				EntityID: "http://localhost:8000/metadata",
+				IDPSSODescriptors: []saml.IDPSSODescriptor{
+					{
+						XMLName: xml.Name{
+							Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+							Local: "IDPSSODescriptor",
+						},
+						SingleSignOnServices: []saml.Endpoint{
+							{
+								Binding:  saml.HTTPRedirectBinding,
+								Location: "http://localhost:8000/sso",
+							},
+						},
+					},
+				},
+			},
+			nil,
+		},
+		{
+			"valid entity descriptor, non utf-8",
+			args{
+				metadata: []byte(`<?xml version="1.0" encoding="windows-1252"?><EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://localhost:8000/metadata"><IDPSSODescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:8000/sso"></SingleSignOnService></IDPSSODescriptor></EntityDescriptor>`),
+			},
+			&saml.EntityDescriptor{
+				EntityID: "http://localhost:8000/metadata",
+				IDPSSODescriptors: []saml.IDPSSODescriptor{
+					{
+						XMLName: xml.Name{
+							Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+							Local: "IDPSSODescriptor",
+						},
+						SingleSignOnServices: []saml.Endpoint{
+							{
+								Binding:  saml.HTTPRedirectBinding,
+								Location: "http://localhost:8000/sso",
+							},
+						},
+					},
+				},
+			},
+			nil,
+		},
+		{
+			"entities descriptor without IDPSSODescriptor",
+			args{
+				metadata: []byte(`<?xml version="1.0" encoding="UTF-8"?><EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"><EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://localhost:8000/metadata"></EntityDescriptor></EntitiesDescriptor>`),
+			},
+			nil,
+			zerrors.ThrowInternal(nil, "SAML-Ejoi3r2", "no entity found with IDPSSODescriptor"),
+		},
+		{
+			"valid entities descriptor",
+			args{
+				metadata: []byte(`<?xml version="1.0" encoding="UTF-8"?><EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"><EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://localhost:8000/metadata"><IDPSSODescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:8000/sso"></SingleSignOnService></IDPSSODescriptor></EntityDescriptor></EntitiesDescriptor>`),
+			},
+			&saml.EntityDescriptor{
+				EntityID: "http://localhost:8000/metadata",
+				IDPSSODescriptors: []saml.IDPSSODescriptor{
+					{
+						XMLName: xml.Name{
+							Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+							Local: "IDPSSODescriptor",
+						},
+						SingleSignOnServices: []saml.Endpoint{
+							{
+								Binding:  saml.HTTPRedirectBinding,
+								Location: "http://localhost:8000/sso",
+							},
+						},
+					},
+				},
+			},
+			nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseMetadata(tt.args.metadata)
+			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

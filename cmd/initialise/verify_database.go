@@ -1,6 +1,7 @@
 package initialise
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 
@@ -28,16 +29,16 @@ The user provided by flags needs privileges to
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
 
-			err := initialise(config.Database, VerifyDatabase(config.Database.DatabaseName()))
+			err := initialise(cmd.Context(), config.Database, VerifyDatabase(config.Database.DatabaseName()))
 			logging.OnError(err).Fatal("unable to initialize the database")
 		},
 	}
 }
 
-func VerifyDatabase(databaseName string) func(*database.DB) error {
-	return func(db *database.DB) error {
+func VerifyDatabase(databaseName string) func(context.Context, *database.DB) error {
+	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("database", databaseName).Info("verify database")
 
-		return exec(db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
+		return exec(ctx, db, fmt.Sprintf(databaseStmt, databaseName), []string{dbAlreadyExistsCode})
 	}
 }

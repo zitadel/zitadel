@@ -27,9 +27,8 @@ import (
 )
 
 const (
-	Domain = "Domain"
-	Code   = "Code"
-	OTP    = "OTP"
+	Code = "Code"
+	OTP  = "OTP"
 )
 
 type NotificationWorker struct {
@@ -105,17 +104,19 @@ func (w *NotificationWorker) Start(ctx context.Context) {
 	}
 }
 
-func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx *sql.Tx, event *notification.RequestedEvent) (err error) {
+func (w *NotificationWorker) reduceNotificationRequested(ctx, txCtx context.Context, tx *sql.Tx, event *notification.RequestedEvent) (err error) {
 	ctx = ContextWithNotifier(ctx, event.Aggregate())
 
 	// if the notification is too old, we can directly cancel
 	if event.CreatedAt().Add(w.config.MaxTtl).Before(w.now()) {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, nil)
+		return w.commands.NotificationCanceled(txCtx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, nil)
 	}
 
 	// Get the notify user first, so if anything fails afterward we have the current state of the user
 	// and can pass that to the retry request.
-	notifyUser, err := w.queries.GetNotifyUserByID(ctx, true, event.UserID)
+	// We do not trigger the projection to reduce load on the database. By the time the notification is processed,
+	// the user should be projected anyway. If not, it will just wait for the next run.
+	notifyUser, err := w.queries.GetNotifyUserByID(ctx, false, event.UserID)
 	if err != nil {
 		return err
 	}
@@ -127,17 +128,17 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 		event.Request.Args.Domain = notifyUser.LastEmail[index+1:]
 	}
 
-	err = w.sendNotification(ctx, tx, event.Request, notifyUser, event)
+	err = w.sendNotification(ctx, txCtx, tx, event.Request, notifyUser, event)
 	if err == nil {
 		return nil
 	}
 	// if retries are disabled or if the error explicitly specifies, we cancel the notification
 	if w.config.MaxAttempts <= 1 || errors.Is(err, &channels.CancelError{}) {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
+		return w.commands.NotificationCanceled(txCtx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 	// otherwise we retry after a backoff delay
 	return w.commands.NotificationRetryRequested(
-		ctx,
+		txCtx,
 		tx,
 		event.Aggregate().ID,
 		event.Aggregate().ResourceOwner,
@@ -146,49 +147,44 @@ func (w *NotificationWorker) reduceNotificationRequested(ctx context.Context, tx
 	)
 }
 
-func (w *NotificationWorker) reduceNotificationRetry(ctx context.Context, tx *sql.Tx, event *notification.RetryRequestedEvent) (err error) {
+func (w *NotificationWorker) reduceNotificationRetry(ctx, txCtx context.Context, tx *sql.Tx, event *notification.RetryRequestedEvent) (err error) {
 	ctx = ContextWithNotifier(ctx, event.Aggregate())
 
 	// if the notification is too old, we can directly cancel
 	if event.CreatedAt().Add(w.config.MaxTtl).Before(w.now()) {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
+		return w.commands.NotificationCanceled(txCtx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 
 	if event.CreatedAt().Add(event.BackOff).After(w.now()) {
 		return nil
 	}
-	err = w.sendNotification(ctx, tx, event.Request, event.NotifyUser, event)
+	err = w.sendNotification(ctx, txCtx, tx, event.Request, event.NotifyUser, event)
 	if err == nil {
 		return nil
 	}
 	// if the max attempts are reached or if the error explicitly specifies, we cancel the notification
 	if event.Sequence() >= uint64(w.config.MaxAttempts) || errors.Is(err, &channels.CancelError{}) {
-		return w.commands.NotificationCanceled(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
+		return w.commands.NotificationCanceled(txCtx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, err)
 	}
 	// otherwise we retry after a backoff delay
-	return w.commands.NotificationRetryRequested(ctx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, notificationEventToRequest(
+	return w.commands.NotificationRetryRequested(txCtx, tx, event.Aggregate().ID, event.Aggregate().ResourceOwner, notificationEventToRequest(
 		event.Request,
 		event.NotifyUser,
 		w.backOff(event.BackOff),
 	), err)
 }
 
-func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, request notification.Request, notifyUser *query.NotifyUser, e eventstore.Event) error {
+func (w *NotificationWorker) sendNotification(ctx, txCtx context.Context, tx *sql.Tx, request notification.Request, notifyUser *query.NotifyUser, e eventstore.Event) error {
 	ctx, err := enrichCtx(ctx, request.TriggeredAtOrigin)
 	if err != nil {
-		err := w.commands.NotificationCanceled(ctx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner, err)
-		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
-			OnError(err).Error("could not cancel notification")
-		return nil
+		return channels.NewCancelError(err)
 	}
 
 	// check early that a "sent" handler exists, otherwise we can cancel early
 	sentHandler, ok := sentHandlers[request.EventType]
 	if !ok {
-		err := w.commands.NotificationCanceled(ctx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner, err)
-		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
-			OnError(err).Errorf(`no "sent" handler registered for %s`, request.EventType)
-		return nil
+		logging.Errorf(`no "sent" handler registered for %s`, request.EventType)
+		return channels.NewCancelError(err)
 	}
 
 	var code string
@@ -232,7 +228,7 @@ func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, r
 	if err := notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel); err != nil {
 		return err
 	}
-	err = w.commands.NotificationSent(ctx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
+	err = w.commands.NotificationSent(txCtx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
 	if err != nil {
 		// In case the notification event cannot be pushed, we most likely cannot create a retry or cancel event.
 		// Therefore, we'll only log the error and also do not need to try to push to the user / session.
@@ -240,7 +236,7 @@ func (w *NotificationWorker) sendNotification(ctx context.Context, tx *sql.Tx, r
 			OnError(err).Error("could not set sent notification event")
 		return nil
 	}
-	err = sentHandler(ctx, w.commands, request.NotificationAggregateID(), request.NotificationAggregateResourceOwner(), generatorInfo, args)
+	err = sentHandler(txCtx, w.commands, request.NotificationAggregateID(), request.NotificationAggregateResourceOwner(), generatorInfo, args)
 	logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
 		OnError(err).Error("could not set notification event on aggregate")
 	return nil
@@ -340,7 +336,7 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 		err = database.CloseTransaction(tx, err)
 	}()
 
-	events, err := w.searchEvents(ctx, tx, retry)
+	events, err := w.searchEvents(txCtx, tx, retry)
 	if err != nil {
 		return err
 	}
@@ -359,11 +355,11 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 		var err error
 		switch e := event.(type) {
 		case *notification.RequestedEvent:
-			w.createSavepoint(ctx, tx, event, workerID, retry)
-			err = w.reduceNotificationRequested(ctx, tx, e)
+			w.createSavepoint(txCtx, tx, event, workerID, retry)
+			err = w.reduceNotificationRequested(ctx, txCtx, tx, e)
 		case *notification.RetryRequestedEvent:
-			w.createSavepoint(ctx, tx, event, workerID, retry)
-			err = w.reduceNotificationRetry(ctx, tx, e)
+			w.createSavepoint(txCtx, tx, event, workerID, retry)
+			err = w.reduceNotificationRetry(ctx, txCtx, tx, e)
 		}
 		if err != nil {
 			w.log(workerID, retry).OnError(err).
@@ -371,14 +367,20 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 				WithField("notificationID", event.Aggregate().ID).
 				WithField("sequence", event.Sequence()).
 				WithField("type", event.Type()).
-				Error("could not push notification event")
-			w.rollbackToSavepoint(ctx, tx, event, workerID, retry)
+				Error("could not handle notification event")
+			// if we have an error, we rollback to the savepoint and continue with the next event
+			// we use the txCtx to make sure we can rollback the transaction in case the ctx is canceled
+			w.rollbackToSavepoint(txCtx, tx, event, workerID, retry)
+		}
+		// if the context is canceled, we stop the processing
+		if ctx.Err() != nil {
+			return nil
 		}
 	}
 	return nil
 }
 
-func (w *NotificationWorker) latestRetries(events []eventstore.Event) {
+func (w *NotificationWorker) latestRetries(events []eventstore.Event) []eventstore.Event {
 	for i := len(events) - 1; i > 0; i-- {
 		// since we delete during the iteration, we need to make sure we don't panic
 		if len(events) <= i {
@@ -390,6 +392,7 @@ func (w *NotificationWorker) latestRetries(events []eventstore.Event) {
 				e.Sequence() < events[i].Sequence()
 		})
 	}
+	return events
 }
 
 func (w *NotificationWorker) createSavepoint(ctx context.Context, tx *sql.Tx, event eventstore.Event, workerID int, retry bool) {
@@ -453,8 +456,7 @@ func (w *NotificationWorker) searchRetryEvents(ctx context.Context, tx *sql.Tx) 
 	if err != nil {
 		return nil, err
 	}
-	w.latestRetries(events)
-	return events, nil
+	return w.latestRetries(events), nil
 }
 
 type existingInstances []string

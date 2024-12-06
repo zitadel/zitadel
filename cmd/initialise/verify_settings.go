@@ -1,6 +1,7 @@
 package initialise
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 
@@ -26,19 +27,19 @@ Cockroach
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
 
-			err := initialise(config.Database, VerifySettings(config.Database.DatabaseName(), config.Database.Username()))
+			err := initialise(cmd.Context(), config.Database, VerifySettings(config.Database.DatabaseName(), config.Database.Username()))
 			logging.OnError(err).Fatal("unable to set settings")
 		},
 	}
 }
 
-func VerifySettings(databaseName, username string) func(*database.DB) error {
-	return func(db *database.DB) error {
+func VerifySettings(databaseName, username string) func(context.Context, *database.DB) error {
+	return func(ctx context.Context, db *database.DB) error {
 		if db.Type() == "postgres" {
 			return nil
 		}
 		logging.WithFields("user", username, "database", databaseName).Info("verify settings")
 
-		return exec(db, fmt.Sprintf(settingsStmt, databaseName, username), nil)
+		return exec(ctx, db, fmt.Sprintf(settingsStmt, databaseName, username), nil)
 	}
 }

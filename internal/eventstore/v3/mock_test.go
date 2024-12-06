@@ -48,12 +48,17 @@ func (e *mockCommand) Fields() []*eventstore.FieldOperation {
 
 func mockEvent(aggregate *eventstore.Aggregate, sequence uint64, payload Payload) eventstore.Event {
 	return &event{
-		aggregate: aggregate,
-		creator:   "creator",
-		revision:  1,
-		typ:       "event.type",
-		sequence:  sequence,
-		payload:   payload,
+		command: &command{
+			InstanceID:    aggregate.InstanceID,
+			AggregateType: string(aggregate.Type),
+			AggregateID:   aggregate.ID,
+			Owner:         aggregate.ResourceOwner,
+			Creator:       "creator",
+			Revision:      1,
+			CommandType:   "event.type",
+			Payload:       payload,
+		},
+		sequence: sequence,
 	}
 }
 
@@ -63,6 +68,16 @@ func mockAggregate(id string) *eventstore.Aggregate {
 		Type:          "type",
 		ResourceOwner: "ro",
 		InstanceID:    "instance",
+		Version:       "v1",
+	}
+}
+
+func mockAggregateWithInstance(id, instance string) *eventstore.Aggregate {
+	return &eventstore.Aggregate{
+		ID:            id,
+		InstanceID:    instance,
+		Type:          "type",
+		ResourceOwner: "ro",
 		Version:       "v1",
 	}
 }

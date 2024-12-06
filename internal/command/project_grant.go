@@ -205,12 +205,6 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
 	}
-
-	err = c.checkProjectExists(ctx, projectID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
