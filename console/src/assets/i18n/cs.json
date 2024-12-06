@@ -1384,7 +1384,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1621,7 +1622,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -1722,8 +1724,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Je povoleno klasické přihlášení s uživatelským jménem a heslem.",
       "ALLOWEXTERNALIDP_DESC": "Přihlášení je povoleno pro níže uvedené poskytovatele identity.",
       "ALLOWREGISTER_DESC": "Pokud je možnost vybrána, objeví se při přihlášení další krok pro registraci uživatele.",
-      "FORCEMFA": "Vynutit MFA",
-      "FORCEMFALOCALONLY": "Vynutit MFA pouze pro lokálně ověřené uživatele",
+      "FORCEMFA": "Vynuti MFA pro všechny uživatele",
+      "FORCEMFALOCALONLY": "Vynutit MFA pouze pro místně ověřené uživatele",
       "FORCEMFALOCALONLY_DESC": "Pokud je možnost vybrána, lokálně ověření uživatelé musí pro přihlášení nastavit druhý faktor.",
       "HIDEPASSWORDRESET_DESC": "Pokud je možnost vybrána, uživatel nemůže během přihlašovacího procesu resetovat své heslo.",
       "HIDELOGINNAMESUFFIX": "Skrýt příponu přihlašovacího jména",
@@ -2572,7 +2574,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

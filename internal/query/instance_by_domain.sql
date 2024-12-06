@@ -1,6 +1,8 @@
 with domain as (
-	select instance_id from projections.instance_domains
-	where domain = $1
+	SELECT instance_id FROM eventstore.fields
+	WHERE object_type = 'instance_domain'
+	AND object_id = $1
+	AND field_name = 'domain'
 ), instance_features as (
 	select i.*
 	from domain d
