@@ -400,6 +400,9 @@ Projections:
   # from HandleActiveInstances duration in the past until the projection's current time
   # If set to 0 (default), every instance is always considered active
   HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
+  # Maximum amount of instances cached as active
+  # If set to 0, every instance is always considered active
+  MaxActiveInstances: 0 # ZITADEL_PROJECTIONS_MAXACTIVEINSTANCES
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     custom_texts:
@@ -423,11 +426,6 @@ Projections:
       TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_LOCKOUT_POLICY_TRANSACTIONDURATION
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
-      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
-      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
-      # Delivery guarantee requirements are higher for quota webhooks
-      # If set to 0 (default), every instance is always considered active
-      HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
       # As quota notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
@@ -438,17 +436,17 @@ Projections:
       BulkLimit: 50
     # The Telemetry projection is used for calling telemetry webhooks
     Telemetry:
-      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
-      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
-      # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
-      # If set to 0 (default), every instance is always considered active
-      HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_HANDLEACTIVEINSTANCES
       # As sending telemetry data doesn't result in database statements, retries don't have any effects
       MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_MAXFAILURECOUNT
       # Telemetry data synchronization is not time critical. Setting RequeueEvery to 55 minutes doesn't annoy the database too much.
       RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
 
 Notifications:
+  # Notifications can be processed by either a sequential mode (legacy) or a new parallel mode.
+  # The parallel mode is currently only recommended for Postgres databases.
+  # For CockroachDB, the sequential mode is recommended, see: https://github.com/zitadel/zitadel/issues/9002
+  # If legacy mode is enabled, the worker config below is ignored.
+  LegacyEnabled: true # ZITADEL_NOTIFICATIONS_LEGACYENABLED
   # The amount of workers processing the notification request events.
   # If set to 0, no notification request events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
@@ -492,10 +490,6 @@ Auth:
     BulkLimit: 100 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
     # See Projections.MaxFailureCount
     FailureCountUntilSkip: 5 #ZITADEL_AUTH_SPOOLER_FAILURECOUNTUNTILSKIP
-    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
-    # from HandleActiveInstances duration in the past until the projections current time
-    # If set to 0 (default), every instance is always considered active
-    HandleActiveInstances: 0s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
   # Defines the amount of auth requests stored in the LRU caches.
   # There are two caches implemented one for id and one for code
   AmountOfCachedAuthRequests: 0 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
@@ -510,10 +504,6 @@ Admin:
     BulkLimit: 200
     # See Projections.MaxFailureCount
     FailureCountUntilSkip: 5
-    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
-    # from HandleActiveInstances duration in the past until the projections current time
-    # If set to 0 (default), every instance is always considered active
-    HandleActiveInstances: 0s
 
 UserAgentCookie:
   Name: zitadel.useragent # ZITADEL_USERAGENTCOOKIE_NAME
