@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/senders"
+	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -95,8 +96,13 @@ func NewUserNotifier(
 	config handler.Config,
 	commands Commands,
 	queries *NotificationQueries,
+	channels types.ChannelChains,
 	otpEmailTmpl string,
+	legacyMode bool,
 ) *handler.Handler {
+	if legacyMode {
+		return NewUserNotifierLegacy(ctx, config, commands, queries, channels, otpEmailTmpl)
+	}
 	return handler.NewHandler(ctx, &config, &userNotifier{
 		commands:     commands,
 		queries:      queries,

@@ -1060,6 +1060,37 @@ func Test_query_events_mocked(t *testing.T) {
 				wantErr: false,
 			},
 		},
+		{
+			name: "aggregate / event type, created after and exclusion, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderDesc().
+					Limit(5).
+					CreationDateAfter(time.Unix(123, 456)).
+					AddQuery().
+					AggregateTypes("notify").
+					EventTypes("notify.foo.bar").
+					Builder().
+					ExcludeAggregateIDs().
+					AggregateTypes("notify").
+					EventTypes("notification.failed", "notification.success").
+					Builder(),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					regexp.QuoteMeta(
+						`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND created_at > $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`,
+					),
+					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), time.Unix(123, 456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", time.Unix(123, 456), uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
 	}
 	crdb := NewCRDB(&database.DB{Database: new(testDB)})
 	for _, tt := range tests {

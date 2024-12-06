@@ -43,6 +43,7 @@ type NotificationWorker struct {
 }
 
 type WorkerConfig struct {
+	LegacyEnabled       bool
 	Workers             uint8
 	BulkLimit           uint16
 	RequeueEvery        time.Duration
@@ -96,6 +97,9 @@ func NewNotificationWorker(
 }
 
 func (w *NotificationWorker) Start(ctx context.Context) {
+	if w.config.LegacyEnabled {
+		return
+	}
 	for i := 0; i < int(w.config.Workers); i++ {
 		go w.schedule(ctx, i, false)
 	}
