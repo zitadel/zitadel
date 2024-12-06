@@ -86,5 +86,6 @@ func (l *limiter) ReportResult(err error) {
 	done := <-l.inflight
 	done(err == nil ||
 		errors.Is(err, redis.Nil) ||
-		errors.Is(err, context.Canceled))
+		errors.Is(err, context.Canceled) ||
+		redis.HasErrorPrefix(err, "NOSCRIPT"))
 }
