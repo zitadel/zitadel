@@ -69,6 +69,7 @@ When the session is terminated, ZITADEL will send back-channel logout requests a
 client of the corresponding session.
 The request is an `application/x-www-form-urlencoded` POST request to the registered URI including a `logout_token`
 parameter in the body.
+
 Please be aware that body *may* contain other values in addition to logout_token. Values that are not understood by the
 implementation *must* be ignored.
 
@@ -102,3 +103,75 @@ Optionally, you can also verify that the TokenID (`jti`) has not been used befor
 
 For details on how to validate the logout token, please refer to the [OpenID Connect Back-Channel Logout specification](https://openid.net/specs/openid-connect-backchannel-1_0.html#Validation).
 
+## Example
+
+This example assumes that your application is registered with client_id `243864426485212395@example` and the back-channel logout
+URI is set to `https://example.com/logout`.
+
+### Authentication
+
+When the user signed in to your application, ZITADEL issued the following id_token:
+```
+eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NjkzMzA1NjAxNzY0Nzg3NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiIxNjQ4NDk0OTQyOTc0NzczNzciLCJhdWQiOlsiMjQzODY0NDI2NDg1MjEyMzk1QGV4YW1wbGUiLCIyNDM4NjQzODExNjk4ODY0NDMiXSwiZXhwIjoxNzMzNzgyNDQ0LCJpYXQiOjE3MzM3MzkyNDQsImF1dGhfdGltZSI6MTczMzczOTI0NCwiYW1yIjpbInVzZXIiLCJtZmEiXSwiYXpwIjoiMjQzODY0NDI2NDg1MjEyMzk1QGV4YW1wbGUiLCJjbGllbnRfaWQiOiIyNDM4NjQ0MjY0ODUyMTIzOTVAZXhhbXBsZSIsImF0X2hhc2giOiJSWVFPSkJuT01LS0hrN1VnLWY1eFJnIiwic2lkIjoiVjFfMjk3MzY0ODE4OTgwMDM0MDA0In0K.lZxHE_Z4tiaDQE-DPtYjnvb0H9rz4wMoGfBMeEm4EG837DGJb7RTq7PuMHWc4Z2e_6lilwfVBWDEOhmrnjmkQwDVxInbbJfN0NiWgeqoW-C1SZ_G00UVIbJdaxPy2-haRihDNNpy0Gjmi7q3FkGXGqkJx9S7ZtC5ISbXLnqfbRbuapoMs7hHNf-Iltf8v7dMs3K8dcAPSHJm0X0x6Cu1ZMeAS2a6H05xKXGM0bRK830AZlL8xmxTNj_q_WZKzxz304XrRNHvYRcHKmJqURSHvRNUR38QeNaiKzINlV2sVvPEY6Dru_PHSPNFu7YLWiUi34VUla6VTxy9ctI_BtI4nw
+```
+
+This represents the following claims:
+```json
+{
+  "iss": "http://localhost:8080",
+  "sub": "164849494297477377",
+  "aud": [
+    "243864426485212395@example",
+    "243864381169886443"
+  ],
+  "exp": 1733782444,
+  "iat": 1733739244,
+  "auth_time": 1733739244,
+  "amr": [
+    "user",
+    "mfa"
+  ],
+  "azp": "243864426485212395@example",
+  "client_id": "243864426485212395@example",
+  "at_hash": "RYQOJBnOMKKHk7Ug-f5xRg",
+  "sid": "V1_297364818980034004"
+}
+```
+
+As you can see, the `sid` claim is present in the token. This represents the application's specific session ID of the
+user session.
+
+
+### Sign Out and Back-Channel Logout
+
+When the user signs out from another application, ZITADEL will send a POST request to `https://example.com/logout` with
+the following body:
+
+```http
+POST /logout HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+
+logout_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NjkzMzA1NjAxNzY0Nzg3NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiIxNjQ4NDk0OTQyOTc0NzczNzciLCJhdWQiOlsiMjQzODY0NDI2NDg1MjEyMzk1QGV4YW1wbGUiXSwiaWF0IjoxNzMzNzM5MjUyLCJleHAiOjE3MzM3NDAxNTMsImp0aSI6IjI5NzM2NDgzNDQ5ODkyMTEzNyIsImV2ZW50cyI6eyJodHRwOi8vc2NoZW1hcy5vcGVuaWQubmV0L2V2ZW50L2JhY2tjaGFubmVsLWxvZ291dCI6e319LCJzaWQiOiJWMV8yOTczNjQ4MTg5ODAwMzQwMDQifQo.ELOPuS61fy8GgCKEtru5df4-9GI4-KQlNf_DMp6b5mtJZIrfykA_M7lYOxOskYhTDicBoQ2jjOjzsDqktI4r6ptD068c5LEOx-k2OVk7ybADsK7tht5omYy4tsbHmkDCZN065WMH0SQH7NKGroVW-MACi6Peuiz3nlQsfho0EnLECqhZT60qxu6qtofvBVhHe15Zlkzffy0vxjKEIeJoTmX_cNVsHlrC_n1vTqZStBrkqu3_rwZxZuynX47vf7_kj_kKhJ3TffRF561n1AP5xnhZ9i--rnaucbGtGGImlKi2sdqC4GzjtdlaKJaRuVF-91x758SLBxqJXPucroJoWw
+```
+
+```json
+{
+  "iss": "http://localhost:8080",
+  "sub": "164849494297477377",
+  "aud": [
+    "243864426485212395@example"
+  ],
+  "iat": 1733739252,
+  "exp": 1733740153,
+  "jti": "297364834498921137",
+  "events": {
+    "http://schemas.openid.net/event/backchannel-logout": {}
+  },
+  "sid": "V1_297364818980034004"
+}
+```
+
+After validating the token, the application can now invalidate the user's local session based on the `sid` claim.
+
+Some applications might also want to delete any user session. In this case, the `sub` claim can be used to identify the user.
