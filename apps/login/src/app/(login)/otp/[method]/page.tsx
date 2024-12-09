@@ -27,9 +27,14 @@ export default async function Page(props: {
     organization,
   });
 
-  const branding = await getBrandingSettings(organization);
+  // email links do not come with organization, thus we need to use the session's organization
+  const branding = await getBrandingSettings(
+    organization ?? session?.factors?.user?.organizationId,
+  );
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings(
+    organization ?? session?.factors?.user?.organizationId,
+  );
 
   const host = (await headers()).get("host");
 
