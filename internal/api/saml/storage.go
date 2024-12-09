@@ -158,16 +158,6 @@ func (p *Storage) createAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	return AuthRequestFromBusiness(resp)
 }
 
-func CreateErrorResponse(authReq models.AuthRequestInt, reason, description, uri string) (string, error) {
-	// TODO handling for errors
-	return "", nil
-}
-
-func CreateResponse(authReq models.AuthRequestInt) (string, error) {
-	// TODO handling for errors
-	return "", nil
-}
-
 func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

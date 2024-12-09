@@ -65,7 +65,7 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 	return samlRequestWriteModelToCurrentSAMLRequest(writeModel), nil
 }
 
-func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
+func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
 	writeModel, err := c.getSAMLRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -75,6 +75,9 @@ func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, 
 	}
 	if writeModel.SAMLRequestState != domain.SAMLRequestStateAdded {
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.SAMLRequest.AlreadyHandled")
+	}
+	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
+		return nil, nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.SAMLRequest.WrongLoginClient")
 	}
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
@@ -123,6 +126,7 @@ func samlRequestWriteModelToCurrentSAMLRequest(writeModel *SAMLRequestWriteModel
 	return &CurrentSAMLRequest{
 		SAMLRequest: &SAMLRequest{
 			ID:            writeModel.AggregateID,
+			LoginClient:   writeModel.LoginClient,
 			ApplicationID: writeModel.ApplicationID,
 			ACSURL:        writeModel.ACSURL,
 			RelayState:    writeModel.RelayState,

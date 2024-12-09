@@ -69,7 +69,7 @@ xtqmbthw2E9VjSk3zSYb4uFc6mv0C/kRPTDUFH+9CpQTBBx/O016hmcatxlBS6JL
 VAV6oE8sEJYHtR6YdZiMWWo=
 -----END PRIVATE KEY-----`
 
-func CreateSAMLSP(root string, idpMetadata *saml.EntityDescriptor) (*samlsp.Middleware, error) {
+func CreateSAMLSP(root string, idpMetadata *saml.EntityDescriptor, binding string) (*samlsp.Middleware, error) {
 	rootURL, err := url.Parse(root)
 	if err != nil {
 		return nil, err
@@ -83,18 +83,30 @@ func CreateSAMLSP(root string, idpMetadata *saml.EntityDescriptor) (*samlsp.Midd
 		return nil, err
 	}
 
-	return samlsp.New(samlsp.Options{
-		URL:         *rootURL,
-		Key:         keyPair.PrivateKey.(*rsa.PrivateKey),
-		Certificate: keyPair.Leaf,
-		IDPMetadata: idpMetadata,
+	sp, err := samlsp.New(samlsp.Options{
+		URL:                 *rootURL,
+		Key:                 keyPair.PrivateKey.(*rsa.PrivateKey),
+		Certificate:         keyPair.Leaf,
+		IDPMetadata:         idpMetadata,
+		UseArtifactResponse: false,
 	})
+	if err != nil {
+		return nil, err
+	}
+	sp.Binding = binding
+	sp.ResponseBinding = binding
+	return sp, nil
 }
 
 func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *samlsp.Middleware) (*management.AddSAMLAppResponse, error) {
 	spMetadata, err := xml.MarshalIndent(m.ServiceProvider.Metadata(), "", "  ")
 	if err != nil {
 		return nil, err
+	}
+
+	if m.ResponseBinding == saml.HTTPRedirectBinding {
+		metadata := strings.Replace(string(spMetadata), saml.HTTPPostBinding, saml.HTTPRedirectBinding, 2)
+		spMetadata = []byte(metadata)
 	}
 
 	resp, err := i.Client.Mgmt.AddSAMLApp(ctx, &management.AddSAMLAppRequest{
@@ -120,8 +132,8 @@ func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *sa
 	})
 }
 
-func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState string) (authRequestID string, err error) {
-	authReq, err := m.ServiceProvider.MakeAuthenticationRequest(acs.Location, acs.Binding, m.ResponseBinding)
+func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState string, responseBinding string) (authRequestID string, err error) {
+	authReq, err := m.ServiceProvider.MakeAuthenticationRequest(acs.Location, acs.Binding, responseBinding)
 	if err != nil {
 		return "", err
 	}

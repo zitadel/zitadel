@@ -50,29 +50,43 @@ func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *
 		return nil, err
 	}
 	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
-	callback, err := saml.CreateErrorResponse(authReq, errorReasonToSAML(ae.GetError()), ae.GetErrorDescription(), ae.GetErrorUri())
+	url, body, err := s.idp.CreateErrorResponse(authReq, errorReasonToSAML(ae.GetError()), ae.GetErrorDescription())
 	if err != nil {
 		return nil, err
 	}
-	return &saml_pb.CreateCallbackResponse{
-		Details:     object.DomainToDetailsPb(details),
-		CallbackUrl: callback,
-	}, nil
+	return createCallbackResponseFromBinding(details, url, body, authReq.RelayState), nil
 }
 
 func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*saml_pb.CreateCallbackResponse, error) {
-	details, _, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken())
+	details, aar, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken(), true)
 	if err != nil {
 		return nil, err
 	}
 	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
+	url, body, err := s.idp.CreateResponse(ctx, authReq)
+	if err != nil {
+		return nil, err
+	}
+	return createCallbackResponseFromBinding(details, url, body, authReq.RelayState), nil
+}
 
-	saml.CreateResponse(authReq)
-
-	return &saml_pb.CreateCallbackResponse{
+func createCallbackResponseFromBinding(details *domain.ObjectDetails, url string, body string, relayState string) *saml_pb.CreateCallbackResponse {
+	resp := &saml_pb.CreateCallbackResponse{
 		Details:     object.DomainToDetailsPb(details),
-		CallbackUrl: "",
-	}, nil
+		CallbackUrl: url,
+	}
+
+	if body != "" {
+		resp.Binding = &saml_pb.CreateCallbackResponse_Post{
+			Post: &saml_pb.PostResponse{
+				RelayState: relayState,
+				Body:       body,
+			},
+		}
+	} else {
+		resp.Binding = &saml_pb.CreateCallbackResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}}
+	}
+	return resp
 }
 
 func errorReasonToDomain(errorReason saml_pb.ErrorReason) domain.SAMLErrorReason {

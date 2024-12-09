@@ -16,6 +16,7 @@ type SAMLRequestWriteModel struct {
 	eventstore.WriteModel
 	aggregate *eventstore.Aggregate
 
+	LoginClient   string
 	ApplicationID string
 	ACSURL        string
 	RelayState    string
@@ -45,6 +46,7 @@ func (m *SAMLRequestWriteModel) Reduce() error {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *samlrequest.AddedEvent:
+			m.LoginClient = e.LoginClient
 			m.ApplicationID = e.ApplicationID
 			m.ACSURL = e.ACSURL
 			m.RelayState = e.RelayState

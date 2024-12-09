@@ -17,7 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
-	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/samlrequest"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -46,7 +45,7 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							samlrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"login",
 								"application",
 								"acs",
@@ -67,7 +66,7 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 				request: &SAMLRequest{},
 			},
 			nil,
-			zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting"),
+			zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.SAMLRequest.AlreadyExisting"),
 		},
 		{
 			"added",
@@ -75,7 +74,7 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
-						samlrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+						samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 							"login",
 							"application",
 							"acs",
@@ -159,7 +158,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 		res    res
 	}{
 		{
-			"authRequest not found",
+			"samlRequest not found",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(),
@@ -172,16 +171,16 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				sessionID: "sessionID",
 			},
 			res{
-				wantErr: zerrors.ThrowNotFound(nil, "COMMAND-jae5P", "Errors.AuthRequest.NotExisting"),
+				wantErr: zerrors.ThrowNotFound(nil, "COMMAND-jae5P", "Errors.SAMLRequest.NotExisting"),
 			},
 		},
 		{
-			"authRequest not existing",
+			"samlRequest not existing",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							samlrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"login",
 								"application",
 								"acs",
@@ -194,8 +193,8 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("id", "instanceID").Aggregate,
-								domain.OIDCErrorReasonUnspecified),
+							samlrequest.NewFailedEvent(mockCtx, &samlrequest.NewAggregate("id", "instanceID").Aggregate,
+								domain.SAMLErrorReasonUnspecified),
 						),
 					),
 				),
@@ -207,7 +206,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				sessionID: "sessionID",
 			},
 			res{
-				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled"),
+				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.SAMLRequest.AlreadyHandled"),
 			},
 		},
 		{
@@ -216,7 +215,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							samlrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"login",
 								"application",
 								"acs",
@@ -240,7 +239,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				checkLoginClient: true,
 			},
 			res{
-				wantErr: zerrors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.AuthRequest.WrongLoginClient"),
+				wantErr: zerrors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.SAMLRequest.WrongLoginClient"),
 			},
 		},
 		{
@@ -249,7 +248,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							samlrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"login",
 								"application",
 								"acs",
@@ -281,7 +280,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							samlrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"login",
 								"application",
 								"acs",
@@ -336,7 +335,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							samlrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"login",
 								"application",
 								"acs",
@@ -380,7 +379,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							samlrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"login",
 								"application",
 								"acs",
@@ -418,7 +417,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+						samlrequest.NewSessionLinkedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 							"sessionID",
 							"userID",
 							testNow,
@@ -439,6 +438,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				authReq: &CurrentSAMLRequest{
 					SAMLRequest: &SAMLRequest{
 						ID:            "V2_id",
+						LoginClient:   "login",
 						ApplicationID: "application",
 						ACSURL:        "acs",
 						RelayState:    "relaystate",
@@ -460,23 +460,16 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 								"loginClient",
-								"clientID",
-								"redirectURI",
-								"state",
-								"nonce",
-								[]string{"openid"},
-								[]string{"audience"},
-								domain.OIDCResponseTypeCode,
-								domain.OIDCResponseModeQuery,
-								nil,
-								nil,
-								nil,
-								nil,
-								nil,
-								nil,
-								true,
+								"application",
+								"acs",
+								"relaystate",
+								"request",
+								"binding",
+								"issuer",
+								"name",
+								"destination",
 							),
 						),
 					),
@@ -505,7 +498,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+						samlrequest.NewSessionLinkedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
 							"sessionID",
 							"userID",
 							testNow,
@@ -527,6 +520,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				authReq: &CurrentSAMLRequest{
 					SAMLRequest: &SAMLRequest{
 						ID:            "V2_id",
+						LoginClient:   "loginClient",
 						ApplicationID: "application",
 						ACSURL:        "acs",
 						RelayState:    "relaystate",
@@ -549,7 +543,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				eventstore:           tt.fields.eventstore(t),
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
-			details, got, err := c.LinkSessionToSAMLRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken)
+			details, got, err := c.LinkSessionToSAMLRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assertObjectDetails(t, tt.res.details, details)
 			if err == nil {
@@ -569,11 +563,11 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 	type args struct {
 		ctx    context.Context
 		id     string
-		reason domain.OIDCErrorReason
+		reason domain.SAMLErrorReason
 	}
 	type res struct {
 		details *domain.ObjectDetails
-		authReq *CurrentAuthRequest
+		samlReq *CurrentSAMLRequest
 		wantErr error
 	}
 	tests := []struct {
@@ -592,10 +586,10 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 			args{
 				ctx:    mockCtx,
 				id:     "foo",
-				reason: domain.OIDCErrorReasonLoginRequired,
+				reason: domain.SAMLErrorReasonAuthNFailed,
 			},
 			res{
-				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.AuthRequest.AlreadyHandled"),
+				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.SAMLRequest.AlreadyHandled"),
 			},
 		},
 		{
@@ -604,51 +598,44 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-								"loginClient",
-								"clientID",
-								"redirectURI",
-								"state",
-								"nonce",
-								[]string{"openid"},
-								[]string{"audience"},
-								domain.OIDCResponseTypeCode,
-								domain.OIDCResponseModeQuery,
-								nil,
-								nil,
-								nil,
-								nil,
-								nil,
-								nil,
-								true,
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"login",
+								"application",
+								"acs",
+								"relaystate",
+								"request",
+								"binding",
+								"issuer",
+								"name",
+								"destination",
 							),
 						),
 					),
 					expectPush(
-						authrequest.NewFailedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-							domain.OIDCErrorReasonLoginRequired),
+						samlrequest.NewFailedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							domain.SAMLErrorReasonAuthNFailed),
 					),
 				),
 			},
 			args{
 				ctx:    mockCtx,
 				id:     "V2_id",
-				reason: domain.OIDCErrorReasonLoginRequired,
+				reason: domain.SAMLErrorReasonAuthNFailed,
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
-				authReq: &CurrentAuthRequest{
-					AuthRequest: &AuthRequest{
-						ID:           "V2_id",
-						LoginClient:  "loginClient",
-						ClientID:     "clientID",
-						RedirectURI:  "redirectURI",
-						State:        "state",
-						Nonce:        "nonce",
-						Scope:        []string{"openid"},
-						Audience:     []string{"audience"},
-						ResponseType: domain.OIDCResponseTypeCode,
-						ResponseMode: domain.OIDCResponseModeQuery,
+				samlReq: &CurrentSAMLRequest{
+					SAMLRequest: &SAMLRequest{
+						ID:            "V2_id",
+						LoginClient:   "login",
+						ApplicationID: "application",
+						ACSURL:        "acs",
+						RelayState:    "relaystate",
+						RequestID:     "request",
+						Binding:       "binding",
+						Issuer:        "issuer",
+						IssuerName:    "name",
+						Destination:   "destination",
 					},
 				},
 			},
@@ -659,10 +646,10 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			details, got, err := c.FailAuthRequest(tt.args.ctx, tt.args.id, tt.args.reason)
+			details, got, err := c.FailSAMLRequest(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assertObjectDetails(t, tt.res.details, details)
-			assert.Equal(t, tt.res.authReq, got)
+			assert.Equal(t, tt.res.samlReq, got)
 		})
 	}
 }

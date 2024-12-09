@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -46,7 +47,9 @@ func TestServer_GetAuthRequest(t *testing.T) {
 	rootURL := "https://sp.example.com"
 	idpMetadata, err := Instance.GetSAMLIDPMetadata()
 	require.NoError(t, err)
-	spMiddleware, err := integration.CreateSAMLSP(rootURL, idpMetadata)
+	spMiddlewareRedirect, err := integration.CreateSAMLSP(rootURL, idpMetadata, saml.HTTPRedirectBinding)
+	require.NoError(t, err)
+	spMiddlewarePost, err := integration.CreateSAMLSP(rootURL, idpMetadata, saml.HTTPPostBinding)
 	require.NoError(t, err)
 
 	acsRedirect := idpMetadata.IDPSSODescriptors[0].SingleSignOnServices[0]
@@ -54,7 +57,9 @@ func TestServer_GetAuthRequest(t *testing.T) {
 
 	project, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)
-	_, err = Instance.CreateSAMLClient(CTX, project.GetId(), spMiddleware)
+	_, err = Instance.CreateSAMLClient(CTX, project.GetId(), spMiddlewareRedirect)
+	require.NoError(t, err)
+	_, err = Instance.CreateSAMLClient(CTX, project.GetId(), spMiddlewarePost)
 	require.NoError(t, err)
 
 	now := time.Now()
@@ -75,13 +80,13 @@ func TestServer_GetAuthRequest(t *testing.T) {
 		{
 			name: "success, redirect binding",
 			dep: func() (string, error) {
-				return Instance.CreateSAMLAuthRequest(spMiddleware, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress())
+				return Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 			},
 		},
 		{
 			name: "success, post binding",
 			dep: func() (string, error) {
-				return Instance.CreateSAMLAuthRequest(spMiddleware, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress())
+				return Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 			},
 		},
 	}
@@ -110,18 +115,23 @@ func TestServer_GetAuthRequest(t *testing.T) {
 }
 
 func TestServer_CreateCallback(t *testing.T) {
-	rootURL := "https://sp.example.com"
 	idpMetadata, err := Instance.GetSAMLIDPMetadata()
 	require.NoError(t, err)
-	spMiddleware, err := integration.CreateSAMLSP(rootURL, idpMetadata)
+	rootURLRedirect := "spredirect.example.com"
+	spMiddlewareRedirect, err := integration.CreateSAMLSP("https://"+rootURLRedirect, idpMetadata, saml.HTTPRedirectBinding)
+	require.NoError(t, err)
+	rootURLPost := "sppost.example.com"
+	spMiddlewarePost, err := integration.CreateSAMLSP("https://"+rootURLPost, idpMetadata, saml.HTTPPostBinding)
 	require.NoError(t, err)
 
 	acsRedirect := idpMetadata.IDPSSODescriptors[0].SingleSignOnServices[0]
-	//acsPost := idpMetadata.IDPSSODescriptors[0].SingleSignOnServices[1]
+	acsPost := idpMetadata.IDPSSODescriptors[0].SingleSignOnServices[1]
 
 	project, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)
-	_, err = Instance.CreateSAMLClient(CTX, project.GetId(), spMiddleware)
+	_, err = Instance.CreateSAMLClient(CTX, project.GetId(), spMiddlewareRedirect)
+	require.NoError(t, err)
+	_, err = Instance.CreateSAMLClient(CTX, project.GetId(), spMiddlewarePost)
 	require.NoError(t, err)
 
 	sessionResp, err := Instance.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
@@ -160,7 +170,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "session not found",
 			req: &saml_pb.CreateCallbackRequest{
 				SamlRequestId: func() string {
-					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddleware, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress())
+					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -177,7 +187,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "session token invalid",
 			req: &saml_pb.CreateCallbackRequest{
 				SamlRequestId: func() string {
-					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddleware, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress())
+					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -191,10 +201,10 @@ func TestServer_CreateCallback(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "fail callback",
+			name: "fail callback, post",
 			req: &saml_pb.CreateCallbackRequest{
 				SamlRequestId: func() string {
-					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddleware, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress())
+					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -202,12 +212,15 @@ func TestServer_CreateCallback(t *testing.T) {
 					Error: &saml_pb.AuthorizationError{
 						Error:            saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED,
 						ErrorDescription: gu.Ptr("nope"),
-						ErrorUri:         gu.Ptr("https://example.com/docs"),
 					},
 				},
 			},
 			want: &saml_pb.CreateCallbackResponse{
-				CallbackUrl: regexp.QuoteMeta(`oidcintegrationtest://callback?error=access_denied&error_description=nope&error_uri=https%3A%2F%2Fexample.com%2Fdocs&state=state`),
+				CallbackUrl: regexp.QuoteMeta(`https://` + rootURLPost + `/saml/acs`),
+				Binding: &saml_pb.CreateCallbackResponse_Post{Post: &saml_pb.PostResponse{
+					RelayState: "notempty",
+					Body:       "notempty",
+				}},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
@@ -216,10 +229,35 @@ func TestServer_CreateCallback(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "code callback",
+			name: "fail callback, redirect",
 			req: &saml_pb.CreateCallbackRequest{
 				SamlRequestId: func() string {
-					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddleware, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress())
+					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &saml_pb.CreateCallbackRequest_Error{
+					Error: &saml_pb.AuthorizationError{
+						Error:            saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED,
+						ErrorDescription: gu.Ptr("nope"),
+					},
+				},
+			},
+			want: &saml_pb.CreateCallbackResponse{
+				CallbackUrl: `https:\/\/` + rootURLRedirect + `\/saml\/acs\?SAMLResponse=(.*)&RelayState=(.*)`,
+				Binding:     &saml_pb.CreateCallbackResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.ID(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "callback, redirect",
+			req: &saml_pb.CreateCallbackRequest{
+				SamlRequestId: func() string {
+					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -231,7 +269,36 @@ func TestServer_CreateCallback(t *testing.T) {
 				},
 			},
 			want: &saml_pb.CreateCallbackResponse{
-				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
+				CallbackUrl: `https:\/\/` + rootURLRedirect + `\/saml\/acs\?SAMLResponse=(.*)&RelayState=(.*)&Signature=(.*)&SigAlg=(.*)`,
+				Binding:     &saml_pb.CreateCallbackResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.ID(),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "callback, post",
+			req: &saml_pb.CreateCallbackRequest{
+				SamlRequestId: func() string {
+					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					require.NoError(t, err)
+					return authRequestID
+				}(),
+				CallbackKind: &saml_pb.CreateCallbackRequest_Session{
+					Session: &saml_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			want: &saml_pb.CreateCallbackResponse{
+				CallbackUrl: regexp.QuoteMeta(`https://` + rootURLPost + `/saml/acs`),
+				Binding: &saml_pb.CreateCallbackResponse_Post{Post: &saml_pb.PostResponse{
+					RelayState: "notempty",
+					Body:       "notempty",
+				}},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
@@ -251,6 +318,13 @@ func TestServer_CreateCallback(t *testing.T) {
 			integration.AssertDetails(t, tt.want, got)
 			if tt.want != nil {
 				assert.Regexp(t, regexp.MustCompile(tt.want.CallbackUrl), got.GetCallbackUrl())
+				if tt.want.GetPost() != nil {
+					assert.NotEmpty(t, got.GetPost().GetRelayState())
+					assert.NotEmpty(t, got.GetPost().GetBody())
+				}
+				if tt.want.GetRedirect() != nil {
+					assert.NotNil(t, got.GetRedirect())
+				}
 			}
 		})
 	}

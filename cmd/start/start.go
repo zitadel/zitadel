@@ -529,7 +529,7 @@ func startAPIs(
 		store,
 		consolePath,
 		oidcServer.AuthCallbackURL(),
-		provider.AuthCallbackURL(samlProvider),
+		samlProvider.AuthCallbackURL(),
 		config.ExternalSecure,
 		userAgentInterceptor,
 		op.NewIssuerInterceptor(oidcServer.IssuerFromRequest).Handler,
@@ -555,7 +555,7 @@ func startAPIs(
 		return nil, err
 	}
 	// After SAML provider so that the callback endpoint can be used
-	if err := apis.RegisterService(ctx, saml_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
+	if err := apis.RegisterService(ctx, saml_v2.CreateServer(commands, queries, samlProvider, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes

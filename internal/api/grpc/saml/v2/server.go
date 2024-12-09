@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
-	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
@@ -18,7 +18,7 @@ type Server struct {
 	command *command.Commands
 	query   *query.Queries
 
-	op             *oidc.Server
+	idp            *saml.Provider
 	externalSecure bool
 }
 
@@ -27,13 +27,13 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
-	op *oidc.Server,
+	idp *saml.Provider,
 	externalSecure bool,
 ) *Server {
 	return &Server{
 		command:        command,
 		query:          query,
-		op:             op,
+		idp:            idp,
 		externalSecure: externalSecure,
 	}
 }

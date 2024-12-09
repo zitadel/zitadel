@@ -56,7 +56,6 @@ message SAMLRequest{
 message AuthorizationError {
   ErrorReason error = 1;
   optional string error_description = 2;
-  optional string error_uri = 3;
 }
 
 enum ErrorReason {

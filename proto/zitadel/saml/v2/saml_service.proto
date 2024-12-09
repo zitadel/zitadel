@@ -216,7 +216,13 @@ message CreateCallbackResponse {
   ];
   oneof binding {
     option (validate.required) = true;
-    bool redirect = 3;
-    string post = 4;
+    RedirectResponse redirect = 3;
+    PostResponse post = 4;
   }
+}
+
+message RedirectResponse{}
+message PostResponse{
+  string relay_state = 1;
+  string body = 2;
 }
