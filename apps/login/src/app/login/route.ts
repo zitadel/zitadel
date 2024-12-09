@@ -9,7 +9,7 @@ import {
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { create, timestampDate } from "@zitadel/client";
 import {
   AuthRequest,
   Prompt,
@@ -37,24 +37,51 @@ const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
-function findSession(
+function isSessionValid(session: Session): boolean {
+  const validPassword = session?.factors?.password?.verifiedAt;
+  const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const validIDP = session?.factors?.intent?.verifiedAt;
+
+  const stillValid = session.expirationDate
+    ? timestampDate(session.expirationDate) > new Date()
+    : true;
+
+  const validFactors = !!(
+    (validPassword || validPasskey || validIDP) &&
+    stillValid
+  );
+
+  return stillValid && validFactors;
+}
+
+function findValidSession(
   sessions: Session[],
   authRequest: AuthRequest,
 ): Session | undefined {
-  if (authRequest.hintUserId) {
-    console.log(`find session for hintUserId: ${authRequest.hintUserId}`);
-    return sessions.find((s) => s.factors?.user?.id === authRequest.hintUserId);
+  const validSessionsWithHint = sessions
+    .filter((s) => {
+      if (authRequest.hintUserId) {
+        return s.factors?.user?.id === authRequest.hintUserId;
+      }
+      if (authRequest.loginHint) {
+        return s.factors?.user?.loginName === authRequest.loginHint;
+      }
+      return false;
+    })
+    .filter(isSessionValid);
+
+  if (validSessionsWithHint.length === 0) {
+    return undefined;
   }
-  if (authRequest.loginHint) {
-    console.log(`find session for loginHint: ${authRequest.loginHint}`);
-    return sessions.find(
-      (s) => s.factors?.user?.loginName === authRequest.loginHint,
-    );
-  }
-  if (sessions.length) {
-    return sessions[0];
-  }
-  return undefined;
+
+  validSessionsWithHint.sort((a, b) => {
+    const dateA = a.changeDate ? timestampDate(a.changeDate).getTime() : 0;
+    const dateB = b.changeDate ? timestampDate(b.changeDate).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  // return most recently changed session
+  return sessions[0];
 }
 
 export async function GET(request: NextRequest) {
@@ -226,8 +253,8 @@ export async function GET(request: NextRequest) {
 
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
       const registerUrl = new URL("/register", request.url);
-      if (authRequest?.id) {
-        registerUrl.searchParams.set("authRequestId", authRequest?.id);
+      if (authRequest.id) {
+        registerUrl.searchParams.set("authRequestId", authRequest.id);
       }
       if (organization) {
         registerUrl.searchParams.set("organization", organization);
@@ -260,8 +287,8 @@ export async function GET(request: NextRequest) {
         }
 
         const loginNameUrl = new URL("/loginname", request.url);
-        if (authRequest?.id) {
-          loginNameUrl.searchParams.set("authRequestId", authRequest?.id);
+        if (authRequest.id) {
+          loginNameUrl.searchParams.set("authRequestId", authRequest.id);
         }
         if (authRequest.loginHint) {
           loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
@@ -272,81 +299,82 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         // NONE prompt - silent authentication
+        const selectedSession = findValidSession(sessions, authRequest);
 
-        let selectedSession = findSession(sessions, authRequest);
-
-        if (selectedSession && selectedSession.id) {
-          const cookie = sessionCookies.find(
-            (cookie) => cookie.id === selectedSession?.id,
-          );
-
-          if (cookie && cookie.id && cookie.token) {
-            const session = {
-              sessionId: cookie?.id,
-              sessionToken: cookie?.token,
-            };
-            const { callbackUrl } = await createCallback(
-              create(CreateCallbackRequestSchema, {
-                authRequestId,
-                callbackKind: {
-                  case: "session",
-                  value: create(SessionSchema, session),
-                },
-              }),
-            );
-            return NextResponse.redirect(callbackUrl);
-          } else {
-            return NextResponse.json(
-              { error: "No active session found" },
-              { status: 400 }, // TODO: check for correct status code
-            );
-          }
-        } else {
+        if (!selectedSession || !selectedSession.id) {
           return NextResponse.json(
             { error: "No active session found" },
-            { status: 400 }, // TODO: check for correct status code
+            { status: 400 },
           );
         }
-      } else {
-        // check for loginHint, userId hint sessions
-        let selectedSession = findSession(sessions, authRequest);
 
-        if (selectedSession && selectedSession.id) {
-          const cookie = sessionCookies.find(
-            (cookie) => cookie.id === selectedSession?.id,
+        const cookie = sessionCookies.find(
+          (cookie) => cookie.id === selectedSession.id,
+        );
+
+        if (!cookie || !cookie.id || !cookie.token) {
+          return NextResponse.json(
+            { error: "No active session found" },
+            { status: 400 },
           );
+        }
 
-          if (cookie && cookie.id && cookie.token) {
-            const session = {
-              sessionId: cookie?.id,
-              sessionToken: cookie?.token,
-            };
-            try {
-              const { callbackUrl } = await createCallback(
-                create(CreateCallbackRequestSchema, {
-                  authRequestId,
-                  callbackKind: {
-                    case: "session",
-                    value: create(SessionSchema, session),
-                  },
-                }),
-              );
-              if (callbackUrl) {
-                return NextResponse.redirect(callbackUrl);
-              } else {
-                console.log(
-                  "could not create callback, redirect user to choose other account",
-                );
-                return gotoAccounts();
-              }
-            } catch (error) {
-              console.error(error);
-              return gotoAccounts();
-            }
+        const session = {
+          sessionId: cookie.id,
+          sessionToken: cookie.token,
+        };
+
+        const { callbackUrl } = await createCallback(
+          create(CreateCallbackRequestSchema, {
+            authRequestId,
+            callbackKind: {
+              case: "session",
+              value: create(SessionSchema, session),
+            },
+          }),
+        );
+        return NextResponse.redirect(callbackUrl);
+      } else {
+        // check for loginHint, userId hint and valid sessions
+        let selectedSession = findValidSession(sessions, authRequest);
+
+        if (!selectedSession || !selectedSession.id) {
+          return gotoAccounts();
+        }
+
+        const cookie = sessionCookies.find(
+          (cookie) => cookie.id === selectedSession.id,
+        );
+
+        if (!cookie || !cookie.id || !cookie.token) {
+          return gotoAccounts();
+        }
+
+        const session = {
+          sessionId: cookie.id,
+          sessionToken: cookie.token,
+        };
+
+        try {
+          const { callbackUrl } = await createCallback(
+            create(CreateCallbackRequestSchema, {
+              authRequestId,
+              callbackKind: {
+                case: "session",
+                value: create(SessionSchema, session),
+              },
+            }),
+          );
+          if (callbackUrl) {
+            return NextResponse.redirect(callbackUrl);
           } else {
+            console.log(
+              "could not create callback, redirect user to choose other account",
+            );
             return gotoAccounts();
           }
-        } else {
+        } catch (error) {
+          console.error(error);
           return gotoAccounts();
         }
       }
