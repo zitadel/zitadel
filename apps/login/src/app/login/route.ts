@@ -47,6 +47,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 async function isSessionValid(session: Session): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
+    console.warn("Session has no user");
     return false;
   }
 
@@ -59,21 +60,45 @@ async function isSessionValid(session: Session): Promise<boolean> {
   const authMethods = authMethodTypes.authMethodTypes;
   if (authMethods && authMethods.includes(AuthenticationMethodType.TOTP)) {
     mfaValid = !!session.factors.totp?.verifiedAt;
+    if (!mfaValid) {
+      console.warn(
+        "Session has no valid totpEmail factor",
+        session.factors.totp?.verifiedAt,
+      );
+    }
   } else if (
     authMethods &&
     authMethods.includes(AuthenticationMethodType.OTP_EMAIL)
   ) {
     mfaValid = !!session.factors.otpEmail?.verifiedAt;
+    if (!mfaValid) {
+      console.warn(
+        "Session has no valid otpEmail factor",
+        session.factors.otpEmail?.verifiedAt,
+      );
+    }
   } else if (
     authMethods &&
     authMethods.includes(AuthenticationMethodType.OTP_SMS)
   ) {
     mfaValid = !!session.factors.otpSms?.verifiedAt;
+    if (!mfaValid) {
+      console.warn(
+        "Session has no valid otpSms factor",
+        session.factors.otpSms?.verifiedAt,
+      );
+    }
   } else if (
     authMethods &&
     authMethods.includes(AuthenticationMethodType.U2F)
   ) {
     mfaValid = !!session.factors.webAuthN?.verifiedAt;
+    if (!mfaValid) {
+      console.warn(
+        "Session has no valid u2f factor",
+        session.factors.webAuthN?.verifiedAt,
+      );
+    }
   } else {
     // only check settings if no auth methods are available, as this would require a setup
     const loginSettings = await getLoginSettings(
@@ -87,6 +112,12 @@ async function isSessionValid(session: Session): Promise<boolean> {
 
       // must have one single check
       mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
+      if (!mfaValid) {
+        console.warn(
+          "Session has no valid multifactor",
+          JSON.stringify(session.factors),
+        );
+      }
     } else {
       mfaValid = true;
     }
@@ -97,12 +128,21 @@ async function isSessionValid(session: Session): Promise<boolean> {
   const validIDP = session?.factors?.intent?.verifiedAt;
 
   const stillValid = session.expirationDate
-    ? timestampDate(session.expirationDate) > new Date()
+    ? timestampDate(session.expirationDate).getTime() > new Date().getTime()
     : true;
 
-  const validFactors = !!(validPassword || validPasskey || validIDP);
+  if (!stillValid) {
+    console.warn(
+      "Session is expired",
+      session.expirationDate
+        ? timestampDate(session.expirationDate).toDateString()
+        : "no expiration date",
+    );
+  }
 
-  return stillValid && validFactors && mfaValid;
+  const validChecks = !!(validPassword || validPasskey || validIDP);
+
+  return stillValid && validChecks && mfaValid;
 }
 
 async function findValidSession(
