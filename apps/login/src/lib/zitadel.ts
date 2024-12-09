@@ -445,11 +445,6 @@ export async function verifyEmail(userId: string, verificationCode: string) {
   );
 }
 
-/**
- *
- * @param userId the id of the user where the email should be set
- * @returns the newly set email
- */
 export async function resendEmailCode(userId: string) {
   return userService.resendEmailCode(
     {
