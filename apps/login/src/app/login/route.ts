@@ -66,7 +66,7 @@ function findValidSession(
       if (authRequest.loginHint) {
         return s.factors?.user?.loginName === authRequest.loginHint;
       }
-      return false;
+      return true;
     })
     .filter(isSessionValid);
 
