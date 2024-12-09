@@ -114,11 +114,13 @@ export function SessionItem({
             {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
           </span>
         ) : (
-          <span className="text-xs opacity-80 text-ellipsis">
-            expired{" "}
-            {session.expirationDate &&
-              moment(timestampDate(session.expirationDate)).fromNow()}
-          </span>
+          verifiedAt && (
+            <span className="text-xs opacity-80 text-ellipsis">
+              expired{" "}
+              {session.expirationDate &&
+                moment(timestampDate(session.expirationDate)).fromNow()}
+            </span>
+          )
         )}
       </div>
 

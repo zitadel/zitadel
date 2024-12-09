@@ -269,6 +269,10 @@ export async function GET(request: NextRequest) {
       if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
         return gotoAccounts();
       } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
+        /**
+         * The login prompt instructs the authentication server to prompt the user for re-authentication, regardless of whether the user is already authenticated
+         */
+
         // if a hint is provided, skip loginname page and jump to the next page
         if (authRequest.loginHint) {
           try {
@@ -299,7 +303,11 @@ export async function GET(request: NextRequest) {
         }
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
-        // NONE prompt - silent authentication
+        /**
+         * With an OIDC none prompt, the authentication server must not display any authentication or consent user interface pages.
+         * This means that the user should not be prompted to enter their password again.
+         * Instead, the server attempts to silently authenticate the user using an existing session or other authentication mechanisms that do not require user interaction
+         **/
         const selectedSession = findValidSession(sessions, authRequest);
 
         if (!selectedSession || !selectedSession.id) {
