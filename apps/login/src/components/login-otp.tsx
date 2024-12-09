@@ -182,6 +182,9 @@ export function LoginOTP({
 
   function setCodeAndContinue(values: Inputs, organization?: string) {
     return submitCode(values, organization).then(async (response) => {
+      // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       if (response) {
         const url =
           authRequestId && response.sessionId
