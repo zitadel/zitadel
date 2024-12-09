@@ -221,6 +221,7 @@ export function LoginOTP({
             <button
               aria-label="Resend OTP Code"
               disabled={loading}
+              type="button"
               className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
               onClick={() => {
                 setLoading(true);
