@@ -244,16 +244,27 @@ export async function GET(request: NextRequest) {
       } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
         // if a hint is provided, skip loginname page and jump to the next page
         if (authRequest.loginHint) {
-          return sendLoginname({
-            loginName: authRequest.loginHint,
-            organization,
-            authRequestId: authRequest.id,
-          });
+          try {
+            const res = await sendLoginname({
+              loginName: authRequest.loginHint,
+              organization,
+              authRequestId: authRequest.id,
+            });
+
+            if (res?.redirect) {
+              return NextResponse.redirect(res.redirect);
+            }
+          } catch (error) {
+            console.error("Failed to execute sendLoginname:", error);
+          }
         }
 
         const loginNameUrl = new URL("/loginname", request.url);
         if (authRequest?.id) {
           loginNameUrl.searchParams.set("authRequestId", authRequest?.id);
+        }
+        if (authRequest.loginHint) {
+          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
         }
         if (organization) {
           loginNameUrl.searchParams.set("organization", organization);
