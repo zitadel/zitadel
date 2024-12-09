@@ -7,6 +7,7 @@ import {
   getAuthRequest,
   getLoginSettings,
   getOrgsByDomain,
+  listAuthenticationMethodTypes,
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
@@ -20,6 +21,7 @@ import {
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -42,14 +44,38 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
-async function isSessionValid(
-  session: Session,
-  checkLoginSettings?: boolean,
-): Promise<boolean> {
-  let mfaValid = true;
-  if (checkLoginSettings && session.factors?.user?.organizationId) {
-    // TODO: check for auth methods of the user to know if the session has all required mfa methods
+async function isSessionValid(session: Session): Promise<boolean> {
+  // session can't be checked without user
+  if (!session.factors?.user) {
+    return false;
+  }
 
+  let mfaValid = true;
+
+  const authMethodTypes = await listAuthenticationMethodTypes(
+    session.factors.user.id,
+  );
+
+  const authMethods = authMethodTypes.authMethodTypes;
+  if (authMethods && authMethods.includes(AuthenticationMethodType.TOTP)) {
+    mfaValid = !!session.factors.totp?.verifiedAt;
+  } else if (
+    authMethods &&
+    authMethods.includes(AuthenticationMethodType.OTP_EMAIL)
+  ) {
+    mfaValid = !!session.factors.otpEmail?.verifiedAt;
+  } else if (
+    authMethods &&
+    authMethods.includes(AuthenticationMethodType.OTP_SMS)
+  ) {
+    mfaValid = !!session.factors.otpSms?.verifiedAt;
+  } else if (
+    authMethods &&
+    authMethods.includes(AuthenticationMethodType.U2F)
+  ) {
+    mfaValid = !!session.factors.webAuthN?.verifiedAt;
+  } else {
+    // only check settings if no auth methods are available, as this would require a setup
     const loginSettings = await getLoginSettings(
       session.factors?.user?.organizationId,
     );
@@ -106,7 +132,7 @@ async function findValidSession(
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
-    if (await isSessionValid(session, true)) {
+    if (await isSessionValid(session)) {
       return session;
     }
   }
@@ -142,7 +168,7 @@ export async function GET(request: NextRequest) {
     if (selectedSession && selectedSession.id) {
       console.log(`Found session ${selectedSession.id}`);
 
-      const isValid = await isSessionValid(selectedSession, true);
+      const isValid = await isSessionValid(selectedSession);
 
       if (isValid) {
         const cookie = sessionCookies.find(
