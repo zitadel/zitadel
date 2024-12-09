@@ -1,6 +1,6 @@
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
-import { sendLoginname } from "@/lib/server/loginname";
+import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
 import {
   createCallback,
   getActiveIdentityProviders,
@@ -276,11 +276,16 @@ export async function GET(request: NextRequest) {
         // if a hint is provided, skip loginname page and jump to the next page
         if (authRequest.loginHint) {
           try {
-            const res = await sendLoginname({
+            let command: SendLoginnameCommand = {
               loginName: authRequest.loginHint,
-              organization,
               authRequestId: authRequest.id,
-            });
+            };
+
+            if (organization) {
+              command = { ...command, organization };
+            }
+
+            const res = await sendLoginname(command);
 
             if (res?.redirect) {
               const absoluteUrl = new URL(res.redirect, request.url);
