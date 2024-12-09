@@ -134,6 +134,7 @@ message IdentityProvider {
   string id = 1;
   string name = 2;
   IdentityProviderType type = 3;
+  bool is_linking_allowed = 4;
 }
 
 enum IdentityProviderType {

@@ -69,6 +69,7 @@ var (
 	DeviceAuthProjection                *handler.Handler
 	SessionProjection                   *handler.Handler
 	AuthRequestProjection               *handler.Handler
+	SamlRequestProjection               *handler.Handler
 	MilestoneProjection                 *handler.Handler
 	QuotaProjection                     *quotaProjection
 	LimitsProjection                    *handler.Handler
@@ -157,6 +158,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	DeviceAuthProjection = newDeviceAuthProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["device_auth"]))
 	SessionProjection = newSessionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sessions"]))
 	AuthRequestProjection = newAuthRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["auth_requests"]))
+	SamlRequestProjection = newSamlRequestProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["saml_requests"]))
 	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]))
 	QuotaProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
 	LimitsProjection = newLimitsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["limits"]))
@@ -286,6 +288,7 @@ func newProjectionsList() {
 		DeviceAuthProjection,
 		SessionProjection,
 		AuthRequestProjection,
+		SamlRequestProjection,
 		MilestoneProjection,
 		QuotaProjection.handler,
 		LimitsProjection,
