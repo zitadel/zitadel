@@ -74,6 +74,7 @@ function findValidSession(
     return undefined;
   }
 
+  // sort by change date descending
   validSessionsWithHint.sort((a, b) => {
     const dateA = a.changeDate ? timestampDate(a.changeDate).getTime() : 0;
     const dateB = b.changeDate ? timestampDate(b.changeDate).getTime() : 0;
