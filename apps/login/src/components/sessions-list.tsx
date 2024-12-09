@@ -29,6 +29,7 @@ export function SessionsList({ sessions, authRequestId }: Props) {
             : 0;
           return dateB - dateA;
         })
+        // TODO: add sorting to move invalid sessions to the bottom
         .map((session, index) => {
           return (
             <SessionItem

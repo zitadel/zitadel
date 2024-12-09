@@ -5,6 +5,7 @@ import {
   createCallback,
   getActiveIdentityProviders,
   getAuthRequest,
+  getLoginSettings,
   getOrgsByDomain,
   listSessions,
   startIdentityProviderFlow,
@@ -37,7 +38,32 @@ const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
 const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
-function isSessionValid(session: Session): boolean {
+/**
+ * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
+ * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
+ **/
+async function isSessionValid(
+  session: Session,
+  checkLoginSettings?: boolean,
+): Promise<boolean> {
+  let mfaValid = true;
+  if (checkLoginSettings && session.factors?.user?.organizationId) {
+    const loginSettings = await getLoginSettings(
+      session.factors?.user?.organizationId,
+    );
+    if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
+      const otpEmail = session.factors.otpEmail?.verifiedAt;
+      const otpSms = session.factors.otpSms?.verifiedAt;
+      const totp = session.factors.totp?.verifiedAt;
+      const webAuthN = session.factors.webAuthN?.verifiedAt;
+
+      // must have one single check
+      mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
+    } else {
+      mfaValid = true;
+    }
+  }
+
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
   const validIDP = session?.factors?.intent?.verifiedAt;
@@ -46,43 +72,44 @@ function isSessionValid(session: Session): boolean {
     ? timestampDate(session.expirationDate) > new Date()
     : true;
 
-  const validFactors = !!(
-    (validPassword || validPasskey || validIDP) &&
-    stillValid
-  );
+  const validFactors = !!(validPassword || validPasskey || validIDP);
 
-  return stillValid && validFactors;
+  return stillValid && validFactors && mfaValid;
 }
 
-function findValidSession(
+async function findValidSession(
   sessions: Session[],
   authRequest: AuthRequest,
-): Session | undefined {
-  const validSessionsWithHint = sessions
-    .filter((s) => {
-      if (authRequest.hintUserId) {
-        return s.factors?.user?.id === authRequest.hintUserId;
-      }
-      if (authRequest.loginHint) {
-        return s.factors?.user?.loginName === authRequest.loginHint;
-      }
-      return true;
-    })
-    .filter(isSessionValid);
+): Promise<Session | undefined> {
+  const sessionsWithHint = sessions.filter((s) => {
+    if (authRequest.hintUserId) {
+      return s.factors?.user?.id === authRequest.hintUserId;
+    }
+    if (authRequest.loginHint) {
+      return s.factors?.user?.loginName === authRequest.loginHint;
+    }
+    return true;
+  });
 
-  if (validSessionsWithHint.length === 0) {
+  if (sessionsWithHint.length === 0) {
     return undefined;
   }
 
   // sort by change date descending
-  validSessionsWithHint.sort((a, b) => {
+  sessionsWithHint.sort((a, b) => {
     const dateA = a.changeDate ? timestampDate(a.changeDate).getTime() : 0;
     const dateB = b.changeDate ? timestampDate(b.changeDate).getTime() : 0;
     return dateB - dateA;
   });
 
-  // return most recently changed session
-  return sessions[0];
+  // return the first valid session according to settings
+  for (const session of sessionsWithHint) {
+    if (await isSessionValid(session, true)) {
+      return session;
+    }
+  }
+
+  return undefined;
 }
 
 export async function GET(request: NextRequest) {
@@ -103,53 +130,51 @@ export async function GET(request: NextRequest) {
     sessions = await loadSessions(ids);
   }
 
-  /**
-   * TODO: before automatically redirecting to the callbackUrl, check if the session is still valid
-   * possible scenaio:
-   * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
-   * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
-   **/
-
   if (authRequestId && sessionId) {
     console.log(
       `Login with session: ${sessionId} and authRequest: ${authRequestId}`,
     );
 
-    let selectedSession = sessions.find((s) => s.id === sessionId);
+    const selectedSession = sessions.find((s) => s.id === sessionId);
 
     if (selectedSession && selectedSession.id) {
       console.log(`Found session ${selectedSession.id}`);
-      const cookie = sessionCookies.find(
-        (cookie) => cookie.id === selectedSession?.id,
-      );
 
-      if (cookie && cookie.id && cookie.token) {
-        const session = {
-          sessionId: cookie?.id,
-          sessionToken: cookie?.token,
-        };
+      const isValid = await isSessionValid(selectedSession, true);
 
-        // works not with _rsc request
-        try {
-          const { callbackUrl } = await createCallback(
-            create(CreateCallbackRequestSchema, {
-              authRequestId,
-              callbackKind: {
-                case: "session",
-                value: create(SessionSchema, session),
-              },
-            }),
-          );
-          if (callbackUrl) {
-            return NextResponse.redirect(callbackUrl);
-          } else {
-            return NextResponse.json(
-              { error: "An error occurred!" },
-              { status: 500 },
+      if (isValid) {
+        const cookie = sessionCookies.find(
+          (cookie) => cookie.id === selectedSession?.id,
+        );
+
+        if (cookie && cookie.id && cookie.token) {
+          const session = {
+            sessionId: cookie?.id,
+            sessionToken: cookie?.token,
+          };
+
+          // works not with _rsc request
+          try {
+            const { callbackUrl } = await createCallback(
+              create(CreateCallbackRequestSchema, {
+                authRequestId,
+                callbackKind: {
+                  case: "session",
+                  value: create(SessionSchema, session),
+                },
+              }),
             );
+            if (callbackUrl) {
+              return NextResponse.redirect(callbackUrl);
+            } else {
+              return NextResponse.json(
+                { error: "An error occurred!" },
+                { status: 500 },
+              );
+            }
+          } catch (error) {
+            return NextResponse.json({ error }, { status: 500 });
           }
-        } catch (error) {
-          return NextResponse.json({ error }, { status: 500 });
         }
       }
     }
@@ -314,7 +339,7 @@ export async function GET(request: NextRequest) {
          * This means that the user should not be prompted to enter their password again.
          * Instead, the server attempts to silently authenticate the user using an existing session or other authentication mechanisms that do not require user interaction
          **/
-        const selectedSession = findValidSession(sessions, authRequest);
+        const selectedSession = await findValidSession(sessions, authRequest);
 
         if (!selectedSession || !selectedSession.id) {
           return NextResponse.json(
@@ -351,7 +376,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(callbackUrl);
       } else {
         // check for loginHint, userId hint and valid sessions
-        let selectedSession = findValidSession(sessions, authRequest);
+        let selectedSession = await findValidSession(sessions, authRequest);
 
         if (!selectedSession || !selectedSession.id) {
           return gotoAccounts();
