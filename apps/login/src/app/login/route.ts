@@ -48,6 +48,8 @@ async function isSessionValid(
 ): Promise<boolean> {
   let mfaValid = true;
   if (checkLoginSettings && session.factors?.user?.organizationId) {
+    // TODO: check for auth methods of the user to know if the session has all required mfa methods
+
     const loginSettings = await getLoginSettings(
       session.factors?.user?.organizationId,
     );
@@ -172,8 +174,33 @@ export async function GET(request: NextRequest) {
                 { status: 500 },
               );
             }
-          } catch (error) {
-            return NextResponse.json({ error }, { status: 500 });
+          } catch (error: unknown) {
+            // handle already handled gracefully as these could come up if old emails with authRequestId are used (reset password, register emails etc.)
+            console.error(error);
+            if (
+              error &&
+              typeof error === "object" &&
+              "code" in error &&
+              error?.code === 9
+            ) {
+              const signedinUrl = new URL("/signedin", request.url);
+
+              if (selectedSession.factors?.user?.loginName) {
+                signedinUrl.searchParams.set(
+                  "loginName",
+                  selectedSession.factors?.user?.loginName,
+                );
+              }
+              if (selectedSession.factors?.user?.organizationId) {
+                signedinUrl.searchParams.set(
+                  "organization",
+                  selectedSession.factors?.user?.organizationId,
+                );
+              }
+              return NextResponse.redirect(signedinUrl);
+            } else {
+              return NextResponse.json({ error }, { status: 500 });
+            }
           }
         }
       }
