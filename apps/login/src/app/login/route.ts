@@ -1,5 +1,6 @@
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
+import { sendLoginname } from "@/lib/server/loginname";
 import {
   createCallback,
   getActiveIdentityProviders,
@@ -241,13 +242,18 @@ export async function GET(request: NextRequest) {
       if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
         return gotoAccounts();
       } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
-        // if prompt is login
+        // if a hint is provided, skip loginname page and jump to the next page
+        if (authRequest.loginHint) {
+          return sendLoginname({
+            loginName: authRequest.loginHint,
+            organization,
+            authRequestId: authRequest.id,
+          });
+        }
+
         const loginNameUrl = new URL("/loginname", request.url);
         if (authRequest?.id) {
           loginNameUrl.searchParams.set("authRequestId", authRequest?.id);
-        }
-        if (authRequest.loginHint) {
-          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
         }
         if (organization) {
           loginNameUrl.searchParams.set("organization", organization);
