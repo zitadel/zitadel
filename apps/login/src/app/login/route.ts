@@ -279,7 +279,8 @@ export async function GET(request: NextRequest) {
             });
 
             if (res?.redirect) {
-              return NextResponse.redirect(res.redirect);
+              const absoluteUrl = new URL(res.redirect, request.url);
+              return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
             console.error("Failed to execute sendLoginname:", error);
