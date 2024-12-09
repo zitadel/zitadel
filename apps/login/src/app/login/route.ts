@@ -183,6 +183,14 @@ export async function GET(request: NextRequest) {
               "code" in error &&
               error?.code === 9
             ) {
+              const loginSettings = await getLoginSettings(
+                selectedSession.factors?.user?.organizationId,
+              );
+
+              if (loginSettings?.defaultRedirectUri) {
+                return NextResponse.redirect(loginSettings.defaultRedirectUri);
+              }
+
               const signedinUrl = new URL("/signedin", request.url);
 
               if (selectedSession.factors?.user?.loginName) {
