@@ -2,6 +2,7 @@ package object
 
 import (
 	"context"
+	user_pb "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -68,5 +69,52 @@ func TextMethodToQuery(method object.TextQueryMethod) query.TextComparison {
 		return query.TextEndsWithIgnoreCase
 	default:
 		return -1
+	}
+}
+
+func AuthMethodsToPb(mfas *query.AuthMethods) []*user_pb.AuthFactor {
+	factors := make([]*user_pb.AuthFactor, len(mfas.AuthMethods))
+	for i, mfa := range mfas.AuthMethods {
+		factors[i] = AuthMethodToPb(mfa)
+	}
+	return factors
+}
+
+func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
+	factor := &user_pb.AuthFactor{
+		State: MFAStateToPb(mfa.State),
+	}
+	switch mfa.Type {
+	case domain.UserAuthMethodTypeTOTP:
+		factor.Type = &user_pb.AuthFactor_Otp{
+			Otp: &user_pb.AuthFactorOTP{},
+		}
+	case domain.UserAuthMethodTypeU2F:
+		factor.Type = &user_pb.AuthFactor_U2F{
+			U2F: &user_pb.AuthFactorU2F{
+				Id:   mfa.TokenID,
+				Name: mfa.Name,
+			},
+		}
+	case domain.UserAuthMethodTypeOTPSMS:
+		factor.Type = &user_pb.AuthFactor_OtpSms{
+			OtpSms: &user_pb.AuthFactorOTPSMS{},
+		}
+	case domain.UserAuthMethodTypeOTPEmail:
+		factor.Type = &user_pb.AuthFactor_OtpEmail{
+			OtpEmail: &user_pb.AuthFactorOTPEmail{},
+		}
+	}
+	return factor
+}
+
+func MFAStateToPb(state domain.MFAState) user_pb.AuthFactorState {
+	switch state {
+	case domain.MFAStateNotReady:
+		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY
+	case domain.MFAStateReady:
+		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_READY
+	default:
+		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	}
 }
