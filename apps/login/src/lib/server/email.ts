@@ -84,8 +84,8 @@ type resendVerifyEmailCommand = {
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
   return command.isInvite
-    ? resendEmailCode(command.userId)
-    : resendInviteCode(command.userId);
+    ? resendInviteCode(command.userId)
+    : resendEmailCode(command.userId);
 }
 
 export async function sendVerificationRedirectWithoutCheck(command: {

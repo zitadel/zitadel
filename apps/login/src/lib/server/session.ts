@@ -15,7 +15,6 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
 import {
   getMostRecentSessionCookie,
@@ -108,7 +107,7 @@ export async function continueWithSession({
           )
         : null;
   if (url) {
-    return redirect(url);
+    return { redirect: url };
   }
 }
 
