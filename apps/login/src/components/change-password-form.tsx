@@ -12,6 +12,7 @@ import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { Alert } from "./alert";
@@ -44,6 +45,7 @@ export function ChangePasswordForm({
   organization,
 }: Props) {
   const t = useTranslations("password");
+  const router = useRouter();
 
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -105,6 +107,14 @@ export function ChangePasswordForm({
     ) {
       setError(passwordResponse.error);
       return;
+    }
+
+    if (
+      passwordResponse &&
+      "redirect" in passwordResponse &&
+      passwordResponse.redirect
+    ) {
+      return router.push(passwordResponse.redirect);
     }
 
     return;
