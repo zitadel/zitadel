@@ -1,0 +1,99 @@
+## Summary
+
+The tests showed heavy database load by time by the first two database queries. These queries need to be analyzed further.
+
+## Performance test results
+
+| Metric                                | Value |
+|-:-------------------------------------|-:-----|
+| Baseline                              | none  |
+| Purpose                               | Test current performance |
+| Test start                            | 15:39 UTC |
+| Test duration                         | 30min |
+| Executed test                         | machine\_jwt\_profile\_grant |
+| k6 version                            | v0.54.0 |
+| VUs                                   | 150 |
+| Client location                       | US1 |
+| ZITADEL location                      | US1 |
+| ZITADEL container specification       | vCPU: 2<br/> Memory: 512 Mib <br/>Container count: 5 |
+| ZITADEL Version                       | v2.66.0 |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: ["IMPROVED_PERFORMANCE_ORG_BY_ID", "IMPROVED_PERFORMANCE_PROJECT", "IMPROVED_PERFORMANCE_USER_GRANT", "IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED", "IMPROVED_PERFORMANCE_PROJECT_GRANT"] |
+| Database                              | type: psql<br />version: v15 |
+| Database location                     | US1 |
+| Database specification                | vCPU: 8<br/> memory: 32Gib |
+| ZITADEL metrics during test           | - |
+| Observed errors                       | - |
+| Top 3 most expensive database queries | 1: SELECT owner, created_at, "sequence", position FROM eventstore.push($1::eventstore.command[])<br/>2: SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 AND event_type = ANY($4) ORDER BY "sequence"<br/>3: WITH usr AS ( SELECT u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, n.login_name AS preferred_login_name FROM projections.users13 u LEFT JOIN projections.login_names3 n ON u.id = n.user_id AND u.instance_id = n.instance_id WHERE u.id = $1 AND u.state = $4 AND u.instance_id = $2 AND n.is_primary = $5 ), human AS ( SELECT $1 AS user_id, row_to_json(r) AS human FROM ( SELECT first_name, last_name, nick_name, display_name, avatar_key, preferred_language, gender, email, is_email_verified, phone, is_phone_verified FROM projections.users13_humans WHERE user_id = $1 AND instance_id = $2 ) r ), machine AS ( SELECT $1 AS user_id, row_to_json(r) AS machine FROM ( SELECT name, description FROM projections.users13_machines WHERE user_id = $1 AND instance_id = $2 ) r ), METADATA AS ( SELECT json_agg(row_to_json(r)) AS METADATA FROM ( SELECT creation_date, change_date, sequence, resource_owner, KEY, encode(value, $6) AS value FROM projections.user_metadata5 WHERE user_id = $1 AND instance_id = $2 ) r ), user_grants AS ( SELECT id, grant_id, state, creation_date, change_date, sequence, user_id, roles, resource_owner, project_id FROM projections.user_grants5 WHERE user_id = $1 AND instance_id = $2 AND project_id = ANY($3) AND state = $7 ), orgs AS ( SELECT id, name, primary_domain FROM projections.orgs1 WHERE id IN ( SELECT resource_owner FROM user_grants UNION SELECT resource_owner FROM usr ) AND instance_id = $2 ), user_org AS ( SELECT row_to_json(r) AS ORGANIZATION FROM ( SELECT o.id, o.name, o.primary_domain FROM orgs o JOIN usr u ON o.id = u.resource_owner ) r ), grants AS ( SELECT json_agg(row_to_json(r)) AS grants FROM ( SELECT g.*, o.name AS org_name, o.primary_domain AS org_primary_domain, p.name AS project_name, u.resource_owner AS user_resource_owner FROM user_grants g LEFT JOIN orgs o ON o.id = g.resource_owner LEFT JOIN projections.projects4 p ON p.id = g.project_id LEFT JOIN usr u ON u.id = g.user_id WHERE p.instance_id = $2 ) r ) SELECT json_build_object( $8, ( SELECT row_<br/> |
+| k6 Iterations per second              | 439 |
+| k6 output                             | [output](#k6-output) |
+| flowchart outcome                     | Scale out |
+
+## Endpoint latencies
+
+import OutputSource from "!!raw-loader!./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+     ✓ openid configuration
+     ✗ token status ok
+      ↳  99% — ✓ 790655 / ✗ 5
+     ✗ access token returned
+      ↳  99% — ✓ 790655 / ✗ 5
+
+     █ setup
+
+       ✓ user defined
+       ✓ authorize status ok
+       ✓ login name status ok
+       ✓ login shows password page
+       ✓ password status ok
+       ✓ password callback
+       ✓ code set
+       ✓ token status ok
+       ✓ access token created
+       ✓ id token created
+       ✓ info created
+       ✓ org created
+       ✓ create user is status ok
+       ✓ generate machine key status ok
+
+     █ teardown
+
+       ✓ org removed
+
+     checks...............................: 99.99% ✓ 1581773    ✗ 10    
+     data_received........................: 1.1 GB 623 kB/s
+     data_sent............................: 628 MB 347 kB/s
+     http_req_blocked.....................: min=167ns    avg=20.68µs  max=493.59ms p(50)=468ns    p(95)=717ns    p(99)=928ns   
+     http_req_connecting..................: min=0s       avg=10.06µs  max=388.27ms p(50)=0s       p(95)=0s       p(99)=0s      
+     http_req_duration....................: min=17.71ms  avg=337.34ms max=16.27s   p(50)=249.03ms p(95)=888.75ms p(99)=1.4s    
+       { expected_response:true }.........: min=17.71ms  avg=337.29ms max=3.56s    p(50)=249.03ms p(95)=888.7ms  p(99)=1.4s    
+     http_req_failed......................: 0.00%  ✓ 5          ✗ 791265
+     http_req_receiving...................: min=25.49µs  avg=1.58ms   max=539.43ms p(50)=89.69µs  p(95)=7.55ms   p(99)=23.46ms 
+     http_req_sending.....................: min=22.7µs   avg=69.14µs  max=480.23ms p(50)=59.16µs  p(95)=85.15µs  p(99)=129.88µs
+     http_req_tls_handshaking.............: min=0s       avg=9.38µs   max=98.15ms  p(50)=0s       p(95)=0s       p(99)=0s      
+     http_req_waiting.....................: min=15.11ms  avg=335.69ms max=16.26s   p(50)=246.91ms p(95)=888.27ms p(99)=1.4s    
+     http_reqs............................: 791270 437.256468/s
+     iteration_duration...................: min=32.28ms  avg=341.46ms max=16.27s   p(50)=253ms    p(95)=892.49ms p(99)=1.41s   
+     iterations...........................: 790660 436.919382/s
+     login_ui_enter_login_name_duration...: min=179.27ms avg=179.27ms max=179.27ms p(50)=179.27ms p(95)=179.27ms p(99)=179.27ms
+     login_ui_enter_password_duration.....: min=17.71ms  avg=17.71ms  max=17.71ms  p(50)=17.71ms  p(95)=17.71ms  p(99)=17.71ms 
+     login_ui_init_login_duration.........: min=77.66ms  avg=77.66ms  max=77.66ms  p(50)=77.66ms  p(95)=77.66ms  p(99)=77.66ms 
+     login_ui_token_duration..............: min=86.79ms  avg=86.79ms  max=86.79ms  p(50)=86.79ms  p(95)=86.79ms  p(99)=86.79ms 
+     oidc_token_duration..................: min=28.38ms  avg=337.54ms max=16.27s   p(50)=249.17ms p(95)=889.01ms p(99)=1.4s    
+     org_create_org_duration..............: min=44.94ms  avg=44.94ms  max=44.94ms  p(50)=44.94ms  p(95)=44.94ms  p(99)=44.94ms 
+     user_add_machine_key_duration........: min=38.11ms  avg=66.64ms  max=160.59ms p(50)=60.28ms  p(95)=104.99ms p(99)=112.5ms 
+     user_create_machine_duration.........: min=37.12ms  avg=122.76ms max=1.03s    p(50)=78.25ms  p(95)=266.95ms p(99)=306.94ms
+     vus..................................: 150    min=0        max=150 
+     vus_max..............................: 150    min=150      max=150 
+
+
+running (30m09.6s), 000/150 VUs, 790660 complete and 0 interrupted iterations
+default ✓ [======================================] 150 VUs  30m0s
+```
+
