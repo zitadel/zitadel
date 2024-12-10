@@ -276,11 +276,58 @@ message Passkey {
   ];
 }
 
+message AuthFactor {
+  AuthFactorState state = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the auth factor";
+    }
+  ];
+  oneof type {
+    AuthFactorOTP otp = 2 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "one type use OTP, OTPSMS, OTPEmail or U2F"
+      }
+    ];
+    AuthFactorU2F u2f = 3 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "one type use OTP, OTPSMS, OTPEmail or U2F"
+      }
+    ];
+    AuthFactorOTPSMS otp_sms = 4 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "one type use OTP, OTPSMS, OTPEmail or U2F"
+      }
+    ];
+    AuthFactorOTPEmail otp_email = 5 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "one type use OTP, OTPSMS, OTPEmail or U2F"
+      }
+    ];
+  }
+}
+
 enum AuthFactorState {
   AUTH_FACTOR_STATE_UNSPECIFIED = 0;
   AUTH_FACTOR_STATE_NOT_READY = 1;
   AUTH_FACTOR_STATE_READY = 2;
   AUTH_FACTOR_STATE_REMOVED = 3;
+}
+
+message AuthFactorOTP {}
+message AuthFactorOTPSMS {}
+message AuthFactorOTPEmail {}
+
+message AuthFactorU2F {
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  string name = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"fido key\""
+    }
+  ];
 }
 
 message SendInviteCode {
