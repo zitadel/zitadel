@@ -59,7 +59,7 @@ export function LoginOTP({
   });
 
   useEffect(() => {
-    if (!initialized.current && ["email", "sms"].includes(method)) {
+    if (!initialized.current && ["email", "sms"].includes(method) && !code) {
       initialized.current = true;
       setLoading(true);
       updateSessionForOTPChallenge()
