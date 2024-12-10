@@ -22,13 +22,13 @@ The tests showed heavy database load by time by the first two database queries. 
 | ZITADEL location                      | US1 |
 | ZITADEL container specification       | vCPU: 2<br/> Memory: 512 Mib <br/>Container count: 5 |
 | ZITADEL Version                       | v2.66.0 |
-| ZITADEL feature flags                 | webKey: true, improvedPerformance: \["IMPROVED_PERFORMANCE_ORG_BY_ID", "IMPROVED_PERFORMANCE_PROJECT", "IMPROVED_PERFORMANCE_USER_GRANT", "IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED", "IMPROVED_PERFORMANCE_PROJECT_GRANT"\] |
+| ZITADEL feature flags                 | webKey: true, improvedPerformance: \[\"IMPROVED\_PERFORMANCE\_ORG\_BY\_ID\", \"IMPROVED\_PERFORMANCE\_PROJECT\", \"IMPROVED\_PERFORMANCE\_USER\_GRANT\", \"IMPROVED\_PERFORMANCE\_ORG\_DOMAIN\_VERIFIED\", \"IMPROVED\_PERFORMANCE\_PROJECT\_GRANT\"\] |
 | Database                              | type: psql<br />version: v15.8 |
 | Database location                     | US1 |
 | Database specification                | vCPU: 8<br/> memory: 32Gib |
 | ZITADEL metrics during test           | - |
 | Observed errors                       | - |
-| Top 3 most expensive database queries | 1: Write events using the newly added eventstore.push function<br/>2: Query events by instance_id, aggregate_type, aggregate_id, event_types<br/>3: Query user<br/> |
+| Top 3 most expensive database queries | 1: Write events using the newly added eventstore.push function<br/>2: Query events by instance\_id, aggregate\_type, aggregate\_id, event\_types<br/>3: Query user<br/> |
 | k6 Iterations per second              | 439 |
 | k6 output                             | [output](#k6-output) |
 | flowchart outcome                     | Scale out |
