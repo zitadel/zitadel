@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"net/http"
@@ -238,7 +239,7 @@ Actions:
 			v := viper.New()
 			v.SetConfigType("yaml")
 			require.NoError(t, v.ReadConfig(strings.NewReader(tt.args.yaml)))
-			got := MustNewConfig(v)
+			got, _ := MustNewConfig(context.Background(), v)
 			tt.want(t, got)
 		})
 	}
