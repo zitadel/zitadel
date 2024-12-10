@@ -1,6 +1,7 @@
 package start
 
 import (
+	"context"
 	"log/slog"
 	"time"
 
@@ -88,7 +89,7 @@ type QuotasConfig struct {
 	Execution *logstore.EmitterConfig
 }
 
-func MustNewConfig(v *viper.Viper) *Config {
+func MustNewConfig(ctx context.Context, v *viper.Viper) (*Config, context.Context) {
 	config := new(Config)
 
 	err := v.Unmarshal(config,
@@ -117,7 +118,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 		"version": build.Version(),
 	}
 
-	slog.SetDefault(config.Log.Slog())
+	logger := config.Log.Slog()
+	slog.SetDefault(logger)
+	loggerCtx := logging.ToContext(ctx, logger)
 
 	err = config.Tracing.NewTracer()
 	logging.OnError(err).Fatal("unable to set tracer")
@@ -131,5 +134,5 @@ func MustNewConfig(v *viper.Viper) *Config {
 	id.Configure(config.Machine)
 	actions.SetHTTPConfig(&config.Actions.HTTP)
 
-	return config
+	return config, loggerCtx
 }

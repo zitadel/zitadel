@@ -2,6 +2,7 @@ package setup
 
 import (
 	"bytes"
+	"context"
 	"log/slog"
 	"strings"
 	"time"
@@ -63,7 +64,7 @@ type InitProjections struct {
 	BulkLimit        uint64
 }
 
-func MustNewConfig(v *viper.Viper) *Config {
+func MustNewConfig(ctx context.Context, v *viper.Viper) (*Config, context.Context) {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
@@ -89,11 +90,13 @@ func MustNewConfig(v *viper.Viper) *Config {
 		"version": build.Version(),
 	}
 
-	slog.SetDefault(config.Log.Slog())
+	logger := config.Log.Slog()
+	slog.SetDefault(logger)
+	loggerCtx := logging.ToContext(ctx, logger)
 
 	id.Configure(config.Machine)
 
-	return config
+	return config, loggerCtx
 }
 
 type Steps struct {

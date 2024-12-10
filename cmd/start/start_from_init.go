@@ -34,13 +34,13 @@ Requirements:
 			err = setup.BindInitProjections(cmd)
 			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
 
-			setupConfig := setup.MustNewConfig(viper.GetViper())
+			setupConfig, ctx := setup.MustNewConfig(cmd.Context(), viper.GetViper())
 			setupSteps := setup.MustNewSteps(viper.New())
-			setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
+			setup.Setup(ctx, setupConfig, setupSteps, masterKey)
 
-			startConfig := MustNewConfig(viper.GetViper())
+			startConfig, ctx := MustNewConfig(ctx, viper.GetViper())
 
-			err = startZitadel(cmd.Context(), startConfig, masterKey, server)
+			err = startZitadel(ctx, startConfig, masterKey, server)
 			logging.OnError(err).Fatal("unable to start zitadel")
 		},
 	}

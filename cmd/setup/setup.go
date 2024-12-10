@@ -64,13 +64,13 @@ Requirements:
 			err = bindForMirror(cmd)
 			logging.OnError(err).Fatal("unable to bind \"for-mirror\" flag")
 
-			config := MustNewConfig(viper.GetViper())
+			config, ctx := MustNewConfig(cmd.Context(), viper.GetViper())
 			steps := MustNewSteps(viper.New())
 
 			masterKey, err := key.MasterKey(cmd)
 			logging.OnError(err).Panic("No master key provided")
 
-			Setup(cmd.Context(), config, steps, masterKey)
+			Setup(ctx, config, steps, masterKey)
 		},
 	}
 

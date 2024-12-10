@@ -109,12 +109,12 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			config := MustNewConfig(viper.GetViper())
+			config, ctx := MustNewConfig(cmd.Context(), viper.GetViper())
 			masterKey, err := key.MasterKey(cmd)
 			if err != nil {
 				return err
 			}
-			return startZitadel(cmd.Context(), config, masterKey, server)
+			return startZitadel(ctx, config, masterKey, server)
 		},
 	}
 
