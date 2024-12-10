@@ -184,7 +184,7 @@ export function LoginOTP({
     return submitCode(values, organization).then(async (response) => {
       setLoading(true);
       // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
-      await new Promise((resolve) => setTimeout(resolve, 4000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       if (response) {
         const url =
