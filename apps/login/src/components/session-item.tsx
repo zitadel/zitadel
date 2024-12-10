@@ -140,6 +140,7 @@ export function SessionItem({
           className="hidden group-hover:block h-5 w-5 transition-all opacity-50 hover:opacity-100"
           onClick={(event) => {
             event.preventDefault();
+            event.stopPropagation();
             clearSession(session.id).then(() => {
               reload();
             });
