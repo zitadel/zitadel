@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -175,6 +177,168 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			}
 			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestServer_GetActiveIdentityProviders(t *testing.T) {
+	instance := integration.NewInstance(CTX)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	instance.AddGenericOAuthProvider(isolatedIAMOwnerCTX, gofakeit.AppName()) // inactive
+	idpActiveName := gofakeit.AppName()
+	idpActiveResp := instance.AddGenericOAuthProvider(isolatedIAMOwnerCTX, idpActiveName)
+	instance.AddProviderToDefaultLoginPolicy(isolatedIAMOwnerCTX, idpActiveResp.GetId())
+	idpLinkingDisallowedName := gofakeit.AppName()
+	idpLinkingDisallowedResp := instance.AddGenericOAuthProviderWithOptions(isolatedIAMOwnerCTX, idpLinkingDisallowedName, false, true)
+	instance.AddProviderToDefaultLoginPolicy(isolatedIAMOwnerCTX, idpLinkingDisallowedResp.GetId())
+	idpCreationDisallowedName := gofakeit.AppName()
+	idpCreationDisallowedResp := instance.AddGenericOAuthProviderWithOptions(isolatedIAMOwnerCTX, idpCreationDisallowedName, true, false)
+	instance.AddProviderToDefaultLoginPolicy(isolatedIAMOwnerCTX, idpCreationDisallowedResp.GetId())
+
+	type args struct {
+		ctx context.Context
+		req *settings.GetActiveIdentityProvidersRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *settings.GetActiveIdentityProvidersResponse
+		wantErr bool
+	}{
+		{
+			name: "permission error",
+			args: args{
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeLogin),
+				req: &settings.GetActiveIdentityProvidersRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "success, all",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &settings.GetActiveIdentityProvidersRequest{},
+			},
+			want: &settings.GetActiveIdentityProvidersResponse{
+				Details: &object_pb.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				IdentityProviders: []*settings.IdentityProvider{
+					{
+						Id:   idpActiveResp.GetId(),
+						Name: idpActiveName,
+						Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+					},
+					{
+						Id:   idpLinkingDisallowedResp.GetId(),
+						Name: idpLinkingDisallowedName,
+						Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+					},
+					{
+						Id:   idpCreationDisallowedResp.GetId(),
+						Name: idpCreationDisallowedName,
+						Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+					},
+				},
+			},
+		},
+		{
+			name: "success, exclude linking disallowed",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &settings.GetActiveIdentityProvidersRequest{
+					ExcludeLinkingDisallowed: gu.Ptr(true),
+				},
+			},
+			want: &settings.GetActiveIdentityProvidersResponse{
+				Details: &object_pb.ListDetails{
+					TotalResult: 2,
+					Timestamp:   timestamppb.Now(),
+				},
+				IdentityProviders: []*settings.IdentityProvider{
+					{
+						Id:   idpActiveResp.GetId(),
+						Name: idpActiveName,
+						Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+					},
+					{
+						Id:   idpCreationDisallowedResp.GetId(),
+						Name: idpCreationDisallowedName,
+						Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+					},
+				},
+			},
+		},
+		{
+			name: "success, exclude creation disallowed",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &settings.GetActiveIdentityProvidersRequest{
+					ExcludeCreationDisallowed: gu.Ptr(true),
+				},
+			},
+			want: &settings.GetActiveIdentityProvidersResponse{
+				Details: &object_pb.ListDetails{
+					TotalResult: 2,
+					Timestamp:   timestamppb.Now(),
+				},
+				IdentityProviders: []*settings.IdentityProvider{
+					{
+						Id:   idpActiveResp.GetId(),
+						Name: idpActiveName,
+						Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+					},
+					{
+						Id:   idpLinkingDisallowedResp.GetId(),
+						Name: idpLinkingDisallowedName,
+						Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+					},
+				},
+			},
+		},
+		{
+			name: "success, exclude creation and linking disallowed",
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &settings.GetActiveIdentityProvidersRequest{
+					ExcludeLinkingDisallowed:  gu.Ptr(true),
+					ExcludeCreationDisallowed: gu.Ptr(true),
+				},
+			},
+			want: &settings.GetActiveIdentityProvidersResponse{
+				Details: &object_pb.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				IdentityProviders: []*settings.IdentityProvider{
+					{
+						Id:   idpActiveResp.GetId(),
+						Name: idpActiveName,
+						Type: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_OAUTH,
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)
+			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
+				got, err := instance.Client.SettingsV2.GetActiveIdentityProviders(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ct, err)
+					return
+				}
+				if !assert.NoError(ct, err) {
+					return
+				}
+				for i, result := range tt.want.GetIdentityProviders() {
+					assert.EqualExportedValues(ct, result, got.GetIdentityProviders()[i])
+				}
+				integration.AssertListDetails(ct, tt.want, got)
+			}, retryDuration, tick)
 		})
 	}
 }

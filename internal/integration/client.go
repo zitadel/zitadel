@@ -379,7 +379,18 @@ func (i *Instance) SetUserPassword(ctx context.Context, userID, password string,
 	return resp.GetDetails()
 }
 
+func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id string) {
+	_, err := i.Client.Admin.AddIDPToLoginPolicy(ctx, &admin.AddIDPToLoginPolicyRequest{
+		IdpId: id,
+	})
+	logging.OnError(err).Panic("add provider to default login policy")
+}
+
 func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *admin.AddGenericOAuthProviderResponse {
+	return i.AddGenericOAuthProviderWithOptions(ctx, name, true, true)
+}
+
+func (i *Instance) AddGenericOAuthProviderWithOptions(ctx context.Context, name string, isLinkingAllowed, isCreationAllowed bool) *admin.AddGenericOAuthProviderResponse {
 	resp, err := i.Client.Admin.AddGenericOAuthProvider(ctx, &admin.AddGenericOAuthProviderRequest{
 		Name:                  name,
 		ClientId:              "clientID",
@@ -390,8 +401,8 @@ func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *ad
 		Scopes:                []string{"openid", "profile", "email"},
 		IdAttribute:           "id",
 		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  true,
-			IsCreationAllowed: true,
+			IsLinkingAllowed:  isLinkingAllowed,
+			IsCreationAllowed: isCreationAllowed,
 			IsAutoCreation:    true,
 			IsAutoUpdate:      true,
 			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,

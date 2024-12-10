@@ -120,7 +120,12 @@ func (s *Server) GetLockoutSettings(ctx context.Context, req *settings.GetLockou
 }
 
 func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.GetActiveIdentityProvidersRequest) (*settings.GetActiveIdentityProvidersResponse, error) {
-	links, err := s.query.IDPLoginPolicyLinks(ctx, object.ResourceOwnerFromReq(ctx, req.GetCtx()), &query.IDPLoginPolicyLinksSearchQuery{}, false)
+	queries, err := activeIdentityProvidersToQuery(req.GetExcludeCreationDisallowed(), req.GetExcludeLinkingDisallowed())
+	if err != nil {
+		return nil, err
+	}
+
+	links, err := s.query.IDPLoginPolicyLinks(ctx, object.ResourceOwnerFromReq(ctx, req.GetCtx()), &query.IDPLoginPolicyLinksSearchQuery{Queries: queries}, false)
 	if err != nil {
 		return nil, err
 	}
@@ -129,6 +134,25 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.G
 		Details:           object.ToListDetails(links.SearchResponse),
 		IdentityProviders: identityProvidersToPb(links.Links),
 	}, nil
+}
+
+func activeIdentityProvidersToQuery(excludeCreationDisallowed bool, exlcudeLinkingDisallowed bool) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, 0)
+	if excludeCreationDisallowed {
+		creationQuery, err := query.NewIDPTemplateIsCreationAllowedSearchQuery(true)
+		if err != nil {
+			return nil, err
+		}
+		q = append(q, creationQuery)
+	}
+	if exlcudeLinkingDisallowed {
+		creationQuery, err := query.NewIDPTemplateIsLinkingAllowedSearchQuery(true)
+		if err != nil {
+			return nil, err
+		}
+		q = append(q, creationQuery)
+	}
+	return q, nil
 }
 
 func (s *Server) GetGeneralSettings(ctx context.Context, _ *settings.GetGeneralSettingsRequest) (*settings.GetGeneralSettingsResponse, error) {

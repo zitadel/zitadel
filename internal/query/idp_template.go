@@ -825,6 +825,14 @@ func NewIDPTemplateResourceOwnerListSearchQuery(ids ...string) (SearchQuery, err
 	return NewListQuery(IDPTemplateResourceOwnerCol, list, ListIn)
 }
 
+func NewIDPTemplateIsCreationAllowedSearchQuery(value bool) (SearchQuery, error) {
+	return NewBoolQuery(IDPTemplateIsCreationAllowedCol, value)
+}
+
+func NewIDPTemplateIsLinkingAllowedSearchQuery(value bool) (SearchQuery, error) {
+	return NewBoolQuery(IDPTemplateIsLinkingAllowedCol, value)
+}
+
 func (q *IDPTemplateSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
