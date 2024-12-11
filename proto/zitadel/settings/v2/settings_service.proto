@@ -324,7 +324,7 @@ service SettingsService {
     };
   }
 
-// Get the security settings
+  // Get the security settings
   rpc GetSecuritySettings(GetSecuritySettingsRequest) returns (GetSecuritySettingsResponse) {
     option (google.api.http) = {
       get: "/v2/settings/security";
@@ -343,7 +343,7 @@ service SettingsService {
     };
   }
 
-// Set the security settings
+  // Set the security settings
   rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
     option (google.api.http) = {
       put: "/v2/policies/security";
@@ -429,6 +429,10 @@ message GetLockoutSettingsResponse {
 
 message GetActiveIdentityProvidersRequest {
   zitadel.object.v2.RequestContext ctx = 1;
+  optional bool creation_allowed = 2;
+  optional bool linking_allowed = 3;
+  optional bool auto_creation = 4;
+  optional bool auto_linking = 5;
 }
 
 message GetActiveIdentityProvidersResponse {
