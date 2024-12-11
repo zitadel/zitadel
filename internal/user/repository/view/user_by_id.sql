@@ -42,6 +42,7 @@ SELECT
     , h.gender
     , h.email
     , h.is_email_verified
+    , n.verified_email
     , h.phone
     , h.is_phone_verified
     , (SELECT COALESCE((SELECT state FROM auth_methods WHERE method_type = 1), 0)) AS otp_state
@@ -77,6 +78,9 @@ FROM projections.users13 u
     LEFT JOIN projections.users13_humans h
         ON u.instance_id = h.instance_id
         AND u.id = h.user_id
+    LEFT JOIN projections.users13_notifications n
+        ON u.instance_id = n.instance_id
+        AND u.id = n.user_id
     LEFT JOIN projections.login_names3 l
         ON u.instance_id = l.instance_id
         AND u.id = l.user_id

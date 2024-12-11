@@ -1081,6 +1081,15 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		}
 	}
 
+	// If the user never had a verified email, we need to verify it.
+	// This prevents situations, where OTP email is the only MFA method and no verified email is set.
+	// If the user had a verified email, but change it and has not yet verified the new one, we'll verify it after we checked the MFA methods.
+	if user.VerifiedEmail == "" && !user.IsEmailVerified {
+		return append(steps, &domain.VerifyEMailStep{
+			InitPassword: !user.PasswordSet && len(idps.Links) == 0,
+		}), nil
+	}
+
 	step, ok, err := repo.mfaChecked(userSession, request, user, isInternalLogin && len(request.LinkingUsers) == 0)
 	if err != nil {
 		return nil, err
