@@ -155,6 +155,7 @@ func (c *SAMLSessionEvents) SetSAMLRequestFailed(ctx context.Context, samlReques
 }
 
 func (c *SAMLSessionEvents) AddSAMLResponse(ctx context.Context, id string, lifetime time.Duration) error {
+	c.samlResponseID = id
 	c.events = append(c.events, samlsession.NewSAMLResponseAddedEvent(ctx, c.samlSessionWriteModel.aggregate, id, lifetime))
 	return nil
 }

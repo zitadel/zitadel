@@ -47,7 +47,6 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 	}
 	type res struct {
 		session *SAMLSession
-		state   string
 		err     error
 	}
 	tests := []struct {

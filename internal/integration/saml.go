@@ -184,24 +184,3 @@ func (i *Instance) GetSAMLIDPMetadata() (*saml.EntityDescriptor, error) {
 func (i *Instance) Issuer() string {
 	return http_util.BuildHTTP(i.Domain, i.Config.Port, i.Config.Secure)
 }
-
-func (i *Instance) getSAMLSPCertificate() (*saml.EntityDescriptor, error) {
-	idpEntityID := i.Issuer() + "/saml/v2/metadata"
-	resp, err := http.Get(idpEntityID)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	entityDescriptor := new(saml.EntityDescriptor)
-	if err := xml.Unmarshal(data, entityDescriptor); err != nil {
-		return nil, err
-	}
-
-	return entityDescriptor, nil
-}

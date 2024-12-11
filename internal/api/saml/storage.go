@@ -106,21 +106,12 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
 		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
 	}
-
-	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
-	if !ok {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-sd436", "no user agent id")
-	}
-
-	resp, err := p.repo.CreateAuthRequest(ctx, CreateAuthRequestToBusiness(ctx, req, acsUrl, protocolBinding, applicationID, relayState, userAgentID))
-	if err != nil {
-		return nil, err
-	}
-
-	return AuthRequestFromBusiness(resp)
+	return p.createAuthRequest(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
 }
 
-func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID, loginClient string) (models.AuthRequestInt, error) {
+func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID, loginClient string) (_ models.AuthRequestInt, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	samlRequest := &command.SAMLRequest{
 		ApplicationID: applicationID,
 		ACSURL:        acsUrl,
