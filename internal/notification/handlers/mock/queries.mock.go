@@ -46,6 +46,20 @@ func (m *MockQueries) EXPECT() *MockQueriesMockRecorder {
 	return m.recorder
 }
 
+// ActiveInstances mocks base method.
+func (m *MockQueries) ActiveInstances() []string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ActiveInstances")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// ActiveInstances indicates an expected call of ActiveInstances.
+func (mr *MockQueriesMockRecorder) ActiveInstances() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActiveInstances", reflect.TypeOf((*MockQueries)(nil).ActiveInstances))
+}
+
 // ActiveLabelPolicyByOrg mocks base method.
 func (m *MockQueries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.LabelPolicy, error) {
 	m.ctrl.T.Helper()

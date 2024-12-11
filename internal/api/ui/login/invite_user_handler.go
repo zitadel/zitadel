@@ -3,6 +3,7 @@ package login
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -38,6 +39,16 @@ type inviteUserData struct {
 	HasLowercase string
 	HasNumber    string
 	HasSymbol    string
+}
+
+func InviteUserLink(origin, userID, loginName, code, orgID string, authRequestID string) string {
+	v := url.Values{}
+	v.Set(queryInviteUserUserID, userID)
+	v.Set(queryInviteUserLoginName, loginName)
+	v.Set(queryInviteUserCode, code)
+	v.Set(queryOrgID, orgID)
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointInviteUser + "?" + v.Encode()
 }
 
 func InviteUserLinkTemplate(origin, userID, orgID string, authRequestID string) string {

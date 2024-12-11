@@ -1620,7 +1620,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -1720,8 +1721,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "De conventionele login met gebruikersnaam en wachtwoord is toegestaan.",
       "ALLOWEXTERNALIDP_DESC": "De login is toegestaan voor de onderliggende identiteitsproviders",
       "ALLOWREGISTER_DESC": "Als de optie is geselecteerd, verschijnt er een extra stap voor het registreren van een gebruiker in het login proces.",
-      "FORCEMFA": "Forceer MFA",
-      "FORCEMFALOCALONLY": "Forceer MFA voor lokaal geauthenticeerde gebruikers",
+      "FORCEMFA": "MFA afdwingen voor alle gebruikers",
+      "FORCEMFALOCALONLY": "MFA alleen afdwingen voor lokaal geverifieerde gebruikers",
       "FORCEMFALOCALONLY_DESC": "Als de optie is geselecteerd, moeten lokaal geauthenticeerde gebruikers een tweede factor configureren voor login.",
       "HIDEPASSWORDRESET_DESC": "Als de optie is geselecteerd, kan de gebruiker zijn wachtwoord niet resetten in het login proces.",
       "HIDELOGINNAMESUFFIX": "Verberg Inlognaam achtervoegsel",
@@ -2580,7 +2581,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

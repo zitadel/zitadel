@@ -1383,7 +1383,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1620,7 +1621,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверката на имейл е извършена",
@@ -1720,8 +1722,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Разрешено е конвенционалното влизане с потребителско име и парола.",
       "ALLOWEXTERNALIDP_DESC": "Входът е разрешен за основните доставчици на самоличност",
       "ALLOWREGISTER_DESC": "Ако опцията е избрана, в входа се появява допълнителна стъпка за регистрация на потребител.",
-      "FORCEMFA": "Сила MFA",
-      "FORCEMFALOCALONLY": "Принудително MFA за локални потребители",
+      "FORCEMFA": "Наложи MFA за всички потребители",
+      "FORCEMFALOCALONLY": "Наложи MFA само за локално автентифицирани потребители",
       "FORCEMFALOCALONLY_DESC": "Ако е избрана опцията, локалните удостоверени потребители трябва да конфигурират втори фактор за влизане.",
       "HIDEPASSWORDRESET_DESC": "Ако опцията е избрана, потребителят не може да нулира паролата си в процеса на влизане.",
       "HIDELOGINNAMESUFFIX": "Скриване на суфикса на името за влизане",
@@ -2559,7 +2561,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Добавяне на мениджър",
