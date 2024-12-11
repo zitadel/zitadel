@@ -46,8 +46,7 @@ func TestCommands_CreateSAMLSessionFromSAMLRequest(t *testing.T) {
 		samlResponseLifetime time.Duration
 	}
 	type res struct {
-		session *SAMLSession
-		err     error
+		err error
 	}
 	tests := []struct {
 		name   string
