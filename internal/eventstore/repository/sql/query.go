@@ -285,7 +285,7 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 
 	excludeAggregateIDs := query.ExcludeAggregateIDs
 	if len(excludeAggregateIDs) > 0 {
-		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position)
+		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position, query.CreatedAfter, query.CreatedBefore)
 	}
 	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
 	if excludeAggregateIDsClauses != "" {
