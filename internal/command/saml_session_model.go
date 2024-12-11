@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/samlsession"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SAMLSessionWriteModel struct {
@@ -99,26 +98,4 @@ func (wm *SAMLSessionWriteModel) reduceSAMLResponseAdded(e *samlsession.SAMLResp
 func (wm *SAMLSessionWriteModel) reduceSAMLResponseRevoked(e *samlsession.SAMLResponseRevokedEvent) {
 	wm.SAMLResponseID = ""
 	wm.SAMLResponseExpiration = e.CreationDate()
-}
-
-func (wm *SAMLSessionWriteModel) CheckAccessToken(samlResponseID string) error {
-	if wm.State != domain.SAMLSessionStateActive {
-		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-KL2pk", "Errors.SAMLSession.Token.Invalid")
-	}
-	if wm.SAMLResponseID != samlResponseID {
-		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-JLKW2", "Errors.SAMLSession.Token.Invalid")
-	}
-	if wm.SAMLResponseExpiration.Before(time.Now()) {
-		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-3j3md", "Errors.SAMLSession.Token.Invalid")
-	}
-	return nil
-}
-
-func (wm *SAMLSessionWriteModel) CheckClient(entityID string) error {
-	for _, aud := range wm.Audience {
-		if aud == entityID {
-			return nil
-		}
-	}
-	return zerrors.ThrowPreconditionFailed(nil, "OIDCS-SKjl3", "Errors.SAMLSession.InvalidClient")
 }

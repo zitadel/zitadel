@@ -44,7 +44,7 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 		return nil, err
 	}
 	if writeModel.SAMLRequestState != domain.SAMLRequestStateUnspecified {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.SAMLRequest.AlreadyExisting")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-MO3vmsMLUt", "Errors.SAMLRequest.AlreadyExisting")
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, samlrequest.NewAddedEvent(
 		ctx,
@@ -71,13 +71,13 @@ func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, err
 	}
 	if writeModel.SAMLRequestState == domain.SAMLRequestStateUnspecified {
-		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-jae5P", "Errors.SAMLRequest.NotExisting")
+		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-GH3PVLSfXC", "Errors.SAMLRequest.NotExisting")
 	}
 	if writeModel.SAMLRequestState != domain.SAMLRequestStateAdded {
-		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.SAMLRequest.AlreadyHandled")
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ttPKNdAIFT", "Errors.SAMLRequest.AlreadyHandled")
 	}
 	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
-		return nil, nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.SAMLRequest.WrongLoginClient")
+		return nil, nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-KCd48Rxt7x", "Errors.SAMLRequest.WrongLoginClient")
 	}
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
@@ -109,7 +109,7 @@ func (c *Commands) FailSAMLRequest(ctx context.Context, id string, reason domain
 		return nil, nil, err
 	}
 	if writeModel.SAMLRequestState != domain.SAMLRequestStateAdded {
-		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.SAMLRequest.AlreadyHandled")
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-32lGj1Fhjt", "Errors.SAMLRequest.AlreadyHandled")
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, samlrequest.NewFailedEvent(
 		ctx,

@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"golang.org/x/text/language"
@@ -39,7 +38,7 @@ func (c *Commands) CreateSAMLSessionFromSAMLRequest(ctx context.Context, samlReq
 	defer func() { span.EndWithError(err) }()
 
 	if samlReqId == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.SAMLRequest.InvalidCode")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-0LxK6O31wH", "Errors.SAMLRequest.InvalidCode")
 	}
 
 	samlReqModel, err := c.getSAMLRequestWriteModel(ctx, samlReqId)
@@ -85,82 +84,13 @@ func (c *Commands) CreateSAMLSessionFromSAMLRequest(ctx context.Context, samlReq
 	return err
 }
 
-func (c *Commands) CreateSAMLSession(ctx context.Context,
-	userID,
-	resourceOwner,
-	clientID,
-	backChannelLogoutURI string,
-	scope,
-	audience []string,
-	authMethods []domain.UserAuthMethodType,
-	authTime time.Time,
-	nonce string,
-	preferredLanguage *language.Tag,
-	userAgent *domain.UserAgent,
-	reason domain.TokenReason,
-	actor *domain.TokenActor,
-	needRefreshToken bool,
-	sessionID string,
-	responseType domain.OIDCResponseType,
-) (session *OIDCSession, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	cmd, err := c.newOIDCSessionAddEvents(ctx, userID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	if reason == domain.TokenReasonImpersonation {
-		if err := c.checkPermission(ctx, "impersonation", resourceOwner, userID); err != nil {
-			return nil, err
-		}
-		cmd.UserImpersonated(ctx, userID, resourceOwner, clientID, actor)
-	}
-
-	cmd.AddSession(ctx, userID, resourceOwner, sessionID, clientID, audience, scope, authMethods, authTime, nonce, preferredLanguage, userAgent)
-	cmd.RegisterLogout(ctx, sessionID, userID, clientID, backChannelLogoutURI)
-	if responseType != domain.OIDCResponseTypeIDToken {
-		if err = cmd.AddAccessToken(ctx, scope, userID, resourceOwner, reason, actor); err != nil {
-			return nil, err
-		}
-	}
-	if needRefreshToken {
-		if err = cmd.AddRefreshToken(ctx, userID); err != nil {
-			return nil, err
-		}
-	}
-	postCommit, err := cmd.SetMilestones(ctx, clientID, sessionID != "")
-	if err != nil {
-		return nil, err
-	}
-	if session, err = cmd.PushEvents(ctx); err != nil {
-		return nil, err
-	}
-	postCommit(ctx)
-	return session, nil
-}
-
-func samlSessionTokenIDsFromToken(token string) (oidcSessionID, refreshTokenID, accessTokenID string, err error) {
-	split := strings.Split(token, TokenDelimiter)
-	if len(split) != 2 {
-		return "", "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
-	}
-	if strings.HasPrefix(split[1], RefreshTokenPrefix) {
-		return split[0], split[1], "", nil
-	}
-	if strings.HasPrefix(split[1], AccessTokenPrefix) {
-		return split[0], "", split[1], nil
-	}
-	return "", "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
-}
-
 func (c *Commands) newSAMLSessionAddEvents(ctx context.Context, userID, resourceOwner string, pending ...eventstore.Command) (*SAMLSessionEvents, error) {
 	userStateModel, err := c.userStateWriteModel(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 	if !userStateModel.UserState.IsEnabled() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-kj3g2", "Errors.User.NotActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-1768ZQpmcP", "Errors.User.NotActive")
 	}
 	sessionID, err := c.idGenerator.Next()
 	if err != nil {
@@ -220,8 +150,8 @@ func (c *SAMLSessionEvents) SetSAMLRequestSuccessful(ctx context.Context, samlRe
 	c.events = append(c.events, samlrequest.NewSucceededEvent(ctx, samlRequestAggregate))
 }
 
-func (c *SAMLSessionEvents) SetSAMLRequestFailed(ctx context.Context, authRequestAggregate *eventstore.Aggregate, err error) {
-	c.events = append(c.events, samlrequest.NewFailedEvent(ctx, authRequestAggregate, domain.SAMLErrorReasonFromError(err)))
+func (c *SAMLSessionEvents) SetSAMLRequestFailed(ctx context.Context, samlRequestAggregate *eventstore.Aggregate, err error) {
+	c.events = append(c.events, samlrequest.NewFailedEvent(ctx, samlRequestAggregate, domain.SAMLErrorReasonFromError(err)))
 }
 
 func (c *SAMLSessionEvents) AddSAMLResponse(ctx context.Context, id string, lifetime time.Duration) error {

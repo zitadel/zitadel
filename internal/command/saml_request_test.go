@@ -66,7 +66,7 @@ func TestCommands_AddSAMLRequest(t *testing.T) {
 				request: &SAMLRequest{},
 			},
 			nil,
-			zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.SAMLRequest.AlreadyExisting"),
+			zerrors.ThrowPreconditionFailed(nil, "COMMAND-MO3vmsMLUt", "Errors.SAMLRequest.AlreadyExisting"),
 		},
 		{
 			"added",
@@ -171,7 +171,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				sessionID: "sessionID",
 			},
 			res{
-				wantErr: zerrors.ThrowNotFound(nil, "COMMAND-jae5P", "Errors.SAMLRequest.NotExisting"),
+				wantErr: zerrors.ThrowNotFound(nil, "COMMAND-GH3PVLSfXC", "Errors.SAMLRequest.NotExisting"),
 			},
 		},
 		{
@@ -206,7 +206,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				sessionID: "sessionID",
 			},
 			res{
-				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.SAMLRequest.AlreadyHandled"),
+				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-ttPKNdAIFT", "Errors.SAMLRequest.AlreadyHandled"),
 			},
 		},
 		{
@@ -239,7 +239,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				checkLoginClient: true,
 			},
 			res{
-				wantErr: zerrors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.SAMLRequest.WrongLoginClient"),
+				wantErr: zerrors.ThrowPermissionDenied(nil, "COMMAND-KCd48Rxt7x", "Errors.SAMLRequest.WrongLoginClient"),
 			},
 		},
 		{
@@ -589,7 +589,7 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 				reason: domain.SAMLErrorReasonAuthNFailed,
 			},
 			res{
-				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.SAMLRequest.AlreadyHandled"),
+				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-32lGj1Fhjt", "Errors.SAMLRequest.AlreadyHandled"),
 			},
 		},
 		{

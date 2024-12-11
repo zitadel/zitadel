@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/samlrequest"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -38,7 +37,7 @@ func NewSAMLRequestWriteModel(ctx context.Context, id string) *SAMLRequestWriteM
 		WriteModel: eventstore.WriteModel{
 			AggregateID: id,
 		},
-		aggregate: &authrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
+		aggregate: &samlrequest.NewAggregate(id, authz.GetInstance(ctx).InstanceID()).Aggregate,
 	}
 }
 
@@ -81,11 +80,11 @@ func (m *SAMLRequestWriteModel) Query() *eventstore.SearchQueryBuilder {
 // CheckAuthenticated checks that the auth request exists, a session must have been linked
 func (m *SAMLRequestWriteModel) CheckAuthenticated() error {
 	if m.SessionID == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "AUTHR-SF2r2", "Errors.SAMLRequest.NotAuthenticated")
+		return zerrors.ThrowPreconditionFailed(nil, "AUTHR-3dNRNwSYeC", "Errors.SAMLRequest.NotAuthenticated")
 	}
 	// check that the requests exists, but has not succeeded yet
 	if m.SAMLRequestState == domain.SAMLRequestStateAdded {
 		return nil
 	}
-	return zerrors.ThrowPreconditionFailed(nil, "AUTHR-sajk3", "Errors.SAMLRequest.NotAuthenticated")
+	return zerrors.ThrowPreconditionFailed(nil, "AUTHR-krQV50AlnJ", "Errors.SAMLRequest.NotAuthenticated")
 }
