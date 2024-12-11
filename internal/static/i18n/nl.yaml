@@ -549,6 +549,12 @@ Errors:
       Invalid: Token is ongeldig
       Expired: Token is verlopen
     InvalidClient: Token is niet uitgegeven voor deze client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest bestaat al
+    NotExisting: SAMLRequest bestaat niet
+    WrongLoginClient: SAMLRequest aangemaakt door andere login client
+  SAMLSession:
+    InvalidClient: SAMLResponse is niet uitgegeven voor deze client
   Feature:
     NotExisting: Functie bestaat niet
     TypeNotSupported: Functie type wordt niet ondersteund
@@ -623,6 +629,8 @@ AggregateTypes:
   system: Systeem
   session: Sessie
   web_key: Websleutel
+  saml_request: SAML-aanvraag
+  saml_session: SAML-sessie
 
 EventTypes:
   execution:

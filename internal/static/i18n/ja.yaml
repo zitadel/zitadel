@@ -538,6 +538,12 @@ Errors:
       Invalid: トークンが無効です
       Expired: トークンの有効期限が切れている
     InvalidClient: トークンが発行されていません
+  SAMLRequest:
+    AlreadyExists: SAMLリクエストはすでに存在します
+    NotExisting: SAMLリクエストが存在しません
+    WrongLoginClient: 他のログイン クライアントによって作成された SAMLRequest
+  SAMLSession:
+    InvalidClient: このクライアントに対してSAMLResponseは発行されませんでした
   Feature:
     NotExisting: 機能が存在しません
     TypeNotSupported: 機能タイプはサポートされていません
@@ -612,6 +618,8 @@ AggregateTypes:
   system: システム
   session: セッション
   web_key: Web キー
+  saml_request: SAML リクエスト
+  saml_session: SAMLセッション
 
 EventTypes:
   execution:

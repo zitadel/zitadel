@@ -549,6 +549,12 @@ Errors:
       Invalid: Le jeton n'est pas valide
       Expired: Le jeton est expiré
     InvalidClient: Le token n'a pas été émis pour ce client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest existe déjà
+    NotExisting: SAMLRequest n'existe pas
+    WrongLoginClient: SAMLRequest créé par un autre client de connexion
+  SAMLSession:
+    InvalidClient: SAMLResponse n'a pas été émise pour ce client
   Feature:
     NotExisting: La fonctionnalité n'existe pas
     TypeNotSupported: Le type de fonctionnalité n'est pas pris en charge
@@ -623,6 +629,8 @@ AggregateTypes:
   system: Système
   session: Session
   web_key: Clé Web
+  saml_request: Requête SAML
+  saml_session: Session SAML
 
 EventTypes:
   execution:

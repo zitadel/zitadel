@@ -550,6 +550,12 @@ Errors:
       Invalid: 토큰이 유효하지 않습니다
       Expired: 토큰이 만료되었습니다
     InvalidClient: 토큰이 이 클라이언트에 대해 발행되지 않았습니다
+  SAMLRequest:
+    AlreadyExists: SAMLRequest가 이미 존재합니다
+    NotExisting: SAMLRequest가 존재하지 않습니다
+    WrongLoginClient: 다른 로그인 클라이언트가 생성한 SAMLRequest
+  SAMLSession:
+    InvalidClient: 이 클라이언트에 대해 SAMLResponse가 발행되지 않았습니다.
   Feature:
     NotExisting: 기능이 존재하지 않습니다
     TypeNotSupported: 기능 유형이 지원되지 않습니다
@@ -624,6 +630,8 @@ AggregateTypes:
   system: 시스템
   session: 세션
   web_key: 웹 키
+  saml_request: SAML 요청
+  saml_session: SAML 세션
 
 EventTypes:
   execution:

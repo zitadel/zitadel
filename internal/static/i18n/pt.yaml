@@ -544,6 +544,16 @@ Errors:
     WrongLoginClient: A solicitação de autenticação foi criada por outro cliente de login
   OIDCSession:
     RefreshTokenInvalid: O Refresh Token é inválido
+    Token:
+      Invalid: O token é inválido
+      Expired: O token expirou
+    InvalidClient: O token não foi emitido para este cliente
+  SAMLRequest:
+    AlreadyExists: O SAMLRequest já existe
+    NotExisting: O SAMLRequest não existe
+    WrongLoginClient: SAMLRequest criado por outro cliente de login
+  SAMLSession:
+    InvalidClient: O SAMLResponse não foi emitido para este cliente
   Feature:
     NotExisting: O recurso não existe
     TypeNotSupported: O tipo de recurso não é compatível
@@ -618,6 +628,8 @@ AggregateTypes:
   system: Sistema
   session: Sessão
   web_key: Chave da Web
+  saml_request: Solicitação SAML
+  saml_session: Sessão SAML
 
 EventTypes:
   execution:

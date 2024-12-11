@@ -549,6 +549,12 @@ Errors:
       Invalid: 令牌无效
       Expired: 令牌已过期
     InvalidClient: 没有为该客户发放令牌
+  SAMLRequest:
+    AlreadyExists: SAMLRequest 已存在
+    NotExisting: SAMLRequest不存在
+    WrongLoginClient: 其他登录客户端创建的 SAMLRequest
+  SAMLSession:
+    InvalidClient: 未向该客户端发出 SAMLResponse
   Feature:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
@@ -623,6 +629,8 @@ AggregateTypes:
   system: 系统
   session: 会话
   web_key: Web 密钥
+  saml_request: SAML 请求
+  saml_session: SAML 会话
 
 EventTypes:
   execution:

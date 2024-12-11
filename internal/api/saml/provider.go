@@ -27,6 +27,11 @@ type Config struct {
 	ProviderConfig *provider.Config
 }
 
+type Provider struct {
+	*provider.Provider
+	command *command.Commands
+}
+
 func NewProvider(
 	conf Config,
 	externalSecure bool,
@@ -40,7 +45,7 @@ func NewProvider(
 	instanceHandler,
 	userAgentCookie func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
-) (*provider.Provider, error) {
+) (*Provider, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
 	provStorage, err := newStorage(
@@ -73,12 +78,19 @@ func NewProvider(
 		options = append(options, provider.WithAllowInsecure())
 	}
 
-	return provider.NewProvider(
+	p, err := provider.NewProvider(
 		provStorage,
 		HandlerPrefix,
 		conf.ProviderConfig,
 		options...,
 	)
+	if err != nil {
+		return nil, err
+	}
+	return &Provider{
+		p,
+		command,
+	}, nil
 }
 
 func newStorage(

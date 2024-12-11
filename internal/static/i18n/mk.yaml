@@ -548,6 +548,12 @@ Errors:
       Invalid: токенот е неважечки
       Expired: токенот е истечен
     InvalidClient: Токен не беше издаден на овој клиент
+  SAMLRequest:
+    AlreadyExists: SAMLRequest веќе постои
+    NotExisting: SAMLRequest не постои
+    WrongLoginClient: SAML Барање создадено од друг клиент за најавување
+  SAMLSession:
+    InvalidClient: SAMLResponse не беше издаден за овој клиент
   Feature:
     NotExisting: Функцијата не постои
     TypeNotSupported: Типот на функција не е поддржан
@@ -622,6 +628,8 @@ AggregateTypes:
   system: Систем
   session: Сесија
   web_key: Веб клуч
+  saml_request: Барање SAML
+  saml_session: SAML сесија
 
 EventTypes:
   execution:

@@ -549,6 +549,12 @@ Errors:
       Invalid: A Token érvénytelen
       Expired: A Token lejárt
     InvalidClient: A Token nem ehhez a klienshez lett kiadva
+  SAMLRequest:
+    AlreadyExists: A SAMLRequest már létezik
+    NotExisting: A SAMLRequest nem létezik
+    WrongLoginClient: A SAMLRequest egy másik bejelentkezési ügyfél által létrehozott
+  SAMLSession:
+    InvalidClient: SAMLResponse nem lett kiadva ehhez az ügyfélhez
   Feature:
     NotExisting: A funkció nem létezik
     TypeNotSupported: A funkció típusa nem támogatott
@@ -599,6 +605,7 @@ Errors:
     FeatureDisabled: A webkulcs funkció le van tiltva
     NoActive: Aktív web kulcs nem található
     NotFound: Web kulcs nem található
+
 AggregateTypes:
   action: Művelet
   instance: Példány
@@ -622,6 +629,9 @@ AggregateTypes:
   system: Rendszer
   session: Munkamenet
   web_key: Webkulcs
+  saml_request: SAML-kérés
+  saml_session: SAML munkamenet
+
 EventTypes:
   execution:
     set: Végrehajtási készlet
