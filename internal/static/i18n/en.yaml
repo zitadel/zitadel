@@ -550,6 +550,12 @@ Errors:
       Invalid: Token is invalid
       Expired: Token is expired
     InvalidClient: Token was not issued for this client
+  SAMLRequest:
+    AlreadyExists: SAMLRequest already exists
+    NotExisting: SAMLRequest does not exist
+    WrongLoginClient: SAMLRequest created by other login client
+  SAMLSession:
+    InvalidClient: SAMLResponse was not issued for this client
   Feature:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
@@ -624,6 +630,8 @@ AggregateTypes:
   system: System
   session: Session
   web_key: Web Key
+  saml_request: SAML Request
+  saml_session: SAML Session
 
 EventTypes:
   execution:
