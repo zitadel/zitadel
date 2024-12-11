@@ -21,5 +21,9 @@ export async function registerWithPasskey(page: Page, firstname: string, lastnam
   await page.goto("/register");
   await registerUserScreenPasskey(page, firstname, lastname, email);
   await page.getByTestId("submit-button").click();
+
+  // wait for projection of user
+  await page.waitForTimeout(2000);
+
   return await passkeyRegister(page);
 }

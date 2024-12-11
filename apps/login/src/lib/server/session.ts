@@ -15,7 +15,6 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { getNextUrl } from "../client";
 import {
   getMostRecentSessionCookie,
@@ -108,7 +107,7 @@ export async function continueWithSession({
           )
         : null;
   if (url) {
-    return redirect(url);
+    return { redirect: url };
   }
 }
 
@@ -132,20 +131,22 @@ export async function updateSession(options: UpdateSessionCommand) {
     challenges,
   } = options;
   const recentSession = sessionId
-    ? await getSessionCookieById({ sessionId }).catch((error) => {
-        return Promise.reject(error);
-      })
+    ? await getSessionCookieById({ sessionId })
     : loginName
-      ? await getSessionCookieByLoginName({ loginName, organization }).catch(
-          (error) => {
-            return Promise.reject(error);
-          },
-        )
-      : await getMostRecentSessionCookie().catch((error) => {
-          return Promise.reject(error);
-        });
+      ? await getSessionCookieByLoginName({ loginName, organization })
+      : await getMostRecentSessionCookie();
+
+  if (!recentSession) {
+    return {
+      error: "Could not find session",
+    };
+  }
 
   const host = (await headers()).get("host");
+
+  if (!host) {
+    return { error: "Could not get host" };
+  }
 
   if (
     host &&
@@ -173,6 +174,10 @@ export async function updateSession(options: UpdateSessionCommand) {
     authRequestId,
     lifetime,
   );
+
+  if (!session) {
+    return { error: "Could not update session" };
+  }
 
   // if password, check if user has MFA methods
   let authMethods;

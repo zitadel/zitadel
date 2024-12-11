@@ -16,12 +16,14 @@ export function isSessionValid(session: Partial<Session>): {
 } {
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const validIDP = session?.factors?.intent?.verifiedAt;
+
   const stillValid = session.expirationDate
     ? timestampDate(session.expirationDate) > new Date()
     : true;
 
-  const verifiedAt = validPassword || validPasskey;
-  const valid = !!((validPassword || validPasskey) && stillValid);
+  const verifiedAt = validPassword || validPasskey || validIDP;
+  const valid = !!((validPassword || validPasskey || validIDP) && stillValid);
 
   return { valid, verifiedAt };
 }
@@ -63,10 +65,14 @@ export function SessionItem({
     <button
       onClick={async () => {
         if (valid && session?.factors?.user) {
-          return continueWithSession({
+          const resp = await continueWithSession({
             ...session,
             authRequestId: authRequestId,
           });
+
+          if (resp?.redirect) {
+            return router.push(resp.redirect);
+          }
         } else if (session.factors?.user) {
           setLoading(true);
           const res = await sendLoginname({
@@ -102,15 +108,23 @@ export function SessionItem({
         />
       </div>
 
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col items-start overflow-hidden">
         <span className="">{session.factors?.user?.displayName}</span>
         <span className="text-xs opacity-80 text-ellipsis">
           {session.factors?.user?.loginName}
         </span>
-        {valid && (
+        {valid ? (
           <span className="text-xs opacity-80 text-ellipsis">
             {verifiedAt && moment(timestampDate(verifiedAt)).fromNow()}
           </span>
+        ) : (
+          verifiedAt && (
+            <span className="text-xs opacity-80 text-ellipsis">
+              expired{" "}
+              {session.expirationDate &&
+                moment(timestampDate(session.expirationDate)).fromNow()}
+            </span>
+          )
         )}
       </div>
 
@@ -126,6 +140,7 @@ export function SessionItem({
           className="hidden group-hover:block h-5 w-5 transition-all opacity-50 hover:opacity-100"
           onClick={(event) => {
             event.preventDefault();
+            event.stopPropagation();
             clearSession(session.id).then(() => {
               reload();
             });

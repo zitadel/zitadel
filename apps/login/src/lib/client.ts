@@ -15,24 +15,29 @@ export async function getNextUrl(
   defaultRedirectUri?: string,
 ): Promise<string> {
   if ("sessionId" in command && "authRequestId" in command) {
-    const url =
-      `/login?` +
-      new URLSearchParams({
-        sessionId: command.sessionId,
-        authRequest: command.authRequestId,
-      });
-    return url;
+    const params = new URLSearchParams({
+      sessionId: command.sessionId,
+      authRequest: command.authRequestId,
+    });
+
+    if (command.organization) {
+      params.append("organization", command.organization);
+    }
+
+    return `/login?` + params;
   }
 
   if (defaultRedirectUri) {
     return defaultRedirectUri;
   }
 
-  const signedInUrl =
-    `/signedin?` +
-    new URLSearchParams({
-      loginName: command.loginName,
-    });
+  const params = new URLSearchParams({
+    loginName: command.loginName,
+  });
 
-  return signedInUrl;
+  if (command.organization) {
+    params.append("organization", command.organization);
+  }
+
+  return `/signedin?` + params;
 }

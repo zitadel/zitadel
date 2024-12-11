@@ -6,7 +6,11 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { changePassword, sendPassword } from "@/lib/server/password";
+import {
+  changePassword,
+  resetPassword,
+  sendPassword,
+} from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -61,6 +65,29 @@ export function SetPasswordForm({
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
+
+  async function resendCode() {
+    setError("");
+    setLoading(true);
+
+    const response = await resetPassword({
+      loginName,
+      organization,
+      authRequestId,
+    })
+      .catch(() => {
+        setError("Could not reset password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    if (response && "error" in response) {
+      setError(response.error);
+      return;
+    }
+  }
 
   async function submitPassword(values: Inputs) {
     setLoading(true);
@@ -176,11 +203,17 @@ export function SetPasswordForm({
                 label="Code"
                 autoComplete="one-time-code"
                 error={errors.code?.message as string}
+                data-testid="code-text-input"
               />
             </div>
 
             <div className="ml-4 mb-1">
-              <Button variant={ButtonVariants.Secondary}>
+              <Button
+                variant={ButtonVariants.Secondary}
+                data-testid="resend-button"
+                onClick={() => resendCode()}
+                disabled={loading}
+              >
                 {t("set.resend")}
               </Button>
             </div>
@@ -196,6 +229,7 @@ export function SetPasswordForm({
             })}
             label="New Password"
             error={errors.password?.message as string}
+            data-testid="password-text-input"
           />
         </div>
         <div className="">
@@ -208,6 +242,7 @@ export function SetPasswordForm({
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
+            data-testid="password-confirm-text-input"
           />
         </div>
       </div>

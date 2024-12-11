@@ -25,6 +25,7 @@ type Props = {
   method: string;
   code?: string;
   loginSettings?: LoginSettings;
+  host: string | null;
 };
 
 type Inputs = {
@@ -39,6 +40,7 @@ export function LoginOTP({
   method,
   code,
   loginSettings,
+  host,
 }: Props) {
   const t = useTranslations("otp");
 
@@ -57,7 +59,7 @@ export function LoginOTP({
   });
 
   useEffect(() => {
-    if (!initialized.current && ["email", "sms"].includes(method)) {
+    if (!initialized.current && ["email", "sms"].includes(method) && !code) {
       initialized.current = true;
       setLoading(true);
       updateSessionForOTPChallenge()
@@ -76,13 +78,24 @@ export function LoginOTP({
 
     if (method === "email") {
       challenges = create(RequestChallengesSchema, {
-        otpEmail: { deliveryType: { case: "sendCode", value: {} } },
+        otpEmail: {
+          deliveryType: {
+            case: "sendCode",
+            value: host
+              ? {
+                  urlTemplate:
+                    `${host.includes("localhost") ? "http://" : "https://"}${host}/otp/${method}?code={{.Code}}&userId={{.UserID}}&sessionId={{.SessionID}}` +
+                    (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+                }
+              : {},
+          },
+        },
       });
     }
 
     if (method === "sms") {
       challenges = create(RequestChallengesSchema, {
-        otpSms: { returnCode: true },
+        otpSms: {},
       });
     }
 
@@ -94,13 +107,18 @@ export function LoginOTP({
       challenges,
       authRequestId,
     })
-      .catch((error) => {
-        setError(error.message ?? "Could not request OTP challenge");
+      .catch(() => {
+        setError("Could not request OTP challenge");
         return;
       })
       .finally(() => {
         setLoading(false);
       });
+
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
 
     return response;
   }
@@ -154,12 +172,21 @@ export function LoginOTP({
         setLoading(false);
       });
 
+    if (response && "error" in response && response.error) {
+      setError(response.error);
+      return;
+    }
+
     return response;
   }
 
   function setCodeAndContinue(values: Inputs, organization?: string) {
     return submitCode(values, organization).then(async (response) => {
-      if (response) {
+      if (response && "sessionId" in response) {
+        setLoading(true);
+        // Wait for 2 seconds to avoid eventual consistency issues with an OTP code being verified in the /login endpoint
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         const url =
           authRequestId && response.sessionId
             ? await getNextUrl(
@@ -180,6 +207,7 @@ export function LoginOTP({
                 )
               : null;
 
+        setLoading(false);
         if (url) {
           router.push(url);
         }
@@ -198,6 +226,7 @@ export function LoginOTP({
             <button
               aria-label="Resend OTP Code"
               disabled={loading}
+              type="button"
               className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
               onClick={() => {
                 setLoading(true);
@@ -210,6 +239,7 @@ export function LoginOTP({
                     setLoading(false);
                   });
               }}
+              data-testid="resend-button"
             >
               {t("verify.resendCode")}
             </button>
@@ -222,11 +252,12 @@ export function LoginOTP({
           {...register("code", { required: "This field is required" })}
           label="Code"
           autoComplete="one-time-code"
+          data-testid="code-text-input"
         />
       </div>
 
       {error && (
-        <div className="py-4">
+        <div className="py-4" data-testid="error">
           <Alert>{error}</Alert>
         </div>
       )}

@@ -23,7 +23,9 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build --filter=login^... && changeset publish",
-    "run-zitadel": "docker compose -f ./acceptance/docker-compose.yaml run setup"
+    "run-zitadel": "docker compose -f ./acceptance/docker-compose.yaml run setup",
+    "run-sink": "docker compose -f ./acceptance/docker-compose.yaml up -d sink",
+    "stop": "docker compose -f ./acceptance/docker-compose.yaml stop"
   },
   "pnpm": {
     "overrides": {
@@ -33,6 +35,10 @@
     }
   },
   "devDependencies": {
+    "@otplib/core": "^12.0.0",
+    "@otplib/plugin-thirty-two": "^12.0.0",
+    "@otplib/plugin-crypto": "^12.0.0",
+    "@faker-js/faker": "^9.2.0",
     "@changesets/cli": "^2.27.9",
     "@playwright/test": "^1.48.2",
     "@types/node": "^22.9.0",
