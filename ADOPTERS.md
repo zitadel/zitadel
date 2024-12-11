@@ -15,5 +15,6 @@ If you are using Zitadel, please consider adding yourself as a user with a quick
 | devOS: Sanity Edition   | [@devOS-Sanity-Edition](https://github.com/devOS-Sanity-Edition)     | Uses SSO Auth for every piece of our internal and external infrastructure |
 | CNAP.tech               | [@cnap-tech](https://github.com/cnap-tech)                           | Using Zitadel for authentication and authorization in cloud-native applications |
 | Minekube                | [@minekube](https://github.com/minekube)                             | Leveraging Zitadel for secure user authentication in gaming infrastructure |
+|hirschengraben           | [hirschengraben.io](hirschengraben.io)                               | Using Zitadel as IDP for a multitenant B2B dispatch app for bike messengers |
 | Organization Name       | contact@example.com                                      | Description of how they use Zitadel             |
 | Individual Name         | contact@example.com                                      | Description of how they use Zitadel             |
