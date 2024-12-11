@@ -429,8 +429,10 @@ message GetLockoutSettingsResponse {
 
 message GetActiveIdentityProvidersRequest {
   zitadel.object.v2.RequestContext ctx = 1;
-  optional bool exclude_creation_disallowed = 2;
-  optional bool exclude_linking_disallowed = 3;
+  optional bool creation_allowed = 2;
+  optional bool linking_allowed = 3;
+  optional bool auto_creation = 4;
+  optional bool auto_linking = 5;
 }
 
 message GetActiveIdentityProvidersResponse {

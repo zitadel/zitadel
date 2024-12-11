@@ -387,10 +387,10 @@ func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id strin
 }
 
 func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *admin.AddGenericOAuthProviderResponse {
-	return i.AddGenericOAuthProviderWithOptions(ctx, name, true, true)
+	return i.AddGenericOAuthProviderWithOptions(ctx, name, true, true, true, idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
 }
 
-func (i *Instance) AddGenericOAuthProviderWithOptions(ctx context.Context, name string, isLinkingAllowed, isCreationAllowed bool) *admin.AddGenericOAuthProviderResponse {
+func (i *Instance) AddGenericOAuthProviderWithOptions(ctx context.Context, name string, isLinkingAllowed, isCreationAllowed, isAutoCreation bool, autoLinking idp.AutoLinkingOption) *admin.AddGenericOAuthProviderResponse {
 	resp, err := i.Client.Admin.AddGenericOAuthProvider(ctx, &admin.AddGenericOAuthProviderRequest{
 		Name:                  name,
 		ClientId:              "clientID",
@@ -403,9 +403,9 @@ func (i *Instance) AddGenericOAuthProviderWithOptions(ctx context.Context, name 
 		ProviderOptions: &idp.Options{
 			IsLinkingAllowed:  isLinkingAllowed,
 			IsCreationAllowed: isCreationAllowed,
-			IsAutoCreation:    true,
+			IsAutoCreation:    isAutoCreation,
 			IsAutoUpdate:      true,
-			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			AutoLinking:       autoLinking,
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")
