@@ -930,6 +930,7 @@ module.exports = {
     },
   ],
   legal: [
+    
     {
       type: "category",
       label: "Legal Agreements",
