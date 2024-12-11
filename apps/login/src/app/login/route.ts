@@ -113,10 +113,7 @@ async function isSessionValid(session: Session): Promise<boolean> {
       // must have one single check
       mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
       if (!mfaValid) {
-        console.warn(
-          "Session has no valid multifactor",
-          JSON.stringify(session.factors),
-        );
+        console.warn("Session has no valid multifactor", session.factors);
       }
     } else {
       mfaValid = true;
