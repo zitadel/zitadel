@@ -1,0 +1,6 @@
+{
+  "name": "console",
+  "sdk": "typescript",
+  "source": ".",
+  "engineVersion": "v0.11.8"
+}
