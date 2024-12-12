@@ -32,7 +32,9 @@ export default async function Page(props: {
     sessionFactors?.factors?.user?.organizationId,
   );
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings(
+    sessionFactors?.factors?.user?.organizationId,
+  );
 
   return (
     <DynamicTheme branding={branding}>
@@ -68,6 +70,7 @@ export default async function Page(props: {
             authRequestId={authRequestId}
             organization={organization}
             passwordComplexitySettings={passwordComplexity}
+            loginSettings={loginSettings}
           />
         ) : (
           <div className="py-4">
