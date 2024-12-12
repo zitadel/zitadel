@@ -16,5 +16,7 @@ If you are using Zitadel, please consider adding yourself as a user with a quick
 | CNAP.tech               | [@cnap-tech](https://github.com/cnap-tech)                           | Using Zitadel for authentication and authorization in cloud-native applications |
 | Minekube                | [@minekube](https://github.com/minekube)                             | Leveraging Zitadel for secure user authentication in gaming infrastructure |
 |hirschengraben           | [hirschengraben.io](hirschengraben.io)                               | Using Zitadel as IDP for a multitenant B2B dispatch app for bike messengers |
+| Smat.io                 | [@smatio](https://github.com/smatio) - [@lukasver](https://github.com/lukasver) | Zitadel for authentication in cloud applications while offering B2B portfolio management solutions for professional investors |
 | Organization Name       | contact@example.com                                      | Description of how they use Zitadel             |
 | Individual Name         | contact@example.com                                      | Description of how they use Zitadel             |
+
