@@ -24,6 +24,7 @@
       "title": "设置密码",
       "description": "为您的账户设置密码",
       "codeSent": "验证码已发送到您的邮箱。",
+      "noCodeReceived": "没有收到验证码？",
       "resend": "重发验证码",
       "submit": "继续"
     },
@@ -173,6 +174,7 @@
     "verify": {
       "title": "验证用户",
       "description": "输入验证邮件中的验证码。",
+      "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
       "submit": "继续"
     }

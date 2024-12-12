@@ -24,6 +24,7 @@
       "title": "Passwort festlegen",
       "description": "Legen Sie das Passwort für Ihr Konto fest",
       "codeSent": "Ein Code wurde an Ihre E-Mail-Adresse gesendet.",
+      "noCodeReceived": "Keinen Code erhalten?",
       "resend": "Erneut senden",
       "submit": "Weiter"
     },
@@ -173,6 +174,7 @@
     "verify": {
       "title": "Benutzer verifizieren",
       "description": "Geben Sie den Code ein, der in der Bestätigungs-E-Mail angegeben ist.",
+      "noCodeReceived": "Keinen Code erhalten?",
       "resendCode": "Code erneut senden",
       "submit": "Weiter"
     }
