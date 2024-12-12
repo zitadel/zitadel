@@ -587,13 +587,11 @@ export async function setPassword(
 type CheckSessionAndSetPasswordCommand = {
   sessionId: string;
   password: string;
-  forceMfa: boolean;
 };
 
 export async function checkSessionAndSetPassword({
   sessionId,
   password,
-  forceMfa,
 }: CheckSessionAndSetPasswordCommand) {
   const sessionCookie = await getSessionCookieById({ sessionId });
 
@@ -631,6 +629,13 @@ export async function checkSessionAndSetPassword({
 
   const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every(
     (method) => !authmethods.authMethodTypes.includes(method),
+  );
+
+  const loginSettings = await getLoginSettings(
+    session.factors.user.organizationId,
+  );
+  const forceMfa = !!(
+    loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly
   );
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user

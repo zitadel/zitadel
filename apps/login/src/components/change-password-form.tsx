@@ -10,7 +10,6 @@ import { sendPassword } from "@/lib/server/password";
 import { checkSessionAndSetPassword } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -32,7 +31,6 @@ type Inputs =
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
-  loginSettings?: LoginSettings;
   sessionId: string;
   loginName: string;
   authRequestId?: string;
@@ -41,7 +39,6 @@ type Props = {
 
 export function ChangePasswordForm({
   passwordComplexitySettings,
-  loginSettings,
   sessionId,
   loginName,
   authRequestId,
@@ -67,7 +64,6 @@ export function ChangePasswordForm({
     const changeResponse = checkSessionAndSetPassword({
       sessionId,
       password: values.password,
-      forceMfa: !!(loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly),
     })
       .catch(() => {
         setError("Could not change password");

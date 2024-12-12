@@ -70,7 +70,6 @@ export default async function Page(props: {
             authRequestId={authRequestId}
             organization={organization}
             passwordComplexitySettings={passwordComplexity}
-            loginSettings={loginSettings}
           />
         ) : (
           <div className="py-4">
