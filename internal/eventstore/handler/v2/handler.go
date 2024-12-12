@@ -23,7 +23,7 @@ import (
 )
 
 type EventStore interface {
-	InstanceIDs(ctx context.Context, maxAge time.Duration, forceLoad bool, query *eventstore.SearchQueryBuilder) ([]string, error)
+	InstanceIDs(ctx context.Context, query *eventstore.SearchQueryBuilder) ([]string, error)
 	FilterToQueryReducer(ctx context.Context, reducer eventstore.QueryReducer) error
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
@@ -34,14 +34,17 @@ type Config struct {
 	Client     *database.DB
 	Eventstore EventStore
 
-	BulkLimit             uint16
-	RequeueEvery          time.Duration
-	RetryFailedAfter      time.Duration
-	HandleActiveInstances time.Duration
-	TransactionDuration   time.Duration
-	MaxFailureCount       uint8
+	BulkLimit           uint16
+	RequeueEvery        time.Duration
+	RetryFailedAfter    time.Duration
+	TransactionDuration time.Duration
+	MaxFailureCount     uint8
 
 	TriggerWithoutEvents Reduce
+
+	ActiveInstancer interface {
+		ActiveInstances() []string
+	}
 }
 
 type Handler struct {
@@ -52,17 +55,18 @@ type Handler struct {
 	bulkLimit  uint16
 	eventTypes map[eventstore.AggregateType][]eventstore.EventType
 
-	maxFailureCount       uint8
-	retryFailedAfter      time.Duration
-	requeueEvery          time.Duration
-	handleActiveInstances time.Duration
-	txDuration            time.Duration
-	now                   nowFunc
+	maxFailureCount  uint8
+	retryFailedAfter time.Duration
+	requeueEvery     time.Duration
+	txDuration       time.Duration
+	now              nowFunc
 
 	triggeredInstancesSync sync.Map
 
 	triggerWithoutEvents Reduce
 	cacheInvalidations   []func(ctx context.Context, aggregates []*eventstore.Aggregate)
+
+	queryInstances func() ([]string, error)
 }
 
 var _ migration.Migration = (*Handler)(nil)
@@ -162,13 +166,18 @@ func NewHandler(
 		bulkLimit:              config.BulkLimit,
 		eventTypes:             aggregates,
 		requeueEvery:           config.RequeueEvery,
-		handleActiveInstances:  config.HandleActiveInstances,
 		now:                    time.Now,
 		maxFailureCount:        config.MaxFailureCount,
 		retryFailedAfter:       config.RetryFailedAfter,
 		triggeredInstancesSync: sync.Map{},
 		triggerWithoutEvents:   config.TriggerWithoutEvents,
 		txDuration:             config.TransactionDuration,
+		queryInstances: func() ([]string, error) {
+			if config.ActiveInstancer != nil {
+				return config.ActiveInstancer.ActiveInstances(), nil
+			}
+			return nil, nil
+		},
 	}
 
 	return handler
@@ -239,7 +248,7 @@ func (h *Handler) schedule(ctx context.Context) {
 			t.Stop()
 			return
 		case <-t.C:
-			instances, err := h.queryInstances(ctx)
+			instances, err := h.queryInstances()
 			h.log().OnError(err).Debug("unable to query instances")
 
 			h.triggerInstances(call.WithTimestamp(ctx), instances)
@@ -355,19 +364,6 @@ func (*existingInstances) Reduce() error {
 }
 
 var _ eventstore.QueryReducer = (*existingInstances)(nil)
-
-func (h *Handler) queryInstances(ctx context.Context) ([]string, error) {
-	if h.handleActiveInstances == 0 {
-		return h.existingInstances(ctx)
-	}
-
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
-		AwaitOpenTransactions().
-		AllowTimeTravel().
-		CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
-
-	return h.es.InstanceIDs(ctx, h.requeueEvery, false, query)
-}
 
 func (h *Handler) existingInstances(ctx context.Context) ([]string, error) {
 	ai := existingInstances{}

@@ -43,18 +43,18 @@ type NotificationWorker struct {
 }
 
 type WorkerConfig struct {
-	Workers               uint8
-	BulkLimit             uint16
-	RequeueEvery          time.Duration
-	RetryWorkers          uint8
-	RetryRequeueEvery     time.Duration
-	HandleActiveInstances time.Duration
-	TransactionDuration   time.Duration
-	MaxAttempts           uint8
-	MaxTtl                time.Duration
-	MinRetryDelay         time.Duration
-	MaxRetryDelay         time.Duration
-	RetryDelayFactor      float32
+	LegacyEnabled       bool
+	Workers             uint8
+	BulkLimit           uint16
+	RequeueEvery        time.Duration
+	RetryWorkers        uint8
+	RetryRequeueEvery   time.Duration
+	TransactionDuration time.Duration
+	MaxAttempts         uint8
+	MaxTtl              time.Duration
+	MinRetryDelay       time.Duration
+	MaxRetryDelay       time.Duration
+	RetryDelayFactor    float32
 }
 
 // nowFunc makes [time.Now] mockable
@@ -97,6 +97,9 @@ func NewNotificationWorker(
 }
 
 func (w *NotificationWorker) Start(ctx context.Context) {
+	if w.config.LegacyEnabled {
+		return
+	}
 	for i := 0; i < int(w.config.Workers); i++ {
 		go w.schedule(ctx, i, false)
 	}
@@ -308,29 +311,7 @@ func (w *NotificationWorker) log(workerID int, retry bool) *logging.Entry {
 }
 
 func (w *NotificationWorker) queryInstances(ctx context.Context, retry bool) ([]string, error) {
-	if w.config.HandleActiveInstances == 0 {
-		return w.existingInstances(ctx)
-	}
-
-	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
-		AwaitOpenTransactions().
-		AllowTimeTravel().
-		CreationDateAfter(w.now().Add(-1 * w.config.HandleActiveInstances))
-
-	maxAge := w.config.RequeueEvery
-	if retry {
-		maxAge = w.config.RetryRequeueEvery
-	}
-	return w.es.InstanceIDs(ctx, maxAge, false, query)
-}
-
-func (w *NotificationWorker) existingInstances(ctx context.Context) ([]string, error) {
-	ai := existingInstances{}
-	if err := w.es.FilterToQueryReducer(ctx, &ai); err != nil {
-		return nil, err
-	}
-
-	return ai, nil
+	return w.queries.ActiveInstances(), nil
 }
 
 func (w *NotificationWorker) triggerInstances(ctx context.Context, instances []string, workerID int, retry bool) {

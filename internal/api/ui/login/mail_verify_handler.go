@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 
 	"github.com/zitadel/logging"
@@ -41,6 +42,15 @@ type mailVerificationData struct {
 	HasLowercase string
 	HasNumber    string
 	HasSymbol    string
+}
+
+func MailVerificationLink(origin, userID, code, orgID, authRequestID string) string {
+	v := url.Values{}
+	v.Set(queryUserID, userID)
+	v.Set(queryCode, code)
+	v.Set(queryOrgID, orgID)
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointMailVerification + "?" + v.Encode()
 }
 
 func MailVerificationLinkTemplate(origin, userID, orgID, authRequestID string) string {
