@@ -6,8 +6,10 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { sendPassword } from "@/lib/server/password";
-import { checkSessionAndSetPassword } from "@/lib/zitadel";
+import {
+  checkSessionAndSetPassword,
+  sendPassword,
+} from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";

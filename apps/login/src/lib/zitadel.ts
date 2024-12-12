@@ -12,8 +12,8 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
-  AuthenticationMethodType,
   RetrieveIdentityProviderIntentRequest,
+  SetPasswordRequest,
   SetPasswordRequestSchema,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
@@ -39,7 +39,6 @@ import {
   UserState,
 } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-import { getSessionCookieById } from "./cookies";
 import { PROVIDER_MAPPING } from "./idp";
 
 const transport = createServerTransport(
@@ -538,7 +537,7 @@ export async function passwordReset(
  * @param code optional if the password should be set with a code (reset), no code for initial setup of password
  * @returns
  */
-export async function setPassword(
+export async function setUserPassword(
   userId: string,
   password: string,
   user: User,
@@ -584,97 +583,8 @@ export async function setPassword(
   });
 }
 
-type CheckSessionAndSetPasswordCommand = {
-  sessionId: string;
-  password: string;
-};
-
-export async function checkSessionAndSetPassword({
-  sessionId,
-  password,
-}: CheckSessionAndSetPasswordCommand) {
-  const sessionCookie = await getSessionCookieById({ sessionId });
-
-  const { session } = await getSession({
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
-
-  if (!session || !session.factors?.user?.id) {
-    return { error: "Could not load session" };
-  }
-
-  const payload = create(SetPasswordRequestSchema, {
-    userId: session.factors.user.id,
-    newPassword: {
-      password,
-    },
-  });
-
-  // check if the user has no password set in order to set a password
-  const authmethods = await listAuthenticationMethodTypes(
-    session.factors.user.id,
-  );
-
-  if (!authmethods) {
-    return { error: "Could not load auth methods" };
-  }
-
-  const requiredAuthMethodsForForceMFA = [
-    AuthenticationMethodType.OTP_EMAIL,
-    AuthenticationMethodType.OTP_SMS,
-    AuthenticationMethodType.TOTP,
-    AuthenticationMethodType.U2F,
-  ];
-
-  const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every(
-    (method) => !authmethods.authMethodTypes.includes(method),
-  );
-
-  const loginSettings = await getLoginSettings(
-    session.factors.user.organizationId,
-  );
-  const forceMfa = !!(
-    loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly
-  );
-
-  // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
-  if (forceMfa && hasNoMFAMethods) {
-    return userService.setPassword(payload, {}).catch((error) => {
-      // throw error if failed precondition (ex. User is not yet initialized)
-      if (error.code === 9 && error.message) {
-        return { error: "Failed precondition" };
-      } else {
-        throw error;
-      }
-    });
-  } else {
-    const myUserService = (sessionToken: string) => {
-      return createUserServiceClient(
-        createServerTransport(sessionToken, {
-          baseUrl: process.env.ZITADEL_API_URL!,
-        }),
-      );
-    };
-
-    const selfService = await myUserService(`${sessionCookie.token}`);
-
-    return selfService
-      .setPassword(
-        {
-          userId: session.factors.user.id,
-          newPassword: { password, changeRequired: false },
-        },
-        {},
-      )
-      .catch((error) => {
-        console.log(error);
-        if (error.code === 7) {
-          return { error: "Session is not valid." };
-        }
-        throw error;
-      });
-  }
+export async function setPassword(payload: SetPasswordRequest) {
+  return userService.setPassword(payload, {});
 }
 
 /**
