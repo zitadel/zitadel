@@ -32,10 +32,16 @@ export async function addU2F(command: RegisterU2FCommand) {
     sessionToken: sessionCookie.token,
   });
 
-  const domain = (await headers()).get("host");
+  const host = (await headers()).get("host");
 
-  if (!domain) {
+  if (!host) {
     return { error: "Could not get domain" };
+  }
+
+  const [hostname, port] = host.split(":");
+
+  if (!hostname) {
+    throw new Error("Could not get hostname");
   }
 
   const userId = session?.session?.factors?.user?.id;
@@ -44,11 +50,7 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: "Could not get session" };
   }
 
-  return registerU2F(
-    userId,
-    domain,
-    // sessionCookie.token
-  );
+  return registerU2F(userId, hostname);
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {

@@ -620,17 +620,7 @@ export async function createPasskeyRegistrationLink(
  * @returns the newly set email
  */
 
-// TODO check for token requirements!
-export async function registerU2F(
-  userId: string,
-  domain: string,
-  // token: string,
-) {
-  // const transport = createServerTransport(token, {
-  //   baseUrl: process.env.ZITADEL_API_URL!,
-  // });
-
-  // const service = createUserServiceClient(transport);
+export async function registerU2F(userId: string, domain: string) {
   return userService.registerU2F({
     userId,
     domain,

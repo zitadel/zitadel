@@ -213,7 +213,7 @@ export function SetPasswordForm({
           </Alert>
         )}
         {codeRequired && (
-          <div className="flex flex-row items-end">
+          <div>
             <TextInput
               type="text"
               required
@@ -227,7 +227,7 @@ export function SetPasswordForm({
             />
           </div>
         )}
-        <div className="">
+        <div>
           <TextInput
             type="password"
             autoComplete="new-password"
@@ -240,7 +240,7 @@ export function SetPasswordForm({
             data-testid="password-text-input"
           />
         </div>
-        <div className="">
+        <div>
           <TextInput
             type="password"
             required

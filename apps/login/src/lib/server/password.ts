@@ -149,18 +149,10 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Could not verify password!" };
   }
 
-  const availableSecondFactors = authMethods?.filter(
-    (m: AuthenticationMethodType) =>
-      m !== AuthenticationMethodType.PASSWORD &&
-      m !== AuthenticationMethodType.PASSKEY,
-  );
-
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
-  if (
-    availableSecondFactors?.length == 0 &&
-    humanUser?.passwordChangeRequired
-  ) {
+  // check if the user has to change password first
+  if (humanUser?.passwordChangeRequired) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName,
     });
@@ -176,7 +168,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { redirect: "/password/change?" + params };
   }
 
-  if (availableSecondFactors?.length == 1) {
+  const availableMultiFactors = authMethods?.filter(
+    (m: AuthenticationMethodType) =>
+      m !== AuthenticationMethodType.PASSWORD &&
+      m !== AuthenticationMethodType.PASSKEY,
+  );
+
+  if (availableMultiFactors?.length == 1) {
     const params = new URLSearchParams({
       loginName: session.factors?.user.loginName,
     });
@@ -192,7 +190,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       );
     }
 
-    const factor = availableSecondFactors[0];
+    const factor = availableMultiFactors[0];
     // if passwordless is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
       return { redirect: `/otp/time-based?` + params };
@@ -203,7 +201,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     } else if (factor === AuthenticationMethodType.U2F) {
       return { redirect: `/u2f?` + params };
     }
-  } else if (availableSecondFactors?.length >= 1) {
+  } else if (availableMultiFactors?.length >= 1) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
     });
@@ -226,7 +224,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Initial User not supported" };
   } else if (
     (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
-    !availableSecondFactors.length
+    !availableMultiFactors.length
   ) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,

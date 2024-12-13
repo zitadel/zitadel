@@ -116,7 +116,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
             </button>
           </div>
         </Alert>
-        <div className="">
+        <div className="mt-4">
           <TextInput
             type="text"
             autoComplete="one-time-code"
