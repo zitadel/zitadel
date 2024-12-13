@@ -137,7 +137,7 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.G
 }
 
 func activeIdentityProvidersToQuery(req *settings.GetActiveIdentityProvidersRequest) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, 0)
+	q := make([]query.SearchQuery, 0, 4)
 	if req.CreationAllowed != nil {
 		creationQuery, err := query.NewIDPTemplateIsCreationAllowedSearchQuery(*req.CreationAllowed)
 		if err != nil {
