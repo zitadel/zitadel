@@ -3,6 +3,60 @@
 Dear community!
 We're excited to announce bi-weekly office hours.
 
+## #7 Feature demo - Back-channel Logout 
+
+Our dev team has been hard at work developing new features for you to explore. What's been cooking? 🧑🏾‍🍳 Back-channel logout! We're inviting to you join our swiss army knife dev Livio on Wednesday, December 11th, 2024 at 11:00 AM (EST) as he walks you through back-channel logout on the ZITADEL platform & answers your questions!
+
+🦒 **What to expect**
+
+A demo session - You'll get the chance to learn more about an upcoming feature through a comprehensive walkthrough led by Livio.
+Brief Q&A - Post-demo, there will be space to share your questions & feedback on the back-channel logout feature.
+
+🗒️ **Details**
+
+Topic: Feature demo - Back-channel logout
+Date & time: Wednesday, December 11th, 2024 at 11:00 AM (EST)
+Duration: ~1 hour
+Platform: ZITADEL’s Discord stage channel
+
+**Register for this event here** ➡️ https://discord.gg/bnuAe2RX?event=1308899625041924127
+
+🗓️ **Add this to your calendar** ➡️ [Google Calendar](https://calendar.google.com/calendar/u/0/r/eventedit?dates=20241211T110000/20241211T110000&details=Our+dev+team+has+been+hard+at+work+developing+new+features+for+you+to+explore.+What%27s+been+cooking?+%F0%9F%A7%91%F0%9F%8F%BD%E2%80%8D%F0%9F%8D%B3+Back-channel+logout!+We%27re+inviting+to+you+join+our+swiss+army+knife+dev+Livio+on+Wednesday,+December+11,+2024+at+11:00+AM+as+he+walks+you+through+implementing+back-channel+logout+on+the+ZITADEL+platform+%26+answers+your+questions!&location=Discord:+ZITADEL+server,+office+hours&text=Feature+Demo+-+Back-Channel+Logout)
+
+If you have any questions prior to the live session, be sure to share them in the (office hours stage chat)[https://discord.com/channels/927474939156643850/1243281463554605058]
+
+Looking forward to seeing you there! Share this with other ZITADEL users & people who might be interested in ZITADEL! It’s appreciated  🫶 
+
+
+## #6 Q&A 
+
+Hey folks!
+
+We’re inviting you to our next open office hours session! C: From leveraging ZITADEL actions to exploring your use cases, join our hosts Silvan & Stefan on Wednesday, November 20, 2024 at 11:00 AM (EST) as they answer your questions about ZITADEL! 
+
+🦒 **What to expect**
+
+An open Q&A session - Share your questions and support others with their inquiries.
+A space to share your thoughts / feedback on the ZITADEL platform
+
+🗒️ **Details**
+
+Target audience: All ZITADEL platform users & community members
+Topic: Q&A Session 
+Date & time: Wednesday, November 20, 2024 at 11:00 AM (EST)
+Duration: ~1 hour 
+Platform: ZITADEL’s Discord stage channel 
+
+Register for this event here ➡️ https://discord.gg/bnuAe2RX?event=1307010383713927230
+
+🗓️ **Add this to your calendar** ➡️ [Google Calendar](https://calendar.google.com/calendar/u/0/r/eventedit?dates=20241120T110000/20241120T110000&details=We%E2%80%99re+inviting+you+to+our+next+open+office+hours+session!+C:+From+leveraging+ZITADEL+actions+to+exploring+your+use+cases,+join+our+hosts+Silvan+%26+Stefan+as+they+answer+your+questions+about+ZITADEL!+%0A%0A**What+to+expect**%0A%0A-+An+open+Q%26A+session+-+Share+your+questions+and+support+others+with+their+inquiries.+%0A-+A+space+to+share+your+thoughts+/+feedback+on+the+ZITADEL+platform+++%0A%0A**Details**+%0A%0A**Target+audience:**+All+ZITADEL+platform+users+%26+community+members%0A**Topic**:+Q%26A+Session+%0A**Date+%26+time**:+Wednesday,+November+20,+2024+11:00+AM%0A**Duration**:+~1+hour+%0A**Platform**:+ZITADEL%E2%80%99s+Discord+stage+channel&location=Discord:+ZITADEL+server,+office+hours&text=Open+Office+Hours)
+
+
+If you have any questions prior to the live session, be sure to share them in the office hours stage chat
+
+Looking forward to seeing you there! Share this with other ZITADEL users & people who might be interested in ZITADEL! It’s appreciated 🫶 
+
+
 ## #5 Q&A
 
 Dear community,

@@ -107,9 +107,18 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Org, err error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if org, ok := q.caches.org.Get(ctx, orgIndexByID, id); ok {
+		return org, nil
+	}
+	defer func() {
+		if err == nil && org != nil {
+			q.caches.org.Set(ctx, org)
+		}
+	}()
 
 	if !authz.GetInstance(ctx).Features().ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeOrgByID) {
 		return q.oldOrgByID(ctx, shouldTriggerBulk, id)
@@ -175,6 +184,11 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *O
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	org, ok := q.caches.org.Get(ctx, orgIndexByPrimaryDomain, domain)
+	if ok {
+		return org, nil
+	}
+
 	stmt, scan := prepareOrgQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		OrgColumnDomain.identifier():     domain,
@@ -189,6 +203,9 @@ func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *O
 		org, err = scan(row)
 		return err
 	}, query, args...)
+	if err == nil {
+		q.caches.org.Set(ctx, org)
+	}
 	return org, err
 }
 
@@ -475,4 +492,31 @@ func prepareOrgUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			}
 			return isUnique, err
 		}
+}
+
+type orgIndex int
+
+//go:generate enumer -type orgIndex -linecomment
+const (
+	// Empty line comment ensures empty string for unspecified value
+	orgIndexUnspecified orgIndex = iota //
+	orgIndexByID
+	orgIndexByPrimaryDomain
+)
+
+// Keys implements [cache.Entry]
+func (o *Org) Keys(index orgIndex) []string {
+	switch index {
+	case orgIndexByID:
+		return []string{o.ID}
+	case orgIndexByPrimaryDomain:
+		return []string{o.Domain}
+	case orgIndexUnspecified:
+	}
+	return nil
+}
+
+func (c *Caches) registerOrgInvalidation() {
+	invalidate := cacheInvalidationFunc(c.org, orgIndexByID, getAggregateID)
+	projection.OrgProjection.RegisterCacheInvalidation(invalidate)
 }

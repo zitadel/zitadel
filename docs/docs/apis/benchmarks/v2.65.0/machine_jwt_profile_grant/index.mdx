@@ -1,0 +1,75 @@
+---
+title: machine jwt profile grant benchmark of zitadel v2.65.0
+sidebar_label: machine jwt profile grant
+---
+
+## Summary
+
+Tests are halted after this test run because of too many [client read events](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/wait-event.clientread.html) on the database.
+
+## Performance test results
+
+| Metric | Value |
+| :---- | :---- |
+| Baseline | none |
+| Test start | 22-10-2024 16:20 UTC |
+| Test duration | 30min |
+| Executed test | machine\_jwt\_profile\_grant |
+| k6 version | v0.54.0 |
+| VUs | 50 |
+| Client location | US1 |
+| Client machine specification | e2-high-cpu-4 |
+| Zitadel location | US1 |
+| Zitadel container specification | vCPUs: 2<br/>Memory: 512 MiB<br/>Container count: 2 |
+| Zitadel feature flags | none |
+| Database | postgres v15 |
+| Database location | US1 |
+| Database specification | vCPUs: 4<br/>Memory: 16 GiB |
+| Zitadel metrics during test |  |
+| Observed errors | Many client read events during push |
+| Top 3 most expensive database queries | 1: Query events `instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 AND event_type = ANY($4)`<br/>2: latest sequence query during push events<br/>3: writing events during push (caused lock wait events) |
+| k6 iterations per second | 193 |
+| k6 overview | [output](#k6-output) |
+| flowchart outcome | Halt tests, must resolve an issue |
+
+## /token endpoint latencies
+
+import OutputSource from "!!raw-loader!./output.json";
+
+import { BenchmarkChart } from '/src/components/benchmark_chart';
+
+<BenchmarkChart testResults={OutputSource} />
+
+## k6 output {#k6-output}
+
+```bash
+checks...............................: 100.00% ✓ 695739 ✗ 0   
+data_received........................: 479 MB 265 kB/s  
+data_sent............................: 276 MB 153 kB/s  
+http_req_blocked.....................: min=178ns avg=5µs max=119.8ms p(50)=460ns p(95)=702ns p(99)=921ns   
+http_req_connecting..................: min=0s avg=1.24µs max=43.45ms p(50)=0s p(95)=0s p(99)=0s   
+http_req_duration....................: min=18ms avg=255.3ms max=1.22s p(50)=241.56ms p(95)=479.19ms p(99)=600.92ms  
+{ expected_response:true }.........: min=18ms avg=255.3ms max=1.22s p(50)=241.56ms p(95)=479.19ms p(99)=600.92ms  
+http_req_failed......................: 0.00% ✓ 0 ✗ 347998  
+http_req_receiving...................: min=25.92µs avg=536.96µs max=401.94ms p(50)=89.44µs p(95)=2.39ms p(99)=11.12ms   
+http_req_sending.....................: min=24.01µs avg=63.86µs max=4.48ms p(50)=60.97µs p(95)=88.69µs p(99)=141.74µs  
+http_req_tls_handshaking.............: min=0s avg=2.8µs max=51.05ms p(50)=0s p(95)=0s p(99)=0s   
+http_req_waiting.....................: min=17.65ms avg=254.7ms max=1.22s p(50)=240.88ms p(95)=478.6ms p(99)=600.6ms   
+http_reqs............................: 347998 192.80552/s  
+iteration_duration...................: min=33.86ms avg=258.77ms max=1.22s p(50)=245ms p(95)=482.61ms p(99)=604.32ms  
+iterations...........................: 347788 192.689171/s  
+login_ui_enter_login_name_duration...: min=218.61ms avg=218.61ms max=218.61ms p(50)=218.61ms p(95)=218.61ms p(99)=218.61ms  
+login_ui_enter_password_duration.....: min=18ms avg=18ms max=18ms p(50)=18ms p(95)=18ms p(99)=18ms   
+login_ui_init_login_duration.........: min=90.96ms avg=90.96ms max=90.96ms p(50)=90.96ms p(95)=90.96ms p(99)=90.96ms   
+login_ui_token_duration..............: min=140.02ms avg=140.02ms max=140.02ms p(50)=140.02ms p(95)=140.02ms p(99)=140.02ms  
+oidc_token_duration..................: min=29.85ms avg=255.38ms max=1.22s p(50)=241.61ms p(95)=479.23ms p(99)=600.95ms  
+org_create_org_duration..............: min=64.51ms avg=64.51ms max=64.51ms p(50)=64.51ms p(95)=64.51ms p(99)=64.51ms   
+user_add_machine_key_duration........: min=44.93ms avg=87.89ms max=159.52ms p(50)=84.43ms p(95)=144.59ms p(99)=155.54ms  
+user_create_machine_duration.........: min=65.75ms avg=266.53ms max=421.58ms p(50)=276.59ms p(95)=380.84ms p(99)=414.43ms  
+vus..................................: 0 min=0 max=50   
+vus_max..............................: 50 min=50 max=50 
+
+running (30m04.9s), 00/50 VUs, 347788 complete and 0 interrupted iterations  
+default ✓ [======================================] 50 VUs 30m0s
+```
+

@@ -196,6 +196,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.OTP,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -245,6 +246,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.DomainVerification,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		&http.Client{},
 		permissionCheck,
 		sessionTokenVerifier,
@@ -277,6 +279,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		config.Projections.Customizations["notificationsquotas"],
 		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
+		config.Notifications,
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -291,6 +294,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
+		queryDBClient,
 	)
 	notification.Start(ctx)
 
@@ -401,6 +405,7 @@ func startAPIs(
 
 	config.Auth.Spooler.Client = dbClient
 	config.Auth.Spooler.Eventstore = eventstore
+	config.Auth.Spooler.ActiveInstancer = queries
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {
 		return nil, fmt.Errorf("error starting auth repo: %w", err)
@@ -408,7 +413,8 @@ func startAPIs(
 
 	config.Admin.Spooler.Client = dbClient
 	config.Admin.Spooler.Eventstore = eventstore
-	err = admin_es.Start(ctx, config.Admin, store, dbClient)
+	config.Admin.Spooler.ActiveInstancer = queries
+	err = admin_es.Start(ctx, config.Admin, store, dbClient, queries)
 	if err != nil {
 		return nil, fmt.Errorf("error starting admin repo: %w", err)
 	}

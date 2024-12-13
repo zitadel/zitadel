@@ -9,6 +9,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -21,7 +22,6 @@ import (
 )
 
 func TestServer_CreateTarget(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -201,11 +201,12 @@ func TestServer_CreateTarget(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := instance.Client.ActionV3Alpha.CreateTarget(tt.ctx, &action.CreateTargetRequest{Target: tt.req})
 			if tt.wantErr {
-				require.Error(t, err)
-				return
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				integration.AssertResourceDetails(t, tt.want, got.Details)
+				assert.NotEmpty(t, got.GetSigningKey())
 			}
-			require.NoError(t, err)
-			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
@@ -218,11 +219,15 @@ func TestServer_PatchTarget(t *testing.T) {
 		ctx context.Context
 		req *action.PatchTargetRequest
 	}
+	type want struct {
+		details    *resource_object.Details
+		signingKey bool
+	}
 	tests := []struct {
 		name    string
 		prepare func(request *action.PatchTargetRequest) error
 		args    args
-		want    *resource_object.Details
+		want    want
 		wantErr bool
 	}{
 		{
@@ -273,12 +278,40 @@ func TestServer_PatchTarget(t *testing.T) {
 					},
 				},
 			},
-			want: &resource_object.Details{
-				Changed: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.ID(),
+			want: want{
+				details: &resource_object.Details{
+					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   instance.ID(),
+					},
 				},
+			},
+		},
+		{
+			name: "regenerate signingkey, ok",
+			prepare: func(request *action.PatchTargetRequest) error {
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				request.Id = targetID
+				return nil
+			},
+			args: args{
+				ctx: isolatedIAMOwnerCTX,
+				req: &action.PatchTargetRequest{
+					Target: &action.PatchTarget{
+						ExpirationSigningKey: durationpb.New(0 * time.Second),
+					},
+				},
+			},
+			want: want{
+				details: &resource_object.Details{
+					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   instance.ID(),
+					},
+				},
+				signingKey: true,
 			},
 		},
 		{
@@ -300,11 +333,13 @@ func TestServer_PatchTarget(t *testing.T) {
 					},
 				},
 			},
-			want: &resource_object.Details{
-				Changed: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.ID(),
+			want: want{
+				details: &resource_object.Details{
+					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   instance.ID(),
+					},
 				},
 			},
 		},
@@ -323,11 +358,13 @@ func TestServer_PatchTarget(t *testing.T) {
 					},
 				},
 			},
-			want: &resource_object.Details{
-				Changed: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.ID(),
+			want: want{
+				details: &resource_object.Details{
+					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   instance.ID(),
+					},
 				},
 			},
 		},
@@ -346,11 +383,13 @@ func TestServer_PatchTarget(t *testing.T) {
 					},
 				},
 			},
-			want: &resource_object.Details{
-				Changed: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.ID(),
+			want: want{
+				details: &resource_object.Details{
+					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   instance.ID(),
+					},
 				},
 			},
 		},
@@ -371,11 +410,13 @@ func TestServer_PatchTarget(t *testing.T) {
 					},
 				},
 			},
-			want: &resource_object.Details{
-				Changed: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.ID(),
+			want: want{
+				details: &resource_object.Details{
+					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   instance.ID(),
+					},
 				},
 			},
 		},
@@ -388,11 +429,14 @@ func TestServer_PatchTarget(t *testing.T) {
 			instance.Client.ActionV3Alpha.PatchTarget(tt.args.ctx, tt.args.req)
 			got, err := instance.Client.ActionV3Alpha.PatchTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
-				require.Error(t, err)
-				return
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				integration.AssertResourceDetails(t, tt.want.details, got.Details)
+				if tt.want.signingKey {
+					assert.NotEmpty(t, got.SigningKey)
+				}
 			}
-			require.NoError(t, err)
-			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
@@ -444,11 +488,12 @@ func TestServer_DeleteTarget(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := instance.Client.ActionV3Alpha.DeleteTarget(tt.ctx, tt.req)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
+			} else {
+				assert.NoError(t, err)
+				integration.AssertResourceDetails(t, tt.want, got.Details)
 			}
-			require.NoError(t, err)
-			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }

@@ -54,6 +54,7 @@ type Config struct {
 	Metrics             metrics.Config
 	Profiler            profiler.Config
 	Projections         projection.Config
+	Notifications       handlers.WorkerConfig
 	Auth                auth_es.Config
 	Admin               admin_es.Config
 	UserAgentCookie     *middleware.UserAgentCookieConfig

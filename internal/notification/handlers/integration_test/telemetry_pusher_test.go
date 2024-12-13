@@ -26,8 +26,6 @@ import (
 )
 
 func TestServer_TelemetryPushMilestones(t *testing.T) {
-	t.Parallel()
-
 	sub := sink.Subscribe(CTX, sink.ChannelMilestone)
 	defer sub.Close()
 

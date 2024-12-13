@@ -408,6 +408,12 @@ message CreateTargetRequest {
 
 message CreateTargetResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
+  // Key used to sign and check payload sent to the target.
+  string signing_key = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"98KmsU67\""
+    }
+  ];
 }
 
 message PatchTargetRequest {
@@ -433,6 +439,12 @@ message PatchTargetRequest {
 
 message PatchTargetResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
+  // Key used to sign and check payload sent to the target.
+  optional string signing_key = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"98KmsU67\""
+    }
+  ];
 }
 
 message DeleteTargetRequest {
