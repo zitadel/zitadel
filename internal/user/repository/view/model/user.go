@@ -79,7 +79,7 @@ type HumanView struct {
 	AvatarKey                string         `json:"storeKey" gorm:"column:avatar_key"`
 	Email                    string         `json:"email" gorm:"column:email"`
 	IsEmailVerified          bool           `json:"-" gorm:"column:is_email_verified"`
-	VerifiedEmail            string         `json:"-" gorm:"-"`
+	VerifiedEmail            string         `json:"-" gorm:"column:verified_email"`
 	Phone                    string         `json:"phone" gorm:"column:phone"`
 	IsPhoneVerified          bool           `json:"-" gorm:"column:is_phone_verified"`
 	Country                  string         `json:"country" gorm:"column:country"`
