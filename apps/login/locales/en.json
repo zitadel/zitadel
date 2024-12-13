@@ -24,6 +24,7 @@
       "title": "Set Password",
       "description": "Set the password for your account",
       "codeSent": "A code has been sent to your email address.",
+      "noCodeReceived": "Didn't receive a code?",
       "resend": "Resend code",
       "submit": "Continue"
     },
@@ -173,6 +174,7 @@
     "verify": {
       "title": "Verify user",
       "description": "Enter the Code provided in the verification email.",
+      "noCodeReceived": "Didn't receive a code?",
       "resendCode": "Resend code",
       "submit": "Continue"
     }

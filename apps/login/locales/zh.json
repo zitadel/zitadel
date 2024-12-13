@@ -24,6 +24,7 @@
       "title": "设置密码",
       "description": "为您的账户设置密码",
       "codeSent": "验证码已发送到您的邮箱。",
+      "noCodeReceived": "没有收到验证码？",
       "resend": "重发验证码",
       "submit": "继续"
     },
@@ -122,6 +123,18 @@
     }
   },
   "register": {
+    "methods": {
+      "passkey": "密钥",
+      "password": "密码"
+    },
+    "disabled": {
+      "title": "注册已禁用",
+      "description": "您的设置不允许注册新用户。"
+    },
+    "missingdata": {
+      "title": "缺少数据",
+      "description": "请提供所有必需的数据。"
+    },
     "title": "注册",
     "description": "创建您的 ZITADEL 账户。",
     "selectMethod": "选择您想使用的认证方法",
@@ -151,7 +164,8 @@
   },
   "signedin": {
     "title": "欢迎 {user}！",
-    "description": "您已登录。"
+    "description": "您已登录。",
+    "continue": "继续"
   },
   "verify": {
     "userIdMissing": "未提供用户 ID！",
@@ -160,6 +174,7 @@
     "verify": {
       "title": "验证用户",
       "description": "输入验证邮件中的验证码。",
+      "noCodeReceived": "没有收到验证码？",
       "resendCode": "重发验证码",
       "submit": "继续"
     }
