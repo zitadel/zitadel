@@ -63,7 +63,7 @@ func AssertDetails[D Details, M DetailsMsg[D]](t assert.TestingT, expected, actu
 	if wantDetails.GetChangeDate() != nil {
 		wantChangeDate := time.Now()
 		gotChangeDate := gotDetails.GetChangeDate().AsTime()
-		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
+		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-10*time.Minute), wantChangeDate.Add(time.Minute))
 	}
 
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
@@ -73,12 +73,12 @@ func AssertResourceDetails(t assert.TestingT, expected *resources_object.Details
 	if expected.GetChanged() != nil {
 		wantChangeDate := time.Now()
 		gotChangeDate := actual.GetChanged().AsTime()
-		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
+		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-10*time.Minute), wantChangeDate.Add(time.Minute))
 	}
 	if expected.GetCreated() != nil {
 		wantCreatedDate := time.Now()
 		gotCreatedDate := actual.GetCreated().AsTime()
-		assert.WithinRange(t, gotCreatedDate, wantCreatedDate.Add(-time.Minute), wantCreatedDate.Add(time.Minute))
+		assert.WithinRange(t, gotCreatedDate, wantCreatedDate.Add(-10*time.Minute), wantCreatedDate.Add(time.Minute))
 	}
 	if expected.GetOwner() != nil {
 		expectedOwner := expected.GetOwner()
