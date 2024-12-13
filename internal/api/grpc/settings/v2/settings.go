@@ -138,29 +138,33 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.G
 
 func activeIdentityProvidersToQuery(req *settings.GetActiveIdentityProvidersRequest) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, 0)
-	if req.GetCreationAllowed() {
-		creationQuery, err := query.NewIDPTemplateIsCreationAllowedSearchQuery(true)
+	if req.CreationAllowed != nil {
+		creationQuery, err := query.NewIDPTemplateIsCreationAllowedSearchQuery(*req.CreationAllowed)
 		if err != nil {
 			return nil, err
 		}
 		q = append(q, creationQuery)
 	}
-	if req.GetLinkingAllowed() {
-		creationQuery, err := query.NewIDPTemplateIsLinkingAllowedSearchQuery(true)
+	if req.LinkingAllowed != nil {
+		creationQuery, err := query.NewIDPTemplateIsLinkingAllowedSearchQuery(*req.LinkingAllowed)
 		if err != nil {
 			return nil, err
 		}
 		q = append(q, creationQuery)
 	}
-	if req.GetAutoCreation() {
-		creationQuery, err := query.NewIDPTemplateIsAutoCreationSearchQuery(true)
+	if req.AutoCreation != nil {
+		creationQuery, err := query.NewIDPTemplateIsAutoCreationSearchQuery(*req.AutoCreation)
 		if err != nil {
 			return nil, err
 		}
 		q = append(q, creationQuery)
 	}
-	if req.GetAutoLinking() {
-		creationQuery, err := query.NewIDPTemplateAutoLinkingSearchQuery(0, query.NumberNotEquals)
+	if req.AutoLinking != nil {
+		compare := query.NumberEquals
+		if *req.AutoLinking {
+			compare = query.NumberNotEquals
+		}
+		creationQuery, err := query.NewIDPTemplateAutoLinkingSearchQuery(0, compare)
 		if err != nil {
 			return nil, err
 		}
