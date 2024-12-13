@@ -32,7 +32,7 @@ const LinkWrapper = ({
 
 export const TOTP = (alreadyAdded: boolean, link: string) => {
   return (
-    <LinkWrapper alreadyAdded={alreadyAdded} link={link} key={link}>
+    <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -40,45 +40,12 @@ export const TOTP = (alreadyAdded: boolean, link: string) => {
         )}
       >
         <svg
-          className="h-9 w-9 transform -translate-x-[2px] mr-4"
-          version="1.1"
-          baseProfile="basic"
-          id="Layer_1"
+          className="h-8 w-8 transform -translate-x-[2px] mr-4 fill-current text-black dark:text-white"
           xmlns="http://www.w3.org/2000/svg"
-          xmlnsXlink="http://www.w3.org/1999/xlink"
-          x="0px"
-          y="0px"
-          viewBox="0 0 512 512"
-          xmlSpace="preserve"
+          viewBox="0 0 24 24"
         >
-          <path
-            fill="#1A73E8"
-            d="M440,255.99997v0.00006C440,273.12085,426.12085,287,409.00003,287H302l-46-93.01001l49.6507-85.9951
-c8.56021-14.82629,27.51834-19.9065,42.34518-11.34724l0.00586,0.0034c14.82776,8.55979,19.90875,27.51928,11.34857,42.34682
-L309.70001,225h99.30002C426.12085,225,440,238.87917,440,255.99997z"
-          />
-          <path
-            fill="#EA4335"
-            d="M348.00174,415.34897l-0.00586,0.00339c-14.82684,8.55927-33.78497,3.47903-42.34518-11.34723L256,318.01001
-l-49.65065,85.99509c-8.5602,14.82629-27.51834,19.90652-42.34517,11.34729l-0.00591-0.00342
-c-14.82777-8.55978-19.90875-27.51929-11.34859-42.34683L202.29999,287L256,285l53.70001,2l49.6503,86.00214
-C367.91049,387.82968,362.8295,406.78918,348.00174,415.34897z"
-          />
-          <path
-            fill="#FBBC04"
-            d="M256,193.98999L242,232l-39.70001-7l-49.6503-86.00212
-c-8.56017-14.82755-3.47919-33.78705,11.34859-42.34684l0.00591-0.00341c14.82683-8.55925,33.78497-3.47903,42.34517,11.34726
-L256,193.98999z"
-          />
-          <path
-            fill="#34A853"
-            d="M248,225l-36,62H102.99997C85.87916,287,72,273.12085,72,256.00003v-0.00006
-C72,238.87917,85.87916,225,102.99997,225H248z"
-          />
-          <polygon
-            fill="#185DB7"
-            points="309.70001,287 202.29999,287 256,193.98999 "
-          />
+          <title>timer-lock-outline</title>
+          <path d="M11 8H13V14H11V8M13 19.92C12.67 19.97 12.34 20 12 20C8.13 20 5 16.87 5 13S8.13 6 12 6C14.82 6 17.24 7.67 18.35 10.06C18.56 10.04 18.78 10 19 10C19.55 10 20.07 10.11 20.57 10.28C20.23 9.22 19.71 8.24 19.03 7.39L20.45 5.97C20 5.46 19.55 5 19.04 4.56L17.62 6C16.07 4.74 14.12 4 12 4C7.03 4 3 8.03 3 13S7.03 22 12 22C12.42 22 12.83 21.96 13.24 21.91C13.09 21.53 13 21.12 13 20.7V19.92M15 1H9V3H15V1M23 17.3V20.8C23 21.4 22.4 22 21.7 22H16.2C15.6 22 15 21.4 15 20.7V17.2C15 16.6 15.6 16 16.2 16V14.5C16.2 13.1 17.6 12 19 12S21.8 13.1 21.8 14.5V16C22.4 16 23 16.6 23 17.3M20.5 14.5C20.5 13.7 19.8 13.2 19 13.2S17.5 13.7 17.5 14.5V16H20.5V14.5Z" />
         </svg>{" "}
         <span>Authenticator App</span>
       </div>
@@ -93,7 +60,7 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
 
 export const U2F = (alreadyAdded: boolean, link: string) => {
   return (
-    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
+    <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -127,7 +94,7 @@ export const U2F = (alreadyAdded: boolean, link: string) => {
 
 export const EMAIL = (alreadyAdded: boolean, link: string) => {
   return (
-    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
+    <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -162,7 +129,7 @@ export const EMAIL = (alreadyAdded: boolean, link: string) => {
 
 export const SMS = (alreadyAdded: boolean, link: string) => {
   return (
-    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
+    <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -196,7 +163,7 @@ export const SMS = (alreadyAdded: boolean, link: string) => {
 
 export const PASSKEYS = (alreadyAdded: boolean, link: string) => {
   return (
-    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
+    <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -230,7 +197,7 @@ export const PASSKEYS = (alreadyAdded: boolean, link: string) => {
 
 export const PASSWORD = (alreadyAdded: boolean, link: string) => {
   return (
-    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
+    <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",

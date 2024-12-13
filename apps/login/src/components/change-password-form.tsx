@@ -6,8 +6,10 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { setMyPassword } from "@/lib/self";
-import { sendPassword } from "@/lib/server/password";
+import {
+  checkSessionAndSetPassword,
+  sendPassword,
+} from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -60,8 +62,9 @@ export function ChangePasswordForm({
 
   async function submitChange(values: Inputs) {
     setLoading(true);
-    const changeResponse = await setMyPassword({
-      sessionId: sessionId,
+
+    const changeResponse = checkSessionAndSetPassword({
+      sessionId,
       password: values.password,
     })
       .catch(() => {
@@ -72,8 +75,12 @@ export function ChangePasswordForm({
         setLoading(false);
       });
 
-    if (changeResponse && "error" in changeResponse) {
-      setError(changeResponse.error);
+    if (changeResponse && "error" in changeResponse && changeResponse.error) {
+      setError(
+        typeof changeResponse.error === "string"
+          ? changeResponse.error
+          : "Unknown error",
+      );
       return;
     }
 

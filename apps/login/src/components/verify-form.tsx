@@ -1,11 +1,12 @@
 "use client";
 
-import { Alert } from "@/components/alert";
+import { Alert, AlertType } from "@/components/alert";
 import { resendVerification, sendVerification } from "@/lib/server/email";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
 import { Spinner } from "./spinner";
@@ -96,7 +97,26 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
   return (
     <>
       <form className="w-full">
-        <div className="">
+        <Alert type={AlertType.INFO}>
+          <div className="flex flex-row">
+            <span className="flex-1 mr-auto text-left">
+              {t("verify.noCodeReceived")}
+            </span>
+            <button
+              aria-label="Resend OTP Code"
+              disabled={loading}
+              type="button"
+              className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+              onClick={() => {
+                resendCode();
+              }}
+              data-testid="resend-button"
+            >
+              {t("verify.resendCode")}
+            </button>
+          </div>
+        </Alert>
+        <div className="mt-4">
           <TextInput
             type="text"
             autoComplete="one-time-code"
@@ -112,13 +132,7 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">
-          <Button
-            type="button"
-            onClick={() => resendCode()}
-            variant={ButtonVariants.Secondary}
-          >
-            {t("verify.resendCode")}
-          </Button>
+          <BackButton />
           <span className="flex-grow"></span>
           <Button
             type="submit"
