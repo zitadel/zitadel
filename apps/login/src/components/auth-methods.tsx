@@ -32,7 +32,7 @@ const LinkWrapper = ({
 
 export const TOTP = (alreadyAdded: boolean, link: string) => {
   return (
-    <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link} key={link}>
+    <LinkWrapper key={link} alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
