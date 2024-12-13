@@ -1091,6 +1091,7 @@ service UserService {
   rpc CreateInviteCode (CreateInviteCodeRequest) returns (CreateInviteCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/invite_code"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1140,6 +1141,7 @@ service UserService {
   rpc VerifyInviteCode (VerifyInviteCodeRequest) returns (VerifyInviteCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/invite_code/verify"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
