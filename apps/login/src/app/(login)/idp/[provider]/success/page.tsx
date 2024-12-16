@@ -179,12 +179,14 @@ export default async function Page(props: {
         );
       });
 
-      return linkingSuccess(
-        userId,
-        { idpIntentId: id, idpIntentToken: token },
-        authRequestId,
-        branding,
-      );
+      if (idpLink) {
+        return linkingSuccess(
+          idpInformation.userId,
+          { idpIntentId: id, idpIntentToken: token },
+          authRequestId,
+          branding,
+        );
+      }
     }
   }
 
