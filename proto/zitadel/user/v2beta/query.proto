@@ -30,6 +30,7 @@ message SearchQuery {
         NotQuery not_query = 13;
         InUserEmailsQuery in_user_emails_query = 14;
         OrganizationIdQuery organization_id_query = 15;
+        PhoneQuery phone_query = 16;
     }
 }
 
@@ -196,7 +197,7 @@ message PhoneQuery {
             example: "\"+41791234567\"";
         }
     ];
-    zitadel.object.v2.TextQueryMethod method = 2 [
+    zitadel.object.v2beta.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines which text equality method is used";
