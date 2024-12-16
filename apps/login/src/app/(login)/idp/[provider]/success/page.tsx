@@ -56,6 +56,32 @@ async function loginSuccess(
   );
 }
 
+async function linkingSuccess(
+  userId: string,
+  idpIntent: { idpIntentId: string; idpIntentToken: string },
+  authRequestId?: string,
+  branding?: BrandingSettings,
+) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "idp" });
+
+  return (
+    <DynamicTheme branding={branding}>
+      <div className="flex flex-col items-center space-y-4">
+        <h1>{t("linkingSuccess.title")}</h1>
+        <div>
+          {t("linkingSuccess.description")}
+          <IdpSignin
+            userId={userId}
+            idpIntent={idpIntent}
+            authRequestId={authRequestId}
+          />
+        </div>
+      </div>
+    </DynamicTheme>
+  );
+}
+
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;
@@ -153,7 +179,7 @@ export default async function Page(props: {
         );
       });
 
-      return loginSuccess(
+      return linkingSuccess(
         userId,
         { idpIntentId: id, idpIntentToken: token },
         authRequestId,
