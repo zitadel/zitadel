@@ -1,0 +1,177 @@
+---
+title: OIDC Back-Channel Logout
+sidebar_label: Back-Channel Logout
+---
+
+The Back-Channel Logout implements [OpenID Connect Back-Channel Logout 1.0](https://openid.net/specs/openid-connect-backchannel-1_0.html)
+and can be used to notify clients about session termination at the OpenID Provider. This guide will explain how
+back-channel logout is implemented inside ZITADEL and gives some usage examples.
+
+:::info
+Back-Channel Logout is currently an experimental [beta](/docs/support/software-release-cycles-support#beta) feature.
+Be sure to enable it on the [feature API](#feature-api) before using it.
+We highly recommend also enabling the `webkey` feature on your instance. This will prevent issues with automatic key rotation.
+:::
+
+In this guide we assume your already familiar with getting and validation token. You should already have a good
+understanding on the following topics before starting with this guide:
+
+- Integrate your app with the [OIDC flow](/docs/guides/integrate/login/oidc/login-users) to obtain tokens
+- [Claims](/docs/apis/openidoauth/claims)
+- [Scope](/docs/apis/openidoauth/scopes)
+- Audience
+
+## Concept
+
+ZITADEL provides the possibility for OpenID Connect clients to be notified about the session termination, for example
+if a user signs out from another client using the same SSO session.
+This allows the client to also invalidate the user's session without the need for an active browser session.
+
+![Authentication and Back-Channel Logout Flow](/img/guides/back-channel-logout/back-channel-logout-flow.png)
+
+1. When an unauthenticated user visits your application,
+2. it will create an authorization request to the authorization endpoint.
+3. The Authorization Server (ZITADEL) will send an HTTP 302 to the user's browser, which will redirect them to the login UI.
+4. The user will have to authenticate using the demanded auth mechanics.
+5. Your application will be called on the registered callback path (redirect_uri) for the authorization code exchange.
+See [OIDC Flow](/docs/guides/integrate/login/oidc/login-users) for more details.
+On successful exchange, an SSO session will be created.
+6. If the user opens another application,
+7. the application will also create an authorization request to the authorization endpoint.
+8. ZITADEL can then reuse the existing SSO session and will not ask the user to authenticate again and directly return the code for exchange.
+See [OIDC Flow](/docs/guides/integrate/login/oidc/login-users) again for details.
+9. At a later point, the user signs out from one of the applications, in this case the second one.
+10. The application will redirect the user to the end_session endpoint.
+11. ZITADEL will terminate the SSO session and redirect the user back to the application's post_logout_redirect_uri.
+The application can delete the local session.
+12. ZITADEL will also send a back-channel logout request to every registered application with previously opened sessions.
+The application can then invalidate the user's session without the need for an active browser session.
+
+### Indicating Support
+
+As required by the [specification](https://openid.net/specs/openid-connect-backchannel-1_0.html#BCSupport), ZITADEL
+will advertise the `backchannel_logout_supported` and `backchannel_logout_session_supported`
+on the discovery endpoint once the feature flag is enabled.
+The latter boolean indicates, that ZITADEL will provide a session ID (`sid`) claim as part of the logout token. This
+provides the possibility to match the exact SSO session, which was terminated.
+
+### Client
+
+To enable the back-channel logout on a client, they simply need to register a `backchannel_logout_uri` as part of their
+configuration, e.g. [creating an OIDC application](https://zitadel.com/docs/apis/resources/mgmt/management-service-add-oidc-app).
+
+As soon as the URI is set, every new authorization request will register a back-channel notification to be sent once
+the session is terminated by a user sign out.
+
+## Back-Channel Request
+
+When the session is terminated, ZITADEL will send back-channel logout requests asynchronously to every registered
+client of the corresponding session.
+The request is an `application/x-www-form-urlencoded` POST request to the registered URI including a `logout_token`
+parameter in the body.
+
+Please be aware that body *may* contain other values in addition to logout_token. Values that are not understood by the
+implementation *must* be ignored.
+
+### Logout Token
+
+The `logout_token` sent in the request is a JWT similar to an ID Token.
+
+:::info
+Note however, that a Logout Token must never contain a `nonce` claim, to make sure it cannot be used as an ID Token.
+:::
+
+The following Claims are used within the Logout Token:
+
+| Claim  | Example                                                        | Description                                                                                                                          |
+|--------|----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| iss    | `$CUSTOM-DOMAIN`                                               | Issuer Identifier                                                                                                                    |
+| sub    | `77776025198584418`                                            | Subject Identifier (the user who signed out)                                                                                         |
+| aud    | `69234237810729019`                                            | Audience(s), will always contain your client_id                                                                                      |
+| iat    | `1311280970`                                                   | Issued at time                                                                                                                       |
+| exp    | `1311281970`                                                   | Expiration time (by default 15min after the issued at time)                                                                          |
+| jti    | `69234237813329048`                                            | Unique identifier for the token                                                                                                      |
+| events | `{ "http://schemas.openid.net/event/backchannel-logout": {} }` | JSON object, which always contains http://schemas.openid.net/event/backchannel-logout. This declares that the JWT is a Logout Token. |
+| sid    | `291693710356251044`                                           | Session ID - String identifier for a Session.                                                                                        |
+
+#### Validation
+
+Verify the Logout Token the same way you verify an ID Token including signature validation, issuer, audience, expiration and issued at time claim checks.
+Make sure that either a subject (`sub`) and / or a session ID (`sid`) is present in the token to identify the user or its session.
+Also, check that the `events` claim contains the `http://schemas.openid.net/event/backchannel-logout` value.
+Optionally, you can also verify that the TokenID (`jti`) has not been used before.
+
+For details on how to validate the logout token, please refer to the [OpenID Connect Back-Channel Logout specification](https://openid.net/specs/openid-connect-backchannel-1_0.html#Validation).
+
+## Example
+
+This example assumes that your application is registered with client_id `243864426485212395@example` and the back-channel logout
+URI is set to `https://example.com/logout`.
+
+### Authentication
+
+When the user signed in to your application, ZITADEL issued the following id_token:
+```
+eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NjkzMzA1NjAxNzY0Nzg3NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiIxNjQ4NDk0OTQyOTc0NzczNzciLCJhdWQiOlsiMjQzODY0NDI2NDg1MjEyMzk1QGV4YW1wbGUiLCIyNDM4NjQzODExNjk4ODY0NDMiXSwiZXhwIjoxNzMzNzgyNDQ0LCJpYXQiOjE3MzM3MzkyNDQsImF1dGhfdGltZSI6MTczMzczOTI0NCwiYW1yIjpbInVzZXIiLCJtZmEiXSwiYXpwIjoiMjQzODY0NDI2NDg1MjEyMzk1QGV4YW1wbGUiLCJjbGllbnRfaWQiOiIyNDM4NjQ0MjY0ODUyMTIzOTVAZXhhbXBsZSIsImF0X2hhc2giOiJSWVFPSkJuT01LS0hrN1VnLWY1eFJnIiwic2lkIjoiVjFfMjk3MzY0ODE4OTgwMDM0MDA0In0K.lZxHE_Z4tiaDQE-DPtYjnvb0H9rz4wMoGfBMeEm4EG837DGJb7RTq7PuMHWc4Z2e_6lilwfVBWDEOhmrnjmkQwDVxInbbJfN0NiWgeqoW-C1SZ_G00UVIbJdaxPy2-haRihDNNpy0Gjmi7q3FkGXGqkJx9S7ZtC5ISbXLnqfbRbuapoMs7hHNf-Iltf8v7dMs3K8dcAPSHJm0X0x6Cu1ZMeAS2a6H05xKXGM0bRK830AZlL8xmxTNj_q_WZKzxz304XrRNHvYRcHKmJqURSHvRNUR38QeNaiKzINlV2sVvPEY6Dru_PHSPNFu7YLWiUi34VUla6VTxy9ctI_BtI4nw
+```
+
+This represents the following claims:
+```json
+{
+  "iss": "http://localhost:8080",
+  "sub": "164849494297477377",
+  "aud": [
+    "243864426485212395@example",
+    "243864381169886443"
+  ],
+  "exp": 1733782444,
+  "iat": 1733739244,
+  "auth_time": 1733739244,
+  "amr": [
+    "user",
+    "mfa"
+  ],
+  "azp": "243864426485212395@example",
+  "client_id": "243864426485212395@example",
+  "at_hash": "RYQOJBnOMKKHk7Ug-f5xRg",
+  "sid": "V1_297364818980034004"
+}
+```
+
+As you can see, the `sid` claim is present in the token. This represents the application's specific session ID of the
+user session.
+
+
+### Sign Out and Back-Channel Logout
+
+When the user signs out from another application, ZITADEL will send a POST request to `https://example.com/logout` with
+the following body:
+
+```http
+POST /logout HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+
+logout_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5NjkzMzA1NjAxNzY0Nzg3NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiIxNjQ4NDk0OTQyOTc0NzczNzciLCJhdWQiOlsiMjQzODY0NDI2NDg1MjEyMzk1QGV4YW1wbGUiXSwiaWF0IjoxNzMzNzM5MjUyLCJleHAiOjE3MzM3NDAxNTMsImp0aSI6IjI5NzM2NDgzNDQ5ODkyMTEzNyIsImV2ZW50cyI6eyJodHRwOi8vc2NoZW1hcy5vcGVuaWQubmV0L2V2ZW50L2JhY2tjaGFubmVsLWxvZ291dCI6e319LCJzaWQiOiJWMV8yOTczNjQ4MTg5ODAwMzQwMDQifQo.ELOPuS61fy8GgCKEtru5df4-9GI4-KQlNf_DMp6b5mtJZIrfykA_M7lYOxOskYhTDicBoQ2jjOjzsDqktI4r6ptD068c5LEOx-k2OVk7ybADsK7tht5omYy4tsbHmkDCZN065WMH0SQH7NKGroVW-MACi6Peuiz3nlQsfho0EnLECqhZT60qxu6qtofvBVhHe15Zlkzffy0vxjKEIeJoTmX_cNVsHlrC_n1vTqZStBrkqu3_rwZxZuynX47vf7_kj_kKhJ3TffRF561n1AP5xnhZ9i--rnaucbGtGGImlKi2sdqC4GzjtdlaKJaRuVF-91x758SLBxqJXPucroJoWw
+```
+
+```json
+{
+  "iss": "http://localhost:8080",
+  "sub": "164849494297477377",
+  "aud": [
+    "243864426485212395@example"
+  ],
+  "iat": 1733739252,
+  "exp": 1733740153,
+  "jti": "297364834498921137",
+  "events": {
+    "http://schemas.openid.net/event/backchannel-logout": {}
+  },
+  "sid": "V1_297364818980034004"
+}
+```
+
+After validating the token, the application can now invalidate the user's local session based on the `sid` claim.
+
+Some applications might also want to delete all user sessions. In this case, the `sub` claim can be used to identify the user.
