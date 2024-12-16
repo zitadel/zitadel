@@ -33,6 +33,7 @@ async function loginFailed(branding?: BrandingSettings) {
 async function loginSuccess(
   userId: string,
   idpIntent: { idpIntentId: string; idpIntentToken: string },
+  authRequestId?: string,
   branding?: BrandingSettings,
 ) {
   const locale = getLocale();
@@ -44,7 +45,11 @@ async function loginSuccess(
         <h1>{t("loginSuccess.title")}</h1>
         <div>
           {t("loginSuccess.description")}
-          <IdpSignin userId={userId} idpIntent={idpIntent} />
+          <IdpSignin
+            userId={userId}
+            idpIntent={idpIntent}
+            authRequestId={authRequestId}
+          />
         </div>
       </div>
     </DynamicTheme>

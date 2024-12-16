@@ -60,8 +60,6 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
     return { error: "Could not create session" };
   }
 
-  console.log("sessionForIdp", session, authRequestId, session.id);
-
   const url = await getNextUrl(
     authRequestId && session.id
       ? {
