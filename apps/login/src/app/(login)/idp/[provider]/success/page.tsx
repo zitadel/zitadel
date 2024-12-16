@@ -204,5 +204,5 @@ export default async function Page(props: {
   }
 
   // return login failed if no linking or creation is allowed and no user was found
-  return loginFailed;
+  return loginFailed(branding);
 }
