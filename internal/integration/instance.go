@@ -238,7 +238,13 @@ func (i *Instance) createMachineUserOrgOwner(ctx context.Context) {
 }
 
 func (i *Instance) createLoginClient(ctx context.Context) {
-	i.createMachineUser(ctx, UserTypeLogin)
+	_, err := i.Client.Admin.AddIAMMember(ctx, &admin.AddIAMMemberRequest{
+		UserId: i.createMachineUser(ctx, UserTypeLogin),
+		Roles:  []string{"IAM_LOGIN_CLIENT"},
+	})
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (i *Instance) setClient(ctx context.Context) {

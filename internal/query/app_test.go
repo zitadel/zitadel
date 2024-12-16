@@ -246,6 +246,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -295,6 +296,7 @@ func Test_AppsPrepare(t *testing.T) {
 							"api-client-id",
 							domain.APIAuthMethodTypePrivateKeyJWT,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -366,6 +368,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1050,6 +1053,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1070,6 +1074,7 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1269,6 +1274,7 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// saml config
 						nil,
 						nil,
@@ -1312,6 +1318,7 @@ func Test_AppPrepare(t *testing.T) {
 							"api-client-id",
 							domain.APIAuthMethodTypePrivateKeyJWT,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1397,7 +1404,6 @@ func Test_AppPrepare(t *testing.T) {
 							database.TextArray[string]{"additional.origin"},
 							false,
 							"back.channel.logout.ch",
-							false,
 							domain.LoginVersionUnspecified,
 							nil,
 							// saml config
@@ -1554,6 +1560,7 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
 							nil,
 							nil,
 							nil,

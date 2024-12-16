@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"net/url"
 	"slices"
 	"strings"
 	"time"
@@ -17,7 +16,7 @@ import (
 )
 
 const (
-	LoginAuthRequestIDParam = "authRequestID"
+	LoginAuthRequestParam = "authRequest"
 )
 
 type Client struct {
@@ -60,15 +59,15 @@ func (c *Client) LoginURL(id string) string {
 	}
 	// any v2 login without a specific base uri will be sent to the configured login v2 UI
 	// this way we're also backwards compatible
-	if c.client.LoginBaseURI == nil || *c.client.LoginBaseURI == "" {
+	if c.client.LoginBaseURI == nil || c.client.LoginBaseURI.URL().String() == "" {
 		return c.defaultLoginURLV2 + id
 	}
 	// for clients with a specific URI (internal or external) we only need to add the auth request id
-	baseURL, _ := url.Parse(*c.client.LoginBaseURI)
-	q := baseURL.Query()
-	q.Set(LoginAuthRequestIDParam, id)
-	baseURL.RawQuery = q.Encode()
-	return baseURL.String()
+	uri := c.client.LoginBaseURI.URL().JoinPath(LoginPath)
+	q := uri.Query()
+	q.Set(LoginAuthRequestParam, id)
+	uri.RawQuery = q.Encode()
+	return uri.String()
 }
 
 func (c *Client) RedirectURIs() []string {

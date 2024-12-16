@@ -3,6 +3,8 @@ package feature
 import (
 	"net/url"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/feature"
@@ -95,19 +97,20 @@ func featureSourceToImprovedPerformanceFlagPb(fs *query.FeatureSource[[]feature.
 	}
 }
 
-func loginV2ToDomain(loginV2 *feature_pb.LoginV2) (*feature.LoginV2, error) {
+func loginV2ToDomain(loginV2 *feature_pb.LoginV2) (_ *feature.LoginV2, err error) {
 	if loginV2 == nil {
 		return nil, nil
 	}
+	var baseURI *url.URL
 	if loginV2.GetBaseUri() != "" {
-		_, err := url.Parse(loginV2.GetBaseUri())
+		baseURI, err = url.Parse(loginV2.GetBaseUri())
 		if err != nil {
 			return nil, err
 		}
 	}
 	return &feature.LoginV2{
 		Required: loginV2.GetRequired(),
-		BaseURI:  loginV2.GetBaseUri(),
+		BaseURI:  baseURI,
 	}, nil
 }
 
@@ -116,8 +119,8 @@ func loginV2ToLoginV2FlagPb(f query.FeatureSource[*feature.LoginV2]) *feature_pb
 	var baseURI *string
 	if f.Value != nil {
 		required = f.Value.Required
-		if f.Value.BaseURI != "" { //TODO!
-			baseURI = &f.Value.BaseURI
+		if f.Value.BaseURI != nil && f.Value.BaseURI.String() != "" {
+			baseURI = gu.Ptr(f.Value.BaseURI.String())
 		}
 	}
 	return &feature_pb.LoginV2FeatureFlag{

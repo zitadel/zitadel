@@ -1,6 +1,7 @@
 package feature
 
 import (
+	"net/url"
 	"slices"
 )
 
@@ -69,6 +70,6 @@ func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool
 }
 
 type LoginV2 struct {
-	Required bool   `json:"required,omitempty"`
-	BaseURI  string `json:"base_uri,omitempty"`
+	Required bool     `json:"required,omitempty"`
+	BaseURI  *url.URL `json:"base_uri,omitempty"`
 }

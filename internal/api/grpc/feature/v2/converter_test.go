@@ -1,6 +1,7 @@
 package feature
 
 import (
+	"net/url"
 	"testing"
 	"time"
 
@@ -42,7 +43,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		OIDCSingleV1SessionTermination:  gu.Ptr(true),
 		LoginV2: &feature.LoginV2{
 			Required: true,
-			BaseURI:  "https://login.com",
+			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
 	}
 	got, err := systemFeaturesToCommand(arg)
@@ -97,7 +98,7 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: &feature.LoginV2{
 				Required: true,
-				BaseURI:  "https://login.com",
+				BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 			},
 		},
 	}
@@ -189,7 +190,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		EnableBackChannelLogout:         gu.Ptr(true),
 		LoginV2: &feature.LoginV2{
 			Required: true,
-			BaseURI:  "https://login.com",
+			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
 	}
 	got, err := instanceFeaturesToCommand(arg)
@@ -248,7 +249,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: &feature.LoginV2{
 				Required: true,
-				BaseURI:  "https://login.com",
+				BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 			},
 		},
 	}
