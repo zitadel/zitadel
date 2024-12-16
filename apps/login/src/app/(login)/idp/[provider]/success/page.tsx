@@ -1,7 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { IdpSignin } from "@/components/idp-signin";
 import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
-import { createNewSessionForIdp } from "@/lib/server/session";
 import {
   addIDPLink,
   createUser,
@@ -13,7 +13,6 @@ import {
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
 
 async function loginFailed(branding?: BrandingSettings) {
   const locale = getLocale();
@@ -51,42 +50,16 @@ export default async function Page(props: {
 
   const { idpInformation, userId } = intent;
 
-  async function continueWithSession(
-    idpIntentId: string,
-    idpIntentToken: string,
-  ) {
-    const sessionRedirectResponse = await createNewSessionForIdp({
-      userId,
-      idpIntent: {
-        idpIntentId,
-        idpIntentToken,
-      },
-      authRequestId,
-    });
-
-    if (
-      !sessionRedirectResponse ||
-      (sessionRedirectResponse &&
-        "error" in sessionRedirectResponse &&
-        sessionRedirectResponse?.error)
-    ) {
-      return loginFailed(branding);
-    }
-
-    if (
-      sessionRedirectResponse &&
-      "redirect" in sessionRedirectResponse &&
-      sessionRedirectResponse?.redirect
-    ) {
-      return redirect(sessionRedirectResponse.redirect);
-    }
-  }
-
   // sign in user. If user should be linked continue
   if (userId && !link) {
     // TODO: update user if idp.options.isAutoUpdate is true
 
-    await continueWithSession(id, token);
+    return (
+      <IdpSignin
+        userId={userId}
+        idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+      />
+    );
   }
 
   if (!idpInformation) {
@@ -153,7 +126,12 @@ export default async function Page(props: {
         );
       });
 
-      await continueWithSession(id, token);
+      return (
+        <IdpSignin
+          userId={userId}
+          idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+        />
+      );
     }
   }
 
