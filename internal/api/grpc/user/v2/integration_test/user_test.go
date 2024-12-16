@@ -2629,6 +2629,126 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	}
 }
 
+func TestServer_ListAuthenticationFactors(t *testing.T) {
+	userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
+
+	userWithU2F := Instance.CreateHumanUser(CTX).GetUserId()
+	U2FId := Instance.RegisterUserU2F(CTX, userWithU2F)
+
+	userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
+	U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
+
+	userWithSMS := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), "").GetUserId()
+	Instance.RegisterUserSMS(CTX, userWithSMS)
+
+	userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), "").GetUserId()
+	Instance.RegisterUserEmail(CTX, userWithEmail)
+
+	tests := []struct {
+		name string
+		req  *user.ListAuthenticationFactorsRequest
+		want *user.ListAuthenticationFactorsResponse
+	}{
+		{
+			name: "no auth",
+			req: &user.ListAuthenticationFactorsRequest{
+				UserId: userIDWithoutAuth,
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: nil,
+			},
+		},
+		{
+			name: "with u2f",
+			req: &user.ListAuthenticationFactorsRequest{
+				UserId: userWithU2F,
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_U2F{
+							U2F: &user.AuthFactorU2F{
+								Id:   U2FId,
+								Name: "nice name",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "with totp, u2f",
+			req: &user.ListAuthenticationFactorsRequest{
+				UserId: userWithTOTP,
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_Otp{
+							Otp: &user.AuthFactorOTP{},
+						},
+					},
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_U2F{
+							U2F: &user.AuthFactorU2F{
+								Id:   U2FIdWithTOTP,
+								Name: "nice name",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "with sms",
+			req: &user.ListAuthenticationFactorsRequest{
+				UserId: userWithSMS,
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_OtpSms{
+							OtpSms: &user.AuthFactorOTPSMS{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "with email",
+			req: &user.ListAuthenticationFactorsRequest{
+				UserId: userWithEmail,
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_OtpEmail{
+							OtpEmail: &user.AuthFactorOTPEmail{},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.ListAuthenticationFactors(CTX, tt.req)
+				require.NoError(ttt, err)
+				assert.ElementsMatch(t, tt.want.GetResult(), got.GetResult())
+			}, retryDuration, tick, "timeout waiting for expected auth methods result")
+
+		})
+	}
+
+}
+
 func TestServer_CreateInviteCode(t *testing.T) {
 	type args struct {
 		ctx     context.Context
