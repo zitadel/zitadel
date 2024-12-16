@@ -43,14 +43,13 @@ async function loginSuccess(
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>{t("loginSuccess.title")}</h1>
-        <div>
-          {t("loginSuccess.description")}
-          <IdpSignin
-            userId={userId}
-            idpIntent={idpIntent}
-            authRequestId={authRequestId}
-          />
-        </div>
+        <p className="ztdl-p">{t("loginSuccess.description")}</p>
+
+        <IdpSignin
+          userId={userId}
+          idpIntent={idpIntent}
+          authRequestId={authRequestId}
+        />
       </div>
     </DynamicTheme>
   );
@@ -69,14 +68,13 @@ async function linkingSuccess(
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>{t("linkingSuccess.title")}</h1>
-        <div>
-          {t("linkingSuccess.description")}
-          <IdpSignin
-            userId={userId}
-            idpIntent={idpIntent}
-            authRequestId={authRequestId}
-          />
-        </div>
+        <p className="ztdl-p">{t("linkingSuccess.description")}</p>
+
+        <IdpSignin
+          userId={userId}
+          idpIntent={idpIntent}
+          authRequestId={authRequestId}
+        />
       </div>
     </DynamicTheme>
   );
