@@ -84,6 +84,7 @@ export default async function Page(props: {
     return loginSuccess(
       userId,
       { idpIntentId: id, idpIntentToken: token },
+      authRequestId,
       branding,
     );
   }
@@ -155,6 +156,7 @@ export default async function Page(props: {
       return loginSuccess(
         userId,
         { idpIntentId: id, idpIntentToken: token },
+        authRequestId,
         branding,
       );
     }
