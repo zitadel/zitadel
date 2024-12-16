@@ -181,7 +181,7 @@ export default async function Page(props: {
 
       if (idpLink) {
         return linkingSuccess(
-          idpInformation.userId,
+          foundUser.userId,
           { idpIntentId: id, idpIntentToken: token },
           authRequestId,
           branding,
