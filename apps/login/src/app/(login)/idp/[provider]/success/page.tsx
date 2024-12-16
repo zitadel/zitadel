@@ -22,7 +22,7 @@ async function loginFailed(branding?: BrandingSettings, error: string = "") {
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>{t("loginError.title")}</h1>
-        <p className="ztdl-p">{t("loginError.title")}</p>
+        <p className="ztdl-p">{t("loginError.description")}</p>
         {error && (
           <div className="w-full">
             {<Alert type={AlertType.ALERT}>{error}</Alert>}
@@ -199,7 +199,12 @@ export default async function Page(props: {
         <DynamicTheme branding={branding}>
           <div className="flex flex-col items-center space-y-4">
             <h1>{t("registerSuccess.title")}</h1>
-            <div>{t("registerSuccess.description")}</div>
+            <p className="ztdl-p">{t("registerSuccess.description")}</p>
+            <IdpSignin
+              userId={newUser.userId}
+              idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+              authRequestId={authRequestId}
+            />
           </div>
         </DynamicTheme>
       );
