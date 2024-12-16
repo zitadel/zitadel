@@ -18,8 +18,6 @@ import (
 )
 
 func TestServer_GetSecurityPolicy(t *testing.T) {
-	t.Parallel()
-
 	instance := integration.NewInstance(CTX)
 	adminCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
@@ -72,8 +70,6 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 }
 
 func TestServer_SetSecurityPolicy(t *testing.T) {
-	t.Parallel()
-
 	instance := integration.NewInstance(CTX)
 	adminCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 

@@ -1384,7 +1384,8 @@
         "nl": "Nederlands",
         "sv": "Svenska",
         "id": "Bahasa Indonesia",
-        "hu": "Magyar"
+        "hu": "Magyar",
+        "ko": "한국어"
       }
     },
     "SMTP": {
@@ -1621,7 +1622,8 @@
         "ru": "Русский",
         "nl": "Nederlands",
         "sv": "Svenska",
-        "id": "Bahasa Indonesia"
+        "id": "Bahasa Indonesia",
+        "ko": "한국어"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1721,8 +1723,8 @@
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
-      "FORCEMFA": "MFA erzwingen",
-      "FORCEMFALOCALONLY": "MFA für lokale Benutzer erzwingen",
+      "FORCEMFA": "MFA für alle Benutzer erzwingen",
+      "FORCEMFALOCALONLY": "MFA nur für lokal authentifizierte Benutzer erzwingen",
       "FORCEMFALOCALONLY_DESC": "Ist die Option gewählt, müssen lokal authentifizierte Benutzer einen zweiten Faktor für den Login verwenden.",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
@@ -2563,7 +2565,8 @@
     "ru": "Русский",
     "nl": "Nederlands",
     "sv": "Svenska",
-    "id": "Bahasa Indonesia"
+    "id": "Bahasa Indonesia",
+    "ko": "한국어"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

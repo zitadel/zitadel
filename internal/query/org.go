@@ -517,6 +517,6 @@ func (o *Org) Keys(index orgIndex) []string {
 }
 
 func (c *Caches) registerOrgInvalidation() {
-	invalidate := cacheInvalidationFunc(c.instance, instanceIndexByID, getAggregateID)
+	invalidate := cacheInvalidationFunc(c.org, orgIndexByID, getAggregateID)
 	projection.OrgProjection.RegisterCacheInvalidation(invalidate)
 }

@@ -19,9 +19,12 @@ type Config struct {
 
 	BulkLimit             uint64
 	FailureCountUntilSkip uint64
-	HandleActiveInstances time.Duration
 	TransactionDuration   time.Duration
 	Handlers              map[string]*ConfigOverwrites
+
+	ActiveInstancer interface {
+		ActiveInstances() []string
+	}
 }
 
 type ConfigOverwrites struct {
@@ -31,6 +34,9 @@ type ConfigOverwrites struct {
 var projections []*handler.Handler
 
 func Register(ctx context.Context, configs Config, view *view.View, queries *query2.Queries) {
+	// make sure the slice does not contain old values
+	projections = nil
+
 	projections = append(projections, newUser(ctx,
 		configs.overwrite("User"),
 		view,
@@ -77,13 +83,13 @@ func ProjectInstance(ctx context.Context) error {
 
 func (config Config) overwrite(viewModel string) handler2.Config {
 	c := handler2.Config{
-		Client:                config.Client,
-		Eventstore:            config.Eventstore,
-		BulkLimit:             uint16(config.BulkLimit),
-		RequeueEvery:          3 * time.Minute,
-		HandleActiveInstances: config.HandleActiveInstances,
-		MaxFailureCount:       uint8(config.FailureCountUntilSkip),
-		TransactionDuration:   config.TransactionDuration,
+		Client:              config.Client,
+		Eventstore:          config.Eventstore,
+		BulkLimit:           uint16(config.BulkLimit),
+		RequeueEvery:        3 * time.Minute,
+		MaxFailureCount:     uint8(config.FailureCountUntilSkip),
+		TransactionDuration: config.TransactionDuration,
+		ActiveInstancer:     config.ActiveInstancer,
 	}
 	overwrite, ok := config.Handlers[viewModel]
 	if !ok {

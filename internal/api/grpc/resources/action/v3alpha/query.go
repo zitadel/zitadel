@@ -97,6 +97,7 @@ func targetToPb(t *query.Target) *action.GetTarget {
 			Timeout:  durationpb.New(t.Timeout),
 			Endpoint: t.Endpoint,
 		},
+		SigningKey: t.SigningKey,
 	}
 	switch t.TargetType {
 	case domain.TargetTypeWebhook:

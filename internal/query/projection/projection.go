@@ -83,6 +83,7 @@ var (
 
 	ProjectGrantFields      *handler.FieldHandler
 	OrgDomainVerifiedFields *handler.FieldHandler
+	InstanceDomainFields    *handler.FieldHandler
 )
 
 type projection interface {
@@ -98,14 +99,14 @@ var (
 
 func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, config Config, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm, systemUsers map[string]*internal_authz.SystemAPIUser) error {
 	projectionConfig = handler.Config{
-		Client:                sqlClient,
-		Eventstore:            es,
-		BulkLimit:             uint16(config.BulkLimit),
-		RequeueEvery:          config.RequeueEvery,
-		HandleActiveInstances: config.HandleActiveInstances,
-		MaxFailureCount:       config.MaxFailureCount,
-		RetryFailedAfter:      config.RetryFailedAfter,
-		TransactionDuration:   config.TransactionDuration,
+		Client:              sqlClient,
+		Eventstore:          es,
+		BulkLimit:           uint16(config.BulkLimit),
+		RequeueEvery:        config.RequeueEvery,
+		MaxFailureCount:     config.MaxFailureCount,
+		RetryFailedAfter:    config.RetryFailedAfter,
+		TransactionDuration: config.TransactionDuration,
+		ActiveInstancer:     config.ActiveInstancer,
 	}
 
 	OrgProjection = newOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
@@ -170,6 +171,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 
 	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
 	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
+	InstanceDomainFields = newFillInstanceDomainFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsInstanceDomain]))
 
 	newProjectionsList()
 	return nil
@@ -220,9 +222,6 @@ func applyCustomConfig(config handler.Config, customConfig CustomConfig) handler
 	}
 	if customConfig.RetryFailedAfter != nil {
 		config.RetryFailedAfter = *customConfig.RetryFailedAfter
-	}
-	if customConfig.HandleActiveInstances != nil {
-		config.HandleActiveInstances = *customConfig.HandleActiveInstances
 	}
 	if customConfig.TransactionDuration != nil {
 		config.TransactionDuration = *customConfig.TransactionDuration

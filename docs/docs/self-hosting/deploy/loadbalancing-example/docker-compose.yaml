@@ -15,7 +15,7 @@ services:
     restart: 'always'
     networks:
       - 'zitadel'
-    image: 'ghcr.io/zitadel/zitadel:stable'
+    image: 'ghcr.io/zitadel/zitadel:latest'
     command: 'start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}" --tlsMode external'
     depends_on:
       db:

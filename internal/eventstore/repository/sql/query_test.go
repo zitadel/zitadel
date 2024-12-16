@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"reflect"
+	"regexp"
 	"strconv"
 	"testing"
 	"time"
@@ -744,6 +745,7 @@ func Test_query_events_mocked(t *testing.T) {
 	type args struct {
 		query *eventstore.SearchQueryBuilder
 		dest  interface{}
+		useV1 bool
 	}
 	type res struct {
 		wantErr bool
@@ -767,6 +769,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder(),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -789,6 +792,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder(),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -811,6 +815,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder(),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -834,6 +839,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder(),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -855,6 +861,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder().LockRowsDuringTx(nil, eventstore.LockOptionWait),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -876,6 +883,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder().LockRowsDuringTx(nil, eventstore.LockOptionNoWait),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -897,6 +905,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder().LockRowsDuringTx(nil, eventstore.LockOptionSkipLocked),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
@@ -919,6 +928,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder(),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQueryErr(t,
@@ -941,6 +951,7 @@ func Test_query_events_mocked(t *testing.T) {
 					AddQuery().
 					AggregateTypes("user").
 					Builder(),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQueryScanErr(t,
@@ -975,11 +986,105 @@ func Test_query_events_mocked(t *testing.T) {
 					AggregateTypes("org").
 					AggregateIDs("asdf42").
 					Builder(),
+				useV1: true,
 			},
 			fields: fields{
 				mock: newMockClient(t).expectQuery(t,
 					`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE \(aggregate_type = \$1 OR \(aggregate_type = \$2 AND aggregate_id = \$3\)\) AND creation_date::TIMESTAMP < \(SELECT COALESCE\(MIN\(start\), NOW\(\)\)::TIMESTAMP FROM crdb_internal\.cluster_transactions where application_name = ANY\(\$4\)\) ORDER BY event_sequence DESC LIMIT \$5`,
 					[]driver.Value{eventstore.AggregateType("user"), eventstore.AggregateType("org"), "asdf42", database.TextArray[string]{}, uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "aggregate / event type, position and exclusion, v1",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderDesc().
+					Limit(5).
+					PositionAfter(123.456).
+					AddQuery().
+					AggregateTypes("notify").
+					EventTypes("notify.foo.bar").
+					Builder().
+					ExcludeAggregateIDs().
+					AggregateTypes("notify").
+					EventTypes("notification.failed", "notification.success").
+					Builder(),
+				useV1: true,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					regexp.QuoteMeta(
+						`SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY event_sequence DESC LIMIT $9`,
+					),
+					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), 123.456, eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", 123.456, uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "aggregate / event type, position and exclusion, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderDesc().
+					Limit(5).
+					PositionAfter(123.456).
+					AddQuery().
+					AggregateTypes("notify").
+					EventTypes("notify.foo.bar").
+					Builder().
+					ExcludeAggregateIDs().
+					AggregateTypes("notify").
+					EventTypes("notification.failed", "notification.success").
+					Builder(),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					regexp.QuoteMeta(
+						`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND "position" > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND "position" > $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`,
+					),
+					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), 123.456, eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", 123.456, uint64(5)},
+				),
+			},
+			res: res{
+				wantErr: false,
+			},
+		},
+		{
+			name: "aggregate / event type, created after and exclusion, v2",
+			args: args{
+				dest: &[]*repository.Event{},
+				query: eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+					InstanceID("instanceID").
+					OrderDesc().
+					Limit(5).
+					CreationDateAfter(time.Unix(123, 456)).
+					AddQuery().
+					AggregateTypes("notify").
+					EventTypes("notify.foo.bar").
+					Builder().
+					ExcludeAggregateIDs().
+					AggregateTypes("notify").
+					EventTypes("notification.failed", "notification.success").
+					Builder(),
+				useV1: false,
+			},
+			fields: fields{
+				mock: newMockClient(t).expectQuery(t,
+					regexp.QuoteMeta(
+						`SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND event_type = $3 AND created_at > $4 AND aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE aggregate_type = $5 AND event_type = ANY($6) AND instance_id = $7 AND created_at > $8) ORDER BY "position" DESC, in_tx_order DESC LIMIT $9`,
+					),
+					[]driver.Value{"instanceID", eventstore.AggregateType("notify"), eventstore.EventType("notify.foo.bar"), time.Unix(123, 456), eventstore.AggregateType("notify"), []eventstore.EventType{"notification.failed", "notification.success"}, "instanceID", time.Unix(123, 456), uint64(5)},
 				),
 			},
 			res: res{
@@ -994,7 +1099,7 @@ func Test_query_events_mocked(t *testing.T) {
 				crdb.DB.DB = tt.fields.mock.client
 			}
 
-			err := query(context.Background(), crdb, tt.args.query, tt.args.dest, true)
+			err := query(context.Background(), crdb, tt.args.query, tt.args.dest, tt.args.useV1)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("query() error = %v, wantErr %v", err, tt.res.wantErr)
 			}

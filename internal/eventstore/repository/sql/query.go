@@ -283,6 +283,23 @@ func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bo
 		args = append(args, additionalArgs...)
 	}
 
+	excludeAggregateIDs := query.ExcludeAggregateIDs
+	if len(excludeAggregateIDs) > 0 {
+		excludeAggregateIDs = append(excludeAggregateIDs, query.InstanceID, query.InstanceIDs, query.Position, query.CreatedAfter, query.CreatedBefore)
+	}
+	excludeAggregateIDsClauses, excludeAggregateIDsArgs := prepareQuery(criteria, useV1, excludeAggregateIDs...)
+	if excludeAggregateIDsClauses != "" {
+		if clauses != "" {
+			clauses += " AND "
+		}
+		if useV1 {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events WHERE " + excludeAggregateIDsClauses + ")"
+		} else {
+			clauses += "aggregate_id NOT IN (SELECT aggregate_id FROM eventstore.events2 WHERE " + excludeAggregateIDsClauses + ")"
+		}
+		args = append(args, excludeAggregateIDsArgs...)
+	}
+
 	if query.AwaitOpenTransactions {
 		instanceIDs := make(database.TextArray[string], 0, 3)
 		if query.InstanceID != nil {

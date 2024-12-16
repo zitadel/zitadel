@@ -1,8 +1,13 @@
 package dialect
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"reflect"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 var (
@@ -17,6 +22,7 @@ var (
 type ConnectionConfig struct {
 	MaxOpenConns,
 	MaxIdleConns uint32
+	AfterConnect []func(ctx context.Context, c *pgx.Conn) error
 }
 
 // takeRatio of MaxOpenConns and MaxIdleConns from config and returns
@@ -29,6 +35,7 @@ func (c *ConnectionConfig) takeRatio(ratio float64) (*ConnectionConfig, error) {
 	out := &ConnectionConfig{
 		MaxOpenConns: uint32(ratio * float64(c.MaxOpenConns)),
 		MaxIdleConns: uint32(ratio * float64(c.MaxIdleConns)),
+		AfterConnect: c.AfterConnect,
 	}
 	if c.MaxOpenConns != 0 && out.MaxOpenConns < 1 && ratio > 0 {
 		out.MaxOpenConns = 1
@@ -38,6 +45,36 @@ func (c *ConnectionConfig) takeRatio(ratio float64) (*ConnectionConfig, error) {
 	}
 
 	return out, nil
+}
+
+var afterConnectFuncs []func(ctx context.Context, c *pgx.Conn) error
+
+func RegisterAfterConnect(f func(ctx context.Context, c *pgx.Conn) error) {
+	afterConnectFuncs = append(afterConnectFuncs, f)
+}
+
+func RegisterDefaultPgTypeVariants[T any](m *pgtype.Map, name, arrayName string) {
+	// T
+	var value T
+	m.RegisterDefaultPgType(value, name)
+
+	// *T
+	valueType := reflect.TypeOf(value)
+	m.RegisterDefaultPgType(reflect.New(valueType).Interface(), name)
+
+	// []T
+	sliceType := reflect.SliceOf(valueType)
+	m.RegisterDefaultPgType(reflect.MakeSlice(sliceType, 0, 0).Interface(), arrayName)
+
+	// *[]T
+	m.RegisterDefaultPgType(reflect.New(sliceType).Interface(), arrayName)
+
+	// []*T
+	sliceOfPointerType := reflect.SliceOf(reflect.TypeOf(reflect.New(valueType).Interface()))
+	m.RegisterDefaultPgType(reflect.MakeSlice(sliceOfPointerType, 0, 0).Interface(), arrayName)
+
+	// *[]*T
+	m.RegisterDefaultPgType(reflect.New(sliceOfPointerType).Interface(), arrayName)
 }
 
 // NewConnectionConfig calculates [ConnectionConfig] values from the passed ratios
@@ -59,11 +96,13 @@ func NewConnectionConfig(openConns, idleConns uint32, pusherRatio, projectionRat
 	queryConfig := &ConnectionConfig{
 		MaxOpenConns: openConns,
 		MaxIdleConns: idleConns,
+		AfterConnect: afterConnectFuncs,
 	}
 	pusherConfig, err := queryConfig.takeRatio(pusherRatio)
 	if err != nil {
 		return nil, fmt.Errorf("event pusher: %w", err)
 	}
+
 	spoolerConfig, err := queryConfig.takeRatio(projectionRatio)
 	if err != nil {
 		return nil, fmt.Errorf("projection spooler: %w", err)

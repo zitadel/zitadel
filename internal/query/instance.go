@@ -143,6 +143,10 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
+func (q *Queries) ActiveInstances() []string {
+	return q.caches.activeInstances.Keys()
+}
+
 func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -198,10 +202,13 @@ var (
 )
 
 func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (_ authz.Instance, err error) {
+	var instance *authzInstance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("unable to get instance by host: instanceHost %s, publicHost %s: %w", instanceHost, publicHost, err)
+		} else {
+			q.caches.activeInstances.Add(instance.ID, true)
 		}
 		span.EndWithError(err)
 	}()
@@ -225,6 +232,12 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+	defer func() {
+		if err != nil {
+			return
+		}
+		q.caches.activeInstances.Add(id, true)
+	}()
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByID, id)
 	if ok {

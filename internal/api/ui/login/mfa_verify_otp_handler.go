@@ -31,6 +31,10 @@ func OTPLink(origin, authRequestID, code string, provider domain.MFAType) string
 	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%d", externalLink(origin), EndpointMFAOTPVerify, QueryAuthRequestID, authRequestID, queryCode, code, querySelectedProvider, provider)
 }
 
+func OTPLinkTemplate(origin, authRequestID string, provider domain.MFAType) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%d", externalLink(origin), EndpointMFAOTPVerify, QueryAuthRequestID, authRequestID, queryCode, "{{.Code}}", querySelectedProvider, provider)
+}
+
 // renderOTPVerification renders the OTP verification for SMS and Email based on the passed MFAType.
 // It will send a new code to either phone or email first.
 func (l *Login) handleOTPVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, selectedProvider domain.MFAType, err error) {
