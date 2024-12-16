@@ -1,26 +1,29 @@
-import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
-import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewEncapsulation, signal } from '@angular/core';
-import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatCheckboxChange } from '@angular/material/checkbox';
-import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { Buffer } from 'buffer';
-import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { mergeMap, Subject, Subscription } from 'rxjs';
-import { map, take } from 'rxjs/operators';
-import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
-import { ChangeType } from 'src/app/modules/changes/changes.component';
-import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
-import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
-import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
-import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import {COMMA, ENTER, SPACE} from '@angular/cdk/keycodes';
+import {Location} from '@angular/common';
+import {Component, OnDestroy, OnInit, signal} from '@angular/core';
+import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup} from '@angular/forms';
+import {MatCheckboxChange} from '@angular/material/checkbox';
+import {MatDialog} from '@angular/material/dialog';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {Buffer} from 'buffer';
+import {Duration} from 'google-protobuf/google/protobuf/duration_pb';
+import {mergeMap, Subject, Subscription} from 'rxjs';
+import {map, take} from 'rxjs/operators';
+import {RadioItemAuthType} from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
+import {ChangeType} from 'src/app/modules/changes/changes.component';
+import {InfoSectionType} from 'src/app/modules/info-section/info-section.component';
+import {NameDialogComponent} from 'src/app/modules/name-dialog/name-dialog.component';
+import {SidenavSetting} from 'src/app/modules/sidenav/sidenav.component';
+import {WarnDialogComponent} from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
   APIAuthMethodType,
   APIConfig,
   App,
   AppState,
+  LoginV1,
+  LoginV2,
+  LoginVersion,
   OIDCAppType,
   OIDCAuthMethodType,
   OIDCConfig,
@@ -35,13 +38,13 @@ import {
   UpdateOIDCAppConfigRequest,
   UpdateSAMLAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
-import { ToastService } from 'src/app/services/toast.service';
+import {Breadcrumb, BreadcrumbService, BreadcrumbType} from 'src/app/services/breadcrumb.service';
+import {GrpcAuthService} from 'src/app/services/grpc-auth.service';
+import {ManagementService} from 'src/app/services/mgmt.service';
+import {ToastService} from 'src/app/services/toast.service';
 
-import { EnvironmentService } from 'src/app/services/environment.service';
-import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
+import {EnvironmentService} from 'src/app/services/environment.service';
+import {AppSecretDialogComponent} from '../app-secret-dialog/app-secret-dialog.component';
 import {
   BASIC_AUTH_METHOD,
   CODE_METHOD,
@@ -50,11 +53,11 @@ import {
   getAuthMethodFromPartialConfig,
   getPartialConfigFromAuthMethod,
   IMPLICIT_METHOD,
-  PKCE_METHOD,
   PK_JWT_METHOD,
+  PKCE_METHOD,
   POST_METHOD,
 } from '../authmethods';
-import { AuthMethodDialogComponent } from './auth-method-dialog/auth-method-dialog.component';
+import {AuthMethodDialogComponent} from './auth-method-dialog/auth-method-dialog.component';
 
 const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 
@@ -178,10 +181,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public InfoSectionType: any = InfoSectionType;
   public copied: string = '';
 
-  public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
+  public settingsList: SidenavSetting[] = [{id: 'configuration', i18nKey: 'APP.CONFIGURATION'}];
   public currentSetting: string | undefined = this.settingsList[0].id;
 
   public isNew = signal<boolean>(false);
+
   constructor(
     private envSvc: EnvironmentService,
     public translate: TranslateService,
@@ -196,32 +200,34 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private breadcrumbService: BreadcrumbService,
   ) {
     this.oidcForm = this.fb.group({
-      devMode: [{ value: false, disabled: true }],
-      skipNativeAppSuccessPage: [{ value: false, disabled: true }],
-      clientId: [{ value: '', disabled: true }],
-      responseTypesList: [{ value: [], disabled: true }],
-      grantTypesList: [{ value: [], disabled: true }],
-      appType: [{ value: '', disabled: true }],
-      authMethodType: [{ value: '', disabled: true }],
+      devMode: [{value: false, disabled: true}],
+      skipNativeAppSuccessPage: [{value: false, disabled: true}],
+      clientId: [{value: '', disabled: true}],
+      responseTypesList: [{value: [], disabled: true}],
+      grantTypesList: [{value: [], disabled: true}],
+      appType: [{value: '', disabled: true}],
+      authMethodType: [{value: '', disabled: true}],
+      loginV2: [{value: false, disabled: true}],
+      loginV2BaseURL: [{value: '', disabled: true}],
     });
 
     this.oidcTokenForm = this.fb.group({
-      accessTokenType: [{ value: '', disabled: true }],
-      accessTokenRoleAssertion: [{ value: false, disabled: true }],
-      idTokenRoleAssertion: [{ value: false, disabled: true }],
-      idTokenUserinfoAssertion: [{ value: false, disabled: true }],
-      clockSkewSeconds: [{ value: 0, disabled: true }],
+      accessTokenType: [{value: '', disabled: true}],
+      accessTokenRoleAssertion: [{value: false, disabled: true}],
+      idTokenRoleAssertion: [{value: false, disabled: true}],
+      idTokenUserinfoAssertion: [{value: false, disabled: true}],
+      clockSkewSeconds: [{value: 0, disabled: true}],
     });
 
     this.apiForm = this.fb.group({
-      authMethodType: [{ value: '', disabled: true }],
+      authMethodType: [{value: '', disabled: true}],
     });
 
     this.samlForm = this.fb.group({
-      metadataUrl: [{ value: '', disabled: true }],
+      metadataUrl: [{value: '', disabled: true}],
       entityId: ['', []],
       acsURL: ['', []],
-      metadataXml: [{ value: '', disabled: true }],
+      metadataXml: [{value: '', disabled: true}],
     });
 
     this.samlForm.valueChanges.subscribe(() => {
@@ -337,13 +343,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 new Breadcrumb({
                   type: BreadcrumbType.PROJECT,
                   name: '',
-                  param: { key: 'projectid', value: projectId },
+                  param: {key: 'projectid', value: projectId},
                   routerLink: ['/projects', projectId],
                 }),
                 new Breadcrumb({
                   type: BreadcrumbType.APP,
                   name: app.app.name,
-                  param: { key: 'appid', value: appId },
+                  param: {key: 'appid', value: appId},
                   routerLink: ['/projects', projectId, 'apps', appId],
                 }),
               ];
@@ -357,21 +363,21 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   this.app.oidcConfig.grantTypesList[0] === OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE
                 ) {
                   this.settingsList = [
-                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                    { id: 'token', i18nKey: 'APP.TOKEN' },
-                    { id: 'urls', i18nKey: 'APP.URLS' },
+                    {id: 'configuration', i18nKey: 'APP.CONFIGURATION'},
+                    {id: 'token', i18nKey: 'APP.TOKEN'},
+                    {id: 'urls', i18nKey: 'APP.URLS'},
                   ];
                 } else {
                   this.settingsList = [
-                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                    { id: 'token', i18nKey: 'APP.TOKEN' },
-                    { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE' },
-                    { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS' },
-                    { id: 'urls', i18nKey: 'APP.URLS' },
+                    {id: 'configuration', i18nKey: 'APP.CONFIGURATION'},
+                    {id: 'token', i18nKey: 'APP.TOKEN'},
+                    {id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE'},
+                    {id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS'},
+                    {id: 'urls', i18nKey: 'APP.URLS'},
                   ];
                 }
 
-                this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
+                this.initialAuthMethod = this.authMethodFromPartialConfig({oidc: this.app.oidcConfig});
                 this.currentAuthMethod = this.initialAuthMethod;
                 if (this.initialAuthMethod === CUSTOM_METHOD.key) {
                   if (!this.authMethods.includes(CUSTOM_METHOD)) {
@@ -383,15 +389,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               } else if (this.app.apiConfig) {
                 this.getAuthMethodOptions('API');
 
-                this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
+                this.initialAuthMethod = this.authMethodFromPartialConfig({api: this.app.apiConfig});
 
                 if (this.initialAuthMethod === 'BASIC') {
-                  this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
+                  this.settingsList = [{id: 'urls', i18nKey: 'APP.URLS'}];
                   this.currentSetting = 'urls';
                 } else {
                   this.settingsList = [
-                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                    { id: 'urls', i18nKey: 'APP.URLS' },
+                    {id: 'configuration', i18nKey: 'APP.CONFIGURATION'},
+                    {id: 'urls', i18nKey: 'APP.URLS'},
                   ];
                 }
                 this.currentAuthMethod = this.initialAuthMethod;
@@ -402,10 +408,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 } else {
                   this.authMethods = this.authMethods.filter((element) => element !== CUSTOM_METHOD);
                 }
+
               } else if (this.app.samlConfig) {
                 this.settingsList = [
-                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                  { id: 'urls', i18nKey: 'APP.URLS' },
+                  {id: 'configuration', i18nKey: 'APP.CONFIGURATION'},
+                  {id: 'urls', i18nKey: 'APP.URLS'},
                 ];
               }
 
@@ -430,6 +437,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 const inSecs = this.app.oidcConfig?.clockSkew.seconds + this.app.oidcConfig?.clockSkew.nanos / 100000;
                 this.oidcTokenForm.controls['clockSkewSeconds'].setValue(inSecs);
               }
+              if (this.app.oidcConfig?.loginVersion?.loginV1) {
+                this.oidcForm.controls['loginV2'].setValue(false);
+              } else if (this.app.oidcConfig?.loginVersion?.loginV2) {
+                this.oidcForm.controls['loginV2'].setValue(true);
+                this.oidcForm.controls['loginV2BaseURL'].setValue(
+                  this.app.oidcConfig.loginVersion.loginV2.baseUri,
+                );
+              }
               if (this.app.oidcConfig) {
                 this.oidcForm.patchValue(this.app.oidcConfig);
                 this.oidcTokenForm.patchValue(this.app.oidcConfig);
@@ -439,7 +454,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               }
 
               this.oidcForm.valueChanges.subscribe((oidcConfig) => {
-                this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: oidcConfig });
+                this.initialAuthMethod = this.authMethodFromPartialConfig({oidc: oidcConfig});
                 if (this.initialAuthMethod === CUSTOM_METHOD.key) {
                   if (!this.authMethods.includes(CUSTOM_METHOD)) {
                     this.authMethods.push(CUSTOM_METHOD);
@@ -450,7 +465,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               });
 
               this.apiForm.valueChanges.subscribe((apiConfig) => {
-                this.initialAuthMethod = this.authMethodFromPartialConfig({ api: apiConfig });
+                this.initialAuthMethod = this.authMethodFromPartialConfig({api: apiConfig});
                 if (this.initialAuthMethod === CUSTOM_METHOD.key) {
                   if (!this.authMethods.includes(CUSTOM_METHOD)) {
                     this.authMethods.push(CUSTOM_METHOD);
@@ -655,6 +670,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         req.setAuthMethodType(this.app.oidcConfig.authMethodType);
         req.setGrantTypesList(this.app.oidcConfig.grantTypesList);
         req.setAppType(this.app.oidcConfig.appType);
+        const login = new LoginVersion();
+        if (this.loginV2?.value) {
+          const loginV2 = new LoginV2();
+          loginV2.setBaseUri(this.loginV2BaseURL?.value);
+          login.setLoginV2(loginV2);
+        } else {
+          login.setLoginV1(new LoginV1());
+        }
+        req.setLoginVersion(login);
 
         // token
         req.setAccessTokenType(this.app.oidcConfig.accessTokenType);
@@ -680,7 +704,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           .updateOIDCAppConfig(req)
           .then(() => {
             if (this.app?.oidcConfig) {
-              const config = { oidc: this.app.oidcConfig };
+              const config = {oidc: this.app.oidcConfig};
               this.currentAuthMethod = this.authMethodFromPartialConfig(config);
             }
             this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
@@ -708,16 +732,16 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         .updateAPIAppConfig(req)
         .then(() => {
           if (this.app?.apiConfig) {
-            const config = { api: this.app.apiConfig };
+            const config = {api: this.app.apiConfig};
             this.currentAuthMethod = this.authMethodFromPartialConfig(config);
 
             if (this.currentAuthMethod === 'BASIC') {
-              this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS' }];
+              this.settingsList = [{id: 'urls', i18nKey: 'APP.URLS'}];
               this.currentSetting = 'urls';
             } else {
               this.settingsList = [
-                { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
-                { id: 'urls', i18nKey: 'APP.URLS' },
+                {id: 'configuration', i18nKey: 'APP.CONFIGURATION'},
+                {id: 'urls', i18nKey: 'APP.URLS'},
               ];
               this.currentSetting = 'configuration';
             }
@@ -837,6 +861,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public get authMethodType(): AbstractControl | null {
     return this.oidcForm.get('authMethodType');
+  }
+
+  public get loginV2(): FormControl<boolean> | null {
+    return this.oidcForm.get('loginV2') as FormControl<boolean>;
+  }
+
+  public get loginV2BaseURL(): AbstractControl | null {
+    return this.oidcForm.get('loginV2BaseURL');
   }
 
   public get apiAuthMethodType(): AbstractControl | null {
