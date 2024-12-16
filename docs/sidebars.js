@@ -258,6 +258,7 @@ module.exports = {
           ],
         },
         "guides/integrate/token-exchange",
+        "guides/integrate/back-channel-logout",
         {
           type: "category",
           label: "Service Users",
