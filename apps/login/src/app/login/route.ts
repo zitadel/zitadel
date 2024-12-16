@@ -211,7 +211,8 @@ export async function GET(request: NextRequest) {
       console.log("Session is valid:", isValid);
 
       if (!isValid && selectedSession.factors?.user) {
-        // if the session is not valid anymore, we need to redirect the user to re-authenticate
+        // if the session is not valid anymore, we need to redirect the user to re-authenticate /
+        // TODO: handle IDP intent direcly if available
         const command: SendLoginnameCommand = {
           loginName: selectedSession.factors.user?.loginName,
           organization: selectedSession.factors?.user?.organizationId,
