@@ -6,7 +6,11 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/helpers/validators";
-import { changePassword, sendPassword } from "@/lib/server/password";
+import {
+  changePassword,
+  resetPassword,
+  sendPassword,
+} from "@/lib/server/password";
 import { create } from "@zitadel/client";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
@@ -14,7 +18,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
-import { Alert } from "./alert";
+import { Alert, AlertType } from "./alert";
 import { BackButton } from "./back-button";
 import { Button, ButtonVariants } from "./button";
 import { TextInput } from "./input";
@@ -61,6 +65,29 @@ export function SetPasswordForm({
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
+
+  async function resendCode() {
+    setError("");
+    setLoading(true);
+
+    const response = await resetPassword({
+      loginName,
+      organization,
+      authRequestId,
+    })
+      .catch(() => {
+        setError("Could not reset password");
+        return;
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    if (response && "error" in response) {
+      setError(response.error);
+      return;
+    }
+  }
 
   async function submitPassword(values: Inputs) {
     setLoading(true);
@@ -165,28 +192,42 @@ export function SetPasswordForm({
     <form className="w-full">
       <div className="pt-4 grid grid-cols-1 gap-4 mb-4">
         {codeRequired && (
-          <div className="flex flex-row items-end">
-            <div className="flex-1">
-              <TextInput
-                type="text"
-                required
-                {...register("code", {
-                  required: "This field is required",
-                })}
-                label="Code"
-                autoComplete="one-time-code"
-                error={errors.code?.message as string}
-              />
-            </div>
-
-            <div className="ml-4 mb-1">
-              <Button variant={ButtonVariants.Secondary}>
+          <Alert type={AlertType.INFO}>
+            <div className="flex flex-row">
+              <span className="flex-1 mr-auto text-left">
+                {t("set.noCodeReceived")}
+              </span>
+              <button
+                aria-label="Resend OTP Code"
+                disabled={loading}
+                type="button"
+                className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+                onClick={() => {
+                  resendCode();
+                }}
+                data-testid="resend-button"
+              >
                 {t("set.resend")}
-              </Button>
+              </button>
             </div>
+          </Alert>
+        )}
+        {codeRequired && (
+          <div>
+            <TextInput
+              type="text"
+              required
+              {...register("code", {
+                required: "This field is required",
+              })}
+              label="Code"
+              autoComplete="one-time-code"
+              error={errors.code?.message as string}
+              data-testid="code-text-input"
+            />
           </div>
         )}
-        <div className="">
+        <div>
           <TextInput
             type="password"
             autoComplete="new-password"
@@ -196,9 +237,10 @@ export function SetPasswordForm({
             })}
             label="New Password"
             error={errors.password?.message as string}
+            data-testid="password-text-input"
           />
         </div>
-        <div className="">
+        <div>
           <TextInput
             type="password"
             required
@@ -208,6 +250,7 @@ export function SetPasswordForm({
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
+            data-testid="password-confirm-text-input"
           />
         </div>
       </div>

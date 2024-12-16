@@ -13,6 +13,7 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
+  SetPasswordRequest,
   SetPasswordRequestSchema,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
@@ -445,11 +446,6 @@ export async function verifyEmail(userId: string, verificationCode: string) {
   );
 }
 
-/**
- *
- * @param userId the id of the user where the email should be set
- * @returns the newly set email
- */
 export async function resendEmailCode(userId: string) {
   return userService.resendEmailCode(
     {
@@ -541,7 +537,7 @@ export async function passwordReset(
  * @param code optional if the password should be set with a code (reset), no code for initial setup of password
  * @returns
  */
-export async function setPassword(
+export async function setUserPassword(
   userId: string,
   password: string,
   user: User,
@@ -587,6 +583,10 @@ export async function setPassword(
   });
 }
 
+export async function setPassword(payload: SetPasswordRequest) {
+  return userService.setPassword(payload, {});
+}
+
 /**
  *
  * @param server
@@ -620,17 +620,7 @@ export async function createPasskeyRegistrationLink(
  * @returns the newly set email
  */
 
-// TODO check for token requirements!
-export async function registerU2F(
-  userId: string,
-  domain: string,
-  // token: string,
-) {
-  // const transport = createServerTransport(token, {
-  //   baseUrl: process.env.ZITADEL_API_URL!,
-  // });
-
-  // const service = createUserServiceClient(transport);
+export async function registerU2F(userId: string, domain: string) {
   return userService.registerU2F({
     userId,
     domain,

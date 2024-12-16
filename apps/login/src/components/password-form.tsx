@@ -134,6 +134,7 @@ export function PasswordForm({
             onClick={() => resetPasswordAndContinue()}
             type="button"
             disabled={loading}
+            data-testid="reset-button"
           >
             {t("verify.resetPassword")}
           </button>

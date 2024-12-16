@@ -24,6 +24,7 @@
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
       "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
+      "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
       "submit": "Continua"
     },
@@ -173,6 +174,7 @@
     "verify": {
       "title": "Verifica utente",
       "description": "Inserisci il codice fornito nell'email di verifica.",
+      "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
       "submit": "Continua"
     }

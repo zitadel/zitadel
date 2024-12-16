@@ -6,23 +6,30 @@ import {
 } from "@/lib/server/cookie";
 import {
   getLoginSettings,
+  getSession,
   getUserByID,
   listAuthenticationMethodTypes,
   listUsers,
   passwordReset,
   setPassword,
+  setUserPassword,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
+import { createUserServiceClient } from "@zitadel/client/v2";
+import { createServerTransport } from "@zitadel/node";
 import {
   Checks,
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User, UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import {
+  AuthenticationMethodType,
+  SetPasswordRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
-import { getSessionCookieByLoginName } from "../cookies";
+import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -142,18 +149,10 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Could not verify password!" };
   }
 
-  const availableSecondFactors = authMethods?.filter(
-    (m: AuthenticationMethodType) =>
-      m !== AuthenticationMethodType.PASSWORD &&
-      m !== AuthenticationMethodType.PASSKEY,
-  );
-
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
-  if (
-    availableSecondFactors?.length == 0 &&
-    humanUser?.passwordChangeRequired
-  ) {
+  // check if the user has to change password first
+  if (humanUser?.passwordChangeRequired) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName,
     });
@@ -169,7 +168,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { redirect: "/password/change?" + params };
   }
 
-  if (availableSecondFactors?.length == 1) {
+  const availableMultiFactors = authMethods?.filter(
+    (m: AuthenticationMethodType) =>
+      m !== AuthenticationMethodType.PASSWORD &&
+      m !== AuthenticationMethodType.PASSKEY,
+  );
+
+  if (availableMultiFactors?.length == 1) {
     const params = new URLSearchParams({
       loginName: session.factors?.user.loginName,
     });
@@ -185,7 +190,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       );
     }
 
-    const factor = availableSecondFactors[0];
+    const factor = availableMultiFactors[0];
     // if passwordless is other method, but user selected password as alternative, perform a login
     if (factor === AuthenticationMethodType.TOTP) {
       return { redirect: `/otp/time-based?` + params };
@@ -196,7 +201,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     } else if (factor === AuthenticationMethodType.U2F) {
       return { redirect: `/u2f?` + params };
     }
-  } else if (availableSecondFactors?.length >= 1) {
+  } else if (availableMultiFactors?.length >= 1) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
     });
@@ -219,7 +224,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Initial User not supported" };
   } else if (
     (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
-    !availableSecondFactors.length
+    !availableMultiFactors.length
   ) {
     const params = new URLSearchParams({
       loginName: session.factors.user.loginName,
@@ -302,5 +307,99 @@ export async function changePassword(command: {
   }
   const userId = user.userId;
 
-  return setPassword(userId, command.password, user, command.code);
+  return setUserPassword(userId, command.password, user, command.code);
+}
+
+type CheckSessionAndSetPasswordCommand = {
+  sessionId: string;
+  password: string;
+};
+
+export async function checkSessionAndSetPassword({
+  sessionId,
+  password,
+}: CheckSessionAndSetPasswordCommand) {
+  const sessionCookie = await getSessionCookieById({ sessionId });
+
+  const { session } = await getSession({
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
+
+  if (!session || !session.factors?.user?.id) {
+    return { error: "Could not load session" };
+  }
+
+  const payload = create(SetPasswordRequestSchema, {
+    userId: session.factors.user.id,
+    newPassword: {
+      password,
+    },
+  });
+
+  // check if the user has no password set in order to set a password
+  const authmethods = await listAuthenticationMethodTypes(
+    session.factors.user.id,
+  );
+
+  if (!authmethods) {
+    return { error: "Could not load auth methods" };
+  }
+
+  const requiredAuthMethodsForForceMFA = [
+    AuthenticationMethodType.OTP_EMAIL,
+    AuthenticationMethodType.OTP_SMS,
+    AuthenticationMethodType.TOTP,
+    AuthenticationMethodType.U2F,
+  ];
+
+  const hasNoMFAMethods = requiredAuthMethodsForForceMFA.every(
+    (method) => !authmethods.authMethodTypes.includes(method),
+  );
+
+  const loginSettings = await getLoginSettings(
+    session.factors.user.organizationId,
+  );
+
+  const forceMfa = !!(
+    loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly
+  );
+
+  // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
+  if (forceMfa && hasNoMFAMethods) {
+    return setPassword(payload).catch((error) => {
+      // throw error if failed precondition (ex. User is not yet initialized)
+      if (error.code === 9 && error.message) {
+        return { error: "Failed precondition" };
+      } else {
+        throw error;
+      }
+    });
+  } else {
+    const myUserService = (sessionToken: string) => {
+      return createUserServiceClient(
+        createServerTransport(sessionToken, {
+          baseUrl: process.env.ZITADEL_API_URL!,
+        }),
+      );
+    };
+
+    const selfService = await myUserService(`${sessionCookie.token}`);
+
+    return selfService
+      .setPassword(
+        {
+          userId: session.factors.user.id,
+          newPassword: { password, changeRequired: false },
+        },
+        {},
+      )
+      .catch((error) => {
+        console.log(error);
+        if (error.code === 7) {
+          return { error: "Session is not valid." };
+        }
+        throw error;
+      });
+  }
 }

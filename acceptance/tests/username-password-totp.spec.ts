@@ -1,6 +1,33 @@
-import { test } from "@playwright/test";
+import { faker } from "@faker-js/faker";
+import { test as base } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
+import { code } from "./code";
+import { codeScreenExpect } from "./code-screen";
+import { loginScreenExpect, loginWithPassword, loginWithPasswordAndTOTP } from "./login";
+import { PasswordUserWithTOTP } from "./user";
 
-test("username, password and totp login", async ({ page }) => {
+// Read from ".env" file.
+dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+
+const test = base.extend<{ user: PasswordUserWithTOTP; sink: any }>({
+  user: async ({ page }, use) => {
+    const user = new PasswordUserWithTOTP({
+      email: faker.internet.email(),
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      organization: "",
+      phone: faker.phone.number({ style: "international" }),
+      password: "Password1!",
+    });
+
+    await user.ensure(page);
+    await use(user);
+    await user.cleanup();
+  },
+});
+
+test("username, password and totp login", async ({ user, page }) => {
   // Given totp is enabled on the organization of the user
   // Given the user has only totp configured as second factor
   // User enters username
@@ -8,9 +35,11 @@ test("username, password and totp login", async ({ page }) => {
   // Screen for entering the code is shown directly
   // User enters the code into the ui
   // User is redirected to the app (default redirect url)
+  await loginWithPasswordAndTOTP(page, user.getUsername(), user.getPassword(), user.getSecret());
+  await loginScreenExpect(page, user.getFullName());
 });
 
-test("username, password and totp otp login, wrong code", async ({ page }) => {
+test("username, password and totp otp login, wrong code", async ({ user, page }) => {
   // Given totp is enabled on the organization of the user
   // Given the user has only totp configured as second factor
   // User enters username
@@ -18,6 +47,10 @@ test("username, password and totp otp login, wrong code", async ({ page }) => {
   // Screen for entering the code is shown directly
   // User enters a wrond code
   // Error message - "Invalid code" is shown
+  const c = "wrongcode";
+  await loginWithPassword(page, user.getUsername(), user.getPassword());
+  await code(page, c);
+  await codeScreenExpect(page, c);
 });
 
 test("username, password and totp login, multiple mfa options", async ({ page }) => {

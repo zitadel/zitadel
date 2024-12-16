@@ -394,3 +394,5 @@ Timebased features like the multifactor init prompt or password expiry, are not 
 - Lockout Settings
 - Password Expiry Settings
 - Login Settings: multifactor init prompt
+- forceMFA on login settings is not checked for IDPs
+- disablePhone / disableEmail from loginSettings will be implemented right after https://github.com/zitadel/zitadel/issues/9016 is merged

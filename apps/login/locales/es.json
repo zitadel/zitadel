@@ -24,6 +24,7 @@
       "title": "Establecer Contraseña",
       "description": "Establece la contraseña para tu cuenta",
       "codeSent": "Se ha enviado un código a su correo electrónico.",
+      "noCodeReceived": "¿No recibiste un código?",
       "resend": "Reenviar código",
       "submit": "Continuar"
     },
@@ -173,6 +174,7 @@
     "verify": {
       "title": "Verificar usuario",
       "description": "Introduce el código proporcionado en el correo electrónico de verificación.",
+      "noCodeReceived": "¿No recibiste un código?",
       "resendCode": "Reenviar código",
       "submit": "Continuar"
     }

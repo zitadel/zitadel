@@ -1,27 +1,39 @@
+import { faker } from "@faker-js/faker";
 import { test } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
 import { loginScreenExpect } from "./login";
 import { registerWithPasskey, registerWithPassword } from "./register";
 import { removeUserByUsername } from "./zitadel";
 
-test("register with password", async ({ page }) => {
-  const username = "register-password@example.com";
-  const password = "Password1!";
-  const firstname = "firstname";
-  const lastname = "lastname";
+// Read from ".env" file.
+dotenv.config({ path: path.resolve(__dirname, ".env.local") });
 
-  await removeUserByUsername(username);
+test("register with password", async ({ page }) => {
+  const username = faker.internet.email();
+  const password = "Password1!";
+  const firstname = faker.person.firstName();
+  const lastname = faker.person.lastName();
+
   await registerWithPassword(page, firstname, lastname, username, password, password);
   await loginScreenExpect(page, firstname + " " + lastname);
+
+  // wait for projection of user
+  await page.waitForTimeout(2000);
+  await removeUserByUsername(username);
 });
 
 test("register with passkey", async ({ page }) => {
-  const username = "register-passkey@example.com";
-  const firstname = "firstname";
-  const lastname = "lastname";
+  const username = faker.internet.email();
+  const firstname = faker.person.firstName();
+  const lastname = faker.person.lastName();
 
-  await removeUserByUsername(username);
   await registerWithPasskey(page, firstname, lastname, username);
   await loginScreenExpect(page, firstname + " " + lastname);
+
+  // wait for projection of user
+  await page.waitForTimeout(2000);
+  await removeUserByUsername(username);
 });
 
 test("register with username and password - only password enabled", async ({ page }) => {
