@@ -29,6 +29,28 @@ async function loginFailed(branding?: BrandingSettings) {
     </DynamicTheme>
   );
 }
+
+async function loginSuccess(
+  userId: string,
+  idpIntent: { idpIntentId: string; idpIntentToken: string },
+  branding?: BrandingSettings,
+) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "idp" });
+
+  return (
+    <DynamicTheme branding={branding}>
+      <div className="flex flex-col items-center space-y-4">
+        <h1>{t("loginSuccess.title")}</h1>
+        <div>
+          {t("loginSuccess.description")}
+          <IdpSignin userId={userId} idpIntent={idpIntent} />
+        </div>
+      </div>
+    </DynamicTheme>
+  );
+}
+
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;
@@ -54,11 +76,10 @@ export default async function Page(props: {
   if (userId && !link) {
     // TODO: update user if idp.options.isAutoUpdate is true
 
-    return (
-      <IdpSignin
-        userId={userId}
-        idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-      />
+    return loginSuccess(
+      userId,
+      { idpIntentId: id, idpIntentToken: token },
+      branding,
     );
   }
 
@@ -126,11 +147,10 @@ export default async function Page(props: {
         );
       });
 
-      return (
-        <IdpSignin
-          userId={userId}
-          idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-        />
+      return loginSuccess(
+        userId,
+        { idpIntentId: id, idpIntentToken: token },
+        branding,
       );
     }
   }
