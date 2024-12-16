@@ -3,16 +3,26 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { IdpSignin } from "@/components/idp-signin";
 import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
 import {
+  addHuman,
   addIDPLink,
-  createUser,
   getBrandingSettings,
   getIDPByID,
+  getLoginSettings,
+  getOrgsByDomain,
   listUsers,
   retrieveIDPIntent,
 } from "@/lib/zitadel";
+import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
+import {
+  AddHumanUserRequest,
+  AddHumanUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+
+const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 async function loginFailed(branding?: BrandingSettings, error: string = "") {
   const locale = getLocale();
@@ -192,7 +202,42 @@ export default async function Page(props: {
   }
 
   if (options?.isCreationAllowed && options.isAutoCreation) {
-    const newUser = await createUser(providerType, idpInformation);
+    let orgToRegisterOn: string | undefined = organization;
+
+    let userData: AddHumanUserRequest =
+      PROVIDER_MAPPING[providerType](idpInformation);
+
+    if (
+      !orgToRegisterOn &&
+      userData.username && // username or email?
+      ORG_SUFFIX_REGEX.test(userData.username)
+    ) {
+      const matched = ORG_SUFFIX_REGEX.exec(userData.username);
+      const suffix = matched?.[1] ?? "";
+
+      // this just returns orgs where the suffix is set as primary domain
+      const orgs = await getOrgsByDomain(suffix);
+      const orgToCheckForDiscovery =
+        orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+
+      const orgLoginSettings = await getLoginSettings(orgToCheckForDiscovery);
+      if (orgLoginSettings?.allowDomainDiscovery) {
+        orgToRegisterOn = orgToCheckForDiscovery;
+      }
+    }
+
+    if (orgToRegisterOn) {
+      const organizationSchema = create(OrganizationSchema, {
+        org: { case: "orgId", value: orgToRegisterOn },
+      });
+
+      userData = create(AddHumanUserRequestSchema, {
+        ...userData,
+        organization: organizationSchema,
+      });
+    }
+
+    const newUser = await addHuman(userData);
 
     if (newUser) {
       return (
