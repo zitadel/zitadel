@@ -597,7 +597,6 @@ func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.Li
 	}, nil
 }
 
-// ListAuthenticationFactors TODO: Working on this
 func (s *Server) ListAuthenticationFactors(ctx context.Context, req *user.ListAuthenticationFactorsRequest) (*user.ListAuthenticationFactorsResponse, error) {
 	query := new(query.UserAuthMethodSearchQueries)
 	err := query.AppendUserIDQuery(req.UserId)
