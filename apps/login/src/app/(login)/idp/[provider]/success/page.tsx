@@ -14,7 +14,7 @@ import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
-async function loginFailed(branding?: BrandingSettings) {
+async function loginFailed(branding?: BrandingSettings, error: string = "") {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
 
@@ -22,9 +22,12 @@ async function loginFailed(branding?: BrandingSettings) {
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>{t("loginError.title")}</h1>
-        <div className="w-full">
-          {<Alert type={AlertType.ALERT}>{t("loginError.title")}</Alert>}
-        </div>
+        <p className="ztdl-p">{t("loginError.title")}</p>
+        {error && (
+          <div className="w-full">
+            {<Alert type={AlertType.ALERT}>{error}</Alert>}
+          </div>
+        )}
       </div>
     </DynamicTheme>
   );
@@ -94,7 +97,7 @@ export default async function Page(props: {
   const branding = await getBrandingSettings(organization);
 
   if (!provider || !id || !token) {
-    return loginFailed(branding);
+    return loginFailed(branding, "IDP context missing");
   }
 
   const intent = await retrieveIDPIntent(id, token);
@@ -114,7 +117,7 @@ export default async function Page(props: {
   }
 
   if (!idpInformation) {
-    return loginFailed(branding);
+    return loginFailed(branding, "IDP information missing");
   }
 
   const idp = await getIDPByID(idpInformation.idpId);
@@ -204,5 +207,5 @@ export default async function Page(props: {
   }
 
   // return login failed if no linking or creation is allowed and no user was found
-  return loginFailed(branding);
+  return loginFailed(branding, "No user found");
 }
