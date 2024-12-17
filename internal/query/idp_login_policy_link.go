@@ -15,10 +15,15 @@ import (
 )
 
 type IDPLoginPolicyLink struct {
-	IDPID     string
-	IDPName   string
-	IDPType   domain.IDPType
-	OwnerType domain.IdentityProviderType
+	IDPID             string
+	IDPName           string
+	IDPType           domain.IDPType
+	OwnerType         domain.IdentityProviderType
+	IsCreationAllowed bool
+	IsLinkingAllowed  bool
+	IsAutoCreation    bool
+	IsAutoUpdate      bool
+	AutoLinking       domain.AutoLinkingOption
 }
 
 type IDPLoginPolicyLinks struct {
@@ -127,6 +132,11 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase, re
 			IDPTemplateNameCol.identifier(),
 			IDPTemplateTypeCol.identifier(),
 			IDPTemplateOwnerTypeCol.identifier(),
+			IDPTemplateIsCreationAllowedCol.identifier(),
+			IDPTemplateIsLinkingAllowedCol.identifier(),
+			IDPTemplateIsAutoCreationCol.identifier(),
+			IDPTemplateIsAutoUpdateCol.identifier(),
+			IDPTemplateAutoLinkingCol.identifier(),
 			countColumn.identifier()).
 			From(idpLoginPolicyLinkTable.identifier()).
 			LeftJoin(join(IDPTemplateIDCol, IDPLoginPolicyLinkIDPIDCol)).
@@ -151,6 +161,11 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase, re
 					&idpName,
 					&idpType,
 					&idpOwnerType,
+					&link.IsCreationAllowed,
+					&link.IsLinkingAllowed,
+					&link.IsAutoCreation,
+					&link.IsAutoUpdate,
+					&link.AutoLinking,
 					&count,
 				)
 				if err != nil {
