@@ -114,6 +114,9 @@ func MFAStateToPb(state domain.MFAState) user_pb.AuthFactorState {
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY
 	case domain.MFAStateReady:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_READY
+	case domain.MFAStateUnspecified, domain.MFAStateRemoved:
+		// Handle all remaining cases so the linter succeeds
+		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	default:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	}
