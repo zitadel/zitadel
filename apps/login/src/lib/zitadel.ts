@@ -10,8 +10,8 @@ import {
 import { createServerTransport } from "@zitadel/node";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
+  AddHumanUserRequest,
   RetrieveIdentityProviderIntentRequest,
   SetPasswordRequest,
   SetPasswordRequestSchema,
@@ -23,7 +23,6 @@ import { create, Duration } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
@@ -39,7 +38,6 @@ import {
   UserState,
 } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-import { PROVIDER_MAPPING } from "./idp";
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
@@ -247,6 +245,10 @@ export async function addHumanUser({
       ? { case: "password", value: { password: password } }
       : undefined,
   });
+}
+
+export async function addHuman(request: AddHumanUserRequest) {
+  return userService.addHumanUser(request);
 }
 
 export async function verifyTOTPRegistration(code: string, userId: string) {
@@ -485,14 +487,6 @@ export function addIDPLink(
     },
     {},
   );
-}
-
-export function createUser(
-  provider: IdentityProviderType,
-  info: IDPInformation,
-) {
-  const userData = PROVIDER_MAPPING[provider](info);
-  return userService.addHumanUser(userData, {});
 }
 
 /**

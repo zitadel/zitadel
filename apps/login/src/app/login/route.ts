@@ -109,9 +109,10 @@ async function isSessionValid(session: Session): Promise<boolean> {
       const otpSms = session.factors.otpSms?.verifiedAt;
       const totp = session.factors.totp?.verifiedAt;
       const webAuthN = session.factors.webAuthN?.verifiedAt;
+      const idp = session.factors.intent?.verifiedAt; // TODO: forceMFA should not consider this as valid factor
 
       // must have one single check
-      mfaValid = !!(otpEmail || otpSms || totp || webAuthN);
+      mfaValid = !!(otpEmail || otpSms || totp || webAuthN || idp);
       if (!mfaValid) {
         console.warn("Session has no valid multifactor", session.factors);
       }
@@ -207,8 +208,11 @@ export async function GET(request: NextRequest) {
 
       const isValid = await isSessionValid(selectedSession);
 
+      console.log("Session is valid:", isValid);
+
       if (!isValid && selectedSession.factors?.user) {
-        // if the session is not valid anymore, we need to redirect the user to re-authenticate
+        // if the session is not valid anymore, we need to redirect the user to re-authenticate /
+        // TODO: handle IDP intent direcly if available
         const command: SendLoginnameCommand = {
           loginName: selectedSession.factors.user?.loginName,
           organization: selectedSession.factors?.user?.organizationId,
