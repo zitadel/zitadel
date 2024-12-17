@@ -60,9 +60,9 @@ You can already use the current state, and extend it with your needs.
   - [x] GitLab
   - [x] GitLab Enterprise
   - [x] Azure
-  - [ ] Apple
+  - [x] Apple
   - [x] Generic OIDC
-  - [ ] Generic OAuth
+  - [x] Generic OAuth
   - [ ] Generic JWT
   - [ ] LDAP
   - [ ] SAML SP
