@@ -104,6 +104,7 @@ func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
 		factor.Type = &user_pb.AuthFactor_OtpEmail{
 			OtpEmail: &user_pb.AuthFactorOTPEmail{},
 		}
+	default:
 	}
 	return factor
 }
