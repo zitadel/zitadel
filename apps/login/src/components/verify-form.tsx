@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, AlertType } from "@/components/alert";
-import { resendVerification, sendVerification } from "@/lib/server/email";
+import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";

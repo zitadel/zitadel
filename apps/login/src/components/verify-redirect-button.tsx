@@ -1,6 +1,6 @@
 "use client";
 
-import { sendVerificationRedirectWithoutCheck } from "@/lib/server/email";
+import { sendVerificationRedirectWithoutCheck } from "@/lib/server/verify";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useState } from "react";

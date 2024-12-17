@@ -17,6 +17,7 @@ import {
 import { create } from "@zitadel/client";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { createServerTransport } from "@zitadel/node";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
   Checks,
   ChecksSchema,
@@ -168,108 +169,43 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { redirect: "/password/change?" + params };
   }
 
-  const availableMultiFactors = authMethods?.filter(
-    (m: AuthenticationMethodType) =>
-      m !== AuthenticationMethodType.PASSWORD &&
-      m !== AuthenticationMethodType.PASSKEY,
+  // throw error if user is in initial state here and do not continue
+
+  if (user.state === UserState.INITIAL) {
+    return { error: "Initial User not supported" };
+  }
+
+  // TODO add check to see if user was verified
+
+  if (!humanUser?.email?.isVerified) {
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+    });
+
+    if (command.authRequestId) {
+      params.append("authRequestId", command.authRequestId);
+    }
+
+    if (command.organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        command.organization ??
+          (session.factors?.user?.organizationId as string),
+      );
+    }
+
+    return { redirect: `/verify` + params };
+  }
+
+  checkMFAFactors(
+    session,
+    loginSettings,
+    authMethods,
+    command.organization,
+    command.authRequestId,
   );
 
-  if (availableMultiFactors?.length == 1) {
-    const params = new URLSearchParams({
-      loginName: session.factors?.user.loginName,
-    });
-
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    const factor = availableMultiFactors[0];
-    // if passwordless is other method, but user selected password as alternative, perform a login
-    if (factor === AuthenticationMethodType.TOTP) {
-      return { redirect: `/otp/time-based?` + params };
-    } else if (factor === AuthenticationMethodType.OTP_SMS) {
-      return { redirect: `/otp/sms?` + params };
-    } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
-      return { redirect: `/otp/email?` + params };
-    } else if (factor === AuthenticationMethodType.U2F) {
-      return { redirect: `/u2f?` + params };
-    }
-  } else if (availableMultiFactors?.length >= 1) {
-    const params = new URLSearchParams({
-      loginName: session.factors.user.loginName,
-    });
-
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    return { redirect: `/mfa?` + params };
-  }
-  // TODO: check if handling of userstate INITIAL is needed
-  else if (user.state === UserState.INITIAL) {
-    return { error: "Initial User not supported" };
-  } else if (
-    (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
-    !availableMultiFactors.length
-  ) {
-    const params = new URLSearchParams({
-      loginName: session.factors.user.loginName,
-      force: "true", // this defines if the mfa is forced in the settings
-      checkAfter: "true", // this defines if the check is directly made after the setup
-    });
-
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    // TODO: provide a way to setup passkeys on mfa page?
-    return { redirect: `/mfa/set?` + params };
-  }
-  // TODO: implement passkey setup
-
-  //  else if (
-  //   submitted.factors &&
-  //   !submitted.factors.webAuthN && // if session was not verified with a passkey
-  //   promptPasswordless && // if explicitly prompted due policy
-  //   !isAlternative // escaped if password was used as an alternative method
-  // ) {
-  //   const params = new URLSearchParams({
-  //     loginName: submitted.factors.user.loginName,
-  //     prompt: "true",
-  //   });
-
-  //   if (authRequestId) {
-  //     params.append("authRequestId", authRequestId);
-  //   }
-
-  //   if (organization) {
-  //     params.append("organization", organization);
-  //   }
-
-  //   return router.push(`/passkey/set?` + params);
-  // }
-  else if (command.authRequestId && session.id) {
+  if (command.authRequestId && session.id) {
     const nextUrl = await getNextUrl(
       {
         sessionId: session.id,
@@ -402,4 +338,111 @@ export async function checkSessionAndSetPassword({
         throw error;
       });
   }
+}
+
+function checkMFAFactors(
+  session: Session,
+  loginSettings: LoginSettings | undefined,
+  authMethods: AuthenticationMethodType[],
+  organization?: string,
+  authRequestId?: string,
+) {
+  const availableMultiFactors = authMethods?.filter(
+    (m: AuthenticationMethodType) =>
+      m !== AuthenticationMethodType.PASSWORD &&
+      m !== AuthenticationMethodType.PASSKEY,
+  );
+
+  if (availableMultiFactors?.length == 1) {
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+    });
+
+    if (authRequestId) {
+      params.append("authRequestId", authRequestId);
+    }
+
+    if (organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        organization ?? (session.factors?.user?.organizationId as string),
+      );
+    }
+
+    const factor = availableMultiFactors[0];
+    // if passwordless is other method, but user selected password as alternative, perform a login
+    if (factor === AuthenticationMethodType.TOTP) {
+      return { redirect: `/otp/time-based?` + params };
+    } else if (factor === AuthenticationMethodType.OTP_SMS) {
+      return { redirect: `/otp/sms?` + params };
+    } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
+      return { redirect: `/otp/email?` + params };
+    } else if (factor === AuthenticationMethodType.U2F) {
+      return { redirect: `/u2f?` + params };
+    }
+  } else if (availableMultiFactors?.length >= 1) {
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+    });
+
+    if (authRequestId) {
+      params.append("authRequestId", authRequestId);
+    }
+
+    if (organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        organization ?? (session.factors?.user?.organizationId as string),
+      );
+    }
+
+    return { redirect: `/mfa?` + params };
+  } else if (
+    (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
+    !availableMultiFactors.length
+  ) {
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+      force: "true", // this defines if the mfa is forced in the settings
+      checkAfter: "true", // this defines if the check is directly made after the setup
+    });
+
+    if (authRequestId) {
+      params.append("authRequestId", authRequestId);
+    }
+
+    if (organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        organization ?? (session.factors?.user?.organizationId as string),
+      );
+    }
+
+    // TODO: provide a way to setup passkeys on mfa page?
+    return { redirect: `/mfa/set?` + params };
+  }
+
+  // TODO: implement passkey setup
+
+  //  else if (
+  //   submitted.factors &&
+  //   !submitted.factors.webAuthN && // if session was not verified with a passkey
+  //   promptPasswordless && // if explicitly prompted due policy
+  //   !isAlternative // escaped if password was used as an alternative method
+  // ) {
+  //   const params = new URLSearchParams({
+  //     loginName: submitted.factors.user.loginName,
+  //     prompt: "true",
+  //   });
+
+  //   if (authRequestId) {
+  //     params.append("authRequestId", authRequestId);
+  //   }
+
+  //   if (organization) {
+  //     params.append("organization", organization);
+  //   }
+
+  //   return router.push(`/passkey/set?` + params);
+  // }
 }
