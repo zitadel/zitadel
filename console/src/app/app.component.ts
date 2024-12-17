@@ -20,6 +20,7 @@ import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 import { fallbackLanguage, supportedLanguages, supportedLanguagesRegexp } from './utils/language';
+import { PosthogService } from './services/posthog.service';
 
 @Component({
   selector: 'cnsl-root',
@@ -68,6 +69,7 @@ export class AppComponent implements OnDestroy {
     keyboardShortcuts: KeyboardShortcutsService,
     private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
+    private posthog: PosthogService,
   ) {
     console.log(
       '%cWait!',
@@ -236,6 +238,8 @@ export class AppComponent implements OnDestroy {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
+
+    this.posthog.init();
   }
 
   // TODO implement Console storage
