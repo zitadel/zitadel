@@ -5,6 +5,8 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/target"
@@ -19,6 +21,8 @@ type AddTarget struct {
 	Endpoint         string
 	Timeout          time.Duration
 	InterruptOnError bool
+
+	SigningKey string
 }
 
 func (a *AddTarget) IsValid() error {
@@ -58,7 +62,11 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 	if wm.State.Exists() {
 		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-9axkz0jvzm", "Errors.Target.AlreadyExists")
 	}
-
+	code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.targetEncryption) //nolint
+	if err != nil {
+		return nil, err
+	}
+	add.SigningKey = code.PlainCode()
 	pushedEvents, err := c.eventstore.Push(ctx, target.NewAddedEvent(
 		ctx,
 		TargetAggregateFromWriteModel(&wm.WriteModel),
@@ -67,6 +75,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		add.Endpoint,
 		add.Timeout,
 		add.InterruptOnError,
+		code.Crypted,
 	))
 	if err != nil {
 		return nil, err
@@ -85,6 +94,9 @@ type ChangeTarget struct {
 	Endpoint         *string
 	Timeout          *time.Duration
 	InterruptOnError *bool
+
+	ExpirationSigningKey bool
+	SigningKey           *string
 }
 
 func (a *ChangeTarget) IsValid() error {
@@ -120,6 +132,17 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 	if !existing.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-xj14f2cccn", "Errors.Target.NotFound")
 	}
+
+	var changedSigningKey *crypto.CryptoValue
+	if change.ExpirationSigningKey {
+		code, err := c.newSigningKey(ctx, c.eventstore.Filter, c.targetEncryption) //nolint
+		if err != nil {
+			return nil, err
+		}
+		changedSigningKey = code.Crypted
+		change.SigningKey = &code.Plain
+	}
+
 	changedEvent := existing.NewChangedEvent(
 		ctx,
 		TargetAggregateFromWriteModel(&existing.WriteModel),
@@ -127,7 +150,9 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 		change.TargetType,
 		change.Endpoint,
 		change.Timeout,
-		change.InterruptOnError)
+		change.InterruptOnError,
+		changedSigningKey,
+	)
 	if changedEvent == nil {
 		return writeModelToObjectDetails(&existing.WriteModel), nil
 	}
@@ -183,4 +208,8 @@ func (c *Commands) getTargetWriteModelByID(ctx context.Context, id string, resou
 		return nil, err
 	}
 	return wm, nil
+}
+
+func (c *Commands) newSigningKey(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+	return c.newEncryptedCodeWithDefault(ctx, filter, domain.SecretGeneratorTypeSigningKey, alg, c.defaultSecretGenerators.SigningKey)
 }

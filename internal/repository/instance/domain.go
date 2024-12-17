@@ -13,6 +13,10 @@ const (
 	InstanceDomainAddedEventType      = domainEventPrefix + "added"
 	InstanceDomainPrimarySetEventType = domainEventPrefix + "primary.set"
 	InstanceDomainRemovedEventType    = domainEventPrefix + "removed"
+
+	InstanceDomainSearchType     = "instance_domain"
+	InstanceDomainSearchField    = "domain"
+	InstanceDomainObjectRevision = uint8(1)
 )
 
 func NewAddInstanceDomainUniqueConstraint(domain string) *eventstore.UniqueConstraint {
@@ -41,6 +45,30 @@ func (e *DomainAddedEvent) Payload() interface{} {
 
 func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddInstanceDomainUniqueConstraint(e.Domain)}
+}
+
+func (e *DomainAddedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			domainSearchObject(e.Domain),
+			InstanceDomainSearchField,
+			&eventstore.Value{
+				Value: e.Domain,
+				// TODO: (adlerhurst) ensure uniqueness if we go with fields table: https://github.com/zitadel/zitadel/issues/9009
+				MustBeUnique: false,
+				ShouldIndex:  true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
 }
 
 func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string, generated bool) *DomainAddedEvent {
@@ -118,6 +146,29 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 	return []*eventstore.UniqueConstraint{NewRemoveInstanceDomainUniqueConstraint(e.Domain)}
 }
 
+func (e *DomainRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			domainSearchObject(e.Domain),
+			InstanceDomainSearchField,
+			&eventstore.Value{
+				Value:        e.Domain,
+				MustBeUnique: true,
+				ShouldIndex:  true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
+}
+
 func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainRemovedEvent {
 	return &DomainRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -139,4 +190,12 @@ func DomainRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 
 	return domainRemoved, nil
+}
+
+func domainSearchObject(domain string) eventstore.Object {
+	return eventstore.Object{
+		Type:     InstanceDomainSearchType,
+		ID:       domain,
+		Revision: InstanceDomainObjectRevision,
+	}
 }
