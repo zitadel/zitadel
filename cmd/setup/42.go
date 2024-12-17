@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	//go:embed 40.sql
+	//go:embed 42.sql
 	addOIDCAppLoginVersion string
 )
 

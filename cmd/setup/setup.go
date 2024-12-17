@@ -170,7 +170,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s37Apps7OIDConfigsBackChannelLogoutURI = &Apps7OIDConfigsBackChannelLogoutURI{dbClient: esPusherDBClient}
 	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: esPusherDBClient, esClient: eventstoreClient}
 	steps.s39DeleteStaleOrgFields = &DeleteStaleOrgFields{dbClient: esPusherDBClient}
-	steps.s40Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: esPusherDBClient}
+	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -235,7 +235,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s33SMSConfigs3TwilioAddVerifyServiceSid,
 		steps.s37Apps7OIDConfigsBackChannelLogoutURI,
 		steps.s39DeleteStaleOrgFields,
-		steps.s40Apps7OIDCConfigsLoginVersion,
+		steps.s42Apps7OIDCConfigsLoginVersion,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
