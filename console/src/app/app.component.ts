@@ -238,8 +238,6 @@ export class AppComponent implements OnDestroy {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
-
-    this.posthog.init();
   }
 
   // TODO implement Console storage

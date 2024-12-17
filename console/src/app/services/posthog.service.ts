@@ -14,6 +14,7 @@ export class PosthogService {
     this.envService.env.subscribe((env) => {
       this.posthogToken = env.posthog_token;
       this.posthogUrl = env.posthog_url;
+      this.init();
     });
   }
 
