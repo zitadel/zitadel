@@ -47,5 +47,5 @@ func (*DeleteStaleOrgFields) Check(map[string]any) bool {
 }
 
 func (*DeleteStaleOrgFields) String() string {
-	return "39_delete_stale_org_fields_repeat"
+	return "repeatable_delete_stale_org_fields"
 }

@@ -127,7 +127,6 @@ type Steps struct {
 	s37Apps7OIDConfigsBackChannelLogoutURI  *Apps7OIDConfigsBackChannelLogoutURI
 	s38BackChannelLogoutNotificationStart   *BackChannelLogoutNotificationStart
 	s40InitPushFunc                         *InitPushFunc
-	s39DeleteStaleOrgFields                 *DeleteStaleOrgFields
 	s41FillFieldsForInstanceDomains         *FillFieldsForInstanceDomains
 }
 
