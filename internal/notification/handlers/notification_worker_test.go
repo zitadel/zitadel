@@ -421,6 +421,7 @@ func Test_userNotifier_reduceNotificationRequested(t *testing.T) {
 			f, a, w := tt.test(ctrl, queries, commands)
 			err := newNotificationWorker(t, ctrl, queries, f, a, w).reduceNotificationRequested(
 				authz.WithInstanceID(context.Background(), instanceID),
+				authz.WithInstanceID(context.Background(), instanceID),
 				&sql.Tx{},
 				a.event.(*notification.RequestedEvent))
 			if w.err != nil {
@@ -799,8 +800,10 @@ func Test_userNotifier_reduceNotificationRetry(t *testing.T) {
 			f, a, w := tt.test(ctrl, queries, commands)
 			err := newNotificationWorker(t, ctrl, queries, f, a, w).reduceNotificationRetry(
 				authz.WithInstanceID(context.Background(), instanceID),
+				authz.WithInstanceID(context.Background(), instanceID),
 				&sql.Tx{},
-				a.event.(*notification.RetryRequestedEvent))
+				a.event.(*notification.RetryRequestedEvent),
+			)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -874,16 +877,15 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			},
 		},
 		config: WorkerConfig{
-			Workers:               1,
-			BulkLimit:             10,
-			RequeueEvery:          2 * time.Second,
-			HandleActiveInstances: 0,
-			TransactionDuration:   5 * time.Second,
-			MaxAttempts:           f.maxAttempts,
-			MaxTtl:                5 * time.Minute,
-			MinRetryDelay:         1 * time.Second,
-			MaxRetryDelay:         10 * time.Second,
-			RetryDelayFactor:      2,
+			Workers:             1,
+			BulkLimit:           10,
+			RequeueEvery:        2 * time.Second,
+			TransactionDuration: 5 * time.Second,
+			MaxAttempts:         f.maxAttempts,
+			MaxTtl:              5 * time.Minute,
+			MinRetryDelay:       1 * time.Second,
+			MaxRetryDelay:       10 * time.Second,
+			RetryDelayFactor:    2,
 		},
 		now:     f.now,
 		backOff: f.backOff,

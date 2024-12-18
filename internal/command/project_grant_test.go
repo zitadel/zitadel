@@ -1273,11 +1273,25 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 			},
 		},
 		{
-			name: "project not existing, precondition failed error",
+			name: "project already removed, precondition failed error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						)),
+						eventFromEventPusher(
+							project.NewProjectRemovedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"projectname1",
+								nil,
+							),
+						),
+					),
 				),
 			},
 			args: args{
@@ -1287,7 +1301,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1295,15 +1309,6 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							project.NewProjectAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1", true, true, true,
-								domain.PrivateLabelingSettingUnspecified,
-							),
-						),
-					),
 					expectFilter(),
 				),
 			},
@@ -1322,15 +1327,6 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							project.NewProjectAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1", true, true, true,
-								domain.PrivateLabelingSettingUnspecified,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -1365,15 +1361,6 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							project.NewProjectAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1", true, true, true,
-								domain.PrivateLabelingSettingUnspecified,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -1410,15 +1397,6 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							project.NewProjectAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectname1", true, true, true,
-								domain.PrivateLabelingSettingUnspecified,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,

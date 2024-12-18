@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"sort"
-	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
@@ -24,10 +23,6 @@ type Eventstore struct {
 	pusher   Pusher
 	querier  Querier
 	searcher Searcher
-
-	instances         []string
-	lastInstanceQuery time.Time
-	instancesMu       sync.Mutex
 }
 
 var (
@@ -68,8 +63,6 @@ func NewEventstore(config *Config) *Eventstore {
 		pusher:   config.Pusher,
 		querier:  config.Querier,
 		searcher: config.Searcher,
-
-		instancesMu: sync.Mutex{},
 	}
 }
 
@@ -90,7 +83,7 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 
 // PushWithClient pushes the events in a single transaction using the provided database client
 // an event needs at least an aggregate
-func (es *Eventstore) PushWithClient(ctx context.Context, client database.QueryExecuter, cmds ...Command) ([]Event, error) {
+func (es *Eventstore) PushWithClient(ctx context.Context, client database.ContextQueryExecuter, cmds ...Command) ([]Event, error) {
 	if es.PushTimeout > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
@@ -243,27 +236,10 @@ func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQu
 	return es.querier.LatestSequence(ctx, queryFactory)
 }
 
-// InstanceIDs returns the instance ids found by the search query
-// forceDBCall forces to query the database, the instance ids are not cached
-func (es *Eventstore) InstanceIDs(ctx context.Context, maxAge time.Duration, forceDBCall bool, queryFactory *SearchQueryBuilder) ([]string, error) {
-	es.instancesMu.Lock()
-	defer es.instancesMu.Unlock()
-
-	if !forceDBCall && time.Since(es.lastInstanceQuery) <= maxAge {
-		return es.instances, nil
-	}
-
-	instances, err := es.querier.InstanceIDs(ctx, queryFactory)
-	if err != nil {
-		return nil, err
-	}
-
-	if !forceDBCall {
-		es.instances = instances
-		es.lastInstanceQuery = time.Now()
-	}
-
-	return instances, nil
+// InstanceIDs returns the distinct instance ids found by the search query
+// Warning: this function can have high impact on performance, only use this function during setup
+func (es *Eventstore) InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error) {
+	return es.querier.InstanceIDs(ctx, queryFactory)
 }
 
 func (es *Eventstore) Client() *database.DB {
@@ -301,7 +277,7 @@ type Pusher interface {
 	// Health checks if the connection to the storage is available
 	Health(ctx context.Context) error
 	// Push stores the actions
-	Push(ctx context.Context, client database.QueryExecuter, commands ...Command) (_ []Event, err error)
+	Push(ctx context.Context, client database.ContextQueryExecuter, commands ...Command) (_ []Event, err error)
 	// Client returns the underlying database connection
 	Client() *database.DB
 }
