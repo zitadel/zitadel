@@ -68,7 +68,7 @@ func TestServer_SetContactPhone(t *testing.T) {
 		},
 		{
 			name: "phone patch, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.SetContactPhoneRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -340,7 +340,7 @@ func TestServer_VerifyContactPhone(t *testing.T) {
 		},
 		{
 			name: "phone verify, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.VerifyContactPhoneRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -530,7 +530,7 @@ func TestServer_ResendContactPhoneCode(t *testing.T) {
 		},
 		{
 			name: "phone resend, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.ResendContactPhoneCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
