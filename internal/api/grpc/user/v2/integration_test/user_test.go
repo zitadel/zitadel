@@ -5,6 +5,7 @@ package user_test
 import (
 	"context"
 	"fmt"
+	"github.com/zitadel/logging"
 	"net/url"
 	"os"
 	"testing"
