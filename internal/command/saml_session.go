@@ -150,8 +150,8 @@ func (c *SAMLSessionEvents) SetSAMLRequestSuccessful(ctx context.Context, samlRe
 	c.events = append(c.events, samlrequest.NewSucceededEvent(ctx, samlRequestAggregate))
 }
 
-func (c *SAMLSessionEvents) SetSAMLRequestFailed(ctx context.Context, samlRequestAggregate *eventstore.Aggregate, err error) {
-	c.events = append(c.events, samlrequest.NewFailedEvent(ctx, samlRequestAggregate, domain.SAMLErrorReasonFromError(err)))
+func (c *SAMLSessionEvents) SetSAMLRequestFailed(ctx context.Context, samlRequestAggregate *eventstore.Aggregate, err domain.SAMLErrorReason) {
+	c.events = append(c.events, samlrequest.NewFailedEvent(ctx, samlRequestAggregate, err))
 }
 
 func (c *SAMLSessionEvents) AddSAMLResponse(ctx context.Context, id string, lifetime time.Duration) error {

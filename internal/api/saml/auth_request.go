@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"net/url"
 
 	"github.com/zitadel/saml/pkg/provider"
 	"github.com/zitadel/saml/pkg/provider/models"
@@ -11,9 +12,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
-func (p *Provider) CreateErrorResponse(authReq models.AuthRequestInt, reason, description string) (string, string, error) {
+func (p *Provider) CreateErrorResponse(ctx context.Context, authReq models.AuthRequestInt, reason domain.SAMLErrorReason, description string) (string, string, error) {
 	resp := &provider.Response{
 		ProtocolBinding: authReq.GetBindingType(),
 		RelayState:      authReq.GetRelayState(),
@@ -22,24 +24,14 @@ func (p *Provider) CreateErrorResponse(authReq models.AuthRequestInt, reason, de
 		Issuer:          authReq.GetDestination(),
 		Audience:        authReq.GetIssuer(),
 	}
-	samlResponse := p.AuthCallbackErrorResponse(resp, reason, description)
-
-	respData, err := xml.Marshal(samlResponse)
-	if err != nil {
+	if _, _, err := p.command.FailSAMLRequest(
+		setContextUserSystem(ctx),
+		authReq.GetID(),
+		reason,
+	); err != nil {
 		return "", "", err
 	}
-
-	switch authReq.GetBindingType() {
-	case provider.PostBinding:
-		return authReq.GetAccessConsumerServiceURL(), base64.StdEncoding.EncodeToString(respData), nil
-	case provider.RedirectBinding:
-		respData, err := xml.DeflateAndBase64(respData)
-		if err != nil {
-			return "", "", err
-		}
-		return fmt.Sprintf("%s?%s", authReq.GetAccessConsumerServiceURL(), provider.BuildRedirectQuery(string(respData), resp.RelayState, resp.SigAlg, resp.Signature)), "", nil
-	}
-	return "", "", nil
+	return createResponse(p.AuthCallbackErrorResponse(resp, domain.SAMLErrorReasonToString(reason), description), authReq.GetBindingType(), authReq.GetAccessConsumerServiceURL(), resp.RelayState, resp.SigAlg, resp.Signature)
 }
 
 func (p *Provider) CreateResponse(ctx context.Context, authReq models.AuthRequestInt) (string, string, error) {
@@ -66,20 +58,28 @@ func (p *Provider) CreateResponse(ctx context.Context, authReq models.AuthReques
 		return "", "", err
 	}
 
+	return createResponse(samlResponse, authReq.GetBindingType(), authReq.GetAccessConsumerServiceURL(), resp.RelayState, resp.SigAlg, resp.Signature)
+}
+
+func createResponse(samlResponse interface{}, binding, acs, relayState, sigAlg, sig string) (string, string, error) {
 	respData, err := xml.Marshal(samlResponse)
 	if err != nil {
 		return "", "", err
 	}
 
-	switch authReq.GetBindingType() {
+	switch binding {
 	case provider.PostBinding:
-		return authReq.GetAccessConsumerServiceURL(), base64.StdEncoding.EncodeToString(respData), nil
+		return acs, base64.StdEncoding.EncodeToString(respData), nil
 	case provider.RedirectBinding:
 		respData, err := xml.DeflateAndBase64(respData)
 		if err != nil {
 			return "", "", err
 		}
-		return fmt.Sprintf("%s?%s", authReq.GetAccessConsumerServiceURL(), provider.BuildRedirectQuery(string(respData), resp.RelayState, resp.SigAlg, resp.Signature)), "", nil
+		parsed, err := url.Parse(acs)
+		if err != nil {
+			return "", "", err
+		}
+		return fmt.Sprintf("%s?%s", parsed.RawQuery, provider.BuildRedirectQuery(string(respData), relayState, sigAlg, sig)), "", nil
 	}
 	return "", "", nil
 }

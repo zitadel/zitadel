@@ -76,10 +76,8 @@ func NewAddedEvent(ctx context.Context,
 type SAMLResponseAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID       string             `json:"id,omitempty"`
-	Lifetime time.Duration      `json:"lifetime,omitempty"`
-	Reason   domain.TokenReason `json:"reason,omitempty"`
-	Actor    *domain.TokenActor `json:"actor,omitempty"`
+	ID       string        `json:"id,omitempty"`
+	Lifetime time.Duration `json:"lifetime,omitempty"`
 }
 
 func (e *SAMLResponseAddedEvent) Payload() interface{} {

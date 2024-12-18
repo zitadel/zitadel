@@ -25,11 +25,6 @@ func (a *AuthRequestV2) GetRelayState() string {
 func (a *AuthRequestV2) GetAccessConsumerServiceURL() string {
 	return a.ACSURL
 }
-
-func (a *AuthRequestV2) GetNameID() string {
-	return a.UserID
-}
-
 func (a *AuthRequestV2) GetAuthRequestID() string {
 	return a.RequestID
 }
@@ -39,22 +34,12 @@ func (a *AuthRequestV2) GetBindingType() string {
 func (a *AuthRequestV2) GetIssuer() string {
 	return a.Issuer
 }
-func (a *AuthRequestV2) GetIssuerName() string {
-	return a.IssuerName
-}
 func (a *AuthRequestV2) GetDestination() string {
 	return a.Destination
-}
-func (a *AuthRequestV2) GetCode() string {
-	return ""
 }
 func (a *AuthRequestV2) GetUserID() string {
 	return a.UserID
 }
-func (a *AuthRequestV2) GetUserName() string {
-	return ""
-}
-
 func (a *AuthRequestV2) Done() bool {
 	return a.UserID != "" && a.SessionID != ""
 }

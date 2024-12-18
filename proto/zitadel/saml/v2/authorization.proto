@@ -11,32 +11,32 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/saml/v2;saml";
 message SAMLRequest{
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
     external_docs: {
-      url: "https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest";
-      description: "Find out more about SAML Auth Request parameters";
+      url: "https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html";
+      description: "Find out more about SAMLRequest parameters";
     }
   };
   
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the authorization request";
+      description: "ID of the SAMLRequest";
     }
   ];
 
   google.protobuf.Timestamp creation_date = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Time when the auth request was created";
+      description: "Time when the SAMLRequest was created";
     }
   ];
 
   string issuer = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "SAML entity ID of the application that created the auth request";
+      description: "SAML entityID of the application that created the SAMLRequest";
     }
   ];
   
-  string assertion_consumer_url = 4 [
+  string assertion_consumer_service = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Base URI that points back to the application";
+      description: "URL which points back to the assertion consumer service of the application";
     }
   ];
 

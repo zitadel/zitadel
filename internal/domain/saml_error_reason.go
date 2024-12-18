@@ -1,5 +1,9 @@
 package domain
 
+import (
+	"github.com/zitadel/saml/pkg/provider"
+)
+
 type SAMLErrorReason int32
 
 const (
@@ -13,6 +17,25 @@ const (
 	SAMLErrorReasonUnsupportedBinding
 )
 
-func SAMLErrorReasonFromError(err error) SAMLErrorReason {
-	return SAMLErrorReasonUnspecified
+func SAMLErrorReasonToString(reason SAMLErrorReason) string {
+	switch reason {
+	case SAMLErrorReasonUnspecified:
+		return "unspecified error"
+	case SAMLErrorReasonVersionMissmatch:
+		return provider.StatusCodeVersionMissmatch
+	case SAMLErrorReasonAuthNFailed:
+		return provider.StatusCodeAuthNFailed
+	case SAMLErrorReasonInvalidAttrNameOrValue:
+		return provider.StatusCodeInvalidAttrNameOrValue
+	case SAMLErrorReasonInvalidNameIDPolicy:
+		return provider.StatusCodeInvalidNameIDPolicy
+	case SAMLErrorReasonRequestDenied:
+		return provider.StatusCodeRequestDenied
+	case SAMLErrorReasonRequestUnsupported:
+		return provider.StatusCodeRequestUnsupported
+	case SAMLErrorReasonUnsupportedBinding:
+		return provider.StatusCodeUnsupportedBinding
+	default:
+		return "unspecified error"
+	}
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/saml/pkg/provider"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -33,31 +32,31 @@ func samlRequestToPb(a *query.SamlRequest) *saml_pb.SAMLRequest {
 	}
 }
 
-func (s *Server) CreateCallback(ctx context.Context, req *saml_pb.CreateCallbackRequest) (*saml_pb.CreateCallbackResponse, error) {
+func (s *Server) CreateResponse(ctx context.Context, req *saml_pb.CreateResponseRequest) (*saml_pb.CreateResponseResponse, error) {
 	switch v := req.GetCallbackKind().(type) {
-	case *saml_pb.CreateCallbackRequest_Error:
+	case *saml_pb.CreateResponseRequest_Error:
 		return s.failSAMLRequest(ctx, req.GetSamlRequestId(), v.Error)
-	case *saml_pb.CreateCallbackRequest_Session:
+	case *saml_pb.CreateResponseRequest_Session:
 		return s.linkSessionToSAMLRequest(ctx, req.GetSamlRequestId(), v.Session)
 	default:
 		return nil, zerrors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
 	}
 }
 
-func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *saml_pb.AuthorizationError) (*saml_pb.CreateCallbackResponse, error) {
+func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *saml_pb.AuthorizationError) (*saml_pb.CreateResponseResponse, error) {
 	details, aar, err := s.command.FailSAMLRequest(ctx, samlRequestID, errorReasonToDomain(ae.GetError()))
 	if err != nil {
 		return nil, err
 	}
 	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
-	url, body, err := s.idp.CreateErrorResponse(authReq, errorReasonToSAML(ae.GetError()), ae.GetErrorDescription())
+	url, body, err := s.idp.CreateErrorResponse(ctx, authReq, errorReasonToDomain(ae.GetError()), ae.GetErrorDescription())
 	if err != nil {
 		return nil, err
 	}
 	return createCallbackResponseFromBinding(details, url, body, authReq.RelayState), nil
 }
 
-func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*saml_pb.CreateCallbackResponse, error) {
+func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*saml_pb.CreateResponseResponse, error) {
 	details, aar, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken(), true)
 	if err != nil {
 		return nil, err
@@ -70,21 +69,21 @@ func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID str
 	return createCallbackResponseFromBinding(details, url, body, authReq.RelayState), nil
 }
 
-func createCallbackResponseFromBinding(details *domain.ObjectDetails, url string, body string, relayState string) *saml_pb.CreateCallbackResponse {
-	resp := &saml_pb.CreateCallbackResponse{
-		Details:     object.DomainToDetailsPb(details),
-		CallbackUrl: url,
+func createCallbackResponseFromBinding(details *domain.ObjectDetails, url string, body string, relayState string) *saml_pb.CreateResponseResponse {
+	resp := &saml_pb.CreateResponseResponse{
+		Details: object.DomainToDetailsPb(details),
+		Url:     url,
 	}
 
 	if body != "" {
-		resp.Binding = &saml_pb.CreateCallbackResponse_Post{
+		resp.Binding = &saml_pb.CreateResponseResponse_Post{
 			Post: &saml_pb.PostResponse{
-				RelayState: relayState,
-				Body:       body,
+				RelayState:   relayState,
+				SamlResponse: body,
 			},
 		}
 	} else {
-		resp.Binding = &saml_pb.CreateCallbackResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}}
+		resp.Binding = &saml_pb.CreateResponseResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}}
 	}
 	return resp
 }
@@ -109,28 +108,5 @@ func errorReasonToDomain(errorReason saml_pb.ErrorReason) domain.SAMLErrorReason
 		return domain.SAMLErrorReasonUnsupportedBinding
 	default:
 		return domain.SAMLErrorReasonUnspecified
-	}
-}
-
-func errorReasonToSAML(reason saml_pb.ErrorReason) string {
-	switch reason {
-	case saml_pb.ErrorReason_ERROR_REASON_UNSPECIFIED:
-		return "unspecified error"
-	case saml_pb.ErrorReason_ERROR_REASON_VERSION_MISSMATCH:
-		return provider.StatusCodeVersionMissmatch
-	case saml_pb.ErrorReason_ERROR_REASON_AUTH_N_FAILED:
-		return provider.StatusCodeAuthNFailed
-	case saml_pb.ErrorReason_ERROR_REASON_INVALID_ATTR_NAME_OR_VALUE:
-		return provider.StatusCodeInvalidAttrNameOrValue
-	case saml_pb.ErrorReason_ERROR_REASON_INVALID_NAMEID_POLICY:
-		return provider.StatusCodeInvalidNameIDPolicy
-	case saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED:
-		return provider.StatusCodeRequestDenied
-	case saml_pb.ErrorReason_ERROR_REASON_REQUEST_UNSUPPORTED:
-		return provider.StatusCodeRequestUnsupported
-	case saml_pb.ErrorReason_ERROR_REASON_UNSUPPORTED_BINDING:
-		return provider.StatusCodeUnsupportedBinding
-	default:
-		return "unspecified error"
 	}
 }

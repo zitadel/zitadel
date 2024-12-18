@@ -153,7 +153,7 @@ func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient strin
 		return "", fmt.Errorf("check redirect: %w", err)
 	}
 
-	prefixWithHost := i.Issuer() + "/ui/login/login?authRequestID="
+	prefixWithHost := i.Issuer() + i.Config.LoginURLV2
 	if !strings.HasPrefix(loc.String(), prefixWithHost) {
 		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}

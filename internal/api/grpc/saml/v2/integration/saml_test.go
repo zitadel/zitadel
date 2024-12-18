@@ -97,7 +97,7 @@ func TestServer_GetAuthRequest(t *testing.T) {
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := Client.GetAuthRequest(CTX, &saml_pb.GetSAMLRequestRequest{
+				got, err := Client.GetSAMLRequest(CTX, &saml_pb.GetSAMLRequestRequest{
 					SamlRequestId: authRequestID,
 				})
 				if tt.wantErr {
@@ -114,7 +114,7 @@ func TestServer_GetAuthRequest(t *testing.T) {
 	}
 }
 
-func TestServer_CreateCallback(t *testing.T) {
+func TestServer_CreateResponse(t *testing.T) {
 	idpMetadata, err := Instance.GetSAMLIDPMetadata()
 	require.NoError(t, err)
 	rootURLRedirect := "spredirect.example.com"
@@ -147,17 +147,17 @@ func TestServer_CreateCallback(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		req       *saml_pb.CreateCallbackRequest
+		req       *saml_pb.CreateResponseRequest
 		AuthError string
-		want      *saml_pb.CreateCallbackResponse
+		want      *saml_pb.CreateResponseResponse
 		wantURL   *url.URL
 		wantErr   bool
 	}{
 		{
 			name: "Not found",
-			req: &saml_pb.CreateCallbackRequest{
+			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: "123",
-				CallbackKind: &saml_pb.CreateCallbackRequest_Session{
+				CallbackKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
@@ -168,13 +168,13 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "session not found",
-			req: &saml_pb.CreateCallbackRequest{
+			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
 					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateCallbackRequest_Session{
+				CallbackKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    "foo",
 						SessionToken: "bar",
@@ -185,13 +185,13 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "session token invalid",
-			req: &saml_pb.CreateCallbackRequest{
+			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
 					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateCallbackRequest_Session{
+				CallbackKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: "bar",
@@ -202,24 +202,24 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "fail callback, post",
-			req: &saml_pb.CreateCallbackRequest{
+			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
 					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateCallbackRequest_Error{
+				CallbackKind: &saml_pb.CreateResponseRequest_Error{
 					Error: &saml_pb.AuthorizationError{
 						Error:            saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED,
 						ErrorDescription: gu.Ptr("nope"),
 					},
 				},
 			},
-			want: &saml_pb.CreateCallbackResponse{
-				CallbackUrl: regexp.QuoteMeta(`https://` + rootURLPost + `/saml/acs`),
-				Binding: &saml_pb.CreateCallbackResponse_Post{Post: &saml_pb.PostResponse{
-					RelayState: "notempty",
-					Body:       "notempty",
+			want: &saml_pb.CreateResponseResponse{
+				Url: regexp.QuoteMeta(`https://` + rootURLPost + `/saml/acs`),
+				Binding: &saml_pb.CreateResponseResponse_Post{Post: &saml_pb.PostResponse{
+					RelayState:   "notempty",
+					SamlResponse: "notempty",
 				}},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
@@ -230,22 +230,22 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "fail callback, redirect",
-			req: &saml_pb.CreateCallbackRequest{
+			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
 					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateCallbackRequest_Error{
+				CallbackKind: &saml_pb.CreateResponseRequest_Error{
 					Error: &saml_pb.AuthorizationError{
 						Error:            saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED,
 						ErrorDescription: gu.Ptr("nope"),
 					},
 				},
 			},
-			want: &saml_pb.CreateCallbackResponse{
-				CallbackUrl: `https:\/\/` + rootURLRedirect + `\/saml\/acs\?SAMLResponse=(.*)&RelayState=(.*)`,
-				Binding:     &saml_pb.CreateCallbackResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}},
+			want: &saml_pb.CreateResponseResponse{
+				Url:     `https:\/\/` + rootURLRedirect + `\/saml\/acs\?SAMLResponse=(.*)&RelayState=(.*)`,
+				Binding: &saml_pb.CreateResponseResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
@@ -255,22 +255,22 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "callback, redirect",
-			req: &saml_pb.CreateCallbackRequest{
+			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
 					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewareRedirect, Instance.Users[integration.UserTypeOrgOwner].ID, acsRedirect, gofakeit.BitcoinAddress(), saml.HTTPRedirectBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateCallbackRequest_Session{
+				CallbackKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
 					},
 				},
 			},
-			want: &saml_pb.CreateCallbackResponse{
-				CallbackUrl: `https:\/\/` + rootURLRedirect + `\/saml\/acs\?SAMLResponse=(.*)&RelayState=(.*)&Signature=(.*)&SigAlg=(.*)`,
-				Binding:     &saml_pb.CreateCallbackResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}},
+			want: &saml_pb.CreateResponseResponse{
+				Url:     `https:\/\/` + rootURLRedirect + `\/saml\/acs\?SAMLResponse=(.*)&RelayState=(.*)&Signature=(.*)&SigAlg=(.*)`,
+				Binding: &saml_pb.CreateResponseResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
@@ -280,24 +280,24 @@ func TestServer_CreateCallback(t *testing.T) {
 		},
 		{
 			name: "callback, post",
-			req: &saml_pb.CreateCallbackRequest{
+			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
 					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateCallbackRequest_Session{
+				CallbackKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
 					},
 				},
 			},
-			want: &saml_pb.CreateCallbackResponse{
-				CallbackUrl: regexp.QuoteMeta(`https://` + rootURLPost + `/saml/acs`),
-				Binding: &saml_pb.CreateCallbackResponse_Post{Post: &saml_pb.PostResponse{
-					RelayState: "notempty",
-					Body:       "notempty",
+			want: &saml_pb.CreateResponseResponse{
+				Url: regexp.QuoteMeta(`https://` + rootURLPost + `/saml/acs`),
+				Binding: &saml_pb.CreateResponseResponse_Post{Post: &saml_pb.PostResponse{
+					RelayState:   "notempty",
+					SamlResponse: "notempty",
 				}},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
@@ -309,7 +309,7 @@ func TestServer_CreateCallback(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.CreateCallback(CTX, tt.req)
+			got, err := Client.CreateResponse(CTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -317,10 +317,10 @@ func TestServer_CreateCallback(t *testing.T) {
 			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 			if tt.want != nil {
-				assert.Regexp(t, regexp.MustCompile(tt.want.CallbackUrl), got.GetCallbackUrl())
+				assert.Regexp(t, regexp.MustCompile(tt.want.Url), got.GetUrl())
 				if tt.want.GetPost() != nil {
 					assert.NotEmpty(t, got.GetPost().GetRelayState())
-					assert.NotEmpty(t, got.GetPost().GetBody())
+					assert.NotEmpty(t, got.GetPost().GetSamlResponse())
 				}
 				if tt.want.GetRedirect() != nil {
 					assert.NotNil(t, got.GetRedirect())

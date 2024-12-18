@@ -194,7 +194,8 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 						),
 						eventFromEventPusher(
 							samlrequest.NewFailedEvent(mockCtx, &samlrequest.NewAggregate("id", "instanceID").Aggregate,
-								domain.SAMLErrorReasonUnspecified),
+								domain.SAMLErrorReasonUnspecified,
+							),
 						),
 					),
 				),
@@ -561,9 +562,10 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		id     string
-		reason domain.SAMLErrorReason
+		ctx         context.Context
+		id          string
+		reason      domain.SAMLErrorReason
+		description string
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -591,6 +593,39 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 			res{
 				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-32lGj1Fhjt", "Errors.SAMLRequest.AlreadyHandled"),
 			},
+		}, {
+			"already failed",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							samlrequest.NewAddedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+								"login",
+								"application",
+								"acs",
+								"relaystate",
+								"request",
+								"binding",
+								"issuer",
+								"name",
+								"destination",
+							),
+						),
+						samlrequest.NewFailedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
+							domain.SAMLErrorReasonAuthNFailed,
+						),
+					),
+				),
+			},
+			args{
+				ctx:         mockCtx,
+				id:          "V2_id",
+				reason:      domain.SAMLErrorReasonAuthNFailed,
+				description: "desc",
+			},
+			res{
+				wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-32lGj1Fhjt", "Errors.SAMLRequest.AlreadyHandled"),
+			},
 		},
 		{
 			"failed",
@@ -613,14 +648,16 @@ func TestCommands_FailSAMLRequest(t *testing.T) {
 					),
 					expectPush(
 						samlrequest.NewFailedEvent(mockCtx, &samlrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-							domain.SAMLErrorReasonAuthNFailed),
+							domain.SAMLErrorReasonAuthNFailed,
+						),
 					),
 				),
 			},
 			args{
-				ctx:    mockCtx,
-				id:     "V2_id",
-				reason: domain.SAMLErrorReasonAuthNFailed,
+				ctx:         mockCtx,
+				id:          "V2_id",
+				reason:      domain.SAMLErrorReasonAuthNFailed,
+				description: "desc",
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
