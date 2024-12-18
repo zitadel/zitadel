@@ -2644,6 +2644,13 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 	userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), "").GetUserId()
 	Instance.RegisterUserOTPEmail(CTX, userWithEmail)
 
+	userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
+	U2FNotReady, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
+		UserId: userWithNotReadyU2F,
+		Domain: Instance.Domain,
+	})
+	logging.OnError(err).Panic("add u2f to user")
+
 	tests := []struct {
 		name string
 		req  *user.ListAuthenticationFactorsRequest
@@ -2749,6 +2756,35 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
 						Type: &user.AuthFactor_OtpEmail{
 							OtpEmail: &user.AuthFactorOTPEmail{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "with not ready u2f",
+			req: &user.ListAuthenticationFactorsRequest{
+				UserId: userWithNotReadyU2F,
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{},
+			},
+		},
+		{
+			name: "with not ready u2f state filtered",
+			req: &user.ListAuthenticationFactorsRequest{
+				UserId: userWithNotReadyU2F,
+				States: []user.AuthFactorState{user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY},
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_U2F{
+							U2F: &user.AuthFactorU2F{
+								Id:   U2FNotReady.GetU2FId(),
+								Name: "nice name",
+							},
 						},
 					},
 				},
