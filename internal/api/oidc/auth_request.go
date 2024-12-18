@@ -42,7 +42,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 		span.EndWithError(err)
 	}()
 
-	// for backwards compatability we pass the login client if set
+	// for backwards compatibility we pass the login client if set
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	loginClient := headers.Get(LoginClientHeader)
 
@@ -271,7 +271,7 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 
 	// V2:
 	// In case there is no id_token_hint and login V2 is either required by feature
-	// or requested via header (backwards compatability),
+	// or requested via header (backwards compatibility),
 	// we'll redirect to the UI (V2) and let it decide which session to terminate
 	//
 	// If there's no id_token_hint and for v1 logins, we handle them separately
@@ -288,7 +288,7 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	// V1:
 	// We check again for the id_token_hint param and if a session is set in it.
 	// All explicit V2 sessions with empty id_token_hint are handled above and all V2 session contain a sessionID
-	// So if any condition is not met, we handle the request as a V1 request abd do a (v1) TerminateSession,
+	// So if any condition is not met, we handle the request as a V1 request and do a (v1) TerminateSession,
 	// which terminates all sessions of the user agent, identified by cookie.
 	if endSessionRequest.IDTokenHintClaims == nil || endSessionRequest.IDTokenHintClaims.SessionID == "" {
 		return endSessionRequest.RedirectURI, o.TerminateSession(ctx, endSessionRequest.UserID, endSessionRequest.ClientID)
