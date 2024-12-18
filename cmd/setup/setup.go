@@ -169,7 +169,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s36FillV2Milestones = &FillV3Milestones{dbClient: queryDBClient, eventstore: eventstoreClient}
 	steps.s37Apps7OIDConfigsBackChannelLogoutURI = &Apps7OIDConfigsBackChannelLogoutURI{dbClient: esPusherDBClient}
 	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: esPusherDBClient, esClient: eventstoreClient}
-	steps.s39DeleteStaleOrgFields = &DeleteStaleOrgFields{dbClient: esPusherDBClient}
+	steps.s39DeleteStaleOrgFields = &DeleteStaleOrgFields{eventstore: eventstoreClient}
 	steps.s40InitPushFunc = &InitPushFunc{dbClient: esPusherDBClient}
 	steps.s41FillFieldsForInstanceDomains = &FillFieldsForInstanceDomains{eventstore: eventstoreClient}
 
@@ -188,6 +188,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			es:      eventstoreClient,
 			Version: build.Version(),
 		},
+		steps.s39DeleteStaleOrgFields,
 	}
 
 	for _, step := range []migration.Migration{
@@ -237,7 +238,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s32AddAuthSessionID,
 		steps.s33SMSConfigs3TwilioAddVerifyServiceSid,
 		steps.s37Apps7OIDConfigsBackChannelLogoutURI,
-		steps.s39DeleteStaleOrgFields,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
