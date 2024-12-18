@@ -42,6 +42,5 @@ func (mig *FillFieldsForInstanceDomains) String() string {
 }
 
 func (f *FillFieldsForInstanceDomains) Check(lastRun map[string]interface{}) bool {
-	currentVersion, _ := lastRun["version"].(string)
-	return currentVersion != f.Version
+	return true
 }
