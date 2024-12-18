@@ -2639,10 +2639,10 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 	U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
 
 	userWithSMS := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), "").GetUserId()
-	Instance.RegisterUserSMS(CTX, userWithSMS)
+	Instance.RegisterUserOTPSMS(CTX, userWithSMS)
 
 	userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), "").GetUserId()
-	Instance.RegisterUserEmail(CTX, userWithEmail)
+	Instance.RegisterUserOTPEmail(CTX, userWithEmail)
 
 	tests := []struct {
 		name string
@@ -2690,6 +2690,26 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 							Otp: &user.AuthFactorOTP{},
 						},
 					},
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_U2F{
+							U2F: &user.AuthFactorU2F{
+								Id:   U2FIdWithTOTP,
+								Name: "nice name",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "with totp, u2f filtered",
+			req: &user.ListAuthenticationFactorsRequest{
+				UserId:      userWithTOTP,
+				AuthFactors: []user.AuthFactors{user.AuthFactors_U2F},
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
 					{
 						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
 						Type: &user.AuthFactor_U2F{
