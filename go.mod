@@ -2,10 +2,6 @@ module github.com/zitadel/zitadel
 
 go 1.22.2
 
-replace (
-	github.com/zitadel/saml => /Users/stebenz/.go/src/github.com/zitadel/saml
-)
-
 require (
 	cloud.google.com/go/profiler v0.4.1
 	cloud.google.com/go/storage v1.43.0
@@ -71,7 +67,7 @@ require (
 	github.com/zitadel/logging v0.6.1
 	github.com/zitadel/oidc/v3 v3.32.0
 	github.com/zitadel/passwap v0.6.0
-	github.com/zitadel/saml v0.3.1
+	github.com/zitadel/saml v0.3.2
 	github.com/zitadel/schema v1.3.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
