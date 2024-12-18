@@ -270,6 +270,14 @@ func NewUserAuthMethodTypesSearchQuery(values ...domain.UserAuthMethodType) (Sea
 	return NewListQuery(UserAuthMethodColumnMethodType, list, ListIn)
 }
 
+func NewUserAuthMethodStatesSearchQuery(values ...domain.MFAState) (SearchQuery, error) {
+	list := make([]interface{}, len(values))
+	for i, value := range values {
+		list[i] = value
+	}
+	return NewListQuery(UserAuthMethodColumnState, list, ListIn)
+}
+
 func (r *UserAuthMethodSearchQueries) AppendResourceOwnerQuery(orgID string) error {
 	query, err := NewUserAuthMethodResourceOwnerSearchQuery(orgID)
 	if err != nil {
@@ -299,6 +307,15 @@ func (r *UserAuthMethodSearchQueries) AppendTokenIDQuery(tokenID string) error {
 
 func (r *UserAuthMethodSearchQueries) AppendStateQuery(state domain.MFAState) error {
 	query, err := NewUserAuthMethodStateSearchQuery(state)
+	if err != nil {
+		return err
+	}
+	r.Queries = append(r.Queries, query)
+	return nil
+}
+
+func (r *UserAuthMethodSearchQueries) AppendStatesQuery(state ...domain.MFAState) error {
+	query, err := NewUserAuthMethodStatesSearchQuery(state...)
 	if err != nil {
 		return err
 	}
