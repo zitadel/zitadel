@@ -64,7 +64,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/twilio/twilio-go v1.22.2
-	github.com/zitadel/logging v0.6.2-0.20241210162136-000926c3db63
+	github.com/zitadel/logging v0.6.2-0.20241218084325-6e2c95157bbe
 	github.com/zitadel/oidc/v3 v3.32.0
 	github.com/zitadel/passwap v0.6.0
 	github.com/zitadel/saml v0.2.0

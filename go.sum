@@ -742,6 +742,8 @@ github.com/zitadel/logging v0.6.2-0.20241204121729-ea91bf60a83a h1:8lHtxjYdreKLi
 github.com/zitadel/logging v0.6.2-0.20241204121729-ea91bf60a83a/go.mod h1:asotyKZQ4HXepSR3j0o++qGKeQiFt0ENDLTM4BG7tD0=
 github.com/zitadel/logging v0.6.2-0.20241210162136-000926c3db63 h1:zOHd/lrg0vi3EIyp2L7b/fjXhdtYHStGlO3EMU+MBqI=
 github.com/zitadel/logging v0.6.2-0.20241210162136-000926c3db63/go.mod h1:asotyKZQ4HXepSR3j0o++qGKeQiFt0ENDLTM4BG7tD0=
+github.com/zitadel/logging v0.6.2-0.20241218084325-6e2c95157bbe h1:HfcdU48FSgVD/a6d1ocTEp21PyjOKtXhksmqoiMI36w=
+github.com/zitadel/logging v0.6.2-0.20241218084325-6e2c95157bbe/go.mod h1:asotyKZQ4HXepSR3j0o++qGKeQiFt0ENDLTM4BG7tD0=
 github.com/zitadel/oidc/v3 v3.32.0 h1:Mw0EPZRC6h+OXAuT0Uk2BZIjJQNHLqUpaJCm6c3IByc=
 github.com/zitadel/oidc/v3 v3.32.0/go.mod h1:DyE/XClysRK/ozFaZSqlYamKVnTh4l6Ln25ihSNI03w=
 github.com/zitadel/passwap v0.6.0 h1:m9F3epFC0VkBXu25rihSLGyHvWiNlCzU5kk8RoI+SXQ=
