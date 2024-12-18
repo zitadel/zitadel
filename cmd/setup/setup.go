@@ -189,7 +189,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		},
 		&FillFieldsForInstanceDomains{
 			eventstore: eventstoreClient,
-			Version:    build.Version(),
 		},
 	}
 

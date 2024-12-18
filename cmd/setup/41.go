@@ -11,8 +11,6 @@ import (
 
 type FillFieldsForInstanceDomains struct {
 	eventstore *eventstore.Eventstore
-
-	Version string `json:"version"`
 }
 
 func (mig *FillFieldsForInstanceDomains) Execute(ctx context.Context, _ eventstore.Event) error {
