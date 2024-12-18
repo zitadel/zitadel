@@ -2200,6 +2200,25 @@ message ListAuthenticationFactorsRequest{
       example: "\"69629026806489455\"";
     }
   ];
+  repeated AuthFactors auth_factors = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specify the Auth Factors you are interested in"
+      default: "All Auth Factors"
+    }
+  ];
+  repeated AuthFactorState states = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Specify the state of the Auth Factors"
+      default: "Auth Factors that are ready"
+    }
+  ];
+}
+
+enum AuthFactors {
+  OTP = 0;
+  OTP_SMS = 1;
+  OTP_EMAIL = 2;
+  U2F = 3;
 }
 
 message ListAuthenticationFactorsResponse {

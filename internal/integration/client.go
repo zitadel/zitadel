@@ -375,14 +375,14 @@ func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) string {
 	return pkr.GetU2FId()
 }
 
-func (i *Instance) RegisterUserSMS(ctx context.Context, userID string) {
+func (i *Instance) RegisterUserOTPSMS(ctx context.Context, userID string) {
 	_, err := i.Client.UserV2.AddOTPSMS(ctx, &user_v2.AddOTPSMSRequest{
 		UserId: userID,
 	})
 	logging.OnError(err).Panic("create user sms")
 }
 
-func (i *Instance) RegisterUserEmail(ctx context.Context, userID string) {
+func (i *Instance) RegisterUserOTPEmail(ctx context.Context, userID string) {
 	_, err := i.Client.UserV2.AddOTPEmail(ctx, &user_v2.AddOTPEmailRequest{
 		UserId: userID,
 	})
