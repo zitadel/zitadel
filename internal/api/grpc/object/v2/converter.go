@@ -114,6 +114,52 @@ func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
 	return factor
 }
 
+func AuthFactorsToPb(authFactors []user_pb.AuthFactors) []domain.UserAuthMethodType {
+	factors := make([]domain.UserAuthMethodType, len(authFactors))
+	for i, authFactor := range authFactors {
+		factors[i] = AuthFactorToPb(authFactor)
+	}
+	return factors
+}
+
+func AuthFactorToPb(authFactor user_pb.AuthFactors) domain.UserAuthMethodType {
+	switch authFactor {
+	case user_pb.AuthFactors_OTP:
+		return domain.UserAuthMethodTypeTOTP
+	case user_pb.AuthFactors_OTP_SMS:
+		return domain.UserAuthMethodTypeOTPSMS
+	case user_pb.AuthFactors_OTP_EMAIL:
+		return domain.UserAuthMethodTypeOTPEmail
+	case user_pb.AuthFactors_U2F:
+		return domain.UserAuthMethodTypeU2F
+	default:
+		return domain.UserAuthMethodTypeUnspecified
+	}
+}
+
+func AuthFactorStatesToPb(authFactorStates []user_pb.AuthFactorState) []domain.MFAState {
+	factorStates := make([]domain.MFAState, len(authFactorStates))
+	for i, authFactorState := range authFactorStates {
+		factorStates[i] = AuthFactorStateToPb(authFactorState)
+	}
+	return factorStates
+}
+
+func AuthFactorStateToPb(authFactorState user_pb.AuthFactorState) domain.MFAState {
+	switch authFactorState {
+	case user_pb.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED:
+		return domain.MFAStateUnspecified
+	case user_pb.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY:
+		return domain.MFAStateNotReady
+	case user_pb.AuthFactorState_AUTH_FACTOR_STATE_READY:
+		return domain.MFAStateReady
+	case user_pb.AuthFactorState_AUTH_FACTOR_STATE_REMOVED:
+		return domain.MFAStateRemoved
+	default:
+		return domain.MFAStateUnspecified
+	}
+}
+
 func MFAStateToPb(state domain.MFAState) user_pb.AuthFactorState {
 	switch state {
 	case domain.MFAStateNotReady:
