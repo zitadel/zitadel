@@ -11,6 +11,8 @@ import (
 
 type FillFieldsForInstanceDomains struct {
 	eventstore *eventstore.Eventstore
+
+	Version string `json:"version"`
 }
 
 func (mig *FillFieldsForInstanceDomains) Execute(ctx context.Context, _ eventstore.Event) error {
@@ -37,4 +39,9 @@ func (mig *FillFieldsForInstanceDomains) Execute(ctx context.Context, _ eventsto
 
 func (mig *FillFieldsForInstanceDomains) String() string {
 	return "41_fill_fields_for_instance_domains"
+}
+
+func (f *FillFieldsForInstanceDomains) Check(lastRun map[string]interface{}) bool {
+	currentVersion, _ := lastRun["version"].(string)
+	return currentVersion != f.Version
 }
