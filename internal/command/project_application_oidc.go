@@ -32,6 +32,8 @@ type addOIDCApp struct {
 	AdditionalOrigins           []string
 	SkipSuccessPageForNativeApp bool
 	BackChannelLogoutURI        string
+	LoginVersion                domain.LoginVersion
+	LoginBaseURI                string
 
 	ClientID          string
 	ClientSecret      string
@@ -110,6 +112,8 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 					trimStringSliceWhiteSpaces(app.AdditionalOrigins),
 					app.SkipSuccessPageForNativeApp,
 					app.BackChannelLogoutURI,
+					app.LoginVersion,
+					app.LoginBaseURI,
 				),
 			}, nil
 		}, nil
@@ -202,6 +206,8 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
 		oidcApp.SkipNativeAppSuccessPage,
 		strings.TrimSpace(oidcApp.BackChannelLogoutURI),
+		oidcApp.LoginVersion,
+		strings.TrimSpace(oidcApp.LoginBaseURI),
 	))
 
 	addedApplication.AppID = oidcApp.AppID
@@ -260,6 +266,8 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		trimStringSliceWhiteSpaces(oidc.AdditionalOrigins),
 		oidc.SkipNativeAppSuccessPage,
 		strings.TrimSpace(oidc.BackChannelLogoutURI),
+		oidc.LoginVersion,
+		strings.TrimSpace(oidc.LoginBaseURI),
 	)
 	if err != nil {
 		return nil, err

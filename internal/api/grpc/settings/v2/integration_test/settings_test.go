@@ -237,7 +237,7 @@ func TestServer_GetActiveIdentityProviders(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: instance.WithAuthorization(CTX, integration.UserTypeLogin),
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 				req: &settings.GetActiveIdentityProvidersRequest{},
 			},
 			wantErr: true,
