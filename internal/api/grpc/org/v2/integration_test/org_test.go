@@ -4,11 +4,11 @@ package org_test
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,15 +35,13 @@ func TestMain(m *testing.M) {
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		OwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		User = Instance.CreateHumanUser(CTX)
 		return m.Run()
 	}())
 }
 
 func TestServer_AddOrganization(t *testing.T) {
-	t.Parallel()
-
 	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
 	tests := []struct {
@@ -75,7 +73,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "invalid admin type",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: fmt.Sprintf("%d", time.Now().UnixNano()),
+				Name: gofakeit.AppName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{},
 				},
@@ -86,7 +84,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "admin with init",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: fmt.Sprintf("%d", time.Now().UnixNano()),
+				Name: gofakeit.AppName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{
 						UserType: &org.AddOrganizationRequest_Admin_Human{
@@ -96,7 +94,7 @@ func TestServer_AddOrganization(t *testing.T) {
 									FamilyName: "lastname",
 								},
 								Email: &user.SetHumanEmail{
-									Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+									Email: gofakeit.Email(),
 									Verification: &user.SetHumanEmail_ReturnCode{
 										ReturnCode: &user.ReturnEmailVerificationCode{},
 									},
@@ -121,7 +119,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			name: "existing user and new human with idp",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
-				Name: fmt.Sprintf("%d", time.Now().UnixNano()),
+				Name: gofakeit.AppName(),
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{
 						UserType: &org.AddOrganizationRequest_Admin_UserId{UserId: User.GetUserId()},
@@ -134,7 +132,7 @@ func TestServer_AddOrganization(t *testing.T) {
 									FamilyName: "lastname",
 								},
 								Email: &user.SetHumanEmail{
-									Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+									Email: gofakeit.Email(),
 									Verification: &user.SetHumanEmail_IsVerified{
 										IsVerified: true,
 									},

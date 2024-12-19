@@ -16,6 +16,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/sink"
+	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object"
@@ -30,12 +31,12 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 
 	instance := integration.NewInstance(CTX)
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	t.Log("testing against instance with primary domain", instance.Domain)
-	awaitMilestone(t, sub, instance.Domain, "InstanceCreated")
+	t.Log("testing against instance", instance.ID())
+	awaitMilestone(t, sub, instance.ID(), milestone.InstanceCreated)
 
 	projectAdded, err := instance.Client.Mgmt.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})
 	require.NoError(t, err)
-	awaitMilestone(t, sub, instance.Domain, "ProjectCreated")
+	awaitMilestone(t, sub, instance.ID(), milestone.ProjectCreated)
 
 	redirectURI := "http://localhost:8888"
 	application, err := instance.Client.Mgmt.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
@@ -50,14 +51,14 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 		AccessTokenType: app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
 	})
 	require.NoError(t, err)
-	awaitMilestone(t, sub, instance.Domain, "ApplicationCreated")
+	awaitMilestone(t, sub, instance.ID(), milestone.ApplicationCreated)
 
 	// create the session to be used for the authN of the clients
 	sessionID, sessionToken, _, _ := instance.CreatePasswordSession(t, iamOwnerCtx, instance.AdminUserID, "Password1!")
 
 	console := consoleOIDCConfig(t, instance)
 	loginToClient(t, instance, console.GetClientId(), console.GetRedirectUris()[0], sessionID, sessionToken)
-	awaitMilestone(t, sub, instance.Domain, "AuthenticationSucceededOnInstance")
+	awaitMilestone(t, sub, instance.ID(), milestone.AuthenticationSucceededOnInstance)
 
 	// make sure the client has been projected
 	require.EventuallyWithT(t, func(collectT *assert.CollectT) {
@@ -68,11 +69,11 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 		assert.NoError(collectT, err)
 	}, time.Minute, time.Second, "app not found")
 	loginToClient(t, instance, application.GetClientId(), redirectURI, sessionID, sessionToken)
-	awaitMilestone(t, sub, instance.Domain, "AuthenticationSucceededOnApplication")
+	awaitMilestone(t, sub, instance.ID(), milestone.AuthenticationSucceededOnApplication)
 
 	_, err = integration.SystemClient().RemoveInstance(CTX, &system.RemoveInstanceRequest{InstanceId: instance.ID()})
 	require.NoError(t, err)
-	awaitMilestone(t, sub, instance.Domain, "InstanceDeleted")
+	awaitMilestone(t, sub, instance.ID(), milestone.InstanceDeleted)
 }
 
 func loginToClient(t *testing.T, instance *integration.Instance, clientID, redirectURI, sessionID, sessionToken string) {
@@ -88,7 +89,7 @@ func loginToClient(t *testing.T, instance *integration.Instance, clientID, redir
 		}},
 	})
 	require.NoError(t, err)
-	provider, err := instance.CreateRelyingPartyForDomain(iamOwnerCtx, instance.Domain, clientID, redirectURI)
+	provider, err := instance.CreateRelyingPartyForDomain(iamOwnerCtx, instance.Domain, clientID, redirectURI, instance.Users.Get(integration.UserTypeLogin).Username)
 	require.NoError(t, err)
 	callbackURL, err := url.Parse(callback.GetCallbackUrl())
 	require.NoError(t, err)
@@ -132,7 +133,7 @@ func consoleOIDCConfig(t *testing.T, instance *integration.Instance) *app.OIDCCo
 	return apps.GetResult()[0].GetOidcConfig()
 }
 
-func awaitMilestone(t *testing.T, sub *sink.Subscription, primaryDomain, expectMilestoneType string) {
+func awaitMilestone(t *testing.T, sub *sink.Subscription, instanceID string, expectMilestoneType milestone.Type) {
 	for {
 		select {
 		case req := <-sub.Recv():
@@ -142,17 +143,17 @@ func awaitMilestone(t *testing.T, sub *sink.Subscription, primaryDomain, expectM
 			}
 			t.Log("received milestone", plain.String())
 			milestone := struct {
-				Type          string `json:"type"`
-				PrimaryDomain string `json:"primaryDomain"`
+				InstanceID string         `json:"instanceId"`
+				Type       milestone.Type `json:"type"`
 			}{}
 			if err := json.Unmarshal(req.Body, &milestone); err != nil {
 				t.Error(err)
 			}
-			if milestone.Type == expectMilestoneType && milestone.PrimaryDomain == primaryDomain {
+			if milestone.Type == expectMilestoneType && milestone.InstanceID == instanceID {
 				return
 			}
-		case <-time.After(2 * time.Minute): // why does it take so long to get a milestone !?
-			t.Fatalf("timed out waiting for milestone %s in domain %s", expectMilestoneType, primaryDomain)
+		case <-time.After(20 * time.Second):
+			t.Fatalf("timed out waiting for milestone %s for instance %s", expectMilestoneType, instanceID)
 		}
 	}
 }

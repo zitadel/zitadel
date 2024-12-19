@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -17,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/limits"
+	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
@@ -155,6 +157,7 @@ type SecretGenerators struct {
 	OTPSMS                   *crypto.GeneratorConfig
 	OTPEmail                 *crypto.GeneratorConfig
 	InviteCode               *crypto.GeneratorConfig
+	SigningKey               *crypto.GeneratorConfig
 }
 
 type ZitadelConfig struct {
@@ -292,7 +295,7 @@ func setUpInstance(ctx context.Context, c *Commands, setup *InstanceSetup) (vali
 	setupFeatures(&validations, setup.Features, setup.zitadel.instanceID)
 	setupLimits(c, &validations, limits.NewAggregate(setup.zitadel.limitsID, setup.zitadel.instanceID), setup.Limits)
 	setupRestrictions(c, &validations, restrictions.NewAggregate(setup.zitadel.restrictionsID, setup.zitadel.instanceID, setup.zitadel.instanceID), setup.Restrictions)
-
+	setupInstanceCreatedMilestone(&validations, setup.zitadel.instanceID)
 	return validations, pat, machineKey, nil
 }
 
@@ -890,7 +893,8 @@ func (c *Commands) RemoveInstance(ctx context.Context, id string) (*domain.Objec
 	if err != nil {
 		return nil, err
 	}
-
+	err = c.caches.milestones.Invalidate(ctx, milestoneIndexInstanceID, id)
+	logging.OnError(err).Error("milestone invalidate")
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreatedAt(),
@@ -908,10 +912,16 @@ func (c *Commands) prepareRemoveInstance(a *instance.Aggregate) preparation.Vali
 			if !writeModel.State.Exists() {
 				return nil, zerrors.ThrowNotFound(err, "COMMA-AE3GS", "Errors.Instance.NotFound")
 			}
-			return []eventstore.Command{instance.NewInstanceRemovedEvent(ctx,
-					&a.Aggregate,
-					writeModel.Name,
-					writeModel.Domains)},
+			milestoneAggregate := milestone.NewInstanceAggregate(a.ID)
+			return []eventstore.Command{
+					instance.NewInstanceRemovedEvent(ctx,
+						&a.Aggregate,
+						writeModel.Name,
+						writeModel.Domains),
+					milestone.NewReachedEvent(ctx,
+						milestoneAggregate,
+						milestone.InstanceDeleted),
+				},
 				nil
 		}, nil
 	}

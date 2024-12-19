@@ -58,6 +58,9 @@ const (
 	AppOIDCConfigColumnClockSkew                = "clock_skew"
 	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
 	AppOIDCConfigColumnSkipNativeAppSuccessPage = "skip_native_app_success_page"
+	AppOIDCConfigColumnBackChannelLogoutURI     = "back_channel_logout_uri"
+	AppOIDCConfigColumnLoginVersion             = "login_version"
+	AppOIDCConfigColumnLoginBaseURI             = "login_base_uri"
 
 	appSAMLTableSuffix             = "saml_configs"
 	AppSAMLConfigColumnAppID       = "app_id"
@@ -125,6 +128,9 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppOIDCConfigColumnClockSkew, handler.ColumnTypeInt64, handler.Default(0)),
 			handler.NewColumn(AppOIDCConfigColumnAdditionalOrigins, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnSkipNativeAppSuccessPage, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(AppOIDCConfigColumnBackChannelLogoutURI, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnLoginVersion, handler.ColumnTypeEnum, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnLoginBaseURI, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(AppOIDCConfigColumnInstanceID, AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
@@ -500,6 +506,9 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnClockSkew, e.ClockSkew),
 				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, database.TextArray[string](e.AdditionalOrigins)),
 				handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, e.SkipNativeAppSuccessPage),
+				handler.NewCol(AppOIDCConfigColumnBackChannelLogoutURI, e.BackChannelLogoutURI),
+				handler.NewCol(AppOIDCConfigColumnLoginVersion, e.LoginVersion),
+				handler.NewCol(AppOIDCConfigColumnLoginBaseURI, e.LoginBaseURI),
 			},
 			handler.WithTableSuffix(appOIDCTableSuffix),
 		),
@@ -522,7 +531,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigChangedType)
 	}
 
-	cols := make([]handler.Column, 0, 15)
+	cols := make([]handler.Column, 0, 18)
 	if e.Version != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnVersion, *e.Version))
 	}
@@ -567,6 +576,15 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	}
 	if e.SkipNativeAppSuccessPage != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnSkipNativeAppSuccessPage, *e.SkipNativeAppSuccessPage))
+	}
+	if e.BackChannelLogoutURI != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnBackChannelLogoutURI, *e.BackChannelLogoutURI))
+	}
+	if e.LoginVersion != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnLoginVersion, *e.LoginVersion))
+	}
+	if e.LoginBaseURI != nil {
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnLoginBaseURI, *e.LoginBaseURI))
 	}
 
 	if len(cols) == 0 {

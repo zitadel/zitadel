@@ -48,6 +48,20 @@ func main() {
 
 What happens here is only a target which prints out the received request, which could also be handled with a different logic.
 
+### Check Signature
+
+To additionally check the signature header you can add the following to the example:
+```go
+	// validate signature
+	if err := actions.ValidatePayload(sentBody, req.Header.Get(actions.SigningHeader), signingKey); err != nil {
+		// if the signed content is not equal the sent content return an error
+		http.Error(w, "error", http.StatusInternalServerError)
+		return
+	}
+```
+
+Where you can replace 'signingKey' with the key received in the next step 'Create target'.
+
 ## Create target
 
 As you see in the example above the target is created with HTTP and port '8090' and if we want to use it as webhook, the target can be created as follows:

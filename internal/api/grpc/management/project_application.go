@@ -80,7 +80,11 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 }
 
 func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest) (*mgmt_pb.AddOIDCAppResponse, error) {
-	app, err := s.command.AddOIDCApplication(ctx, AddOIDCAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	oidcApp, err := AddOIDCAppRequestToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	app, err := s.command.AddOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +132,11 @@ func (s *Server) UpdateApp(ctx context.Context, req *mgmt_pb.UpdateAppRequest) (
 }
 
 func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOIDCAppConfigRequest) (*mgmt_pb.UpdateOIDCAppConfigResponse, error) {
-	config, err := s.command.ChangeOIDCApplication(ctx, UpdateOIDCAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	oidcApp, err := UpdateOIDCAppConfigRequestToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	config, err := s.command.ChangeOIDCApplication(ctx, oidcApp, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

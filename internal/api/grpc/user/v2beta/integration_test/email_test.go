@@ -3,10 +3,9 @@
 package user_test
 
 import (
-	"fmt"
 	"testing"
-	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,8 +17,6 @@ import (
 )
 
 func TestServer_SetEmail(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {
@@ -134,22 +131,23 @@ func TestServer_SetEmail(t *testing.T) {
 			got, err := Client.SetEmail(CTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 			if tt.want.GetVerificationCode() != "" {
 				assert.NotEmpty(t, got.GetVerificationCode())
+			} else {
+				assert.Empty(t, got.GetVerificationCode())
 			}
 		})
 	}
 }
 
 func TestServer_ResendEmailCode(t *testing.T) {
-	t.Parallel()
-
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email()).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -237,20 +235,21 @@ func TestServer_ResendEmailCode(t *testing.T) {
 			got, err := Client.ResendEmailCode(CTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
+
 			integration.AssertDetails(t, tt.want, got)
 			if tt.want.GetVerificationCode() != "" {
 				assert.NotEmpty(t, got.GetVerificationCode())
+			} else {
+				assert.Empty(t, got.GetVerificationCode())
 			}
 		})
 	}
 }
 
 func TestServer_VerifyEmail(t *testing.T) {
-	t.Parallel()
-
 	userResp := Instance.CreateHumanUser(CTX)
 	tests := []struct {
 		name    string
@@ -294,9 +293,9 @@ func TestServer_VerifyEmail(t *testing.T) {
 			got, err := Client.VerifyEmail(CTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}

@@ -49,6 +49,7 @@ import (
 	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
 	userschema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/userschema/v3alpha"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/webkey/v3"
+	saml_v2 "github.com/zitadel/zitadel/internal/api/grpc/saml/v2"
 	session_v2 "github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
 	settings_v2 "github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
@@ -69,6 +70,7 @@ import (
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
 	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
@@ -177,6 +179,10 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	}))
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
+	cacheConnectors, err := connector.StartConnectors(config.Caches, queryDBClient)
+	if err != nil {
+		return fmt.Errorf("unable to start caches: %w", err)
+	}
 
 	queries, err := query.StartQueries(
 		ctx,
@@ -184,13 +190,14 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
-		config.Caches,
+		cacheConnectors,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,
 		keys.OTP,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
 		func(q *query.Queries) domain.PermissionCheck {
@@ -222,8 +229,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		DisplayName:    config.WebAuthNName,
 		ExternalSecure: config.ExternalSecure,
 	}
-	commands, err := command.StartCommands(
+	commands, err := command.StartCommands(ctx,
 		eventstoreClient,
+		cacheConnectors,
 		config.SystemDefaults,
 		config.InternalAuthZ.RolePermissionMappings,
 		storage,
@@ -239,6 +247,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.DomainVerification,
 		keys.OIDC,
 		keys.SAML,
+		keys.Target,
 		&http.Client{},
 		permissionCheck,
 		sessionTokenVerifier,
@@ -269,7 +278,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
+		config.Projections.Customizations["backchannel"],
 		config.Projections.Customizations["telemetry"],
+		config.Notifications,
 		*config.Telemetry,
 		config.ExternalDomain,
 		config.ExternalPort,
@@ -282,6 +293,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.User,
 		keys.SMTP,
 		keys.SMS,
+		keys.OIDC,
+		config.OIDC.DefaultBackChannelLogoutLifetime,
+		queryDBClient,
 	)
 	notification.Start(ctx)
 
@@ -392,6 +406,7 @@ func startAPIs(
 
 	config.Auth.Spooler.Client = dbClient
 	config.Auth.Spooler.Eventstore = eventstore
+	config.Auth.Spooler.ActiveInstancer = queries
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {
 		return nil, fmt.Errorf("error starting auth repo: %w", err)
@@ -399,7 +414,8 @@ func startAPIs(
 
 	config.Admin.Spooler.Client = dbClient
 	config.Admin.Spooler.Eventstore = eventstore
-	err = admin_es.Start(ctx, config.Admin, store, dbClient)
+	config.Admin.Spooler.ActiveInstancer = queries
+	err = admin_es.Start(ctx, config.Admin, store, dbClient, queries)
 	if err != nil {
 		return nil, fmt.Errorf("error starting admin repo: %w", err)
 	}
@@ -515,7 +531,7 @@ func startAPIs(
 		store,
 		consolePath,
 		oidcServer.AuthCallbackURL(),
-		provider.AuthCallbackURL(samlProvider),
+		samlProvider.AuthCallbackURL(),
 		config.ExternalSecure,
 		userAgentInterceptor,
 		op.NewIssuerInterceptor(oidcServer.IssuerFromRequest).Handler,
@@ -538,6 +554,10 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
+		return nil, err
+	}
+	// After SAML provider so that the callback endpoint can be used
+	if err := apis.RegisterService(ctx, saml_v2.CreateServer(commands, queries, samlProvider, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes

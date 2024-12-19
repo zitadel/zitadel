@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"reflect"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -47,7 +47,7 @@ func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowTy
 	if err != nil {
 		return nil, err
 	}
-	if reflect.DeepEqual(existingFlow.Triggers[triggerType], actionIDs) {
+	if slices.Equal(existingFlow.Triggers[triggerType], actionIDs) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nfh52", "Errors.Flow.NoChanges")
 	}
 	if len(actionIDs) > 0 {

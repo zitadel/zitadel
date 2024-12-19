@@ -64,6 +64,13 @@ There are different types of Targets:
 
 The API documentation to create a target can be found [here](/apis/resources/action_service_v3/zitadel-actions-create-target)
 
+### Content Signing
+
+To ensure the integrity of request content, each call includes a 'ZITADEL-Signature' in the headers. This header contains an HMAC value computed from the request content and a timestamp, which can be used to time out requests. The logic for this process is provided in 'pkg/actions/signing.go'. The goal is to verify that the HMAC value in the header matches the HMAC value computed by the Target, ensuring that the sent and received requests are identical.
+
+Each Target resource now contains also a Signing Key, which gets generated and returned when a Target is [created](/apis/resources/action_service_v3/zitadel-actions-create-target),
+and can also be newly generated when a Target is [patched](/apis/resources/action_service_v3/zitadel-actions-patch-target).
+
 ## Execution
 
 ZITADEL decides on specific conditions if one or more Targets have to be called.

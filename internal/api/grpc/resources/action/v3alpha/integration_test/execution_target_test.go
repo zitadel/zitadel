@@ -26,7 +26,6 @@ import (
 )
 
 func TestServer_ExecutionTarget(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -62,8 +61,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetDetails().GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
-				targetRequest := instance.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, false)
-				instance.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+
+				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, false)
+
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
 
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
@@ -117,9 +118,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
-				targetResponse := instance.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, false)
-				instance.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
+				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, false)
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 				return func() {
 					closeRequest()
 					closeResponse()
@@ -158,11 +159,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
 
-				targetRequest := instance.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, true)
-				instance.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+				targetRequest := waitForTarget(ctx, t, instance, urlRequest, domain.TargetTypeCall, true)
+				waitForExecutionOnCondition(ctx, t, instance, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
 				// GetTarget with used target
 				request.Id = targetRequest.GetDetails().GetId()
-
 				return func() {
 					closeRequest()
 				}, nil
@@ -229,9 +229,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
-				targetResponse := instance.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, true)
-				instance.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
+				targetResponse := waitForTarget(ctx, t, instance, targetResponseURL, domain.TargetTypeCall, true)
+				waitForExecutionOnCondition(ctx, t, instance, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 				return func() {
 					closeResponse()
 				}, nil
@@ -250,31 +250,93 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				require.NoError(t, err)
 				defer close()
 			}
-			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
-
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(isolatedIAMOwnerCTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
 				if tt.wantErr {
-					assert.Error(ttt, err, "Error: "+err.Error())
-				} else {
-					assert.NoError(ttt, err)
-				}
-				if err != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
 
-				integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
-				assert.Equal(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
+				integration.AssertResourceDetails(ttt, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
+				tt.want.Target.Details = got.GetTarget().GetDetails()
+				assert.EqualExportedValues(ttt, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+
+			}, retryDuration, tick, "timeout waiting for expected execution result")
 
 			if tt.clean != nil {
 				tt.clean(tt.ctx)
 			}
 		})
 	}
+}
+
+func waitForExecutionOnCondition(ctx context.Context, t *testing.T, instance *integration.Instance, condition *action.Condition, targets []*action.ExecutionTargetType) {
+	instance.SetExecution(ctx, t, condition, targets)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, err := instance.Client.ActionV3Alpha.SearchExecutions(ctx, &action.SearchExecutionsRequest{
+			Filters: []*action.ExecutionSearchFilter{
+				{Filter: &action.ExecutionSearchFilter_InConditionsFilter{
+					InConditionsFilter: &action.InConditionsFilter{Conditions: []*action.Condition{condition}},
+				}},
+			},
+		})
+		if !assert.NoError(ttt, err) {
+			return
+		}
+		if !assert.Len(ttt, got.GetResult(), 1) {
+			return
+		}
+		gotTargets := got.GetResult()[0].GetExecution().GetTargets()
+		// always first check length, otherwise its failed anyway
+		if assert.Len(ttt, gotTargets, len(targets)) {
+			for i := range targets {
+				assert.EqualExportedValues(ttt, targets[i].GetType(), gotTargets[i].GetType())
+			}
+		}
+	}, retryDuration, tick, "timeout waiting for expected execution result")
+	return
+}
+
+func waitForTarget(ctx context.Context, t *testing.T, instance *integration.Instance, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+	resp := instance.CreateTarget(ctx, t, "", endpoint, ty, interrupt)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, err := instance.Client.ActionV3Alpha.SearchTargets(ctx, &action.SearchTargetsRequest{
+			Filters: []*action.TargetSearchFilter{
+				{Filter: &action.TargetSearchFilter_InTargetIdsFilter{
+					InTargetIdsFilter: &action.InTargetIDsFilter{TargetIds: []string{resp.GetDetails().GetId()}},
+				}},
+			},
+		})
+		if !assert.NoError(ttt, err) {
+			return
+		}
+		if !assert.Len(ttt, got.GetResult(), 1) {
+			return
+		}
+		config := got.GetResult()[0].GetConfig()
+		assert.Equal(ttt, config.GetEndpoint(), endpoint)
+		switch ty {
+		case domain.TargetTypeWebhook:
+			if !assert.NotNil(ttt, config.GetRestWebhook()) {
+				return
+			}
+			assert.Equal(ttt, interrupt, config.GetRestWebhook().GetInterruptOnError())
+		case domain.TargetTypeAsync:
+			assert.NotNil(ttt, config.GetRestAsync())
+		case domain.TargetTypeCall:
+			if !assert.NotNil(ttt, config.GetRestCall()) {
+				return
+			}
+			assert.Equal(ttt, interrupt, config.GetRestCall().GetInterruptOnError())
+		}
+	}, retryDuration, tick, "timeout waiting for expected execution result")
+	return resp
 }
 
 func conditionRequestFullMethod(fullMethod string) *action.Condition {

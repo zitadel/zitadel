@@ -41,7 +41,6 @@ func NewFieldHandler(config *Config, name string, eventTypes map[eventstore.Aggr
 			bulkLimit:              config.BulkLimit,
 			eventTypes:             eventTypes,
 			requeueEvery:           config.RequeueEvery,
-			handleActiveInstances:  config.HandleActiveInstances,
 			now:                    time.Now,
 			maxFailureCount:        config.MaxFailureCount,
 			retryFailedAfter:       config.RetryFailedAfter,

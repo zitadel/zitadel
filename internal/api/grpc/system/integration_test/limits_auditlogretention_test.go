@@ -22,8 +22,6 @@ import (
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
-	t.Parallel()
-
 	isoInstance := integration.NewInstance(CTX)
 	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t, isoInstance.Client)

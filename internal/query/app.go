@@ -59,6 +59,9 @@ type OIDCApp struct {
 	AdditionalOrigins        database.TextArray[string]
 	AllowedOrigins           database.TextArray[string]
 	SkipNativeAppSuccessPage bool
+	BackChannelLogoutURI     string
+	LoginVersion             domain.LoginVersion
+	LoginBaseURI             *string
 }
 
 type SAMLApp struct {
@@ -179,6 +182,10 @@ var (
 		name:  projection.AppOIDCConfigColumnAppID,
 		table: appOIDCConfigsTable,
 	}
+	AppOIDCConfigColumnInstanceID = Column{
+		name:  projection.AppOIDCConfigColumnInstanceID,
+		table: appOIDCConfigsTable,
+	}
 	AppOIDCConfigColumnVersion = Column{
 		name:  projection.AppOIDCConfigColumnVersion,
 		table: appOIDCConfigsTable,
@@ -241,6 +248,18 @@ var (
 	}
 	AppOIDCConfigColumnSkipNativeAppSuccessPage = Column{
 		name:  projection.AppOIDCConfigColumnSkipNativeAppSuccessPage,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnBackChannelLogoutURI = Column{
+		name:  projection.AppOIDCConfigColumnBackChannelLogoutURI,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnLoginVersion = Column{
+		name:  projection.AppOIDCConfigColumnLoginVersion,
+		table: appOIDCConfigsTable,
+	}
+	AppOIDCConfigColumnLoginBaseURI = Column{
+		name:  projection.AppOIDCConfigColumnLoginBaseURI,
 		table: appOIDCConfigsTable,
 	}
 )
@@ -496,6 +515,30 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 	return ids, nil
 }
 
+func (q *Queries) OIDCClientLoginVersion(ctx context.Context, clientID string) (loginVersion domain.LoginVersion, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareLoginVersionByClientID(ctx, q.client)
+	eq := sq.Eq{
+		AppOIDCConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		AppOIDCConfigColumnClientID.identifier():   clientID,
+	}
+	stmt, args, err := query.Where(eq).ToSql()
+	if err != nil {
+		return domain.LoginVersionUnspecified, zerrors.ThrowInvalidArgument(err, "QUERY-WEh31", "Errors.Query.InvalidRequest")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		loginVersion, err = scan(row)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-W2gsa", "Errors.Internal")
+	}
+	return loginVersion, nil
+}
+
 func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnName, value, method)
 }
@@ -536,6 +579,9 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase, activeOnly bool) (
 		AppOIDCConfigColumnClockSkew.identifier(),
 		AppOIDCConfigColumnAdditionalOrigins.identifier(),
 		AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+		AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
+		AppOIDCConfigColumnLoginVersion.identifier(),
+		AppOIDCConfigColumnLoginBaseURI.identifier(),
 
 		AppSAMLConfigColumnAppID.identifier(),
 		AppSAMLConfigColumnEntityID.identifier(),
@@ -600,6 +646,9 @@ func scanApp(row *sql.Row) (*App, error) {
 		&oidcConfig.clockSkew,
 		&oidcConfig.additionalOrigins,
 		&oidcConfig.skipNativeAppSuccessPage,
+		&oidcConfig.backChannelLogoutURI,
+		&oidcConfig.loginVersion,
+		&oidcConfig.loginBaseURI,
 
 		&samlConfig.appID,
 		&samlConfig.entityID,
@@ -649,6 +698,9 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
 			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
+			AppOIDCConfigColumnLoginVersion.identifier(),
+			AppOIDCConfigColumnLoginBaseURI.identifier(),
 		).From(appsTable.identifier()).
 			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
@@ -685,6 +737,9 @@ func prepareOIDCAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 				&oidcConfig.clockSkew,
 				&oidcConfig.additionalOrigins,
 				&oidcConfig.skipNativeAppSuccessPage,
+				&oidcConfig.backChannelLogoutURI,
+				&oidcConfig.loginVersion,
+				&oidcConfig.loginBaseURI,
 			)
 
 			if err != nil {
@@ -896,6 +951,9 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
 			AppOIDCConfigColumnSkipNativeAppSuccessPage.identifier(),
+			AppOIDCConfigColumnBackChannelLogoutURI.identifier(),
+			AppOIDCConfigColumnLoginVersion.identifier(),
+			AppOIDCConfigColumnLoginBaseURI.identifier(),
 
 			AppSAMLConfigColumnAppID.identifier(),
 			AppSAMLConfigColumnEntityID.identifier(),
@@ -948,6 +1006,9 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 					&oidcConfig.clockSkew,
 					&oidcConfig.additionalOrigins,
 					&oidcConfig.skipNativeAppSuccessPage,
+					&oidcConfig.backChannelLogoutURI,
+					&oidcConfig.loginVersion,
+					&oidcConfig.loginBaseURI,
 
 					&samlConfig.appID,
 					&samlConfig.entityID,
@@ -1002,6 +1063,21 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
+func prepareLoginVersionByClientID(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (domain.LoginVersion, error)) {
+	return sq.Select(
+			AppOIDCConfigColumnLoginVersion.identifier(),
+		).From(appOIDCConfigsTable.identifier()).
+			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (domain.LoginVersion, error) {
+			var loginVersion sql.NullInt16
+			if err := row.Scan(
+				&loginVersion,
+			); err != nil {
+				return domain.LoginVersionUnspecified, zerrors.ThrowInternal(err, "QUERY-KL2io", "Errors.Internal")
+			}
+			return domain.LoginVersion(loginVersion.Int16), nil
+		}
+}
+
 type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
@@ -1020,6 +1096,9 @@ type sqlOIDCConfig struct {
 	responseTypes            database.NumberArray[domain.OIDCResponseType]
 	grantTypes               database.NumberArray[domain.OIDCGrantType]
 	skipNativeAppSuccessPage sql.NullBool
+	backChannelLogoutURI     sql.NullString
+	loginVersion             sql.NullInt16
+	loginBaseURI             sql.NullString
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -1043,6 +1122,11 @@ func (c sqlOIDCConfig) set(app *App) {
 		ResponseTypes:            c.responseTypes,
 		GrantTypes:               c.grantTypes,
 		SkipNativeAppSuccessPage: c.skipNativeAppSuccessPage.Bool,
+		BackChannelLogoutURI:     c.backChannelLogoutURI.String,
+		LoginVersion:             domain.LoginVersion(c.loginVersion.Int16),
+	}
+	if c.loginBaseURI.Valid {
+		app.OIDCConfig.LoginBaseURI = &c.loginBaseURI.String
 	}
 	compliance := domain.GetOIDCCompliance(app.OIDCConfig.Version, app.OIDCConfig.AppType, app.OIDCConfig.GrantTypes, app.OIDCConfig.ResponseTypes, app.OIDCConfig.AuthMethodType, app.OIDCConfig.RedirectURIs)
 	app.OIDCConfig.ComplianceProblems = compliance.Problems

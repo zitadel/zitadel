@@ -2827,7 +2827,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "invalid second-factor type";
+                    description: "invalid second factor type";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -2862,7 +2862,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "Invalid second-factor type";
+                    description: "Invalid second factor type";
                     schema: {
                         json_schema: {
                             ref: "#/definitions/rpcStatus";
@@ -2886,12 +2886,12 @@ service AdminService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Authentication Methods"
-            summary: "List Multi Factors (MFA)";
-            description: "Returns a list of multi factors (MFA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
+            summary: "List Multi-factors (MFA)";
+            description: "Returns a list of multi-factors (MFA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
                 key: "200";
                 value: {
-                    description: "multi factors of default login policy";
+                    description: "multi-factors of default login policy";
                 };
             };
         };
@@ -2946,7 +2946,7 @@ service AdminService {
             tags: "Settings";
             tags: "Login Settings";
             tags: "Authentication Methods"
-            summary: "Remove Multi Factor (MFA)";
+            summary: "Remove Multi-factor (MFA)";
             description: "Remove a multi-factor (MFA) from the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
                 key: "200";

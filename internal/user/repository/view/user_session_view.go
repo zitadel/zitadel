@@ -20,8 +20,8 @@ var userSessionsByUserAgentQuery string
 //go:embed user_agent_by_user_session_id.sql
 var userAgentByUserSessionIDQuery string
 
-//go:embed active_user_ids_by_session_id.sql
-var activeUserIDsBySessionIDQuery string
+//go:embed active_user_sessions_by_session_id.sql
+var activeUserSessionsBySessionIDQuery string
 
 func UserSessionByIDs(ctx context.Context, db *database.DB, agentID, userID, instanceID string) (userSession *model.UserSessionView, err error) {
 	err = db.QueryRowContext(
@@ -65,36 +65,39 @@ func UserAgentIDBySessionID(ctx context.Context, db *database.DB, sessionID, ins
 	return userAgentID, err
 }
 
-// ActiveUserIDsBySessionID returns all userIDs with an active session on the same user agent (its id is also returned) based on a sessionID
-func ActiveUserIDsBySessionID(ctx context.Context, db *database.DB, sessionID, instanceID string) (userAgentID string, userIDs []string, err error) {
+// ActiveUserSessionsBySessionID returns all sessions (sessionID:userID map) with an active session on the same user agent (its id is also returned) based on a sessionID
+func ActiveUserSessionsBySessionID(ctx context.Context, db *database.DB, sessionID, instanceID string) (userAgentID string, sessions map[string]string, err error) {
 	err = db.QueryContext(
 		ctx,
 		func(rows *sql.Rows) error {
-			userAgentID, userIDs, err = scanActiveUserAgentUserIDs(rows)
+			userAgentID, sessions, err = scanActiveUserAgentUserIDs(rows)
 			return err
 		},
-		activeUserIDsBySessionIDQuery,
+		activeUserSessionsBySessionIDQuery,
 		sessionID,
 		instanceID,
 	)
-	return userAgentID, userIDs, err
+	return userAgentID, sessions, err
 }
 
-func scanActiveUserAgentUserIDs(rows *sql.Rows) (userAgentID string, userIDs []string, err error) {
+func scanActiveUserAgentUserIDs(rows *sql.Rows) (userAgentID string, sessions map[string]string, err error) {
+	sessions = make(map[string]string)
 	for rows.Next() {
-		var userID string
+		var userID, sessionID string
 		err := rows.Scan(
 			&userAgentID,
-			&userID)
+			&userID,
+			&sessionID,
+		)
 		if err != nil {
 			return "", nil, err
 		}
-		userIDs = append(userIDs, userID)
+		sessions[sessionID] = userID
 	}
 	if err := rows.Close(); err != nil {
 		return "", nil, zerrors.ThrowInternal(err, "VIEW-Sbrws", "Errors.Query.CloseRows")
 	}
-	return userAgentID, userIDs, nil
+	return userAgentID, sessions, nil
 }
 
 func scanUserSession(row *sql.Row) (*model.UserSessionView, error) {

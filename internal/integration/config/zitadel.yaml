@@ -8,20 +8,30 @@ TLS:
 
 Caches:
   Connectors:
+    Memory:
+      Enabled: true
     Postgres:
       Enabled: true
-      AutoPrune:
-        Interval: 30s
-        TimeOut: 1s
+    Redis:
+      Enabled: true
   Instance:
-    Connector: "postgres"
-    MaxAge: 1h
-    LastUsage: 30m
+    Connector: "memory"
+    MaxAge: 5m
+    LastUsage: 1m
     Log:
       Level: info
-      AddSource: true
-      Formatter:
-        Format: text
+  Milestones:
+    Connector: "postgres"
+    MaxAge: 5m
+    LastUsage: 1m
+    Log:
+      Level: info
+  Organization:
+    Connector: "redis"
+    MaxAge: 5m
+    LastUsage: 1m
+    Log:
+      Level: info
 
 Quotas:
   Access:

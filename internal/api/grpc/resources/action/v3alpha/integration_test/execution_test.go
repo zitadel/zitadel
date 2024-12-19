@@ -25,7 +25,6 @@ func executionTargetsSingleInclude(include *action.Condition) []*action.Executio
 }
 
 func TestServer_SetExecution_Request(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -196,7 +195,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				require.Error(t, err)
 				return
 			}
-
 			require.NoError(t, err)
 
 			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
@@ -208,7 +206,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 }
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -347,7 +344,6 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 }
 
 func TestServer_SetExecution_Response(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -529,7 +525,6 @@ func TestServer_SetExecution_Response(t *testing.T) {
 }
 
 func TestServer_SetExecution_Event(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -717,7 +712,6 @@ func TestServer_SetExecution_Event(t *testing.T) {
 }
 
 func TestServer_SetExecution_Function(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)

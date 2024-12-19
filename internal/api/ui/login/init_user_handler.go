@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -53,6 +54,17 @@ func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet boo
 	v.Set(queryInitUserPassword, strconv.FormatBool(passwordSet))
 	v.Set(QueryAuthRequestID, authRequestID)
 	return externalLink(origin) + EndpointInitUser + "?" + v.Encode()
+}
+
+func InitUserLinkTemplate(origin, userID, orgID, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
+		externalLink(origin), EndpointInitUser,
+		queryInitUserUserID, userID,
+		queryInitUserLoginName, "{{.LoginName}}",
+		queryInitUserCode, "{{.Code}}",
+		queryOrgID, orgID,
+		queryInitUserPassword, "{{.PasswordSet}}",
+		QueryAuthRequestID, authRequestID)
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {

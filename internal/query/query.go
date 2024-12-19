@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -29,10 +29,11 @@ type Queries struct {
 	client       *database.DB
 	caches       *Caches
 
-	keyEncryptionAlgorithm crypto.EncryptionAlgorithm
-	idpConfigEncryption    crypto.EncryptionAlgorithm
-	sessionTokenVerifier   func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
-	checkPermission        domain.PermissionCheck
+	keyEncryptionAlgorithm    crypto.EncryptionAlgorithm
+	idpConfigEncryption       crypto.EncryptionAlgorithm
+	targetEncryptionAlgorithm crypto.EncryptionAlgorithm
+	sessionTokenVerifier      func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error)
+	checkPermission           domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
 	mutex                               sync.Mutex
@@ -49,10 +50,10 @@ func StartQueries(
 	es *eventstore.Eventstore,
 	esV4 es_v4.Querier,
 	querySqlClient, projectionSqlClient *database.DB,
-	caches *cache.CachesConfig,
+	cacheConnectors connector.Connectors,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
-	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
+	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm, targetEncryptionAlgorithm crypto.EncryptionAlgorithm,
 	zitadelRoles []authz.RoleMapping,
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 	permissionCheck func(q *Queries) domain.PermissionCheck,
@@ -70,6 +71,7 @@ func StartQueries(
 		zitadelRoles:                        zitadelRoles,
 		keyEncryptionAlgorithm:              keyEncryptionAlgorithm,
 		idpConfigEncryption:                 idpConfigEncryption,
+		targetEncryptionAlgorithm:           targetEncryptionAlgorithm,
 		sessionTokenVerifier:                sessionTokenVerifier,
 		multifactors: domain.MultifactorConfigs{
 			OTP: domain.OTPConfig{
@@ -82,6 +84,7 @@ func StartQueries(
 
 	repo.checkPermission = permissionCheck(repo)
 
+	projections.ActiveInstancer = repo
 	err = projection.Create(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
 	if err != nil {
 		return nil, err
@@ -89,7 +92,15 @@ func StartQueries(
 	if startProjections {
 		projection.Start(ctx)
 	}
-	repo.caches, err = startCaches(ctx, caches, querySqlClient)
+
+	repo.caches, err = startCaches(
+		ctx,
+		cacheConnectors,
+		ActiveInstanceConfig{
+			MaxEntries: int(projections.MaxActiveInstances),
+			TTL:        projections.HandleActiveInstances,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

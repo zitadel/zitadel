@@ -34,6 +34,7 @@ import (
 	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
 	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
+	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
@@ -65,6 +66,7 @@ type Client struct {
 	WebKeyV3Alpha  webkey_v3alpha.ZITADELWebKeysClient
 	IDPv2          idp_pb.IdentityProviderServiceClient
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
+	SAMLv2         saml_pb.SAMLServiceClient
 }
 
 func newClient(ctx context.Context, target string) (*Client, error) {
@@ -96,6 +98,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
+		SAMLv2:         saml_pb.NewSAMLServiceClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -379,7 +382,18 @@ func (i *Instance) SetUserPassword(ctx context.Context, userID, password string,
 	return resp.GetDetails()
 }
 
+func (i *Instance) AddProviderToDefaultLoginPolicy(ctx context.Context, id string) {
+	_, err := i.Client.Admin.AddIDPToLoginPolicy(ctx, &admin.AddIDPToLoginPolicyRequest{
+		IdpId: id,
+	})
+	logging.OnError(err).Panic("add provider to default login policy")
+}
+
 func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *admin.AddGenericOAuthProviderResponse {
+	return i.AddGenericOAuthProviderWithOptions(ctx, name, true, true, true, idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME)
+}
+
+func (i *Instance) AddGenericOAuthProviderWithOptions(ctx context.Context, name string, isLinkingAllowed, isCreationAllowed, isAutoCreation bool, autoLinking idp.AutoLinkingOption) *admin.AddGenericOAuthProviderResponse {
 	resp, err := i.Client.Admin.AddGenericOAuthProvider(ctx, &admin.AddGenericOAuthProviderRequest{
 		Name:                  name,
 		ClientId:              "clientID",
@@ -390,11 +404,11 @@ func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *ad
 		Scopes:                []string{"openid", "profile", "email"},
 		IdAttribute:           "id",
 		ProviderOptions: &idp.Options{
-			IsLinkingAllowed:  true,
-			IsCreationAllowed: true,
-			IsAutoCreation:    true,
+			IsLinkingAllowed:  isLinkingAllowed,
+			IsCreationAllowed: isCreationAllowed,
+			IsAutoCreation:    isAutoCreation,
 			IsAutoUpdate:      true,
-			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
+			AutoLinking:       autoLinking,
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")

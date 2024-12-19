@@ -46,9 +46,6 @@ export async function setup() {
 
 export default function (data: any) {
   token(new JWTProfileRequest(data.machines[__VU - 1].userId, data.machines[__VU - 1].keyId))
-  .then((token) => {
-    userinfo(token.accessToken!)
-  })
 }
 
 export function teardown(data: any) {

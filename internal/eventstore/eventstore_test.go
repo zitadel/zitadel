@@ -12,6 +12,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -329,6 +330,12 @@ func Test_eventData(t *testing.T) {
 	}
 }
 
+var _ Pusher = (*testPusher)(nil)
+
+func (repo *testPusher) Client() *database.DB {
+	return nil
+}
+
 type testPusher struct {
 	events []Event
 	errs   []error
@@ -340,7 +347,7 @@ func (repo *testPusher) Health(ctx context.Context) error {
 	return nil
 }
 
-func (repo *testPusher) Push(ctx context.Context, commands ...Command) (events []Event, err error) {
+func (repo *testPusher) Push(_ context.Context, _ database.ContextQueryExecuter, commands ...Command) (events []Event, err error) {
 	if len(repo.errs) != 0 {
 		err, repo.errs = repo.errs[0], repo.errs[1:]
 		return nil, err
@@ -437,6 +444,10 @@ func (repo *testQuerier) InstanceIDs(ctx context.Context, queryFactory *SearchQu
 	return repo.instances, nil
 }
 
+func (*testQuerier) Client() *database.DB {
+	return nil
+}
+
 func TestEventstore_Push(t *testing.T) {
 	type args struct {
 		events []Command
@@ -479,6 +490,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.aggregate",
 								ResourceOwner: "caos",
 								InstanceID:    "zitadel",
+								Version:       "v1",
 							},
 							Data:      []byte(nil),
 							User:      "editorUser",
@@ -523,6 +535,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.aggregate",
 								ResourceOwner: "caos",
 								InstanceID:    "zitadel",
+								Version:       "v1",
 							},
 							Data:      []byte(nil),
 							User:      "editorUser",
@@ -574,6 +587,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.aggregate",
 								ResourceOwner: "caos",
 								InstanceID:    "zitadel",
+								Version:       "v1",
 							},
 							Data:      []byte(nil),
 							User:      "editorUser",
@@ -585,6 +599,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.aggregate",
 								ResourceOwner: "caos",
 								InstanceID:    "zitadel",
+								Version:       "v1",
 							},
 							Data:      []byte(nil),
 							User:      "editorUser",
@@ -647,6 +662,7 @@ func TestEventstore_Push(t *testing.T) {
 									Type:          "test.aggregate",
 									ResourceOwner: "caos",
 									InstanceID:    "zitadel",
+									Version:       "v1",
 								},
 								Data:      []byte(nil),
 								User:      "editorUser",
@@ -658,6 +674,7 @@ func TestEventstore_Push(t *testing.T) {
 									Type:          "test.aggregate",
 									ResourceOwner: "caos",
 									InstanceID:    "zitadel",
+									Version:       "v1",
 								},
 								Data:      []byte(nil),
 								User:      "editorUser",
@@ -671,6 +688,7 @@ func TestEventstore_Push(t *testing.T) {
 									Type:          "test.aggregate",
 									ResourceOwner: "caos",
 									InstanceID:    "zitadel",
+									Version:       "v1",
 								},
 								Data:      []byte(nil),
 								User:      "editorUser",
@@ -767,6 +785,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.aggregate",
 								ResourceOwner: "caos",
 								InstanceID:    "zitadel",
+								Version:       "v1",
 							},
 							Data:      []byte(nil),
 							User:      "editorUser",
@@ -817,6 +836,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.aggregate",
 								ResourceOwner: "caos",
 								InstanceID:    "zitadel",
+								Version:       "v1",
 							},
 							Data:      []byte(nil),
 							User:      "editorUser",
@@ -872,6 +892,7 @@ func TestEventstore_Push(t *testing.T) {
 								Type:          "test.aggregate",
 								ResourceOwner: "caos",
 								InstanceID:    "zitadel",
+								Version:       "v1",
 							},
 							Data:      []byte(nil),
 							User:      "editorUser",

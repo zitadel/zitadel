@@ -143,6 +143,10 @@ func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
+func (q *Queries) ActiveInstances() []string {
+	return q.caches.activeInstances.Keys()
+}
+
 func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQueries) (instances *Instances, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -198,10 +202,13 @@ var (
 )
 
 func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (_ authz.Instance, err error) {
+	var instance *authzInstance
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("unable to get instance by host: instanceHost %s, publicHost %s: %w", instanceHost, publicHost, err)
+		} else {
+			q.caches.activeInstances.Add(instance.ID, true)
 		}
 		span.EndWithError(err)
 	}()
@@ -225,6 +232,12 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+	defer func() {
+		if err != nil {
+			return
+		}
+		q.caches.activeInstances.Add(id, true)
+	}()
 
 	instance, ok := q.caches.instance.Get(ctx, instanceIndexByID, id)
 	if ok {
@@ -522,9 +535,9 @@ func (i *authzInstance) Keys(index instanceIndex) []string {
 		return []string{i.ID}
 	case instanceIndexByHost:
 		return i.ExternalDomains
-	default:
-		return nil
+	case instanceIndexUnspecified:
 	}
+	return nil
 }
 
 func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
@@ -587,9 +600,10 @@ func (c *Caches) registerInstanceInvalidation() {
 	projection.InstanceTrustedDomainProjection.RegisterCacheInvalidation(invalidate)
 	projection.SecurityPolicyProjection.RegisterCacheInvalidation(invalidate)
 
-	// limits uses own aggregate ID, invalidate using resource owner.
+	// These projections have their own aggregate ID, invalidate using resource owner.
 	invalidate = cacheInvalidationFunc(c.instance, instanceIndexByID, getResourceOwner)
 	projection.LimitsProjection.RegisterCacheInvalidation(invalidate)
+	projection.RestrictionsProjection.RegisterCacheInvalidation(invalidate)
 
 	// System feature update should invalidate all instances, so Truncate the cache.
 	projection.SystemFeatureProjection.RegisterCacheInvalidation(func(ctx context.Context, _ []*eventstore.Aggregate) {

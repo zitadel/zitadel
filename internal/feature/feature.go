@@ -1,6 +1,9 @@
 package feature
 
-import "slices"
+import (
+	"net/url"
+	"slices"
+)
 
 //go:generate enumer -type Key -transform snake -trimprefix Key
 type Key int
@@ -18,6 +21,8 @@ const (
 	KeyDebugOIDCParentError
 	KeyOIDCSingleV1SessionTermination
 	KeyDisableUserTokenEvent
+	KeyEnableBackChannelLogout
+	KeyLoginV2
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -43,8 +48,10 @@ type Features struct {
 	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
 	WebKey                          bool                      `json:"web_key,omitempty"`
 	DebugOIDCParentError            bool                      `json:"debug_oidc_parent_error,omitempty"`
-	OIDCSingleV1SessionTermination  bool                      `json:"terminate_single_v1_session,omitempty"`
+	OIDCSingleV1SessionTermination  bool                      `json:"oidc_single_v1_session_termination,omitempty"`
 	DisableUserTokenEvent           bool                      `json:"disable_user_token_event,omitempty"`
+	EnableBackChannelLogout         bool                      `json:"enable_back_channel_logout,omitempty"`
+	LoginV2                         LoginV2                   `json:"login_v2,omitempty"`
 }
 
 type ImprovedPerformanceType int32
@@ -60,4 +67,9 @@ const (
 
 func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {
 	return slices.Contains(f.ImprovedPerformance, typ)
+}
+
+type LoginV2 struct {
+	Required bool     `json:"required,omitempty"`
+	BaseURI  *url.URL `json:"base_uri,omitempty"`
 }

@@ -31,6 +31,9 @@ type addOIDCApp struct {
 	ClockSkew                   time.Duration
 	AdditionalOrigins           []string
 	SkipSuccessPageForNativeApp bool
+	BackChannelLogoutURI        string
+	LoginVersion                domain.LoginVersion
+	LoginBaseURI                string
 
 	ClientID          string
 	ClientSecret      string
@@ -108,6 +111,9 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 					app.ClockSkew,
 					trimStringSliceWhiteSpaces(app.AdditionalOrigins),
 					app.SkipSuccessPageForNativeApp,
+					app.BackChannelLogoutURI,
+					app.LoginVersion,
+					app.LoginBaseURI,
 				),
 			}, nil
 		}, nil
@@ -199,13 +205,21 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		oidcApp.ClockSkew,
 		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
 		oidcApp.SkipNativeAppSuccessPage,
+		strings.TrimSpace(oidcApp.BackChannelLogoutURI),
+		oidcApp.LoginVersion,
+		strings.TrimSpace(oidcApp.LoginBaseURI),
 	))
 
 	addedApplication.AppID = oidcApp.AppID
+	postCommit, err := c.applicationCreatedMilestone(ctx, &events)
+	if err != nil {
+		return nil, err
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
+	postCommit(ctx)
 	err = AppendAndReduce(addedApplication, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -251,6 +265,9 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.ClockSkew,
 		trimStringSliceWhiteSpaces(oidc.AdditionalOrigins),
 		oidc.SkipNativeAppSuccessPage,
+		strings.TrimSpace(oidc.BackChannelLogoutURI),
+		oidc.LoginVersion,
+		strings.TrimSpace(oidc.LoginBaseURI),
 	)
 	if err != nil {
 		return nil, err

@@ -15,8 +15,6 @@ import (
 )
 
 func TestServer_ListInstances(t *testing.T) {
-	t.Parallel()
-
 	isoInstance := integration.NewInstance(CTX)
 
 	tests := []struct {
@@ -104,7 +102,7 @@ func TestServer_ListInstances(t *testing.T) {
 			}
 			require.NoError(t, err)
 			got := resp.GetResult()
-			assert.Len(t, got, len(tt.want))
+			require.Len(t, got, len(tt.want))
 			for i := 0; i < len(tt.want); i++ {
 				assert.Equalf(t, tt.want[i].GetId(), got[i].GetId(), "instance[%d] id", i)
 			}

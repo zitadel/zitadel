@@ -41,6 +41,12 @@ func (m *InstanceFeaturesWriteModel) Reduce() (err error) {
 				return err
 			}
 			reduceInstanceFeature(&m.InstanceFeatures, key, e.Value)
+		case *feature_v2.SetEvent[*feature.LoginV2]:
+			_, key, err := e.FeatureInfo()
+			if err != nil {
+				return err
+			}
+			reduceInstanceFeature(&m.InstanceFeatures, key, e.Value)
 		case *feature_v2.SetEvent[[]feature.ImprovedPerformanceType]:
 			_, key, err := e.FeatureInfo()
 			if err != nil {
@@ -71,6 +77,8 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
 			feature_v2.InstanceOIDCSingleV1SessionTerminationEventType,
 			feature_v2.InstanceDisableUserTokenEvent,
+			feature_v2.InstanceEnableBackChannelLogout,
+			feature_v2.InstanceLoginVersion,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -116,6 +124,11 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyDisableUserTokenEvent:
 		v := value.(bool)
 		features.DisableUserTokenEvent = &v
+	case feature.KeyEnableBackChannelLogout:
+		v := value.(bool)
+		features.EnableBackChannelLogout = &v
+	case feature.KeyLoginV2:
+		features.LoginV2 = value.(*feature.LoginV2)
 	}
 }
 
@@ -133,5 +146,7 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DebugOIDCParentError, f.DebugOIDCParentError, feature_v2.InstanceDebugOIDCParentErrorEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.OIDCSingleV1SessionTermination, f.OIDCSingleV1SessionTermination, feature_v2.InstanceOIDCSingleV1SessionTerminationEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DisableUserTokenEvent, f.DisableUserTokenEvent, feature_v2.InstanceDisableUserTokenEvent)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.InstanceEnableBackChannelLogout)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.InstanceLoginVersion)
 	return cmds
 }

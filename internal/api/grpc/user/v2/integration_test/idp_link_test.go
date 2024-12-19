@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
@@ -19,8 +20,6 @@ import (
 )
 
 func TestServer_AddIDPLink(t *testing.T) {
-	t.Parallel()
-
 	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
@@ -91,32 +90,29 @@ func TestServer_AddIDPLink(t *testing.T) {
 			got, err := Client.AddIDPLink(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
-
+			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
 
 func TestServer_ListIDPLinks(t *testing.T) {
-	t.Parallel()
-
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks-%s", gofakeit.AppName()), gofakeit.Email())
 
 	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
-	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email())
 	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpResp.Id, "externalUsername_instance")
 	require.NoError(t, err)
 
 	ctxOrg := metadata.AppendToOutgoingContext(IamCTX, "x-zitadel-orgid", orgResp.GetOrganizationId())
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(ctxOrg, orgResp.OrganizationId)
-	userOrgResp := Instance.CreateHumanUserVerified(ctxOrg, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	userOrgResp := Instance.CreateHumanUserVerified(ctxOrg, orgResp.OrganizationId, gofakeit.Email())
 	_, err = Instance.CreateUserIDPlink(ctxOrg, userOrgResp.GetUserId(), "external_org", orgIdpResp.Id, "externalUsername_org")
 	require.NoError(t, err)
 
-	userMultipleResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	userMultipleResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email())
 	_, err = Instance.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", instanceIdpResp.Id, "externalUsername_multi")
 	require.NoError(t, err)
 	_, err = Instance.CreateUserIDPlink(ctxOrg, userMultipleResp.GetUserId(), "external_multi", orgIdpResp.Id, "externalUsername_multi")
@@ -236,48 +232,41 @@ func TestServer_ListIDPLinks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			retryDuration := time.Minute
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
-			}
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Client.ListIDPLinks(tt.args.ctx, tt.args.req)
-				assertErr := assert.NoError
+				got, err := Client.ListIDPLinks(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assertErr = assert.Error
-				}
-				assertErr(ttt, listErr)
-				if listErr != nil {
+					require.Error(ttt, err)
 					return
 				}
+				require.NoError(ttt, err)
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
-				for i := range tt.want.Result {
-					assert.Contains(ttt, got.Result, tt.want.Result[i])
+				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
+					for i := range tt.want.Result {
+						assert.Contains(ttt, got.Result, tt.want.Result[i])
+					}
 				}
 				integration.AssertListDetails(t, tt.want, got)
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected idplinks result")
+			}, retryDuration, tick, "timeout waiting for expected idplinks result")
 		})
 	}
 }
 
 func TestServer_RemoveIDPLink(t *testing.T) {
-	t.Parallel()
-
-	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks-%s", gofakeit.AppName()), gofakeit.Email())
 
 	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
-	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email())
 	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpResp.Id, "externalUsername_instance")
 	require.NoError(t, err)
 
 	ctxOrg := metadata.AppendToOutgoingContext(IamCTX, "x-zitadel-orgid", orgResp.GetOrganizationId())
 	orgIdpResp := Instance.AddOrgGenericOAuthProvider(ctxOrg, orgResp.OrganizationId)
-	userOrgResp := Instance.CreateHumanUserVerified(ctxOrg, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	userOrgResp := Instance.CreateHumanUserVerified(ctxOrg, orgResp.OrganizationId, gofakeit.Email())
 	_, err = Instance.CreateUserIDPlink(ctxOrg, userOrgResp.GetUserId(), "external_org", orgIdpResp.Id, "externalUsername_org")
 	require.NoError(t, err)
 
-	userNoLinkResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	userNoLinkResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, gofakeit.Email())
 
 	type args struct {
 		ctx context.Context
@@ -363,9 +352,9 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 			got, err := Client.RemoveIDPLink(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+				return
 			}
+			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
 		})

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -48,6 +49,9 @@ var (
 		` projections.apps7_oidc_configs.clock_skew,` +
 		` projections.apps7_oidc_configs.additional_origins,` +
 		` projections.apps7_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
+		` projections.apps7_oidc_configs.login_version,` +
+		` projections.apps7_oidc_configs.login_base_uri,` +
 		//saml config
 		` projections.apps7_saml_configs.app_id,` +
 		` projections.apps7_saml_configs.entity_id,` +
@@ -91,6 +95,9 @@ var (
 		` projections.apps7_oidc_configs.clock_skew,` +
 		` projections.apps7_oidc_configs.additional_origins,` +
 		` projections.apps7_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps7_oidc_configs.back_channel_logout_uri,` +
+		` projections.apps7_oidc_configs.login_version,` +
+		` projections.apps7_oidc_configs.login_base_uri,` +
 		//saml config
 		` projections.apps7_saml_configs.app_id,` +
 		` projections.apps7_saml_configs.entity_id,` +
@@ -163,6 +170,9 @@ var (
 		"clock_skew",
 		"additional_origins",
 		"skip_native_app_success_page",
+		"back_channel_logout_uri",
+		"login_version",
+		"login_base_uri",
 		//saml config
 		"app_id",
 		"entity_id",
@@ -217,6 +227,9 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -300,6 +313,9 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -352,6 +368,9 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -440,6 +459,9 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -482,6 +504,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -526,6 +551,9 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -568,6 +596,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -612,6 +643,9 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -654,6 +688,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -698,6 +735,9 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -740,6 +780,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -784,6 +827,9 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -826,6 +872,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -870,6 +919,9 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							true,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -912,6 +964,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: true,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersionUnspecified,
+							LoginBaseURI:             nil,
 						},
 					},
 				},
@@ -956,6 +1011,9 @@ func Test_AppsPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersion2,
+							"https://login.ch/",
 							// saml config
 							nil,
 							nil,
@@ -993,6 +1051,9 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1013,6 +1074,9 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1072,6 +1136,9 @@ func Test_AppsPrepare(t *testing.T) {
 							ComplianceProblems:       nil,
 							AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 							SkipNativeAppSuccessPage: false,
+							BackChannelLogoutURI:     "back.channel.logout.ch",
+							LoginVersion:             domain.LoginVersion2,
+							LoginBaseURI:             gu.Ptr("https://login.ch/"),
 						},
 					},
 					{
@@ -1205,6 +1272,9 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
+						nil,
 						// saml config
 						nil,
 						nil,
@@ -1248,6 +1318,9 @@ func Test_AppPrepare(t *testing.T) {
 							"api-client-id",
 							domain.APIAuthMethodTypePrivateKeyJWT,
 							// oidc config
+							nil,
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1330,6 +1403,9 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1367,6 +1443,9 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
@@ -1411,6 +1490,9 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1448,6 +1530,9 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
@@ -1475,6 +1560,9 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							// oidc config
+							nil,
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1558,6 +1646,9 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1595,6 +1686,9 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
@@ -1639,6 +1733,9 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1676,6 +1773,9 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
@@ -1720,6 +1820,9 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1757,6 +1860,9 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},
@@ -1801,6 +1907,9 @@ func Test_AppPrepare(t *testing.T) {
 							1 * time.Second,
 							database.TextArray[string]{"additional.origin"},
 							false,
+							"back.channel.logout.ch",
+							domain.LoginVersionUnspecified,
+							nil,
 							// saml config
 							nil,
 							nil,
@@ -1838,6 +1947,9 @@ func Test_AppPrepare(t *testing.T) {
 					ComplianceProblems:       nil,
 					AllowedOrigins:           database.TextArray[string]{"https://redirect.to", "additional.origin"},
 					SkipNativeAppSuccessPage: false,
+					BackChannelLogoutURI:     "back.channel.logout.ch",
+					LoginVersion:             domain.LoginVersionUnspecified,
+					LoginBaseURI:             nil,
 				},
 			},
 		},

@@ -12,7 +12,10 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
+	jose "github.com/go-jose/go-jose/v4"
+	authz "github.com/zitadel/zitadel/internal/api/authz"
 	domain "github.com/zitadel/zitadel/internal/domain"
 	query "github.com/zitadel/zitadel/internal/query"
 	gomock "go.uber.org/mock/gomock"
@@ -23,6 +26,7 @@ import (
 type MockQueries struct {
 	ctrl     *gomock.Controller
 	recorder *MockQueriesMockRecorder
+	isgomock struct{}
 }
 
 // MockQueriesMockRecorder is the mock recorder for MockQueries.
@@ -42,196 +46,255 @@ func (m *MockQueries) EXPECT() *MockQueriesMockRecorder {
 	return m.recorder
 }
 
-// ActiveLabelPolicyByOrg mocks base method.
-func (m *MockQueries) ActiveLabelPolicyByOrg(arg0 context.Context, arg1 string, arg2 bool) (*query.LabelPolicy, error) {
+// ActiveInstances mocks base method.
+func (m *MockQueries) ActiveInstances() []string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ActiveLabelPolicyByOrg", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "ActiveInstances")
+	ret0, _ := ret[0].([]string)
+	return ret0
+}
+
+// ActiveInstances indicates an expected call of ActiveInstances.
+func (mr *MockQueriesMockRecorder) ActiveInstances() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActiveInstances", reflect.TypeOf((*MockQueries)(nil).ActiveInstances))
+}
+
+// ActiveLabelPolicyByOrg mocks base method.
+func (m *MockQueries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.LabelPolicy, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ActiveLabelPolicyByOrg", ctx, orgID, withOwnerRemoved)
 	ret0, _ := ret[0].(*query.LabelPolicy)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ActiveLabelPolicyByOrg indicates an expected call of ActiveLabelPolicyByOrg.
-func (mr *MockQueriesMockRecorder) ActiveLabelPolicyByOrg(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) ActiveLabelPolicyByOrg(ctx, orgID, withOwnerRemoved any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActiveLabelPolicyByOrg", reflect.TypeOf((*MockQueries)(nil).ActiveLabelPolicyByOrg), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActiveLabelPolicyByOrg", reflect.TypeOf((*MockQueries)(nil).ActiveLabelPolicyByOrg), ctx, orgID, withOwnerRemoved)
+}
+
+// ActivePrivateSigningKey mocks base method.
+func (m *MockQueries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*query.PrivateKeys, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ActivePrivateSigningKey", ctx, t)
+	ret0, _ := ret[0].(*query.PrivateKeys)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ActivePrivateSigningKey indicates an expected call of ActivePrivateSigningKey.
+func (mr *MockQueriesMockRecorder) ActivePrivateSigningKey(ctx, t any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ActivePrivateSigningKey", reflect.TypeOf((*MockQueries)(nil).ActivePrivateSigningKey), ctx, t)
 }
 
 // CustomTextListByTemplate mocks base method.
-func (m *MockQueries) CustomTextListByTemplate(arg0 context.Context, arg1, arg2 string, arg3 bool) (*query.CustomTexts, error) {
+func (m *MockQueries) CustomTextListByTemplate(ctx context.Context, aggregateID, template string, withOwnerRemoved bool) (*query.CustomTexts, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CustomTextListByTemplate", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "CustomTextListByTemplate", ctx, aggregateID, template, withOwnerRemoved)
 	ret0, _ := ret[0].(*query.CustomTexts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CustomTextListByTemplate indicates an expected call of CustomTextListByTemplate.
-func (mr *MockQueriesMockRecorder) CustomTextListByTemplate(arg0, arg1, arg2, arg3 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) CustomTextListByTemplate(ctx, aggregateID, template, withOwnerRemoved any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CustomTextListByTemplate", reflect.TypeOf((*MockQueries)(nil).CustomTextListByTemplate), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CustomTextListByTemplate", reflect.TypeOf((*MockQueries)(nil).CustomTextListByTemplate), ctx, aggregateID, template, withOwnerRemoved)
+}
+
+// GetActiveSigningWebKey mocks base method.
+func (m *MockQueries) GetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetActiveSigningWebKey", ctx)
+	ret0, _ := ret[0].(*jose.JSONWebKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetActiveSigningWebKey indicates an expected call of GetActiveSigningWebKey.
+func (mr *MockQueriesMockRecorder) GetActiveSigningWebKey(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetActiveSigningWebKey", reflect.TypeOf((*MockQueries)(nil).GetActiveSigningWebKey), ctx)
 }
 
 // GetDefaultLanguage mocks base method.
-func (m *MockQueries) GetDefaultLanguage(arg0 context.Context) language.Tag {
+func (m *MockQueries) GetDefaultLanguage(ctx context.Context) language.Tag {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDefaultLanguage", arg0)
+	ret := m.ctrl.Call(m, "GetDefaultLanguage", ctx)
 	ret0, _ := ret[0].(language.Tag)
 	return ret0
 }
 
 // GetDefaultLanguage indicates an expected call of GetDefaultLanguage.
-func (mr *MockQueriesMockRecorder) GetDefaultLanguage(arg0 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) GetDefaultLanguage(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLanguage", reflect.TypeOf((*MockQueries)(nil).GetDefaultLanguage), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLanguage", reflect.TypeOf((*MockQueries)(nil).GetDefaultLanguage), ctx)
 }
 
 // GetInstanceRestrictions mocks base method.
-func (m *MockQueries) GetInstanceRestrictions(arg0 context.Context) (query.Restrictions, error) {
+func (m *MockQueries) GetInstanceRestrictions(ctx context.Context) (query.Restrictions, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetInstanceRestrictions", arg0)
+	ret := m.ctrl.Call(m, "GetInstanceRestrictions", ctx)
 	ret0, _ := ret[0].(query.Restrictions)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetInstanceRestrictions indicates an expected call of GetInstanceRestrictions.
-func (mr *MockQueriesMockRecorder) GetInstanceRestrictions(arg0 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) GetInstanceRestrictions(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInstanceRestrictions", reflect.TypeOf((*MockQueries)(nil).GetInstanceRestrictions), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInstanceRestrictions", reflect.TypeOf((*MockQueries)(nil).GetInstanceRestrictions), ctx)
 }
 
 // GetNotifyUserByID mocks base method.
-func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 string) (*query.NotifyUser, error) {
+func (m *MockQueries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string) (*query.NotifyUser, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetNotifyUserByID", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetNotifyUserByID", ctx, shouldTriggered, userID)
 	ret0, _ := ret[0].(*query.NotifyUser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetNotifyUserByID indicates an expected call of GetNotifyUserByID.
-func (mr *MockQueriesMockRecorder) GetNotifyUserByID(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) GetNotifyUserByID(ctx, shouldTriggered, userID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifyUserByID", reflect.TypeOf((*MockQueries)(nil).GetNotifyUserByID), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifyUserByID", reflect.TypeOf((*MockQueries)(nil).GetNotifyUserByID), ctx, shouldTriggered, userID)
+}
+
+// InstanceByID mocks base method.
+func (m *MockQueries) InstanceByID(ctx context.Context, id string) (authz.Instance, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstanceByID", ctx, id)
+	ret0, _ := ret[0].(authz.Instance)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// InstanceByID indicates an expected call of InstanceByID.
+func (mr *MockQueriesMockRecorder) InstanceByID(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstanceByID", reflect.TypeOf((*MockQueries)(nil).InstanceByID), ctx, id)
 }
 
 // MailTemplateByOrg mocks base method.
-func (m *MockQueries) MailTemplateByOrg(arg0 context.Context, arg1 string, arg2 bool) (*query.MailTemplate, error) {
+func (m *MockQueries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.MailTemplate, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MailTemplateByOrg", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "MailTemplateByOrg", ctx, orgID, withOwnerRemoved)
 	ret0, _ := ret[0].(*query.MailTemplate)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // MailTemplateByOrg indicates an expected call of MailTemplateByOrg.
-func (mr *MockQueriesMockRecorder) MailTemplateByOrg(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) MailTemplateByOrg(ctx, orgID, withOwnerRemoved any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTemplateByOrg", reflect.TypeOf((*MockQueries)(nil).MailTemplateByOrg), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MailTemplateByOrg", reflect.TypeOf((*MockQueries)(nil).MailTemplateByOrg), ctx, orgID, withOwnerRemoved)
 }
 
 // NotificationPolicyByOrg mocks base method.
-func (m *MockQueries) NotificationPolicyByOrg(arg0 context.Context, arg1 bool, arg2 string, arg3 bool) (*query.NotificationPolicy, error) {
+func (m *MockQueries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*query.NotificationPolicy, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NotificationPolicyByOrg", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "NotificationPolicyByOrg", ctx, shouldTriggerBulk, orgID, withOwnerRemoved)
 	ret0, _ := ret[0].(*query.NotificationPolicy)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // NotificationPolicyByOrg indicates an expected call of NotificationPolicyByOrg.
-func (mr *MockQueriesMockRecorder) NotificationPolicyByOrg(arg0, arg1, arg2, arg3 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) NotificationPolicyByOrg(ctx, shouldTriggerBulk, orgID, withOwnerRemoved any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationPolicyByOrg", reflect.TypeOf((*MockQueries)(nil).NotificationPolicyByOrg), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationPolicyByOrg", reflect.TypeOf((*MockQueries)(nil).NotificationPolicyByOrg), ctx, shouldTriggerBulk, orgID, withOwnerRemoved)
 }
 
 // NotificationProviderByIDAndType mocks base method.
-func (m *MockQueries) NotificationProviderByIDAndType(arg0 context.Context, arg1 string, arg2 domain.NotificationProviderType) (*query.DebugNotificationProvider, error) {
+func (m *MockQueries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*query.DebugNotificationProvider, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "NotificationProviderByIDAndType", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "NotificationProviderByIDAndType", ctx, aggID, providerType)
 	ret0, _ := ret[0].(*query.DebugNotificationProvider)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // NotificationProviderByIDAndType indicates an expected call of NotificationProviderByIDAndType.
-func (mr *MockQueriesMockRecorder) NotificationProviderByIDAndType(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) NotificationProviderByIDAndType(ctx, aggID, providerType any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationProviderByIDAndType", reflect.TypeOf((*MockQueries)(nil).NotificationProviderByIDAndType), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotificationProviderByIDAndType", reflect.TypeOf((*MockQueries)(nil).NotificationProviderByIDAndType), ctx, aggID, providerType)
 }
 
 // SMSProviderConfigActive mocks base method.
-func (m *MockQueries) SMSProviderConfigActive(arg0 context.Context, arg1 string) (*query.SMSConfig, error) {
+func (m *MockQueries) SMSProviderConfigActive(ctx context.Context, resourceOwner string) (*query.SMSConfig, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SMSProviderConfigActive", arg0, arg1)
+	ret := m.ctrl.Call(m, "SMSProviderConfigActive", ctx, resourceOwner)
 	ret0, _ := ret[0].(*query.SMSConfig)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SMSProviderConfigActive indicates an expected call of SMSProviderConfigActive.
-func (mr *MockQueriesMockRecorder) SMSProviderConfigActive(arg0, arg1 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) SMSProviderConfigActive(ctx, resourceOwner any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMSProviderConfigActive", reflect.TypeOf((*MockQueries)(nil).SMSProviderConfigActive), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMSProviderConfigActive", reflect.TypeOf((*MockQueries)(nil).SMSProviderConfigActive), ctx, resourceOwner)
 }
 
 // SMTPConfigActive mocks base method.
-func (m *MockQueries) SMTPConfigActive(arg0 context.Context, arg1 string) (*query.SMTPConfig, error) {
+func (m *MockQueries) SMTPConfigActive(ctx context.Context, resourceOwner string) (*query.SMTPConfig, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SMTPConfigActive", arg0, arg1)
+	ret := m.ctrl.Call(m, "SMTPConfigActive", ctx, resourceOwner)
 	ret0, _ := ret[0].(*query.SMTPConfig)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SMTPConfigActive indicates an expected call of SMTPConfigActive.
-func (mr *MockQueriesMockRecorder) SMTPConfigActive(arg0, arg1 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) SMTPConfigActive(ctx, resourceOwner any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMTPConfigActive", reflect.TypeOf((*MockQueries)(nil).SMTPConfigActive), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMTPConfigActive", reflect.TypeOf((*MockQueries)(nil).SMTPConfigActive), ctx, resourceOwner)
 }
 
 // SearchInstanceDomains mocks base method.
-func (m *MockQueries) SearchInstanceDomains(arg0 context.Context, arg1 *query.InstanceDomainSearchQueries) (*query.InstanceDomains, error) {
+func (m *MockQueries) SearchInstanceDomains(ctx context.Context, queries *query.InstanceDomainSearchQueries) (*query.InstanceDomains, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchInstanceDomains", arg0, arg1)
+	ret := m.ctrl.Call(m, "SearchInstanceDomains", ctx, queries)
 	ret0, _ := ret[0].(*query.InstanceDomains)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SearchInstanceDomains indicates an expected call of SearchInstanceDomains.
-func (mr *MockQueriesMockRecorder) SearchInstanceDomains(arg0, arg1 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) SearchInstanceDomains(ctx, queries any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchInstanceDomains", reflect.TypeOf((*MockQueries)(nil).SearchInstanceDomains), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchInstanceDomains", reflect.TypeOf((*MockQueries)(nil).SearchInstanceDomains), ctx, queries)
 }
 
 // SearchMilestones mocks base method.
-func (m *MockQueries) SearchMilestones(arg0 context.Context, arg1 []string, arg2 *query.MilestonesSearchQueries) (*query.Milestones, error) {
+func (m *MockQueries) SearchMilestones(ctx context.Context, instanceIDs []string, queries *query.MilestonesSearchQueries) (*query.Milestones, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SearchMilestones", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "SearchMilestones", ctx, instanceIDs, queries)
 	ret0, _ := ret[0].(*query.Milestones)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SearchMilestones indicates an expected call of SearchMilestones.
-func (mr *MockQueriesMockRecorder) SearchMilestones(arg0, arg1, arg2 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) SearchMilestones(ctx, instanceIDs, queries any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMilestones", reflect.TypeOf((*MockQueries)(nil).SearchMilestones), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchMilestones", reflect.TypeOf((*MockQueries)(nil).SearchMilestones), ctx, instanceIDs, queries)
 }
 
 // SessionByID mocks base method.
-func (m *MockQueries) SessionByID(arg0 context.Context, arg1 bool, arg2, arg3 string) (*query.Session, error) {
+func (m *MockQueries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (*query.Session, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SessionByID", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "SessionByID", ctx, shouldTriggerBulk, id, sessionToken)
 	ret0, _ := ret[0].(*query.Session)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SessionByID indicates an expected call of SessionByID.
-func (mr *MockQueriesMockRecorder) SessionByID(arg0, arg1, arg2, arg3 any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) SessionByID(ctx, shouldTriggerBulk, id, sessionToken any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SessionByID", reflect.TypeOf((*MockQueries)(nil).SessionByID), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SessionByID", reflect.TypeOf((*MockQueries)(nil).SessionByID), ctx, shouldTriggerBulk, id, sessionToken)
 }

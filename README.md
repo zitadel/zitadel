@@ -13,8 +13,6 @@
         <img alt="GitHub Workflow Status (with event)" src="https://img.shields.io/github/actions/workflow/status/zitadel/zitadel/build.yml?event=pull_request"></a>
     <a href="https://zitadel.com/docs/support/software-release-cycles-support" alt="Release">
         <img src="https://badgen.net/github/release/zitadel/zitadel/stable" /></a>
-    <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
-        <img alt="Dynamic YAML Badge" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fzitadel%2Fzitadel%2Fmain%2Frelease-channels.yaml&query=%24.stable&label=stable"></a>
     <a href="https://goreportcard.com/report/github.com/zitadel/zitadel" alt="Go Report Card">
         <img src="https://goreportcard.com/badge/github.com/zitadel/zitadel" /></a>
     <a href="https://codecov.io/gh/zitadel/zitadel" alt="Code Coverage">
@@ -88,6 +86,10 @@ Available data regions are:
 
 ZITADEL Cloud comes with a free tier, providing you with all the same features as the open-source version.
 Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
+
+## Adopters
+
+We are grateful to the organizations and individuals who are using ZITADEL. If you are using ZITADEL, please consider adding your name to our [Adopters list](./ADOPTERS.md) by submitting a pull request.
 
 ### Example applications
 

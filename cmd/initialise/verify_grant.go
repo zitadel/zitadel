@@ -1,6 +1,7 @@
 package initialise
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 
@@ -23,16 +24,16 @@ Prerequisites:
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
 
-			err := initialise(config.Database, VerifyGrant(config.Database.DatabaseName(), config.Database.Username()))
+			err := initialise(cmd.Context(), config.Database, VerifyGrant(config.Database.DatabaseName(), config.Database.Username()))
 			logging.OnError(err).Fatal("unable to set grant")
 		},
 	}
 }
 
-func VerifyGrant(databaseName, username string) func(*database.DB) error {
-	return func(db *database.DB) error {
+func VerifyGrant(databaseName, username string) func(context.Context, *database.DB) error {
+	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("user", username, "database", databaseName).Info("verify grant")
 
-		return exec(db, fmt.Sprintf(grantStmt, databaseName, username), nil)
+		return exec(ctx, db, fmt.Sprintf(grantStmt, databaseName, username), nil)
 	}
 }
