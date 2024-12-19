@@ -125,7 +125,18 @@ func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
 		return nil
 	}
 	sequence.sequence = currentSequence
-	if sequence.aggregate.ResourceOwner == "" {
+	if resourceOwner != "" && sequence.aggregate.ResourceOwner != "" && sequence.aggregate.ResourceOwner != resourceOwner {
+		logging.WithFields(
+			"current_sequence", sequence.sequence,
+			"instance_id", sequence.aggregate.InstanceID,
+			"agg_type", sequence.aggregate.Type,
+			"agg_id", sequence.aggregate.ID,
+			"current_owner", resourceOwner,
+			"provided_owner", sequence.aggregate.ResourceOwner,
+		).Info("would have set wrong resource owner")
+	}
+	// set resource owner from previous events
+	if resourceOwner != "" {
 		sequence.aggregate.ResourceOwner = resourceOwner
 	}
 
