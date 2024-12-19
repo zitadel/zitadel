@@ -68,6 +68,16 @@ func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {
 	if len(messages) == 0 {
 		return nil
 	}
+	var isAllowed bool
+	for _, allowed := range t.allowedLanguages {
+		if allowed == tag {
+			isAllowed = true
+			break
+		}
+	}
+	if !isAllowed {
+		return nil
+	}
 	i18nMessages := make([]*i18n.Message, len(messages))
 	for i, message := range messages {
 		i18nMessages[i] = &i18n.Message{
