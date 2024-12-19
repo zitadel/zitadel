@@ -1,6 +1,9 @@
 "use client";
 
-import { sendVerificationRedirectWithoutCheck } from "@/lib/server/verify";
+import {
+  sendVerificationRedirectWithoutCheck,
+  SendVerificationRedirectWithoutCheckCommand,
+} from "@/lib/server/verify";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -11,12 +14,16 @@ import { Spinner } from "./spinner";
 
 export function VerifyRedirectButton({
   userId,
+  loginName,
   authRequestId,
   authMethods,
+  organization,
 }: {
-  userId: string;
+  userId?: string;
+  loginName?: string;
   authRequestId: string;
   authMethods: AuthenticationMethodType[] | null;
+  organization?: string;
 }) {
   const t = useTranslations("verify");
   const [error, setError] = useState<string>("");
@@ -26,10 +33,24 @@ export function VerifyRedirectButton({
   async function submitAndContinue(): Promise<boolean | void> {
     setLoading(true);
 
-    await sendVerificationRedirectWithoutCheck({
-      userId,
+    let command = {
+      organization,
       authRequestId,
-    })
+    } as SendVerificationRedirectWithoutCheckCommand;
+
+    if (userId) {
+      command = {
+        ...command,
+        userId,
+      } as SendVerificationRedirectWithoutCheckCommand;
+    } else if (loginName) {
+      command = {
+        ...command,
+        loginName,
+      } as SendVerificationRedirectWithoutCheckCommand;
+    }
+
+    await sendVerificationRedirectWithoutCheck(command)
       .catch((error) => {
         setError("Could not verify user");
         return;

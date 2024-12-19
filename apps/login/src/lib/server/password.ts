@@ -340,7 +340,7 @@ export async function checkSessionAndSetPassword({
   }
 }
 
-function checkMFAFactors(
+export function checkMFAFactors(
   session: Session,
   loginSettings: LoginSettings | undefined,
   authMethods: AuthenticationMethodType[],

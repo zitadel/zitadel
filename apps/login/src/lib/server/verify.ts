@@ -2,23 +2,22 @@
 
 import {
   getLoginSettings,
+  getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-  listUsers,
   resendEmailCode,
   resendInviteCode,
   verifyEmail,
   verifyInviteCode,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
-import {
-  createSessionAndUpdateCookie,
-  setSessionAndUpdateCookie,
-} from "./cookie";
+import { createSessionAndUpdateCookie } from "./cookie";
+import { checkMFAFactors } from "./password";
 
 type VerifyUserByEmailCommand = {
   userId: string;
@@ -96,16 +95,13 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
     : resendEmailCode(command.userId);
 }
 
-type SendVerificationRedirectWithoutCheckCommand =
-  | {
-      loginName: string;
-      organization?: string;
-      authRequestId?: string;
-    }
-  | {
-      userId: string;
-      authRequestId?: string;
-    };
+export type SendVerificationRedirectWithoutCheckCommand = {
+  organization?: string;
+  authRequestId?: string;
+} & (
+  | { userId: string; loginName?: never }
+  | { userId?: never; loginName: string }
+);
 
 export async function sendVerificationRedirectWithoutCheck(
   command: SendVerificationRedirectWithoutCheckCommand,
@@ -114,52 +110,31 @@ export async function sendVerificationRedirectWithoutCheck(
     return { error: "No userId, nor loginname provided" };
   }
 
-  let sessionCookie;
-  let loginSettings: LoginSettings | undefined;
-  let session;
-  let user: User;
+  let session: Session | undefined;
+  let user: User | undefined;
+
+  const loginSettings = await getLoginSettings(command.organization);
 
   if ("loginName" in command) {
-    sessionCookie = await getSessionCookieByLoginName({
+    const sessionCookie = await getSessionCookieByLoginName({
       loginName: command.loginName,
       organization: command.organization,
     }).catch((error) => {
       console.warn("Ignored error:", error);
     });
-  } else if (command.userId) {
-    const users = await listUsers({
-      loginName: command.loginName,
-      organizationId: command.organization,
-    });
 
-    if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
-      user = users.result[0];
-
-      const checks = create(ChecksSchema, {
-        user: { search: { case: "userId", value: users.result[0].userId } },
-        password: { password: command.checks.password?.password },
-      });
-
-      loginSettings = await getLoginSettings(command.organization);
-
-      session = await createSessionAndUpdateCookie(
-        checks,
-        undefined,
-        command.authRequestId,
-        loginSettings?.passwordCheckLifetime,
-      );
+    if (!sessionCookie) {
+      return { error: "Could not load session cookie" };
     }
 
-    // this is a fake error message to hide that the user does not even exist
-    return { error: "Could not verify password" };
-  } else {
-    session = await setSessionAndUpdateCookie(
-      sessionCookie,
-      command.checks,
-      undefined,
-      command.authRequestId,
-      loginSettings?.passwordCheckLifetime,
-    );
+    session = await getSession({
+      sessionId: sessionCookie.id,
+      sessionToken: sessionCookie.token,
+    }).then((response) => {
+      if (response?.session) {
+        return response.session;
+      }
+    });
 
     if (!session?.factors?.user?.id) {
       return { error: "Could not create session for user" };
@@ -167,50 +142,57 @@ export async function sendVerificationRedirectWithoutCheck(
 
     const userResponse = await getUserByID(session?.factors?.user?.id);
 
-    if (!userResponse.user) {
-      return { error: "Could not find user" };
+    if (!userResponse?.user) {
+      return { error: "Could not load user" };
     }
 
     user = userResponse.user;
-  }
+  } else if ("userId" in command) {
+    const userResponse = await getUserByID(command.userId);
 
-  if (!loginSettings) {
-    loginSettings = await getLoginSettings(
-      command.organization ?? session.factors?.user?.organizationId,
+    if (!userResponse?.user) {
+      return { error: "Could not load user" };
+    }
+
+    user = userResponse.user;
+
+    const checks = create(ChecksSchema, {
+      user: {
+        search: {
+          case: "loginName",
+          value: userResponse.user.preferredLoginName,
+        },
+      },
+    });
+
+    session = await createSessionAndUpdateCookie(
+      checks,
+      undefined,
+      command.authRequestId,
     );
+
+    // this is a fake error message to hide that the user does not even exist
+    return { error: "Could not verify password" };
   }
 
-  if (!session?.factors?.user?.id || !sessionCookie) {
+  if (!session?.factors?.user?.id) {
     return { error: "Could not create session for user" };
   }
-  // const userResponse = await getUserByID(command.userId);
 
-  // if (!userResponse || !userResponse.user) {
-  //   return { error: "Could not load user" };
-  // }
+  if (!session?.factors?.user?.id) {
+    return { error: "Could not create session for user" };
+  }
 
-  // const checks = create(ChecksSchema, {
-  //   user: {
-  //     search: {
-  //       case: "loginName",
-  //       value: userResponse.user.preferredLoginName,
-  //     },
-  //   },
-  // });
+  if (!user) {
+    return { error: "Could not load user" };
+  }
 
-  // const session = await createSessionAndUpdateCookie(
-  //   checks,
-  //   undefined,
-  //   command.authRequestId,
-  // );
-
-  const authMethodResponse = await listAuthenticationMethodTypes(
-    command.userId,
-  );
+  const authMethodResponse = await listAuthenticationMethodTypes(user.userId);
 
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
     return { error: "Could not load possible authenticators" };
   }
+
   // if no authmethods are found on the user, redirect to set one up
   if (
     authMethodResponse &&
@@ -226,4 +208,38 @@ export async function sendVerificationRedirectWithoutCheck(
     }
     return { redirect: `/authenticator/set?${params}` };
   }
+
+  // redirect to mfa factor if user has one, or redirect to set one up
+  checkMFAFactors(
+    session,
+    loginSettings,
+    authMethodResponse.authMethodTypes,
+    command.organization,
+    command.authRequestId,
+  );
+
+  // login user if no additional steps are required
+  if (command.authRequestId && session.id) {
+    const nextUrl = await getNextUrl(
+      {
+        sessionId: session.id,
+        authRequestId: command.authRequestId,
+        organization:
+          command.organization ?? session.factors?.user?.organizationId,
+      },
+      loginSettings?.defaultRedirectUri,
+    );
+
+    return { redirect: nextUrl };
+  }
+
+  const url = await getNextUrl(
+    {
+      loginName: session.factors.user.loginName,
+      organization: session.factors?.user?.organizationId,
+    },
+    loginSettings?.defaultRedirectUri,
+  );
+
+  return { redirect: url };
 }

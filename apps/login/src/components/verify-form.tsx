@@ -17,12 +17,19 @@ type Inputs = {
 
 type Props = {
   userId: string;
+  loginName?: string;
   code?: string;
   isInvite: boolean;
   params: URLSearchParams;
 };
 
-export function VerifyForm({ userId, code, isInvite, params }: Props) {
+export function VerifyForm({
+  userId,
+  loginName,
+  code,
+  isInvite,
+  params,
+}: Props) {
   const t = useTranslations("verify");
 
   const router = useRouter();
