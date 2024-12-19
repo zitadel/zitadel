@@ -169,8 +169,8 @@ message CreateCallbackRequest {
   string auth_request_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "Set this field when the authorization flow failed. It creates a callback URL to the application, with the error details set.";
-      ref: "https://openid.net/specs/openid-connect-core-1_0.html#AuthError";
+      description: "ID of the Auth Request.";
+      example: "\"163840776835432705\"";
     }
   ];
 

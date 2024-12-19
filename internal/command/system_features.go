@@ -20,6 +20,7 @@ type SystemFeatures struct {
 	OIDCSingleV1SessionTermination  *bool
 	DisableUserTokenEvent           *bool
 	EnableBackChannelLogout         *bool
+	LoginV2                         *feature.LoginV2
 }
 
 func (m *SystemFeatures) isEmpty() bool {
@@ -33,7 +34,8 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.ImprovedPerformance == nil &&
 		m.OIDCSingleV1SessionTermination == nil &&
 		m.DisableUserTokenEvent == nil &&
-		m.EnableBackChannelLogout == nil
+		m.EnableBackChannelLogout == nil &&
+		m.LoginV2 == nil
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {

@@ -2570,6 +2570,10 @@
       "CLIENTSECRETREGENERATED": "Klienthemlighet genererad.",
       "DELETED": "App raderad.",
       "CONFIGCHANGED": "Ändringar upptäckta!"
+    },
+    "LOGINV2": {
+      "USEV2": "Använd nya inloggningsgränssnittet",
+      "BASEURL": "Anpassad bas-URL för det nya inloggningsgränssnittet"
     }
   },
   "GENDERS": {

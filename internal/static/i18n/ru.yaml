@@ -538,6 +538,12 @@ Errors:
       Invalid: Токен недействителен
       Expired: Срок действия токена истек
     InvalidClient: Токен не был выпущен для этого клиента
+  SAMLRequest:
+    AlreadyExists: SAMLRequest уже существует
+    NotExisting: SAMLRequest не существует
+    WrongLoginClient: SAMLRequest создан другим клиентом входа
+  SAMLSession:
+    InvalidClient: SAMLResponse не был отправлен для этого клиента
   Feature:
     NotExisting: ункция не существует
     TypeNotSupported: Тип объекта не поддерживается
@@ -612,6 +618,8 @@ AggregateTypes:
   system: Система
   session: Сеанс
   web_key: Веб-ключ
+  saml_request: SAML-запрос
+  saml_session: Сессия SAML
 
 EventTypes:
   execution:

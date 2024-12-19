@@ -49,6 +49,7 @@ import (
 	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
 	userschema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/userschema/v3alpha"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/webkey/v3"
+	saml_v2 "github.com/zitadel/zitadel/internal/api/grpc/saml/v2"
 	session_v2 "github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
 	settings_v2 "github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
@@ -530,7 +531,7 @@ func startAPIs(
 		store,
 		consolePath,
 		oidcServer.AuthCallbackURL(),
-		provider.AuthCallbackURL(samlProvider),
+		samlProvider.AuthCallbackURL(),
 		config.ExternalSecure,
 		userAgentInterceptor,
 		op.NewIssuerInterceptor(oidcServer.IssuerFromRequest).Handler,
@@ -553,6 +554,10 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
+		return nil, err
+	}
+	// After SAML provider so that the callback endpoint can be used
+	if err := apis.RegisterService(ctx, saml_v2.CreateServer(commands, queries, samlProvider, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
