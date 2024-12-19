@@ -17,7 +17,10 @@ If you are using Zitadel, please consider adding yourself as a user with a quick
 | Minekube                | [@minekube](https://github.com/minekube)                             | Leveraging Zitadel for secure user authentication in gaming infrastructure |
 | Micromate               | [@sschoeb](https://github.com/sschoeb)                             | Using Zitadel for authentication and authorization for learners and managers in our digital learning assistant as well as in the Micromate manage platform |
 | Smat.io                 | [@smatio](https://github.com/smatio) - [@lukasver](https://github.com/lukasver) | Zitadel for authentication in cloud applications while offering B2B portfolio management solutions for professional investors |
-
+|hirschengraben           | [hirschengraben.io](hirschengraben.io)                               | Using Zitadel as IDP for a multitenant B2B dispatch app for bike messengers |
+| OpenAIP                 | [@openaip](https://github.com/openAIP)                               | Using Zitadel Cloud for everything related to user authentication. |
+| Smat.io                 | [@smatio](https://github.com/smatio) - [@lukasver](https://github.com/lukasver) | Zitadel for authentication in cloud applications while offering B2B portfolio management solutions for professional investors |
+| roclub GmbH             | [@holgerson97](https://github.com/holgerson97)                        | Roclub builds a telehealth application to enable remote MRI/CT examinations. |
 | Organization Name       | contact@example.com                                      | Description of how they use Zitadel             |
 | Individual Name         | contact@example.com                                      | Description of how they use Zitadel             |
 
