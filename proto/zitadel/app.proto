@@ -174,6 +174,11 @@ message OIDCConfig {
             description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
         }
     ];
+    LoginVersion login_version = 22 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];
 }
 
 enum OIDCResponseType {
@@ -238,4 +243,18 @@ message APIConfig {
             description: "defines how the API passes the login credentials";
         }
     ];
+}
+
+message LoginVersion {
+    oneof version {
+        LoginV1 login_v1 = 1;
+        LoginV2 login_v2 = 2;
+    }
+}
+
+message LoginV1 {}
+
+message LoginV2 {
+    // Optionally specify a base uri of the login UI. If unspecified the default URI will be used.
+    optional string base_uri = 1;
 }
