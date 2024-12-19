@@ -175,9 +175,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Initial User not supported" };
   }
 
-  // TODO add check to see if user was verified
-
-  if (!humanUser?.email?.isVerified) {
+  // add check to see if user was verified
+  if (
+    !humanUser?.email?.isVerified &&
+    process.env.EMAIL_VERIFICATION === "true"
+  ) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
     });
