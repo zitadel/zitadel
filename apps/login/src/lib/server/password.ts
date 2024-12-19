@@ -30,7 +30,7 @@ import {
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
-import { checkMFAFactors } from "../verify-helper";
+import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -135,21 +135,6 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Could not create session for user" };
   }
 
-  // if password, check if user has MFA methods
-  let authMethods;
-  if (command.checks && command.checks.password && session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes(
-      session.factors.user.id,
-    );
-    if (response.authMethodTypes && response.authMethodTypes.length) {
-      authMethods = response.authMethodTypes;
-    }
-  }
-
-  if (!authMethods || !session.factors?.user?.loginName) {
-    return { error: "Could not verify password!" };
-  }
-
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
   // check if the user has to change password first
@@ -175,28 +160,28 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Initial User not supported" };
   }
 
-  // add check to see if user was verified
-  if (
-    !humanUser?.email?.isVerified &&
-    process.env.EMAIL_VERIFICATION === "true"
-  ) {
-    const params = new URLSearchParams({
-      loginName: session.factors?.user?.loginName as string,
-    });
+  // check to see if user was verified
 
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
+  checkEmailVerification(
+    session,
+    humanUser,
+    command.organization,
+    command.authRequestId,
+  );
+
+  // if password, check if user has MFA methods
+  let authMethods;
+  if (command.checks && command.checks.password && session.factors?.user?.id) {
+    const response = await listAuthenticationMethodTypes(
+      session.factors.user.id,
+    );
+    if (response.authMethodTypes && response.authMethodTypes.length) {
+      authMethods = response.authMethodTypes;
     }
+  }
 
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ??
-          (session.factors?.user?.organizationId as string),
-      );
-    }
-
-    return { redirect: `/verify?` + params };
+  if (!authMethods) {
+    return { error: "Could not verify password!" };
   }
 
   checkMFAFactors(

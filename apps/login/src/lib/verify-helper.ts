@@ -1,6 +1,36 @@
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+
+export function checkEmailVerification(
+  session: Session,
+  humanUser?: HumanUser,
+  organization?: string,
+  authRequestId?: string,
+) {
+  if (
+    !humanUser?.email?.isVerified &&
+    process.env.EMAIL_VERIFICATION === "true"
+  ) {
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+    });
+
+    if (authRequestId) {
+      params.append("authRequestId", authRequestId);
+    }
+
+    if (organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        organization ?? (session.factors?.user?.organizationId as string),
+      );
+    }
+
+    return { redirect: `/verify?` + params };
+  }
+}
 
 export function checkMFAFactors(
   session: Session,

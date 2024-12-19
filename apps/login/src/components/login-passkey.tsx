@@ -3,7 +3,7 @@
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
 import { getNextUrl } from "@/lib/client";
 import { updateSession } from "@/lib/server/session";
-import { create } from "@zitadel/client";
+import { create, JsonObject } from "@zitadel/client";
 import {
   RequestChallengesSchema,
   UserVerificationRequirement,
@@ -118,7 +118,7 @@ export function LoginPasskey({
     return session;
   }
 
-  async function submitLogin(data: any) {
+  async function submitLogin(data: JsonObject) {
     setLoading(true);
     const response = await updateSession({
       loginName,
