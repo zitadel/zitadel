@@ -15,10 +15,13 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
+	"github.com/zitadel/logging"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
+	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
+	session_pb "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 const spCertificate = `-----BEGIN CERTIFICATE-----
@@ -158,6 +161,40 @@ func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient strin
 		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}
 	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
+}
+
+func (i *Instance) FailSAMLAuthRequest(ctx context.Context, id string, reason saml_pb.ErrorReason) *saml_pb.CreateResponseResponse {
+	resp, err := i.Client.SAMLv2.CreateResponse(ctx, &saml_pb.CreateResponseRequest{
+		SamlRequestId: id,
+		ResponseKind:  &saml_pb.CreateResponseRequest_Error{Error: &saml_pb.AuthorizationError{Error: reason}},
+	})
+	logging.OnError(err).Panic("create human user")
+	return resp
+}
+
+func (i *Instance) SuccessfulSAMLAuthRequest(ctx context.Context, userId, id string) *saml_pb.CreateResponseResponse {
+	respSession, err := i.Client.SessionV2.CreateSession(ctx, &session_pb.CreateSessionRequest{
+		Checks: &session_pb.Checks{
+			User: &session_pb.CheckUser{
+				Search: &session_pb.CheckUser_UserId{
+					UserId: userId,
+				},
+			},
+		},
+	})
+	logging.OnError(err).Panic("create session")
+
+	resp, err := i.Client.SAMLv2.CreateResponse(ctx, &saml_pb.CreateResponseRequest{
+		SamlRequestId: id,
+		ResponseKind: &saml_pb.CreateResponseRequest_Session{
+			Session: &saml_pb.Session{
+				SessionId:    respSession.GetSessionId(),
+				SessionToken: respSession.GetSessionToken(),
+			},
+		},
+	})
+	logging.OnError(err).Panic("create human user")
+	return resp
 }
 
 func (i *Instance) GetSAMLIDPMetadata() (*saml.EntityDescriptor, error) {

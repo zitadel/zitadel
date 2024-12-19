@@ -57,7 +57,8 @@ type Storage struct {
 	command    *command.Commands
 	query      *query.Queries
 
-	defaultLoginURL string
+	defaultLoginURL   string
+	defaultLoginURLv2 string
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
@@ -70,7 +71,12 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 		&serviceprovider.Config{
 			Metadata: app.SAMLConfig.Metadata,
 		},
-		p.defaultLoginURL,
+		func(id string) string {
+			if strings.HasPrefix(id, command.IDPrefixV2) {
+				return p.defaultLoginURLv2 + id
+			}
+			return p.defaultLoginURL + id
+		},
 	)
 }
 
@@ -119,7 +125,6 @@ func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.A
 		RequestID:     req.Id,
 		Binding:       protocolBinding,
 		Issuer:        req.Issuer.Text,
-		IssuerName:    req.Issuer.SPProvidedID,
 		Destination:   req.Destination,
 		LoginClient:   loginClient,
 	}

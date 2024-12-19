@@ -26,7 +26,6 @@ type AddedEvent struct {
 	RequestID     string `json:"request_id,omitempty"`
 	Binding       string `json:"binding,omitempty"`
 	Issuer        string `json:"issuer,omitempty"`
-	IssuerName    string `json:"issuer_name,omitempty"`
 	Destination   string `json:"destination,omitempty"`
 }
 
@@ -51,7 +50,6 @@ func NewAddedEvent(ctx context.Context,
 	requestID string,
 	binding string,
 	issuer string,
-	issuerName string,
 	destination string,
 ) *AddedEvent {
 	return &AddedEvent{
@@ -67,7 +65,6 @@ func NewAddedEvent(ctx context.Context,
 		RequestID:     requestID,
 		Binding:       binding,
 		Issuer:        issuer,
-		IssuerName:    issuerName,
 		Destination:   destination,
 	}
 }

@@ -33,13 +33,13 @@ func samlRequestToPb(a *query.SamlRequest) *saml_pb.SAMLRequest {
 }
 
 func (s *Server) CreateResponse(ctx context.Context, req *saml_pb.CreateResponseRequest) (*saml_pb.CreateResponseResponse, error) {
-	switch v := req.GetCallbackKind().(type) {
+	switch v := req.GetResponseKind().(type) {
 	case *saml_pb.CreateResponseRequest_Error:
 		return s.failSAMLRequest(ctx, req.GetSamlRequestId(), v.Error)
 	case *saml_pb.CreateResponseRequest_Session:
 		return s.linkSessionToSAMLRequest(ctx, req.GetSamlRequestId(), v.Session)
 	default:
-		return nil, zerrors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
+		return nil, zerrors.ThrowUnimplementedf(nil, "SAMLv2-0Tfak3fBS0", "verification oneOf %T in method CreateResponse not implemented", v)
 	}
 }
 
@@ -49,7 +49,7 @@ func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *
 		return nil, err
 	}
 	authReq := &saml.AuthRequestV2{CurrentSAMLRequest: aar}
-	url, body, err := s.idp.CreateErrorResponse(ctx, authReq, errorReasonToDomain(ae.GetError()), ae.GetErrorDescription())
+	url, body, err := s.idp.CreateErrorResponse(authReq, errorReasonToDomain(ae.GetError()), ae.GetErrorDescription())
 	if err != nil {
 		return nil, err
 	}

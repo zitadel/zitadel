@@ -3,7 +3,6 @@ package saml
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
 	"net/url"
 
 	"github.com/zitadel/saml/pkg/provider"
@@ -15,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-func (p *Provider) CreateErrorResponse(ctx context.Context, authReq models.AuthRequestInt, reason domain.SAMLErrorReason, description string) (string, string, error) {
+func (p *Provider) CreateErrorResponse(authReq models.AuthRequestInt, reason domain.SAMLErrorReason, description string) (string, string, error) {
 	resp := &provider.Response{
 		ProtocolBinding: authReq.GetBindingType(),
 		RelayState:      authReq.GetRelayState(),
@@ -23,13 +22,6 @@ func (p *Provider) CreateErrorResponse(ctx context.Context, authReq models.AuthR
 		RequestID:       authReq.GetAuthRequestID(),
 		Issuer:          authReq.GetDestination(),
 		Audience:        authReq.GetIssuer(),
-	}
-	if _, _, err := p.command.FailSAMLRequest(
-		setContextUserSystem(ctx),
-		authReq.GetID(),
-		reason,
-	); err != nil {
-		return "", "", err
 	}
 	return createResponse(p.AuthCallbackErrorResponse(resp, domain.SAMLErrorReasonToString(reason), description), authReq.GetBindingType(), authReq.GetAccessConsumerServiceURL(), resp.RelayState, resp.SigAlg, resp.Signature)
 }
@@ -79,7 +71,13 @@ func createResponse(samlResponse interface{}, binding, acs, relayState, sigAlg, 
 		if err != nil {
 			return "", "", err
 		}
-		return fmt.Sprintf("%s?%s", parsed.RawQuery, provider.BuildRedirectQuery(string(respData), relayState, sigAlg, sig)), "", nil
+		values := parsed.Query()
+		values.Add("SAMLResponse", string(respData))
+		values.Add("RelayState", relayState)
+		values.Add("SigAlg", sigAlg)
+		values.Add("Signature", sig)
+		parsed.RawQuery = values.Encode()
+		return parsed.String(), "", nil
 	}
 	return "", "", nil
 }

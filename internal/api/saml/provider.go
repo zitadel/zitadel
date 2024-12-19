@@ -24,7 +24,8 @@ const (
 )
 
 type Config struct {
-	ProviderConfig *provider.Config
+	ProviderConfig    *provider.Config
+	DefaultLoginURLV2 string
 }
 
 type Provider struct {
@@ -56,6 +57,8 @@ func NewProvider(
 		certEncAlg,
 		es,
 		projections,
+		fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
+		conf.DefaultLoginURLV2,
 	)
 	if err != nil {
 		return nil, err
@@ -101,16 +104,19 @@ func newStorage(
 	certEncAlg crypto.EncryptionAlgorithm,
 	es *eventstore.Eventstore,
 	db *database.DB,
+	defaultLoginURL string,
+	defaultLoginURLV2 string,
 ) (*Storage, error) {
 	return &Storage{
-		encAlg:          encAlg,
-		certEncAlg:      certEncAlg,
-		locker:          crdb.NewLocker(db.DB, locksTable, signingKey),
-		eventstore:      es,
-		repo:            repo,
-		command:         command,
-		query:           query,
-		defaultLoginURL: fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
+		encAlg:            encAlg,
+		certEncAlg:        certEncAlg,
+		locker:            crdb.NewLocker(db.DB, locksTable, signingKey),
+		eventstore:        es,
+		repo:              repo,
+		command:           command,
+		query:             query,
+		defaultLoginURL:   defaultLoginURL,
+		defaultLoginURLv2: defaultLoginURLV2,
 	}, nil
 }
 

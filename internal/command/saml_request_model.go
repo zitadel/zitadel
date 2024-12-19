@@ -22,7 +22,6 @@ type SAMLRequestWriteModel struct {
 	RequestID     string
 	Binding       string
 	Issuer        string
-	IssuerName    string
 	Destination   string
 
 	SessionID        string
@@ -52,7 +51,6 @@ func (m *SAMLRequestWriteModel) Reduce() error {
 			m.RequestID = e.RequestID
 			m.Binding = e.Binding
 			m.Issuer = e.Issuer
-			m.IssuerName = e.IssuerName
 			m.Destination = e.Destination
 			m.SAMLRequestState = domain.SAMLRequestStateAdded
 		case *samlrequest.SessionLinkedEvent:

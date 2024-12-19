@@ -92,7 +92,8 @@ func (wm *SAMLSessionWriteModel) reduceAdded(e *samlsession.AddedEvent) {
 
 func (wm *SAMLSessionWriteModel) reduceSAMLResponseAdded(e *samlsession.SAMLResponseAddedEvent) {
 	wm.SAMLResponseID = e.ID
-	wm.SAMLResponseCreation = e.CreationDate().Add(e.Lifetime)
+	wm.SAMLResponseCreation = e.CreationDate()
+	wm.SAMLResponseExpiration = e.CreationDate().Add(e.Lifetime)
 }
 
 func (wm *SAMLSessionWriteModel) reduceSAMLResponseRevoked(e *samlsession.SAMLResponseRevokedEvent) {

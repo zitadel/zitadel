@@ -174,7 +174,7 @@ message CreateResponseRequest {
     }
   ];
 
-  oneof callback_kind {
+  oneof response_kind {
     option (validate.required) = true;
     Session session = 2;
     // Set this field when the authorization flow failed. It creates a response depending on the SP, with the error details set.
@@ -213,9 +213,9 @@ message CreateResponseResponse {
   ];
   // Binding is defined through the request, what the IDP is able to use and what bindings are available for the SP.
   oneof binding {
-    // Set if the binding is Redirect-Binding, where the application can directly be redirected to the URL.
+    // Set if the binding is Redirect-Binding, where the user can directly be redirected to the application, using a \"302 FOUND\" status to the URL.
     RedirectResponse redirect = 3;
-    // Set if the binding is POST-Binding, where the application gets called per method POST with the SAMLResponse and RelayState in the from-body.
+    // Set if the binding is POST-Binding, where the application expects to be called per HTTP POST with the SAMLResponse and RelayState in the form body.
     PostResponse post = 4;
   }
 }

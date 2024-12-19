@@ -21,7 +21,6 @@ type SAMLRequest struct {
 	RequestID     string
 	Binding       string
 	Issuer        string
-	IssuerName    string
 	Destination   string
 }
 
@@ -56,7 +55,6 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 		samlRequest.RequestID,
 		samlRequest.Binding,
 		samlRequest.Issuer,
-		samlRequest.IssuerName,
 		samlRequest.Destination,
 	))
 	if err != nil {
@@ -133,7 +131,6 @@ func samlRequestWriteModelToCurrentSAMLRequest(writeModel *SAMLRequestWriteModel
 			RequestID:     writeModel.RequestID,
 			Binding:       writeModel.Binding,
 			Issuer:        writeModel.Issuer,
-			IssuerName:    writeModel.IssuerName,
 			Destination:   writeModel.Destination,
 		},
 		SessionID:   writeModel.SessionID,

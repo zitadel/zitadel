@@ -157,7 +157,7 @@ func TestServer_CreateResponse(t *testing.T) {
 			name: "Not found",
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: "123",
-				CallbackKind: &saml_pb.CreateResponseRequest_Session{
+				ResponseKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
@@ -174,7 +174,7 @@ func TestServer_CreateResponse(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateResponseRequest_Session{
+				ResponseKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    "foo",
 						SessionToken: "bar",
@@ -191,7 +191,7 @@ func TestServer_CreateResponse(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateResponseRequest_Session{
+				ResponseKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: "bar",
@@ -208,7 +208,7 @@ func TestServer_CreateResponse(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateResponseRequest_Error{
+				ResponseKind: &saml_pb.CreateResponseRequest_Error{
 					Error: &saml_pb.AuthorizationError{
 						Error:            saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED,
 						ErrorDescription: gu.Ptr("nope"),
@@ -229,6 +229,24 @@ func TestServer_CreateResponse(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "fail callback, post, already failed",
+			req: &saml_pb.CreateResponseRequest{
+				SamlRequestId: func() string {
+					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					require.NoError(t, err)
+					Instance.FailSAMLAuthRequest(CTX, authRequestID, saml_pb.ErrorReason_ERROR_REASON_AUTH_N_FAILED)
+					return authRequestID
+				}(),
+				ResponseKind: &saml_pb.CreateResponseRequest_Error{
+					Error: &saml_pb.AuthorizationError{
+						Error:            saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED,
+						ErrorDescription: gu.Ptr("nope"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "fail callback, redirect",
 			req: &saml_pb.CreateResponseRequest{
 				SamlRequestId: func() string {
@@ -236,7 +254,7 @@ func TestServer_CreateResponse(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateResponseRequest_Error{
+				ResponseKind: &saml_pb.CreateResponseRequest_Error{
 					Error: &saml_pb.AuthorizationError{
 						Error:            saml_pb.ErrorReason_ERROR_REASON_REQUEST_DENIED,
 						ErrorDescription: gu.Ptr("nope"),
@@ -244,7 +262,7 @@ func TestServer_CreateResponse(t *testing.T) {
 				},
 			},
 			want: &saml_pb.CreateResponseResponse{
-				Url:     `https:\/\/` + rootURLRedirect + `\/saml\/acs\?SAMLResponse=(.*)&RelayState=(.*)`,
+				Url:     `https:\/\/` + rootURLRedirect + `\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)`,
 				Binding: &saml_pb.CreateResponseResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
@@ -261,7 +279,7 @@ func TestServer_CreateResponse(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateResponseRequest_Session{
+				ResponseKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
@@ -269,7 +287,7 @@ func TestServer_CreateResponse(t *testing.T) {
 				},
 			},
 			want: &saml_pb.CreateResponseResponse{
-				Url:     `https:\/\/` + rootURLRedirect + `\/saml\/acs\?SAMLResponse=(.*)&RelayState=(.*)&Signature=(.*)&SigAlg=(.*)`,
+				Url:     `https:\/\/` + rootURLRedirect + `\/saml\/acs\?RelayState=(.*)&SAMLResponse=(.*)&SigAlg=(.*)&Signature=(.*)`,
 				Binding: &saml_pb.CreateResponseResponse_Redirect{Redirect: &saml_pb.RedirectResponse{}},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
@@ -286,7 +304,7 @@ func TestServer_CreateResponse(t *testing.T) {
 					require.NoError(t, err)
 					return authRequestID
 				}(),
-				CallbackKind: &saml_pb.CreateResponseRequest_Session{
+				ResponseKind: &saml_pb.CreateResponseRequest_Session{
 					Session: &saml_pb.Session{
 						SessionId:    sessionResp.GetSessionId(),
 						SessionToken: sessionResp.GetSessionToken(),
@@ -305,6 +323,24 @@ func TestServer_CreateResponse(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		{
+			name: "callback, post",
+			req: &saml_pb.CreateResponseRequest{
+				SamlRequestId: func() string {
+					authRequestID, err := Instance.CreateSAMLAuthRequest(spMiddlewarePost, Instance.Users[integration.UserTypeOrgOwner].ID, acsPost, gofakeit.BitcoinAddress(), saml.HTTPPostBinding)
+					require.NoError(t, err)
+					Instance.SuccessfulSAMLAuthRequest(CTX, Instance.Users[integration.UserTypeOrgOwner].ID, authRequestID)
+					return authRequestID
+				}(),
+				ResponseKind: &saml_pb.CreateResponseRequest_Session{
+					Session: &saml_pb.Session{
+						SessionId:    sessionResp.GetSessionId(),
+						SessionToken: sessionResp.GetSessionToken(),
+					},
+				},
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
