@@ -18,17 +18,19 @@ type Inputs = {
 type Props = {
   userId: string;
   loginName?: string;
+  organization?: string;
   code?: string;
   isInvite: boolean;
-  params: URLSearchParams;
+  authRequestId?: string;
 };
 
 export function VerifyForm({
   userId,
   loginName,
+  organization,
+  authRequestId,
   code,
   isInvite,
-  params,
 }: Props) {
   const t = useTranslations("verify");
 
@@ -74,6 +76,9 @@ export function VerifyForm({
         code: value.code,
         userId,
         isInvite: isInvite,
+        loginName: loginName,
+        organization: organization,
+        authRequestId: authRequestId,
       })
         .catch(() => {
           setError("Could not verify user");

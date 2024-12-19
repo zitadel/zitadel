@@ -88,12 +88,21 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </>
         )}
 
-        {user && (
+        {sessionFactors ? (
           <UserAvatar
-            loginName={user.preferredLoginName}
-            displayName={human?.profile?.displayName}
-            showDropdown={false}
-          />
+            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            displayName={sessionFactors.factors?.user?.displayName}
+            showDropdown
+            searchParams={searchParams}
+          ></UserAvatar>
+        ) : (
+          user && (
+            <UserAvatar
+              loginName={user.preferredLoginName}
+              displayName={human?.profile?.displayName}
+              showDropdown={false}
+            />
+          )
         )}
 
         {id &&
@@ -110,10 +119,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
             // check if auth methods are set
             <VerifyForm
               loginName={loginName}
+              organization={organization}
               userId={id}
               code={code}
               isInvite={invite === "true"}
-              params={params}
+              authRequestId={authRequestId}
             />
           ))}
       </div>

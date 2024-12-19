@@ -350,8 +350,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       if (command.authRequestId) {
         params.set("authRequestId", command.authRequestId);
       }
+
       if (command.loginName) {
-        params.set("loginName", command.loginName);
+        params.set("email", command.loginName);
       }
 
       return { redirect: "/register?" + params };
