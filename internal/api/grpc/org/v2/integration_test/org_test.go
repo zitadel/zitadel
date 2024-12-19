@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		OwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		User = Instance.CreateHumanUser(CTX)
 		return m.Run()
 	}())

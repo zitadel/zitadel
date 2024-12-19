@@ -2537,6 +2537,10 @@
       "CLIENTSECRETREGENERATED": "segredo do cliente gerado.",
       "DELETED": "Aplicativo excluído.",
       "CONFIGCHANGED": "Alterações detectadas!"
+    },
+    "LOGINV2": {
+      "USEV2": "Usar a nova interface de usuário de login",
+      "BASEURL": "URL base personalizado para a nova interface de usuário de login"
     }
   },
   "GENDERS": {

@@ -25,6 +25,7 @@ var iamRoles = []string{
 	"IAM_USER_MANAGER",
 	"IAM_ADMIN_IMPERSONATOR",
 	"IAM_END_USER_IMPERSONATOR",
+	"IAM_LOGIN_CLIENT",
 }
 
 func TestServer_ListIAMMemberRoles(t *testing.T) {

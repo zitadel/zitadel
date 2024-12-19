@@ -168,7 +168,7 @@ service UserService {
 
   // Search Users
   //
-  // Search for users. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination..
+  // Search for users. By default, we will return all users of your instance that you have permission to read. Make sure to include a limit and sorting for pagination.
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
       post: "/v2/users"
@@ -1091,6 +1091,7 @@ service UserService {
   rpc CreateInviteCode (CreateInviteCodeRequest) returns (CreateInviteCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/invite_code"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1140,6 +1141,7 @@ service UserService {
   rpc VerifyInviteCode (VerifyInviteCodeRequest) returns (VerifyInviteCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/invite_code/verify"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
