@@ -283,6 +283,7 @@ func (p *projectGrantProjection) reduceOwnerCorrected(event eventstore.Event) (*
 		[]handler.Condition{
 			handler.NewCond(ProjectGrantColumnInstanceID, event.Aggregate().InstanceID),
 			handler.NewCond(ProjectGrantColumnProjectID, event.Aggregate().ID),
+			handler.NewUnequalCond(ProjectGrantColumnResourceOwner, event.Aggregate().ResourceOwner),
 		},
 	), nil
 }
