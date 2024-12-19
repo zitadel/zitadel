@@ -563,6 +563,7 @@ OIDC:
   DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
+  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
   ProviderConfig:
     MetadataConfig:
       Path: "/metadata" # ZITADEL_SAML_PROVIDERCONFIG_METADATACONFIG_PATH

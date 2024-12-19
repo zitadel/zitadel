@@ -549,6 +549,12 @@ Errors:
       Invalid: Token är ogiltig
       Expired: Token har gått ut
     InvalidClient: Token utfärdades inte för denna klient
+  SAMLRequest:
+    AlreadyExists: SAMLRequest finns redan
+    NotExisting: SAMLRequest finns inte
+    WrongLoginClient: SAMLRequest skapad av annan inloggningsklient
+  SAMLSession:
+    InvalidClient: SAMLResponse utfärdades inte för den här klienten
   Feature:
     NotExisting: Funktionen existerar inte
     TypeNotSupported: Funktionstypen stöds inte
@@ -623,6 +629,8 @@ AggregateTypes:
   system: System
   session: Session
   web_key: Webbnyckel
+  saml_request: SAML-förfrågan
+  saml_session: SAML-session
 
 EventTypes:
   execution:
