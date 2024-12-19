@@ -30,6 +30,7 @@ message SearchQuery {
         NotQuery not_query = 13;
         InUserEmailsQuery in_user_emails_query = 14;
         OrganizationIdQuery organization_id_query = 15;
+        PhoneQuery phone_query = 16;
     }
 }
 
@@ -174,6 +175,26 @@ message EmailQuery {
             description: "email address of the user"
             max_length: 200;
             example: "\"gigi@zitadel.com\"";
+        }
+    ];
+    zitadel.object.v2.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+// Query for users with a specific phone.
+message PhoneQuery {
+    string number = 1 [
+        (validate.rules).string = {max_len: 20},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Phone number of the user"
+            min_length: 1;
+            max_length: 20;
+            example: "\"+41791234567\"";
         }
     ];
     zitadel.object.v2.TextQueryMethod method = 2 [
