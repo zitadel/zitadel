@@ -1,13 +1,9 @@
 "use server";
 
-import {
-  createSessionForIdpAndUpdateCookie,
-  setSessionAndUpdateCookie,
-} from "@/lib/server/cookie";
+import { setSessionAndUpdateCookie } from "@/lib/server/cookie";
 import {
   deleteSession,
   getLoginSettings,
-  getUserByID,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import { Duration } from "@zitadel/client";
@@ -22,81 +18,6 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
-import { checkPasswordChangeRequired } from "../verify-helper";
-
-type CreateNewSessionCommand = {
-  userId: string;
-  idpIntent: {
-    idpIntentId: string;
-    idpIntentToken: string;
-  };
-  loginName?: string;
-  password?: string;
-  authRequestId?: string;
-};
-
-export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
-  const { userId, idpIntent, authRequestId } = options;
-
-  if (!userId || !idpIntent) {
-    throw new Error("No userId or loginName provided");
-  }
-
-  const userResponse = await getUserByID(userId);
-
-  if (!userResponse || !userResponse.user) {
-    return { error: "Could not find user" };
-  }
-
-  const loginSettings = await getLoginSettings(
-    userResponse.user.details?.resourceOwner,
-  );
-
-  const session = await createSessionForIdpAndUpdateCookie(
-    userId,
-    idpIntent,
-    authRequestId,
-    loginSettings?.externalLoginCheckLifetime,
-  );
-
-  if (!session || !session.factors?.user) {
-    return { error: "Could not create session" };
-  }
-
-  const humanUser =
-    userResponse.user.type.case === "human"
-      ? userResponse.user.type.value
-      : undefined;
-
-  // check if the user has to change password first
-  checkPasswordChangeRequired(
-    session,
-    humanUser,
-    session.factors.user.organizationId,
-    authRequestId,
-  );
-
-  // TODO: check if user has MFA methods
-  // checkMFAFactors(session, loginSettings, authMethods, organization, authRequestId);
-
-  const url = await getNextUrl(
-    authRequestId && session.id
-      ? {
-          sessionId: session.id,
-          authRequestId: authRequestId,
-          organization: session.factors.user.organizationId,
-        }
-      : {
-          loginName: session.factors.user.loginName,
-          organization: session.factors.user.organizationId,
-        },
-    loginSettings?.defaultRedirectUri,
-  );
-
-  if (url) {
-    return { redirect: url };
-  }
-}
 
 export async function continueWithSession({
   authRequestId,

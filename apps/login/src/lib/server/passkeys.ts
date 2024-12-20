@@ -175,7 +175,16 @@ export async function sendPasskey(command: SendPasskeyCommand) {
       ? userResponse.user.type.value
       : undefined;
 
-  checkEmailVerification(session, humanUser, organization, authRequestId);
+  const emailVerificationCheck = checkEmailVerification(
+    session,
+    humanUser,
+    organization,
+    authRequestId,
+  );
+
+  if (emailVerificationCheck?.redirect) {
+    return emailVerificationCheck;
+  }
 
   const url =
     authRequestId && session.id

@@ -142,12 +142,16 @@ export async function sendPassword(command: UpdateSessionCommand) {
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
   // check if the user has to change password first
-  checkPasswordChangeRequired(
+  const passwordChangedCheck = checkPasswordChangeRequired(
     session,
     humanUser,
     command.organization,
     command.authRequestId,
   );
+
+  if (passwordChangedCheck?.redirect) {
+    return passwordChangedCheck;
+  }
 
   // throw error if user is in initial state here and do not continue
   if (user.state === UserState.INITIAL) {
@@ -155,12 +159,16 @@ export async function sendPassword(command: UpdateSessionCommand) {
   }
 
   // check to see if user was verified
-  checkEmailVerification(
+  const emailVerificationCheck = checkEmailVerification(
     session,
     humanUser,
     command.organization,
     command.authRequestId,
   );
+
+  if (emailVerificationCheck?.redirect) {
+    return emailVerificationCheck;
+  }
 
   // if password, check if user has MFA methods
   let authMethods;

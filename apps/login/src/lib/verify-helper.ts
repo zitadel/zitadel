@@ -35,6 +35,11 @@ export function checkEmailVerification(
   organization?: string,
   authRequestId?: string,
 ) {
+  console.log(
+    humanUser?.email,
+    process.env.EMAIL_VERIFICATION,
+    process.env.EMAIL_VERIFICATION === "true",
+  );
   if (
     !humanUser?.email?.isVerified &&
     process.env.EMAIL_VERIFICATION === "true"
