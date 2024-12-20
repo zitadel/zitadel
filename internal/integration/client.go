@@ -8,6 +8,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
@@ -235,6 +236,15 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 		},
 	})
 	logging.OnError(err).Panic("create org")
+	// wait until organization is projected, as organization is used as resourceowner in the permission handling
+	if err := await(func() error {
+		_, err := i.Client.Admin.GetOrgByID(ctx, &admin.GetOrgByIDRequest{
+			Id: resp.GetOrganizationId(),
+		})
+		return err
+	}); err != nil {
+		logging.OnError(err).Panic("await org")
+	}
 	return resp
 }
 
@@ -639,6 +649,19 @@ func (i *Instance) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx c
 		},
 	})
 	require.NoError(t, err)
+
+	retryDuration, tick := WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t,
+		func(tt *assert.CollectT) {
+			resp, err := i.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{
+				SessionId:    createResp.GetSessionId(),
+				SessionToken: gu.Ptr(updateResp.GetSessionToken()),
+			})
+			assert.NoError(tt, err)
+			assert.Equal(tt, createResp.GetSessionId(), resp.GetSession().GetId())
+		}, retryDuration, tick, "awaiting successful usage of token failed",
+	)
+
 	return createResp.GetSessionId(), updateResp.GetSessionToken(),
 		createResp.GetDetails().GetChangeDate().AsTime(), updateResp.GetDetails().GetChangeDate().AsTime()
 }
