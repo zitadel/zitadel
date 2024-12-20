@@ -3,6 +3,7 @@
 package user_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -245,6 +246,178 @@ func TestServer_ResendEmailCode(t *testing.T) {
 			} else {
 				assert.Empty(t, got.GetVerificationCode())
 			}
+		})
+	}
+}
+
+func TestServer_SendEmailCode(t *testing.T) {
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email()).GetUserId()
+
+	tests := []struct {
+		name    string
+		req     *user.SendEmailCodeRequest
+		want    *user.SendEmailCodeResponse
+		wantErr bool
+	}{
+		{
+			name: "user not existing",
+			req: &user.SendEmailCodeRequest{
+				UserId: "xxx",
+			},
+			wantErr: true,
+		},
+		{
+			name: "user no code",
+			req: &user.SendEmailCodeRequest{
+				UserId: verifiedUserID,
+			},
+			want: &user.SendEmailCodeResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "resend",
+			req: &user.SendEmailCodeRequest{
+				UserId: userID,
+			},
+			want: &user.SendEmailCodeResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "custom url template",
+			req: &user.SendEmailCodeRequest{
+				UserId: userID,
+				Verification: &user.SendEmailCodeRequest_SendCode{
+					SendCode: &user.SendEmailVerificationCode{
+						UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+					},
+				},
+			},
+			want: &user.SendEmailCodeResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+		},
+		{
+			name: "template error",
+			req: &user.SendEmailCodeRequest{
+				UserId: userID,
+				Verification: &user.SendEmailCodeRequest_SendCode{
+					SendCode: &user.SendEmailVerificationCode{
+						UrlTemplate: gu.Ptr("{{"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "return code",
+			req: &user.SendEmailCodeRequest{
+				UserId: userID,
+				Verification: &user.SendEmailCodeRequest_ReturnCode{
+					ReturnCode: &user.ReturnEmailVerificationCode{},
+				},
+			},
+			want: &user.SendEmailCodeResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+				VerificationCode: gu.Ptr("xxx"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.SendEmailCode(CTX, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			integration.AssertDetails(t, tt.want, got)
+			if tt.want.GetVerificationCode() != "" {
+				assert.NotEmpty(t, got.GetVerificationCode())
+			} else {
+				assert.Empty(t, got.GetVerificationCode())
+			}
+		})
+	}
+}
+
+func TestServer_HasEmailCode(t *testing.T) {
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email()).GetUserId()
+
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		req     *user.HasEmailCodeRequest
+		want    *user.HasEmailCodeResponse
+		wantErr bool
+	}{
+		{
+			name: "user not existing",
+			ctx:  CTX,
+			req: &user.HasEmailCodeRequest{
+				UserId: "xxx",
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission",
+			ctx:  UserCTX,
+			req: &user.HasEmailCodeRequest{
+				UserId: verifiedUserID,
+			},
+			wantErr: true,
+		},
+		{
+			name: "user no code",
+			ctx:  CTX,
+			req: &user.HasEmailCodeRequest{
+				UserId: verifiedUserID,
+			},
+			want: &user.HasEmailCodeResponse{
+				Code: false,
+			},
+		},
+		{
+			name: "user code",
+			ctx:  CTX,
+			req: &user.HasEmailCodeRequest{
+				UserId: userID,
+			},
+			want: &user.HasEmailCodeResponse{
+				Code: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.HasEmailCode(tt.ctx, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			assert.Equal(t, tt.want.GetCode(), got.GetCode())
 		})
 	}
 }
