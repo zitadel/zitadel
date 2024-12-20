@@ -93,6 +93,26 @@ async function linkingSuccess(
   );
 }
 
+async function linkingFailed(branding?: BrandingSettings) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "idp" });
+
+  return (
+    <DynamicTheme branding={branding}>
+      <div className="flex flex-col items-center space-y-4">
+        <h1>{t("linkingError.title")}</h1>
+        <div className="w-full">
+          {
+            <Alert type={AlertType.ALERT}>
+              {t("linkingError.description")}
+            </Alert>
+          }
+        </div>
+      </div>
+    </DynamicTheme>
+  );
+}
+
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
   params: Promise<{ provider: string }>;
@@ -174,20 +194,7 @@ export default async function Page(props: {
         },
         foundUser.userId,
       ).catch((error) => {
-        return (
-          <DynamicTheme branding={branding}>
-            <div className="flex flex-col items-center space-y-4">
-              <h1>{t("linkingError.title")}</h1>
-              <div className="w-full">
-                {
-                  <Alert type={AlertType.ALERT}>
-                    {t("linkingError.description")}
-                  </Alert>
-                }
-              </div>
-            </div>
-          </DynamicTheme>
-        );
+        return linkingFailed(branding);
       });
 
       if (idpLink) {
@@ -201,7 +208,8 @@ export default async function Page(props: {
     }
   }
 
-  if (options?.isCreationAllowed && options.isAutoCreation) {
+  // if link === true, do not create user
+  if (options?.isCreationAllowed && options.isAutoCreation && !link) {
     let orgToRegisterOn: string | undefined = organization;
 
     let userData: AddHumanUserRequest =
@@ -254,6 +262,10 @@ export default async function Page(props: {
         </DynamicTheme>
       );
     }
+  }
+
+  if (link) {
+    return linkingFailed(branding);
   }
 
   // return login failed if no linking or creation is allowed and no user was found

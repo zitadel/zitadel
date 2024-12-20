@@ -70,11 +70,7 @@ export function SignInWithIdp({
   const renderIDPButton = (idp: IdentityProvider) => {
     const { id, name, type } = idp;
     const onClick = () => startFlow(id, idpTypeToSlug(type));
-    /* - TODO: Implement after https://github.com/zitadel/zitadel/issues/8981  */
 
-    //   .filter((idp) =>
-    //     linkOnly ? idp.config?.options.isLinkingAllowed : true,
-    //   )
     const components: Partial<
       Record<
         IdentityProviderType,
