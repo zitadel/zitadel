@@ -1,7 +1,7 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import { getNextUrl } from "@/lib/client";
+import { sendPasskey } from "@/lib/server/passkeys";
 import { updateSession } from "@/lib/server/session";
 import { create, JsonObject } from "@zitadel/client";
 import {
@@ -120,7 +120,7 @@ export function LoginPasskey({
 
   async function submitLogin(data: JsonObject) {
     setLoading(true);
-    const response = await updateSession({
+    const response = await sendPasskey({
       loginName,
       sessionId,
       organization,
@@ -142,7 +142,9 @@ export function LoginPasskey({
       return;
     }
 
-    return response;
+    if (response && "redirect" in response && response.redirect) {
+      return router.push(response.redirect);
+    }
   }
 
   async function submitLoginAndContinue(
@@ -192,31 +194,7 @@ export function LoginPasskey({
           },
         };
 
-        return submitLogin(data).then(async (resp) => {
-          const url =
-            authRequestId && resp?.sessionId
-              ? await getNextUrl(
-                  {
-                    sessionId: resp.sessionId,
-                    authRequestId: authRequestId,
-                    organization: organization,
-                  },
-                  loginSettings?.defaultRedirectUri,
-                )
-              : resp?.factors?.user?.loginName
-                ? await getNextUrl(
-                    {
-                      loginName: resp.factors.user.loginName,
-                      organization: organization,
-                    },
-                    loginSettings?.defaultRedirectUri,
-                  )
-                : null;
-
-          if (url) {
-            router.push(url);
-          }
-        });
+        return submitLogin(data);
       })
       .finally(() => {
         setLoading(false);

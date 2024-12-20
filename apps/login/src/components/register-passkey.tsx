@@ -1,7 +1,10 @@
 "use client";
 
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/helpers/base64";
-import { registerPasskeyLink, verifyPasskey } from "@/lib/server/passkeys";
+import {
+  registerPasskeyLink,
+  verifyPasskeyRegistration,
+} from "@/lib/server/passkeys";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -45,7 +48,7 @@ export function RegisterPasskey({
     sessionId: string,
   ) {
     setLoading(true);
-    const response = await verifyPasskey({
+    const response = await verifyPasskeyRegistration({
       passkeyId,
       passkeyName,
       publicKeyCredential,

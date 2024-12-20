@@ -3,6 +3,32 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
+export function checkPasswordChangeRequired(
+  session: Session,
+  humanUser: HumanUser | undefined,
+  organization?: string,
+  authRequestId?: string,
+) {
+  if (humanUser?.passwordChangeRequired) {
+    const params = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+    });
+
+    if (organization || session.factors?.user?.organizationId) {
+      params.append(
+        "organization",
+        session.factors?.user?.organizationId as string,
+      );
+    }
+
+    if (authRequestId) {
+      params.append("authRequestId", authRequestId);
+    }
+
+    return { redirect: "/password/change?" + params };
+  }
+}
+
 export function checkEmailVerification(
   session: Session,
   humanUser?: HumanUser,

@@ -22,6 +22,7 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
+import { checkPasswordChangeRequired } from "../verify-helper";
 
 type CreateNewSessionCommand = {
   userId: string;
@@ -41,13 +42,15 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
     throw new Error("No userId or loginName provided");
   }
 
-  const user = await getUserByID(userId);
+  const userResponse = await getUserByID(userId);
 
-  if (!user) {
+  if (!userResponse || !userResponse.user) {
     return { error: "Could not find user" };
   }
 
-  const loginSettings = await getLoginSettings(user.details?.resourceOwner);
+  const loginSettings = await getLoginSettings(
+    userResponse.user.details?.resourceOwner,
+  );
 
   const session = await createSessionForIdpAndUpdateCookie(
     userId,
@@ -59,6 +62,22 @@ export async function createNewSessionForIdp(options: CreateNewSessionCommand) {
   if (!session || !session.factors?.user) {
     return { error: "Could not create session" };
   }
+
+  const humanUser =
+    userResponse.user.type.case === "human"
+      ? userResponse.user.type.value
+      : undefined;
+
+  // check if the user has to change password first
+  checkPasswordChangeRequired(
+    session,
+    humanUser,
+    session.factors.user.organizationId,
+    authRequestId,
+  );
+
+  // TODO: check if user has MFA methods
+  // checkMFAFactors(session, loginSettings, authMethods, organization, authRequestId);
 
   const url = await getNextUrl(
     authRequestId && session.id

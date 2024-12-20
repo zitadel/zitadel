@@ -30,7 +30,11 @@ import {
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
-import { checkEmailVerification, checkMFAFactors } from "../verify-helper";
+import {
+  checkEmailVerification,
+  checkMFAFactors,
+  checkPasswordChangeRequired,
+} from "../verify-helper";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -138,30 +142,19 @@ export async function sendPassword(command: UpdateSessionCommand) {
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
   // check if the user has to change password first
-  if (humanUser?.passwordChangeRequired) {
-    const params = new URLSearchParams({
-      loginName: session.factors?.user?.loginName,
-    });
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append("organization", session.factors?.user?.organizationId);
-    }
-
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    return { redirect: "/password/change?" + params };
-  }
+  checkPasswordChangeRequired(
+    session,
+    humanUser,
+    command.organization,
+    command.authRequestId,
+  );
 
   // throw error if user is in initial state here and do not continue
-
   if (user.state === UserState.INITIAL) {
     return { error: "Initial User not supported" };
   }
 
   // check to see if user was verified
-
   checkEmailVerification(
     session,
     humanUser,
