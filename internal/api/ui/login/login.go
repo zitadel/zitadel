@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -15,6 +16,8 @@ import (
 	_ "github.com/zitadel/zitadel/internal/api/ui/login/statik"
 	auth_repository "github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/internal/cache/connector"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -38,6 +41,7 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
+	caches              *Caches
 }
 
 type Config struct {
@@ -74,6 +78,7 @@ func CreateLogin(config Config,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
+	cacheConnectors connector.Connectors,
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
@@ -94,6 +99,12 @@ func CreateLogin(config Config,
 	login.router = CreateRouter(login, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
 	login.renderer = CreateRenderer(HandlerPrefix, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
+
+	var err error
+	login.caches, err = startCaches(context.Background(), cacheConnectors)
+	if err != nil {
+		return nil, err
+	}
 	return login, nil
 }
 
@@ -200,4 +211,42 @@ func setUserContext(ctx context.Context, userID, resourceOwner string) context.C
 
 func (l *Login) baseURL(ctx context.Context) string {
 	return http_utils.DomainContext(ctx).Origin() + HandlerPrefix
+}
+
+type Caches struct {
+	idpFormCallbacks cache.Cache[idpFormCallbackIndex, string, *idpFormCallback]
+}
+
+func startCaches(background context.Context, connectors connector.Connectors) (_ *Caches, err error) {
+	caches := new(Caches)
+	caches.idpFormCallbacks, err = connector.StartCache[idpFormCallbackIndex, string, *idpFormCallback](background, []idpFormCallbackIndex{idpFormCallbackIndexRequestID}, cache.PurposeIdPFormCallback, connectors.Config.IdPFormCallbacks, connectors)
+	if err != nil {
+		return nil, err
+	}
+	return caches, nil
+}
+
+type idpFormCallbackIndex int
+
+const (
+	idpFormCallbackIndexUnspecified idpFormCallbackIndex = iota
+	idpFormCallbackIndexRequestID
+)
+
+type idpFormCallback struct {
+	InstanceID string
+	State      string
+	Form       url.Values
+}
+
+// Keys implements cache.Entry
+func (c *idpFormCallback) Keys(i idpFormCallbackIndex) []string {
+	if i == idpFormCallbackIndexRequestID {
+		return []string{idpFormCallbackKey(c.InstanceID, c.State)}
+	}
+	return nil
+}
+
+func idpFormCallbackKey(instanceID, state string) string {
+	return instanceID + "-" + state
 }
