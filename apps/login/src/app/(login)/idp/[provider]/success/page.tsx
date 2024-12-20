@@ -1,6 +1,9 @@
-import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { IdpSignin } from "@/components/idp-signin";
+import { linkingFailed } from "@/components/idps/pages/linking-failed";
+import { linkingSuccess } from "@/components/idps/pages/linking-success";
+import { loginFailed } from "@/components/idps/pages/login-failed";
+import { loginSuccess } from "@/components/idps/pages/login-success";
 import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
 import {
   addHuman,
@@ -15,7 +18,6 @@ import {
 import { create } from "@zitadel/client";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
 import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import {
   AddHumanUserRequest,
   AddHumanUserRequestSchema,
@@ -23,95 +25,6 @@ import {
 import { getLocale, getTranslations } from "next-intl/server";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
-
-async function loginFailed(branding?: BrandingSettings, error: string = "") {
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "idp" });
-
-  return (
-    <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>{t("loginError.title")}</h1>
-        <p className="ztdl-p">{t("loginError.description")}</p>
-        {error && (
-          <div className="w-full">
-            {<Alert type={AlertType.ALERT}>{error}</Alert>}
-          </div>
-        )}
-      </div>
-    </DynamicTheme>
-  );
-}
-
-async function loginSuccess(
-  userId: string,
-  idpIntent: { idpIntentId: string; idpIntentToken: string },
-  authRequestId?: string,
-  branding?: BrandingSettings,
-) {
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "idp" });
-
-  return (
-    <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>{t("loginSuccess.title")}</h1>
-        <p className="ztdl-p">{t("loginSuccess.description")}</p>
-
-        <IdpSignin
-          userId={userId}
-          idpIntent={idpIntent}
-          authRequestId={authRequestId}
-        />
-      </div>
-    </DynamicTheme>
-  );
-}
-
-async function linkingSuccess(
-  userId: string,
-  idpIntent: { idpIntentId: string; idpIntentToken: string },
-  authRequestId?: string,
-  branding?: BrandingSettings,
-) {
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "idp" });
-
-  return (
-    <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>{t("linkingSuccess.title")}</h1>
-        <p className="ztdl-p">{t("linkingSuccess.description")}</p>
-
-        <IdpSignin
-          userId={userId}
-          idpIntent={idpIntent}
-          authRequestId={authRequestId}
-        />
-      </div>
-    </DynamicTheme>
-  );
-}
-
-async function linkingFailed(branding?: BrandingSettings) {
-  const locale = getLocale();
-  const t = await getTranslations({ locale, namespace: "idp" });
-
-  return (
-    <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>{t("linkingError.title")}</h1>
-        <div className="w-full">
-          {
-            <Alert type={AlertType.ALERT}>
-              {t("linkingError.description")}
-            </Alert>
-          }
-        </div>
-      </div>
-    </DynamicTheme>
-  );
-}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -168,9 +81,13 @@ export default async function Page(props: {
         userName: idpInformation.userName,
       },
       userId,
-    );
+    ).catch((error) => {
+      console.error(error);
+      return linkingFailed(branding);
+    });
 
     if (!idpLink) {
+      console.log("linking failed");
       return linkingFailed(branding);
     } else {
       return linkingSuccess(
@@ -217,10 +134,12 @@ export default async function Page(props: {
         },
         foundUser.userId,
       ).catch((error) => {
+        console.error(error);
         return linkingFailed(branding);
       });
-
-      if (idpLink) {
+      if (!idpLink) {
+        return linkingFailed(branding);
+      } else {
         return linkingSuccess(
           foundUser.userId,
           { idpIntentId: id, idpIntentToken: token },
