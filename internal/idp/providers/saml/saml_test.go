@@ -3,6 +3,7 @@ package saml
 import (
 	"encoding/xml"
 	"testing"
+	"time"
 
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
@@ -254,6 +255,31 @@ func TestParseMetadata(t *testing.T) {
 			},
 			&saml.EntityDescriptor{
 				EntityID: "http://localhost:8000/metadata",
+				IDPSSODescriptors: []saml.IDPSSODescriptor{
+					{
+						XMLName: xml.Name{
+							Space: "urn:oasis:names:tc:SAML:2.0:metadata",
+							Local: "IDPSSODescriptor",
+						},
+						SingleSignOnServices: []saml.Endpoint{
+							{
+								Binding:  saml.HTTPRedirectBinding,
+								Location: "http://localhost:8000/sso",
+							},
+						},
+					},
+				},
+			},
+			nil,
+		},
+		{
+			"valid entities using xsd duration descriptor",
+			args{
+				metadata: []byte(`<?xml version="1.0" encoding="UTF-8"?><EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" cacheDuration="PT5H"><EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://localhost:8000/metadata" cacheDuration="PT5H"><IDPSSODescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:8000/sso"></SingleSignOnService></IDPSSODescriptor></EntityDescriptor></EntitiesDescriptor>`),
+			},
+			&saml.EntityDescriptor{
+				EntityID:      "http://localhost:8000/metadata",
+				CacheDuration: 5 * time.Hour,
 				IDPSSODescriptors: []saml.IDPSSODescriptor{
 					{
 						XMLName: xml.Name{
