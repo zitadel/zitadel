@@ -601,6 +601,12 @@ func NewCond(name string, value interface{}) Condition {
 	}
 }
 
+func NewUnequalCond(name string, value any) Condition {
+	return func(param string) (string, []any) {
+		return name + " <> " + param, []any{value}
+	}
+}
+
 func NewNamespacedCondition(name string, value interface{}) NamespacedCondition {
 	return func(namespace string) Condition {
 		return NewCond(namespace+"."+name, value)
