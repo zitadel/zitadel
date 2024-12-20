@@ -133,9 +133,9 @@ export default async function Page(props: {
           ></ChooseAuthenticatorToSetup>
         )}
 
-        <p className="ztdl-p text-center">
-          or sign in with an Identity Provider
-        </p>
+        <div className="py-3 flex flex-col">
+          <p className="ztdl-p text-center">{t("linkWithIDP")}</p>
+        </div>
 
         {loginSettings?.allowExternalIdp && identityProviders && (
           <SignInWithIdp

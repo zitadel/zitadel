@@ -159,6 +159,29 @@ export default async function Page(props: {
 
   const providerType = idpTypeToIdentityProviderType(idp.type);
 
+  if (link && options?.isLinkingAllowed) {
+    console.log(userId);
+    const idpLink = await addIDPLink(
+      {
+        id: idpInformation.idpId,
+        userId: idpInformation.userId,
+        userName: idpInformation.userName,
+      },
+      userId,
+    );
+
+    if (!idpLink) {
+      return linkingFailed(branding);
+    } else {
+      return linkingSuccess(
+        userId,
+        { idpIntentId: id, idpIntentToken: token },
+        authRequestId,
+        branding,
+      );
+    }
+  }
+
   // search for potential user via username, then link
   if (options?.isLinkingAllowed) {
     let foundUser;
