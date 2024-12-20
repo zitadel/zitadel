@@ -117,6 +117,16 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
+func (c *Commands) checkPermissionReadUser(ctx context.Context, resourceOwner, userID string) error {
+	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
+		return nil
+	}
+	if err := c.checkPermission(ctx, domain.PermissionUserRead, resourceOwner, userID); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
 	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
 		return nil
