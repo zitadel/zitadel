@@ -199,7 +199,7 @@ Caches:
         Interval: 1m
         TimeOut: 5s
     Postgres:
-      Enabled: false
+      Enabled: true
       AutoPrune:
         Interval: 15m
         TimeOut: 30s
@@ -309,9 +309,9 @@ Caches:
   Instance:
     # Connector must be enabled above.
     # When connector is empty, this cache will be disabled.
-    Connector: ""
+    Connector: "postgres"
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
     # Log enables cache-specific logging. Default to error log to stderr when omitted.
     Log:
       Level: error
@@ -322,7 +322,7 @@ Caches:
   Milestones:
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
     Log:
       Level: error
       AddSource: true
@@ -332,7 +332,17 @@ Caches:
   Organization:
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
+  # IdP callbacks using form POST cache, required for handling them securely and without possible too big request urls.
+  IdPFormCallbacks:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
     Log:
       Level: error
       AddSource: true
