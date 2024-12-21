@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package zitadel.saml.v2;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/saml/v2;saml";
+
+message SAMLRequest{
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    external_docs: {
+      url: "https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html";
+      description: "Find out more about SAMLRequest parameters";
+    }
+  };
+  
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the SAMLRequest";
+    }
+  ];
+
+  google.protobuf.Timestamp creation_date = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Time when the SAMLRequest was created";
+    }
+  ];
+
+  string issuer = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "SAML entityID of the application that created the SAMLRequest";
+    }
+  ];
+  
+  string assertion_consumer_service = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "URL which points back to the assertion consumer service of the application";
+    }
+  ];
+
+  string relay_state = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "RelayState provided by the application for the request";
+    }
+  ];
+
+  string binding = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Binding used by the application for the request";
+    }
+  ];
+}
+
+message AuthorizationError {
+  ErrorReason error = 1;
+  optional string error_description = 2;
+}
+
+enum ErrorReason {
+  ERROR_REASON_UNSPECIFIED = 0;
+  
+  ERROR_REASON_VERSION_MISSMATCH = 1;
+  ERROR_REASON_AUTH_N_FAILED = 2;
+  ERROR_REASON_INVALID_ATTR_NAME_OR_VALUE = 3;
+  ERROR_REASON_INVALID_NAMEID_POLICY = 4;
+  ERROR_REASON_REQUEST_DENIED =5;
+  ERROR_REASON_REQUEST_UNSUPPORTED = 6;
+  ERROR_REASON_UNSUPPORTED_BINDING = 7;
+}
