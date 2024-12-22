@@ -134,8 +134,8 @@ func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...a
 	return obj, nil
 }
 
-func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, error) {
-	client, pool, err := config.connector.Connect(useAdmin, config.EventPushConnRatio, config.ProjectionSpoolerConnRatio, purpose)
+func Connect(config Config, useAdmin bool) (*DB, error) {
+	client, pool, err := config.connector.Connect(useAdmin)
 	if err != nil {
 		return nil, err
 	}

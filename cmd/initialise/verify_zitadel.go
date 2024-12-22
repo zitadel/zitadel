@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 )
 
@@ -85,7 +84,7 @@ func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config)
 func verifyZitadel(ctx context.Context, config database.Config) error {
 	logging.WithFields("database", config.DatabaseName()).Info("verify zitadel")
 
-	db, err := database.Connect(config, false, dialect.DBPurposeQuery)
+	db, err := database.Connect(config, false)
 	if err != nil {
 		return err
 	}

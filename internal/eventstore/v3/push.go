@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"fmt"
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -53,6 +55,11 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		defer func() {
 			err = close(err)
 		}()
+	}
+
+	_, err = tx.ExecContext(ctx, "SET LOCAL application_name = $1", fmt.Sprintf("zitadel_es_pusher_%s", authz.GetInstance(ctx).InstanceID()))
+	if err != nil {
+		return nil, err
 	}
 
 	events, err := writeEvents(ctx, tx, commands)
