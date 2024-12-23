@@ -60,7 +60,7 @@ func (c *Commands) ResendUserEmailReturnCode(ctx context.Context, userID string,
 // SendUserEmailCode generates a new code
 // and triggers a notification e-mail with the default confirmation URL format.
 func (c *Commands) SendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.resendUserEmailCode(ctx, userID, alg, false, "")
+	return c.sendUserEmailCode(ctx, userID, alg, false, "")
 }
 
 // SendUserEmailCodeURLTemplate generates a new code
@@ -70,13 +70,13 @@ func (c *Commands) SendUserEmailCodeURLTemplate(ctx context.Context, userID stri
 	if err := domain.RenderConfirmURLTemplate(io.Discard, urlTmpl, userID, "code", "orgID"); err != nil {
 		return nil, err
 	}
-	return c.resendUserEmailCode(ctx, userID, alg, false, urlTmpl)
+	return c.sendUserEmailCode(ctx, userID, alg, false, urlTmpl)
 }
 
 // SendUserEmailReturnCode generates a new code and does not send a notification email.
 // The generated plain text code will be set in the returned Email object.
 func (c *Commands) SendUserEmailReturnCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
-	return c.resendUserEmailCode(ctx, userID, alg, true, "")
+	return c.sendUserEmailCode(ctx, userID, alg, true, "")
 }
 
 // ChangeUserEmailVerified sets a user's email address and marks it is verified.
@@ -111,7 +111,7 @@ func (c *Commands) resendUserEmailCode(ctx context.Context, userID string, alg c
 		return nil, err
 	}
 	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.resendUserEmailCodeWithGenerator(ctx, userID, gen, returnCode, urlTmpl)
+	return c.sendUserEmailCodeWithGenerator(ctx, userID, gen, returnCode, urlTmpl, true)
 }
 
 func (c *Commands) sendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
@@ -120,7 +120,7 @@ func (c *Commands) sendUserEmailCode(ctx context.Context, userID string, alg cry
 		return nil, err
 	}
 	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.sendUserEmailCodeWithGenerator(ctx, userID, gen, returnCode, urlTmpl)
+	return c.sendUserEmailCodeWithGenerator(ctx, userID, gen, returnCode, urlTmpl, false)
 }
 
 // changeUserEmailWithGenerator set a user's email address.
@@ -135,16 +135,8 @@ func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, ema
 	return cmd.Push(ctx)
 }
 
-func (c *Commands) resendUserEmailCodeWithGenerator(ctx context.Context, userID string, gen crypto.Generator, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	cmd, err := c.sendUserEmailCodeWithGeneratorEvents(ctx, userID, gen, returnCode, urlTmpl, true)
-	if err != nil {
-		return nil, err
-	}
-	return cmd.Push(ctx)
-}
-
-func (c *Commands) sendUserEmailCodeWithGenerator(ctx context.Context, userID string, gen crypto.Generator, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	cmd, err := c.sendUserEmailCodeWithGeneratorEvents(ctx, userID, gen, returnCode, urlTmpl, false)
+func (c *Commands) sendUserEmailCodeWithGenerator(ctx context.Context, userID string, gen crypto.Generator, returnCode bool, urlTmpl string, existingCheck bool) (*domain.Email, error) {
+	cmd, err := c.sendUserEmailCodeWithGeneratorEvents(ctx, userID, gen, returnCode, urlTmpl, existingCheck)
 	if err != nil {
 		return nil, err
 	}
