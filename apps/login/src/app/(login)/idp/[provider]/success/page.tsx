@@ -74,17 +74,20 @@ export default async function Page(props: {
 
   if (link && options?.isLinkingAllowed) {
     console.log(userId);
-    const idpLink = await addIDPLink(
-      {
-        id: idpInformation.idpId,
-        userId: idpInformation.userId,
-        userName: idpInformation.userName,
-      },
-      userId,
-    ).catch((error) => {
+    let idpLink;
+    try {
+      idpLink = await addIDPLink(
+        {
+          id: idpInformation.idpId,
+          userId: idpInformation.userId,
+          userName: idpInformation.userName,
+        },
+        userId,
+      );
+    } catch (error) {
       console.error(error);
       return linkingFailed(branding);
-    });
+    }
 
     if (!idpLink) {
       console.log("linking failed");
@@ -126,17 +129,21 @@ export default async function Page(props: {
     }
 
     if (foundUser) {
-      const idpLink = await addIDPLink(
-        {
-          id: idpInformation.idpId,
-          userId: idpInformation.userId,
-          userName: idpInformation.userName,
-        },
-        foundUser.userId,
-      ).catch((error) => {
+      let idpLink;
+      try {
+        idpLink = await addIDPLink(
+          {
+            id: idpInformation.idpId,
+            userId: idpInformation.userId,
+            userName: idpInformation.userName,
+          },
+          foundUser.userId,
+        );
+      } catch (error) {
         console.error(error);
         return linkingFailed(branding);
-      });
+      }
+
       if (!idpLink) {
         return linkingFailed(branding);
       } else {

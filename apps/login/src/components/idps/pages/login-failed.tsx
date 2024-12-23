@@ -1,13 +1,15 @@
-"use client";
-
 import { LanguageProvider } from "@/components/language-provider";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Alert, AlertType } from "../../alert";
 import { DynamicTheme } from "../../dynamic-theme";
 
-export function loginFailed(branding?: BrandingSettings, error: string = "") {
-  const t = useTranslations("idp");
+export async function loginFailed(
+  branding?: BrandingSettings,
+  error: string = "",
+) {
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "idp" });
 
   return (
     <LanguageProvider>

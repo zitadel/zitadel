@@ -1,17 +1,16 @@
-"use client";
-
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import { DynamicTheme } from "../../dynamic-theme";
 import { IdpSignin } from "../../idp-signin";
 
-export function linkingSuccess(
+export async function linkingSuccess(
   userId: string,
   idpIntent: { idpIntentId: string; idpIntentToken: string },
   authRequestId?: string,
   branding?: BrandingSettings,
 ) {
-  const t = useTranslations("idp");
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "idp" });
 
   return (
     <DynamicTheme branding={branding}>
