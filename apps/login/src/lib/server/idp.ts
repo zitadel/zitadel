@@ -98,7 +98,10 @@ export async function createNewSessionFromIdpIntent(
   }
 
   // TODO: check if user has MFA methods
-  // checkMFAFactors(session, loginSettings, authMethods, organization, authRequestId);
+  // const mfaFactorCheck = checkMFAFactors(session, loginSettings, authMethods, organization, authRequestId);
+  // if (mfaFactorCheck?.redirect) {
+  //   return mfaFactorCheck;
+  // }
 
   const url = await getNextUrl(
     command.authRequestId && session.id

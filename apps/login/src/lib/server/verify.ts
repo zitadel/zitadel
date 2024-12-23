@@ -139,13 +139,17 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   // redirect to mfa factor if user has one, or redirect to set one up
-  checkMFAFactors(
+  const mfaFactorCheck = checkMFAFactors(
     session,
     loginSettings,
     authMethodResponse.authMethodTypes,
     command.organization,
     command.authRequestId,
   );
+
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
+  }
 
   // login user if no additional steps are required
   if (command.authRequestId && session.id) {
@@ -299,13 +303,17 @@ export async function sendVerificationRedirectWithoutCheck(
   const loginSettings = await getLoginSettings(user.details?.resourceOwner);
 
   // redirect to mfa factor if user has one, or redirect to set one up
-  checkMFAFactors(
+  const mfaFactorCheck = checkMFAFactors(
     session,
     loginSettings,
     authMethodResponse.authMethodTypes,
     command.organization,
     command.authRequestId,
   );
+
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
+  }
 
   // login user if no additional steps are required
   if (command.authRequestId && session.id) {

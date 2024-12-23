@@ -185,13 +185,17 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Could not verify password!" };
   }
 
-  checkMFAFactors(
+  const mfaFactorCheck = checkMFAFactors(
     session,
     loginSettings,
     authMethods,
     command.organization,
     command.authRequestId,
   );
+
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
+  }
 
   if (command.authRequestId && session.id) {
     const nextUrl = await getNextUrl(

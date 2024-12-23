@@ -1,7 +1,7 @@
 "use server";
 
 import { createSessionAndUpdateCookie } from "@/lib/server/cookie";
-import { addHumanUser, getLoginSettings } from "@/lib/zitadel";
+import { addHumanUser, getLoginSettings, getUserByID } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
@@ -9,6 +9,7 @@ import {
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { getNextUrl } from "../client";
+import { checkEmailVerification } from "../verify-helper";
 
 type RegisterUserCommand = {
   email: string;
@@ -25,7 +26,7 @@ export type RegisterUserResponse = {
   factors: Factors | undefined;
 };
 export async function registerUser(command: RegisterUserCommand) {
-  const human = await addHumanUser({
+  const addResponse = await addHumanUser({
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -33,14 +34,14 @@ export async function registerUser(command: RegisterUserCommand) {
     organization: command.organization,
   });
 
-  if (!human) {
+  if (!addResponse) {
     return { error: "Could not create user" };
   }
 
   const loginSettings = await getLoginSettings(command.organization);
 
   let checkPayload: any = {
-    user: { search: { case: "userId", value: human.userId } },
+    user: { search: { case: "userId", value: addResponse.userId } },
   };
 
   if (command.password) {
@@ -75,6 +76,28 @@ export async function registerUser(command: RegisterUserCommand) {
 
     return { redirect: "/passkey/set?" + params };
   } else {
+    const userResponse = await getUserByID(session?.factors?.user?.id);
+
+    if (!userResponse.user) {
+      return { error: "Could not find user" };
+    }
+
+    const humanUser =
+      userResponse.user.type.case === "human"
+        ? userResponse.user.type.value
+        : undefined;
+
+    const emailVerificationCheck = checkEmailVerification(
+      session,
+      humanUser,
+      session.factors.user.organizationId,
+      command.authRequestId,
+    );
+
+    if (emailVerificationCheck?.redirect) {
+      return emailVerificationCheck;
+    }
+
     const url = await getNextUrl(
       command.authRequestId && session.id
         ? {
