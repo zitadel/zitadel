@@ -79,10 +79,7 @@ func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 		_, err := c.Exec(ctx, "SET enable_multiple_modifications_of_table = on")
 		return err
 	})
-	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
-	if err != nil {
-		return nil, nil, err
-	}
+	connConfig := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
 
 	config, err := pgxpool.ParseConfig(c.String(useAdmin))
 	if err != nil {

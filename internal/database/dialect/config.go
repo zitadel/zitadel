@@ -26,33 +26,8 @@ type Matcher interface {
 }
 
 const (
-	// QueryAppName             = "zitadel_queries"
-	// EventstorePusherAppName  = "zitadel_es_pusher"
-	// ProjectionSpoolerAppName = "zitadel_projection_spooler"
 	defaultAppName = "zitadel"
 )
-
-// DBPurpose is what the resulting connection pool is used for.
-// type DBPurpose int
-
-// const (
-// 	DBPurposeQuery DBPurpose = iota
-// 	DBPurposeEventPusher
-// 	DBPurposeProjectionSpooler
-// )
-
-// func (p DBPurpose) AppName() string {
-// 	switch p {
-// 	case DBPurposeQuery:
-// 		return QueryAppName
-// 	case DBPurposeEventPusher:
-// 		return EventstorePusherAppName
-// 	case DBPurposeProjectionSpooler:
-// 		return ProjectionSpoolerAppName
-// 	default:
-// 		return defaultAppName
-// 	}
-// }
 
 type Connector interface {
 	Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error)

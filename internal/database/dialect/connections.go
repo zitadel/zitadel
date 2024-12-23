@@ -10,11 +10,8 @@ import (
 )
 
 var (
-	// ErrNegativeRatio       = errors.New("ratio cannot be negative")
-	// ErrHighSumRatio        = errors.New("sum of pusher and projection ratios must be < 1")
 	ErrIllegalMaxOpenConns = errors.New("MaxOpenConns of the database must be higher than 3 or 0 for unlimited")
 	ErrIllegalMaxIdleConns = errors.New("MaxIdleConns of the database must be higher than 3 or 0 for unlimited")
-	// ErrInvalidPurpose      = errors.New("DBPurpose out of range")
 )
 
 // ConnectionConfig defines the Max Open and Idle connections for a DB connection pool.
@@ -59,10 +56,10 @@ func RegisterDefaultPgTypeVariants[T any](m *pgtype.Map, name, arrayName string)
 //
 // openConns and idleConns must be at least 3 or 0, which means no limit.
 // The pusherRatio and spoolerRatio must be between 0 and 1.
-func NewConnectionConfig(openConns, idleConns uint32) (*ConnectionConfig, error) {
+func NewConnectionConfig(openConns, idleConns uint32) *ConnectionConfig {
 	return &ConnectionConfig{
 		MaxOpenConns: openConns,
 		MaxIdleConns: idleConns,
 		AfterConnect: afterConnectFuncs,
-	}, nil
+	}
 }
