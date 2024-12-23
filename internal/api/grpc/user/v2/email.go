@@ -94,16 +94,6 @@ func (s *Server) SendEmailCode(ctx context.Context, req *user.SendEmailCodeReque
 	}, nil
 }
 
-func (s *Server) HasEmailCode(ctx context.Context, req *user.HasEmailCodeRequest) (*user.HasEmailCodeResponse, error) {
-	code, err := s.query.HasHumanEmailCode(ctx, req.GetUserId())
-	if err != nil {
-		return nil, err
-	}
-	return &user.HasEmailCodeResponse{
-		Code: code,
-	}, nil
-}
-
 func (s *Server) VerifyEmail(ctx context.Context, req *user.VerifyEmailRequest) (*user.VerifyEmailResponse, error) {
 	details, err := s.command.VerifyUserEmail(ctx,
 		req.GetUserId(),

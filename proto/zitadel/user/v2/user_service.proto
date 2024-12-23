@@ -277,30 +277,6 @@ service UserService {
     };
   }
 
-  // Check if there is an email code already
-  //
-  // Check if there is an email code already.
-  rpc HasEmailCode (HasEmailCodeRequest) returns (HasEmailCodeResponse) {
-    option (google.api.http) = {
-      get: "/v2/users/{user_id}/email/code"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200"
-        value: {
-          description: "OK";
-        }
-      };
-    };
-  }
-
   // Verify the email
   //
   // Verify the email with the generated code.
@@ -1380,22 +1356,6 @@ message SendEmailCodeResponse{
   zitadel.object.v2.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
-}
-
-message HasEmailCodeRequest{
-  string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629026806489455\"";
-    }
-  ];
-}
-
-message HasEmailCodeResponse{
-  bool code = 1;
 }
 
 message VerifyEmailRequest{

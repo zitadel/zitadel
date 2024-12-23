@@ -3,7 +3,6 @@
 package user_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -356,68 +355,6 @@ func TestServer_SendEmailCode(t *testing.T) {
 			} else {
 				assert.Empty(t, got.GetVerificationCode())
 			}
-		})
-	}
-}
-
-func TestServer_HasEmailCode(t *testing.T) {
-	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email()).GetUserId()
-
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		req     *user.HasEmailCodeRequest
-		want    *user.HasEmailCodeResponse
-		wantErr bool
-	}{
-		{
-			name: "user not existing",
-			ctx:  CTX,
-			req: &user.HasEmailCodeRequest{
-				UserId: "xxx",
-			},
-			wantErr: true,
-		},
-		{
-			name: "no permission",
-			ctx:  UserCTX,
-			req: &user.HasEmailCodeRequest{
-				UserId: verifiedUserID,
-			},
-			wantErr: true,
-		},
-		{
-			name: "user no code",
-			ctx:  CTX,
-			req: &user.HasEmailCodeRequest{
-				UserId: verifiedUserID,
-			},
-			want: &user.HasEmailCodeResponse{
-				Code: false,
-			},
-		},
-		{
-			name: "user code",
-			ctx:  CTX,
-			req: &user.HasEmailCodeRequest{
-				UserId: userID,
-			},
-			want: &user.HasEmailCodeResponse{
-				Code: true,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.HasEmailCode(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			assert.Equal(t, tt.want.GetCode(), got.GetCode())
 		})
 	}
 }
