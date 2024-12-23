@@ -73,7 +73,6 @@ export default async function Page(props: {
   const providerType = idpTypeToIdentityProviderType(idp.type);
 
   if (link && options?.isLinkingAllowed) {
-    console.log(userId);
     let idpLink;
     try {
       idpLink = await addIDPLink(
@@ -85,12 +84,10 @@ export default async function Page(props: {
         userId,
       );
     } catch (error) {
-      console.error(error);
       return linkingFailed(branding);
     }
 
     if (!idpLink) {
-      console.log("linking failed");
       return linkingFailed(branding);
     } else {
       return linkingSuccess(
@@ -140,7 +137,6 @@ export default async function Page(props: {
           foundUser.userId,
         );
       } catch (error) {
-        console.error(error);
         return linkingFailed(branding);
       }
 
