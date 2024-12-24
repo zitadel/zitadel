@@ -3,10 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Alert, AlertType } from "../../alert";
 import { DynamicTheme } from "../../dynamic-theme";
 
-export async function loginFailed(
-  branding?: BrandingSettings,
-  error: string = "",
-) {
+export async function loginFailed(branding?: BrandingSettings, error?: string) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "idp" });
 
