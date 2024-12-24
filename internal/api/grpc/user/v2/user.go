@@ -597,6 +597,42 @@ func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.Li
 	}, nil
 }
 
+func (s *Server) ListAuthenticationFactors(ctx context.Context, req *user.ListAuthenticationFactorsRequest) (*user.ListAuthenticationFactorsResponse, error) {
+	query := new(query.UserAuthMethodSearchQueries)
+	err := query.AppendUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(req.GetAuthFactors()) > 0 {
+		authMethods := object.AuthFactorsToPb(req.GetAuthFactors())
+		err = query.AppendAuthMethodsQuery(authMethods...)
+	} else {
+		err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeTOTP, domain.UserAuthMethodTypeOTPSMS, domain.UserAuthMethodTypeOTPEmail)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if len(req.GetStates()) > 0 {
+		states := object.AuthFactorStatesToPb(req.GetStates())
+		err = query.AppendStatesQuery(states...)
+	} else {
+		err = query.AppendStateQuery(domain.MFAStateReady)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &user.ListAuthenticationFactorsResponse{
+		Result: object.AuthMethodsToPb(authMethods),
+	}, nil
+}
+
 func authMethodTypesToPb(methodTypes []domain.UserAuthMethodType) []user.AuthenticationMethodType {
 	methods := make([]user.AuthenticationMethodType, len(methodTypes))
 	for i, method := range methodTypes {
