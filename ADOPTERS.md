@@ -12,6 +12,7 @@ If you are using Zitadel, please consider adding yourself as a user with a quick
 | ----------------------- | -------------------------------------------------------------------- | ----------------------------------------------- |
 | Zitadel                 | [@fforootd](https://github.com/fforootd) (and many more)             | Zitadel Cloud makes heavy use of of Zitadel ;-) |
 | Rawkode Academy         | [@RawkodeAcademy](https://github.com/RawkodeAcademy)                 | Rawkode Academy Platform & Zulip use Zitadel for all user and M2M authentication |
+| XPeditionist            | [@XPeditionistTravel](https://github.com/XPeditionistTravel)         | An innovative all-in-one travel solution use Zitadel as complete auth solution. |
 | devOS: Sanity Edition   | [@devOS-Sanity-Edition](https://github.com/devOS-Sanity-Edition)     | Uses SSO Auth for every piece of our internal and external infrastructure |
 | CNAP.tech               | [@cnap-tech](https://github.com/cnap-tech)                           | Using Zitadel for authentication and authorization in cloud-native applications |
 | Minekube                | [@minekube](https://github.com/minekube)                             | Leveraging Zitadel for secure user authentication in gaming infrastructure |
