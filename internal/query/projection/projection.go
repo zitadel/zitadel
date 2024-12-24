@@ -23,6 +23,7 @@ var (
 	ActionProjection                    *handler.Handler
 	FlowProjection                      *handler.Handler
 	ProjectProjection                   *handler.Handler
+	GroupProjection                     *handler.Handler
 	PasswordComplexityProjection        *handler.Handler
 	PasswordAgeProjection               *handler.Handler
 	LockoutPolicyProjection             *handler.Handler
@@ -49,9 +50,11 @@ var (
 	InstanceMemberProjection            *handler.Handler
 	ProjectMemberProjection             *handler.Handler
 	ProjectGrantMemberProjection        *handler.Handler
+	GroupMemberProjection               *handler.Handler
 	AuthNKeyProjection                  *handler.Handler
 	PersonalAccessTokenProjection       *handler.Handler
 	UserGrantProjection                 *handler.Handler
+	GroupGrantProjection                *handler.Handler
 	UserMetadataProjection              *handler.Handler
 	UserAuthMethodProjection            *handler.Handler
 	InstanceProjection                  *handler.Handler
@@ -115,6 +118,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	ActionProjection = newActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
 	FlowProjection = newFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
 	ProjectProjection = newProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
+	GroupProjection = newGroupProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["groups"]))
 	PasswordComplexityProjection = newPasswordComplexityProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_complexities"]))
 	PasswordAgeProjection = newPasswordAgeProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_age_policy"]))
 	LockoutPolicyProjection = newLockoutPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["lockout_policy"]))
@@ -140,12 +144,14 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	InstanceTrustedDomainProjection = newInstanceTrustedDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_trusted_domains"]))
 	InstanceMemberProjection = newInstanceMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam_members"]))
 	ProjectMemberProjection = newProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
+	GroupMemberProjection = newGroupMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_members"]))
 	ProjectGrantMemberProjection = newProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
 	AuthNKeyProjection = newAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
 	PersonalAccessTokenProjection = newPersonalAccessTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["personal_access_tokens"]))
 	UserGrantProjection = newUserGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_grants"]))
 	UserMetadataProjection = newUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
 	UserAuthMethodProjection = newUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
+	GroupGrantProjection = newGroupGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["group_grants"]))
 	InstanceProjection = newInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))
 	SecretGeneratorProjection = newSecretGeneratorProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["secret_generators"]))
 	SMTPConfigProjection = newSMTPConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["smtp_configs"]))
@@ -245,6 +251,7 @@ func newProjectionsList() {
 		ActionProjection,
 		FlowProjection,
 		ProjectProjection,
+		GroupProjection,
 		PasswordComplexityProjection,
 		PasswordAgeProjection,
 		LockoutPolicyProjection,
@@ -276,6 +283,7 @@ func newProjectionsList() {
 		UserGrantProjection,
 		UserMetadataProjection,
 		UserAuthMethodProjection,
+		GroupGrantProjection,
 		InstanceProjection,
 		SecretGeneratorProjection,
 		SMTPConfigProjection,

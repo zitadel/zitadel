@@ -34,6 +34,9 @@ type Membership struct {
 	IAM          *IAMMembership
 	Project      *ProjectMembership
 	ProjectGrant *ProjectGrantMembership
+
+	Group      *GroupMembership
+	GroupGrant *GroupGrantMembership
 }
 
 type OrgMembership struct {
@@ -58,6 +61,18 @@ type ProjectGrantMembership struct {
 	GrantedOrgID string
 }
 
+type GroupMembership struct {
+	GroupID string
+	Name    string
+}
+
+type GroupGrantMembership struct {
+	ProjectID    string
+	ProjectName  string
+	GrantID      string
+	GrantedOrgID string
+}
+
 type MembershipSearchQuery struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -65,6 +80,10 @@ type MembershipSearchQuery struct {
 
 func NewMembershipUserIDQuery(userID string) (SearchQuery, error) {
 	return NewTextQuery(membershipUserID.setTable(membershipAlias), userID, TextEquals)
+}
+
+func NewMembershipGroupIDQuery(userID string) (SearchQuery, error) {
+	return NewTextQuery(membershipGroupID.setTable(membershipAlias), userID, TextEquals)
 }
 
 func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
@@ -215,6 +234,14 @@ var (
 		name:  projection.ProjectGrantColumnGrantedOrgID,
 		table: membershipAlias,
 	}
+	membershipGroupID = Column{
+		name:  projection.GroupMemberGroupIDCol,
+		table: membershipAlias,
+	}
+	// membershipGroupGrantID = Column{
+	// 	name:  projection.GroupGrantIDCol,
+	// 	table: membershipAlias,
+	// }
 )
 
 func getMembershipFromQuery(queries *MembershipSearchQuery) (string, []interface{}) {

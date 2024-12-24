@@ -1,0 +1,4 @@
+Step-1
+make compile && ./zitadel start-from-init --masterkey MobilesentrixZitadelSSOGroups123 --tlsMode disabled
+
+Step-2
