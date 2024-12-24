@@ -47,6 +47,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       await resendVerification({
         userId: sessionFactors?.factors?.user?.id,
         isInvite: invite === "true",
+      }).catch((error) => {
+        console.error("Could not resend verification email", error);
+        throw Error("Could not request email");
       });
     }
   } else if ("userId" in searchParams && userId) {
@@ -54,6 +57,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       await resendVerification({
         userId,
         isInvite: invite === "true",
+      }).catch((error) => {
+        console.error("Could not resend verification email", error);
+        throw Error("Could not request email");
       });
     }
 
