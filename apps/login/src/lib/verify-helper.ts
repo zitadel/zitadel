@@ -29,17 +29,40 @@ export function checkPasswordChangeRequired(
   }
 }
 
+export function checkInvite(
+  session: Session,
+  humanUser?: HumanUser,
+  organization?: string,
+  authRequestId?: string,
+) {
+  if (humanUser?.email && humanUser.email.isVerified) {
+    const paramsVerify = new URLSearchParams({
+      loginName: session.factors?.user?.loginName as string,
+      userId: session.factors?.user?.id as string, // verify needs user id
+      invite: "true", // TODO: check - set this to true as we dont expect old email verification method here
+    });
+
+    if (organization || session.factors?.user?.organizationId) {
+      paramsVerify.append(
+        "organization",
+        organization ?? (session.factors?.user?.organizationId as string),
+      );
+    }
+
+    if (authRequestId) {
+      paramsVerify.append("authRequestId", authRequestId);
+    }
+
+    return { redirect: "/verify?" + paramsVerify };
+  }
+}
+
 export function checkEmailVerification(
   session: Session,
   humanUser?: HumanUser,
   organization?: string,
   authRequestId?: string,
 ) {
-  console.log(
-    humanUser?.email,
-    process.env.EMAIL_VERIFICATION,
-    process.env.EMAIL_VERIFICATION === "true",
-  );
   if (
     !humanUser?.email?.isVerified &&
     process.env.EMAIL_VERIFICATION === "true"

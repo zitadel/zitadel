@@ -88,12 +88,12 @@ export function VerifyForm({
           setLoading(false);
         });
 
-      if (response?.error) {
+      if (response && "error" in response && response?.error) {
         setError(response.error);
         return;
       }
 
-      if (response?.redirect) {
+      if (response && "redirect" in response && response?.redirect) {
         return router.push(response?.redirect);
       }
     },

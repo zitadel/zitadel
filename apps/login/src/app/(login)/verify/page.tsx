@@ -3,6 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { VerifyRedirectButton } from "@/components/verify-redirect-button";
+import { resendVerification } from "@/lib/server/verify";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -19,8 +20,15 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { userId, loginName, code, organization, authRequestId, invite } =
-    searchParams;
+  const {
+    userId,
+    loginName,
+    code,
+    organization,
+    authRequestId,
+    invite,
+    skipsend,
+  } = searchParams;
 
   const branding = await getBrandingSettings(organization);
 
@@ -34,7 +42,21 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       loginName,
       organization,
     });
+
+    if (!skipsend && sessionFactors?.factors?.user?.id) {
+      await resendVerification({
+        userId: sessionFactors?.factors?.user?.id,
+        isInvite: invite === "true",
+      });
+    }
   } else if ("userId" in searchParams && userId) {
+    if (!skipsend) {
+      await resendVerification({
+        userId,
+        isInvite: invite === "true",
+      });
+    }
+
     const userResponse = await getUserByID(userId);
     if (userResponse) {
       user = userResponse.user;
