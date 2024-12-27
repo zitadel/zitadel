@@ -84,6 +84,34 @@ describe("verify invite", () => {
   });
 
   it.only("shows authenticators after successful invite verification", () => {
+    stub("zitadel.user.v2.UserService", "GetUserByID", {
+      data: {
+        user: {
+          userId: "221394658884845598",
+          state: 1,
+          username: "john@zitadel.com",
+          loginNames: ["john@zitadel.com"],
+          preferredLoginName: "john@zitadel.com",
+          human: {
+            userId: "221394658884845598",
+            state: 1,
+            username: "john@zitadel.com",
+            loginNames: ["john@zitadel.com"],
+            preferredLoginName: "john@zitadel.com",
+            profile: {
+              givenName: "John",
+              familyName: "Doe",
+              avatarUrl: "https://zitadel.com/avatar.jpg",
+            },
+            email: {
+              email: "john@zitadel.com",
+              isVerified: true, // email needs to be verified
+            },
+          },
+        },
+      },
+    });
+
     stub("zitadel.user.v2.UserService", "VerifyInviteCode");
     cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
     cy.location("pathname", { timeout: 10_000 }).should(
