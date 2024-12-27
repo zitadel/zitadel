@@ -74,6 +74,7 @@ export default async function Page(props: {
 
   if (link) {
     if (!options?.isLinkingAllowed) {
+      // linking was probably disallowed since the invitation was created
       return linkingFailed(branding, "Linking is no longer allowed");
     }
 
