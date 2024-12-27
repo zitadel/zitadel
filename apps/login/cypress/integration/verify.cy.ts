@@ -17,6 +17,8 @@ describe("verify invite", () => {
       },
     });
 
+    stub("zitadel.user.v2.UserService", "SendEmailCode");
+
     stub("zitadel.user.v2.UserService", "GetUserByID", {
       data: {
         user: {
