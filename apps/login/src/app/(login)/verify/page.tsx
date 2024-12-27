@@ -3,7 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { VerifyRedirectButton } from "@/components/verify-redirect-button";
-import { resendVerification } from "@/lib/server/verify";
+import { sendCode } from "@/lib/server/verify";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -44,7 +44,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     });
 
     if (!skipsend && sessionFactors?.factors?.user?.id) {
-      await resendVerification({
+      await sendCode({
         userId: sessionFactors?.factors?.user?.id,
         isInvite: invite === "true",
       }).catch((error) => {
@@ -54,7 +54,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     }
   } else if ("userId" in searchParams && userId) {
     if (!skipsend) {
-      await resendVerification({
+      await sendCode({
         userId,
         isInvite: invite === "true",
       }).catch((error) => {

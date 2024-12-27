@@ -7,6 +7,7 @@ import {
   listAuthenticationMethodTypes,
   resendEmailCode,
   resendInviteCode,
+  sendEmailCode,
   verifyEmail,
   verifyInviteCode,
 } from "@/lib/zitadel";
@@ -189,6 +190,11 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
   return command.isInvite
     ? resendInviteCode(command.userId)
     : resendEmailCode(command.userId, host, command.authRequestId);
+}
+
+export async function sendCode(command: resendVerifyEmailCommand) {
+  const host = (await headers()).get("host");
+  return sendEmailCode(command.userId, host, command.authRequestId);
 }
 
 export type SendVerificationRedirectWithoutCheckCommand = {
