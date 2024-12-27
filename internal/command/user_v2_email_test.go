@@ -586,7 +586,7 @@ func TestCommands_SendUserEmailCode(t *testing.T) {
 			}
 			_, err := c.SendUserEmailCode(context.Background(), tt.args.userID, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_changeUserEmailWithGenerator
+			// successful cases are tested in TestCommands_sendUserEmailCodeWithGeneratorEvents
 		})
 	}
 }
@@ -717,7 +717,7 @@ func TestCommands_ResendUserEmailCodeURLTemplate(t *testing.T) {
 			}
 			_, err := c.ResendUserEmailCodeURLTemplate(context.Background(), tt.args.userID, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_resendUserEmailCodeWithGenerator
+			// successful cases are tested in TestCommands_sendUserEmailCodeWithGeneratorEvents
 		})
 	}
 }
@@ -809,7 +809,7 @@ func TestCommands_SendUserEmailCodeURLTemplate(t *testing.T) {
 			}
 			_, err := c.SendUserEmailCodeURLTemplate(context.Background(), tt.args.userID, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_resendUserEmailCodeWithGenerator
+			// successful cases are tested in TestCommands_sendUserEmailCodeWithGeneratorEvents
 		})
 	}
 }
@@ -1005,7 +1005,7 @@ func TestCommands_SendUserEmailReturnCode(t *testing.T) {
 			}
 			_, err := c.SendUserEmailReturnCode(context.Background(), tt.args.userID, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_resendUserEmailCodeWithGenerator
+			// successful cases are tested in TestCommands_sendUserEmailCodeWithGeneratorEvents
 		})
 	}
 }
