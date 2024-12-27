@@ -71,7 +71,7 @@ type Group struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
-	State         domain.ProjectState
+	State         domain.GroupState
 	Sequence      uint64
 
 	Name        string
