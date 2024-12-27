@@ -84,6 +84,7 @@ export default async function Page(props: {
         userId,
       );
     } catch (error) {
+      console.error(error);
       return linkingFailed(branding);
     }
 
@@ -137,6 +138,7 @@ export default async function Page(props: {
           foundUser.userId,
         );
       } catch (error) {
+        console.error(error);
         return linkingFailed(branding);
       }
 
