@@ -72,7 +72,11 @@ export default async function Page(props: {
 
   const providerType = idpTypeToIdentityProviderType(idp.type);
 
-  if (link && options?.isLinkingAllowed) {
+  if (link) {
+    if (!options?.isLinkingAllowed) {
+      return linkingFailed(branding, "Linking is no longer allowed");
+    }
+
     let idpLink;
     try {
       idpLink = await addIDPLink(
@@ -153,10 +157,6 @@ export default async function Page(props: {
         );
       }
     }
-  }
-
-  if (link) {
-    return linkingFailed(branding);
   }
 
   if (options?.isCreationAllowed && options.isAutoCreation) {
