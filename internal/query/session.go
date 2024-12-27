@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -78,6 +79,24 @@ type SessionOTPFactor struct {
 type SessionsSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
+}
+
+func sessionsCheckPermission(ctx context.Context, sessions *Sessions, permissionCheck domain.PermissionCheck) {
+	sessions.Sessions = slices.DeleteFunc(sessions.Sessions,
+		func(session *Session) bool {
+			return sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, permissionCheck) != nil
+		},
+	)
+}
+
+func sessionCheckPermission(ctx context.Context, resourceOwner string, creator string, permissionCheck domain.PermissionCheck) error {
+	data := authz.GetCtxData(ctx)
+	if data.UserID != creator {
+		if err := permissionCheck(ctx, domain.PermissionSessionRead, resourceOwner, ""); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (q *SessionsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -195,7 +214,24 @@ var (
 	}
 )
 
-func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (session *Session, err error) {
+func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string, permissionCheck domain.PermissionCheck) (session *Session, err error) {
+	session, tokenID, err := q.sessionByID(ctx, shouldTriggerBulk, id)
+	if err != nil {
+		return nil, err
+	}
+	if sessionToken == "" {
+		if err := sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, permissionCheck); err != nil {
+			return nil, err
+		}
+		return session, nil
+	}
+	if err := q.sessionTokenVerifier(ctx, sessionToken, session.ID, tokenID); err != nil {
+		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-dsfr3", "Errors.PermissionDenied")
+	}
+	return session, nil
+}
+
+func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id string) (session *Session, tokenID string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -214,27 +250,31 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		},
 	).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
+		return nil, "", zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	var tokenID string
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		session, tokenID, err = scan(row)
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	if sessionToken == "" {
-		return session, nil
-	}
-	if err := q.sessionTokenVerifier(ctx, sessionToken, session.ID, tokenID); err != nil {
-		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-dsfr3", "Errors.PermissionDenied")
-	}
-	return session, nil
+	return session, tokenID, nil
 }
 
-func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries) (sessions *Sessions, err error) {
+func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries, permissionCheck domain.PermissionCheck) (*Sessions, error) {
+	sessions, err := q.searchSessions(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil {
+		sessionsCheckPermission(ctx, sessions, permissionCheck)
+	}
+	return sessions, nil
+}
+
+func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQueries) (sessions *Sessions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -270,6 +310,10 @@ func NewSessionIDsSearchQuery(ids []string) (SearchQuery, error) {
 
 func NewSessionCreatorSearchQuery(creator string) (SearchQuery, error) {
 	return NewTextQuery(SessionColumnCreator, creator, TextEquals)
+}
+
+func NewSessionUserAgentFingerprintIDSearchQuery(fingerprintID string) (SearchQuery, error) {
+	return NewTextQuery(SessionColumnUserAgentFingerprintID, fingerprintID, TextEquals)
 }
 
 func NewUserIDSearchQuery(id string) (SearchQuery, error) {

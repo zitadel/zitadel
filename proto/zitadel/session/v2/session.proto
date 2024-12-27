@@ -136,6 +136,8 @@ message SearchQuery {
     IDsQuery ids_query = 1;
     UserIDQuery user_id_query = 2;
     CreationDateQuery creation_date_query = 3;
+    OwnCreatorQuery own_creator_query = 4;
+    OwnUserAgentQuery own_useragent_query = 5;
   }
 }
 
@@ -157,9 +159,13 @@ message CreationDateQuery {
   ];
 }
 
+message OwnCreatorQuery {}
+
+message OwnUserAgentQuery {}
+
 message UserAgent {
   optional string fingerprint_id = 1;
-  optional string ip  = 2;
+  optional string ip = 2;
   optional string description = 3;
 
   // A header may have multiple values.
@@ -169,7 +175,7 @@ message UserAgent {
   message HeaderValues {
     repeated string values = 1;
   }
-  map<string,HeaderValues> header = 4;
+  map<string, HeaderValues> header = 4;
 }
 
 enum SessionFieldName {
