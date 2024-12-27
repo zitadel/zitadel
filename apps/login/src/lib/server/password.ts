@@ -30,6 +30,11 @@ import {
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
+import {
+  checkEmailVerification,
+  checkMFAFactors,
+  checkPasswordChangeRequired,
+} from "../verify-helper";
 
 type ResetPasswordCommand = {
   loginName: string;
@@ -134,6 +139,37 @@ export async function sendPassword(command: UpdateSessionCommand) {
     return { error: "Could not create session for user" };
   }
 
+  const humanUser = user.type.case === "human" ? user.type.value : undefined;
+
+  // check if the user has to change password first
+  const passwordChangedCheck = checkPasswordChangeRequired(
+    session,
+    humanUser,
+    command.organization,
+    command.authRequestId,
+  );
+
+  if (passwordChangedCheck?.redirect) {
+    return passwordChangedCheck;
+  }
+
+  // throw error if user is in initial state here and do not continue
+  if (user.state === UserState.INITIAL) {
+    return { error: "Initial User not supported" };
+  }
+
+  // check to see if user was verified
+  const emailVerificationCheck = checkEmailVerification(
+    session,
+    humanUser,
+    command.organization,
+    command.authRequestId,
+  );
+
+  if (emailVerificationCheck?.redirect) {
+    return emailVerificationCheck;
+  }
+
   // if password, check if user has MFA methods
   let authMethods;
   if (command.checks && command.checks.password && session.factors?.user?.id) {
@@ -145,131 +181,23 @@ export async function sendPassword(command: UpdateSessionCommand) {
     }
   }
 
-  if (!authMethods || !session.factors?.user?.loginName) {
+  if (!authMethods) {
     return { error: "Could not verify password!" };
   }
 
-  const humanUser = user.type.case === "human" ? user.type.value : undefined;
-
-  // check if the user has to change password first
-  if (humanUser?.passwordChangeRequired) {
-    const params = new URLSearchParams({
-      loginName: session.factors?.user?.loginName,
-    });
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append("organization", session.factors?.user?.organizationId);
-    }
-
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    return { redirect: "/password/change?" + params };
-  }
-
-  const availableMultiFactors = authMethods?.filter(
-    (m: AuthenticationMethodType) =>
-      m !== AuthenticationMethodType.PASSWORD &&
-      m !== AuthenticationMethodType.PASSKEY,
+  const mfaFactorCheck = checkMFAFactors(
+    session,
+    loginSettings,
+    authMethods,
+    command.organization,
+    command.authRequestId,
   );
 
-  if (availableMultiFactors?.length == 1) {
-    const params = new URLSearchParams({
-      loginName: session.factors?.user.loginName,
-    });
-
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    const factor = availableMultiFactors[0];
-    // if passwordless is other method, but user selected password as alternative, perform a login
-    if (factor === AuthenticationMethodType.TOTP) {
-      return { redirect: `/otp/time-based?` + params };
-    } else if (factor === AuthenticationMethodType.OTP_SMS) {
-      return { redirect: `/otp/sms?` + params };
-    } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
-      return { redirect: `/otp/email?` + params };
-    } else if (factor === AuthenticationMethodType.U2F) {
-      return { redirect: `/u2f?` + params };
-    }
-  } else if (availableMultiFactors?.length >= 1) {
-    const params = new URLSearchParams({
-      loginName: session.factors.user.loginName,
-    });
-
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    return { redirect: `/mfa?` + params };
+  if (mfaFactorCheck?.redirect) {
+    return mfaFactorCheck;
   }
-  // TODO: check if handling of userstate INITIAL is needed
-  else if (user.state === UserState.INITIAL) {
-    return { error: "Initial User not supported" };
-  } else if (
-    (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) &&
-    !availableMultiFactors.length
-  ) {
-    const params = new URLSearchParams({
-      loginName: session.factors.user.loginName,
-      force: "true", // this defines if the mfa is forced in the settings
-      checkAfter: "true", // this defines if the check is directly made after the setup
-    });
 
-    if (command.authRequestId) {
-      params.append("authRequestId", command.authRequestId);
-    }
-
-    if (command.organization || session.factors?.user?.organizationId) {
-      params.append(
-        "organization",
-        command.organization ?? session.factors?.user?.organizationId,
-      );
-    }
-
-    // TODO: provide a way to setup passkeys on mfa page?
-    return { redirect: `/mfa/set?` + params };
-  }
-  // TODO: implement passkey setup
-
-  //  else if (
-  //   submitted.factors &&
-  //   !submitted.factors.webAuthN && // if session was not verified with a passkey
-  //   promptPasswordless && // if explicitly prompted due policy
-  //   !isAlternative // escaped if password was used as an alternative method
-  // ) {
-  //   const params = new URLSearchParams({
-  //     loginName: submitted.factors.user.loginName,
-  //     prompt: "true",
-  //   });
-
-  //   if (authRequestId) {
-  //     params.append("authRequestId", authRequestId);
-  //   }
-
-  //   if (organization) {
-  //     params.append("organization", organization);
-  //   }
-
-  //   return router.push(`/passkey/set?` + params);
-  // }
-  else if (command.authRequestId && session.id) {
+  if (command.authRequestId && session.id) {
     const nextUrl = await getNextUrl(
       {
         sessionId: session.id,

@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, AlertType } from "@/components/alert";
-import { resendVerification, sendVerification } from "@/lib/server/email";
+import { resendVerification, sendVerification } from "@/lib/server/verify";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -17,12 +17,21 @@ type Inputs = {
 
 type Props = {
   userId: string;
+  loginName?: string;
+  organization?: string;
   code?: string;
   isInvite: boolean;
-  params: URLSearchParams;
+  authRequestId?: string;
 };
 
-export function VerifyForm({ userId, code, isInvite, params }: Props) {
+export function VerifyForm({
+  userId,
+  loginName,
+  organization,
+  authRequestId,
+  code,
+  isInvite,
+}: Props) {
   const t = useTranslations("verify");
 
   const router = useRouter();
@@ -67,6 +76,9 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
         code: value.code,
         userId,
         isInvite: isInvite,
+        loginName: loginName,
+        organization: organization,
+        authRequestId: authRequestId,
       })
         .catch(() => {
           setError("Could not verify user");
@@ -76,12 +88,12 @@ export function VerifyForm({ userId, code, isInvite, params }: Props) {
           setLoading(false);
         });
 
-      if (response?.error) {
+      if (response && "error" in response && response?.error) {
         setError(response.error);
         return;
       }
 
-      if (response?.redirect) {
+      if (response && "redirect" in response && response?.redirect) {
         return router.push(response?.redirect);
       }
     },

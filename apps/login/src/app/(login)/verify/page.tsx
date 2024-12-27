@@ -3,6 +3,8 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { VerifyRedirectButton } from "@/components/verify-redirect-button";
+import { resendVerification } from "@/lib/server/verify";
+import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getUserByID,
@@ -18,14 +20,49 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { userId, loginName, code, organization, authRequestId, invite } =
-    searchParams;
+  const {
+    userId,
+    loginName,
+    code,
+    organization,
+    authRequestId,
+    invite,
+    skipsend,
+  } = searchParams;
 
   const branding = await getBrandingSettings(organization);
 
+  let sessionFactors;
   let user: User | undefined;
   let human: HumanUser | undefined;
-  if (userId) {
+  let id: string | undefined;
+
+  if ("loginName" in searchParams) {
+    sessionFactors = await loadMostRecentSession({
+      loginName,
+      organization,
+    });
+
+    if (!skipsend && sessionFactors?.factors?.user?.id) {
+      await resendVerification({
+        userId: sessionFactors?.factors?.user?.id,
+        isInvite: invite === "true",
+      }).catch((error) => {
+        console.error("Could not resend verification email", error);
+        throw Error("Could not request email");
+      });
+    }
+  } else if ("userId" in searchParams && userId) {
+    if (!skipsend) {
+      await resendVerification({
+        userId,
+        isInvite: invite === "true",
+      }).catch((error) => {
+        console.error("Could not resend verification email", error);
+        throw Error("Could not request email");
+      });
+    }
+
     const userResponse = await getUserByID(userId);
     if (userResponse) {
       user = userResponse.user;
@@ -34,6 +71,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       }
     }
   }
+
+  id = userId ?? sessionFactors?.factors?.user?.id;
 
   let authMethods: AuthenticationMethodType[] | null = null;
   if (human?.email?.isVerified) {
@@ -66,7 +105,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         <h1>{t("verify.title")}</h1>
         <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
-        {!userId && (
+        {!id && (
           <>
             <h1>{t("verify.title")}</h1>
             <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
@@ -77,29 +116,44 @@ export default async function Page(props: { searchParams: Promise<any> }) {
           </>
         )}
 
-        {user && (
+        {sessionFactors ? (
           <UserAvatar
-            loginName={user.preferredLoginName}
-            displayName={human?.profile?.displayName}
-            showDropdown={false}
-          />
+            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            displayName={sessionFactors.factors?.user?.displayName}
+            showDropdown
+            searchParams={searchParams}
+          ></UserAvatar>
+        ) : (
+          user && (
+            <UserAvatar
+              loginName={user.preferredLoginName}
+              displayName={human?.profile?.displayName}
+              showDropdown={false}
+            />
+          )
         )}
 
-        {human?.email?.isVerified ? (
-          <VerifyRedirectButton
-            userId={userId}
-            authRequestId={authRequestId}
-            authMethods={authMethods}
-          />
-        ) : (
-          // check if auth methods are set
-          <VerifyForm
-            userId={userId}
-            code={code}
-            isInvite={invite === "true"}
-            params={params}
-          />
-        )}
+        {id &&
+          (human?.email?.isVerified ? (
+            // show page for already verified users
+            <VerifyRedirectButton
+              userId={id}
+              loginName={loginName}
+              organization={organization}
+              authRequestId={authRequestId}
+              authMethods={authMethods}
+            />
+          ) : (
+            // check if auth methods are set
+            <VerifyForm
+              loginName={loginName}
+              organization={organization}
+              userId={id}
+              code={code}
+              isInvite={invite === "true"}
+              authRequestId={authRequestId}
+            />
+          ))}
       </div>
     </DynamicTheme>
   );

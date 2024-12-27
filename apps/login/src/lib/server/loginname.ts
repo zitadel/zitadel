@@ -8,6 +8,7 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { checkInvite } from "../verify-helper";
 import {
   getActiveIdentityProviders,
   getIDPByID,
@@ -171,29 +172,21 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     );
 
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      if (
-        potentialUsers[0].type.case === "human" &&
-        potentialUsers[0].type.value.email &&
-        !potentialUsers[0].type.value.email.isVerified
-      ) {
-        const paramsVerify = new URLSearchParams({
-          loginName: session.factors?.user?.loginName,
-          userId: session.factors?.user?.id, // verify needs user id
-          invite: "true", // TODO: check - set this to true as we dont expect old email verification method here
-        });
+      const humanUser =
+        potentialUsers[0].type.case === "human"
+          ? potentialUsers[0].type.value
+          : undefined;
 
-        if (command.organization || session.factors?.user?.organizationId) {
-          paramsVerify.append(
-            "organization",
-            command.organization ?? session.factors?.user?.organizationId,
-          );
-        }
+      // redirect to /verify invite if no auth method is set and email is not verified
+      const inviteCheck = checkInvite(
+        session,
+        humanUser,
+        session.factors.user.organizationId,
+        command.authRequestId,
+      );
 
-        if (command.authRequestId) {
-          paramsVerify.append("authRequestId", command.authRequestId);
-        }
-
-        return { redirect: "/verify?" + paramsVerify };
+      if (inviteCheck?.redirect) {
+        return inviteCheck;
       }
 
       const paramsAuthenticatorSetup = new URLSearchParams({
@@ -350,8 +343,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       if (command.authRequestId) {
         params.set("authRequestId", command.authRequestId);
       }
+
       if (command.loginName) {
-        params.set("loginName", command.loginName);
+        params.set("email", command.loginName);
       }
 
       return { redirect: "/register?" + params };
