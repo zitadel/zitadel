@@ -8,40 +8,32 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
+	group_pb "github.com/zitadel/zitadel/pkg/grpc/group"
 )
 
-func UserGrantsToPb(assetPrefix string, grants []*query.UserGrant) []*user_pb.UserGrant {
-	u := make([]*user_pb.UserGrant, len(grants))
+func GroupGrantsToPb(assetPrefix string, grants []*query.GroupGrant) []*group_pb.GroupGrant {
+	u := make([]*group_pb.GroupGrant, len(grants))
 	for i, grant := range grants {
-		u[i] = UserGrantToPb(assetPrefix, grant)
+		u[i] = GroupGrantToPb(assetPrefix, grant)
 	}
 	return u
 }
 
-func UserGrantToPb(assetPrefix string, grant *query.UserGrant) *user_pb.UserGrant {
-	return &user_pb.UserGrant{
-		Id:                 grant.ID,
-		UserId:             grant.UserID,
-		State:              UserGrantStateToPb(grant.State),
-		RoleKeys:           grant.Roles,
-		ProjectId:          grant.ProjectID,
-		OrgId:              grant.ResourceOwner,
-		ProjectGrantId:     grant.GrantID,
-		UserName:           grant.Username,
-		FirstName:          grant.FirstName,
-		LastName:           grant.LastName,
-		Email:              grant.Email,
-		DisplayName:        grant.DisplayName,
-		OrgDomain:          grant.OrgPrimaryDomain,
-		OrgName:            grant.OrgName,
-		ProjectName:        grant.ProjectName,
-		AvatarUrl:          domain.AvatarURL(assetPrefix, grant.UserResourceOwner, grant.AvatarURL),
-		PreferredLoginName: grant.PreferredLoginName,
-		UserType:           TypeToPb(grant.UserType),
-		GrantedOrgId:       grant.GrantedOrgID,
-		GrantedOrgName:     grant.GrantedOrgName,
-		GrantedOrgDomain:   grant.GrantedOrgDomain,
+func GroupGrantToPb(assetPrefix string, grant *query.GroupGrant) *group_pb.GroupGrant {
+	return &group_pb.GroupGrant{
+		Id:               grant.ID,
+		GroupId:          grant.GroupID,
+		State:            GroupGrantStateToPb(grant.State),
+		RoleKeys:         grant.Roles,
+		ProjectId:        grant.ProjectID,
+		OrgId:            grant.ResourceOwner,
+		ProjectGrantId:   grant.GrantID,
+		OrgDomain:        grant.OrgPrimaryDomain,
+		OrgName:          grant.OrgName,
+		ProjectName:      grant.ProjectName,
+		GrantedOrgId:     grant.GrantedOrgID,
+		GrantedOrgName:   grant.GrantedOrgName,
+		GrantedOrgDomain: grant.GrantedOrgDomain,
 		Details: object.ToViewDetailsPb(
 			grant.Sequence,
 			grant.CreationDate,
@@ -51,25 +43,25 @@ func UserGrantToPb(assetPrefix string, grant *query.UserGrant) *user_pb.UserGran
 	}
 }
 
-func UserGrantStateToPb(state domain.UserGrantState) user_pb.UserGrantState {
+func GroupGrantStateToPb(state domain.GroupGrantState) group_pb.GroupGrantState {
 	switch state {
-	case domain.UserGrantStateActive:
-		return user_pb.UserGrantState_USER_GRANT_STATE_ACTIVE
-	case domain.UserGrantStateInactive:
-		return user_pb.UserGrantState_USER_GRANT_STATE_INACTIVE
-	case domain.UserGrantStateRemoved,
-		domain.UserGrantStateUnspecified:
+	case domain.GroupGrantStateActive:
+		return group_pb.GroupGrantState_GROUP_GRANT_STATE_ACTIVE
+	case domain.GroupGrantStateInactive:
+		return group_pb.GroupGrantState_GROUP_GRANT_STATE_INACTIVE
+	case domain.GroupGrantStateRemoved,
+		domain.GroupGrantStateUnspecified:
 		// these states should never occur here and are mainly listed for linting purposes
 		fallthrough
 	default:
-		return user_pb.UserGrantState_USER_GRANT_STATE_UNSPECIFIED
+		return group_pb.GroupGrantState_GROUP_GRANT_STATE_UNSPECIFIED
 	}
 }
 
-func UserGrantQueriesToQuery(ctx context.Context, queries []*user_pb.UserGrantQuery) (q []query.SearchQuery, err error) {
+func GroupGrantQueriesToQuery(ctx context.Context, queries []*group_pb.GroupGrantQuery) (q []query.SearchQuery, err error) {
 	q = make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i], err = UserGrantQueryToQuery(ctx, query)
+		q[i], err = GroupGrantQueryToQuery(ctx, query)
 		if err != nil {
 			return nil, err
 		}
@@ -77,104 +69,55 @@ func UserGrantQueriesToQuery(ctx context.Context, queries []*user_pb.UserGrantQu
 	return q, nil
 }
 
-func UserGrantQueryToQuery(ctx context.Context, query *user_pb.UserGrantQuery) (query.SearchQuery, error) {
+func GroupGrantQueryToQuery(ctx context.Context, query *group_pb.GroupGrantQuery) (query.SearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *user_pb.UserGrantQuery_DisplayNameQuery:
-		return UserGrantDisplayNameQueryToModel(q.DisplayNameQuery)
-	case *user_pb.UserGrantQuery_EmailQuery:
-		return UserGrantEmailQueryToModel(q.EmailQuery)
-	case *user_pb.UserGrantQuery_FirstNameQuery:
-		return UserGrantFirstNameQueryToModel(q.FirstNameQuery)
-	case *user_pb.UserGrantQuery_LastNameQuery:
-		return UserGrantLastNameQueryToModel(q.LastNameQuery)
-	case *user_pb.UserGrantQuery_OrgDomainQuery:
-		return UserGrantOrgDomainQueryToModel(q.OrgDomainQuery)
-	case *user_pb.UserGrantQuery_OrgNameQuery:
-		return UserGrantOrgNameQueryToModel(q.OrgNameQuery)
-	case *user_pb.UserGrantQuery_ProjectGrantIdQuery:
-		return UserGrantProjectGrantIDQueryToModel(q.ProjectGrantIdQuery)
-	case *user_pb.UserGrantQuery_ProjectIdQuery:
-		return UserGrantProjectIDQueryToModel(q.ProjectIdQuery)
-	case *user_pb.UserGrantQuery_ProjectNameQuery:
-		return UserGrantProjectNameQueryToModel(q.ProjectNameQuery)
-	case *user_pb.UserGrantQuery_RoleKeyQuery:
-		return UserGrantRoleKeyQueryToModel(q.RoleKeyQuery)
-	case *user_pb.UserGrantQuery_UserIdQuery:
-		return UserGrantUserIDQueryToModel(q.UserIdQuery)
-	case *user_pb.UserGrantQuery_UserNameQuery:
-		return UserGrantUserNameQueryToModel(q.UserNameQuery)
-	case *user_pb.UserGrantQuery_WithGrantedQuery:
-		return UserGrantWithGrantedQueryToModel(ctx, q.WithGrantedQuery)
-	case *user_pb.UserGrantQuery_UserTypeQuery:
-		return UserGrantUserTypeQueryToModel(q.UserTypeQuery)
+	case *group_pb.GroupGrantQuery_OrgDomainQuery:
+		return GroupGrantOrgDomainQueryToModel(q.OrgDomainQuery)
+	case *group_pb.GroupGrantQuery_OrgNameQuery:
+		return GroupGrantOrgNameQueryToModel(q.OrgNameQuery)
+	case *group_pb.GroupGrantQuery_ProjectGrantIdQuery:
+		return GroupGrantProjectGrantIDQueryToModel(q.ProjectGrantIdQuery)
+	case *group_pb.GroupGrantQuery_ProjectIdQuery:
+		return GroupGrantProjectIDQueryToModel(q.ProjectIdQuery)
+	case *group_pb.GroupGrantQuery_ProjectNameQuery:
+		return GroupGrantProjectNameQueryToModel(q.ProjectNameQuery)
+	case *group_pb.GroupGrantQuery_GroupIdQuery:
+		return GroupGrantGroupIDQueryToModel(q.GroupIdQuery)
+	case *group_pb.GroupGrantQuery_WithGrantedQuery:
+		return GroupGrantWithGrantedQueryToModel(ctx, q.WithGrantedQuery)
 	default:
 		return nil, errors.New("invalid query")
 	}
 }
 
-func UserGrantDisplayNameQueryToModel(q *user_pb.UserGrantDisplayNameQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantDisplayNameQuery(q.DisplayName, object.TextMethodToQuery(q.Method))
+func GroupGrantOrgDomainQueryToModel(q *group_pb.GroupGrantOrgDomainQuery) (query.SearchQuery, error) {
+	return query.NewGroupGrantDomainQuery(q.OrgDomain, object.TextMethodToQuery(q.Method))
 }
 
-func UserGrantEmailQueryToModel(q *user_pb.UserGrantEmailQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantEmailQuery(q.Email, object.TextMethodToQuery(q.Method))
+func GroupGrantOrgNameQueryToModel(q *group_pb.GroupGrantOrgNameQuery) (query.SearchQuery, error) {
+	return query.NewGroupGrantOrgNameQuery(q.OrgName, object.TextMethodToQuery(q.Method))
 }
 
-func UserGrantFirstNameQueryToModel(q *user_pb.UserGrantFirstNameQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantFirstNameQuery(q.FirstName, object.TextMethodToQuery(q.Method))
+func GroupGrantProjectIDQueryToModel(q *group_pb.GroupGrantProjectIDQuery) (query.SearchQuery, error) {
+	return query.NewGroupGrantProjectIDSearchQuery(q.ProjectId)
 }
 
-func UserGrantLastNameQueryToModel(q *user_pb.UserGrantLastNameQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantLastNameQuery(q.LastName, object.TextMethodToQuery(q.Method))
+func GroupGrantProjectGrantIDQueryToModel(q *group_pb.GroupGrantProjectGrantIDQuery) (query.SearchQuery, error) {
+	return query.NewGroupGrantGrantIDSearchQuery(q.ProjectGrantId)
 }
 
-func UserGrantOrgDomainQueryToModel(q *user_pb.UserGrantOrgDomainQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantDomainQuery(q.OrgDomain, object.TextMethodToQuery(q.Method))
+func GroupGrantProjectNameQueryToModel(q *group_pb.GroupGrantProjectNameQuery) (query.SearchQuery, error) {
+	return query.NewGroupGrantProjectNameQuery(q.ProjectName, object.TextMethodToQuery(q.Method))
 }
 
-func UserGrantOrgNameQueryToModel(q *user_pb.UserGrantOrgNameQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantOrgNameQuery(q.OrgName, object.TextMethodToQuery(q.Method))
+func GroupGrantRoleKeyQueryToModel(q *group_pb.GroupGrantRoleKeyQuery) (query.SearchQuery, error) {
+	return query.NewGroupGrantRoleQuery(q.RoleKey)
 }
 
-func UserGrantProjectIDQueryToModel(q *user_pb.UserGrantProjectIDQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantProjectIDSearchQuery(q.ProjectId)
+func GroupGrantGroupIDQueryToModel(q *group_pb.GroupGrantGroupIDQuery) (query.SearchQuery, error) {
+	return query.NewGroupGrantGroupIDSearchQuery(q.GroupId)
 }
 
-func UserGrantProjectGrantIDQueryToModel(q *user_pb.UserGrantProjectGrantIDQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantGrantIDSearchQuery(q.ProjectGrantId)
-}
-
-func UserGrantProjectNameQueryToModel(q *user_pb.UserGrantProjectNameQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantProjectNameQuery(q.ProjectName, object.TextMethodToQuery(q.Method))
-}
-
-func UserGrantRoleKeyQueryToModel(q *user_pb.UserGrantRoleKeyQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantRoleQuery(q.RoleKey)
-}
-
-func UserGrantUserIDQueryToModel(q *user_pb.UserGrantUserIDQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantUserIDSearchQuery(q.UserId)
-}
-
-func UserGrantUserNameQueryToModel(q *user_pb.UserGrantUserNameQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantUsernameQuery(q.UserName, object.TextMethodToQuery(q.Method))
-}
-
-func UserGrantWithGrantedQueryToModel(ctx context.Context, q *user_pb.UserGrantWithGrantedQuery) (query.SearchQuery, error) {
+func GroupGrantWithGrantedQueryToModel(ctx context.Context, q *group_pb.GroupGrantWithGrantedQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantWithGrantedQuery(authz.GetCtxData(ctx).OrgID)
-}
-
-func UserGrantUserTypeQueryToModel(q *user_pb.UserGrantUserTypeQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantUserTypeQuery(grantTypeToDomain(q.Type))
-}
-
-func grantTypeToDomain(typ user_pb.Type) domain.UserType {
-	switch typ {
-	case user_pb.Type_TYPE_HUMAN:
-		return domain.UserTypeHuman
-	case user_pb.Type_TYPE_MACHINE:
-		return domain.UserTypeMachine
-	default:
-		return domain.UserTypeUnspecified
-	}
 }

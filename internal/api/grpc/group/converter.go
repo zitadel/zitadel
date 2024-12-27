@@ -71,7 +71,7 @@ func GroupQueryToModel(apiQuery *group_pb.GroupQuery) (query.SearchQuery, error)
 	case *group_pb.GroupQuery_GroupResourceOwnerQuery:
 		return query.NewGroupResourceOwnerSearchQuery(q.GroupResourceOwnerQuery.ResourceOwner)
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-uQ9nC", "List.Query.Invalid")
 	}
 }
 
@@ -86,69 +86,13 @@ func groupStateToPb(state domain.GroupState) group_pb.GroupState {
 	}
 }
 
-func projectGrantStateToPb(state domain.ProjectGrantState) group_pb.ProjectGrantState {
+func groupGrantStateToPb(state domain.GroupGrantState) group_pb.GroupGrantState {
 	switch state {
-	case domain.ProjectGrantStateActive:
-		return group_pb.ProjectGrantState_PROJECT_GRANT_STATE_ACTIVE
-	case domain.ProjectGrantStateInactive:
-		return group_pb.ProjectGrantState_PROJECT_GRANT_STATE_INACTIVE
+	case domain.GroupGrantStateActive:
+		return group_pb.GroupGrantState_GROUP_GRANT_STATE_ACTIVE
+	case domain.GroupGrantStateInactive:
+		return group_pb.GroupGrantState_GROUP_GRANT_STATE_INACTIVE
 	default:
-		return group_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
-	}
-}
-
-func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) group_pb.PrivateLabelingSetting {
-	switch setting {
-	case domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy:
-		return group_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY
-	case domain.PrivateLabelingSettingEnforceProjectResourceOwnerPolicy:
-		return group_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY
-	default:
-		return group_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
-	}
-}
-
-func RoleQueriesToModel(queries []*group_pb.RoleQuery) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, len(queries))
-	for i, query := range queries {
-		q[i], err = RoleQueryToModel(query)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return q, nil
-}
-
-func RoleQueryToModel(apiQuery *group_pb.RoleQuery) (query.SearchQuery, error) {
-	switch q := apiQuery.Query.(type) {
-	case *group_pb.RoleQuery_KeyQuery:
-		return query.NewProjectRoleKeySearchQuery(object.TextMethodToQuery(q.KeyQuery.Method), q.KeyQuery.Key)
-	case *group_pb.RoleQuery_DisplayNameQuery:
-		return query.NewProjectRoleDisplayNameSearchQuery(object.TextMethodToQuery(q.DisplayNameQuery.Method), q.DisplayNameQuery.DisplayName)
-	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-fms0e", "List.Query.Invalid")
-	}
-}
-
-func RoleViewsToPb(roles []*query.ProjectRole) []*group_pb.Role {
-	o := make([]*group_pb.Role, len(roles))
-	for i, org := range roles {
-		o[i] = RoleViewToPb(org)
-	}
-	return o
-}
-
-func RoleViewToPb(role *query.ProjectRole) *group_pb.Role {
-	return &group_pb.Role{
-		Key:         role.Key,
-		DisplayName: role.DisplayName,
-		Group:       role.Group,
-		Details: object.ToViewDetailsPb(
-
-			role.Sequence,
-			role.CreationDate,
-			role.ChangeDate,
-			role.ResourceOwner,
-		),
+		return group_pb.GroupGrantState_GROUP_GRANT_STATE_UNSPECIFIED
 	}
 }

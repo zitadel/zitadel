@@ -90,6 +90,21 @@ message GroupGrant {
             example: "\"zitadel.cloud\"";
         }
     ];
+    string org_id = 13 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\"";
+        }
+    ];
+    string org_domain = 14 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\"";
+        }
+    ];
+    string org_name = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
 }
 
 enum GroupState {
@@ -120,8 +135,10 @@ message GroupGrantQuery {
         GroupGrantOrgNameQuery org_name_query = 7;
         GroupGrantOrgDomainQuery org_domain_query = 8;
         GroupGrantProjectNameQuery project_name_query = 9;
-        // GroupGrantDisplayNameQuery display_name_query = 13;
-        // GroupGrantUserTypeQuery user_type_query = 14;
+        GroupGrantOrgDomainQuery org_domain_query = 10;
+        GroupGrantOrgIdQuery org_id_query = 11;
+        GroupGrantOrgNameQuery org_name_query = 12;
+        
     }
 }
 
@@ -230,6 +247,45 @@ message GroupGrantProjectNameQuery {
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ITADE\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "3"
+        }
+    ];
+}
+
+message GroupGrantOrgIDQuery {
+    string user_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message GroupGrantOrgNameQuery {
+    string org_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADE\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "3"
+        }
+    ];
+}
+
+message GroupGrantOrgDomainNameQuery {
+    string org_domain_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADE\""
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [

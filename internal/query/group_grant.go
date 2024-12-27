@@ -95,9 +95,9 @@ type GroupGrant struct {
 	Sequence     uint64                     `json:"sequence,omitempty"`
 	Roles        database.TextArray[string] `json:"roles,omitempty"`
 	// GrantID represents the project grant id
-	GrantID            string                `json:"grant_id,omitempty"`
-	State              domain.UserGrantState `json:"state,omitempty"`
-	GroupResourceOwner string                `json:"group_resource_owner,omitempty"`
+	GrantID            string                 `json:"grant_id,omitempty"`
+	State              domain.GroupGrantState `json:"state,omitempty"`
+	GroupResourceOwner string                 `json:"group_resource_owner,omitempty"`
 
 	// UserID             string          `json:"user_id,omitempty"`
 	// Username           string          `json:"username,omitempty"`
