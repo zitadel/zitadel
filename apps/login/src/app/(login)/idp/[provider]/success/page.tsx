@@ -153,8 +153,11 @@ export default async function Page(props: {
     }
   }
 
-  // if link === true, do not create user
-  if (options?.isCreationAllowed && options.isAutoCreation && !link) {
+  if (link) {
+    return linkingFailed(branding);
+  }
+
+  if (options?.isCreationAllowed && options.isAutoCreation) {
     let orgToRegisterOn: string | undefined = organization;
 
     let userData: AddHumanUserRequest =
@@ -207,10 +210,6 @@ export default async function Page(props: {
         </DynamicTheme>
       );
     }
-  }
-
-  if (link) {
-    return linkingFailed(branding);
   }
 
   // return login failed if no linking or creation is allowed and no user was found
