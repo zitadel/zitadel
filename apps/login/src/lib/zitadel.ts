@@ -633,11 +633,15 @@ export async function verifyU2FRegistration(
   return userService.verifyU2FRegistration(request, {});
 }
 
-export async function getActiveIdentityProviders(orgId?: string) {
-  return settingsService.getActiveIdentityProviders(
-    { ctx: makeReqCtx(orgId) },
-    {},
-  );
+export async function getActiveIdentityProviders(
+  orgId?: string,
+  linking_allowed?: boolean,
+) {
+  const props: any = { ctx: makeReqCtx(orgId) };
+  if (linking_allowed) {
+    props.linkingAllowed = linking_allowed;
+  }
+  return settingsService.getActiveIdentityProviders(props, {});
 }
 
 /**

@@ -120,6 +120,7 @@ export async function sendVerificationRedirectWithoutCheck(command: {
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
     return { error: "Could not load possible authenticators" };
   }
+
   // if no authmethods are found on the user, redirect to set one up
   if (
     authMethodResponse &&

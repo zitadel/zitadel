@@ -183,7 +183,8 @@
     "title": "Seleccionar método de autenticación",
     "description": "Selecciona el método con el que deseas autenticarte",
     "noMethodsAvailable": "No hay métodos de autenticación disponibles",
-    "allSetup": "¡Ya has configurado un autenticador!"
+    "allSetup": "¡Ya has configurado un autenticador!",
+    "linkWithIDP": "o vincúlalo con un proveedor de identidad"
   },
   "error": {
     "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",

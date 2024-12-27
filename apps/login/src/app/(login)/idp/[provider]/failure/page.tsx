@@ -28,7 +28,7 @@ export default async function Page(props: {
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>{t("loginError.title")}</h1>
-        <div>{t("loginError.description")}</div>
+        <p className="ztdl-p">{t("loginError.description")}</p>
       </div>
     </DynamicTheme>
   );
