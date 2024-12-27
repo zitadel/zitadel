@@ -183,7 +183,8 @@
     "title": "选择认证方式",
     "description": "选择您想使用的认证方法",
     "noMethodsAvailable": "没有可用的认证方法",
-    "allSetup": "您已经设置好了一个认证器！"
+    "allSetup": "您已经设置好了一个认证器！",
+    "linkWithIDP": "或将其与身份提供者关联"
   },
   "error": {
     "unknownContext": "无法获取用户的上下文。请先输入用户名或提供 loginName 作为搜索参数。",
