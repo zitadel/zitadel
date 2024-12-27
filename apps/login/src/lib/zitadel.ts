@@ -15,6 +15,7 @@ import {
   ResendEmailCodeRequest,
   ResendEmailCodeRequestSchema,
   RetrieveIdentityProviderIntentRequest,
+  SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
   VerifyPasskeyRegistrationRequest,
@@ -271,6 +272,32 @@ export async function verifyInviteCode(
 
 export async function resendInviteCode(userId: string) {
   return userService.resendInviteCode({ userId }, {});
+}
+
+export async function sendEmailCode(
+  userId: string,
+  host: string | null,
+  authRequestId?: string,
+) {
+  let medium = create(SendEmailCodeRequestSchema, {
+    userId,
+  });
+
+  if (host) {
+    medium = create(SendEmailCodeRequestSchema, {
+      ...medium,
+      verification: {
+        case: "sendCode",
+        value: create(SendEmailVerificationCodeSchema, {
+          urlTemplate:
+            `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+            (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+        }),
+      },
+    });
+  }
+
+  return userService.sendEmailCode(medium, {});
 }
 
 export async function createInviteCode(userId: string, host: string | null) {
