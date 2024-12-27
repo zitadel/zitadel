@@ -170,8 +170,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       session.factors?.user?.id,
     );
 
-    console.log(methods);
-
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
       if (
         potentialUsers[0].type.case === "human" &&
