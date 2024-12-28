@@ -25,13 +25,13 @@ If any inconsistencies arise between this privacy policy and the otherwise appli
 
 ZITADEL determines the purposes for and means of the processing (i.e., we are the data controller) of your personal data as described in this privacy policy, unless expressly specified otherwise. The responsible party for the data processing described in this privacy policy and contact for questions and issues regarding data protection is:
 
-**Zitadel, Inc.** 
-Four Embarcadero Center, Suite 1400
-San Francisco, CA 94111-4164
-United States of America
+**Zitadel, Inc.**  
+Four Embarcadero Center, Suite 1400  
+San Francisco, CA 94111-4164  
+United States of America  
 [legal@zitadel.com](mailto:legal@zitadel.com)
 
-**CAOS AG**  
+**CAOS AG (Affiliate of Zitadel, Inc.)**  
 Data Protection Officer  
 Lerchenfeldstrasse 3
 9014 St. Gallen  
@@ -241,7 +241,7 @@ We disclose the following categories of personal data for business or commercial
   * We disclose audiovisual information with businesses and service providers who help administer customer service and fraud or loss prevention services.  
   * We disclose inferences with businesses and service providers who help administer marketing and personalization.
 
-Privacy rights
+### Privacy rights
 
 Right to Opt-Out of Cookies and Sale/Sharing: Although we do not sell personal data for monetary value, our use of cookies and automated technologies may be considered a “sale” / “sharing” in certain states, such as California. Visitors to our US website can opt out of such third parties by clicking the “Manage cookie preferences” link at the bottom of our Site. The categories of personal data disclosed that may be considered a “sale” / “sharing” include identifiers, device information, Internet or other network activity, geolocation data, and commercial data.
 
@@ -270,7 +270,7 @@ California Shine the Light: Customers who are residents of California may reques
 
 Do Not Track signals: Most modern web browsers give you the option to send a 'Do Not Track' signal to the sites you visit, indicating that you do not wish to be tracked. However, there is currently no accepted standard for how a site should respond to this signal, and we do not take any action in response to this signal.‍
 
-## Note on international data transfers 
+## Note on international data transfers
 
 Our Sites and Services make use of tools from companies based in countries outside of Switzerland or the EU/EEA, namely those based in the USA. When these tools are active, your personal data may be transferred to the servers of the respective companies abroad. If you are using the Site or Services from outside the United States, your personal data may be processed in a foreign country, where privacy laws may be less stringent than the laws in your country. In these cases, we only transfer personal data after we have implemented the legally required measures for this, such as concluding standard contractual clauses on data protection or obtaining the consent of the data subjects. If interested, the documentation on these measures can be obtained from the contact person mentioned above. By submitting your personal data to us you agree to the transfer, storage, and processing of your personal data in a country other than your country of residence including, but not necessarily limited to, the United States.
 
