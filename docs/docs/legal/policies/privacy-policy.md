@@ -2,7 +2,6 @@
 title: Privacy Policy
 custom_edit_url: null
 --- 
-import PiidTable from '../_piid-table.mdx';
 
 Last updated on 31 December, 2024
 
@@ -61,11 +60,11 @@ This website uses TLS encryption for security reasons and to protect the transmi
 
 We process personal data in accordance with Swiss data protection law. In addition, we process - to the extent and insofar as the EU Data Protection Regulation is applicable - personal data in accordance with the following legal bases within the meaning of Art. 6 (1) DSGVO :
 
-- Insofar as we obtain the consent of the data subject for processing operations, Art. 6 (1) a) DSGVO serves as the legal basis.
-- When processing personal data for the fulfillment of a contract with the data subject as well as for the implementation of corresponding pre-contractual measures, Art. 6 para. 1 lit. b DSGVO serves as the legal basis.
-- To the extent that processing of personal data is necessary to comply with a legal obligation to which we are subject under any applicable law of the EU or under any applicable law of a country in which the GDPR applies in whole or in part, Art. 6 para. 1 lit. c GDPR serves as the legal basis.
-- For the processing of personal data in order to protect vital interests of the data subject or another natural person, Art. 6 para. 1 lit. d DSGVO serves as the legal basis.
-- If personal data is processed in order to protect the legitimate interests of us or of third parties and if the fundamental freedoms and rights and interests of the data subject do not override our interests and the interests of third parties, Article 6 (1) (f) of the GDPR serves as the legal basis. Legitimate interests are in particular our business interest in being able to provide our website and our products, information security, the enforcement of our own legal claims and compliance with Swiss law.
+* Insofar as we obtain the consent of the data subject for processing operations, Art. 6 (1) a) DSGVO serves as the legal basis.
+* When processing personal data for the fulfillment of a contract with the data subject as well as for the implementation of corresponding pre-contractual measures, Art. 6 para. 1 lit. b DSGVO serves as the legal basis.
+* To the extent that processing of personal data is necessary to comply with a legal obligation to which we are subject under any applicable law of the EU or under any applicable law of a country in which the GDPR applies in whole or in part, Art. 6 para. 1 lit. c GDPR serves as the legal basis.
+* For the processing of personal data in order to protect vital interests of the data subject or another natural person, Art. 6 para. 1 lit. d DSGVO serves as the legal basis.
+* If personal data is processed in order to protect the legitimate interests of us or of third parties and if the fundamental freedoms and rights and interests of the data subject do not override our interests and the interests of third parties, Article 6 (1) (f) of the GDPR serves as the legal basis. Legitimate interests are in particular our business interest in being able to provide our website and our products, information security, the enforcement of our own legal claims and compliance with Swiss law.
 
 We will retain personal data for the period of time necessary for the particular purpose for which it was collected and where we have an ongoing legitimate business need to do so (for example to comply with applicable legal, tax or accounting requirements). Subsequently, they are either deleted or made anonymous, unless we need them for a longer period of time in exceptional cases, e.g. due to legal storage and documentation obligations or our legitimate interests, such as the protection of rights to which we are entitled or the defense of claims. 
 
@@ -92,7 +91,10 @@ Our Sites can generally be visited without registration. If you apply for a job 
 The use of our services is generally only possible with registration. During registration and in the course of using the services, we collect and process various personal data.
 
 In particular, the following personal data are part of the processing:
-<PiidTable />
+
+import { PiiTable } from "../../../src/components/pii_table";
+
+<PiiTable />
 
 Unless otherwise mentioned, the nature and purpose of the processing is as follows:
 

@@ -5,7 +5,6 @@ custom:
     created_at: 2022-07-15
     updated_at: 2023-11-16
 --- 
-import PiidTable from './_piid-table.mdx';
 
 Last updated on December 31, 2023
 
@@ -54,7 +53,10 @@ This DPA will become effective on the date the Agreement enters into effect and 
 For the avoidance of doubt, the terms of the Framework Agreement will continue in full force and effect; however, to the extent any term in any Agreement regarding either Party’s obligations with respect to Customer Data is less restrictive than or is inconsistent with this DPA, the terms of this DPA shall supersede and control.
 
 The Parties acknowledge that the following Customer Data will be processed as part of the Services:
-<PiidTable />
+
+import { PiiTable } from "../../src/components/pii_table";
+
+<PiiTable />
 
 ## Scope
 
