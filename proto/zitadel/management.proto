@@ -10346,6 +10346,46 @@ message RemoveProjectGrantMemberResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ListGroupMembersRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 2;
+    //criteria the client is looking for
+    repeated zitadel.member.v1.SearchQuery queries = 3;
+}
+
+message ListGroupMembersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.member.v1.Member result = 2;
+}
+
+message AddGroupMemberRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddGroupMemberResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateGroupMemberRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateGroupMemberResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveGroupMemberRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string user_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveGroupMemberResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetUserGrantByIDRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];

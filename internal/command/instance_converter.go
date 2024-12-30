@@ -24,6 +24,13 @@ func memberWriteModelToMember(writeModel *MemberWriteModel) *domain.Member {
 	}
 }
 
+func groupMemberWriteModelToMember(writeModel *GroupMemberWrite) *domain.GroupMember {
+	return &domain.GroupMember{
+		ObjectRoot: writeModelToObjectRoot(writeModel.WriteModel),
+		UserID:     writeModel.UserID,
+	}
+}
+
 func writeModelToLoginPolicy(wm *LoginPolicyWriteModel) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
 		ObjectRoot:                 writeModelToObjectRoot(wm.WriteModel),

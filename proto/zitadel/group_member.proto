@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "zitadel/user.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.group_member.v1;
+
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/groupmember";
+
+message GroupMember {
+    string user_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    string group_id = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    string preferred_login_name = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi@zitadel.com\"";
+            description: "preferred login name of the user"
+        }
+    ];
+    string email = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi@zitadel.com\"";
+            description: "preferred login name of the user"
+        }
+    ];
+    string first_name = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Gigi\"";
+            description: "the first name of the user"
+        }
+    ];
+    string last_name = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Giraffe\"";
+            description: "last name of the user"
+        }
+    ];
+    string display_name = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "display name of the user"
+            example: "\"Gigi Giraffe\"";
+        }
+    ];
+    string avatar_url = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "avatar URL of the user"
+            example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+        }
+    ];
+    zitadel.user.v1.Type user_type = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "type of the user (human / machine)"
+        }
+    ];
+}
+
+message SearchQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        FirstNameQuery first_name_query = 1;
+        LastNameQuery last_name_query = 2;
+        EmailQuery email_query = 3;
+        UserIDQuery user_id_query = 4;
+    }
+}
+
+message FirstNameQuery {
+    string first_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"Gigi\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+message LastNameQuery {
+    string last_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"Giraffe\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+message EmailQuery {
+    string email = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "email address of the user"
+            max_length: 200;
+            example: "\"gigi@zitadel.com\"";
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used";
+        }
+    ];
+}
+
+message UserIDQuery {
+    string user_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the id of the user"
+            max_length: 200;
+            example: "\"69629023906488334\"";
+        }
+    ];
+}
+
+message GroupIDQuery {
+    string group_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the id of the user"
+            max_length: 200;
+            example: "\"69629023906488334\"";
+        }
+    ];
+}

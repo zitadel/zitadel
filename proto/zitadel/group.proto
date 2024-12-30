@@ -125,20 +125,17 @@ message GroupGrantQuery {
 
         GroupGrantProjectIDQuery project_id_query = 1;
         GroupGrantGroupIDQuery group_id_query = 2;
-        GroupGrantWithGrantedQuery with_granted_query = 3;
-        GroupGrantRoleKeyQuery role_key_query = 4;
-        GroupGrantProjectGrantIDQuery project_grant_id_query = 5;
-        GroupGrantGroupNameQuery group_name_query = 6;
-        // GroupGrantFirstNameQuery first_name_query = 7;
-        // GroupGrantLastNameQuery last_name_query = 8;
-        // GroupGrantEmailQuery email_query = 9;
-        GroupGrantOrgNameQuery org_name_query = 7;
-        GroupGrantOrgDomainQuery org_domain_query = 8;
-        GroupGrantProjectNameQuery project_name_query = 9;
-        GroupGrantOrgDomainQuery org_domain_query = 10;
-        GroupGrantOrgIdQuery org_id_query = 11;
-        GroupGrantOrgNameQuery org_name_query = 12;
-        
+        GroupGrantGroupNameQuery group_name_query = 3;
+        GroupGrantWithGrantedQuery with_granted_query = 4;
+        GroupGrantRoleKeyQuery role_key_query = 5;
+        GroupGrantProjectGrantIDQuery project_grant_id_query = 6;
+        GroupGrantProjectNameQuery project_name_query = 7;
+        GroupGrantOrgNameQuery org_name_query = 8;
+        GroupGrantOrgDomainQuery org_domain_query = 9;
+        GroupGrantOrgIdQuery org_id_query = 10;
+        GroupGrantGrantedOrgIdQuery granted_org_id_query = 11;
+        GroupGrantGrantedOrgNameQuery granted_org_name_query = 12;
+        GroupGrantGrantedOrgDomainQuery granted_org_domain_query = 13;
     }
 }
 
@@ -160,8 +157,17 @@ message GroupGrantProjectIDQuery {
     ];
 }
 
-message GroupGrantUserIDQuery {
-    string user_id = 1 [
+message GroupGrantOrgIdQuery {
+    string org_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message GroupGrantGrantedOrgIdQuery {
+    string granted_org_id = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"78629023905388335\""
@@ -258,7 +264,7 @@ message GroupGrantProjectNameQuery {
 }
 
 message GroupGrantOrgIDQuery {
-    string user_id = 1 [
+    string org_id = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"78629023905388335\""
@@ -266,32 +272,42 @@ message GroupGrantOrgIDQuery {
     ];
 }
 
-message GroupGrantOrgNameQuery {
-    string org_name = 1 [
+message GroupGrantGrantedOrgIDQuery {
+    string granted_org_id = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADE\""
-        }
-    ];
-    zitadel.v1.TextQueryMethod method = 2 [
-        (validate.rules).enum.defined_only = true,
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "3"
+            example: "\"78629023905388335\""
         }
     ];
 }
 
-message GroupGrantOrgDomainNameQuery {
-    string org_domain_name = 1 [
+
+message GroupGrantGrantedOrgNameQuery {
+    string granted_org_name = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"ZITADE\""
+            example: "\"cao\""
         }
     ];
     zitadel.v1.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "3"
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message GroupGrantGrantedOrgDomainQuery {
+    string granted_org_domain = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"OS AG\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
         }
     ];
 }
