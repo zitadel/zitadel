@@ -2541,6 +2541,10 @@
       "CLIENTSECRETREGENERATED": "Client Secret generiert.",
       "DELETED": "App gelöscht.",
       "CONFIGCHANGED": "Konfigurationsänderung entdeckt."
+    },
+    "LOGINV2": {
+      "USEV2": "Neue Login-Benutzeroberfläche verwenden",
+      "BASEURL": "Benutzerdefinierte Basis-URL für die neue Login-Benutzeroberfläche"
     }
   },
   "GENDERS": {

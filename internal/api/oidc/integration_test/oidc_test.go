@@ -18,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
@@ -394,16 +395,27 @@ func Test_ZITADEL_API_terminated_session_user_disabled(t *testing.T) {
 
 func createClient(t testing.TB, instance *integration.Instance) (clientID, projectID string) {
 	return createClientWithOpts(t, instance, clientOpts{
-		redirectURI: redirectURI,
-		logoutURI:   logoutRedirectURI,
-		devMode:     false,
+		redirectURI:  redirectURI,
+		logoutURI:    logoutRedirectURI,
+		devMode:      false,
+		LoginVersion: nil,
+	})
+}
+
+func createClientLoginV2(t testing.TB, instance *integration.Instance) (clientID, projectID string) {
+	return createClientWithOpts(t, instance, clientOpts{
+		redirectURI:  redirectURI,
+		logoutURI:    logoutRedirectURI,
+		devMode:      false,
+		LoginVersion: &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: nil}}},
 	})
 }
 
 type clientOpts struct {
-	redirectURI string
-	logoutURI   string
-	devMode     bool
+	redirectURI  string
+	logoutURI    string
+	devMode      bool
+	LoginVersion *app.LoginVersion
 }
 
 func createClientWithOpts(t testing.TB, instance *integration.Instance, opts clientOpts) (clientID, projectID string) {
@@ -411,13 +423,19 @@ func createClientWithOpts(t testing.TB, instance *integration.Instance, opts cli
 
 	project, err := instance.CreateProject(ctx)
 	require.NoError(t, err)
-	app, err := instance.CreateOIDCNativeClient(ctx, opts.redirectURI, opts.logoutURI, project.GetId(), opts.devMode)
+	app, err := instance.CreateOIDCClientLoginVersion(ctx, opts.redirectURI, opts.logoutURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, opts.devMode, opts.LoginVersion)
 	require.NoError(t, err)
 	return app.GetClientId(), project.GetId()
 }
 
 func createImplicitClient(t testing.TB) string {
-	app, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit)
+	app, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit, nil)
+	require.NoError(t, err)
+	return app.GetClientId()
+}
+
+func createImplicitClientNoLoginClientHeader(t testing.TB) string {
+	app, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit, &app.LoginVersion{Version: &app.LoginVersion_LoginV2{LoginV2: &app.LoginV2{BaseUri: nil}}})
 	require.NoError(t, err)
 	return app.GetClientId()
 }
@@ -428,8 +446,20 @@ func createAuthRequest(t testing.TB, instance *integration.Instance, clientID, r
 	return redURL
 }
 
+func createAuthRequestNoLoginClientHeader(t testing.TB, instance *integration.Instance, clientID, redirectURI string, scope ...string) string {
+	redURL, err := instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTX, clientID, redirectURI, "", scope...)
+	require.NoError(t, err)
+	return redURL
+}
+
 func createAuthRequestImplicit(t testing.TB, clientID, redirectURI string, scope ...string) string {
 	redURL, err := Instance.CreateOIDCAuthRequestImplicit(CTX, clientID, Instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, scope...)
+	require.NoError(t, err)
+	return redURL
+}
+
+func createAuthRequestImplicitNoLoginClientHeader(t testing.TB, clientID, redirectURI string, scope ...string) string {
+	redURL, err := Instance.CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(CTX, clientID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }

@@ -2541,6 +2541,10 @@
       "CLIENTSECRETREGENERATED": "客户端秘钥已生成。",
       "DELETED": "应用已删除。",
       "CONFIGCHANGED": "检测到变化！"
+    },
+    "LOGINV2": {
+      "USEV2": "使用新的登录UI",
+      "BASEURL": "新的登录UI的自定义基本URL"
     }
   },
   "GENDERS": {

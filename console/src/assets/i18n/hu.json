@@ -2564,6 +2564,10 @@
       "CLIENTSECRETREGENERATED": "Az ügyfél titok generálva.",
       "DELETED": "Az app törölve.",
       "CONFIGCHANGED": "Változások észlelve!"
+    },
+    "LOGINV2": {
+      "USEV2": "Új bejelentkezési felhasználói felület használata",
+      "BASEURL": "Egyéni alapértelmezett URL az új bejelentkezési felhasználói felülethez"
     }
   },
   "GENDERS": {

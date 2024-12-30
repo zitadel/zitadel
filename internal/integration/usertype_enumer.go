@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _UserTypeName = "unspecifiediam_ownerorg_ownerlogin"
+const _UserTypeName = "unspecifiediam_ownerorg_ownerloginno_permission"
 
-var _UserTypeIndex = [...]uint8{0, 11, 20, 29, 34}
+var _UserTypeIndex = [...]uint8{0, 11, 20, 29, 34, 47}
 
-const _UserTypeLowerName = "unspecifiediam_ownerorg_ownerlogin"
+const _UserTypeLowerName = "unspecifiediam_ownerorg_ownerloginno_permission"
 
 func (i UserType) String() string {
 	if i < 0 || i >= UserType(len(_UserTypeIndex)-1) {
@@ -28,9 +28,10 @@ func _UserTypeNoOp() {
 	_ = x[UserTypeIAMOwner-(1)]
 	_ = x[UserTypeOrgOwner-(2)]
 	_ = x[UserTypeLogin-(3)]
+	_ = x[UserTypeNoPermission-(4)]
 }
 
-var _UserTypeValues = []UserType{UserTypeUnspecified, UserTypeIAMOwner, UserTypeOrgOwner, UserTypeLogin}
+var _UserTypeValues = []UserType{UserTypeUnspecified, UserTypeIAMOwner, UserTypeOrgOwner, UserTypeLogin, UserTypeNoPermission}
 
 var _UserTypeNameToValueMap = map[string]UserType{
 	_UserTypeName[0:11]:       UserTypeUnspecified,
@@ -41,6 +42,8 @@ var _UserTypeNameToValueMap = map[string]UserType{
 	_UserTypeLowerName[20:29]: UserTypeOrgOwner,
 	_UserTypeName[29:34]:      UserTypeLogin,
 	_UserTypeLowerName[29:34]: UserTypeLogin,
+	_UserTypeName[34:47]:      UserTypeNoPermission,
+	_UserTypeLowerName[34:47]: UserTypeNoPermission,
 }
 
 var _UserTypeNames = []string{
@@ -48,6 +51,7 @@ var _UserTypeNames = []string{
 	_UserTypeName[11:20],
 	_UserTypeName[20:29],
 	_UserTypeName[29:34],
+	_UserTypeName[34:47],
 }
 
 // UserTypeString retrieves an enum value from the enum constants string name.
