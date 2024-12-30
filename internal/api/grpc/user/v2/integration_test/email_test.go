@@ -251,7 +251,7 @@ func TestServer_ResendEmailCode(t *testing.T) {
 
 func TestServer_SendEmailCode(t *testing.T) {
 	userID := Instance.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email()).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, gofakeit.Email(), gofakeit.Phone()).GetUserId()
 
 	tests := []struct {
 		name    string
