@@ -15,6 +15,8 @@ import "zitadel/change.proto";
 import "zitadel/auth_n_key.proto";
 import "zitadel/metadata.proto";
 import "zitadel/action.proto";
+import "zitadel/group.proto";
+import "zitadel/group_member.proto";
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -4266,6 +4268,470 @@ service ManagementService {
             };
         };
     }
+
+    rpc ListGroupMembers(ListGroupMembersRequest) returns (ListGroupMembersResponse) {
+        option (google.api.http) = {
+            post: "/groups/{group_id}/members/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.member.read"
+            check_field_name: "GroupId"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups"
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "List Project Members";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the group level, matching the search queries. The search queries will be AND linked."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc AddGroupMember(AddGroupMemberRequest) returns (AddGroupMemberResponse) {
+        option (google.api.http) = {
+            post: "/groups/{group_id}/members"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.member.write"
+            check_field_name: "GroupId"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Add Group Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the group level."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+    /* Not needed as we don't have any roles attached to the group members
+    rpc UpdateGroupMember(UpdateProjectMemberRequest) returns (UpdateGroupMemberResponse) {
+        option (google.api.http) = {
+            put: "/projects/{project_id}/members/{user_id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.member.write"
+            check_field_name: "ProjectId"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Projects";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Update Project Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+    */
+
+    rpc RemoveGroupMember(RemoveGroupMemberRequest) returns (RemoveGroupMemberResponse) {
+        option (google.api.http) = {
+            delete: "/groups/{group_id}/members/{user_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.member.delete"
+            check_field_name: "GroupId"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            tags: "Members";
+            tags: "ZITADEL Administrators";
+            summary: "Remove Group Member";
+            description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an group level. The user can still have roles on another level (iam, organization)"
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ListGroupChanges(ListGroupChangesRequest) returns (ListGroupChangesResponse) {
+        option (google.api.http) = {
+            post: "/groups/{group_id}/changes/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.read"
+            check_field_name: "GroupId"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Group History";
+            description: "Returns a list of changes/events that have happened on the group. It's the history of the group. Make sure to send a limit."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc AddGroup(AddGroupRequest) returns (AddGroupResponse) {
+        option (google.api.http) = {
+            post: "/groups"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.create"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Create Group";
+            description: "Create a new group. A Group is a vessel for different users sharing the same role context."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc UpdateGroup(UpdateGroupRequest) returns (UpdateGroupResponse) {
+        option (google.api.http) = {
+            put: "/groups/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.write"
+            check_field_name: "Id"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Update Group";
+            description: "Update a group and its settings. A Group is a vessel for different users sharing the same role context."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc DeactivateGroup(DeactivateGroupRequest) returns (DeactivateGroupResponse) {
+        option (google.api.http) = {
+            post: "/groups/{id}/_deactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.write"
+            check_field_name: "Id"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Deactivate Group";
+            description: "Set the state of a group to deactivated. Request returns an error if the group is already deactivated."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ReactivateGroup(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
+        option (google.api.http) = {
+            post: "/groups/{id}/_reactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.write"
+            check_field_name: "Id"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Reactivate Group";
+            description: "Set the state of a group to active. Request returns an error if the group is not deactivated."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc RemoveGroup(RemoveGroupRequest) returns (RemoveGroupResponse) {
+        option (google.api.http) = {
+            delete: "/groups/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.delete"
+            check_field_name: "Id"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Remove Group";
+            description: "Group and all its sub-resources like group grants will be removed."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc GetGroupGrantByID(GetGroupGrantByIDRequest) returns (GetGroupGrantByIDResponse) {
+        option (google.api.http) = {
+            get: "/groups/{group_id}/grants/{grant_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Group Grants";
+            summary: "Group Grant By ID";
+            description: "Returns a group grant per ID. A group grant is a role for a containing users to specific project and organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ListGroupGrants(ListGroupGrantRequest) returns (ListGroupGrantResponse) {
+        option (google.api.http) = {
+            post: "/groups/grants/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Group Grants";
+            summary: "Search Group Grants";
+            description: "Returns a list of group grants that match the search queries.  A group grant is a role for a containing users to specific project and organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc AddGroupGrant(AddGroupGrantRequest) returns (AddGroupGrantResponse) {
+        option (google.api.http) = {
+            post: "/groups/{group_id}/grants"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Group Grants";
+            summary: "Add User Grant";
+            description: "Add a group grant for a specific group.  A group grant is a role for a containing users to specific project and organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc UpdateGroupGrant(UpdateGroupGrantRequest) returns (UpdateGroupGrantResponse) {
+        option (google.api.http) = {
+            put: "/groups/{group_id}/grants/{grant_id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Group Grants";
+            summary: "Update Group Grants";
+            description: "Update the roles of a group grant.  A group grant is a role for a containing users to specific project and organization."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc DeactivateGroupGrant(DeactivateGroupGrantRequest) returns (DeactivateGroupGrantResponse) {
+        option (google.api.http) = {
+            post: "/groups/{group_id}/grants/{grant_id}/_deactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Group Grants";
+            summary: "Deactivate Group Grant";
+            description: "Deactivate the group grant. The group users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the group grant is already deactivated."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ReactivateGroupGrant(ReactivateGroupGrantRequest) returns (ReactivateGroupGrantResponse) {
+        option (google.api.http) = {
+            post: "/groups/{group_id}/grants/{grant_id}/_reactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Group Grants";
+            summary: "Reactivate Group Grant";
+            description: "Reactivate a deactivated group grant. The group user will be able to use the granted project again. An error will be returned if the group grant is not deactivated."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc RemoveGroupGrant(RemoveGroupGrantRequest) returns (RemoveGroupGrantResponse) {
+        option (google.api.http) = {
+            delete: "/groups/{group_id}/grants/{grant_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Group Grants";
+            summary: "Remove Group Grant";
+            description: "Removes the group grant from the group. The group user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc BulkRemoveGroupGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
+        option (google.api.http) = {
+            delete: "/group_grants/_bulk"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.delete"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Group Grants";
+            summary: "Bulk Remove Group Grants";
+            description: "Remove a list of group grants. The group users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
 
     //deprecated: please use DomainPolicy instead
     rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
@@ -10351,12 +10817,12 @@ message ListGroupMembersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
     //criteria the client is looking for
-    repeated zitadel.member.v1.SearchQuery queries = 3;
+    repeated zitadel.group_member.v1.SearchQuery queries = 3;
 }
 
 message ListGroupMembersResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.member.v1.Member result = 2;
+    repeated zitadel.group_member.v1.GroupMember result = 2;
 }
 
 message AddGroupMemberRequest {
@@ -10385,6 +10851,211 @@ message RemoveGroupMemberRequest {
 message RemoveGroupMemberResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
+
+message ListGroupChangesRequest {
+    //list limitations and ordering
+    zitadel.change.v1.ChangeQuery query = 1;
+    string group_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ListGroupChangesResponse {
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary info)
+    repeated zitadel.change.v1.Change result = 2;
+}
+
+
+message AddGroupRequest {
+    string name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"MyGroup\"";
+        }
+    ];
+    bool description = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Description of the group\"";
+            description: "Description of the group";
+        }
+    ];
+}
+
+message AddGroupResponse {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"98729028932384528\"";
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+}
+
+message UpdateGroupRequest {
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200}
+    ];
+    string name = 2  [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"MyGroup-Updated\"";
+        }
+    ];
+    string description = 3  [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Group Description-Updated\"";
+        }
+    ];
+    
+}
+
+message UpdateGroupResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeactivateGroupRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateGroupResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ReactivateGroupRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ReactivateGroupResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveGroupRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveGroupResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+
+message GetGroupGrantByIDRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetGroupGrantByIDResponse {
+    zitadel.group.v1.GroupGrant group_grant = 1;
+}
+
+message ListGroupGrantRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criteria the client is looking for
+    repeated zitadel.group.v1.GroupGrantQuery queries = 2;
+}
+
+message ListGroupGrantResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.group.v1.GroupGrant result = 2;
+}
+
+message AddGroupGrantRequest {
+    string group_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            example: "\"69629026806489455\"";
+        }
+    ];
+    string project_id = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"58949026806489455\"";
+        }
+    ];
+    string project_grant_id = 3 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"9847026806489455\"";
+            description: "Make sure to fill in the project grant id if the user grant is for a granted project and the organization is not the owner of the project.";
+        }
+    ];
+    repeated string role_keys = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"RoleKey1\", \"RoleKey2\"]"
+        }
+    ];
+}
+
+message AddGroupGrantResponse {
+    string group_grant_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+}
+
+message UpdateGroupGrantRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    repeated string role_keys = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"RoleKey1\", \"RoleKey2\"]"
+        }
+    ];
+}
+
+message UpdateGroupGrantResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message DeactivateGroupGrantRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message DeactivateGroupGrantResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ReactivateGroupGrantRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ReactivateGroupGrantResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveGroupGrantRequest {
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveGroupGrantResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkRemoveGroupGrantRequest {
+    repeated string grant_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"9384786806489455\", \"2984754806489455\"]"
+        }
+    ];
+}
+
+message BulkRemoveGroupGrantResponse {}
 
 message GetUserGrantByIDRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];

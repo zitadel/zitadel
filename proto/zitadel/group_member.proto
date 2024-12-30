@@ -20,7 +20,7 @@ message GroupMember {
             example: "\"69629023906488334\"";
         }
     ];
-    zitadel.v1.ObjectDetails details = 2;
+    zitadel.v1.ObjectDetails details = 3;
     string preferred_login_name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"gigi@zitadel.com\"";
