@@ -2,7 +2,6 @@ package object
 
 import (
 	"context"
-	user_pb "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	user_pb "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
