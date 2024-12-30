@@ -104,6 +104,16 @@ export function checkMFAFactors(
       m !== AuthenticationMethodType.PASSKEY,
   );
 
+  const hasAuthenticatedWithPasskey =
+    session.factors?.webAuthN?.verifiedAt &&
+    session.factors?.webAuthN?.userVerified;
+
+  // escape further checks if user has authenticated with passkey
+  if (hasAuthenticatedWithPasskey) {
+    return;
+  }
+
+  // if user has not authenticated with passkey and has only one additional mfa factor, redirect to that
   if (availableMultiFactors?.length == 1) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
@@ -131,7 +141,7 @@ export function checkMFAFactors(
     } else if (factor === AuthenticationMethodType.U2F) {
       return { redirect: `/u2f?` + params };
     }
-  } else if (availableMultiFactors?.length >= 1) {
+  } else if (availableMultiFactors?.length > 1) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
     });
