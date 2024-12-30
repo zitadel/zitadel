@@ -268,7 +268,7 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 	return resp
 }
 
-func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email string) *user_v2.AddHumanUserResponse {
+func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email, phone string) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
@@ -289,7 +289,7 @@ func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email strin
 			},
 		},
 		Phone: &user_v2.SetHumanPhone{
-			Phone: "+41791234567",
+			Phone: phone,
 			Verification: &user_v2.SetHumanPhone_IsVerified{
 				IsVerified: true,
 			},
