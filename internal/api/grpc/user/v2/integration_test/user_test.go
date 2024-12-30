@@ -2633,38 +2633,25 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 
 	tests := []struct {
 		name string
+		args *user.ListAuthenticationFactorsRequest
 		want *user.ListAuthenticationFactorsResponse
-		dep  func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error)
+		dep  func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error
 	}{
 		{
 			name: "no auth",
+			args: &user.ListAuthenticationFactorsRequest{},
 			want: &user.ListAuthenticationFactorsResponse{
 				Result: nil,
 			},
-			dep: func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error) {
-				userIDWithoutAuth := Instance.CreateHumanUser(ctx).GetUserId()
-				return &user.ListAuthenticationFactorsRequest{
-					UserId: userIDWithoutAuth,
-				}, nil
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
+				args.UserId = userIDWithoutAuth
+				return nil
 			},
 		},
 		{
 			name: "with u2f",
-			dep: func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error) {
-				userWithU2F := Instance.CreateHumanUser(ctx).GetUserId()
-				U2FId := Instance.RegisterUserU2F(ctx, userWithU2F)
-
-				response.Result[0].Type = &user.AuthFactor_U2F{
-					U2F: &user.AuthFactorU2F{
-						Id:   U2FId,
-						Name: "nice name",
-					},
-				}
-
-				return &user.ListAuthenticationFactorsRequest{
-					UserId: userWithU2F,
-				}, nil
-			},
+			args: &user.ListAuthenticationFactorsRequest{},
 			want: &user.ListAuthenticationFactorsResponse{
 				Result: []*user.AuthFactor{
 					{
@@ -2672,24 +2659,24 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				},
 			},
-		},
-		{
-			name: "with totp, u2f",
-			dep: func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error) {
-				userWithTOTP := Instance.CreateHumanUserWithTOTP(ctx, "secret").GetUserId()
-				U2FIdWithTOTP := Instance.RegisterUserU2F(ctx, userWithTOTP)
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userWithU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				U2FId := Instance.RegisterUserU2F(CTX, userWithU2F)
 
-				response.Result[1].Type = &user.AuthFactor_U2F{
+				args.UserId = userWithU2F
+				want.Result[0].Type = &user.AuthFactor_U2F{
 					U2F: &user.AuthFactorU2F{
-						Id:   U2FIdWithTOTP,
+						Id:   U2FId,
 						Name: "nice name",
 					},
 				}
 
-				return &user.ListAuthenticationFactorsRequest{
-					UserId: userWithTOTP,
-				}, nil
+				return nil
 			},
+		},
+		{
+			name: "with totp, u2f",
+			args: &user.ListAuthenticationFactorsRequest{},
 			want: &user.ListAuthenticationFactorsResponse{
 				Result: []*user.AuthFactor{
 					{
@@ -2703,24 +2690,25 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				},
 			},
-		},
-		{
-			name: "with totp, u2f filtered",
-			dep: func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error) {
-				userWithTOTP := Instance.CreateHumanUserWithTOTP(ctx, "secret").GetUserId()
-				U2FIdWithTOTP := Instance.RegisterUserU2F(ctx, userWithTOTP)
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
+				U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
 
-				response.Result[0].Type = &user.AuthFactor_U2F{
+				args.UserId = userWithTOTP
+				want.Result[1].Type = &user.AuthFactor_U2F{
 					U2F: &user.AuthFactorU2F{
 						Id:   U2FIdWithTOTP,
 						Name: "nice name",
 					},
 				}
 
-				return &user.ListAuthenticationFactorsRequest{
-					UserId:      userWithTOTP,
-					AuthFactors: []user.AuthFactors{user.AuthFactors_U2F},
-				}, nil
+				return nil
+			},
+		},
+		{
+			name: "with totp, u2f filtered",
+			args: &user.ListAuthenticationFactorsRequest{
+				AuthFactors: []user.AuthFactors{user.AuthFactors_U2F},
 			},
 			want: &user.ListAuthenticationFactorsResponse{
 				Result: []*user.AuthFactor{
@@ -2729,17 +2717,24 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				},
 			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
+				U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
+
+				args.UserId = userWithTOTP
+				want.Result[0].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FIdWithTOTP,
+						Name: "nice name",
+					},
+				}
+
+				return nil
+			},
 		},
 		{
 			name: "with sms",
-			dep: func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error) {
-				userWithSMS := Instance.CreateHumanUserVerified(ctx, Instance.DefaultOrg.GetId(), "").GetUserId()
-				Instance.RegisterUserOTPSMS(CTX, userWithSMS)
-
-				return &user.ListAuthenticationFactorsRequest{
-					UserId: userWithSMS,
-				}, nil
-			},
+			args: &user.ListAuthenticationFactorsRequest{},
 			want: &user.ListAuthenticationFactorsResponse{
 				Result: []*user.AuthFactor{
 					{
@@ -2750,17 +2745,18 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				},
 			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userWithSMS := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), "").GetUserId()
+				Instance.RegisterUserOTPSMS(CTX, userWithSMS)
+
+				args.UserId = userWithSMS
+
+				return nil
+			},
 		},
 		{
 			name: "with email",
-			dep: func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error) {
-				userWithEmail := Instance.CreateHumanUserVerified(ctx, Instance.DefaultOrg.GetId(), "").GetUserId()
-				Instance.RegisterUserOTPEmail(CTX, userWithEmail)
-
-				return &user.ListAuthenticationFactorsRequest{
-					UserId: userWithEmail,
-				}, nil
-			},
+			args: &user.ListAuthenticationFactorsRequest{},
 			want: &user.ListAuthenticationFactorsResponse{
 				Result: []*user.AuthFactor{
 					{
@@ -2771,50 +2767,40 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				},
 			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), "").GetUserId()
+				Instance.RegisterUserOTPEmail(CTX, userWithEmail)
+
+				args.UserId = userWithEmail
+
+				return nil
+			},
 		},
 		{
 			name: "with not ready u2f",
-			dep: func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error) {
-				userWithNotReadyU2F := Instance.CreateHumanUser(ctx).GetUserId()
-				_, err := Instance.Client.UserV2.RegisterU2F(ctx, &user.RegisterU2FRequest{
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				_, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
 					UserId: userWithNotReadyU2F,
 					Domain: Instance.Domain,
 				})
 				if err != nil {
-					return nil, err
+					return err
 				}
 
-				return &user.ListAuthenticationFactorsRequest{
-					UserId: userWithNotReadyU2F,
-				}, nil
-			},
-			want: &user.ListAuthenticationFactorsResponse{
-				Result: []*user.AuthFactor{},
+				args.UserId = userWithNotReadyU2F
+
+				return nil
 			},
 		},
 		{
 			name: "with not ready u2f state filtered",
-			dep: func(ctx context.Context, response *user.ListAuthenticationFactorsResponse) (*user.ListAuthenticationFactorsRequest, error) {
-				userWithNotReadyU2F := Instance.CreateHumanUser(ctx).GetUserId()
-				U2FNotReady, err := Instance.Client.UserV2.RegisterU2F(ctx, &user.RegisterU2FRequest{
-					UserId: userWithNotReadyU2F,
-					Domain: Instance.Domain,
-				})
-				if err != nil {
-					return nil, err
-				}
-
-				response.Result[0].Type = &user.AuthFactor_U2F{
-					U2F: &user.AuthFactorU2F{
-						Id:   U2FNotReady.GetU2FId(),
-						Name: "",
-					},
-				}
-
-				return &user.ListAuthenticationFactorsRequest{
-					UserId: userWithNotReadyU2F,
-					States: []user.AuthFactorState{user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY},
-				}, nil
+			args: &user.ListAuthenticationFactorsRequest{
+				States: []user.AuthFactorState{user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY},
 			},
 			want: &user.ListAuthenticationFactorsResponse{
 				Result: []*user.AuthFactor{
@@ -2823,16 +2809,37 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 					},
 				},
 			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				U2FNotReady, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
+					UserId: userWithNotReadyU2F,
+					Domain: Instance.Domain,
+				})
+				if err != nil {
+					return err
+				}
+
+				args.UserId = userWithNotReadyU2F
+				want.Result[0].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FNotReady.GetU2FId(),
+						Name: "",
+					},
+				}
+
+				return nil
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			err := tt.dep(tt.args, tt.want)
+			require.NoError(t, err)
+
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				req, err := tt.dep(CTX, tt.want)
-				require.NoError(ttt, err)
 
-				got, err := Client.ListAuthenticationFactors(CTX, req)
+				got, err := Client.ListAuthenticationFactors(CTX, tt.args)
 				require.NoError(ttt, err)
 
 				assert.ElementsMatch(t, tt.want.GetResult(), got.GetResult())
