@@ -9808,6 +9808,11 @@ message AddOIDCAppRequest {
             description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
         }
     ];
+    zitadel.app.v1.LoginVersion login_version = 19 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
+        }
+    ];
 }
 
 message AddOIDCAppResponse {
@@ -9987,6 +9992,11 @@ message UpdateOIDCAppConfigRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"https://example.com/auth/backchannel\"]";
             description: "ZITADEL will use this URI to notify the application about terminated session according to the OIDC Back-Channel Logout (https://openid.net/specs/openid-connect-backchannel-1_0.html)";
+        }
+    ];
+    zitadel.app.v1.LoginVersion login_version = 18 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Specify the preferred login UI, where the user is redirected to for authentication. If unset, the login UI is chosen by the instance default.";
         }
     ];
 }

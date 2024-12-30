@@ -25,7 +25,7 @@ import (
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
+func (i *Instance) CreateOIDCClientLoginVersion(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, loginVersion *app.LoginVersion, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
 	if len(grantTypes) == 0 {
 		grantTypes = []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN}
 	}
@@ -47,6 +47,7 @@ func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedi
 		ClockSkew:                nil,
 		AdditionalOrigins:        nil,
 		SkipNativeAppSuccessPage: false,
+		LoginVersion:             loginVersion,
 	})
 	if err != nil {
 		return nil, err
@@ -64,6 +65,10 @@ func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedi
 		})
 		return err
 	})
+}
+
+func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
+	return i.CreateOIDCClientLoginVersion(ctx, redirectURI, logoutRedirectURI, projectID, appType, authMethod, devMode, nil, grantTypes...)
 }
 
 func (i *Instance) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, devMode bool) (*management.AddOIDCAppResponse, error) {
@@ -128,7 +133,7 @@ func (i *Instance) CreateOIDCInactivateProjectClient(ctx context.Context, redire
 	return client, err
 }
 
-func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string) (*management.AddOIDCAppResponse, error) {
+func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string, loginVersion *app.LoginVersion) (*management.AddOIDCAppResponse, error) {
 	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
 		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
 	})
@@ -153,6 +158,7 @@ func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI
 		ClockSkew:                nil,
 		AdditionalOrigins:        nil,
 		SkipNativeAppSuccessPage: false,
+		LoginVersion:             loginVersion,
 	})
 	if err != nil {
 		return nil, err
@@ -209,15 +215,28 @@ const CodeVerifier = "codeVerifier"
 func (i *Instance) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
 	return i.CreateOIDCAuthRequestWithDomain(ctx, i.Domain, clientID, loginClient, redirectURI, scope...)
 }
+
+func (i *Instance) CreateOIDCAuthRequestWithoutLoginClientHeader(ctx context.Context, clientID, redirectURI, loginBaseURI string, scope ...string) (authRequestID string, err error) {
+	return i.createOIDCAuthRequestWithDomain(ctx, i.Domain, clientID, redirectURI, "", loginBaseURI, scope...)
+}
+
 func (i *Instance) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := i.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, scope...)
+	return i.createOIDCAuthRequestWithDomain(ctx, domain, clientID, redirectURI, loginClient, "", scope...)
+}
+
+func (i *Instance) createOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, redirectURI, loginClient, loginBaseURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := i.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, loginClient, scope...)
 	if err != nil {
 		return "", fmt.Errorf("create relying party: %w", err)
 	}
 	codeChallenge := oidc.NewSHACodeChallenge(CodeVerifier)
 	authURL := rp.AuthURL("state", provider, rp.WithCodeChallenge(codeChallenge))
 
-	req, err := GetRequest(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	var headers map[string]string
+	if loginClient != "" {
+		headers = map[string]string{oidc_internal.LoginClientHeader: loginClient}
+	}
+	req, err := GetRequest(authURL, headers)
 	if err != nil {
 		return "", fmt.Errorf("get request: %w", err)
 	}
@@ -227,14 +246,24 @@ func (i *Instance) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, 
 		return "", fmt.Errorf("check redirect: %w", err)
 	}
 
-	prefixWithHost := provider.Issuer() + i.Config.LoginURLV2
-	if !strings.HasPrefix(loc.String(), prefixWithHost) {
-		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
+	if loginBaseURI == "" {
+		loginBaseURI = provider.Issuer() + i.Config.LoginURLV2
 	}
-	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
+	if !strings.HasPrefix(loc.String(), loginBaseURI) {
+		return "", fmt.Errorf("login location has not prefix %s, but is %s", loginBaseURI, loc.String())
+	}
+	return strings.TrimPrefix(loc.String(), loginBaseURI), nil
+}
+
+func (i *Instance) CreateOIDCAuthRequestImplicitWithoutLoginClientHeader(ctx context.Context, clientID, redirectURI string, scope ...string) (authRequestID string, err error) {
+	return i.createOIDCAuthRequestImplicit(ctx, clientID, redirectURI, nil, scope...)
 }
 
 func (i *Instance) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	return i.createOIDCAuthRequestImplicit(ctx, clientID, redirectURI, map[string]string{oidc_internal.LoginClientHeader: loginClient}, scope...)
+}
+
+func (i *Instance) createOIDCAuthRequestImplicit(ctx context.Context, clientID, redirectURI string, headers map[string]string, scope ...string) (authRequestID string, err error) {
 	provider, err := i.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
@@ -249,7 +278,7 @@ func (i *Instance) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, 
 	parsed.RawQuery = queries.Encode()
 	authURL = parsed.String()
 
-	req, err := GetRequest(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	req, err := GetRequest(authURL, headers)
 	if err != nil {
 		return "", err
 	}
@@ -271,14 +300,21 @@ func (i *Instance) OIDCIssuer() string {
 }
 
 func (i *Instance) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
-	return i.CreateRelyingPartyForDomain(ctx, i.Domain, clientID, redirectURI, scope...)
+	return i.CreateRelyingPartyForDomain(ctx, i.Domain, clientID, redirectURI, i.Users.Get(UserTypeLogin).Username, scope...)
 }
 
-func (i *Instance) CreateRelyingPartyForDomain(ctx context.Context, domain, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+func (i *Instance) CreateRelyingPartyWithoutLoginClientHeader(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+	return i.CreateRelyingPartyForDomain(ctx, i.Domain, clientID, redirectURI, "", scope...)
+}
+
+func (i *Instance) CreateRelyingPartyForDomain(ctx context.Context, domain, clientID, redirectURI, loginClientUsername string, scope ...string) (rp.RelyingParty, error) {
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
-	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport, i.Users.Get(UserTypeLogin).Username}}
+	if loginClientUsername == "" {
+		return rp.NewRelyingPartyOIDC(ctx, http_util.BuildHTTP(domain, i.Config.Port, i.Config.Secure), clientID, "", redirectURI, scope)
+	}
+	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport, loginClientUsername}}
 	return rp.NewRelyingPartyOIDC(ctx, http_util.BuildHTTP(domain, i.Config.Port, i.Config.Secure), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
 }
 
