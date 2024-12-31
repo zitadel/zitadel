@@ -35,7 +35,7 @@ export function checkInvite(
   organization?: string,
   authRequestId?: string,
 ) {
-  if (humanUser?.email && humanUser.email.isVerified) {
+  if (!humanUser?.email?.isVerified) {
     const paramsVerify = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
       userId: session.factors?.user?.id as string, // verify needs user id
