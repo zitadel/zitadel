@@ -459,6 +459,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnOTPSMSCheckedAt.identifier(),
 			SessionColumnOTPEmailCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
+			SessionColumnUserAgentFingerprintID.identifier(),
+			SessionColumnUserAgentIP.identifier(),
+			SessionColumnUserAgentDescription.identifier(),
+			SessionColumnUserAgentHeader.identifier(),
 			SessionColumnExpiration.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -485,6 +489,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					otpSMSCheckedAt     sql.NullTime
 					otpEmailCheckedAt   sql.NullTime
 					metadata            database.Map[[]byte]
+					userAgentIP         sql.NullString
+					userAgentHeader     database.Map[[]string]
 					expiration          sql.NullTime
 				)
 
@@ -509,6 +515,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&otpSMSCheckedAt,
 					&otpEmailCheckedAt,
 					&metadata,
+					&session.UserAgent.FingerprintID,
+					&userAgentIP,
+					&session.UserAgent.Description,
+					&userAgentHeader,
 					&expiration,
 					&sessions.Count,
 				)
@@ -529,6 +539,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 				session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 				session.Metadata = metadata
+				session.UserAgent.Header = http.Header(userAgentHeader)
+				if userAgentIP.Valid {
+					session.UserAgent.IP = net.ParseIP(userAgentIP.String)
+				}
 				session.Expiration = expiration.Time
 
 				sessions.Sessions = append(sessions.Sessions, session)

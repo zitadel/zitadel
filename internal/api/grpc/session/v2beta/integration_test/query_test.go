@@ -15,8 +15,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
 
 func TestServer_GetSession(t *testing.T) {
@@ -337,12 +337,10 @@ func TestServer_ListSessions(t *testing.T) {
 			},
 		},
 		{
-			name: "list sessions, no permission",
+			name: "list sessions, wrong creator",
 			args: args{
 				UserCTX,
-				&session.ListSessionsRequest{
-					Queries: []*session.SearchQuery{},
-				},
+				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
 					info := createSession(ctx, t, "", "", nil, nil)
 					request.Queries = append(request.Queries, &session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}})
@@ -351,29 +349,10 @@ func TestServer_ListSessions(t *testing.T) {
 			},
 			want: &session.ListSessionsResponse{
 				Details: &object.ListDetails{
-					TotalResult: 1,
+					TotalResult: 0,
 					Timestamp:   timestamppb.Now(),
 				},
 				Sessions: []*session.Session{},
-			},
-		},
-		{
-			name: "list sessions, permission, ok",
-			args: args{
-				CTX,
-				&session.ListSessionsRequest{},
-				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
-					info := createSession(ctx, t, "", "", nil, nil)
-					request.Queries = append(request.Queries, &session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}})
-					return []*sessionAttr{info}
-				},
-			},
-			want: &session.ListSessionsResponse{
-				Details: &object.ListDetails{
-					TotalResult: 1,
-					Timestamp:   timestamppb.Now(),
-				},
-				Sessions: []*session.Session{{}},
 			},
 		},
 		{
@@ -496,64 +475,6 @@ func TestServer_ListSessions(t *testing.T) {
 						},
 					},
 				},
-			},
-		},
-		{
-			name: "list sessions, creator, ok",
-			args: args{
-				CTX,
-				&session.ListSessionsRequest{},
-				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
-					info := createSession(ctx, t, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
-					request.Queries = append(request.Queries,
-						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
-						&session.SearchQuery{Query: &session.SearchQuery_OwnCreatorQuery{OwnCreatorQuery: &session.OwnCreatorQuery{}}})
-					return []*sessionAttr{info}
-				},
-			},
-			wantExpirationWindow: time.Minute * 5,
-			wantFactors:          []wantFactor{wantUserFactor},
-			want: &session.ListSessionsResponse{
-				Details: &object.ListDetails{
-					TotalResult: 1,
-					Timestamp:   timestamppb.Now(),
-				},
-				Sessions: []*session.Session{
-					{
-						Metadata: map[string][]byte{"key": []byte("value")},
-						UserAgent: &session.UserAgent{
-							FingerprintId: gu.Ptr("agent"),
-							Ip:            gu.Ptr("1.2.3.4"),
-							Description:   gu.Ptr("Description"),
-							Header: map[string]*session.UserAgent_HeaderValues{
-								"foo": {Values: []string{"foo", "bar"}},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "list sessions, wrong creator",
-			args: args{
-				IAMOwnerCTX,
-				&session.ListSessionsRequest{},
-				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
-					info := createSession(ctx, t, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
-					request.Queries = append(request.Queries,
-						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
-						&session.SearchQuery{Query: &session.SearchQuery_OwnCreatorQuery{OwnCreatorQuery: &session.OwnCreatorQuery{}}})
-					return []*sessionAttr{}
-				},
-			},
-			wantExpirationWindow: time.Minute * 5,
-			wantFactors:          []wantFactor{wantUserFactor},
-			want: &session.ListSessionsResponse{
-				Details: &object.ListDetails{
-					TotalResult: 0,
-					Timestamp:   timestamppb.Now(),
-				},
-				Sessions: []*session.Session{},
 			},
 		},
 	}
