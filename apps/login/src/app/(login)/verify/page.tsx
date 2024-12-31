@@ -3,7 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { VerifyRedirectButton } from "@/components/verify-redirect-button";
-import { sendCode } from "@/lib/server/verify";
+import { sendEmailCode } from "@/lib/server/verify";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -37,26 +37,28 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let human: HumanUser | undefined;
   let id: string | undefined;
 
+  const doSend = !skipsend && invite !== "true";
+
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
       loginName,
       organization,
     });
 
-    if (!skipsend && sessionFactors?.factors?.user?.id) {
-      await sendCode({
+    if (doSend && sessionFactors?.factors?.user?.id) {
+      await sendEmailCode({
         userId: sessionFactors?.factors?.user?.id,
-        isInvite: invite === "true",
+        authRequestId,
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Could not request email");
       });
     }
   } else if ("userId" in searchParams && userId) {
-    if (!skipsend) {
-      await sendCode({
+    if (doSend) {
+      await sendEmailCode({
         userId,
-        isInvite: invite === "true",
+        authRequestId,
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Could not request email");

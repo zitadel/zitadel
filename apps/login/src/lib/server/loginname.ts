@@ -171,6 +171,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       session.factors?.user?.id,
     );
 
+    // this can be expected to be an invite as users created in console have a password set.
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
       const humanUser =
         potentialUsers[0].type.case === "human"
