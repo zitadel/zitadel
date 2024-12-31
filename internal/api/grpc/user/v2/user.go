@@ -624,7 +624,7 @@ func (s *Server) ListAuthenticationFactors(ctx context.Context, req *user.ListAu
 	if err != nil {
 		return nil, err
 	}
-	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, nil)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

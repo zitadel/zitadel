@@ -2630,12 +2630,13 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 }
 
 func TestServer_ListAuthenticationFactors(t *testing.T) {
-
 	tests := []struct {
-		name string
-		args *user.ListAuthenticationFactorsRequest
-		want *user.ListAuthenticationFactorsResponse
-		dep  func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error
+		name    string
+		args    *user.ListAuthenticationFactorsRequest
+		want    *user.ListAuthenticationFactorsResponse
+		dep     func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error
+		wantErr bool
+		ctx     context.Context
 	}{
 		{
 			name: "no auth",
@@ -2830,16 +2831,44 @@ func TestServer_ListAuthenticationFactors(t *testing.T) {
 				return nil
 			},
 		},
+		{
+			name: "with no userId",
+			args: &user.ListAuthenticationFactorsRequest{
+				UserId: "",
+			},
+			wantErr: true,
+		},
+		{
+			name: "with no permission",
+			args: &user.ListAuthenticationFactorsRequest{},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) error {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "totp").GetUserId()
+
+				args.UserId = userWithTOTP
+
+				return nil
+			},
+			ctx:     UserCTX,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.dep(tt.args, tt.want)
-			require.NoError(t, err)
+			if tt.ctx == nil {
+				tt.ctx = CTX
+			}
+			if tt.dep != nil {
+				err := tt.dep(tt.args, tt.want)
+				require.NoError(t, err)
+			}
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-
-				got, err := Client.ListAuthenticationFactors(CTX, tt.args)
+				got, err := Client.ListAuthenticationFactors(tt.ctx, tt.args)
+				if tt.wantErr {
+					require.Error(ttt, err)
+					return
+				}
 				require.NoError(ttt, err)
 
 				assert.ElementsMatch(t, tt.want.GetResult(), got.GetResult())
