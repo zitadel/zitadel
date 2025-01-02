@@ -1,4 +1,4 @@
-import { createServerTransport } from "@zitadel/client";
+import { createServerTransport } from "@zitadel/client/node";
 import {
   createIdpServiceClient,
   createOIDCServiceClient,
