@@ -326,6 +326,7 @@ export async function listUsers({
     );
   } else if (userName || email || phone) {
     const orQueries: SearchQuery[] = [];
+
     if (userName) {
       const userNameQuery = create(SearchQuerySchema, {
         query: {
