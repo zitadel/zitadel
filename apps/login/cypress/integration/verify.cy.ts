@@ -83,15 +83,6 @@ describe("verify email", () => {
     });
   });
 
-  // it("shows password and passkey method after successful invite verification", () => {
-  //   stub("zitadel.user.v2.UserService", "VerifyEmail");
-  //   cy.visit("/verify?userId=221394658884845598&code=abc");
-  //   cy.location("pathname", { timeout: 10_000 }).should(
-  //     "eq",
-  //     "/authenticator/set",
-  //   );
-  // });
-
   it("shows an error if email code validation failed", () => {
     stub("zitadel.user.v2.UserService", "VerifyEmail", {
       code: 3,
@@ -99,7 +90,7 @@ describe("verify email", () => {
     });
     // TODO: Avoid uncaught exception in application
     cy.once("uncaught:exception", () => false);
-    cy.visit("/verify?userId=221394658884845598&code=abc&submit=true");
+    cy.visit("/verify?userId=221394658884845598&code=abc");
     cy.contains("Could not verify email", { timeout: 10_000 });
   });
 });

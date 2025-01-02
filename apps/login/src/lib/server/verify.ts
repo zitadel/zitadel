@@ -39,6 +39,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
         return { error: "Could not verify email" };
       });
 
+  if ("error" in verifyResponse) {
+    return verifyResponse;
+  }
+
   if (!verifyResponse) {
     return { error: "Could not verify" };
   }
