@@ -109,6 +109,8 @@ func fieldNameToSessionColumn(field session.SessionFieldName) query.Column {
 	switch field {
 	case session.SessionFieldName_SESSION_FIELD_NAME_CREATION_DATE:
 		return query.SessionColumnCreationDate
+	case session.SessionFieldName_SESSION_FIELD_NAME_UNSPECIFIED:
+		return query.Column{}
 	default:
 		return query.Column{}
 	}
