@@ -71,6 +71,10 @@ var (
 		` projections.sessions8.otp_sms_checked_at,` +
 		` projections.sessions8.otp_email_checked_at,` +
 		` projections.sessions8.metadata,` +
+		` projections.sessions8.user_agent_fingerprint_id,` +
+		` projections.sessions8.user_agent_ip,` +
+		` projections.sessions8.user_agent_description,` +
+		` projections.sessions8.user_agent_header,` +
 		` projections.sessions8.expiration,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions8` +
@@ -129,6 +133,10 @@ var (
 		"otp_sms_checked_at",
 		"otp_email_checked_at",
 		"metadata",
+		"user_agent_fingerprint_id",
+		"user_agent_ip",
+		"user_agent_description",
+		"user_agent_header",
 		"expiration",
 		"count",
 	}
@@ -186,6 +194,10 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							"fingerPrintID",
+							"1.2.3.4",
+							"agentDescription",
+							[]byte(`{"foo":["foo","bar"]}`),
 							testNow,
 						},
 					},
@@ -233,6 +245,12 @@ func Test_SessionsPrepare(t *testing.T) {
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
+						UserAgent: domain.UserAgent{
+							FingerprintID: gu.Ptr("fingerPrintID"),
+							IP:            net.IPv4(1, 2, 3, 4),
+							Description:   gu.Ptr("agentDescription"),
+							Header:        http.Header{"foo": []string{"foo", "bar"}},
+						},
 						Expiration: testNow,
 					},
 				},
@@ -267,6 +285,10 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							"fingerPrintID",
+							"1.2.3.4",
+							"agentDescription",
+							[]byte(`{"foo":["foo","bar"]}`),
 							testNow,
 						},
 						{
@@ -290,6 +312,10 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							"fingerPrintID",
+							"1.2.3.4",
+							"agentDescription",
+							[]byte(`{"foo":["foo","bar"]}`),
 							testNow,
 						},
 					},
@@ -337,6 +363,12 @@ func Test_SessionsPrepare(t *testing.T) {
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
+						UserAgent: domain.UserAgent{
+							FingerprintID: gu.Ptr("fingerPrintID"),
+							IP:            net.IPv4(1, 2, 3, 4),
+							Description:   gu.Ptr("agentDescription"),
+							Header:        http.Header{"foo": []string{"foo", "bar"}},
+						},
 						Expiration: testNow,
 					},
 					{
@@ -375,6 +407,12 @@ func Test_SessionsPrepare(t *testing.T) {
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
+						},
+						UserAgent: domain.UserAgent{
+							FingerprintID: gu.Ptr("fingerPrintID"),
+							IP:            net.IPv4(1, 2, 3, 4),
+							Description:   gu.Ptr("agentDescription"),
+							Header:        http.Header{"foo": []string{"foo", "bar"}},
 						},
 						Expiration: testNow,
 					},

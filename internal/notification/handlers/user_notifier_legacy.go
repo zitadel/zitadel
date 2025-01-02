@@ -324,7 +324,7 @@ func (u *userNotifierLegacy) reduceSessionOTPSMSChallenged(event eventstore.Even
 		return handler.NewNoOpStatement(e), nil
 	}
 	ctx := HandlerContext(event.Aggregate())
-	s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "")
+	s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -428,7 +428,7 @@ func (u *userNotifierLegacy) reduceSessionOTPEmailChallenged(event eventstore.Ev
 		return handler.NewNoOpStatement(e), nil
 	}
 	ctx := HandlerContext(event.Aggregate())
-	s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "")
+	s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "", nil)
 	if err != nil {
 		return nil, err
 	}
