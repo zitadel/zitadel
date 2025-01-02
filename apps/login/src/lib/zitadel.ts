@@ -311,7 +311,7 @@ export async function listUsers({
 }: ListUsersCommand) {
   const queries: SearchQuery[] = [];
 
-  // either loginName or userName and email or phone are required
+  // either use loginName or userName, email, phone
   if (loginName) {
     queries.push(
       create(SearchQuerySchema, {
@@ -324,18 +324,20 @@ export async function listUsers({
         },
       }),
     );
-  } else if (userName && (email || phone)) {
-    const userNameQuery = create(SearchQuerySchema, {
-      query: {
-        case: "userNameQuery",
-        value: {
-          userName: userName,
-          method: TextQueryMethod.EQUALS,
+  } else if (userName || email || phone) {
+    const orQueries: SearchQuery[] = [];
+    if (userName) {
+      const userNameQuery = create(SearchQuerySchema, {
+        query: {
+          case: "userNameQuery",
+          value: {
+            userName: userName,
+            method: TextQueryMethod.EQUALS,
+          },
         },
-      },
-    });
-
-    const orQueries: SearchQuery[] = [userNameQuery];
+      });
+      orQueries.push(userNameQuery);
+    }
 
     if (email) {
       const emailQuery = create(SearchQuerySchema, {
@@ -351,17 +353,16 @@ export async function listUsers({
     }
 
     if (phone) {
-      // TODO add after https://github.com/zitadel/zitadel/issues/9016 is merged
-      // const phoneQuery = create(SearchQuerySchema, {
-      //   query: {
-      //     case: "phoneQuery",
-      //     value: {
-      //       emailAddress: email,
-      //       method: TextQueryMethod.EQUALS,
-      //     },
-      //   },
-      // });
-      // orQueries.push(phoneQuery);
+      const phoneQuery = create(SearchQuerySchema, {
+        query: {
+          case: "phoneQuery",
+          value: {
+            number: phone,
+            method: TextQueryMethod.EQUALS,
+          },
+        },
+      });
+      orQueries.push(phoneQuery);
     }
 
     queries.push(
@@ -370,18 +371,6 @@ export async function listUsers({
           case: "orQuery",
           value: {
             queries: orQueries,
-          },
-        },
-      }),
-    );
-  } else if (userName) {
-    queries.push(
-      create(SearchQuerySchema, {
-        query: {
-          case: "userNameQuery",
-          value: {
-            userName: userName,
-            method: TextQueryMethod.EQUALS,
           },
         },
       }),
