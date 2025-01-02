@@ -17,6 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
@@ -523,100 +524,37 @@ func (i *Instance) AddSAMLPostProvider(ctx context.Context) string {
 	return resp.GetId()
 }
 
-/*
-func (s *Instance) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
-	resp, err := i.Client.UserV2.StartIdentityProviderIntent(ctx, &user.StartIdentityProviderIntentRequest{
+func (i *Instance) CreateIntent(ctx context.Context, idpID string) *user_v2.StartIdentityProviderIntentResponse {
+	resp, err := i.Client.UserV2.StartIdentityProviderIntent(ctx, &user_v2.StartIdentityProviderIntentRequest{
 		IdpId: idpID,
-		Content: &user.StartIdentityProviderIntentRequest_Urls{
-			Urls: &user.RedirectURLs{
+		Content: &user_v2.StartIdentityProviderIntentRequest_Urls{
+			Urls: &user_v2.RedirectURLs{
 				SuccessUrl: "https://example.com/success",
 				FailureUrl: "https://example.com/failure",
 			},
-			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 		},
 	})
 	logging.OnError(err).Fatal("create generic OAuth idp")
 	return resp
 }
 
-func (i *Instance) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
-	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
-	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Instance.InstanceID())
+func (i *Instance) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	intentID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(i.ID(), idpID, idpUserID, userID)
 	require.NoError(t, err)
-	return writeModel.AggregateID
+	return intentID, token, changeDate, sequence
 }
 
-func (i *Instance) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
-	intentID := s.CreateIntent(t, ctx, idpID)
-	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
+func (i *Instance) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	intentID, token, changeDate, sequence, err := sink.SuccessfulLDAPIntent(i.ID(), idpID, idpUserID, userID)
 	require.NoError(t, err)
-	idpUser := openid.NewUser(
-		&oidc.UserInfo{
-			Subject: idpUserID,
-			UserInfoProfile: oidc.UserInfoProfile{
-				PreferredUsername: "username",
-			},
-		},
-	)
-	idpSession := &openid.Session{
-		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
-			Token: &oauth2.Token{
-				AccessToken: "accessToken",
-			},
-			IDToken: "idToken",
-		},
-	}
-	token, err := s.Commands.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, userID)
-	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
+	return intentID, token, changeDate, sequence
 }
 
-func (s *Instance) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
-	intentID := s.CreateIntent(t, ctx, idpID)
-	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
+func (i *Instance) CreateSuccessfulSAMLIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	intentID, token, changeDate, sequence, err := sink.SuccessfulSAMLIntent(i.ID(), idpID, idpUserID, userID)
 	require.NoError(t, err)
-	username := "username"
-	lang := language.Make("en")
-	idpUser := ldap.NewUser(
-		idpUserID,
-		"",
-		"",
-		"",
-		"",
-		username,
-		"",
-		false,
-		"",
-		false,
-		lang,
-		"",
-		"",
-	)
-	attributes := map[string][]string{"id": {idpUserID}, "username": {username}, "language": {lang.String()}}
-	token, err := s.Commands.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, userID, attributes)
-	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
+	return intentID, token, changeDate, sequence
 }
-
-func (s *Instance) CreateSuccessfulSAMLIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
-	intentID := s.CreateIntent(t, ctx, idpID)
-	writeModel, err := s.Server.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
-	require.NoError(t, err)
-
-	idpUser := &saml.UserMapper{
-		ID:         idpUserID,
-		Attributes: map[string][]string{"attribute1": {"value1"}},
-	}
-	assertion := &crewjam_saml.Assertion{ID: "id"}
-
-	token, err := s.Server.Commands.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, userID, assertion)
-	require.NoError(t, err)
-	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
-}
-*/
 
 func (i *Instance) CreateVerifiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
 	return i.CreateVerifiedWebAuthNSessionWithLifetime(t, ctx, userID, 0)

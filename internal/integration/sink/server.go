@@ -3,6 +3,9 @@
 package sink
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -10,11 +13,23 @@ import (
 	"path"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/oauth2"
+	"golang.org/x/text/language"
+
+	crewjam_saml "github.com/crewjam/saml"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
+	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 )
 
 const (
@@ -33,6 +48,60 @@ func CallURL(ch Channel) string {
 	return u.String()
 }
 
+func SuccessfulOAuthIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+	u := url.URL{
+		Scheme: "http",
+		Host:   host,
+		Path:   successfulIntentOAuthPath(),
+	}
+	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
+		InstanceID: instanceID,
+		IDPID:      idpID,
+		IDPUserID:  idpUserID,
+		UserID:     userID,
+	})
+	if err != nil {
+		return "", "", time.Time{}, uint64(0), err
+	}
+	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
+}
+
+func SuccessfulSAMLIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+	u := url.URL{
+		Scheme: "http",
+		Host:   host,
+		Path:   successfulIntentSAMLPath(),
+	}
+	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
+		InstanceID: instanceID,
+		IDPID:      idpID,
+		IDPUserID:  idpUserID,
+		UserID:     userID,
+	})
+	if err != nil {
+		return "", "", time.Time{}, uint64(0), err
+	}
+	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
+}
+
+func SuccessfulLDAPIntent(instanceID, idpID, idpUserID, userID string) (string, string, time.Time, uint64, error) {
+	u := url.URL{
+		Scheme: "http",
+		Host:   host,
+		Path:   successfulIntentLDAPPath(),
+	}
+	resp, err := callIntent(u.String(), &SuccessfulIntentRequest{
+		InstanceID: instanceID,
+		IDPID:      idpID,
+		IDPUserID:  idpUserID,
+		UserID:     userID,
+	})
+	if err != nil {
+		return "", "", time.Time{}, uint64(0), err
+	}
+	return resp.IntentID, resp.Token, resp.ChangeDate, resp.Sequence, nil
+}
+
 // StartServer starts a simple HTTP server on localhost:8081
 // ZITADEL can use the server to send HTTP requests which can be
 // used to validate tests through [Subscribe]rs.
@@ -41,7 +110,7 @@ func CallURL(ch Channel) string {
 // [CallURL] can be used to obtain the full URL for a given Channel.
 //
 // This function is only active when the `integration` build tag is enabled
-func StartServer() (close func()) {
+func StartServer(commands *command.Commands) (close func()) {
 	router := chi.NewRouter()
 	for _, ch := range ChannelValues() {
 		fwd := &forwarder{
@@ -50,6 +119,9 @@ func StartServer() (close func()) {
 		}
 		router.HandleFunc(rootPath(ch), fwd.receiveHandler)
 		router.HandleFunc(subscribePath(ch), fwd.subscriptionHandler)
+		router.HandleFunc(successfulIntentOAuthPath(), successfulIntentHandler(commands, createSuccessfulOAuthIntent))
+		router.HandleFunc(successfulIntentSAMLPath(), successfulIntentHandler(commands, createSuccessfulSAMLIntent))
+		router.HandleFunc(successfulIntentLDAPPath(), successfulIntentHandler(commands, createSuccessfulLDAPIntent))
 	}
 	s := &http.Server{
 		Addr:    listenAddr,
@@ -74,6 +146,26 @@ func rootPath(c Channel) string {
 
 func subscribePath(c Channel) string {
 	return path.Join("/", c.String(), "subscribe")
+}
+
+func intentPath() string {
+	return path.Join("/", "intent")
+}
+
+func successfulIntentPath() string {
+	return path.Join(intentPath(), "/", "successful")
+}
+
+func successfulIntentOAuthPath() string {
+	return path.Join(successfulIntentPath(), "/", "oauth")
+}
+
+func successfulIntentSAMLPath() string {
+	return path.Join(successfulIntentPath(), "/", "saml")
+}
+
+func successfulIntentLDAPPath() string {
+	return path.Join(successfulIntentPath(), "/", "ldap")
 }
 
 // forwarder handles incoming HTTP requests from ZITADEL and
@@ -164,4 +256,166 @@ func readLoop(ws *websocket.Conn) (done chan error) {
 	}(done)
 
 	return done
+}
+
+type SuccessfulIntentRequest struct {
+	InstanceID string `json:"instance_id"`
+	IDPID      string `json:"idp_id"`
+	IDPUserID  string `json:"idp_user_id"`
+	UserID     string `json:"user_id"`
+}
+type SuccessfulIntentResponse struct {
+	IntentID   string    `json:"intent_id"`
+	Token      string    `json:"token"`
+	ChangeDate time.Time `json:"change_date"`
+	Sequence   uint64    `json:"sequence"`
+}
+
+func callIntent(url string, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
+	data, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.Post(url, "application/json", io.NopCloser(bytes.NewReader(data)))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(string(body))
+	}
+	result := new(SuccessfulIntentResponse)
+	if err := json.Unmarshal(body, result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func successfulIntentHandler(cmd *command.Commands, createIntent func(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		req := &SuccessfulIntentRequest{}
+		if err := json.Unmarshal(body, req); err != nil {
+		}
+
+		ctx := authz.WithInstanceID(r.Context(), req.InstanceID)
+		resp, err := createIntent(ctx, cmd, req)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		data, err := json.Marshal(resp)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		w.Write(data)
+		return
+	}
+}
+
+func createIntent(ctx context.Context, cmd *command.Commands, instanceID, idpID string) (string, error) {
+	writeModel, _, err := cmd.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", instanceID)
+	if err != nil {
+		return "", err
+	}
+	return writeModel.AggregateID, nil
+}
+
+func createSuccessfulOAuthIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
+	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	idpUser := openid.NewUser(
+		&oidc.UserInfo{
+			Subject: req.IDPUserID,
+			UserInfoProfile: oidc.UserInfoProfile{
+				PreferredUsername: "username",
+			},
+		},
+	)
+	idpSession := &openid.Session{
+		Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
+			Token: &oauth2.Token{
+				AccessToken: "accessToken",
+			},
+			IDToken: "idToken",
+		},
+	}
+	token, err := cmd.SucceedIDPIntent(ctx, writeModel, idpUser, idpSession, req.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &SuccessfulIntentResponse{
+		intentID,
+		token,
+		writeModel.ChangeDate,
+		writeModel.ProcessedSequence,
+	}, nil
+}
+
+func createSuccessfulSAMLIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
+	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+
+	idpUser := &saml.UserMapper{
+		ID:         req.IDPUserID,
+		Attributes: map[string][]string{"attribute1": {"value1"}},
+	}
+	assertion := &crewjam_saml.Assertion{ID: "id"}
+
+	token, err := cmd.SucceedSAMLIDPIntent(ctx, writeModel, idpUser, req.UserID, assertion)
+	if err != nil {
+		return nil, err
+	}
+	return &SuccessfulIntentResponse{
+		intentID,
+		token,
+		writeModel.ChangeDate,
+		writeModel.ProcessedSequence,
+	}, nil
+}
+
+func createSuccessfulLDAPIntent(ctx context.Context, cmd *command.Commands, req *SuccessfulIntentRequest) (*SuccessfulIntentResponse, error) {
+	intentID, err := createIntent(ctx, cmd, req.InstanceID, req.IDPID)
+	writeModel, err := cmd.GetIntentWriteModel(ctx, intentID, req.InstanceID)
+	username := "username"
+	lang := language.Make("en")
+	idpUser := ldap.NewUser(
+		req.IDPUserID,
+		"",
+		"",
+		"",
+		"",
+		username,
+		"",
+		false,
+		"",
+		false,
+		lang,
+		"",
+		"",
+	)
+	attributes := map[string][]string{"id": {req.IDPUserID}, "username": {username}, "language": {lang.String()}}
+	token, err := cmd.SucceedLDAPIDPIntent(ctx, writeModel, idpUser, req.UserID, attributes)
+	if err != nil {
+		return nil, err
+	}
+	return &SuccessfulIntentResponse{
+		intentID,
+		token,
+		writeModel.ChangeDate,
+		writeModel.ProcessedSequence,
+	}, nil
 }
