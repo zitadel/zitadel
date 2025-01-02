@@ -28,6 +28,8 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
+this fork adds the IDP initiated SSO by converting IDP initiated request to SP initated using a callback handler in the application backend   
+
 |Community Meeting|
 |------------------|
 |ZITADEL holds bi-weekly community calls. To join the community calls or to watch previous meeting notes and recordings, please visit the [meeting schedule](https://github.com/zitadel/zitadel/blob/main/MEETING_SCHEDULE.md).|
