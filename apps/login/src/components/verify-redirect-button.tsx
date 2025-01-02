@@ -51,8 +51,8 @@ export function VerifyRedirectButton({
     }
 
     await sendVerificationRedirectWithoutCheck(command)
-      .catch((error) => {
-        setError("Could not verify user");
+      .catch(() => {
+        setError("Could not verify");
         return;
       })
       .finally(() => {

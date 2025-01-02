@@ -38,7 +38,7 @@ describe("verify invite", () => {
             },
             email: {
               email: "john@zitadel.com",
-              isVerified: true, // email needs to be verified
+              isVerified: false,
             },
           },
         },
@@ -76,6 +76,15 @@ describe("verify invite", () => {
             intent: undefined,
           },
           metadata: {},
+        },
+      },
+    });
+
+    stub("zitadel.settings.v2.SettingsService", "GetLoginSettings", {
+      data: {
+        settings: {
+          passkeysType: 1,
+          allowUsernamePassword: true,
         },
       },
     });

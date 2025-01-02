@@ -40,7 +40,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       });
 
   if (!verifyResponse) {
-    return { error: "Could not verify user" };
+    return { error: "Could not verify" };
   }
 
   let session: Session | undefined;
