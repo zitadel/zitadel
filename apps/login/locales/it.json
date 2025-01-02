@@ -24,6 +24,7 @@
       "title": "Imposta Password",
       "description": "Imposta la password per il tuo account",
       "codeSent": "Un codice è stato inviato al tuo indirizzo email.",
+      "noCodeReceived": "Non hai ricevuto un codice?",
       "resend": "Invia di nuovo",
       "submit": "Continua"
     },
@@ -173,6 +174,7 @@
     "verify": {
       "title": "Verifica utente",
       "description": "Inserisci il codice fornito nell'email di verifica.",
+      "noCodeReceived": "Non hai ricevuto un codice?",
       "resendCode": "Invia di nuovo il codice",
       "submit": "Continua"
     }
@@ -181,7 +183,8 @@
     "title": "Seleziona metodo di autenticazione",
     "description": "Seleziona il metodo con cui desideri autenticarti",
     "noMethodsAvailable": "Nessun metodo di autenticazione disponibile",
-    "allSetup": "Hai già configurato un autenticatore!"
+    "allSetup": "Hai già configurato un autenticatore!",
+    "linkWithIDP": "o collega con un Identity Provider"
   },
   "error": {
     "unknownContext": "Impossibile ottenere il contesto dell'utente. Assicurati di inserire prima il nome utente o di fornire un loginName come parametro di ricerca.",

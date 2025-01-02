@@ -24,6 +24,7 @@
       "title": "Establecer Contraseña",
       "description": "Establece la contraseña para tu cuenta",
       "codeSent": "Se ha enviado un código a su correo electrónico.",
+      "noCodeReceived": "¿No recibiste un código?",
       "resend": "Reenviar código",
       "submit": "Continuar"
     },
@@ -173,6 +174,7 @@
     "verify": {
       "title": "Verificar usuario",
       "description": "Introduce el código proporcionado en el correo electrónico de verificación.",
+      "noCodeReceived": "¿No recibiste un código?",
       "resendCode": "Reenviar código",
       "submit": "Continuar"
     }
@@ -181,7 +183,8 @@
     "title": "Seleccionar método de autenticación",
     "description": "Selecciona el método con el que deseas autenticarte",
     "noMethodsAvailable": "No hay métodos de autenticación disponibles",
-    "allSetup": "¡Ya has configurado un autenticador!"
+    "allSetup": "¡Ya has configurado un autenticador!",
+    "linkWithIDP": "o vincúlalo con un proveedor de identidad"
   },
   "error": {
     "unknownContext": "No se pudo obtener el contexto del usuario. Asegúrate de ingresar primero el nombre de usuario o proporcionar un loginName como parámetro de búsqueda.",

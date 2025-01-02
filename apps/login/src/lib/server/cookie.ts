@@ -91,47 +91,44 @@ export async function createSessionForIdpAndUpdateCookie(
     lifetime,
   );
 
-  if (createdSession) {
-    return getSession({
-      sessionId: createdSession.sessionId,
-      sessionToken: createdSession.sessionToken,
-    }).then((response) => {
-      if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: CustomCookieData = {
-          id: createdSession.sessionId,
-          token: createdSession.sessionToken,
-          creationTs: response.session.creationDate
-            ? `${timestampMs(response.session.creationDate)}`
-            : "",
-          expirationTs: response.session.expirationDate
-            ? `${timestampMs(response.session.expirationDate)}`
-            : "",
-          changeTs: response.session.changeDate
-            ? `${timestampMs(response.session.changeDate)}`
-            : "",
-          loginName: response.session.factors.user.loginName ?? "",
-          organization: response.session.factors.user.organizationId ?? "",
-        };
-
-        if (authRequestId) {
-          sessionCookie.authRequestId = authRequestId;
-        }
-
-        if (response.session.factors.user.organizationId) {
-          sessionCookie.organization =
-            response.session.factors.user.organizationId;
-        }
-
-        return addSessionToCookie(sessionCookie).then(() => {
-          return response.session as Session;
-        });
-      } else {
-        throw "could not get session or session does not have loginName";
-      }
-    });
-  } else {
+  if (!createdSession) {
     throw "Could not create session";
   }
+
+  const { session } = await getSession({
+    sessionId: createdSession.sessionId,
+    sessionToken: createdSession.sessionToken,
+  });
+
+  if (!session || !session.factors?.user?.loginName) {
+    throw "Could not retrieve session";
+  }
+
+  const sessionCookie: CustomCookieData = {
+    id: createdSession.sessionId,
+    token: createdSession.sessionToken,
+    creationTs: session.creationDate
+      ? `${timestampMs(session.creationDate)}`
+      : "",
+    expirationTs: session.expirationDate
+      ? `${timestampMs(session.expirationDate)}`
+      : "",
+    changeTs: session.changeDate ? `${timestampMs(session.changeDate)}` : "",
+    loginName: session.factors.user.loginName ?? "",
+    organization: session.factors.user.organizationId ?? "",
+  };
+
+  if (authRequestId) {
+    sessionCookie.authRequestId = authRequestId;
+  }
+
+  if (session.factors.user.organizationId) {
+    sessionCookie.organization = session.factors.user.organizationId;
+  }
+
+  return addSessionToCookie(sessionCookie).then(() => {
+    return session as Session;
+  });
 }
 
 export type SessionWithChallenges = Session & {

@@ -21,7 +21,7 @@ export function IdpSignin({
   idpIntent: { idpIntentId, idpIntentToken },
   authRequestId,
 }: Props) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
@@ -55,8 +55,8 @@ export function IdpSignin({
   }, []);
 
   return (
-    <div className="flex items-center justify-center">
-      {loading && <Spinner />}
+    <div className="flex items-center justify-center py-4">
+      {loading && <Spinner className="h-5 w-5" />}
       {error && (
         <div className="py-4">
           <Alert>{error}</Alert>

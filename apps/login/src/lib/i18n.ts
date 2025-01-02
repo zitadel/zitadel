@@ -20,6 +20,11 @@ export const LANGS: Lang[] = [
     name: "Español",
     code: "es",
   },
+  {
+    name: "简体中文",
+    code: "zh",
+  },
 ];
 
 export const LANGUAGE_COOKIE_NAME = "NEXT_LOCALE";
+export const LANGUAGE_HEADER_NAME = "accept-language";

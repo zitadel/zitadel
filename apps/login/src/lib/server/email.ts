@@ -84,8 +84,8 @@ type resendVerifyEmailCommand = {
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
   return command.isInvite
-    ? resendEmailCode(command.userId)
-    : resendInviteCode(command.userId);
+    ? resendInviteCode(command.userId)
+    : resendEmailCode(command.userId);
 }
 
 export async function sendVerificationRedirectWithoutCheck(command: {
@@ -120,6 +120,7 @@ export async function sendVerificationRedirectWithoutCheck(command: {
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
     return { error: "Could not load possible authenticators" };
   }
+
   // if no authmethods are found on the user, redirect to set one up
   if (
     authMethodResponse &&

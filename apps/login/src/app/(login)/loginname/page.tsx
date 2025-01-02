@@ -61,7 +61,7 @@ export default async function Page(props: {
             <SignInWithIdp
               identityProviders={identityProviders}
               authRequestId={authRequestId}
-              organization={organization ?? defaultOrganization} // use the organization from the searchParams here otherwise fallback to the default organization
+              organization={organization}
             ></SignInWithIdp>
           )}
         </UsernameForm>
