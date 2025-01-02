@@ -1,3 +1,4 @@
+import { createServerTransport } from "@zitadel/client";
 import {
   createIdpServiceClient,
   createOIDCServiceClient,
@@ -7,7 +8,6 @@ import {
   createUserServiceClient,
   makeReqCtx,
 } from "@zitadel/client/v2";
-import { createServerTransport } from "@zitadel/node";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import {

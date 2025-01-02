@@ -1,6 +1,6 @@
 import { createGrpcTransport, GrpcTransportOptions } from "@connectrpc/connect-node";
-import { NewAuthorizationBearerInterceptor } from "@zitadel/client";
 import { importPKCS8, SignJWT } from "jose";
+import { NewAuthorizationBearerInterceptor } from "./interceptors";
 
 /**
  * Create a server transport with the given token and configuration options.

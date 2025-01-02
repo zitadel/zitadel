@@ -14,9 +14,8 @@ import {
   setPassword,
   setUserPassword,
 } from "@/lib/zitadel";
-import { create } from "@zitadel/client";
+import { create, createServerTransport } from "@zitadel/client";
 import { createUserServiceClient } from "@zitadel/client/v2";
-import { createServerTransport } from "@zitadel/node";
 import {
   Checks,
   ChecksSchema,
