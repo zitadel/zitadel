@@ -17,14 +17,16 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type Memberships struct {
+type GroupMemberships struct {
 	SearchResponse
-	Memberships []*Membership
+	GroupMemberships []*GroupMembership
 }
 
-type Membership struct {
-	UserID        string
-	Roles         database.TextArray[string]
+type GroupMembership struct {
+	UserID  string
+	GroupID string
+	Roles   database.TextArray[string]
+
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	Sequence      uint64
@@ -34,90 +36,109 @@ type Membership struct {
 	IAM          *IAMMembership
 	Project      *ProjectMembership
 	ProjectGrant *ProjectGrantMembership
-
-	// Group      *GroupMembership
-	// GroupGrant *GroupGrantMembership
 }
 
-type OrgMembership struct {
-	OrgID string
-	Name  string
+var (
+	//groupMembershipAlias is a hack to satisfy checks in the queries
+	groupMembershipAlias = table{
+		name:          "group_members1", // Old value: members
+		instanceIDCol: projection.MemberInstanceID,
+	}
+	groupMembershipUserID = Column{
+		name:  projection.MemberUserIDCol,
+		table: groupMembershipAlias,
+	}
+	groupMembershipRoles = Column{
+		name:  projection.MemberRolesCol,
+		table: groupMembershipAlias,
+	}
+	groupMembershipCreationDate = Column{
+		name:  projection.MemberCreationDate,
+		table: groupMembershipAlias,
+	}
+	groupMembershipChangeDate = Column{
+		name:  projection.MemberChangeDate,
+		table: groupMembershipAlias,
+	}
+	groupMembershipSequence = Column{
+		name:  projection.MemberSequence,
+		table: groupMembershipAlias,
+	}
+	groupMembershipResourceOwner = Column{
+		name:  projection.MemberResourceOwner,
+		table: groupMembershipAlias,
+	}
+	groupMembershipInstanceID = Column{
+		name:  projection.MemberInstanceID,
+		table: groupMembershipAlias,
+	}
+	groupMembershipOrgID = Column{
+		name:  projection.OrgMemberOrgIDCol,
+		table: groupMembershipAlias,
+	}
+	groupMembershipIAMID = Column{
+		name:  projection.InstanceMemberIAMIDCol,
+		table: groupMembershipAlias,
+	}
+	groupMembershipProjectID = Column{
+		name:  projection.ProjectMemberProjectIDCol,
+		table: groupMembershipAlias,
+	}
+	groupMembershipGrantID = Column{
+		name:  projection.ProjectGrantMemberGrantIDCol,
+		table: groupMembershipAlias,
+	}
+	groupMembershipGrantGrantedOrgID = Column{
+		name:  projection.ProjectGrantColumnGrantedOrgID,
+		table: groupMembershipAlias,
+	}
+	groupMembershipGroupID = Column{
+		name:  projection.GroupMemberGroupIDCol,
+		table: groupMembershipAlias,
+	}
+	// membershipGroupGrantID = Column{
+	// 	name:  projection.GroupGrantIDCol,
+	// 	table: membershipAlias,
+	// }
+)
+
+func NewGroupMembershipUserIDQuery(userID string) (SearchQuery, error) {
+	return NewTextQuery(groupMembershipUserID.setTable(groupMembershipAlias), userID, TextEquals)
 }
 
-type IAMMembership struct {
-	IAMID string
-	Name  string
+func NewGroupMembershipGroupIDQuery(groupID string) (SearchQuery, error) {
+	return NewTextQuery(groupMembershipGroupID.setTable(groupMembershipAlias), groupID, TextEquals)
 }
 
-type ProjectMembership struct {
-	ProjectID string
-	Name      string
-}
-
-type ProjectGrantMembership struct {
-	ProjectID    string
-	ProjectName  string
-	GrantID      string
-	GrantedOrgID string
-}
-
-type GroupGrantMembership struct {
-	ProjectID    string
-	ProjectName  string
-	GrantID      string
-	GrantedOrgID string
-}
-
-type MembershipSearchQuery struct {
-	SearchRequest
-	Queries []SearchQuery
-}
-
-func NewMembershipUserIDQuery(userID string) (SearchQuery, error) {
-	return NewTextQuery(membershipUserID.setTable(membershipAlias), userID, TextEquals)
-}
-
-// func NewMembershipGroupIDQuery(groupID string) (SearchQuery, error) {
-// 	return NewTextQuery(membershipGroupID.setTable(membershipAlias), groupID, TextEquals)
-// }
-
-func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
+func NewGroupMembershipOrgIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(OrgMemberOrgID, value, TextEquals)
 }
 
-func NewMembershipResourceOwnersSearchQuery(ids ...string) (SearchQuery, error) {
+func NewGroupMembershipResourceOwnersSearchQuery(ids ...string) (SearchQuery, error) {
 	list := make([]interface{}, len(ids))
 	for i, value := range ids {
 		list[i] = value
 	}
-	return NewListQuery(membershipResourceOwner, list, ListIn)
+	return NewListQuery(groupMembershipResourceOwner, list, ListIn)
 }
 
-func NewMembershipGrantedOrgIDSearchQuery(id string) (SearchQuery, error) {
+func NewGroupMembershipGrantedOrgIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnGrantedOrgID, id, TextEquals)
 }
 
-func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
+func NewGroupMembershipProjectIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectMemberProjectID, value, TextEquals)
 }
 
-func NewMembershipProjectGrantIDQuery(value string) (SearchQuery, error) {
+func NewGroupMembershipProjectGrantIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantMemberGrantID, value, TextEquals)
 }
 
-func NewMembershipIsIAMQuery() (SearchQuery, error) {
+func NewGroupMembershipIsIAMQuery() (SearchQuery, error) {
 	return NewNotNullQuery(InstanceMemberIAMID)
 }
 
-func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = q.SearchRequest.toQuery(query)
-	for _, q := range q.Queries {
-		query = q.toQuery(query)
-	}
-	return query
-}
-
-func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery, shouldTrigger bool) (memberships *Memberships, err error) {
+func (q *Queries) GroupMemberships(ctx context.Context, queries *MembershipSearchQuery, shouldTrigger bool) (groupMemberships *GroupMemberships, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -152,7 +173,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 		wg.Wait()
 	}
 
-	query, queryArgs, scan := prepareMembershipsQuery(ctx, q.client, queries)
+	query, queryArgs, scan := prepareGroupMembershipsQuery(ctx, q.client, queries)
 	eq := sq.Eq{membershipInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
@@ -165,85 +186,21 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	queryArgs = append(queryArgs, args...)
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		memberships, err = scan(rows)
+		groupMemberships, err = scan(rows)
 		return err
 	}, stmt, queryArgs...)
 	if err != nil {
 		return nil, err
 	}
-	memberships.State = latestSequence
-	return memberships, nil
+	groupMemberships.State = latestSequence
+	return groupMemberships, nil
 }
 
-var (
-	//membershipAlias is a hack to satisfy checks in the queries
-	membershipAlias = table{
-		name:          "members",
-		instanceIDCol: projection.MemberInstanceID,
-	}
-	membershipUserID = Column{
-		name:  projection.MemberUserIDCol,
-		table: membershipAlias,
-	}
-	membershipRoles = Column{
-		name:  projection.MemberRolesCol,
-		table: membershipAlias,
-	}
-	membershipCreationDate = Column{
-		name:  projection.MemberCreationDate,
-		table: membershipAlias,
-	}
-	membershipChangeDate = Column{
-		name:  projection.MemberChangeDate,
-		table: membershipAlias,
-	}
-	membershipSequence = Column{
-		name:  projection.MemberSequence,
-		table: membershipAlias,
-	}
-	membershipResourceOwner = Column{
-		name:  projection.MemberResourceOwner,
-		table: membershipAlias,
-	}
-	membershipInstanceID = Column{
-		name:  projection.MemberInstanceID,
-		table: membershipAlias,
-	}
-	membershipOrgID = Column{
-		name:  projection.OrgMemberOrgIDCol,
-		table: membershipAlias,
-	}
-	membershipIAMID = Column{
-		name:  projection.InstanceMemberIAMIDCol,
-		table: membershipAlias,
-	}
-	membershipProjectID = Column{
-		name:  projection.ProjectMemberProjectIDCol,
-		table: membershipAlias,
-	}
-	membershipGrantID = Column{
-		name:  projection.ProjectGrantMemberGrantIDCol,
-		table: membershipAlias,
-	}
-	membershipGrantGrantedOrgID = Column{
-		name:  projection.ProjectGrantColumnGrantedOrgID,
-		table: membershipAlias,
-	}
-	membershipGroupID = Column{
-		name:  projection.GroupMemberGroupIDCol,
-		table: membershipAlias,
-	}
-	// membershipGroupGrantID = Column{
-	// 	name:  projection.GroupGrantIDCol,
-	// 	table: membershipAlias,
-	// }
-)
-
-func getMembershipFromQuery(queries *MembershipSearchQuery) (string, []interface{}) {
-	orgMembers, orgMembersArgs := prepareOrgMember(queries)
-	iamMembers, iamMembersArgs := prepareIAMMember(queries)
-	projectMembers, projectMembersArgs := prepareProjectMember(queries)
-	projectGrantMembers, projectGrantMembersArgs := prepareProjectGrantMember(queries)
+func getGroupMembershipFromQuery(queries *MembershipSearchQuery) (string, []interface{}) {
+	orgMembers, orgMembersArgs := prepareGroupOrgMember(queries)
+	iamMembers, iamMembersArgs := prepareGroupIAMMember(queries)
+	projectMembers, projectMembersArgs := prepareGroupProjectMember(queries)
+	projectGrantMembers, projectGrantMembersArgs := prepareGroupProjectGrantMember(queries)
 	args := make([]interface{}, 0)
 	args = append(append(append(append(args, orgMembersArgs...), iamMembersArgs...), projectMembersArgs...), projectGrantMembersArgs...)
 
@@ -255,13 +212,14 @@ func getMembershipFromQuery(queries *MembershipSearchQuery) (string, []interface
 			projectMembers +
 			" UNION ALL " +
 			projectGrantMembers +
-			") AS " + membershipAlias.identifier(),
+			") AS " + groupMembershipAlias.identifier(),
 		args
 }
 
-func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, queries *MembershipSearchQuery) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*Memberships, error)) {
-	query, args := getMembershipFromQuery(queries)
+func prepareGroupMembershipsQuery(ctx context.Context, db prepareDatabase, queries *MembershipSearchQuery) (sq.SelectBuilder, []interface{}, func(*sql.Rows) (*GroupMemberships, error)) {
+	query, args := getGroupMembershipFromQuery(queries)
 	return sq.Select(
+			membershipGroupID.identifier(),
 			membershipUserID.identifier(),
 			membershipRoles.identifier(),
 			membershipCreationDate.identifier(),
@@ -284,13 +242,13 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, queries *M
 			LeftJoin(join(InstanceColumnID, membershipInstanceID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		args,
-		func(rows *sql.Rows) (*Memberships, error) {
-			memberships := make([]*Membership, 0)
+		func(rows *sql.Rows) (*GroupMemberships, error) {
+			memberships := make([]*GroupMembership, 0)
 			var count uint64
 			for rows.Next() {
 
 				var (
-					membership   = new(Membership)
+					membership   = new(GroupMembership)
 					orgID        = sql.NullString{}
 					instanceID   = sql.NullString{}
 					projectID    = sql.NullString{}
@@ -303,7 +261,6 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, queries *M
 
 				err := rows.Scan(
 					&membership.UserID,
-					&membership.Roles,
 					&membership.CreationDate,
 					&membership.ChangeDate,
 					&membership.Sequence,
@@ -354,8 +311,8 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, queries *M
 				return nil, zerrors.ThrowInternal(err, "QUERY-N34NV", "Errors.Query.CloseRows")
 			}
 
-			return &Memberships{
-				Memberships: memberships,
+			return &GroupMemberships{
+				GroupMemberships: memberships,
 				SearchResponse: SearchResponse{
 					Count: count,
 				},
@@ -363,7 +320,7 @@ func prepareMembershipsQuery(ctx context.Context, db prepareDatabase, queries *M
 		}
 }
 
-func prepareOrgMember(query *MembershipSearchQuery) (string, []interface{}) {
+func prepareGroupOrgMember(query *MembershipSearchQuery) (string, []interface{}) {
 	builder := sq.Select(
 		OrgMemberUserID.identifier(),
 		OrgMemberRoles.identifier(),
@@ -373,20 +330,20 @@ func prepareOrgMember(query *MembershipSearchQuery) (string, []interface{}) {
 		OrgMemberResourceOwner.identifier(),
 		OrgMemberInstanceID.identifier(),
 		OrgMemberOrgID.identifier(),
-		"NULL::TEXT AS "+membershipIAMID.name,
-		"NULL::TEXT AS "+membershipProjectID.name,
-		"NULL::TEXT AS "+membershipGrantID.name,
+		"NULL::TEXT AS "+groupMembershipIAMID.name,
+		"NULL::TEXT AS "+groupMembershipProjectID.name,
+		"NULL::TEXT AS "+groupMembershipGrantID.name,
 	).From(orgMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name || q.Col().table.name == orgMemberTable.name {
+		if q.Col().table.name == groupMembershipAlias.name || q.Col().table.name == orgMemberTable.name {
 			builder = q.toQuery(builder)
 		}
 	}
 	return builder.MustSql()
 }
 
-func prepareIAMMember(query *MembershipSearchQuery) (string, []interface{}) {
+func prepareGroupIAMMember(query *MembershipSearchQuery) (string, []interface{}) {
 	builder := sq.Select(
 		InstanceMemberUserID.identifier(),
 		InstanceMemberRoles.identifier(),
@@ -402,14 +359,14 @@ func prepareIAMMember(query *MembershipSearchQuery) (string, []interface{}) {
 	).From(instanceMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name || q.Col().table.name == instanceMemberTable.name {
+		if q.Col().table.name == groupMembershipAlias.name || q.Col().table.name == instanceMemberTable.name {
 			builder = q.toQuery(builder)
 		}
 	}
 	return builder.MustSql()
 }
 
-func prepareProjectMember(query *MembershipSearchQuery) (string, []interface{}) {
+func prepareGroupProjectMember(query *MembershipSearchQuery) (string, []interface{}) {
 	builder := sq.Select(
 		ProjectMemberUserID.identifier(),
 		ProjectMemberRoles.identifier(),
@@ -425,7 +382,7 @@ func prepareProjectMember(query *MembershipSearchQuery) (string, []interface{}) 
 	).From(projectMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name || q.Col().table.name == projectMemberTable.name {
+		if q.Col().table.name == groupMembershipAlias.name || q.Col().table.name == projectMemberTable.name {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -433,7 +390,8 @@ func prepareProjectMember(query *MembershipSearchQuery) (string, []interface{}) 
 	return builder.MustSql()
 }
 
-func prepareProjectGrantMember(query *MembershipSearchQuery) (string, []interface{}) {
+// Need to add GroupID but for that need to update project_grant table for adding groupID
+func prepareGroupProjectGrantMember(query *MembershipSearchQuery) (string, []interface{}) {
 	builder := sq.Select(
 		ProjectGrantMemberUserID.identifier(),
 		ProjectGrantMemberRoles.identifier(),
@@ -449,7 +407,7 @@ func prepareProjectGrantMember(query *MembershipSearchQuery) (string, []interfac
 	).From(projectGrantMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name || q.Col().table.name == projectMemberTable.name || q.Col().table.name == projectGrantMemberTable.name {
+		if q.Col().table.name == groupMembershipAlias.name || q.Col().table.name == projectMemberTable.name || q.Col().table.name == projectGrantMemberTable.name {
 			builder = q.toQuery(builder)
 		}
 	}

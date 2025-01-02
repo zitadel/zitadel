@@ -4,28 +4,27 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	group_member "github.com/zitadel/zitadel/internal/repository/groupmember"
 	"github.com/zitadel/zitadel/internal/repository/member"
 )
 
 var (
-	MemberAddedType          = groupEventTypePrefix + group_member.AddedEventType
-	MemberChangedType        = groupEventTypePrefix + group_member.ChangedEventType
-	MemberRemovedType        = groupEventTypePrefix + group_member.RemovedEventType
-	MemberCascadeRemovedType = groupEventTypePrefix + group_member.CascadeRemovedEventType
+	MemberAddedType          = groupEventTypePrefix + member.AddedEventType
+	MemberChangedType        = groupEventTypePrefix + member.ChangedEventType
+	MemberRemovedType        = groupEventTypePrefix + member.RemovedEventType
+	MemberCascadeRemovedType = groupEventTypePrefix + member.CascadeRemovedEventType
 )
 
-type GroupMemberAddedEvent struct {
-	group_member.GroupMemberAddedEvent
+type MemberAddedEvent struct {
+	member.MemberAddedEvent
 }
 
 func NewGroupMemberAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userID string,
-) *GroupMemberAddedEvent {
-	return &GroupMemberAddedEvent{
-		GroupMemberAddedEvent: *group_member.NewGroupMemberAddedEvent(
+) *MemberAddedEvent {
+	return &MemberAddedEvent{
+		MemberAddedEvent: *member.NewMemberAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
@@ -42,20 +41,21 @@ func MemberAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 		return nil, err
 	}
 
-	return &GroupMemberAddedEvent{GroupMemberAddedEvent: *e.(*group_member.GroupMemberAddedEvent)}, nil
+	return &MemberAddedEvent{MemberAddedEvent: *e.(*member.MemberAddedEvent)}, nil
 }
 
-type GroupMemberChangedEvent struct {
-	group_member.GroupMemberChangedEvent
+type MemberChangedEvent struct {
+	member.MemberChangedEvent
 }
 
 func NewGroupMemberChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userID string,
-) *GroupMemberChangedEvent {
-	return &GroupMemberChangedEvent{
-		GroupMemberChangedEvent: *group_member.NewGroupMemberChangedEvent(
+) *MemberChangedEvent {
+
+	return &MemberChangedEvent{
+		MemberChangedEvent: *member.NewMemberChangedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
@@ -72,21 +72,21 @@ func MemberChangedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 		return nil, err
 	}
 
-	return &GroupMemberChangedEvent{GroupMemberChangedEvent: *e.(*group_member.GroupMemberChangedEvent)}, nil
+	return &MemberChangedEvent{MemberChangedEvent: *e.(*member.MemberChangedEvent)}, nil
 }
 
-type GroupMemberRemovedEvent struct {
-	group_member.GroupMemberRemovedEvent
+type MemberRemovedEvent struct {
+	member.MemberRemovedEvent
 }
 
 func NewGroupMemberRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userID string,
-) *GroupMemberRemovedEvent {
+) *MemberRemovedEvent {
 
-	return &GroupMemberRemovedEvent{
-		GroupMemberRemovedEvent: *group_member.NewRemovedEvent(
+	return &MemberRemovedEvent{
+		MemberRemovedEvent: *member.NewRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
@@ -98,26 +98,26 @@ func NewGroupMemberRemovedEvent(
 }
 
 func MemberRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e, err := group_member.RemovedEventMapper(event)
+	e, err := member.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &GroupMemberRemovedEvent{GroupMemberRemovedEvent: *e.(*group_member.GroupMemberRemovedEvent)}, nil
+	return &MemberRemovedEvent{MemberRemovedEvent: *e.(*member.MemberRemovedEvent)}, nil
 }
 
-type GroupMemberCascadeRemovedEvent struct {
-	group_member.GroupMemberCascadeRemovedEvent
+type MemberCascadeRemovedEvent struct {
+	member.MemberCascadeRemovedEvent
 }
 
 func NewGroupMemberCascadeRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userID string,
-) *GroupMemberCascadeRemovedEvent {
+) *MemberCascadeRemovedEvent {
 
-	return &GroupMemberCascadeRemovedEvent{
-		GroupMemberCascadeRemovedEvent: *group_member.NewCascadeRemovedEvent(
+	return &MemberCascadeRemovedEvent{
+		MemberCascadeRemovedEvent: *member.NewCascadeRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
@@ -134,5 +134,5 @@ func MemberCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, 
 		return nil, err
 	}
 
-	return &GroupMemberCascadeRemovedEvent{GroupMemberCascadeRemovedEvent: *e.(*group_member.GroupMemberCascadeRemovedEvent)}, nil
+	return &MemberCascadeRemovedEvent{MemberCascadeRemovedEvent: *e.(*member.MemberCascadeRemovedEvent)}, nil
 }

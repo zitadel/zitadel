@@ -81,6 +81,8 @@ func groupStateToPb(state domain.GroupState) group_pb.GroupState {
 		return group_pb.GroupState_GROUP_STATE_ACTIVE
 	case domain.GroupStateInactive:
 		return group_pb.GroupState_GROUP_STATE_INACTIVE
+	case domain.GroupStateUnspecified:
+		return group_pb.GroupState_GROUP_STATE_UNSPECIFIED
 	default:
 		return group_pb.GroupState_GROUP_STATE_UNSPECIFIED
 	}

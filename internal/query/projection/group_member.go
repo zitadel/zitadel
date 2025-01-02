@@ -8,7 +8,7 @@ import (
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/group"
-	group_member "github.com/zitadel/zitadel/internal/repository/groupmember"
+
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -62,7 +62,7 @@ func withGroupMemberCond(cond string, value interface{}) reduceGroupMemberOpt {
 	}
 }
 
-func reduceGroupMemberAdded(e group_member.GroupMemberAddedEvent, userResourceOwner string, opts ...reduceMemberOpt) (*handler.Statement, error) {
+func reduceGroupMemberAdded(e group.MemberAddedEvent, userResourceOwner string, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		cols: []handler.Column{
 			handler.NewCol(GroupMemberUserIDCol, e.UserID),
@@ -82,7 +82,7 @@ func reduceGroupMemberAdded(e group_member.GroupMemberAddedEvent, userResourceOw
 	return handler.NewCreateStatement(&e, config.cols), nil
 }
 
-func reduceGroupMemberChanged(e group_member.GroupMemberChangedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
+func reduceGroupMemberChanged(e group.MemberChangedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
 	config := reduceGroupMemberConfig{
 		cols: []handler.Column{
 			handler.NewCol(GroupMemberChangeDate, e.CreatedAt()),
@@ -100,7 +100,7 @@ func reduceGroupMemberChanged(e group_member.GroupMemberChangedEvent, opts ...re
 	return handler.NewUpdateStatement(&e, config.cols, config.conds), nil
 }
 
-func reduceGroupMemberCascadeRemoved(e group_member.GroupMemberCascadeRemovedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
+func reduceGroupMemberCascadeRemoved(e group.MemberCascadeRemovedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
 	config := reduceGroupMemberConfig{
 		conds: []handler.Condition{
 			handler.NewCond(GroupMemberInstanceID, e.Aggregate().InstanceID),
@@ -266,7 +266,7 @@ func (g *groupMemberProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (g *groupMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.GroupMemberAddedEvent)
+	e, ok := event.(*group.MemberAddedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-chy6O", "reduce.wrong.event.type %s", group.MemberAddedType)
 	}
@@ -276,40 +276,41 @@ func (g *groupMemberProjection) reduceAdded(event eventstore.Event) (*handler.St
 		return nil, err
 	}
 	return reduceGroupMemberAdded(
-		*group_member.NewGroupMemberAddedEvent(&e.BaseEvent, e.UserID),
+		*group.NewGroupMemberAddedEvent(ctx, e.Aggregate(), e.UserID),
 		userOwner,
 		withMemberCol(GroupMemberGroupIDCol, e.Aggregate().ID),
 	)
 }
 
 func (g *groupMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.GroupMemberChangedEvent)
+	e, ok := event.(*group.MemberChangedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-10XK2", "reduce.wrong.event.type %s", group.MemberChangedType)
 	}
 	return reduceGroupMemberChanged(
-		*group_member.NewGroupMemberChangedEvent(&e.BaseEvent, e.UserID),
+		*group.NewGroupMemberChangedEvent(setGroupMemberContext(e.Aggregate()), e.Aggregate(), e.UserID),
 		withGroupMemberCond(GroupMemberGroupIDCol, e.Aggregate().ID),
 	)
 }
 
 func (g *groupMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.GroupMemberCascadeRemovedEvent)
+	e, ok := event.(*group.MemberCascadeRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-bHe54", "reduce.wrong.event.type %s", group.MemberCascadeRemovedType)
 	}
 	return reduceGroupMemberCascadeRemoved(
-		*group_member.NewCascadeRemovedEvent(&e.BaseEvent, e.UserID),
+		*group.NewGroupMemberCascadeRemovedEvent(setGroupMemberContext(e.Aggregate()), e.Aggregate(), e.UserID),
 		withGroupMemberCond(GroupMemberGroupIDCol, e.Aggregate().ID),
 	)
 }
 
 func (g *groupMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.GroupMemberRemovedEvent)
+	e, ok := event.(*group.MemberRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fKAOi", "reduce.wrong.event.type %s", group.MemberRemovedType)
 	}
-	return reduceGroupMemberRemoved(e,
+	return reduceGroupMemberRemoved(
+		e,
 		withGroupMemberCond(GroupMemberUserIDCol, e.UserID),
 		withGroupMemberCond(GroupMemberGroupIDCol, e.Aggregate().ID),
 	)

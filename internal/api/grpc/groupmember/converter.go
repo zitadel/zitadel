@@ -9,18 +9,18 @@ import (
 	member_pb "github.com/zitadel/zitadel/pkg/grpc/groupmember"
 )
 
-func MembersToPb(assetAPIPrefix string, members []*query.Member) []*member_pb.Member {
-	m := make([]*member_pb.Member, len(members))
+func MembersToPb(assetAPIPrefix string, members []*query.GroupMember) []*member_pb.GroupMember {
+	m := make([]*member_pb.GroupMember, len(members))
 	for i, member := range members {
 		m[i] = MemberToPb(assetAPIPrefix, member)
 	}
 	return m
-} sxad
+}
 
-func MemberToPb(assetAPIPrefix string, m *query.Member) *member_pb.Member {
-	return &member_pb.Member{
+func MemberToPb(assetAPIPrefix string, m *query.GroupMember) *member_pb.GroupMember {
+	return &member_pb.GroupMember{
 		UserId:             m.UserID,
-		Roles:              m.Roles,
+		GroupId:            m.GroupID,
 		PreferredLoginName: m.PreferredLoginName,
 		Email:              m.Email,
 		FirstName:          m.FirstName,
@@ -59,6 +59,6 @@ func MemberQueryToMember(search *member_pb.SearchQuery) (query.SearchQuery, erro
 	case *member_pb.SearchQuery_UserIdQuery:
 		return query.NewMemberUserIDSearchQuery(q.UserIdQuery.UserId)
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "MEMBE-7Bb92", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(nil, "GMEMBE-8Bb92", "Errors.Query.InvalidRequest")
 	}
 }

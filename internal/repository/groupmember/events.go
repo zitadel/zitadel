@@ -1,4 +1,4 @@
-package member
+package groupmember
 
 import (
 	"fmt"
@@ -8,31 +8,32 @@ import (
 )
 
 const (
-	UniqueMember            = "groupmember"
-	AddedEventType          = "groupmember.added"
-	ChangedEventType        = "groupmember.changed"
-	RemovedEventType        = "groupmember.removed"
-	CascadeRemovedEventType = "groupmember.cascade.removed"
+	GroupUniqueMember            = "member.group"
+	GroupAddedEventType          = "member.group.added"
+	GroupChangedEventType        = "member.group.changed"
+	GroupRemovedEventType        = "member.group.removed"
+	GroupCascadeRemovedEventType = "member.group.cascade.removed"
 )
 
-func NewAddGroupMemberUniqueConstraint(aggregateID, userID string) *eventstore.UniqueConstraint {
+func NewAddGroupMemberUniqueConstraint(aggregateID, groupID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		UniqueMember,
-		fmt.Sprintf("%s:%s", aggregateID, userID),
+		GroupUniqueMember,
+		fmt.Sprintf("%s:%s", aggregateID, groupID),
 		"Errors.GroupMember.AlreadyExists")
 }
 
-func NewRemoveGroupMemberUniqueConstraint(aggregateID, userID string) *eventstore.UniqueConstraint {
+func NewRemoveGroupMemberUniqueConstraint(aggregateID, groupID string) *eventstore.UniqueConstraint {
 	return eventstore.NewRemoveUniqueConstraint(
-		UniqueMember,
-		fmt.Sprintf("%s:%s", aggregateID, userID),
+		GroupUniqueMember,
+		fmt.Sprintf("%s:%s", aggregateID, groupID),
 	)
 }
 
 type GroupMemberAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	GroupID string   `json:"groupId"`
+	Roles   []string `json:"roles"`
 }
 
 func (e *GroupMemberAddedEvent) Payload() interface{} {
@@ -40,17 +41,19 @@ func (e *GroupMemberAddedEvent) Payload() interface{} {
 }
 
 func (e *GroupMemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddGroupMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+	return []*eventstore.UniqueConstraint{NewAddGroupMemberUniqueConstraint(e.Aggregate().ID, e.GroupID)}
 }
 
 func NewGroupMemberAddedEvent(
 	base *eventstore.BaseEvent,
-	userID string,
+	groupID string,
+	roles ...string,
 ) *GroupMemberAddedEvent {
 
 	return &GroupMemberAddedEvent{
 		BaseEvent: *base,
-		UserID:    userID,
+		GroupID:   groupID,
+		Roles:     roles,
 	}
 }
 
@@ -70,7 +73,8 @@ func GroupMemberAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 type GroupMemberChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId,omitempty"`
+	GroupID string   `json:"groupId,omitempty"`
+	Roles   []string `json:"roles,omitempty"`
 }
 
 func (e *GroupMemberChangedEvent) Payload() interface{} {
@@ -83,15 +87,17 @@ func (e *GroupMemberChangedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 
 func NewGroupMemberChangedEvent(
 	base *eventstore.BaseEvent,
-	userID string,
+	groupID string,
+	roles ...string,
 ) *GroupMemberChangedEvent {
 	return &GroupMemberChangedEvent{
 		BaseEvent: *base,
-		UserID:    userID,
+		GroupID:   groupID,
+		Roles:     roles,
 	}
 }
 
-func ChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+func GroupChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GroupMemberChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -107,7 +113,7 @@ func ChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type GroupMemberRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	GroupID string `json:"groupId"`
 }
 
 func (e *GroupMemberRemovedEvent) Payload() interface{} {
@@ -115,21 +121,21 @@ func (e *GroupMemberRemovedEvent) Payload() interface{} {
 }
 
 func (e *GroupMemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveGroupMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+	return []*eventstore.UniqueConstraint{NewRemoveGroupMemberUniqueConstraint(e.Aggregate().ID, e.GroupID)}
 }
 
-func NewRemovedEvent(
+func NewGroupRemovedEvent(
 	base *eventstore.BaseEvent,
-	userID string,
+	groupID string,
 ) *GroupMemberRemovedEvent {
 
 	return &GroupMemberRemovedEvent{
 		BaseEvent: *base,
-		UserID:    userID,
+		GroupID:   groupID,
 	}
 }
 
-func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+func GroupRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GroupMemberRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -145,7 +151,7 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type GroupMemberCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID string `json:"userId"`
+	GroupID string `json:"groupId"`
 }
 
 func (e *GroupMemberCascadeRemovedEvent) Payload() interface{} {
@@ -153,21 +159,21 @@ func (e *GroupMemberCascadeRemovedEvent) Payload() interface{} {
 }
 
 func (e *GroupMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveGroupMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+	return []*eventstore.UniqueConstraint{NewRemoveGroupMemberUniqueConstraint(e.Aggregate().ID, e.GroupID)}
 }
 
-func NewCascadeRemovedEvent(
+func NewGroupCascadeRemovedEvent(
 	base *eventstore.BaseEvent,
-	userID string,
+	groupID string,
 ) *GroupMemberCascadeRemovedEvent {
 
 	return &GroupMemberCascadeRemovedEvent{
 		BaseEvent: *base,
-		UserID:    userID,
+		GroupID:   groupID,
 	}
 }
 
-func CascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+func GroupCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GroupMemberCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

@@ -5,8 +5,8 @@ import es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 type GroupMember struct {
 	es_models.ObjectRoot
 
-	UserID  string
 	GroupID string
+	Roles   []string
 }
 
 type GroupMemberState int32
@@ -25,5 +25,15 @@ func (s GroupMemberState) Valid() bool {
 }
 
 func (i *GroupMember) IsValid() bool {
-	return i.AggregateID != "" && i.UserID != "" && i.GroupID != ""
+	return i.AggregateID != "" && i.GroupID != "" && len(i.Roles) != 0
+}
+
+func NewGroupMember(aggregateID, groupID string, roles ...string) *GroupMember {
+	return &GroupMember{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID: aggregateID,
+		},
+		GroupID: groupID,
+		Roles:   roles,
+	}
 }

@@ -24,6 +24,8 @@ type GroupMember struct {
 
 	UserID             string
 	GroupID            string
+	GroupName          string
+	GroupDescription   string
 	Roles              database.TextArray[string]
 	PreferredLoginName string
 	Email              string

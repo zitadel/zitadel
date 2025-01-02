@@ -4406,6 +4406,56 @@ service ManagementService {
         };
     }
 
+    rpc GetGroupByID(GetGroupByIDRequest) returns (GetGroupByIDResponse) {
+        option (google.api.http) = {
+            get: "/groups/{id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.read"
+            check_field_name: "Id"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Get Group By ID";
+            description: "Returns a group owned by the organization. A Group is a vessel for different users sharing the same role context."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse) {
+        option (google.api.http) = {
+            post: "/groups/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Search Group";
+            description: "Lists groups in my org. A Group is a vessel for different users sharing the same role context."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
     rpc AddGroup(AddGroupRequest) returns (AddGroupResponse) {
         option (google.api.http) = {
             post: "/groups"
@@ -4576,6 +4626,31 @@ service ManagementService {
                 headers: {
                     name: "x-zitadel-orgid";
                     description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ListGroupGrantChanges(ListGroupGrantChangesRequest) returns (ListGroupGrantChangesResponse) {
+        option (google.api.http) = {
+            post: "/groups/{group_id}/grants/{grant_id}/changes/_search"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.grant.read"
+            check_field_name: "GrantId"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups";
+            summary: "Group Grant History";
+            description: "Returns a list of changes/events that have happened on the group grant. It's the history of the group grant. Make sure to send a limit."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to change/get objects of another organization include the header. Make sure the requesting user has permission to access the requested data.";
                     type: STRING,
                     required: false;
                 };
@@ -10865,6 +10940,30 @@ message ListGroupChangesResponse {
     repeated zitadel.change.v1.Change result = 2;
 }
 
+message GetGroupByIDRequest {
+    string id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629026806489455\"";
+        }
+    ];
+}
+
+message GetGroupByIDResponse {
+    zitadel.group.v1.Group group = 1;
+}
+
+message ListGroupsRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criteria the client is looking for
+    repeated zitadel.group.v1.GroupQuery queries = 2;
+}
+
+message ListGroupsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.group.v1.Group result = 2;
+}
 
 message AddGroupRequest {
     string name = 1 [
@@ -10876,7 +10975,7 @@ message AddGroupRequest {
             example: "\"MyGroup\"";
         }
     ];
-    bool description = 2 [
+    string description = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
             max_length: 200;
@@ -10915,7 +11014,6 @@ message UpdateGroupRequest {
             example: "\"Group Description-Updated\"";
         }
     ];
-    
 }
 
 message UpdateGroupResponse {
@@ -10966,6 +11064,20 @@ message ListGroupGrantRequest {
 message ListGroupGrantResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.group.v1.GroupGrant result = 2;
+}
+
+message ListGroupGrantChangesRequest {
+    //list limitations and ordering
+    zitadel.change.v1.ChangeQuery query = 1;
+    string group_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string grant_id = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ListGroupGrantChangesResponse {
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary info)
+    repeated zitadel.change.v1.Change result = 2;
 }
 
 message AddGroupGrantRequest {

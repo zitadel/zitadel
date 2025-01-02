@@ -24,6 +24,10 @@ var (
 		name:  projection.MemberUserIDCol,
 		table: orgMemberTable,
 	}
+	OrgMemberGroupID = Column{
+		name:  projection.GroupMemberGroupIDCol,
+		table: orgMemberTable,
+	}
 	OrgMemberRoles = Column{
 		name:  projection.MemberRolesCol,
 		table: orgMemberTable,
@@ -87,6 +91,34 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (mem
 	}, stmt, args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-5g4yV", "Errors.Internal")
+	}
+
+	members.State = currentSequence
+	return members, err
+}
+
+func (q *Queries) OrgGroupMembers(ctx context.Context, queries *OrgMembersQuery) (members *GroupMembers, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareOrgGroupMembersQuery(ctx, q.client)
+	eq := sq.Eq{OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	if err != nil {
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-QCBVB", "Errors.Query.InvalidRequest")
+	}
+
+	currentSequence, err := q.latestState(ctx, orgsTable)
+	if err != nil {
+		return nil, err
+	}
+
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		members, err = scan(rows)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-6Qznl", "Errors.Internal")
 	}
 
 	members.State = currentSequence
@@ -180,6 +212,67 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 
 			return &Members{
 				Members: members,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
+}
+
+func prepareOrgGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*GroupMembers, error)) {
+	return sq.Select(
+			OrgMemberCreationDate.identifier(),
+			OrgMemberChangeDate.identifier(),
+			OrgMemberSequence.identifier(),
+			OrgMemberResourceOwner.identifier(),
+			OrgMemberGroupID.identifier(),
+			GroupColumnName.identifier(),
+			GroupColumnDescription.identifier(),
+			OrgMemberRoles.identifier(),
+			countColumn.identifier(),
+		).From(orgMemberTable.identifier()).
+			LeftJoin(join(GroupColumnID, OrgMemberGroupID) + db.Timetravel(call.Took(ctx))).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*GroupMembers, error) {
+			members := make([]*GroupMember, 0)
+			var count uint64
+
+			for rows.Next() {
+				member := new(GroupMember)
+
+				var (
+					groupName        = sql.NullString{}
+					groupDescription = sql.NullString{}
+				)
+
+				err := rows.Scan(
+					&member.CreationDate,
+					&member.ChangeDate,
+					&member.Sequence,
+					&member.ResourceOwner,
+					&member.Roles,
+					&member.GroupID,
+					&groupName,
+					&groupDescription,
+
+					&count,
+				)
+
+				if err != nil {
+					return nil, err
+				}
+
+				member.GroupName = groupName.String
+				member.GroupDescription = groupDescription.String
+				members = append(members, member)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, zerrors.ThrowInternal(err, "QUERY-M44NV", "Errors.Query.CloseRows")
+			}
+
+			return &GroupMembers{
+				GroupMembers: members,
 				SearchResponse: SearchResponse{
 					Count: count,
 				},
