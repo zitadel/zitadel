@@ -42,9 +42,9 @@ export const Commands = ({mode, name, lower, configfilename}) => {
             <CodeBlock language="bash">
                 {'# Download the configuration files.'}{'\n'}
                 {'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy\n'}
-                {`wget $\{ZITADEL_CONFIG_FILES\}/docker-compose.yaml -O docker-compose-base.yaml`}{'\n'}
-                {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/docker-compose.yaml -O docker-compose-'}{lower}{'.yaml'}{'\n'}
-                {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/'}{configfilename}{' -O '}{configfilename}{'\n'}
+                {'wget $\{ZITADEL_CONFIG_FILES\}/docker-compose.yaml -O docker-compose-base.yaml --quiet \n'}
+                {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/docker-compose.yaml -O docker-compose-'}{lower}{'.yaml --quiet \n'}
+                {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/'}{configfilename}{' -O '}{configfilename}{'--quiet \n'}
                 {'\n'}
                 {genCert}
                 {'# Run the database, ZITADEL and '}{name}{'.'}{'\n'}
