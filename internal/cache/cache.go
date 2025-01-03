@@ -17,6 +17,7 @@ const (
 	PurposeAuthzInstance
 	PurposeMilestones
 	PurposeOrganization
+	PurposeIdPFormCallback
 )
 
 // Cache stores objects with a value of type `V`.
