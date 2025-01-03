@@ -497,8 +497,6 @@ export async function resendEmailCode(
     request = { ...request, verification: { case: "sendCode", value: medium } };
   }
 
-  console.log(request);
-
   return userService.resendEmailCode(request, {});
 }
 
