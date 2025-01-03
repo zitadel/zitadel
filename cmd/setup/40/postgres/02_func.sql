@@ -61,6 +61,8 @@ LEFT JOIN max_seq
     ON cmds.instance_id = max_seq.instance_id
     AND cmds.aggregate_type = max_seq.aggregate_type
     AND cmds.aggregate_id = max_seq.aggregate_id
+ORDER BY
+    in_tx_order
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
