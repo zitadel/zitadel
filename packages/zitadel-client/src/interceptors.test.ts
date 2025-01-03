@@ -1,19 +1,22 @@
-import { describe, expect, test, vitest } from "vitest";
-import { Int32Value, MethodKind, StringValue } from "@bufbuild/protobuf";
+import { Int32Value } from "@bufbuild/protobuf/wkt";
+import { compileService } from "@bufbuild/protocompile";
 import { createRouterTransport, HandlerContext } from "@connectrpc/connect";
+import { describe, expect, test, vitest } from "vitest";
 import { NewAuthorizationBearerInterceptor } from "./interceptors";
 
-const TestService = {
-  typeName: "handwritten.TestService",
-  methods: {
-    unary: {
-      name: "Unary",
-      I: Int32Value,
-      O: StringValue,
-      kind: MethodKind.Unary,
-    },
-  },
-} as const;
+const TestService = compileService(`
+  syntax = "proto3";
+  package handwritten;
+  service TestService {
+    rpc Unary(Int32Value) returns (StringValue);
+  }
+  message Int32Value {
+    int32 value = 1;
+  }
+  message StringValue {
+    string value = 1;
+  }
+`);
 
 describe("NewAuthorizationBearerInterceptor", () => {
   const transport = {
@@ -21,51 +24,37 @@ describe("NewAuthorizationBearerInterceptor", () => {
   };
 
   test("injects the authorization token", async () => {
-    const handler = vitest.fn(
-      (request: Int32Value, context: HandlerContext) => {
-        return { value: request.value.toString() };
-      },
-    );
+    const handler = vitest.fn((request: Int32Value, context: HandlerContext) => {
+      return { value: request.value.toString() };
+    });
 
     const service = createRouterTransport(
-      ({ service }) => {
-        service(TestService, { unary: handler });
+      ({ rpc }) => {
+        rpc(TestService.method.unary, handler);
       },
       { transport },
     );
 
-    await service.unary(
-      TestService,
-      TestService.methods.unary,
-      undefined,
-      undefined,
-      {},
-      { value: 9001 },
-    );
+    await service.unary(TestService.method.unary, undefined, undefined, {}, { value: 9001 });
 
     expect(handler).toBeCalled();
-    expect(handler.mock.calls[0][1].requestHeader.get("Authorization")).toBe(
-      "Bearer mytoken",
-    );
+    expect(handler.mock.calls[0][1].requestHeader.get("Authorization")).toBe("Bearer mytoken");
   });
 
   test("do not overwrite the previous authorization token", async () => {
-    const handler = vitest.fn(
-      (request: Int32Value, context: HandlerContext) => {
-        return { value: request.value.toString() };
-      },
-    );
+    const handler = vitest.fn((request: Int32Value, context: HandlerContext) => {
+      return { value: request.value.toString() };
+    });
 
     const service = createRouterTransport(
-      ({ service }) => {
-        service(TestService, { unary: handler });
+      ({ rpc }) => {
+        rpc(TestService.method.unary, handler);
       },
       { transport },
     );
 
     await service.unary(
-      TestService,
-      TestService.methods.unary,
+      TestService.method.unary,
       undefined,
       undefined,
       { Authorization: "Bearer somethingelse" },
@@ -73,8 +62,6 @@ describe("NewAuthorizationBearerInterceptor", () => {
     );
 
     expect(handler).toBeCalled();
-    expect(handler.mock.calls[0][1].requestHeader.get("Authorization")).toBe(
-      "Bearer somethingelse",
-    );
+    expect(handler.mock.calls[0][1].requestHeader.get("Authorization")).toBe("Bearer somethingelse");
   });
 });

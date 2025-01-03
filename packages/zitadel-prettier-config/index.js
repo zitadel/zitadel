@@ -7,4 +7,5 @@ export default {
   trailingComma: 'all',
   bracketSpacing: true,
   arrowParens: 'always',
+  plugins: ["prettier-plugin-organize-imports"]
 };

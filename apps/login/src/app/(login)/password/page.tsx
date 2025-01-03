@@ -1,53 +1,70 @@
+import { Alert } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { PasswordForm } from "@/components/password-form";
+import { UserAvatar } from "@/components/user-avatar";
+import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
+  getDefaultOrg,
   getLoginSettings,
-  getSession,
 } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import PasswordForm from "@/ui/PasswordForm";
-import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { getLocale, getTranslations } from "next-intl/server";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
-  const { loginName, organization, promptPasswordless, authRequestId, alt } =
-    searchParams;
-  const sessionFactors = await loadSession(loginName, organization);
+  const searchParams = await props.searchParams;
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "password" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
-  async function loadSession(loginName?: string, organization?: string) {
-    const recent = await getMostRecentCookieWithLoginname(
-      loginName,
-      organization,
-    );
+  let { loginName, organization, authRequestId, alt } = searchParams;
 
-    return getSession(recent.id, recent.token).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
+  let defaultOrganization;
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg();
+
+    if (org) {
+      defaultOrganization = org.id;
+    }
   }
 
-  const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(organization);
+  // also allow no session to be found (ignoreUnkownUsername)
+  let sessionFactors;
+  try {
+    sessionFactors = await loadMostRecentSession({
+      loginName,
+      organization,
+    });
+  } catch (error) {
+    // ignore error to continue to show the password form
+    console.warn(error);
+  }
+
+  const branding = await getBrandingSettings(
+    organization ?? defaultOrganization,
+  );
+  const loginSettings = await getLoginSettings(
+    organization ?? defaultOrganization,
+  );
 
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{sessionFactors?.factors?.user?.displayName ?? "Password"}</h1>
-        <p className="ztdl-p mb-6 block">Enter your password.</p>
+        <h1>
+          {sessionFactors?.factors?.user?.displayName ?? t("verify.title")}
+        </h1>
+        <p className="ztdl-p mb-6 block">{t("verify.description")}</p>
 
-        {!sessionFactors && (
-          <div className="py-4">
-            <Alert>
-              Could not get the context of the user. Make sure to enter the
-              username first or provide a loginName as searchParam.
-            </Alert>
-          </div>
-        )}
+        {/* show error only if usernames should be shown to be unknown */}
+        {(!sessionFactors || !loginName) &&
+          !loginSettings?.ignoreUnknownUsernames && (
+            <div className="py-4">
+              <Alert>{tError("unknownContext")}</Alert>
+            </div>
+          )}
 
         {sessionFactors && (
           <UserAvatar
@@ -58,14 +75,18 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        <PasswordForm
-          loginName={loginName}
-          authRequestId={authRequestId}
-          organization={organization}
-          loginSettings={loginSettings}
-          promptPasswordless={promptPasswordless === "true"}
-          isAlternative={alt === "true"}
-        />
+        {loginName && (
+          <PasswordForm
+            loginName={loginName}
+            authRequestId={authRequestId}
+            organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
+            loginSettings={loginSettings}
+            promptPasswordless={
+              loginSettings?.passkeysType == PasskeysType.ALLOWED
+            }
+            isAlternative={alt === "true"}
+          />
+        )}
       </div>
     </DynamicTheme>
   );

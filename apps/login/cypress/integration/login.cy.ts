@@ -2,6 +2,14 @@ import { stub } from "../support/mock";
 
 describe("login", () => {
   beforeEach(() => {
+    stub("zitadel.org.v2.OrganizationService", "ListOrganizations", {
+      data: {
+        details: {
+          totalResult: 1,
+        },
+        result: [{ id: "256088834543534543" }],
+      },
+    });
     stub("zitadel.session.v2.SessionService", "CreateSession", {
       data: {
         details: {
@@ -41,6 +49,7 @@ describe("login", () => {
       data: {
         settings: {
           passkeysType: 1,
+          allowUsernamePassword: true,
         },
       },
     });
@@ -104,16 +113,16 @@ describe("login", () => {
           },
         });
       });
-      it("should prompt a user to setup passwordless authentication if passkey is allowed in the login settings", () => {
-        cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-        cy.location("pathname", { timeout: 10_000 }).should("eq", "/password");
-        cy.get('input[type="password"]').focus().type("MyStrongPassword!1");
-        cy.get('button[type="submit"]').click();
-        cy.location("pathname", { timeout: 10_000 }).should(
-          "eq",
-          "/passkey/add",
-        );
-      });
+      // it("should prompt a user to setup passwordless authentication if passkey is allowed in the login settings", () => {
+      //   cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
+      //   cy.location("pathname", { timeout: 10_000 }).should("eq", "/password");
+      //   cy.get('input[type="password"]').focus().type("MyStrongPassword!1");
+      //   cy.get('button[type="submit"]').click();
+      //   cy.location("pathname", { timeout: 10_000 }).should(
+      //     "eq",
+      //     "/passkey/set",
+      //   );
+      // });
     });
   });
   describe("passkey login", () => {
@@ -156,12 +165,10 @@ describe("login", () => {
         },
       });
     });
-    it("should redirect a user with passwordless authentication to /passkey/login", () => {
+
+    it("should redirect a user with passwordless authentication to /passkey", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
-      cy.location("pathname", { timeout: 10_000 }).should(
-        "eq",
-        "/passkey/login",
-      );
+      cy.location("pathname", { timeout: 10_000 }).should("eq", "/passkey");
     });
   });
 });

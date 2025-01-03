@@ -1,37 +1,45 @@
+import { Alert } from "@/components/alert";
+import { BackButton } from "@/components/back-button";
+import { Button, ButtonVariants } from "@/components/button";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { TotpRegister } from "@/components/totp-register";
+import { UserAvatar } from "@/components/user-avatar";
+import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,
   addOTPSMS,
   getBrandingSettings,
-  getSession,
+  getLoginSettings,
   registerTOTP,
 } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import BackButton from "@/ui/BackButton";
-import { Button, ButtonVariants } from "@/ui/Button";
-import DynamicTheme from "@/ui/DynamicTheme";
-import { Spinner } from "@/ui/Spinner";
-import TOTPRegister from "@/ui/TOTPRegister";
-import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
-import Link from "next/link";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getLocale, getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default async function Page({
-  searchParams,
-  params,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-  params: Record<string | number | symbol, string | undefined>;
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+  params: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "otp" });
+  const tError = await getTranslations({ locale, namespace: "error" });
+
   const { loginName, organization, sessionId, authRequestId, checkAfter } =
     searchParams;
   const { method } = params;
 
   const branding = await getBrandingSettings(organization);
-  const { session, token } = await loadSession(loginName, organization);
+  const loginSettings = await getLoginSettings(organization);
 
-  let totpResponse: RegisterTOTPResponse | undefined,
-    totpError: Error | undefined;
+  const session = await loadMostRecentSession({
+    loginName,
+    organization,
+  });
+
+  let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
       await registerTOTP(session.factors.user.id)
@@ -40,15 +48,19 @@ export default async function Page({
             totpResponse = resp;
           }
         })
-        .catch((error) => {
-          totpError = error;
+        .catch((err) => {
+          error = err;
         });
     } else if (method === "sms") {
       // does not work
-      await addOTPSMS(session.factors.user.id);
+      await addOTPSMS(session.factors.user.id).catch((error) => {
+        error = new Error("Could not add OTP via SMS");
+      });
     } else if (method === "email") {
       // works
-      await addOTPEmail(session.factors.user.id);
+      await addOTPEmail(session.factors.user.id).catch((error) => {
+        error = new Error("Could not add OTP via Email");
+      });
     } else {
       throw new Error("Invalid method");
     }
@@ -56,61 +68,53 @@ export default async function Page({
     throw new Error("No session found");
   }
 
-  async function loadSession(loginName?: string, organization?: string) {
-    const recent = await getMostRecentCookieWithLoginname(
-      loginName,
-      organization,
-    );
-
-    return getSession(recent.id, recent.token).then((response) => {
-      return { session: response?.session, token: recent.token };
-    });
-  }
-
   const paramsToContinue = new URLSearchParams({});
   let urlToContinue = "/accounts";
 
-  if (authRequestId && sessionId) {
-    if (sessionId) {
-      paramsToContinue.append("sessionId", sessionId);
-    }
+  if (sessionId) {
+    paramsToContinue.append("sessionId", sessionId);
+  }
+  if (loginName) {
+    paramsToContinue.append("loginName", loginName);
+  }
+  if (organization) {
+    paramsToContinue.append("organization", organization);
+  }
+
+  if (checkAfter) {
     if (authRequestId) {
       paramsToContinue.append("authRequestId", authRequestId);
     }
-    if (organization) {
-      paramsToContinue.append("organization", organization);
+    urlToContinue = `/otp/${method}?` + paramsToContinue;
+    // immediately check the OTP on the next page if sms or email was set up
+    if (["email", "sms"].includes(method)) {
+      return redirect(urlToContinue);
+    }
+  } else if (authRequestId && sessionId) {
+    if (authRequestId) {
+      paramsToContinue.append("authRequest", authRequestId);
     }
     urlToContinue = `/login?` + paramsToContinue;
   } else if (loginName) {
-    if (loginName) {
-      paramsToContinue.append("loginName", loginName);
-    }
     if (authRequestId) {
       paramsToContinue.append("authRequestId", authRequestId);
     }
-    if (organization) {
-      paramsToContinue.append("organization", organization);
-    }
-
     urlToContinue = `/signedin?` + paramsToContinue;
   }
 
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Register 2-factor</h1>
+        <h1>{t("set.title")}</h1>
         {!session && (
           <div className="py-4">
-            <Alert>
-              Could not get the context of the user. Make sure to enter the
-              username first or provide a loginName as searchParam.
-            </Alert>
+            <Alert>{tError("unknownContext")}</Alert>
           </div>
         )}
 
-        {totpError && (
+        {error && (
           <div className="py-4">
-            <Alert>{totpError?.message}</Alert>
+            <Alert>{error?.message}</Alert>
           </div>
         )}
 
@@ -125,13 +129,9 @@ export default async function Page({
 
         {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
           <>
-            <p className="ztdl-p">
-              Scan the QR Code or navigate to the URL manually.
-            </p>
+            <p className="ztdl-p">{t("set.totpRegisterDescription")}</p>
             <div>
-              {/* {auth && <div>{auth.to}</div>} */}
-
-              <TOTPRegister
+              <TotpRegister
                 uri={totpResponse.uri as string}
                 secret={totpResponse.secret as string}
                 loginName={loginName}
@@ -139,7 +139,8 @@ export default async function Page({
                 authRequestId={authRequestId}
                 organization={organization}
                 checkAfter={checkAfter === "true"}
-              ></TOTPRegister>
+                loginSettings={loginSettings}
+              ></TotpRegister>
             </div>{" "}
           </>
         ) : (
@@ -155,19 +156,14 @@ export default async function Page({
             <div className="mt-8 flex w-full flex-row items-center">
               <BackButton />
               <span className="flex-grow"></span>
-              <Link
-                href={
-                  checkAfter
-                    ? `/otp/${method}?` + new URLSearchParams()
-                    : urlToContinue
-                }
-              >
+
+              <Link href={urlToContinue}>
                 <Button
                   type="submit"
                   className="self-end"
                   variant={ButtonVariants.Primary}
                 >
-                  continue
+                  {t("set.submit")}
                 </Button>
               </Link>
             </div>

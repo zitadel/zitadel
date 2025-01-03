@@ -1,9 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "DEBUG",
     "ZITADEL_API_URL",
@@ -14,6 +12,7 @@
     "ZITADEL_SYSTEM_API_KEY",
     "ZITADEL_ISSUER",
     "ZITADEL_ADMIN_TOKEN",
+    "EMAIL_VERIFICATION",
     "VERCEL_URL"
   ],
   "tasks": {
@@ -22,6 +21,8 @@
     },
     "build": {},
     "test": {},
+    "start": {},
+    "start:built": {},
     "test:unit": {},
     "test:integration": {},
     "test:watch": {

@@ -1,22 +1,49 @@
 FirstInstance:
-  MachineKeyPath: /machinekey/zitadel-admin-sa.json
+  PatPath: /pat/zitadel-admin-sa.pat
   Org:
+    Human:
+      UserName: zitadel-admin
+      FirstName: ZITADEL
+      LastName: Admin
+      Password: Password1!
+      PasswordChangeRequired: false
+      PreferredLanguage: en
     Machine:
       Machine:
         Username: zitadel-admin-sa
         Name: Admin
-      MachineKey:
-        Type: 1
+      Pat:
+        ExpirationDate: 2099-01-01T00:00:00Z
+
+DefaultInstance:
+  PrivacyPolicy:
+    TOSLink: "https://zitadel.com/docs/legal/terms-of-service"
+    PrivacyLink: "https://zitadel.com/docs/legal/policies/privacy-policy"
+    HelpLink: "https://zitadel.com/docs"
+    SupportEmail: "support@zitadel.com"
+    DocsLink: "https://zitadel.com/docs"
 
 Database:
-  Cockroach:
+  EventPushConnRatio: 0.2 # 4
+  ProjectionSpoolerConnRatio: 0.3 # 6
+  postgres:
     Host: db
+    Port: 5432
+    Database: zitadel
+    MaxOpenConns: 20
+    MaxIdleConns: 20
+    MaxConnLifetime: 1h
+    MaxConnIdleTime: 5m
+    User:
+      Username: zitadel
+      SSL:
+        Mode: disable
+    Admin:
+      Username: zitadel
+      SSL:
+        Mode: disable
 
 Logstore:
   Access:
     Stdout:
       Enabled: true
-
-DefaultInstance:
-  LoginPolicy:
-    MfaInitSkipLifetime: 0h

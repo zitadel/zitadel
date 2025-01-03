@@ -1,14 +1,16 @@
-# ZITADEL TypeScript with Turborepo and Changesets
+# ZITADEL TypeScript with Turborepo
 
 This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL
 Login UI.
-The repo makes use of the [build system Turbo](https://turbo.build/repo) and
-the [Changesets CLI for versioning the packages](https://github.com/changesets/changesets).
+
+<img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
 
 **⚠️ This repo and packages are in alpha state and subject to change ⚠️**
 
-The scope of functionality of this repo and packages is limited and under active development.
-Once the package structure is set and all APIs are fully implemented we'll move this repo to beta state.
+The scope of functionality of this repo and packages is under active development.
+
+The `@zitadel/client` package is using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
+
 You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
 Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
 a [GitHub issue](https://github.com/zitadel/typescript/issues).
@@ -28,11 +30,8 @@ We think the easiest path of getting up and running, is the following:
 ## Included Apps And Packages
 
 - `login`: The login UI used by ZITADEL Cloud, powered by Next.js
-- `@zitadel/node`: core components for establishing node client connection, grpc stub
-- `@zitadel/client`: shared client utilities
+- `@zitadel/client`: shared client utilities for node and browser environments
 - `@zitadel/proto`: shared protobuf types
-- `@zitadel/react`: shared React utilities and components built with tailwindcss
-- `@zitadel/next`: shared Next.js utilities
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
 
@@ -50,17 +49,19 @@ the features will be extended.
 This list should show the current implementation state, and also what is missing.
 You can already use the current state, and extend it with your needs.
 
+#### Features list
+
 - [x] Local User Registration (with Password)
 - [x] User Registration and Login with external Provider
   - [x] Google
-  - [ ] GitHub
-  - [ ] GitHub Enterprise
+  - [x] GitHub
+  - [x] GitHub Enterprise
   - [x] GitLab
-  - [ ] GitLab Enterprise
-  - [ ] Azure
-  - [ ] Apple
-  - [ ] Generic OIDC
-  - [ ] Generic OAuth
+  - [x] GitLab Enterprise
+  - [x] Azure
+  - [x] Apple
+  - [x] Generic OIDC
+  - [x] Generic OAuth
   - [ ] Generic JWT
   - [ ] LDAP
   - [ ] SAML SP
@@ -70,9 +71,10 @@ You can already use the current state, and extend it with your needs.
   - [x] OTP: Email Code
   - [x] OTP: SMS Code
 - [ ] Password Change/Reset
-- [ ] Domain Discovery
+- [x] Domain Discovery
 - [x] Branding
 - OIDC Standard
+
   - [x] Authorization Code Flow with PKCE
   - [x] AuthRequest `hintUserId`
   - [x] AuthRequest `loginHint`
@@ -84,11 +86,59 @@ You can already use the current state, and extend it with your needs.
   - Scopes
     - [x] `openid email profile address``
     - [x] `offline access`
-    - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
+    - [x] `urn:zitadel:iam:org:idp:id:{idp_id}`
     - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
     - [x] `urn:zitadel:iam:org:id:{orgid}`
     - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
   - [ ] AuthRequest UI locales
+
+  #### Flow diagram
+
+  This diagram shows the available pages and flows.
+
+  > Note that back navigation or retries are not displayed.
+
+```mermaid
+    flowchart TD
+    A[Start] --> register
+    A[Start] --> accounts
+    A[Start] --> loginname
+    loginname -- signInWithIDP --> idp-success
+    loginname -- signInWithIDP --> idp-failure
+    idp-success --> B[signedin]
+    loginname --> password
+    loginname -- hasPasskey --> passkey
+    loginname -- allowRegister --> register
+    passkey-add --passwordAllowed --> password
+    passkey -- hasPassword --> password
+    passkey --> B[signedin]
+    password -- hasMFA --> mfa
+    password -- allowPasskeys --> passkey-add
+    password -- reset --> password-set
+    email -- reset --> password-set
+    password-set --> B[signedin]
+    password-change --> B[signedin]
+    password -- userstate=initial --> password-change
+
+    mfa --> otp
+    otp --> B[signedin]
+    mfa--> u2f
+    u2f -->B[signedin]
+    register -- password/passkey --> B[signedin]
+    password --> B[signedin]
+    password-- forceMFA -->mfaset
+    mfaset --> u2fset
+    mfaset --> otpset
+    u2fset --> B[signedin]
+    otpset --> B[signedin]
+    accounts--> loginname
+    password -- not verified yet -->verify
+    register-- withpassword -->verify
+    passkey-- notVerified --> verify
+    verify --> B[signedin]
+```
+
+You can find a more detailed documentation of the different pages [here](./apps/login/readme.md).
 
 ## Tooling
 
@@ -119,22 +169,6 @@ settings. The [Changesets bot](https://github.com/apps/changeset-bot) should als
 Read the [changesets documentation](https://github.com/changesets/changesets/blob/main/docs/automating-changesets.md)
 for more information about this automation
 
-### NPM
-
-If you want to publish a package to the public npm registry and make them publicly available, this is already setup.
-
-To publish packages to a private npm organization scope, **remove** the following from each of the `package.json`'s
-
-```diff
-- "publishConfig": {
--  "access": "public"
-- },
-```
-
-### GitHub Package Registry
-
-See [working with the npm registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#publishing-a-package-using-publishconfig-in-the-packagejson-file)
-
 ### Run Login UI
 
 To run the application make sure to install the dependencies with
@@ -143,32 +177,75 @@ To run the application make sure to install the dependencies with
 pnpm install
 ```
 
-then setup the environment for the login application which needs a `.env.local` in `/apps/login`.
-Go to your instance and create a service user for the application having the `IAM_OWNER` manager role.
-This user is required to have access to create users on your primary organization and reading policy data so it can be
-restricted to your personal use case but we'll stick with `IAM_OWNER` for convenience. Create a PAT and copy the value to
-paste it under the `ZITADEL_SERVICE_USER_TOKEN` key.
-The file should look as follows:
-
-```
-ZITADEL_API_URL=[yourinstanceurl]
-ZITADEL_ORG_ID=[yourprimaryorg]
-ZITADEL_SERVICE_USER_TOKEN=[yourserviceuserpersonalaccesstoken]
-```
-
 then generate the GRPC stubs with
 
 ```sh
 pnpm generate
 ```
 
-and then run it with
+To run the application against a local ZITADEL instance, run the following command:
+
+```sh
+pnpm run-zitadel
+```
+
+This sets up ZITADEL using docker compose and writes the configuration to the file `apps/login/.env.local`.
+
+<details>
+<summary>Alternatively, use another environment</summary>
+You can develop against any ZITADEL instance in which you have sufficient rights to execute the following steps.
+Just create or overwrite the file `apps/login/.env.local` yourself.
+Add your instances base URL to the file at the key `ZITADEL_API_URL`.
+Go to your instance and create a service user for the login application.
+The login application creates users on your primary organization and reads policy data.
+For the sake of simplicity, just make the service user an instance member with the role `IAM_OWNER`.
+Create a PAT and copy it to the file `apps/login/.env.local` using the key `ZITADEL_SERVICE_USER_TOKEN`.
+Also add the users ID to the file using the key `ZITADEL_SERVICE_USER_ID`.
+
+The file should look similar to this:
+
+```
+ZITADEL_API_URL=https://zitadel-tlx3du.us1.zitadel.cloud
+ZITADEL_SERVICE_USER_ID=289106423158521850
+ZITADEL_SERVICE_USER_TOKEN=1S6w48thfWFI2klgfwkCnhXJLf9FQ457E-_3H74ePQxfO3Af0Tm4V5Xi-ji7urIl_xbn-Rk
+```
+
+</details>
+
+Start the login application in dev mode:
 
 ```sh
 pnpm dev
 ```
 
 Open the login application with your favorite browser at `localhost:3000`.
+Change the source code and see the changes live in your browser.
+
+Make sure the application still behaves as expected by running all tests
+
+```sh
+pnpm test
+```
+
+To satisfy your unique workflow requirements, check out the package.json in the root directory for more detailed scripts.
+
+### Run Login UI Acceptance tests
+
+To run the acceptance tests you need a running ZITADEL environment and a component which receives HTTP requests for the emails and sms's.
+This component should also be able to return the content of these notifications, as the codes and links are used in the login flows.
+There is a basic implementation in Golang available under [the sink package](./acceptance/sink).
+
+To setup ZITADEL with the additional Sink container for handling the notifications:
+
+```sh
+pnpm run-sink
+```
+
+Then you can start the acceptance tests with:
+
+```sh
+pnpm test:acceptance
+```
 
 ### Deploy to Vercel
 

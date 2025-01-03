@@ -1,41 +1,32 @@
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
-import Alert, { AlertType } from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import RegisterPasskey from "@/ui/RegisterPasskey";
-import RegisterU2F from "@/ui/RegisterU2F";
-import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { Alert } from "@/components/alert";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { RegisterU2f } from "@/components/register-u2f";
+import { UserAvatar } from "@/components/user-avatar";
+import { loadMostRecentSession } from "@/lib/session";
+import { getBrandingSettings } from "@/lib/zitadel";
+import { getLocale, getTranslations } from "next-intl/server";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
-  const { loginName, organization, authRequestId } = searchParams;
+  const searchParams = await props.searchParams;
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "u2f" });
+  const tError = await getTranslations({ locale, namespace: "error" });
 
-  const sessionFactors = await loadSession(loginName);
+  const { loginName, organization, authRequestId, checkAfter } = searchParams;
 
-  async function loadSession(loginName?: string) {
-    const recent = await getMostRecentCookieWithLoginname(
-      loginName,
-      organization,
-    );
-    return getSession(recent.id, recent.token).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-  }
-  const title = "Use your passkey to confirm it's really you";
-  const description =
-    "Your device will ask for your fingerprint, face, or screen lock";
+  const sessionFactors = await loadMostRecentSession({
+    loginName,
+    organization,
+  });
 
   const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{title}</h1>
+        <h1>{t("set.title")}</h1>
 
         {sessionFactors && (
           <UserAvatar
@@ -45,22 +36,21 @@ export default async function Page({
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">{description}</p>
+        <p className="ztdl-p mb-6 block">{t("set.description")}</p>
 
         {!sessionFactors && (
           <div className="py-4">
-            <Alert>
-              Could not get the context of the user. Make sure to enter the
-              username first or provide a loginName as searchParam.
-            </Alert>
+            <Alert>{tError("unknownContext")}</Alert>
           </div>
         )}
 
         {sessionFactors?.id && (
-          <RegisterU2F
+          <RegisterU2f
+            loginName={loginName}
             sessionId={sessionFactors.id}
             organization={organization}
             authRequestId={authRequestId}
+            checkAfter={checkAfter === "true"}
           />
         )}
       </div>

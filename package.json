@@ -5,35 +5,55 @@
   "scripts": {
     "generate": "turbo run generate",
     "build": "turbo run build",
+    "build:packages": "turbo run build --filter=./packages/*",
+    "build:apps": "turbo run build --filter=./apps/*",
     "test": "turbo run test",
+    "start": "turbo run start",
+    "start:built": "turbo run start:built",
     "test:unit": "turbo run test:unit -- --passWithNoTests",
     "test:integration": "turbo run test:integration",
+    "test:acceptance": "pnpm exec playwright test",
     "test:watch": "turbo run test:watch",
     "dev": "turbo run dev --no-cache --continue",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "clean": "turbo run clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --check \"**/*.{ts,tsx,md}\"",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "turbo run build --filter=login^... && changeset publish"
+    "release": "turbo run build --filter=login^... && changeset publish",
+    "run-zitadel": "docker compose -f ./acceptance/docker-compose.yaml run setup",
+    "run-sink": "docker compose -f ./acceptance/docker-compose.yaml up -d sink",
+    "stop": "docker compose -f ./acceptance/docker-compose.yaml stop"
   },
   "pnpm": {
     "overrides": {
-      "@typescript-eslint/parser": "^7.9.0"
+      "@typescript-eslint/parser": "^7.9.0",
+      "@types/react": "npm:types-react@19.0.0-rc.1",
+      "@types/react-dom": "npm:types-react-dom@19.0.0-rc.1"
     }
   },
   "devDependencies": {
-    "@changesets/cli": "^2.22.0",
-    "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^8.57.0",
+    "@otplib/core": "^12.0.0",
+    "@otplib/plugin-thirty-two": "^12.0.0",
+    "@otplib/plugin-crypto": "^12.0.0",
+    "@faker-js/faker": "^9.2.0",
+    "@changesets/cli": "^2.27.9",
+    "@playwright/test": "^1.48.2",
+    "@types/node": "^22.9.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "@zitadel/prettier-config": "workspace:*",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "eslint": "8.57.1",
     "eslint-config-zitadel": "workspace:*",
     "prettier": "^3.2.5",
-    "prettier-plugin-organize-imports": "^4.0.0",
-    "tsup": "^8.0.2",
-    "turbo": "2.0.9",
-    "typescript": "^5.4.5",
-    "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.6.0"
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "tsup": "^8.3.5",
+    "turbo": "2.2.3",
+    "typescript": "^5.6.3",
+    "vite-tsconfig-paths": "^5.1.2",
+    "vitest": "^2.1.4"
   }
 }

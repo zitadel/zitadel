@@ -1,21 +1,31 @@
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { RegisterForm } from "@/components/register-form";
 import {
   getBrandingSettings,
+  getDefaultOrg,
   getLegalAndSupportSettings,
+  getLoginSettings,
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
-import DynamicTheme from "@/ui/DynamicTheme";
-import RegisterFormWithoutPassword from "@/ui/RegisterFormWithoutPassword";
-import SetPasswordForm from "@/ui/SetPasswordForm";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { getLocale, getTranslations } from "next-intl/server";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
-  const { firstname, lastname, email, organization, authRequestId } =
+  const searchParams = await props.searchParams;
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "register" });
+
+  let { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
-  const setPassword = !!(firstname && lastname && email);
+  if (!organization) {
+    const org: Organization | null = await getDefaultOrg();
+    if (org) {
+      organization = org.id;
+    }
+  }
 
   const legal = await getLegalAndSupportSettings(organization);
   const passwordComplexitySettings =
@@ -23,39 +33,35 @@ export default async function Page({
 
   const branding = await getBrandingSettings(organization);
 
-  return setPassword ? (
+  const loginSettings = await getLoginSettings(organization);
+
+  if (!loginSettings?.allowRegister) {
+    return (
+      <DynamicTheme branding={branding}>
+        <div className="flex flex-col items-center space-y-4">
+          <h1>{t("disabled.title")}</h1>
+          <p className="ztdl-p">{t("disabled.description")}</p>
+        </div>
+      </DynamicTheme>
+    );
+  }
+
+  return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Set Password</h1>
-        <p className="ztdl-p">Set the password for your account</p>
+        <h1>{t("title")}</h1>
+        <p className="ztdl-p">{t("description")}</p>
 
         {legal && passwordComplexitySettings && (
-          <SetPasswordForm
-            passwordComplexitySettings={passwordComplexitySettings}
-            email={email}
-            firstname={firstname}
-            lastname={lastname}
-            organization={organization}
-            authRequestId={authRequestId}
-          ></SetPasswordForm>
-        )}
-      </div>
-    </DynamicTheme>
-  ) : (
-    <DynamicTheme branding={branding}>
-      <div className="flex flex-col items-center space-y-4">
-        <h1>Register</h1>
-        <p className="ztdl-p">Create your ZITADEL account.</p>
-
-        {legal && passwordComplexitySettings && (
-          <RegisterFormWithoutPassword
+          <RegisterForm
             legal={legal}
             organization={organization}
             firstname={firstname}
             lastname={lastname}
             email={email}
             authRequestId={authRequestId}
-          ></RegisterFormWithoutPassword>
+            loginSettings={loginSettings}
+          ></RegisterForm>
         )}
       </div>
     </DynamicTheme>

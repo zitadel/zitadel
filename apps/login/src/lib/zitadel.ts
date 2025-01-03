@@ -1,52 +1,92 @@
+import { createServerTransport } from "@zitadel/client/node";
 import {
+  createIdpServiceClient,
   createOIDCServiceClient,
+  createOrganizationServiceClient,
   createSessionServiceClient,
   createSettingsServiceClient,
   createUserServiceClient,
   makeReqCtx,
 } from "@zitadel/client/v2";
-import { createManagementServiceClient } from "@zitadel/client/v1";
-import { createServerTransport } from "@zitadel/node";
-import { GetActiveIdentityProvidersRequest } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import {
+  AddHumanUserRequest,
+  ResendEmailCodeRequest,
+  ResendEmailCodeRequestSchema,
   RetrieveIdentityProviderIntentRequest,
+  SendEmailCodeRequestSchema,
+  SetPasswordRequest,
+  SetPasswordRequestSchema,
+  VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { create, Duration } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import { ProviderSlug } from "./demos";
-import { PlainMessage } from "@zitadel/client";
-
-const SESSION_LIFETIME_S = 3000;
+import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
+import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import {
+  NotificationType,
+  SendPasswordResetLinkSchema,
+} from "@zitadel/proto/zitadel/user/v2/password_pb";
+import {
+  SearchQuery,
+  SearchQuerySchema,
+} from "@zitadel/proto/zitadel/user/v2/query_pb";
+import {
+  SendInviteCodeSchema,
+  User,
+  UserState,
+} from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { unstable_cacheLife as cacheLife } from "next/cache";
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
-  {
-    baseUrl: process.env.ZITADEL_API_URL!,
-    httpVersion: "2",
-  },
+  { baseUrl: process.env.ZITADEL_API_URL! },
 );
 
 export const sessionService = createSessionServiceClient(transport);
-export const managementService = createManagementServiceClient(transport);
 export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
+export const idpService = createIdpServiceClient(transport);
+export const orgService = createOrganizationServiceClient(transport);
 export const settingsService = createSettingsServiceClient(transport);
 
+const useCache = process.env.DEBUG !== "true";
+
+async function cacheWrapper<T>(callback: Promise<T>) {
+  "use cache";
+  cacheLife("hours");
+
+  return callback;
+}
+
 export async function getBrandingSettings(organization?: string) {
-  return settingsService
+  const callback = settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => resp.settings);
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLoginSettings(orgId?: string) {
-  return settingsService
+  const callback = settingsService
     .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => resp.settings);
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
+export async function listIDPLinks(userId: string) {
+  return userService.listIDPLinks(
+    {
+      userId,
+    },
+    {},
+  );
 }
 
 export async function addOTPEmail(userId: string) {
@@ -58,74 +98,48 @@ export async function addOTPEmail(userId: string) {
   );
 }
 
-export async function addOTPSMS(userId: string, token?: string) {
-  // TODO: Follow up here, I do not understand the branching
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
-
+export async function addOTPSMS(userId: string) {
   return userService.addOTPSMS({ userId }, {});
 }
 
-export async function registerTOTP(userId: string, token?: string) {
-  // TODO: Follow up here, I do not understand the branching
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+export async function registerTOTP(userId: string) {
   return userService.registerTOTP({ userId }, {});
 }
 
 export async function getGeneralSettings() {
-  return settingsService
+  const callback = settingsService
     .getGeneralSettings({}, {})
     .then((resp) => resp.supportedLanguages);
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
-  return settingsService
+  const callback = settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
-    .then((resp) => {
-      return resp.settings;
-    });
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
-  return settingsService
+  const callback = settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
-    .then((resp) => resp.settings);
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function createSessionFromChecks(
-  checks: PlainMessage<Checks>,
-  challenges: PlainMessage<RequestChallenges> | undefined,
+  checks: Checks,
+  challenges: RequestChallenges | undefined,
+  lifetime?: Duration,
 ) {
   return sessionService.createSession(
     {
       checks: checks,
       challenges,
-      lifetime: {
-        seconds: BigInt(SESSION_LIFETIME_S),
-        nanos: 0,
-      },
+      lifetime,
     },
     {},
   );
@@ -137,6 +151,7 @@ export async function createSessionForUserIdAndIdpIntent(
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   },
+  lifetime?: Duration,
 ) {
   return sessionService.createSession({
     checks: {
@@ -148,10 +163,7 @@ export async function createSessionForUserIdAndIdpIntent(
       },
       idpIntent,
     },
-    // lifetime: {
-    //   seconds: 300,
-    //   nanos: 0,
-    // },
+    lifetime,
   });
 }
 
@@ -159,7 +171,8 @@ export async function setSession(
   sessionId: string,
   sessionToken: string,
   challenges: RequestChallenges | undefined,
-  checks?: PlainMessage<Checks>,
+  checks?: Checks,
+  lifetime?: Duration,
 ) {
   return sessionService.setSession(
     {
@@ -168,12 +181,19 @@ export async function setSession(
       challenges,
       checks: checks ? checks : {},
       metadata: {},
+      lifetime,
     },
     {},
   );
 }
 
-export async function getSession(sessionId: string, sessionToken: string) {
+export async function getSession({
+  sessionId,
+  sessionToken,
+}: {
+  sessionId: string;
+  sessionToken: string;
+}) {
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 
@@ -213,7 +233,13 @@ export async function addHumanUser({
   organization,
 }: AddHumanUserData) {
   return userService.addHumanUser({
-    email: { email },
+    email: {
+      email,
+      verification: {
+        case: "isVerified",
+        value: false,
+      },
+    },
     username: email,
     profile: { givenName: firstName, familyName: lastName },
     organization: organization
@@ -225,24 +251,11 @@ export async function addHumanUser({
   });
 }
 
-export async function verifyTOTPRegistration(
-  code: string,
-  userId: string,
-  token?: string,
-) {
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+export async function addHuman(request: AddHumanUserRequest) {
+  return userService.addHumanUser(request);
+}
+
+export async function verifyTOTPRegistration(code: string, userId: string) {
   return userService.verifyTOTPRegistration({ code, userId }, {});
 }
 
@@ -250,62 +263,177 @@ export async function getUserByID(userId: string) {
   return userService.getUserByID({ userId }, {});
 }
 
-export async function listUsers(userName: string, organizationId: string) {
-  return userService.listUsers(
+export async function verifyInviteCode(
+  userId: string,
+  verificationCode: string,
+) {
+  return userService.verifyInviteCode({ userId, verificationCode }, {});
+}
+
+export async function resendInviteCode(userId: string) {
+  return userService.resendInviteCode({ userId }, {});
+}
+
+export async function sendEmailCode(
+  userId: string,
+  host: string | null,
+  authRequestId?: string,
+) {
+  let medium = create(SendEmailCodeRequestSchema, {
+    userId,
+  });
+
+  if (host) {
+    medium = create(SendEmailCodeRequestSchema, {
+      ...medium,
+      verification: {
+        case: "sendCode",
+        value: create(SendEmailVerificationCodeSchema, {
+          urlTemplate:
+            `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+            (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+        }),
+      },
+    });
+  }
+
+  return userService.sendEmailCode(medium, {});
+}
+
+export async function createInviteCode(userId: string, host: string | null) {
+  let medium = create(SendInviteCodeSchema, {
+    applicationName: "Typescript Login",
+  });
+
+  if (host) {
+    medium = {
+      ...medium,
+      urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
+    };
+  }
+
+  return userService.createInviteCode(
     {
-      queries: organizationId
-        ? [
-            {
-              query: {
-                case: "userNameQuery",
-                value: {
-                  userName,
-                  method: TextQueryMethod.EQUALS,
-                },
-              },
-            },
-            {
-              query: {
-                case: "organizationIdQuery",
-                value: {
-                  organizationId,
-                },
-              },
-            },
-          ]
-        : [
-            {
-              query: {
-                case: "userNameQuery",
-                value: {
-                  userName,
-                  method: TextQueryMethod.EQUALS,
-                },
-              },
-            },
-          ],
+      userId,
+      verification: {
+        case: "sendCode",
+        value: medium,
+      },
     },
     {},
   );
 }
 
-export async function getOrgByDomain(domain: string) {
-  return managementService.getOrgByDomainGlobal({ domain }, {});
+export async function listUsers({
+  loginName,
+  userName,
+  email,
+  organizationId,
+}: {
+  loginName?: string;
+  userName?: string;
+  email?: string;
+  organizationId?: string;
+}) {
+  const queries: SearchQuery[] = [];
+
+  if (loginName) {
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "loginNameQuery",
+          value: {
+            loginName: loginName,
+            method: TextQueryMethod.EQUALS,
+          },
+        },
+      }),
+    );
+  }
+
+  if (userName) {
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "userNameQuery",
+          value: {
+            userName: userName,
+            method: TextQueryMethod.EQUALS,
+          },
+        },
+      }),
+    );
+  }
+
+  if (organizationId) {
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "organizationIdQuery",
+          value: {
+            organizationId,
+          },
+        },
+      }),
+    );
+  }
+
+  if (email) {
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "emailQuery",
+          value: {
+            emailAddress: email,
+          },
+        },
+      }),
+    );
+  }
+
+  return userService.listUsers({ queries: queries });
 }
 
-export const PROVIDER_NAME_MAPPING: {
-  [provider: string]: string;
-} = {
-  [ProviderSlug.GOOGLE]: "Google",
-  [ProviderSlug.GITHUB]: "GitHub",
-};
+export async function getDefaultOrg(): Promise<Organization | null> {
+  return orgService
+    .listOrganizations(
+      {
+        queries: [
+          {
+            query: {
+              case: "defaultQuery",
+              value: {},
+            },
+          },
+        ],
+      },
+      {},
+    )
+    .then((resp) => (resp?.result && resp.result[0] ? resp.result[0] : null));
+}
+
+export async function getOrgsByDomain(domain: string) {
+  return orgService.listOrganizations(
+    {
+      queries: [
+        {
+          query: {
+            case: "domainQuery",
+            value: { domain, method: TextQueryMethod.EQUALS },
+          },
+        },
+      ],
+    },
+    {},
+  );
+}
 
 export async function startIdentityProviderFlow({
   idpId,
   urls,
 }: {
   idpId: string;
-  urls: PlainMessage<RedirectURLs>;
+  urls: RedirectURLsJson;
 }) {
   return userService.startIdentityProviderIntent({
     idpId,
@@ -336,7 +464,7 @@ export async function getAuthRequest({
   });
 }
 
-export async function createCallback(req: PlainMessage<CreateCallbackRequest>) {
+export async function createCallback(req: CreateCallbackRequest) {
   return oidcService.createCallback(req);
 }
 
@@ -350,14 +478,54 @@ export async function verifyEmail(userId: string, verificationCode: string) {
   );
 }
 
-/**
- *
- * @param userId the id of the user where the email should be set
- * @returns the newly set email
- */
-export async function resendEmailCode(userId: string) {
-  return userService.resendEmailCode(
+export async function resendEmailCode(
+  userId: string,
+  host: string | null,
+  authRequestId?: string,
+) {
+  let request: ResendEmailCodeRequest = create(ResendEmailCodeRequestSchema, {
+    userId,
+  });
+
+  if (host) {
+    const medium = create(SendEmailVerificationCodeSchema, {
+      urlTemplate:
+        `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+        (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+    });
+
+    request = { ...request, verification: { case: "sendCode", value: medium } };
+  }
+
+  return userService.resendEmailCode(request, {});
+}
+
+export function retrieveIDPIntent(id: string, token: string) {
+  return userService.retrieveIdentityProviderIntent(
+    { idpIntentId: id, idpIntentToken: token },
+    {},
+  );
+}
+
+export function getIDPByID(id: string) {
+  return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
+}
+
+export function addIDPLink(
+  idp: {
+    id: string;
+    userId: string;
+    userName: string;
+  },
+  userId: string,
+) {
+  return userService.addIDPLink(
     {
+      idpLink: {
+        userId: idp.userId,
+        idpId: idp.id,
+        userName: idp.userName,
+      },
       userId,
     },
     {},
@@ -369,13 +537,91 @@ export async function resendEmailCode(userId: string) {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function passwordReset(userId: string): Promise<any> {
+export async function passwordReset(
+  userId: string,
+  host: string | null,
+  authRequestId?: string,
+) {
+  let medium = create(SendPasswordResetLinkSchema, {
+    notificationType: NotificationType.Email,
+  });
+
+  if (host) {
+    medium = {
+      ...medium,
+      urlTemplate:
+        `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+        (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+    };
+  }
+
   return userService.passwordReset(
     {
       userId,
+      medium: {
+        case: "sendLink",
+        value: medium,
+      },
     },
     {},
   );
+}
+
+/**
+ *
+ * @param userId userId of the user to set the password for
+ * @param password the new password
+ * @param code optional if the password should be set with a code (reset), no code for initial setup of password
+ * @returns
+ */
+export async function setUserPassword(
+  userId: string,
+  password: string,
+  user: User,
+  code?: string,
+) {
+  let payload = create(SetPasswordRequestSchema, {
+    userId,
+    newPassword: {
+      password,
+    },
+  });
+
+  // check if the user has no password set in order to set a password
+  if (!code) {
+    const authmethods = await listAuthenticationMethodTypes(userId);
+
+    // if the user has no authmethods set, we can set a password otherwise we need a code
+    if (
+      !(authmethods.authMethodTypes.length === 0) &&
+      user.state !== UserState.INITIAL
+    ) {
+      return { error: "Provide a code to set a password" };
+    }
+  }
+
+  if (code) {
+    payload = {
+      ...payload,
+      verification: {
+        case: "verificationCode",
+        value: code,
+      },
+    };
+  }
+
+  return userService.setPassword(payload, {}).catch((error) => {
+    // throw error if failed precondition (ex. User is not yet initialized)
+    if (error.code === 9 && error.message) {
+      return { error: error.message };
+    } else {
+      throw error;
+    }
+  });
+}
+
+export async function setPassword(payload: SetPasswordRequest) {
+  return userService.setPassword(payload, {});
 }
 
 /**
@@ -384,24 +630,17 @@ export async function passwordReset(userId: string): Promise<any> {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
+
+// TODO check for token requirements!
 export async function createPasskeyRegistrationLink(
   userId: string,
-  token?: string,
+  // token: string,
 ) {
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+  // const transport = createServerTransport(token, {
+  //   baseUrl: process.env.ZITADEL_API_URL!,
+  // });
 
+  // const service = createUserServiceClient(transport);
   return userService.createPasskeyRegistrationLink({
     userId,
     medium: {
@@ -417,6 +656,7 @@ export async function createPasskeyRegistrationLink(
  * @param domain the domain on which the factor is registered
  * @returns the newly set email
  */
+
 export async function registerU2F(userId: string, domain: string) {
   return userService.registerU2F({
     userId,
@@ -431,16 +671,20 @@ export async function registerU2F(userId: string, domain: string) {
  * @returns the newly set email
  */
 export async function verifyU2FRegistration(
-  request: PlainMessage<VerifyU2FRegistrationRequest>,
+  request: VerifyU2FRegistrationRequest,
 ) {
   return userService.verifyU2FRegistration(request, {});
 }
 
-export async function getActiveIdentityProviders(orgId?: string) {
-  return settingsService.getActiveIdentityProviders(
-    { ctx: makeReqCtx(orgId) },
-    {},
-  );
+export async function getActiveIdentityProviders(
+  orgId?: string,
+  linking_allowed?: boolean,
+) {
+  const props: any = { ctx: makeReqCtx(orgId) };
+  if (linking_allowed) {
+    props.linkingAllowed = linking_allowed;
+  }
+  return settingsService.getActiveIdentityProviders(props, {});
 }
 
 /**
@@ -449,24 +693,9 @@ export async function getActiveIdentityProviders(orgId?: string) {
  * @returns the newly set email
  */
 export async function verifyPasskeyRegistration(
-  passkeyId: string,
-  passkeyName: string,
-  publicKeyCredential:
-    | {
-        [key: string]: any;
-      }
-    | undefined,
-  userId: string,
+  request: VerifyPasskeyRegistrationRequest,
 ) {
-  return userService.verifyPasskeyRegistration(
-    {
-      passkeyId,
-      passkeyName,
-      publicKeyCredential,
-      userId,
-    },
-    {},
-  );
+  return userService.verifyPasskeyRegistration(request, {});
 }
 
 /**
@@ -483,7 +712,6 @@ export async function registerPasskey(
     userId,
     code,
     domain,
-    // authenticator:
   });
 }
 

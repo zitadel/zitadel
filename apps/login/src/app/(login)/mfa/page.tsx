@@ -1,25 +1,26 @@
+import { Alert } from "@/components/alert";
+import { BackButton } from "@/components/back-button";
+import { ChooseSecondFactor } from "@/components/choose-second-factor";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { UserAvatar } from "@/components/user-avatar";
+import { getSessionCookieById } from "@/lib/cookies";
+import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getSession,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
-import Alert from "@/ui/Alert";
-import BackButton from "@/ui/BackButton";
-import ChooseSecondFactor from "@/ui/ChooseSecondFactor";
-import DynamicTheme from "@/ui/DynamicTheme";
-import UserAvatar from "@/ui/UserAvatar";
-import {
-  getMostRecentCookieWithLoginname,
-  getSessionCookieById,
-} from "@/utils/cookies";
+import { getLocale, getTranslations } from "next-intl/server";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
-  const { loginName, checkAfter, authRequestId, organization, sessionId } =
-    searchParams;
+  const searchParams = await props.searchParams;
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "mfa" });
+  const tError = await getTranslations({ locale, namespace: "error" });
+
+  const { loginName, authRequestId, organization, sessionId } = searchParams;
 
   const sessionFactors = sessionId
     ? await loadSessionById(sessionId, organization)
@@ -29,27 +30,29 @@ export default async function Page({
     loginName?: string,
     organization?: string,
   ) {
-    const recent = await getMostRecentCookieWithLoginname(
+    return loadMostRecentSession({
       loginName,
       organization,
-    );
-    return getSession(recent.id, recent.token).then((response) => {
-      if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes(
-          response.session.factors.user.id,
-        ).then((methods) => {
-          return {
-            factors: response.session?.factors,
-            authMethods: methods.authMethodTypes ?? [],
-          };
-        });
+    }).then((session) => {
+      if (session && session.factors?.user?.id) {
+        return listAuthenticationMethodTypes(session.factors.user.id).then(
+          (methods) => {
+            return {
+              factors: session?.factors,
+              authMethods: methods.authMethodTypes ?? [],
+            };
+          },
+        );
       }
     });
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(recent.id, recent.token).then((response) => {
+    const recent = await getSessionCookieById({ sessionId, organization });
+    return getSession({
+      sessionId: recent.id,
+      sessionToken: recent.token,
+    }).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(
           response.session.factors.user.id,
@@ -68,9 +71,9 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Verify 2-Factor</h1>
+        <h1>{t("verify.title")}</h1>
 
-        <p className="ztdl-p">Choose one of the following second factors.</p>
+        <p className="ztdl-p">{t("verify.description")}</p>
 
         {sessionFactors && (
           <UserAvatar
@@ -81,9 +84,7 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        {!(loginName || sessionId) && (
-          <Alert>Provide your active session as loginName param</Alert>
-        )}
+        {!(loginName || sessionId) && <Alert>{tError("unknownContext")}</Alert>}
 
         {sessionFactors ? (
           <ChooseSecondFactor
@@ -94,7 +95,7 @@ export default async function Page({
             userMethods={sessionFactors.authMethods ?? []}
           ></ChooseSecondFactor>
         ) : (
-          <Alert>No second factors available to setup.</Alert>
+          <Alert>{t("verify.noResults")}</Alert>
         )}
 
         <div className="mt-8 flex w-full flex-row items-center">

@@ -1,186 +1,220 @@
-import { ProviderSlug } from "@/lib/demos";
-import { getBrandingSettings, userService } from "@/lib/zitadel";
-import Alert, { AlertType } from "@/ui/Alert";
-import DynamicTheme from "@/ui/DynamicTheme";
-import IdpSignin from "@/ui/IdpSignin";
-import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import { PartialMessage } from "@zitadel/client";
+import { DynamicTheme } from "@/components/dynamic-theme";
+import { IdpSignin } from "@/components/idp-signin";
+import { linkingFailed } from "@/components/idps/pages/linking-failed";
+import { linkingSuccess } from "@/components/idps/pages/linking-success";
+import { loginFailed } from "@/components/idps/pages/login-failed";
+import { loginSuccess } from "@/components/idps/pages/login-success";
+import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
+import {
+  addHuman,
+  addIDPLink,
+  getBrandingSettings,
+  getIDPByID,
+  getLoginSettings,
+  getOrgsByDomain,
+  listUsers,
+  retrieveIDPIntent,
+} from "@/lib/zitadel";
+import { create } from "@zitadel/client";
+import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
+import { OrganizationSchema } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import {
+  AddHumanUserRequest,
+  AddHumanUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getLocale, getTranslations } from "next-intl/server";
 
-const PROVIDER_MAPPING: {
-  [provider: string]: (
-    rI: IDPInformation,
-  ) => PartialMessage<AddHumanUserRequest>;
-} = {
-  [ProviderSlug.GOOGLE]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as {
-      User: {
-        email: string;
-        name?: string;
-        given_name?: string;
-        family_name?: string;
-      };
-    };
+const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
-    const idpLink: PartialMessage<IDPLink> = {
-      idpId: idp.idpId,
-      userId: idp.userId,
-      userName: idp.userName,
-    };
-
-    const req: PartialMessage<AddHumanUserRequest> = {
-      username: idp.userName,
-      email: {
-        email: rawInfo.User?.email,
-        verification: { case: "isVerified", value: true },
-      },
-      // organisation: Organisation | undefined;
-      profile: {
-        displayName: rawInfo.User?.name ?? "",
-        givenName: rawInfo.User?.given_name ?? "",
-        familyName: rawInfo.User?.family_name ?? "",
-      },
-      idpLinks: [idpLink],
-    };
-    return req;
-  },
-  [ProviderSlug.GITHUB]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as {
-      email: string;
-      name: string;
-    };
-    const idpLink: PartialMessage<IDPLink> = {
-      idpId: idp.idpId,
-      userId: idp.userId,
-      userName: idp.userName,
-    };
-    const req: PartialMessage<AddHumanUserRequest> = {
-      username: idp.userName,
-      email: {
-        email: rawInfo?.email,
-        verification: { case: "isVerified", value: true },
-      },
-      // organisation: Organisation | undefined;
-      profile: {
-        displayName: rawInfo?.name ?? "",
-        givenName: rawInfo?.name ?? "",
-        familyName: rawInfo?.name ?? "",
-      },
-      idpLinks: [idpLink],
-    };
-    return req;
-  },
-};
-
-function retrieveIDPIntent(id: string, token: string) {
-  return userService.retrieveIdentityProviderIntent(
-    { idpIntentId: id, idpIntentToken: token },
-    {},
-  );
-}
-
-function createUser(
-  provider: ProviderSlug,
-  info: IDPInformation,
-): Promise<string> {
-  const userData = PROVIDER_MAPPING[provider](info);
-  return userService.addHumanUser(userData, {}).then((resp) => resp.userId);
-}
-
-export default async function Page({
-  searchParams,
-  params,
-}: {
-  searchParams: Record<string | number | symbol, string | undefined>;
-  params: { provider: ProviderSlug };
+export default async function Page(props: {
+  searchParams: Promise<Record<string | number | symbol, string | undefined>>;
+  params: Promise<{ provider: string }>;
 }) {
-  const { id, token, authRequestId, organization } = searchParams;
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+  const locale = getLocale();
+  const t = await getTranslations({ locale, namespace: "idp" });
+  const { id, token, authRequestId, organization, link } = searchParams;
   const { provider } = params;
 
   const branding = await getBrandingSettings(organization);
 
-  if (provider && id && token) {
-    return retrieveIDPIntent(id, token)
-      .then((resp) => {
-        const { idpInformation, userId } = resp;
+  if (!provider || !id || !token) {
+    return loginFailed(branding, "IDP context missing");
+  }
 
-        if (idpInformation) {
-          // handle login
-          if (userId) {
-            return (
-              <DynamicTheme branding={branding}>
-                <div className="flex flex-col items-center space-y-4">
-                  <h1>Login successful</h1>
-                  <div>You have successfully been loggedIn!</div>
+  const intent = await retrieveIDPIntent(id, token);
 
-                  <IdpSignin
-                    userId={userId}
-                    idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-                    authRequestId={authRequestId}
-                  />
-                </div>
-              </DynamicTheme>
-            );
-          } else {
-            // handle register
-            return createUser(provider, idpInformation)
-              .then((userId) => {
-                return (
-                  <DynamicTheme branding={branding}>
-                    <div className="flex flex-col items-center space-y-4">
-                      <h1>Register successful</h1>
-                      <div>You have successfully been registered!</div>
-                    </div>
-                  </DynamicTheme>
-                );
-              })
-              .catch((error) => {
-                return (
-                  <DynamicTheme branding={branding}>
-                    <div className="flex flex-col items-center space-y-4">
-                      <h1>Register failed</h1>
-                      <div className="w-full">
-                        {
-                          <Alert type={AlertType.ALERT}>
-                            {JSON.stringify(error.message)}
-                          </Alert>
-                        }
-                      </div>
-                    </div>
-                  </DynamicTheme>
-                );
-              });
-          }
-        } else {
-          throw new Error("Could not get user information.");
-        }
-      })
-      .catch((error) => {
-        return (
-          <DynamicTheme branding={branding}>
-            <div className="flex flex-col items-center space-y-4">
-              <h1>An error occurred</h1>
-              <div className="w-full">
-                {
-                  <Alert type={AlertType.ALERT}>
-                    {JSON.stringify(error.message)}
-                  </Alert>
-                }
-              </div>
-            </div>
-          </DynamicTheme>
-        );
-      });
-  } else {
-    return (
-      <DynamicTheme branding={branding}>
-        <div className="flex flex-col items-center space-y-4">
-          <div className="flex flex-col items-center space-y-4">
-            <h1>Register</h1>
-            <p className="ztdl-p">No id and token received!</p>
-          </div>
-        </div>
-      </DynamicTheme>
+  const { idpInformation, userId } = intent;
+
+  // sign in user. If user should be linked continue
+  if (userId && !link) {
+    // TODO: update user if idp.options.isAutoUpdate is true
+
+    return loginSuccess(
+      userId,
+      { idpIntentId: id, idpIntentToken: token },
+      authRequestId,
+      branding,
     );
   }
+
+  if (!idpInformation) {
+    return loginFailed(branding, "IDP information missing");
+  }
+
+  const idp = await getIDPByID(idpInformation.idpId);
+  const options = idp?.config?.options;
+
+  if (!idp) {
+    throw new Error("IDP not found");
+  }
+
+  const providerType = idpTypeToIdentityProviderType(idp.type);
+
+  if (link) {
+    if (!options?.isLinkingAllowed) {
+      // linking was probably disallowed since the invitation was created
+      return linkingFailed(branding, "Linking is no longer allowed");
+    }
+
+    let idpLink;
+    try {
+      idpLink = await addIDPLink(
+        {
+          id: idpInformation.idpId,
+          userId: idpInformation.userId,
+          userName: idpInformation.userName,
+        },
+        userId,
+      );
+    } catch (error) {
+      console.error(error);
+      return linkingFailed(branding);
+    }
+
+    if (!idpLink) {
+      return linkingFailed(branding);
+    } else {
+      return linkingSuccess(
+        userId,
+        { idpIntentId: id, idpIntentToken: token },
+        authRequestId,
+        branding,
+      );
+    }
+  }
+
+  // search for potential user via username, then link
+  if (options?.isLinkingAllowed) {
+    let foundUser;
+    const email = PROVIDER_MAPPING[providerType](idpInformation).email?.email;
+
+    if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
+      foundUser = await listUsers({ email }).then((response) => {
+        return response.result ? response.result[0] : null;
+      });
+    } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
+      foundUser = await listUsers(
+        options.autoLinking === AutoLinkingOption.USERNAME
+          ? { userName: idpInformation.userName }
+          : { email },
+      ).then((response) => {
+        return response.result ? response.result[0] : null;
+      });
+    } else {
+      foundUser = await listUsers({
+        userName: idpInformation.userName,
+        email,
+      }).then((response) => {
+        return response.result ? response.result[0] : null;
+      });
+    }
+
+    if (foundUser) {
+      let idpLink;
+      try {
+        idpLink = await addIDPLink(
+          {
+            id: idpInformation.idpId,
+            userId: idpInformation.userId,
+            userName: idpInformation.userName,
+          },
+          foundUser.userId,
+        );
+      } catch (error) {
+        console.error(error);
+        return linkingFailed(branding);
+      }
+
+      if (!idpLink) {
+        return linkingFailed(branding);
+      } else {
+        return linkingSuccess(
+          foundUser.userId,
+          { idpIntentId: id, idpIntentToken: token },
+          authRequestId,
+          branding,
+        );
+      }
+    }
+  }
+
+  if (options?.isCreationAllowed && options.isAutoCreation) {
+    let orgToRegisterOn: string | undefined = organization;
+
+    let userData: AddHumanUserRequest =
+      PROVIDER_MAPPING[providerType](idpInformation);
+
+    if (
+      !orgToRegisterOn &&
+      userData.username && // username or email?
+      ORG_SUFFIX_REGEX.test(userData.username)
+    ) {
+      const matched = ORG_SUFFIX_REGEX.exec(userData.username);
+      const suffix = matched?.[1] ?? "";
+
+      // this just returns orgs where the suffix is set as primary domain
+      const orgs = await getOrgsByDomain(suffix);
+      const orgToCheckForDiscovery =
+        orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
+
+      const orgLoginSettings = await getLoginSettings(orgToCheckForDiscovery);
+      if (orgLoginSettings?.allowDomainDiscovery) {
+        orgToRegisterOn = orgToCheckForDiscovery;
+      }
+    }
+
+    if (orgToRegisterOn) {
+      const organizationSchema = create(OrganizationSchema, {
+        org: { case: "orgId", value: orgToRegisterOn },
+      });
+
+      userData = create(AddHumanUserRequestSchema, {
+        ...userData,
+        organization: organizationSchema,
+      });
+    }
+
+    const newUser = await addHuman(userData);
+
+    if (newUser) {
+      return (
+        <DynamicTheme branding={branding}>
+          <div className="flex flex-col items-center space-y-4">
+            <h1>{t("registerSuccess.title")}</h1>
+            <p className="ztdl-p">{t("registerSuccess.description")}</p>
+            <IdpSignin
+              userId={newUser.userId}
+              idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+              authRequestId={authRequestId}
+            />
+          </div>
+        </DynamicTheme>
+      );
+    }
+  }
+
+  // return login failed if no linking or creation is allowed and no user was found
+  return loginFailed(branding, "No user found");
 }

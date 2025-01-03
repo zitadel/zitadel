@@ -1,3 +1,7 @@
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin();
+
 /** @type {import('next').NextConfig} */
 
 const secureHeaders = [
@@ -32,9 +36,8 @@ const secureHeaders = [
 
 const nextConfig = {
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
-  swcMinify: true,
   experimental: {
-    serverActions: true,
+    dynamicIO: true,
   },
   images: {
     remotePatterns: [
@@ -62,4 +65,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

@@ -4,11 +4,6 @@ export type Item = {
   description?: string;
 };
 
-export enum ProviderSlug {
-  GOOGLE = "google",
-  GITHUB = "github",
-}
-
 export const demos: { name: string; items: Item[] }[] = [
   {
     name: "Login",
