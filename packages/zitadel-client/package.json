@@ -27,6 +27,11 @@
       "types": "./dist/v3alpha.d.ts",
       "import": "./dist/v3alpha.js",
       "require": "./dist/v3alpha.cjs"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js",
+      "require": "./dist/node.cjs"
     }
   },
   "files": [
@@ -46,6 +51,9 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.2.2",
     "@connectrpc/connect": "^2.0.0",
+    "@connectrpc/connect-node": "^2.0.0",
+    "@connectrpc/connect-web": "^2.0.0",
+    "jose": "^5.3.0",
     "@zitadel/proto": "workspace:*"
   },
   "devDependencies": {

@@ -9,7 +9,7 @@ Login UI.
 
 The scope of functionality of this repo and packages is under active development.
 
-The `@zitadel/client` and `@zitadel/node` packages are using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
+The `@zitadel/client` package is using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
 
 You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
 Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
@@ -30,8 +30,7 @@ We think the easiest path of getting up and running, is the following:
 ## Included Apps And Packages
 
 - `login`: The login UI used by ZITADEL Cloud, powered by Next.js
-- `@zitadel/node`: core components for establishing node client connection
-- `@zitadel/client`: shared client utilities
+- `@zitadel/client`: shared client utilities for node and browser environments
 - `@zitadel/proto`: shared protobuf types
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
