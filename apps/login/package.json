@@ -40,7 +40,6 @@
     "@tailwindcss/forms": "0.5.7",
     "@vercel/analytics": "^1.2.2",
     "@zitadel/client": "workspace:*",
-    "@zitadel/node": "workspace:*",
     "@zitadel/proto": "workspace:*",
     "clsx": "1.2.1",
     "copy-to-clipboard": "^3.3.3",

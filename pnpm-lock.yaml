@@ -91,9 +91,6 @@ importers:
       '@zitadel/client':
         specifier: workspace:*
         version: link:../../packages/zitadel-client
-      '@zitadel/node':
-        specifier: workspace:*
-        version: link:../../packages/zitadel-node
       '@zitadel/proto':
         specifier: workspace:*
         version: link:../../packages/zitadel-proto
@@ -263,41 +260,22 @@ importers:
       '@connectrpc/connect':
         specifier: ^2.0.0
         version: 2.0.0(@bufbuild/protobuf@2.2.2)
-      '@zitadel/proto':
-        specifier: workspace:*
-        version: link:../zitadel-proto
-    devDependencies:
-      '@bufbuild/protocompile':
-        specifier: ^0.0.1
-        version: 0.0.1(@bufbuild/buf@1.47.2)
-      '@zitadel/tsconfig':
-        specifier: workspace:*
-        version: link:../zitadel-tsconfig
-      eslint-config-zitadel:
-        specifier: workspace:*
-        version: link:../eslint-config-zitadel
-
-  packages/zitadel-node:
-    dependencies:
       '@connectrpc/connect-node':
         specifier: ^2.0.0
         version: 2.0.0(@bufbuild/protobuf@2.2.2)(@connectrpc/connect@2.0.0(@bufbuild/protobuf@2.2.2))
       '@connectrpc/connect-web':
         specifier: ^2.0.0
         version: 2.0.0(@bufbuild/protobuf@2.2.2)(@connectrpc/connect@2.0.0(@bufbuild/protobuf@2.2.2))
+      '@zitadel/proto':
+        specifier: workspace:*
+        version: link:../zitadel-proto
       jose:
         specifier: ^5.3.0
         version: 5.8.0
     devDependencies:
-      '@connectrpc/connect':
-        specifier: ^2.0.0
-        version: 2.0.0(@bufbuild/protobuf@2.2.2)
-      '@types/node':
-        specifier: ^22.9.0
-        version: 22.9.0
-      '@zitadel/client':
-        specifier: workspace:*
-        version: link:../zitadel-client
+      '@bufbuild/protocompile':
+        specifier: ^0.0.1
+        version: 0.0.1(@bufbuild/buf@1.47.2)
       '@zitadel/tsconfig':
         specifier: workspace:*
         version: link:../zitadel-tsconfig
