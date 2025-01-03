@@ -88,11 +88,11 @@ export function SessionItem({
               setLoading(false);
             });
 
-          if (res?.redirect) {
+          if (res && "redirect" in res && res.redirect) {
             return router.push(res.redirect);
           }
 
-          if (res?.error) {
+          if (res && "error" in res && res.error) {
             setError(res.error);
             return;
           }

@@ -12,7 +12,10 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import {
   AddHumanUserRequest,
+  ResendEmailCodeRequest,
+  ResendEmailCodeRequestSchema,
   RetrieveIdentityProviderIntentRequest,
+  SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
   VerifyPasskeyRegistrationRequest,
@@ -23,6 +26,7 @@ import { create, Duration } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
   NotificationType,
@@ -270,6 +274,32 @@ export async function resendInviteCode(userId: string) {
   return userService.resendInviteCode({ userId }, {});
 }
 
+export async function sendEmailCode(
+  userId: string,
+  host: string | null,
+  authRequestId?: string,
+) {
+  let medium = create(SendEmailCodeRequestSchema, {
+    userId,
+  });
+
+  if (host) {
+    medium = create(SendEmailCodeRequestSchema, {
+      ...medium,
+      verification: {
+        case: "sendCode",
+        value: create(SendEmailVerificationCodeSchema, {
+          urlTemplate:
+            `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+            (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+        }),
+      },
+    });
+  }
+
+  return userService.sendEmailCode(medium, {});
+}
+
 export async function createInviteCode(userId: string, host: string | null) {
   let medium = create(SendInviteCodeSchema, {
     applicationName: "Typescript Login",
@@ -448,13 +478,26 @@ export async function verifyEmail(userId: string, verificationCode: string) {
   );
 }
 
-export async function resendEmailCode(userId: string) {
-  return userService.resendEmailCode(
-    {
-      userId,
-    },
-    {},
-  );
+export async function resendEmailCode(
+  userId: string,
+  host: string | null,
+  authRequestId?: string,
+) {
+  let request: ResendEmailCodeRequest = create(ResendEmailCodeRequestSchema, {
+    userId,
+  });
+
+  if (host) {
+    const medium = create(SendEmailVerificationCodeSchema, {
+      urlTemplate:
+        `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+        (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+    });
+
+    request = { ...request, verification: { case: "sendCode", value: medium } };
+  }
+
+  return userService.resendEmailCode(request, {});
 }
 
 export function retrieveIDPIntent(id: string, token: string) {
