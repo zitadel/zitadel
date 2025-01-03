@@ -24,7 +24,7 @@ export const Description = ({mode, link}) => {
 }
 
 export const Commands = ({mode, name, lower, configfilename}) => {
-    let genCert = '# Generate a self signed certificate and key.\nopenssl req -x509 -batch -subj "/CN=127.0.0.1.sslip.io/O=ZITADEL Demo" -nodes -newkey rsa:2048 -keyout ./selfsigned.key -out ./selfsigned.crt\n\n';
+    let genCert = '# Generate a self signed certificate and key.\nopenssl req -x509 -batch -subj "/CN=127.0.0.1.sslip.io/O=ZITADEL Demo" -nodes -newkey rsa:2048 -keyout ./selfsigned.key -out ./selfsigned.crt 2>/dev/null\n\n';
     let connPort = "443"
     let connInsecureFlag = "--insecure "
     let connScheme = "https"
