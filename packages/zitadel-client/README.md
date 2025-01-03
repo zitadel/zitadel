@@ -23,11 +23,14 @@ yarn add @zitadel/client
 You can import and use the services provided by this package to interact with ZITADEL.
 
 ```ts
-import { createUserServiceClient } from "@zitadel/client";
+import { createSettingsServiceClient, makeReqCtx } from "@zitadel/client/v2";
 
-const userService = createUserServiceClient({
-  // Configuration options
-});
+// Example usage
+const transport = createServerTransport(process.env.ZITADEL_SERVICE_USER_TOKEN!, { baseUrl: process.env.ZITADEL_API_URL! });
+
+const settingsService = createSettingsServiceClient(transport);
+
+settingsService.getBrandingSettings({ ctx: makeReqCtx("orgId") }, {});
 ```
 
 ### Utilities
@@ -40,3 +43,11 @@ import { timestampMs } from "@zitadel/client";
 // Example usage
 console.log(`${timestampMs(session.creationDate)}`);
 ```
+
+## Documentation
+
+For detailed documentation and API references, please visit the [ZITADEL documentation](https://zitadel.com/docs).
+
+## Contributing
+
+Contributions are welcome! Please read the contributing guidelines before getting started.
