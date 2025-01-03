@@ -192,7 +192,7 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
       env-cmd:
-        specifier: ^10.1.0
+        specifier: ^10.0.0
         version: 10.1.0
       grpc-tools:
         specifier: 1.12.4
@@ -6892,7 +6892,7 @@ snapshots:
   env-cmd@10.1.0:
     dependencies:
       commander: 4.1.1
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
 
   environment@1.1.0: {}
 
