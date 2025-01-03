@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  // This tells ESLint to load the config from the package `eslint-config-zitadel`
+  // This tells ESLint to load the config from the package `@zitadel/eslint-config`
   extends: ["zitadel"],
   settings: {
     next: {
