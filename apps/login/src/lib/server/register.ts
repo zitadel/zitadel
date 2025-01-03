@@ -92,7 +92,6 @@ export async function registerUser(command: RegisterUserCommand) {
       humanUser,
       session.factors.user.organizationId,
       command.authRequestId,
-      //true, // skip send as a mail was send during registration
     );
 
     if (emailVerificationCheck?.redirect) {

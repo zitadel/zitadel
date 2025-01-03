@@ -20,15 +20,8 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "verify" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const {
-    userId,
-    loginName,
-    code,
-    organization,
-    authRequestId,
-    invite,
-    skipsend,
-  } = searchParams;
+  const { userId, loginName, code, organization, authRequestId, invite } =
+    searchParams;
 
   const branding = await getBrandingSettings(organization);
 
@@ -37,7 +30,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   let human: HumanUser | undefined;
   let id: string | undefined;
 
-  const doSend = !skipsend && invite !== "true";
+  const doSend = invite !== "true";
 
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({

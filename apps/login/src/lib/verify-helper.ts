@@ -62,7 +62,6 @@ export function checkEmailVerification(
   humanUser?: HumanUser,
   organization?: string,
   authRequestId?: string,
-  skipSend?: boolean,
 ) {
   if (
     !humanUser?.email?.isVerified &&
@@ -81,10 +80,6 @@ export function checkEmailVerification(
         "organization",
         organization ?? (session.factors?.user?.organizationId as string),
       );
-    }
-
-    if (skipSend) {
-      params.append("skipsend", "true");
     }
 
     return { redirect: `/verify?` + params };
