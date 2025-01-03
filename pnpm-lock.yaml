@@ -173,6 +173,9 @@ importers:
       '@zitadel/prettier-config':
         specifier: workspace:*
         version: link:../../packages/zitadel-prettier-config
+      '@zitadel/tailwind-config':
+        specifier: workspace:*
+        version: link:../../packages/zitadel-tailwind-config
       '@zitadel/tsconfig':
         specifier: workspace:*
         version: link:../../packages/zitadel-tsconfig
@@ -227,9 +230,6 @@ importers:
       typescript:
         specifier: ^5.6.3
         version: 5.6.3
-      zitadel-tailwind-config:
-        specifier: workspace:*
-        version: link:../../packages/zitadel-tailwind-config
 
   packages/zitadel-client:
     dependencies:

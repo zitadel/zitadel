@@ -86,6 +86,6 @@
     "tailwindcss": "3.4.14",
     "ts-proto": "^2.2.7",
     "typescript": "^5.6.3",
-    "zitadel-tailwind-config": "workspace:*"
+    "@zitadel/tailwind-config": "workspace:*"
   }
 }
