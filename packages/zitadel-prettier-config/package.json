@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "description": "Prettier configuration",
   "type": "module",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./index.js"
   }

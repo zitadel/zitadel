@@ -1,7 +1,9 @@
 {
   "name": "@zitadel/tailwind-config",
   "version": "0.1.0",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "index.js",
   "devDependencies": {
     "tailwindcss": "^3.4.14",
