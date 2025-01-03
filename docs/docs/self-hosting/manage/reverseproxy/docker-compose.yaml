@@ -49,10 +49,10 @@ services:
     networks:
       - 'zitadel'
     depends_on:
-      zitadel-init:
-        condition: 'service_completed_successfully'
       db:
         condition: 'service_healthy'
+      zitadel-init:
+        condition: 'service_completed_successfully'
 
   zitadel-enabled-tls:
     extends:
@@ -125,10 +125,9 @@ services:
     restart: 'always'
     image: postgres:16-alpine
     environment:
-      PGUSER: root
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres"]
+      test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
       timeout: 60s
       retries: 10
