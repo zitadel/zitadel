@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 func systemCmd() *cobra.Command {
@@ -34,11 +33,11 @@ Only keys and assets are mirrored`,
 }
 
 func copySystem(ctx context.Context, config *Migration) {
-	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
+	sourceClient, err := database.Connect(config.Source, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
-	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
+	destClient, err := database.Connect(config.Destination, false)
 	logging.OnError(err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
