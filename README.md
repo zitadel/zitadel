@@ -33,7 +33,7 @@ We think the easiest path of getting up and running, is the following:
 - `@zitadel/client`: shared client utilities for node and browser environments
 - `@zitadel/proto`: shared protobuf types
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
-- `eslint-config-zitadel`: ESLint preset
+- `@zitadel/eslint-config`: ESLint preset
 
 Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
 

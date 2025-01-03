@@ -73,7 +73,7 @@
     "cypress": "^13.15.2",
     "del-cli": "6.0.0",
     "env-cmd": "^10.1.0",
-    "eslint-config-zitadel": "workspace:*",
+    "@zitadel/eslint-config": "workspace:*",
     "grpc-tools": "1.12.4",
     "jsdom": "^25.0.1",
     "lint-staged": "15.2.10",

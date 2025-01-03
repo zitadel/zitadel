@@ -37,6 +37,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.3
         version: 4.3.3(vite@5.4.11(@types/node@22.9.0)(sass@1.80.7))
+      '@zitadel/eslint-config':
+        specifier: workspace:*
+        version: link:packages/eslint-config-zitadel
       '@zitadel/prettier-config':
         specifier: workspace:*
         version: link:packages/zitadel-prettier-config
@@ -49,9 +52,6 @@ importers:
       eslint:
         specifier: 8.57.1
         version: 8.57.1
-      eslint-config-zitadel:
-        specifier: workspace:*
-        version: link:packages/eslint-config-zitadel
       prettier:
         specifier: ^3.2.5
         version: 3.3.3
@@ -167,6 +167,9 @@ importers:
       '@vercel/git-hooks':
         specifier: 1.0.0
         version: 1.0.0
+      '@zitadel/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config-zitadel
       '@zitadel/prettier-config':
         specifier: workspace:*
         version: link:../../packages/zitadel-prettier-config
@@ -188,9 +191,6 @@ importers:
       env-cmd:
         specifier: ^10.1.0
         version: 10.1.0
-      eslint-config-zitadel:
-        specifier: workspace:*
-        version: link:../../packages/eslint-config-zitadel
       grpc-tools:
         specifier: 1.12.4
         version: 1.12.4
@@ -276,12 +276,12 @@ importers:
       '@bufbuild/protocompile':
         specifier: ^0.0.1
         version: 0.0.1(@bufbuild/buf@1.47.2)
+      '@zitadel/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config-zitadel
       '@zitadel/tsconfig':
         specifier: workspace:*
         version: link:../zitadel-tsconfig
-      eslint-config-zitadel:
-        specifier: workspace:*
-        version: link:../eslint-config-zitadel
 
   packages/zitadel-prettier-config: {}
 

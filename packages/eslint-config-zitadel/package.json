@@ -1,5 +1,5 @@
 {
-  "name": "eslint-config-zitadel",
+  "name": "@zitadel/eslint-config",
   "version": "0.0.0",
   "main": "index.js",
   "license": "MIT",
