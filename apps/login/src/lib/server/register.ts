@@ -79,7 +79,7 @@ export async function registerUser(command: RegisterUserCommand) {
     const userResponse = await getUserByID(session?.factors?.user?.id);
 
     if (!userResponse.user) {
-      return { error: "Could not find user" };
+      return { error: "User not found in the system" };
     }
 
     const humanUser =

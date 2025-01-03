@@ -310,7 +310,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     if (resp) {
       return resp;
     }
-    return { error: "Could not find user" };
+    return { error: "User not found in the system" };
   } else if (
     loginSettings?.allowRegister &&
     loginSettings?.allowUsernamePassword
@@ -371,5 +371,5 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   // fallbackToPassword
 
-  return { error: "Could not find user" };
+  return { error: "User not found in the system" };
 }

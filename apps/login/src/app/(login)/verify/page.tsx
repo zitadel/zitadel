@@ -44,7 +44,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         authRequestId,
       }).catch((error) => {
         console.error("Could not resend verification email", error);
-        throw Error("Could not request email");
+        throw Error("Failed to send verification email");
       });
     }
   } else if ("userId" in searchParams && userId) {
@@ -54,7 +54,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
         authRequestId,
       }).catch((error) => {
         console.error("Could not resend verification email", error);
-        throw Error("Could not request email");
+        throw Error("Failed to send verification email");
       });
     }
 

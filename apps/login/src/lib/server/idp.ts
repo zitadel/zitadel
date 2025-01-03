@@ -62,7 +62,7 @@ export async function createNewSessionFromIdpIntent(
   const userResponse = await getUserByID(command.userId);
 
   if (!userResponse || !userResponse.user) {
-    return { error: "Could not find user" };
+    return { error: "User not found in the system" };
   }
 
   const loginSettings = await getLoginSettings(
