@@ -49,6 +49,16 @@ export default async function Page(props: {
     organization ?? defaultOrganization,
   );
 
+  const params = new URLSearchParams();
+
+  if (authRequestId) {
+    params.append("authRequestId", authRequestId);
+  }
+
+  if (organization) {
+    params.append("organization", organization);
+  }
+
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
@@ -57,16 +67,7 @@ export default async function Page(props: {
 
         <div className="flex flex-col w-full space-y-2">
           <SessionsList sessions={sessions} authRequestId={authRequestId} />
-          <Link
-            href={
-              authRequestId
-                ? `/loginname?` +
-                  new URLSearchParams({
-                    authRequestId,
-                  })
-                : "/loginname"
-            }
-          >
+          <Link href={`/loginname?` + params}>
             <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-all">
               <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
                 <UserPlusIcon className="h-5 w-5" />

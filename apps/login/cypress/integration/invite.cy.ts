@@ -1,6 +1,6 @@
 import { stub } from "../support/mock";
 
-describe("verify email", () => {
+describe("verify invite", () => {
   beforeEach(() => {
     stub("zitadel.org.v2.OrganizationService", "ListOrganizations", {
       data: {
@@ -13,11 +13,9 @@ describe("verify email", () => {
 
     stub("zitadel.user.v2.UserService", "ListAuthenticationMethodTypes", {
       data: {
-        authMethodTypes: [1], // set one method such that we know that the user was not invited
+        authMethodTypes: [], // user with no auth methods was invited
       },
     });
-
-    stub("zitadel.user.v2.UserService", "SendEmailCode");
 
     stub("zitadel.user.v2.UserService", "GetUserByID", {
       data: {
@@ -40,7 +38,7 @@ describe("verify email", () => {
             },
             email: {
               email: "john@zitadel.com",
-              isVerified: false, // email is not verified yet
+              isVerified: false,
             },
           },
         },
@@ -81,16 +79,36 @@ describe("verify email", () => {
         },
       },
     });
+
+    stub("zitadel.settings.v2.SettingsService", "GetLoginSettings", {
+      data: {
+        settings: {
+          passkeysType: 1,
+          allowUsernamePassword: true,
+        },
+      },
+    });
   });
 
-  it("shows an error if email code validation failed", () => {
-    stub("zitadel.user.v2.UserService", "VerifyEmail", {
+  it.only("shows authenticators after successful invite verification", () => {
+    stub("zitadel.user.v2.UserService", "VerifyInviteCode");
+
+    cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
+    cy.location("pathname", { timeout: 10_000 }).should(
+      "eq",
+      "/authenticator/set",
+    );
+  });
+
+  it("shows an error if invite code validation failed", () => {
+    stub("zitadel.user.v2.UserService", "VerifyInviteCode", {
       code: 3,
       error: "error validating code",
     });
+
     // TODO: Avoid uncaught exception in application
     cy.once("uncaught:exception", () => false);
-    cy.visit("/verify?userId=221394658884845598&code=abc");
-    cy.contains("Could not verify email", { timeout: 10_000 });
+    cy.visit("/verify?userId=221394658884845598&code=abc&invite=true");
+    cy.contains("Could not verify invite", { timeout: 10_000 });
   });
 });
