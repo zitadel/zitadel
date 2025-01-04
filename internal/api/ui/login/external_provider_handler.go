@@ -3,6 +3,8 @@ package login
 import (
 	"context"
 	"net/http"
+	"net/url"
+	"slices"
 	"strings"
 
 	"github.com/crewjam/saml/samlsp"
@@ -52,6 +54,12 @@ type externalIDPCallbackData struct {
 
 	// Apple returns a user on first registration
 	User string `schema:"user"`
+}
+
+type externalIDPInitiatedCallbackData struct {
+	IdpID       string   `schema:"idp"`
+	RedirectUri *url.URL `schema:"redirect_uri"`
+	Domain      string   `schema:"domain"`
 }
 
 type externalNotFoundOptionFormData struct {
@@ -214,8 +222,102 @@ func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.R
 		l.renderLogin(w, r, nil, err)
 		return
 	}
+
+	relayState := r.PostFormValue("RelayState")
+	if data, ok := l.validateIDPInitiatedLogin(r.Context(), relayState); ok {
+		l.handleIDPInitiatedLoginCallbackForm(w, r, data)
+		return
+	}
+
 	r.Form.Add("Method", http.MethodPost)
 	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
+}
+
+// validateIDPInitiatedLogin validates wheather idp, applicationID and redirectUri are valid
+// when idp initiated flow occurs.
+func (l *Login) validateIDPInitiatedLogin(ctx context.Context, relayState string) (*externalIDPInitiatedCallbackData, bool) {
+	data := &externalIDPInitiatedCallbackData{}
+
+	urlQuery, err := url.ParseQuery(relayState)
+	if err != nil {
+		logging.Error("unable to parse relayState for idp initiated login")
+		return data, false
+	}
+
+	var (
+		idpID       = urlQuery.Get("idp")
+		clientID    = urlQuery.Get("client_id")
+		orgID       = urlQuery.Get("org_id")
+		redirectUri = urlQuery.Get("redirect_uri")
+	)
+
+	if orgID == "" || idpID == "" || clientID == "" || redirectUri == "" {
+		logging.Error("unable to load orgID, idpID, clientID and redirectURI from relayState for idp initiated login")
+		return data, false
+	}
+
+	parsedRedirectURI, err := url.Parse(redirectUri)
+	if err != nil {
+		logging.Error("unable to parse redirectURI from relayState for idp initiated login")
+		return data, false
+	}
+
+	_, err = l.command.GetProvider(ctx, idpID, l.oidcAuthCallbackURL(ctx, idpID), l.samlAuthCallbackURL(ctx, idpID))
+	if err != nil {
+		logging.Error("unable to get idp provider for idp initiated login")
+		return data, false
+	}
+
+	searchQuery, err := query.NewOrgDomainOrgIDSearchQuery(orgID)
+	if err != nil {
+		logging.Error("unable to search query for idp initiated login")
+		return data, false
+	}
+
+	domains, err := l.query.SearchOrgDomains(ctx, &query.OrgDomainSearchQueries{Queries: []query.SearchQuery{searchQuery}}, false)
+	if err != nil {
+		logging.Error("unable to load domains for idp initiated login")
+		return data, false
+	}
+
+	var primaryDomain *query.Domain
+	for _, domain := range domains.Domains {
+		if domain.IsPrimary {
+			primaryDomain = domain
+			break
+		}
+	}
+	if primaryDomain == nil {
+		logging.Error("unable to primary domain for idp initiated login")
+		return data, false
+	}
+
+	app, err := l.query.AppByOIDCClientID(ctx, clientID)
+	if err != nil {
+		logging.Error("unable to oidc application by clientID for idp initiated login")
+		return data, false
+	}
+	if app.OIDCConfig == nil || !slices.Contains(app.OIDCConfig.RedirectURIs, parsedRedirectURI.String()) {
+		logging.Debug("redirect URI not contained in OIDC application")
+		return data, false
+	}
+
+	data.IdpID = idpID
+	data.RedirectUri = parsedRedirectURI
+	data.Domain = primaryDomain.Domain
+
+	return data, true
+}
+
+// handleIDPInitiatedLoginCallbackForm handles the callback from IDP initiated flow.
+// handler will redirect to redirectUri with idp as query parameter.
+func (l *Login) handleIDPInitiatedLoginCallbackForm(w http.ResponseWriter, r *http.Request, data *externalIDPInitiatedCallbackData) {
+	query := data.RedirectUri.Query()
+	query.Add("idp", data.IdpID)
+	query.Add("domain", data.Domain)
+
+	data.RedirectUri.RawQuery = query.Encode()
+	http.Redirect(w, r, data.RedirectUri.String(), http.StatusFound)
 }
 
 // handleExternalLoginCallback handles the callback from a IDP
