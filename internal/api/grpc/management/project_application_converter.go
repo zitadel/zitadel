@@ -36,7 +36,11 @@ func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueri
 	}, nil
 }
 
-func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) *domain.OIDCApp {
+func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) (*domain.OIDCApp, error) {
+	loginVersion, loginBaseURI, err := app_grpc.LoginVersionToDomain(req.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
 	return &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.ProjectId,
@@ -58,7 +62,9 @@ func AddOIDCAppRequestToDomain(req *mgmt_pb.AddOIDCAppRequest) *domain.OIDCApp {
 		AdditionalOrigins:        req.AdditionalOrigins,
 		SkipNativeAppSuccessPage: req.SkipNativeAppSuccessPage,
 		BackChannelLogoutURI:     req.GetBackChannelLogoutUri(),
-	}
+		LoginVersion:             loginVersion,
+		LoginBaseURI:             loginBaseURI,
+	}, nil
 }
 
 func AddSAMLAppRequestToDomain(req *mgmt_pb.AddSAMLAppRequest) *domain.SAMLApp {
@@ -89,7 +95,11 @@ func UpdateAppRequestToDomain(app *mgmt_pb.UpdateAppRequest) domain.Application 
 	}
 }
 
-func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest) *domain.OIDCApp {
+func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest) (*domain.OIDCApp, error) {
+	loginVersion, loginBaseURI, err := app_grpc.LoginVersionToDomain(app.GetLoginVersion())
+	if err != nil {
+		return nil, err
+	}
 	return &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: app.ProjectId,
@@ -110,7 +120,9 @@ func UpdateOIDCAppConfigRequestToDomain(app *mgmt_pb.UpdateOIDCAppConfigRequest)
 		AdditionalOrigins:        app.AdditionalOrigins,
 		SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 		BackChannelLogoutURI:     app.BackChannelLogoutUri,
-	}
+		LoginVersion:             loginVersion,
+		LoginBaseURI:             loginBaseURI,
+	}, nil
 }
 
 func UpdateSAMLAppConfigRequestToDomain(app *mgmt_pb.UpdateSAMLAppConfigRequest) *domain.SAMLApp {
