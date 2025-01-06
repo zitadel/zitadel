@@ -69,7 +69,7 @@ func TestServer_SetContactEmail(t *testing.T) {
 		},
 		{
 			name: "email patch, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.SetContactEmailRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -412,7 +412,7 @@ func TestServer_VerifyContactEmail(t *testing.T) {
 		},
 		{
 			name: "email verify, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.VerifyContactEmailRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -601,7 +601,7 @@ func TestServer_ResendContactEmailCode(t *testing.T) {
 		},
 		{
 			name: "email resend, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.ResendContactEmailCodeRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()

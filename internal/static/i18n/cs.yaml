@@ -547,6 +547,12 @@ Errors:
       Invalid: Token je neplatný
       Expired: Token vypršel
     InvalidClient: Token nebyl vydán pro tohoto klienta
+  SAMLRequest:
+    AlreadyExists: SAMLRequest již existuje
+    NotExisting: SAMLRequest neexistuje
+    WrongLoginClient: SAMLRequest vytvořený jiným přihlašovacím klientem
+  SAMLSession:
+    InvalidClient: Pro tohoto klienta nebyla vydána odpověď SAMLResponse
   Feature:
     NotExisting: Funkce neexistuje
     TypeNotSupported: Typ funkce není podporován
@@ -621,6 +627,8 @@ AggregateTypes:
   system: Systém
   session: Sezení
   web_key: Webový klíč
+  saml_request: Žádost SAML
+  saml_session: Relace SAML
 
 EventTypes:
   execution:

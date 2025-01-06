@@ -2550,6 +2550,10 @@
       "CLIENTSECRETREGENERATED": "klient tajemství regenerováno.",
       "DELETED": "Aplikace smazána.",
       "CONFIGCHANGED": "Zjištěny změny!"
+    },
+    "LOGINV2": {
+      "USEV2": "Použít nové uživatelské rozhraní pro přihlášení",
+      "BASEURL": "Vlastní základní adresa URL pro nové uživatelské rozhraní pro přihlášení"
     }
   },
   "GENDERS": {

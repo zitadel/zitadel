@@ -27,7 +27,7 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.IDPv2

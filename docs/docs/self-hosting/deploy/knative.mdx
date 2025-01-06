@@ -27,7 +27,7 @@ kubectl apply -f https://raw.githubusercontent.com/zitadel/zitadel/main/deploy/k
 
 ```bash
 kn service create zitadel \
---image ghcr.io/zitadel/zitadel:stable \
+--image ghcr.io/zitadel/zitadel:latest \
 --port 8080 \
 --env ZITADEL_DATABASE_COCKROACH_HOST=cockroachdb \
 --env ZITADEL_EXTERNALSECURE=false \

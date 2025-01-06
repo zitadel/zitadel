@@ -114,10 +114,13 @@ curl --request POST \
 }'
 ```
 
-## Example: Find out when user have been authenticated
+## Example: Find out which users have authenticated
 
-The following example shows you how you could use the events search to get all events where a token has been created.
-Also we include the refresh tokens in this example to know when the user has become a new token.
+### OIDC session
+
+The following example shows you how you could use the events search to get all events where a user has authenticated using OIDC.
+Also we include the refresh tokens in this example to know when the user has received a new token.
+Sessions without tokens events may by created during implicit flow with ID Token only, which do not create an access token.
 
 ```bash
 curl --request POST \
@@ -127,10 +130,37 @@ curl --request POST \
   --data '{
 	"asc": true,
 	"limit": 1000,
-	"event_types": [
-		"user.token.added",
-		"user.refresh.token.added"
-	]
+	"eventTypes": [
+    "oidc_session.added",
+    "oidc_session.access_token.added",
+    "oidc_session.refresh_token.added",
+    "oidc_session.refresh_token.renewed"
+  ],
+  "aggregateTypes": [
+    "oidc_session"
+  ]
+}'
+```
+
+### SAML session
+
+The following example shows you how you could use the events search to get all events where a user has authenticated using SAML.
+
+```bash
+curl --request POST \
+  --url $CUSTOM-DOMAIN/admin/v1/events/_search \
+  --header "Authorization: Bearer $TOKEN" \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"asc": true,
+	"limit": 1000,
+	"eventTypes": [
+    "saml_session.added",
+    "saml_session.saml_response.added"
+  ],
+  "aggregateTypes": [
+    "saml_session"
+  ]
 }'
 ```
 

@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/crewjam/saml/samlsp"
@@ -36,6 +37,9 @@ import (
 
 const (
 	queryIDPConfigID           = "idpConfigID"
+	queryState                 = "state"
+	queryRelayState            = "RelayState"
+	queryMethod                = "method"
 	tmplExternalNotFoundOption = "externalnotfoundoption"
 )
 
@@ -214,13 +218,36 @@ func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.R
 		l.renderLogin(w, r, nil, err)
 		return
 	}
-	r.Form.Add("Method", http.MethodPost)
-	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
+	state := r.Form.Get(queryState)
+	if state == "" {
+		state = r.Form.Get(queryRelayState)
+	}
+	if state == "" {
+		l.renderLogin(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-dsg3f", "Errors.AuthRequest.NotFound"))
+		return
+	}
+	l.caches.idpFormCallbacks.Set(r.Context(), &idpFormCallback{
+		InstanceID: authz.GetInstance(r.Context()).InstanceID(),
+		State:      state,
+		Form:       r.Form,
+	})
+	v := url.Values{}
+	v.Set(queryMethod, http.MethodPost)
+	v.Set(queryState, state)
+	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+v.Encode(), 302)
 }
 
 // handleExternalLoginCallback handles the callback from a IDP
 // and tries to extract the user with the provided data
 func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Request) {
+	// workaround because of CSRF on external identity provider flows using form_post
+	if r.URL.Query().Get(queryMethod) == http.MethodPost {
+		if err := l.setDataFromFormCallback(r, r.URL.Query().Get(queryState)); err != nil {
+			l.renderLogin(w, r, nil, err)
+			return
+		}
+	}
+
 	data := new(externalIDPCallbackData)
 	err := l.getParseData(r, data)
 	if err != nil {
@@ -229,11 +256,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	}
 	if data.State == "" {
 		data.State = data.RelayState
-	}
-	// workaround because of CSRF on external identity provider flows
-	if data.Method == http.MethodPost {
-		r.Method = http.MethodPost
-		r.PostForm = r.Form
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
@@ -343,6 +365,25 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	l.handleExternalUserAuthenticated(w, r, authReq, identityProvider, session, user, l.renderNextStep)
+}
+
+func (l *Login) setDataFromFormCallback(r *http.Request, state string) error {
+	r.Method = http.MethodPost
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+	// fallback to the form data in case the request was started before the cache was implemented
+	r.PostForm = r.Form
+	idpCallback, ok := l.caches.idpFormCallbacks.Get(r.Context(), idpFormCallbackIndexRequestID,
+		idpFormCallbackKey(authz.GetInstance(r.Context()).InstanceID(), state))
+	if ok {
+		r.PostForm = idpCallback.Form
+		// We need to set the form as well to make sure the data is parsed correctly.
+		// Form precedes PostForm in the parsing order.
+		r.Form = idpCallback.Form
+	}
+	return nil
 }
 
 func (l *Login) tryMigrateExternalUserID(r *http.Request, session idp.Session, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) (previousIDMatched bool, err error) {
