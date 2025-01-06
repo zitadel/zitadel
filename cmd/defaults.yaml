@@ -611,6 +611,9 @@ Console:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_CONSOLE_LONGCACHE_SHAREDMAXAGE
   InstanceManagementURL: "" # ZITADEL_CONSOLE_INSTANCEMANAGEMENTURL
+  PostHog:
+    URL: "" # ZITADEL_CONSOLE_POSTHOG_URL
+    Token: "" # ZITADEL_CONSOLE_POSTHOG_TOKEN
 
 EncryptionKeys:
   DomainVerification:
