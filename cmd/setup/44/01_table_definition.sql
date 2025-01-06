@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS instances (
     , change_date TIMESTAMPTZ NOT NULL
     , creation_date TIMESTAMPTZ NOT NULL
     , latest_position NUMERIC NOT NULL
+    , latest_in_position_order INT2 NOT NULL
     , default_org_id TEXT
     , iam_project_id TEXT
     , console_client_id TEXT

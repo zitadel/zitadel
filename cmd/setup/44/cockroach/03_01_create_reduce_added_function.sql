@@ -1,11 +1,6 @@
-CREATE OR REPLACE FUNCTION reduce_instance_added(
-    id TEXT
-    , "name" TEXT 
-    , creation_date TIMESTAMPTZ
-    , "position" NUMERIC
-)
+CREATE OR REPLACE FUNCTION reduce_instance_added("event" RECORD)
 RETURNS VOID
-LANGUAGE PLpgSQL
+LANGUAGE SQL
 AS $$
 BEGIN
     INSERT INTO instances (
@@ -14,12 +9,14 @@ BEGIN
         , creation_date
         , change_date
         , latest_position
+        , latest_in_position_order
     ) VALUES (
-        id
-        , "name"
-        , creation_date
-        , creation_date
-        , "position"
+        (event).aggregate_id
+        , (event).payload->>'name'
+        , (event).created_at
+        , (event).created_at
+        , (event).position
+        , (event).in_tx_order::INT2
     )
     ON CONFLICT (id) DO NOTHING;
 END;

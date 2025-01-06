@@ -1,21 +1,16 @@
-CREATE OR REPLACE FUNCTION reduce_instance_console_set(
-    instance_id TEXT
-    , app_id TEXT 
-    , client_id TEXT
-    , change_date TIMESTAMPTZ
-    , "position" NUMERIC
-)
+CREATE OR REPLACE FUNCTION reduce_instance_console_set("event" eventstore.events2)
 RETURNS VOID
 LANGUAGE PLpgSQL
 AS $$
 BEGIN
     UPDATE instances SET
-        console_app_id = app_id
-        , console_client_id = client_id
-        , change_date = change_date
-        , latest_position = "position"
+        console_app_id = (event).payload->>'appId'
+        , console_client_id = (event).payload->>'clientId'
+        , change_date = (event).created_at
+        , latest_position = (event).position
+        , latest_in_position_order = (event).in_tx_order::INT2
     WHERE 
-        id = instance_id
-        AND latest_position <= "position";
+        id = (event).aggregate_id
+        AND (latest_position, latest_in_position_order) < ((event).position, (event).in_tx_order::INT2);
 END;
 $$;
