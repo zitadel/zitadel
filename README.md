@@ -30,8 +30,8 @@ We think the easiest path of getting up and running, is the following:
 ## Included Apps And Packages
 
 - `login`: The login UI used by ZITADEL Cloud, powered by Next.js
-- `@zitadel/client`: shared client utilities for node and browser environments <center>[![npm package](https://img.shields.io/npm/v/@zitadel/client.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/client) </center>
-- `@zitadel/proto`: shared protobuf types <center>[![npm package](https://img.shields.io/npm/v/@zitadel/proto.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/proto)</center>
+- <div style="text-align: center;">`@zitadel/client`: shared client utilities for node and browser environments [![npm package](https://img.shields.io/npm/v/@zitadel/client.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/client) </div>
+- <div style="text-align: center;">`@zitadel/proto`: shared protobuf types [![npm package](https://img.shields.io/npm/v/@zitadel/proto.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/proto)</div>
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `@zitadel/eslint-config`: ESLint preset
 
