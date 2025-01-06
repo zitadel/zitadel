@@ -1,5 +1,13 @@
 # @zitadel/client
 
+## 1.0.1
+
+### Patch Changes
+
+- README updates
+- Updated dependencies
+  - @zitadel/proto@1.0.1
+
 ## 1.0.0
 
 ### Major Changes
