@@ -50,7 +50,7 @@ End-users authenticate to an application in your frontend project.
 The frontend then sends requests to the backend, validates the token with ZITADEL's introspection endpoint, and returns a payload to the frontend.
 The backend returns the error `invalid audience (APP-Zxfako)`.
 
-You must add the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to the auth request that is send from the front end.
+You must add the scope `urn:zitadel:iam:org:project:id:{projectId}:aud` to the auth request that is send from the front end.
 Replace `projectId` with the projectId of your backend.
 
 ### Accessing ZITADEL's APIs
