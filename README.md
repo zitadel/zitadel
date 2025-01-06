@@ -5,6 +5,9 @@ Login UI.
 
 <img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
 
+[![npm package](https://img.shields.io/npm/v/@zitadel/proto.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/proto)
+[![npm package](https://img.shields.io/npm/v/@zitadel/client.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/client)
+
 **⚠️ This repo and packages are in alpha state and subject to change ⚠️**
 
 The scope of functionality of this repo and packages is under active development.
@@ -31,7 +34,7 @@ We think the easiest path of getting up and running, is the following:
 
 - `login`: The login UI used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/client`: shared client utilities for node and browser environments
-- `@zitadel/proto`: shared protobuf types
+- `@zitadel/proto`: Protocol Buffers (proto) definitions used by ZITADEL projects
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `@zitadel/eslint-config`: ESLint preset
 
