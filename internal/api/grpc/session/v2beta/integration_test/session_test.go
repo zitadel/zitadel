@@ -861,21 +861,30 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", createResp.GetSessionToken()))
-	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: createResp.GetSessionId()})
-	require.Error(t, err)
-	require.Nil(t, sessionResp)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: createResp.GetSessionId()})
+		if !assert.Error(tt, err) {
+			return
+		}
+		assert.Nil(tt, sessionResp)
+	}, retryDuration, tick)
 }
 
 func Test_ZITADEL_API_success(t *testing.T) {
 	id, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
-
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
-	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.NoError(t, err)
 
-	webAuthN := sessionResp.GetSession().GetFactors().GetWebAuthN()
-	require.NotNil(t, id, webAuthN.GetVerifiedAt().AsTime())
-	require.True(t, webAuthN.GetUserVerified())
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+		if !assert.NoError(tt, err) {
+			return
+		}
+		webAuthN := sessionResp.GetSession().GetFactors().GetWebAuthN()
+		assert.NotNil(tt, id, webAuthN.GetVerifiedAt().AsTime())
+		assert.True(tt, webAuthN.GetUserVerified())
+	}, retryDuration, tick)
 }
 
 func Test_ZITADEL_API_session_not_found(t *testing.T) {
@@ -883,18 +892,30 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 
 	// test session token works
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
-	_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.NoError(t, err)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+		if !assert.NoError(tt, err) {
+			return
+		}
+	}, retryDuration, tick)
 
 	//terminate the session and test it does not work anymore
-	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+	_, err := Client.DeleteSession(CTX, &session.DeleteSessionRequest{
 		SessionId:    id,
 		SessionToken: gu.Ptr(token),
 	})
 	require.NoError(t, err)
+
 	ctx = integration.WithAuthorizationToken(context.Background(), token)
-	_, err = Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.Error(t, err)
+	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+		if !assert.Error(tt, err) {
+			return
+		}
+	}, retryDuration, tick)
 }
 
 func Test_ZITADEL_API_session_expired(t *testing.T) {
@@ -902,8 +923,13 @@ func Test_ZITADEL_API_session_expired(t *testing.T) {
 
 	// test session token works
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
-	_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.NoError(t, err)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+		if !assert.NoError(tt, err) {
+			return
+		}
+	}, retryDuration, tick)
 
 	// ensure session expires and does not work anymore
 	time.Sleep(20 * time.Second)

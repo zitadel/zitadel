@@ -61,7 +61,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{})
 					require.NoError(t, err)
 					request.SessionId = resp.SessionId
 					return resp.GetDetails().GetSequence()
@@ -75,7 +75,7 @@ func TestServer_GetSession(t *testing.T) {
 				CTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{})
 					require.NoError(t, err)
 					request.SessionId = resp.SessionId
 					return resp.GetDetails().GetSequence()
@@ -91,7 +91,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{})
 					require.NoError(t, err)
 					request.SessionId = resp.SessionId
 					request.SessionToken = gu.Ptr(resp.SessionToken)
@@ -108,7 +108,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{
 						UserAgent: &session.UserAgent{
 							FingerprintId: gu.Ptr("fingerPrintID"),
 							Ip:            gu.Ptr("1.2.3.4"),
@@ -144,7 +144,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{
 						Lifetime: durationpb.New(5 * time.Minute),
 					},
 					)
@@ -165,7 +165,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{
 						Metadata: map[string][]byte{"foo": []byte("bar")},
 					},
 					)
@@ -187,7 +187,7 @@ func TestServer_GetSession(t *testing.T) {
 				UserCTX,
 				&session.GetSessionRequest{},
 				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{
 						Checks: &session.Checks{
 							User: &session.CheckUser{
 								Search: &session.CheckUser_UserId{
@@ -213,7 +213,7 @@ func TestServer_GetSession(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var sequence uint64
 			if tt.args.dep != nil {
-				sequence = tt.args.dep(tt.args.ctx, t, tt.args.req)
+				sequence = tt.args.dep(CTX, t, tt.args.req)
 			}
 
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(tt.args.ctx, time.Minute)

@@ -84,14 +84,15 @@ type SessionsSearchQueries struct {
 func sessionsCheckPermission(ctx context.Context, sessions *Sessions, permissionCheck domain.PermissionCheck) {
 	sessions.Sessions = slices.DeleteFunc(sessions.Sessions,
 		func(session *Session) bool {
-			return sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, permissionCheck) != nil
+			return sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserFactor, permissionCheck) != nil
 		},
 	)
 }
 
-func sessionCheckPermission(ctx context.Context, resourceOwner string, creator string, permissionCheck domain.PermissionCheck) error {
+func sessionCheckPermission(ctx context.Context, resourceOwner string, creator string, userFactor SessionUserFactor, permissionCheck domain.PermissionCheck) error {
 	data := authz.GetCtxData(ctx)
-	if data.UserID != creator {
+	// only check for permission if user is not the creator and not the user the session belongs to
+	if data.UserID != creator && data.UserID != userFactor.UserID {
 		if err := permissionCheck(ctx, domain.PermissionSessionRead, resourceOwner, ""); err != nil {
 			return err
 		}
@@ -220,7 +221,7 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		return nil, err
 	}
 	if sessionToken == "" {
-		if err := sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, permissionCheck); err != nil {
+		if err := sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserFactor, permissionCheck); err != nil {
 			return nil, err
 		}
 		return session, nil
