@@ -439,7 +439,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 
-	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, User.GetUserId(), "id")
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId())
 	require.NoError(t, err)
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId: createResp.GetSessionId(),
@@ -457,7 +457,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 
-	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, User.GetUserId(), "id")
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId())
 	require.NoError(t, err)
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -481,7 +481,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 
 	// successful intent without known / linked user
 	idpUserID := "id"
-	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, User.GetUserId(), "id")
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", User.GetUserId())
 	require.NoError(t, err)
 
 	// link the user (with info from intent)
