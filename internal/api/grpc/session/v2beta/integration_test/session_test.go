@@ -23,6 +23,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/sink"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
@@ -438,7 +439,8 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 
-	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, idpID, User.GetUserId(), "id")
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, User.GetUserId(), "id")
+	require.NoError(t, err)
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
@@ -455,7 +457,8 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 	idpID := Instance.AddGenericOAuthProvider(IAMOwnerCTX, gofakeit.AppName()).GetId()
 
-	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, idpID, User.GetUserId(), "id")
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, User.GetUserId(), "id")
+	require.NoError(t, err)
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -478,7 +481,8 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 
 	// successful intent without known / linked user
 	idpUserID := "id"
-	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, idpID, "", idpUserID)
+	intentID, token, _, _, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, User.GetUserId(), "id")
+	require.NoError(t, err)
 
 	// link the user (with info from intent)
 	Instance.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())

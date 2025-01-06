@@ -17,7 +17,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
@@ -536,24 +535,6 @@ func (i *Instance) CreateIntent(ctx context.Context, idpID string) *user_v2.Star
 	})
 	logging.OnError(err).Fatal("create generic OAuth idp")
 	return resp
-}
-
-func (i *Instance) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	intentID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(i.ID(), idpID, idpUserID, userID)
-	require.NoError(t, err)
-	return intentID, token, changeDate, sequence
-}
-
-func (i *Instance) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	intentID, token, changeDate, sequence, err := sink.SuccessfulLDAPIntent(i.ID(), idpID, idpUserID, userID)
-	require.NoError(t, err)
-	return intentID, token, changeDate, sequence
-}
-
-func (i *Instance) CreateSuccessfulSAMLIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	intentID, token, changeDate, sequence, err := sink.SuccessfulSAMLIntent(i.ID(), idpID, idpUserID, userID)
-	require.NoError(t, err)
-	return intentID, token, changeDate, sequence
 }
 
 func (i *Instance) CreateVerifiedWebAuthNSession(t *testing.T, ctx context.Context, userID string) (id, token string, start, change time.Time) {
