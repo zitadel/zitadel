@@ -10,10 +10,11 @@ The typescript repository contains all TypeScript and JavaScript packages and ap
 
 - **[login](./typescript-repo#new-login-ui)**: The future login UI used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/proto`: Typescript implementation of Protocol Buffers, suitable for web browsers and Node.js.
-- `@zitadel/client`: Core components for establishing a client connection
-- `@zitadel/node`: Core components for establishing a server connection
-- `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
-- `eslint-config-zitadel`: ESLint preset
+- `@zitadel/client`: Services and utilities to interact with ZITADEL
+- `@zitadel/tsconfig`: TypeScript configuration used by ZITADEL projects
+- `@zitadel/eslint-config`: ESLint configuration used by ZITADEL projects
+- `@zitadel/prettier-config`: Prettier configuration used by ZITADEL projects
+- `@zitadel/tailwind-config`: Tailwind CSS configuration used by ZITADEL projects
 
 ## Login UI
 
@@ -86,7 +87,7 @@ The application can then request a token calling the /token endpoint of the logi
 - Security Prompts
   - [x] Setup Passkey as Passwordless method
   - [x] Setup TOTP as Multifactor
-  - [ ] Password Change
+  - [x] Password Change
 - Login
   - [x] Email Password
   - [x] Passkey
@@ -95,7 +96,7 @@ The application can then request a token calling the /token endpoint of the logi
     - [x] GitHub
     - [x] GitLab
     - [x] Azure
-    - [ ] Apple
+    - [x] Apple
 - Register
   - [x] Email Password
   - [x] Passkey
