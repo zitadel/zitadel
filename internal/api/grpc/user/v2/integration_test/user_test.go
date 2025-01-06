@@ -2118,15 +2118,15 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
 	intentID := Instance.CreateIntent(CTX, idpID).GetIdpIntent().GetIdpIntentId()
 
-	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "", "id")
+	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", "")
 	require.NoError(t, err)
-	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "user", "id")
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", "user")
 	require.NoError(t, err)
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "", "id")
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "id", "")
 	require.NoError(t, err)
-	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "user", "id")
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "id", "user")
 	require.NoError(t, err)
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), idpID, "", "id")
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), idpID, "id", "")
 	require.NoError(t, err)
 	type args struct {
 		ctx context.Context
