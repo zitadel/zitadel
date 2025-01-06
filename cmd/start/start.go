@@ -316,6 +316,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		authZRepo,
 		keys,
 		permissionCheck,
+		cacheConnectors,
 	)
 	if err != nil {
 		return err
@@ -360,6 +361,7 @@ func startAPIs(
 	authZRepo authz_repo.Repository,
 	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
+	cacheConnectors connector.Connectors,
 ) (*api.API, error) {
 	repo := struct {
 		authz_repo.Repository
@@ -541,6 +543,7 @@ func startAPIs(
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
+		cacheConnectors,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login: %w", err)

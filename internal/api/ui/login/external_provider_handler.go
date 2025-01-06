@@ -214,8 +214,20 @@ func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.R
 		l.renderLogin(w, r, nil, err)
 		return
 	}
-	r.Form.Add("Method", http.MethodPost)
-	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
+	state := r.Form.Get("state")
+	if state == "" {
+		state = r.Form.Get("RelayState")
+	}
+	if state == "" {
+		l.renderLogin(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-dsg3f", "Errors.AuthRequest.NotFound"))
+		return
+	}
+	l.caches.idpFormCallbacks.Set(r.Context(), &idpFormCallback{
+		InstanceID: authz.GetInstance(r.Context()).InstanceID(),
+		State:      state,
+		Form:       r.Form,
+	})
+	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?method=POST&state="+state, 302)
 }
 
 // handleExternalLoginCallback handles the callback from a IDP
@@ -232,8 +244,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	}
 	// workaround because of CSRF on external identity provider flows
 	if data.Method == http.MethodPost {
-		r.Method = http.MethodPost
-		r.PostForm = r.Form
+		l.setDataFromFormCallback(r, data.State)
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
@@ -343,6 +354,17 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	l.handleExternalUserAuthenticated(w, r, authReq, identityProvider, session, user, l.renderNextStep)
+}
+
+func (l *Login) setDataFromFormCallback(r *http.Request, state string) {
+	r.Method = http.MethodPost
+	// fallback to the form data in case the request was started before the cache was implemented
+	r.PostForm = r.Form
+	idpCallback, ok := l.caches.idpFormCallbacks.Get(r.Context(), idpFormCallbackIndexRequestID,
+		idpFormCallbackKey(authz.GetInstance(r.Context()).InstanceID(), state))
+	if ok {
+		r.PostForm = idpCallback.Form
+	}
 }
 
 func (l *Login) tryMigrateExternalUserID(r *http.Request, session idp.Session, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) (previousIDMatched bool, err error) {
