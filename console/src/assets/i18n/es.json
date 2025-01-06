@@ -2538,6 +2538,10 @@
       "CLIENTSECRETREGENERATED": "secreto del cliente generado.",
       "DELETED": "App borrada.",
       "CONFIGCHANGED": "¡Cambios detectados!"
+    },
+    "LOGINV2": {
+      "USEV2": "Usar la nueva interfaz de usuario de inicio de sesión",
+      "BASEURL": "URL base personalizada para la nueva interfaz de usuario de inicio de sesión"
     }
   },
   "GENDERS": {

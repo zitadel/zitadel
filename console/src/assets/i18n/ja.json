@@ -2532,6 +2532,10 @@
       "CLIENTSECRETREGENERATED": "クライアントシークレットが生成されました。",
       "DELETED": "アプリが削除されました。",
       "CONFIGCHANGED": "変更を検出しました！"
+    },
+    "LOGINV2": {
+      "USEV2": "新しいログインUIを使用する",
+      "BASEURL": "新しいログインUIのカスタムベースURL"
     }
   },
   "GENDERS": {

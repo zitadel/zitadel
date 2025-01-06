@@ -2542,6 +2542,10 @@
       "CLIENTSECRETREGENERATED": "Client secret generato.",
       "DELETED": "App rimossa con successo.",
       "CONFIGCHANGED": "Modifiche alla configurazione rilevate"
+    },
+    "LOGINV2": {
+      "USEV2": "Utilizza la nuova interfaccia utente di accesso",
+      "BASEURL": "URL base personalizzato per la nuova interfaccia utente di accesso"
     }
   },
   "GENDERS": {
