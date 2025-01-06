@@ -108,7 +108,7 @@ InitMFAPrompt:
 InitMFAOTP:
   Title: Zwei-Faktor-Authentifizierung
   Description: Erstelle deinen Zweitfaktor. Installiere eine Authentifizierungs-App, wenn du noch keine hast.
-  OTPDescription: Scanne den Code mit einer Authentifizierungs-App (z.B. Google/Mircorsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
+  OTPDescription: Scanne den Code mit einer Authentifizierungs-App (z.B. Google/Microsoft Authenticator, Authy) oder kopiere das Secret und gib anschliessend den Code ein.
   SecretLabel: Secret
   CodeLabel: Code
   NextButtonText: Weiter
