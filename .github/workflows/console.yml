@@ -49,11 +49,11 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: ${{ inputs.node_version }}
-            cache: 'yarn'
-            cache-dependency-path: console/yarn.lock
+            cache: 'pnpm'
+            cache-dependency-path: pnpm-lock.yaml
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          run: make console_build
+          run: turbo run build
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v4
