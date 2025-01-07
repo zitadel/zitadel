@@ -1329,7 +1329,7 @@ func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []stri
 			}
 		}
 		// error if the explicitly set IdP is not allowed, to avoid misinterpretation with usage of another IdP
-		return nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Org.IdpNotExisting")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-LWif2", "Errors.Org.IdpNotExisting")
 	}
 	// reuse the previously used IdP from the session
 	if userSession.SelectedIDPConfigID != "" {
