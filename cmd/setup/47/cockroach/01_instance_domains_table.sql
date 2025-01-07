@@ -11,5 +11,6 @@ CREATE TABLE IF NOT EXISTS instance_domains (
     , latest_in_position_order INT2 NOT NULL
 
     , PRIMARY KEY (instance_id, domain)
-    , CONSTRAINT fk_instance_id FOREIGN KEY (instance_id) REFERENCES instances (id)
+    , CONSTRAINT fk_instance_id FOREIGN KEY (instance_id) REFERENCES instances (id) ON DELETE CASCADE
+    , UNIQUE (domain)
 );
