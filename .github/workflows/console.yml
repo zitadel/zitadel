@@ -29,6 +29,10 @@ jobs:
         - 
           uses: actions/checkout@v4
         - 
+          uses: pnpm/action-setup@v2
+          with:
+            version: 6.32.9
+        - 
           uses: actions/cache/restore@v4
           timeout-minutes: 1
           continue-on-error: true
@@ -53,7 +57,7 @@ jobs:
             cache-dependency-path: pnpm-lock.yaml
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          run: turbo run build
+          run: make console_build
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/cache/save@v4
