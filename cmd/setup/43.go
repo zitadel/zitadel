@@ -2,15 +2,18 @@ package setup
 
 import (
 	"context"
-	_ "embed"
+	"embed"
+	"fmt"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
-	//go:embed 43.sql
-	createFieldsDomainIndex string
+	//go:embed 43/cockroach/*.sql
+	//go:embed 43/postgres/*.sql
+	createFieldsDomainIndex embed.FS
 )
 
 type CreateFieldsDomainIndex struct {
@@ -18,8 +21,17 @@ type CreateFieldsDomainIndex struct {
 }
 
 func (mig *CreateFieldsDomainIndex) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, createFieldsDomainIndex)
-	return err
+	statements, err := readStatements(createFieldsDomainIndex, "43", mig.dbClient.Type())
+	if err != nil {
+		return err
+	}
+	for _, stmt := range statements {
+		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
+			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
+		}
+	}
+	return nil
 }
 
 func (mig *CreateFieldsDomainIndex) String() string {
