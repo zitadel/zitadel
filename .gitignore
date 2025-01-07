@@ -89,3 +89,4 @@ load-test/yarn-error.log
 load-test/dist
 load-test/output/*
 .vercel
+.turbo
