@@ -11,5 +11,3 @@ CREATE TABLE IF NOT EXISTS instances (
     , console_app_id TEXT
     , default_language TEXT
 );
-
--- |     sequence INT8 NOT NULL,

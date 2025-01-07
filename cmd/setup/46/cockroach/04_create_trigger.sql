@@ -1,5 +1,5 @@
 CREATE TRIGGER reduce_instance_events
-AFTER INSERT ON eventstore.events2
+AFTER INSERT ON "queue"
 FOR EACH ROW
-WHEN (NEW).aggregate_type = 'instance'
+WHEN (NEW).subscriber = 'transactional-instances'
 EXECUTE FUNCTION reduce_instance_events();

@@ -1,6 +1,6 @@
-CREATE OR REPLACE FUNCTION reduce_instance_added("event" RECORD)
+CREATE OR REPLACE FUNCTION reduce_instance_added("event" eventstore.events2)
 RETURNS VOID
-LANGUAGE SQL
+LANGUAGE PLpgSQL
 AS $$
 BEGIN
     INSERT INTO instances (
