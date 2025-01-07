@@ -1334,8 +1334,8 @@ func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []stri
 	// reuse the previously used IdP from the session
 	if userSession.SelectedIDPConfigID != "" {
 		// only use the previously used IdP if allowed
-		for i := range request.AllowedExternalIDPs {
-			if userSession.SelectedIDPConfigID == request.AllowedExternalIDPs[i].IDPConfigID {
+		for _, allowedIdP := range request.AllowedExternalIDPs {
+			if userSession.SelectedIDPConfigID == allowedIdP.IDPConfigID {
 				return &domain.ExternalLoginStep{SelectedIDPConfigID: userSession.SelectedIDPConfigID}, nil
 			}
 		}
