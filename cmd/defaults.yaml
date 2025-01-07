@@ -198,8 +198,11 @@ Caches:
       AutoPrune:
         Interval: 1m
         TimeOut: 5s
+    # Postgres connector uses the configured database (postgres or cockraochdb) as cache.
+    # It is suitable for deployments with multiple containers.
+    # The cache is enabled by default because it is the default cache states for IdP form callbacks
     Postgres:
-      Enabled: false
+      Enabled: true
       AutoPrune:
         Interval: 15m
         TimeOut: 30s
@@ -311,7 +314,7 @@ Caches:
     # When connector is empty, this cache will be disabled.
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
     # Log enables cache-specific logging. Default to error log to stderr when omitted.
     Log:
       Level: error
@@ -322,7 +325,7 @@ Caches:
   Milestones:
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
     Log:
       Level: error
       AddSource: true
@@ -332,7 +335,17 @@ Caches:
   Organization:
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
+  # IdP callbacks using form POST cache, required for handling them securely and without possible too big request urls.
+  IdPFormCallbacks:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
     Log:
       Level: error
       AddSource: true
@@ -598,6 +611,9 @@ Console:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_CONSOLE_LONGCACHE_SHAREDMAXAGE
   InstanceManagementURL: "" # ZITADEL_CONSOLE_INSTANCEMANAGEMENTURL
+  PostHog:
+    URL: "" # ZITADEL_CONSOLE_POSTHOG_URL
+    Token: "" # ZITADEL_CONSOLE_POSTHOG_TOKEN
 
 EncryptionKeys:
   DomainVerification:

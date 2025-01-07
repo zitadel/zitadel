@@ -238,6 +238,8 @@ func userQueryToQuery(query *user.SearchQuery, level uint8) (query.SearchQuery, 
 		return displayNameQueryToQuery(q.DisplayNameQuery)
 	case *user.SearchQuery_EmailQuery:
 		return emailQueryToQuery(q.EmailQuery)
+	case *user.SearchQuery_PhoneQuery:
+		return phoneQueryToQuery(q.PhoneQuery)
 	case *user.SearchQuery_StateQuery:
 		return stateQueryToQuery(q.StateQuery)
 	case *user.SearchQuery_TypeQuery:
@@ -283,6 +285,10 @@ func displayNameQueryToQuery(q *user.DisplayNameQuery) (query.SearchQuery, error
 
 func emailQueryToQuery(q *user.EmailQuery) (query.SearchQuery, error) {
 	return query.NewUserEmailSearchQuery(q.EmailAddress, object.TextMethodToQuery(q.Method))
+}
+
+func phoneQueryToQuery(q *user.PhoneQuery) (query.SearchQuery, error) {
+	return query.NewUserPhoneSearchQuery(q.Number, object.TextMethodToQuery(q.Method))
 }
 
 func stateQueryToQuery(q *user.StateQuery) (query.SearchQuery, error) {
