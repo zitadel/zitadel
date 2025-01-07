@@ -1149,12 +1149,12 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 }
 
 func checkForAllowedIDPs(allowedIDPs []*domain.IDPProvider, idps []*query.IDPUserLink) (_ []string) {
-	allowedLinkedIDPs := make([]string, 0)
+	allowedLinkedIDPs := make([]string, 0, len(idps))
 	// only use allowed linked idps
-	for i := range idps {
-		for j := range allowedIDPs {
-			if idps[i].IDPID == allowedIDPs[j].IDPConfigID {
-				allowedLinkedIDPs = append(allowedLinkedIDPs, allowedIDPs[j].IDPConfigID)
+	for _, idp := range idps {
+		for _, allowedIdP := range allowedIDPs {
+			if idp.IDPID == allowedIdP.IDPConfigID {
+				allowedLinkedIDPs = append(allowedLinkedIDPs, allowedIdP.IDPConfigID)
 			}
 		}
 	}
