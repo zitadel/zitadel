@@ -65,10 +65,8 @@ func CloseTransaction(tx Tx, err error) error {
 }
 
 type Config struct {
-	Dialects                   map[string]interface{} `mapstructure:",remain"`
-	EventPushConnRatio         float64
-	ProjectionSpoolerConnRatio float64
-	connector                  dialect.Connector
+	Dialects  map[string]interface{} `mapstructure:",remain"`
+	connector dialect.Connector
 }
 
 func (c *Config) SetConnector(connector dialect.Connector) {

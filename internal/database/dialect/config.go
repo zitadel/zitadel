@@ -26,7 +26,7 @@ type Matcher interface {
 }
 
 const (
-	defaultAppName = "zitadel"
+	DefaultAppName = "zitadel"
 )
 
 type Connector interface {

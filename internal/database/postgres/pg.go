@@ -184,7 +184,7 @@ func (c Config) String(useAdmin bool) string {
 		"host=" + c.Host,
 		"port=" + strconv.Itoa(int(c.Port)),
 		"user=" + user.Username,
-		"application_name=zitadel",
+		"application_name=" + dialect.DefaultAppName,
 		"sslmode=" + user.SSL.Mode,
 	}
 	if c.Options != "" {
