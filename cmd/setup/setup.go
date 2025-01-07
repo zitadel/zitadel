@@ -171,6 +171,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: esPusherDBClient, esClient: eventstoreClient}
 	steps.s40InitPushFunc = &InitPushFunc{dbClient: esPusherDBClient}
 	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: esPusherDBClient}
+	steps.s45EventQueue = &EventQueue{dbClient: queryDBClient}
+	steps.s46TransactionalInstanceTable = &TransactionalInstanceTable{dbClient: queryDBClient}
+	steps.s47TransactionalInstanceDomainTable = &TransactionalInstanceDomainTable{dbClient: queryDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -198,6 +201,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
 		steps.s40InitPushFunc,
+		steps.s45EventQueue,
+		steps.s46TransactionalInstanceTable,
+		steps.s47TransactionalInstanceDomainTable,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,

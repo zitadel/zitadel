@@ -128,6 +128,9 @@ type Steps struct {
 	s38BackChannelLogoutNotificationStart   *BackChannelLogoutNotificationStart
 	s40InitPushFunc                         *InitPushFunc
 	s42Apps7OIDCConfigsLoginVersion         *Apps7OIDCConfigsLoginVersion
+	s45EventQueue                           *EventQueue
+	s46TransactionalInstanceTable           *TransactionalInstanceTable
+	s47TransactionalInstanceDomainTable     *TransactionalInstanceDomainTable
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
