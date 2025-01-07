@@ -1323,8 +1323,8 @@ func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []stri
 	// use the explicitly set IdP first
 	if request.SelectedIDPConfigID != "" {
 		// only use the explicitly set IdP if allowed
-		for i := range request.AllowedExternalIDPs {
-			if request.SelectedIDPConfigID == request.AllowedExternalIDPs[i].IDPConfigID {
+		for _, allowedIdP := range request.AllowedExternalIDPs {
+			if request.SelectedIDPConfigID == allowedIdP.IDPConfigID {
 				return &domain.ExternalLoginStep{SelectedIDPConfigID: request.SelectedIDPConfigID}, nil
 			}
 		}
