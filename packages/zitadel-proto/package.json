@@ -1,13 +1,16 @@
 {
   "name": "@zitadel/proto",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
   "type": "module",
   "files": [
-    "zitadel/**"
+    "zitadel/**",
+    "validate/**",
+    "google/**",
+    "protoc-gen-openapiv2/**"
   ],
   "sideEffects": false,
   "scripts": {

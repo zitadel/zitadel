@@ -37,6 +37,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.3
         version: 4.3.3(vite@5.4.11(@types/node@22.9.0)(sass@1.80.7))
+      '@zitadel/eslint-config':
+        specifier: workspace:*
+        version: link:packages/zitadel-eslint-config
       '@zitadel/prettier-config':
         specifier: workspace:*
         version: link:packages/zitadel-prettier-config
@@ -49,9 +52,6 @@ importers:
       eslint:
         specifier: 8.57.1
         version: 8.57.1
-      eslint-config-zitadel:
-        specifier: workspace:*
-        version: link:packages/eslint-config-zitadel
       prettier:
         specifier: ^3.2.5
         version: 3.3.3
@@ -167,9 +167,15 @@ importers:
       '@vercel/git-hooks':
         specifier: 1.0.0
         version: 1.0.0
+      '@zitadel/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/zitadel-eslint-config
       '@zitadel/prettier-config':
         specifier: workspace:*
         version: link:../../packages/zitadel-prettier-config
+      '@zitadel/tailwind-config':
+        specifier: workspace:*
+        version: link:../../packages/zitadel-tailwind-config
       '@zitadel/tsconfig':
         specifier: workspace:*
         version: link:../../packages/zitadel-tsconfig
@@ -186,11 +192,8 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
       env-cmd:
-        specifier: ^10.1.0
+        specifier: ^10.0.0
         version: 10.1.0
-      eslint-config-zitadel:
-        specifier: workspace:*
-        version: link:../../packages/eslint-config-zitadel
       grpc-tools:
         specifier: 1.12.4
         version: 1.12.4
@@ -227,30 +230,6 @@ importers:
       typescript:
         specifier: ^5.6.3
         version: 5.6.3
-      zitadel-tailwind-config:
-        specifier: workspace:*
-        version: link:../../packages/zitadel-tailwind-config
-
-  packages/eslint-config-zitadel:
-    dependencies:
-      '@babel/eslint-parser':
-        specifier: ^7.25.9
-        version: 7.25.9(@babel/core@7.26.0)(eslint@8.57.1)
-      '@typescript-eslint/parser':
-        specifier: ^7.9.0
-        version: 7.18.0(eslint@8.57.1)(typescript@5.6.3)
-      eslint-config-next:
-        specifier: ^14.2.18
-        version: 14.2.18(eslint@8.57.1)(typescript@5.6.3)
-      eslint-config-prettier:
-        specifier: ^9.1.0
-        version: 9.1.0(eslint@8.57.1)
-      eslint-config-turbo:
-        specifier: ^2.0.9
-        version: 2.1.0(eslint@8.57.1)
-      eslint-plugin-react:
-        specifier: ^7.34.1
-        version: 7.35.0(eslint@8.57.1)
 
   packages/zitadel-client:
     dependencies:
@@ -276,12 +255,33 @@ importers:
       '@bufbuild/protocompile':
         specifier: ^0.0.1
         version: 0.0.1(@bufbuild/buf@1.47.2)
+      '@zitadel/eslint-config':
+        specifier: workspace:*
+        version: link:../zitadel-eslint-config
       '@zitadel/tsconfig':
         specifier: workspace:*
         version: link:../zitadel-tsconfig
-      eslint-config-zitadel:
-        specifier: workspace:*
-        version: link:../eslint-config-zitadel
+
+  packages/zitadel-eslint-config:
+    dependencies:
+      '@babel/eslint-parser':
+        specifier: ^7.25.9
+        version: 7.25.9(@babel/core@7.26.0)(eslint@8.57.1)
+      '@typescript-eslint/parser':
+        specifier: ^7.9.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.6.3)
+      eslint-config-next:
+        specifier: ^14.2.18
+        version: 14.2.18(eslint@8.57.1)(typescript@5.6.3)
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@8.57.1)
+      eslint-config-turbo:
+        specifier: ^2.0.9
+        version: 2.1.0(eslint@8.57.1)
+      eslint-plugin-react:
+        specifier: ^7.34.1
+        version: 7.35.0(eslint@8.57.1)
 
   packages/zitadel-prettier-config: {}
 
@@ -2204,15 +2204,6 @@ packages:
       supports-color:
         optional: true
 
-  debug@4.3.6:
-    resolution: {integrity: sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-
   debug@4.3.7:
     resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
     engines: {node: '>=6.0'}
@@ -3443,9 +3434,6 @@ packages:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
 
-  ms@2.1.2:
-    resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
-
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
@@ -4457,12 +4445,6 @@ packages:
   tree-kill@1.2.2:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
-
-  ts-api-utils@1.3.0:
-    resolution: {integrity: sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      typescript: '>=4.2.0'
 
   ts-api-utils@1.4.1:
     resolution: {integrity: sha512-5RU2/lxTA3YUZxju61HO2U6EoZLvBLtmV2mbTvqyu4a/7s7RmJPT+1YekhMVsQhznRWk/czIwDUg+V8Q9ZuG4w==}
@@ -6073,7 +6055,7 @@ snapshots:
       '@typescript-eslint/types': 7.18.0
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.6.3)
       '@typescript-eslint/visitor-keys': 7.18.0
-      debug: 4.3.6
+      debug: 4.3.7(supports-color@5.5.0)
       eslint: 8.57.1
     optionalDependencies:
       typescript: 5.6.3
@@ -6115,7 +6097,7 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.5
       semver: 7.6.3
-      ts-api-utils: 1.3.0(typescript@5.6.3)
+      ts-api-utils: 1.4.1(typescript@5.6.3)
     optionalDependencies:
       typescript: 5.6.3
     transitivePeerDependencies:
@@ -6765,10 +6747,6 @@ snapshots:
     optionalDependencies:
       supports-color: 8.1.1
 
-  debug@4.3.6:
-    dependencies:
-      ms: 2.1.2
-
   debug@4.3.7(supports-color@5.5.0):
     dependencies:
       ms: 2.1.3
@@ -6914,7 +6892,7 @@ snapshots:
   env-cmd@10.1.0:
     dependencies:
       commander: 4.1.1
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
 
   environment@1.1.0: {}
 
@@ -8220,8 +8198,6 @@ snapshots:
 
   mri@1.2.0: {}
 
-  ms@2.1.2: {}
-
   ms@2.1.3: {}
 
   mz@2.7.0:
@@ -9214,10 +9190,6 @@ snapshots:
       punycode: 2.3.1
 
   tree-kill@1.2.2: {}
-
-  ts-api-utils@1.3.0(typescript@5.6.3):
-    dependencies:
-      typescript: 5.6.3
 
   ts-api-utils@1.4.1(typescript@5.6.3):
     dependencies:
