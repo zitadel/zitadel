@@ -1,9 +1,11 @@
 {
   "name": "@zitadel/prettier-config",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Prettier configuration",
   "type": "module",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": "./index.js"
   }
