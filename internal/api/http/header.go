@@ -108,14 +108,8 @@ func GetOrgID(r *http.Request) string {
 }
 
 func GetForwardedFor(headers http.Header) (string, bool) {
-	forwarded, ok := headers[ForwardedFor]
-	if ok {
-		ip := strings.TrimSpace(strings.Split(forwarded[0], ",")[0])
-		if ip != "" {
-			return ip, true
-		}
-	}
-	return "", false
+	forwarded := strings.Split(headers.Get(ForwardedFor), ",")[0]
+	return forwarded, forwarded != ""
 }
 
 func RemoteAddrFromCtx(ctx context.Context) string {
