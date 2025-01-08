@@ -129,6 +129,7 @@ type Steps struct {
 	s40InitPushFunc                         *InitPushFunc
 	s42Apps7OIDCConfigsLoginVersion         *Apps7OIDCConfigsLoginVersion
 	s43CreateFieldsDomainIndex              *CreateFieldsDomainIndex
+	s44ReplaceCurrentSequencesIndex         *ReplaceCurrentSequencesIndex
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
