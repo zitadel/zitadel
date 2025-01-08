@@ -87,5 +87,6 @@ $$;
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 VOLATILE AS $$
 INSERT INTO eventstore.events2
 SELECT * FROM eventstore.commands_to_events(commands)
+ORDER BY in_tx_order
 RETURNING *
 $$ LANGUAGE SQL;
