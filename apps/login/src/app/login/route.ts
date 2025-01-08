@@ -221,7 +221,7 @@ export async function GET(request: NextRequest) {
 
         const res = await sendLoginname(command);
 
-        if (res?.redirect) {
+        if (res && "redirect" in res && res?.redirect) {
           const absoluteUrl = new URL(res.redirect, request.url);
           return NextResponse.redirect(absoluteUrl.toString());
         }
@@ -429,7 +429,7 @@ export async function GET(request: NextRequest) {
 
             const res = await sendLoginname(command);
 
-            if (res?.redirect) {
+            if (res && "redirect" in res && res?.redirect) {
               const absoluteUrl = new URL(res.redirect, request.url);
               return NextResponse.redirect(absoluteUrl.toString());
             }

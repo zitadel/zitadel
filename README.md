@@ -5,11 +5,14 @@ Login UI.
 
 <img src="./apps/login/screenshots/collage.png" alt="collage of login screens" width="1600px" />
 
+[![npm package](https://img.shields.io/npm/v/@zitadel/proto.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/proto)
+[![npm package](https://img.shields.io/npm/v/@zitadel/client.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/client)
+
 **⚠️ This repo and packages are in alpha state and subject to change ⚠️**
 
 The scope of functionality of this repo and packages is under active development.
 
-The `@zitadel/client` and `@zitadel/node` packages are using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
+The `@zitadel/client` package is using [@connectrpc/connect](https://github.com/connectrpc/connect-es#readme).
 
 You can read the [contribution guide](/CONTRIBUTING.md) on how to contribute.
 Questions can be raised in our [Discord channel](https://discord.gg/erh5Brh7jE) or as
@@ -30,11 +33,10 @@ We think the easiest path of getting up and running, is the following:
 ## Included Apps And Packages
 
 - `login`: The login UI used by ZITADEL Cloud, powered by Next.js
-- `@zitadel/node`: core components for establishing node client connection
-- `@zitadel/client`: shared client utilities
-- `@zitadel/proto`: shared protobuf types
+- `@zitadel/client`: shared client utilities for node and browser environments
+- `@zitadel/proto`: Protocol Buffers (proto) definitions used by ZITADEL projects
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
-- `eslint-config-zitadel`: ESLint preset
+- `@zitadel/eslint-config`: ESLint preset
 
 Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
 
