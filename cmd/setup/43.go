@@ -12,16 +12,17 @@ import (
 )
 
 var (
-	//go:embed 43/*.sql
-	replaceCurrentSequencesIndex embed.FS
+	//go:embed 43/cockroach/*.sql
+	//go:embed 43/postgres/*.sql
+	createFieldsDomainIndex embed.FS
 )
 
-type ReplaceCurrentSequencesIndex struct {
+type CreateFieldsDomainIndex struct {
 	dbClient *database.DB
 }
 
-func (mig *ReplaceCurrentSequencesIndex) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(replaceCurrentSequencesIndex, "43", "")
+func (mig *CreateFieldsDomainIndex) Execute(ctx context.Context, _ eventstore.Event) error {
+	statements, err := readStatements(createFieldsDomainIndex, "43", mig.dbClient.Type())
 	if err != nil {
 		return err
 	}
@@ -34,6 +35,6 @@ func (mig *ReplaceCurrentSequencesIndex) Execute(ctx context.Context, _ eventsto
 	return nil
 }
 
-func (mig *ReplaceCurrentSequencesIndex) String() string {
-	return "43_replace_current_sequences_index"
+func (mig *CreateFieldsDomainIndex) String() string {
+	return "43_create_fields_domain_index"
 }
