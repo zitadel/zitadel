@@ -2,15 +2,18 @@ package setup
 
 import (
 	"context"
-	_ "embed"
+	"embed"
+	"fmt"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
-	//go:embed 43.sql
-	replaceCurrentSequencesIndex string
+	//go:embed 43/*.sql
+	replaceCurrentSequencesIndex embed.FS
 )
 
 type ReplaceCurrentSequencesIndex struct {
@@ -18,8 +21,17 @@ type ReplaceCurrentSequencesIndex struct {
 }
 
 func (mig *ReplaceCurrentSequencesIndex) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, replaceCurrentSequencesIndex)
-	return err
+	statements, err := readStatements(replaceCurrentSequencesIndex, "43", "")
+	if err != nil {
+		return err
+	}
+	for _, stmt := range statements {
+		logging.WithFields("file", stmt.file, "migration", mig.String()).Info("execute statement")
+		if _, err := mig.dbClient.ExecContext(ctx, stmt.query); err != nil {
+			return fmt.Errorf("%s %s: %w", mig.String(), stmt.file, err)
+		}
+	}
+	return nil
 }
 
 func (mig *ReplaceCurrentSequencesIndex) String() string {
