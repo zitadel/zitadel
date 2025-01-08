@@ -31,7 +31,6 @@ type Config struct {
 	AuthMethodPrivateKeyJWT           bool
 	GrantTypeRefreshToken             bool
 	RequestObjectSupported            bool
-	SigningKeyAlgorithm               string
 	DefaultAccessTokenLifetime        time.Duration
 	DefaultIdTokenLifetime            time.Duration
 	DefaultRefreshTokenIdleExpiration time.Duration
@@ -71,7 +70,6 @@ type OPStorage struct {
 	defaultLogoutURLV2                string
 	defaultAccessTokenLifetime        time.Duration
 	defaultIdTokenLifetime            time.Duration
-	signingKeyAlgorithm               string
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
 	encAlg                            crypto.EncryptionAlgorithm
@@ -162,7 +160,6 @@ func NewServer(
 		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
-		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
 		encAlg:                     encryptionAlg,
 		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
 		assetAPIPrefix:             assets.AssetAPI(),
@@ -232,7 +229,6 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		defaultLoginURLV2:                 config.DefaultLoginURLV2,
 		defaultLogoutURLV2:                config.DefaultLogoutURLV2,
-		signingKeyAlgorithm:               config.SigningKeyAlgorithm,
 		defaultAccessTokenLifetime:        config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime,
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration,
