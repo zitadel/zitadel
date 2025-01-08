@@ -1,14 +1,27 @@
 import { createGrpcTransport, GrpcTransportOptions } from "@connectrpc/connect-node";
+import { createGrpcWebTransport } from "@connectrpc/connect-web";
 import { importPKCS8, SignJWT } from "jose";
 import { NewAuthorizationBearerInterceptor } from "./interceptors";
 
 /**
- * Create a server transport with the given token and configuration options.
+ * Create a server transport using grpc with the given token and configuration options.
  * @param token
  * @param opts
  */
 export function createServerTransport(token: string, opts: GrpcTransportOptions) {
   return createGrpcTransport({
+    ...opts,
+    interceptors: [...(opts.interceptors || []), NewAuthorizationBearerInterceptor(token)],
+  });
+}
+
+/**
+ * Create a client transport using grpc web with the given token and configuration options.
+ * @param token
+ * @param opts
+ */
+export function createClientTransport(token: string, opts: GrpcTransportOptions) {
+  return createGrpcWebTransport({
     ...opts,
     interceptors: [...(opts.interceptors || []), NewAuthorizationBearerInterceptor(token)],
   });
