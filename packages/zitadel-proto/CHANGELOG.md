@@ -1,5 +1,11 @@
 # @zitadel/proto
 
+## 1.0.2
+
+### Patch Changes
+
+- include validate, google and protoc-gen-openapiv2
+
 ## 1.0.1
 
 ### Patch Changes
