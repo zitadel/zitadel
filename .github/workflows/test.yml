@@ -81,9 +81,6 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Cypress
-        run: pnpm exec cypress install
-
         # We can cache the Playwright binary independently from the pnpm cache, because we install it separately.
         # After pnpm install --frozen-lockfile, we can get the version so we only have to download the binary once per version.
       - run: echo "PLAYWRIGHT_VERSION=$(npx playwright --version | cut -d ' ' -f 2)" >> $GITHUB_ENV
