@@ -7,7 +7,10 @@
   },
   "type": "module",
   "files": [
-    "zitadel/**"
+    "zitadel/**",
+    "validate/**",
+    "google/**",
+    "protoc-gen-openapiv2/**"
   ],
   "sideEffects": false,
   "scripts": {
