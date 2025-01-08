@@ -87,9 +87,15 @@ func sessionQueryToQuery(ctx context.Context, sq *session.SearchQuery) (query.Se
 		return query.NewUserIDSearchQuery(q.UserIdQuery.GetId())
 	case *session.SearchQuery_CreationDateQuery:
 		return creationDateQueryToQuery(q.CreationDateQuery)
-	case *session.SearchQuery_OwnCreatorQuery:
+	case *session.SearchQuery_CreatorQuery:
+		if q.CreatorQuery != nil && q.CreatorQuery.GetId() != "" {
+			return query.NewSessionCreatorSearchQuery(q.CreatorQuery.GetId())
+		}
 		return query.NewSessionCreatorSearchQuery(authz.GetCtxData(ctx).UserID)
-	case *session.SearchQuery_OwnUseragentQuery:
+	case *session.SearchQuery_UseragentQuery:
+		if q.UseragentQuery != nil && q.UseragentQuery.GetId() != "" {
+			return query.NewSessionUserAgentFingerprintIDSearchQuery(q.UseragentQuery.GetId())
+		}
 		return query.NewSessionUserAgentFingerprintIDSearchQuery(authz.GetCtxData(ctx).AgentID)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")

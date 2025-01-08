@@ -136,8 +136,8 @@ message SearchQuery {
     IDsQuery ids_query = 1;
     UserIDQuery user_id_query = 2;
     CreationDateQuery creation_date_query = 3;
-    OwnCreatorQuery own_creator_query = 4;
-    OwnUserAgentQuery own_useragent_query = 5;
+    CreatorQuery creator_query = 4;
+    UserAgentQuery useragent_query = 5;
   }
 }
 
@@ -159,9 +159,27 @@ message CreationDateQuery {
   ];
 }
 
-message OwnCreatorQuery {}
+message CreatorQuery {
+  // ID of the user used to create the session, if empty the id of the calling user is used as creator.
+  optional string id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
 
-message OwnUserAgentQuery {}
+message UserAgentQuery {
+  // ID of the useragent used for the session, if empty the used useragent for the call is used.
+  optional string id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
 
 message UserAgent {
   optional string fingerprint_id = 1;

@@ -392,11 +392,11 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 								Method:       objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER,
 							},
 						}},
-						{Query: &session.SearchQuery_OwnCreatorQuery{
-							OwnCreatorQuery: &session.OwnCreatorQuery{},
+						{Query: &session.SearchQuery_CreatorQuery{
+							CreatorQuery: &session.CreatorQuery{},
 						}},
-						{Query: &session.SearchQuery_OwnUseragentQuery{
-							OwnUseragentQuery: &session.OwnUserAgentQuery{},
+						{Query: &session.SearchQuery_UseragentQuery{
+							UseragentQuery: &session.UserAgentQuery{},
 						}},
 					},
 				},
@@ -492,8 +492,8 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 							Ids: []string{"4", "5", "6"},
 						},
 					}},
-					{Query: &session.SearchQuery_OwnCreatorQuery{
-						OwnCreatorQuery: &session.OwnCreatorQuery{},
+					{Query: &session.SearchQuery_CreatorQuery{
+						CreatorQuery: &session.CreatorQuery{},
 					}},
 				},
 			},
@@ -587,26 +587,48 @@ func Test_sessionQueryToQuery(t *testing.T) {
 			want: mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampEquals),
 		},
 		{
-			name: "creator",
+			name: "own creator",
 			args: args{
 				authz.SetCtxData(context.Background(), authz.CtxData{UserID: "creator"}),
 				&session.SearchQuery{
-					Query: &session.SearchQuery_OwnCreatorQuery{
-						OwnCreatorQuery: &session.OwnCreatorQuery{},
+					Query: &session.SearchQuery_CreatorQuery{
+						CreatorQuery: &session.CreatorQuery{},
 					},
 				}},
 			want: mustNewTextQuery(t, query.SessionColumnCreator, "creator", query.TextEquals),
 		},
 		{
-			name: "useragent",
+			name: "creator",
+			args: args{
+				authz.SetCtxData(context.Background(), authz.CtxData{UserID: "creator1"}),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_CreatorQuery{
+						CreatorQuery: &session.CreatorQuery{Id: gu.Ptr("creator2")},
+					},
+				}},
+			want: mustNewTextQuery(t, query.SessionColumnCreator, "creator2", query.TextEquals),
+		},
+		{
+			name: "own useragent",
 			args: args{
 				authz.SetCtxData(context.Background(), authz.CtxData{AgentID: "agent"}),
 				&session.SearchQuery{
-					Query: &session.SearchQuery_OwnUseragentQuery{
-						OwnUseragentQuery: &session.OwnUserAgentQuery{},
+					Query: &session.SearchQuery_UseragentQuery{
+						UseragentQuery: &session.UserAgentQuery{},
 					},
 				}},
 			want: mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent", query.TextEquals),
+		},
+		{
+			name: "useragent",
+			args: args{
+				authz.SetCtxData(context.Background(), authz.CtxData{AgentID: "agent1"}),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_UseragentQuery{
+						UseragentQuery: &session.UserAgentQuery{Id: gu.Ptr("agent2")},
+					},
+				}},
+			want: mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent2", query.TextEquals),
 		},
 	}
 	for _, tt := range tests {

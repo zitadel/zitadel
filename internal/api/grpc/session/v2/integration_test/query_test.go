@@ -499,7 +499,7 @@ func TestServer_ListSessions(t *testing.T) {
 			},
 		},
 		{
-			name: "list sessions, creator, ok",
+			name: "list sessions, own creator, ok",
 			args: args{
 				CTX,
 				&session.ListSessionsRequest{},
@@ -507,7 +507,42 @@ func TestServer_ListSessions(t *testing.T) {
 					info := createSession(ctx, t, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
 					request.Queries = append(request.Queries,
 						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
-						&session.SearchQuery{Query: &session.SearchQuery_OwnCreatorQuery{OwnCreatorQuery: &session.OwnCreatorQuery{}}})
+						&session.SearchQuery{Query: &session.SearchQuery_CreatorQuery{CreatorQuery: &session.CreatorQuery{}}})
+					return []*sessionAttr{info}
+				},
+			},
+			wantExpirationWindow: time.Minute * 5,
+			wantFactors:          []wantFactor{wantUserFactor},
+			want: &session.ListSessionsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				Sessions: []*session.Session{
+					{
+						Metadata: map[string][]byte{"key": []byte("value")},
+						UserAgent: &session.UserAgent{
+							FingerprintId: gu.Ptr("agent"),
+							Ip:            gu.Ptr("1.2.3.4"),
+							Description:   gu.Ptr("Description"),
+							Header: map[string]*session.UserAgent_HeaderValues{
+								"foo": {Values: []string{"foo", "bar"}},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list sessions, creator, ok",
+			args: args{
+				IAMOwnerCTX,
+				&session.ListSessionsRequest{},
+				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
+					info := createSession(ctx, t, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
+					request.Queries = append(request.Queries,
+						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
+						&session.SearchQuery{Query: &session.SearchQuery_CreatorQuery{CreatorQuery: &session.CreatorQuery{Id: gu.Ptr(Instance.Users.Get(integration.UserTypeOrgOwner).ID)}}})
 					return []*sessionAttr{info}
 				},
 			},
@@ -542,7 +577,7 @@ func TestServer_ListSessions(t *testing.T) {
 					info := createSession(ctx, t, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
 					request.Queries = append(request.Queries,
 						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
-						&session.SearchQuery{Query: &session.SearchQuery_OwnCreatorQuery{OwnCreatorQuery: &session.OwnCreatorQuery{}}})
+						&session.SearchQuery{Query: &session.SearchQuery_CreatorQuery{CreatorQuery: &session.CreatorQuery{}}})
 					return []*sessionAttr{}
 				},
 			},
