@@ -1,0 +1,25 @@
+-- CREATE OR REPLACE FUNCTION notify_subscriber()
+-- RETURNS TRIGGER 
+-- LANGUAGE PLpgSQL
+-- AS $$
+-- DECLARE
+--     subscriber_id UUID;
+-- BEGIN
+--     FOR subscriber_id IN (
+--         SELECT 
+--             DISTINCT s.id
+--         FROM
+--             subscriptions.subscribers s 
+--         WHERE
+--             (NEW).subscriber = s.id
+--             AND s.should_notify
+--             AND (s.last_notified_position IS NULL OR s.last_notified_position < (NEW).position)
+--     ) LOOP
+--         PERFORM pg_notify('subscriber_' || subscriber_id::TEXT, NULL);
+--         UPDATE subscriptions.subscribers
+--         SET last_notified_position = (NEW).position
+--         WHERE id = subscriber_id;
+--     END LOOP;
+--     RETURN (NEW);
+-- END;
+-- $$;

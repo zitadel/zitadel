@@ -1,9 +1,9 @@
-CREATE OR REPLACE FUNCTION queue_events()
+CREATE OR REPLACE FUNCTION subscriptions.queue_events()
 RETURNS TRIGGER 
 LANGUAGE PLpgSQL
 AS $$
 BEGIN
-    INSERT INTO "queue" (
+    INSERT INTO subscriptions."queue" (
         subscriber
         , instance_id
         , aggregate_type
@@ -20,7 +20,7 @@ BEGIN
         , (NEW).position
         , (NEW).in_tx_order
     FROM
-        subscriptions
+        subscriptions.subscribed_events
     WHERE
         (instance_id IS NULL OR (NEW).instance_id = instance_id)
         AND ("all" OR (
