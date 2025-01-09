@@ -58,6 +58,19 @@ func (c *ResourceClient) Create(ctx context.Context, orgID string, body []byte) 
 	return user, err
 }
 
+func (c *ResourceClient) Delete(ctx context.Context, orgID, id string) error {
+	return c.do(ctx, http.MethodDelete, orgID, id)
+}
+
+func (c *ResourceClient) do(ctx context.Context, method, orgID, url string) error {
+	req, err := http.NewRequestWithContext(ctx, method, c.buildURL(orgID, url), nil)
+	if err != nil {
+		return err
+	}
+
+	return c.doReq(req, nil)
+}
+
 func (c *ResourceClient) doWithBody(ctx context.Context, method, orgID, url string, body io.Reader, responseEntity interface{}) error {
 	req, err := http.NewRequestWithContext(ctx, method, c.buildURL(orgID, url), body)
 	if err != nil {

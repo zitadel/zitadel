@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"slices"
 
+	"github.com/gorilla/mux"
+
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/api/scim/serrors"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -43,6 +45,11 @@ func (adapter *ResourceHandlerAdapter[T]) Create(r *http.Request) (T, error) {
 	}
 
 	return adapter.handler.Create(r.Context(), entity)
+}
+
+func (adapter *ResourceHandlerAdapter[T]) Delete(r *http.Request) error {
+	id := mux.Vars(r)["id"]
+	return adapter.handler.Delete(r.Context(), id)
 }
 
 func (adapter *ResourceHandlerAdapter[T]) readEntityFromBody(r *http.Request) (T, error) {

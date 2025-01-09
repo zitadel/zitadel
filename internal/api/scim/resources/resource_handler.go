@@ -19,6 +19,7 @@ type ResourceHandler[T ResourceHolder] interface {
 	NewResource() T
 
 	Create(ctx context.Context, resource T) (T, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type Resource struct {
