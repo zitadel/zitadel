@@ -188,11 +188,10 @@ Note: [Zitadel Manager Guide](https://zitadel.com/docs/guides/manage/console/man
     * ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
 5. Add the domain where your login UI is hosted to the [trusted domains](https://zitadel.com/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
 6. Use the new login in your application. You have three different options on how to achieve this
-    1. Enable the new login on your application configuration and add the URL of your login UI, with this settings Zitadel will automatically redirect you to the new login if you call the old one.
-    2. Enable the loginV2 feature on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
-https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    1. Enable the new login on your application configuration and add the URL of your login UI, with that settings Zitadel will automatically redirect you to the new login if you call the old one.
    ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
-    3. Change the issuer in your application configuration to the new domain of your login
+    2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
+    3. Change the issuer in the code of your application to the new domain of your login
 
 ### Important Notes
 
