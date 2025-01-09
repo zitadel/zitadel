@@ -73,6 +73,9 @@ const (
 	NotifyLastPhoneCol          = "last_phone"
 	NotifyVerifiedPhoneCol      = "verified_phone"
 	NotifyPasswordSetCol        = "password_set"
+
+	// groups
+	GroupIDsCol = "group_ids"
 )
 
 type userProjection struct{}
@@ -97,6 +100,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(UserUsernameCol, handler.ColumnTypeText),
 			handler.NewColumn(UserTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(GroupIDsCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
 			handler.WithIndex(handler.NewIndex("username", []string{UserUsernameCol})),

@@ -5,7 +5,7 @@ import es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 type GroupGrant struct {
 	es_models.ObjectRoot
 
-	State          UserGrantState
+	State          GroupGrantState
 	GroupID        string
 	ProjectID      string
 	ProjectGrantID string

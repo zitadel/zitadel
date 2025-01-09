@@ -39,6 +39,7 @@ type User struct {
 	PreferredLoginName string                     `json:"preferred_login_name,omitempty"`
 	Human              *Human                     `json:"human,omitempty"`
 	Machine            *Machine                   `json:"machine,omitempty"`
+	GroupIDs           []string                   `json:"group_ids,omitempty"`
 }
 
 type Human struct {

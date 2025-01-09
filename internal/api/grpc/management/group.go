@@ -5,9 +5,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	change_grpc "github.com/zitadel/zitadel/internal/api/grpc/change"
-	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
+	group_grpc "github.com/zitadel/zitadel/internal/api/grpc/group"
+	groupmember_grpc "github.com/zitadel/zitadel/internal/api/grpc/groupmember"
 	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
-	project_grpc "github.com/zitadel/zitadel/internal/api/grpc/project"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
@@ -15,8 +15,8 @@ import (
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func (s *Server) GetGroupByID(ctx context.Context, req *mgmt_pb.GetGroupByIDRequest) (*mgmt_pb.GetProjectByIDResponse, error) {
-	project, err := s.query.GroupByID(ctx, true, req.Id)
+func (s *Server) GetGroupByID(ctx context.Context, req *mgmt_pb.GetGroupByIDRequest) (*mgmt_pb.GetGroupByIDResponse, error) {
+	group, err := s.query.GroupByID(ctx, true, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (s *Server) GetGroupByID(ctx context.Context, req *mgmt_pb.GetGroupByIDRequ
 // }
 
 func (s *Server) ListGroups(ctx context.Context, req *mgmt_pb.ListGroupsRequest) (*mgmt_pb.ListGroupsResponse, error) {
-	queries, err := listProjectRequestToModel(req)
+	queries, err := listGroupRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -48,13 +48,13 @@ func (s *Server) ListGroups(ctx context.Context, req *mgmt_pb.ListGroupsRequest)
 	if err != nil {
 		return nil, err
 	}
-	projects, err := s.query.SearchProjects(ctx, queries)
+	groups, err := s.query.SearchGroups(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ListProjectsResponse{
-		Result:  project_grpc.ProjectViewsToPb(projects.Projects),
-		Details: object_grpc.ToListDetails(projects.Count, projects.Sequence, projects.LastRun),
+	return &mgmt_pb.ListGroupsResponse{
+		Result:  group_grpc.GroupViewsToPb(groups.Groups),
+		Details: object_grpc.ToListDetails(groups.Count, groups.Sequence, groups.LastRun),
 	}, nil
 }
 
@@ -79,7 +79,7 @@ func (s *Server) ListGroupGrantChanges(ctx context.Context, req *mgmt_pb.ListGro
 		SequenceGreater(sequence).
 		AddQuery().
 		AggregateTypes(project.AggregateType).
-		AggregateIDs(req.ProjectId).
+		AggregateIDs(req.GroupId).
 		EventData(map[string]interface{}{
 			"grantId": req.GrantId,
 		}).
@@ -93,7 +93,7 @@ func (s *Server) ListGroupGrantChanges(ctx context.Context, req *mgmt_pb.ListGro
 		return nil, err
 	}
 
-	return &mgmt_pb.ListProjectGrantChangesResponse{
+	return &mgmt_pb.ListGroupGrantChangesResponse{
 		Result: change_grpc.EventsToChangesPb(changes, s.assetAPIPrefix(ctx)),
 	}, nil
 }
@@ -234,7 +234,7 @@ func (s *Server) removeGroupDependencies(ctx context.Context, groupID string) ([
 	if err != nil {
 		return nil, nil, err
 	}
-	membershipsGroupQuery, err := query.NewMembershipGroupIDQuery(groupID)
+	membershipsGroupQuery, err := query.NewGroupMembershipGroupIDQuery(groupID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -262,12 +262,13 @@ func (s *Server) RemoveGroup(ctx context.Context, req *mgmt_pb.RemoveGroupReques
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.RemoveProjectResponse{
+	return &mgmt_pb.RemoveGroupResponse{
 		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) ListProjectRoles(ctx context.Context, req *mgmt_pb.ListProjectRolesRequest) (*mgmt_pb.ListProjectRolesResponse, error) {
+/*
+func (s *Server) ListGroupRoles(ctx context.Context, req *mgmt_pb.ListGroupRolesRequest) (*mgmt_pb.ListProjectRolesResponse, error) {
 	queries, err := listProjectRolesRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -357,45 +358,47 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 	}, nil
 }
 
-func (s *Server) ListProjectMemberRoles(ctx context.Context, _ *mgmt_pb.ListProjectMemberRolesRequest) (*mgmt_pb.ListProjectMemberRolesResponse, error) {
+
+func (s *Server) ListGroupMemberRoles(ctx context.Context, _ *mgmt_pb.ListGroupMemberRolesRequest) (*mgmt_pb.ListProjectMemberRolesResponse, error) {
 	roles, err := s.query.GetProjectMemberRoles(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectMemberRolesResponse{Result: roles}, nil //TODO: details
 }
+*/
 
-func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjectMembersRequest) (*mgmt_pb.ListProjectMembersResponse, error) {
-	queries, err := ListProjectMembersRequestToModel(ctx, req)
+func (s *Server) ListGroupMembers(ctx context.Context, req *mgmt_pb.ListGroupMembersRequest) (*mgmt_pb.ListGroupMembersResponse, error) {
+	queries, err := ListGroupMembersRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.query.ProjectMembers(ctx, queries)
+	members, err := s.query.GroupMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ListProjectMembersResponse{
-		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.Members),
+	return &mgmt_pb.ListGroupMembersResponse{
+		Result:  groupmember_grpc.MembersToPb(s.assetAPIPrefix(ctx), members.GroupMembers),
 		Details: object_grpc.ToListDetails(members.Count, members.Sequence, members.LastRun),
 	}, nil
 }
 
-func (s *Server) AddProjectMember(ctx context.Context, req *mgmt_pb.AddProjectMemberRequest) (*mgmt_pb.AddProjectMemberResponse, error) {
-	member, err := s.command.AddProjectMember(ctx, AddProjectMemberRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+func (s *Server) AddGroupMember(ctx context.Context, req *mgmt_pb.AddGroupMemberRequest) (*mgmt_pb.AddGroupMemberResponse, error) {
+	member, err := s.command.AddGroupMember(ctx, AddGroupMemberRequestToDomain(ctx, req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.AddProjectMemberResponse{
+	return &mgmt_pb.AddGroupMemberResponse{
 		Details: object_grpc.AddToDetailsPb(member.Sequence, member.ChangeDate, member.ResourceOwner),
 	}, nil
 }
 
-func (s *Server) UpdateProjectMember(ctx context.Context, req *mgmt_pb.UpdateProjectMemberRequest) (*mgmt_pb.UpdateProjectMemberResponse, error) {
-	member, err := s.command.ChangeProjectMember(ctx, UpdateProjectMemberRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+func (s *Server) UpdateGroupMember(ctx context.Context, req *mgmt_pb.UpdateGroupMemberRequest) (*mgmt_pb.UpdateGroupMemberResponse, error) {
+	member, err := s.command.ChangeGroupMember(ctx, UpdateGroupMemberRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.UpdateProjectMemberResponse{
+	return &mgmt_pb.UpdateGroupMemberResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			member.Sequence,
 			member.ChangeDate,
@@ -404,12 +407,12 @@ func (s *Server) UpdateProjectMember(ctx context.Context, req *mgmt_pb.UpdatePro
 	}, nil
 }
 
-func (s *Server) RemoveProjectMember(ctx context.Context, req *mgmt_pb.RemoveProjectMemberRequest) (*mgmt_pb.RemoveProjectMemberResponse, error) {
-	details, err := s.command.RemoveProjectMember(ctx, req.ProjectId, req.UserId, authz.GetCtxData(ctx).OrgID)
+func (s *Server) RemoveGroupMember(ctx context.Context, req *mgmt_pb.RemoveGroupMemberRequest) (*mgmt_pb.RemoveGroupMemberResponse, error) {
+	details, err := s.command.RemoveGroupMember(ctx, req.GroupId, req.UserId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.RemoveProjectMemberResponse{
+	return &mgmt_pb.RemoveGroupMemberResponse{
 		Details: object_grpc.DomainToChangeDetailsPb(details),
 	}, nil
 }

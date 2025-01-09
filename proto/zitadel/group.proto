@@ -344,3 +344,102 @@ message GroupResourceOwnerQuery {
         }
     ];
 }
+
+message Membership {
+    string group_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    repeated string roles = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"IAM_OWNER\"]"
+        }
+    ];
+    string group_name = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Name of the group"
+            example: "\"Gigi Giraffe\"";
+        }
+    ];
+    oneof type {
+        bool iam = 5 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one of type use iam, org id, project id or project grant id"
+            }
+        ];
+        string org_id = 6 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one of type use iam, org id, project id or project grant id"
+            }
+        ];
+        string project_id = 7 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one of type use iam, org id, project id or project grant id"
+            }
+        ];
+        string project_grant_id = 8 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one of type use iam, org id, project id or project grant id"
+            }
+        ];
+    }
+}
+
+message MembershipQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        MembershipOrgQuery org_query = 1;
+        MembershipProjectQuery project_query = 2;
+        MembershipProjectGrantQuery project_grant_query = 3;
+        MembershipIAMQuery iam_query = 4;
+        MembershipGroupQuery group_query = 5;
+    }
+}
+
+// this query always equals
+message MembershipOrgQuery {
+    string org_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+// this query always equals
+message MembershipProjectQuery {
+    string project_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+// this query always equals
+message MembershipProjectGrantQuery {
+    string project_grant_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+// this query always equals
+message MembershipIAMQuery {
+    bool iam = 1;
+}
+
+// this query always equals
+message MembershipGroupQuery {
+    string group_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}

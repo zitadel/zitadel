@@ -4284,12 +4284,37 @@ service ManagementService {
             tags: "Groups"
             tags: "Members";
             tags: "ZITADEL Administrators";
-            summary: "List Project Members";
+            summary: "List Group Members";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the group level, matching the search queries. The search queries will be AND linked."
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
                     description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc ListGroupMemberships(ListGroupMembershipsRequest) returns (ListGroupMembershipsResponse) {
+        option (google.api.http) = {
+            post: "/groups/{group_id}/memberships/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "group.membership.read"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Groups"
+            summary: "List ZITADEL Permissions";
+            description: "Show all the permissions the group has in ZITADEL (ZITADEL Manager)."
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get the result of another organization include the header. Make sure the user has permission to access the requested data.";
                     type: STRING,
                     required: false;
                 };
@@ -4533,7 +4558,7 @@ service ManagementService {
         };
     }
 
-    rpc ReactivateGroup(ReactivateProjectRequest) returns (ReactivateProjectResponse) {
+    rpc ReactivateGroup(ReactivateGroupRequest) returns (ReactivateGroupResponse) {
         option (google.api.http) = {
             post: "/groups/{id}/_reactivate"
             body: "*"
@@ -4782,7 +4807,7 @@ service ManagementService {
         };
     }
 
-    rpc BulkRemoveGroupGrant(BulkRemoveUserGrantRequest) returns (BulkRemoveUserGrantResponse) {
+    rpc BulkRemoveGroupGrant(BulkRemoveGroupGrantRequest) returns (BulkRemoveGroupGrantResponse) {
         option (google.api.http) = {
             delete: "/group_grants/_bulk"
             body: "*"
@@ -10898,6 +10923,20 @@ message ListGroupMembersRequest {
 message ListGroupMembersResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.group_member.v1.GroupMember result = 2;
+}
+
+message ListGroupMembershipsRequest {
+    //list limitations and ordering
+    string group_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //the field the result is sorted
+    zitadel.v1.ListQuery query = 2;
+    //criteria the client is looking for
+    repeated zitadel.group.v1.MembershipQuery queries = 3;
+}
+
+message ListGroupMembershipsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.group.v1.Membership result = 2;
 }
 
 message AddGroupMemberRequest {

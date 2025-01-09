@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/group"
+	es_user "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -25,6 +26,13 @@ func (c *Commands) AddGroupMember(ctx context.Context, member *domain.Member, re
 	if err != nil {
 		return nil, err
 	}
+
+	// Add group_id entry to users table
+	err = c.addGroupIDToUser(ctx, member.UserID, member.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
 	err = AppendAndReduce(addedMember, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -73,6 +81,12 @@ func (c *Commands) ChangeGroupMember(ctx context.Context, member *domain.Member,
 		return nil, err
 	}
 
+	// Add group_id entry to users table
+	err = c.addGroupIDToUser(ctx, member.UserID, member.AggregateID)
+	if err != nil {
+		return nil, err
+	}
+
 	err = AppendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -100,10 +114,18 @@ func (c *Commands) RemoveGroupMember(ctx context.Context, groupID, userID, resou
 	if err != nil {
 		return nil, err
 	}
+
+	// Remove group_id entry from users table
+	err = c.removeGroupIDFromUser(ctx, userID, groupID)
+	if err != nil {
+		return nil, err
+	}
+
 	err = AppendAndReduce(m, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
+
 	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
@@ -133,4 +155,56 @@ func (c *Commands) groupMemberWriteModelByID(ctx context.Context, groupID, userI
 	}
 
 	return writeModel, nil
+}
+
+func (c *Commands) addGroupIDToUser(ctx context.Context, userID, groupID string) error {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+
+	// Fetch the existing user
+	user, err := c.query.GetUserByID(ctx, false, userID)
+	if err != nil {
+		return err
+	}
+
+	// Add the groupID to the user's group_ids
+	user.GroupIDs = append(user.GroupIDs, groupID)
+
+	// Update the user in the database
+	userAgg := eventstore.NewAggregate(ctx, user.ID, eventstore.AggregateType(es_user.UserGroupAddedType), "v1")
+	evt := es_user.NewUserGroupAddedEvent(ctx, userAgg, user.GroupIDs...)
+	_, err = c.eventstore.Push(ctx, evt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Commands) removeGroupIDFromUser(ctx context.Context, userID, groupID string) error {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+
+	// Fetch the existing user
+	user, err := c.query.GetUserByID(ctx, false, userID)
+	if err != nil {
+		return err
+	}
+
+	// Remove the groupID from the user's group_ids
+	for i, id := range user.GroupIDs {
+		if id == groupID {
+			user.GroupIDs = append(user.GroupIDs[:i], user.GroupIDs[i+1:]...)
+			break
+		}
+	}
+
+	// Update the user in the database
+	userAgg := eventstore.NewAggregate(ctx, user.ID, eventstore.AggregateType(es_user.UserGroupRemovedType), "v1")
+	_, err = c.eventstore.Push(ctx, es_user.NewUserGroupRemovedEvent(ctx, userAgg, user.GroupIDs...))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

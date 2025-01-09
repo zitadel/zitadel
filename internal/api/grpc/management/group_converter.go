@@ -38,12 +38,13 @@ func GroupGrantsToIDs(groupGrants *query.GroupGrants) []string {
 	return converted
 }
 
-func AddGroupMemberRequestToDomain(req *mgmt_pb.AddGroupMemberRequest) *domain.GroupMember {
-	return domain.NewGroupMember(req.GroupId, req.UserId)
+// Need to fix -->
+func AddGroupMemberRequestToDomain(ctx context.Context, req *mgmt_pb.AddGroupMemberRequest) *domain.Member {
+	return domain.NewMember(req.GroupId, req.UserId)
 }
 
-func UpdateGroupMemberRequestToDomain(req *mgmt_pb.UpdateGroupMemberRequest) *domain.GroupMember {
-	return domain.NewGroupMember(req.GroupId, req.UserId)
+func UpdateGroupMemberRequestToDomain(req *mgmt_pb.UpdateGroupMemberRequest) *domain.Member {
+	return domain.NewMember(req.GroupId, req.UserId)
 }
 
 func listGroupRequestToModel(req *mgmt_pb.ListGroupsRequest) (*query.GroupSearchQueries, error) {
@@ -134,3 +135,31 @@ func ListGroupMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListGroupM
 		GroupID: req.GroupId,
 	}, nil
 }
+
+/*
+func ListGroupMembershipsRequestToModel(ctx context.Context, req *mgmt_pb.ListGroupMembershipsRequest) (*query.MembershipSearchQuery, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := user_grpc.MembershipQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	userQuery, err := query.NewMembershipUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewMembershipResourceOwnersSearchQuery(authz.GetInstance(ctx).InstanceID(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, userQuery, ownerQuery)
+	return &query.MembershipSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		//SortingColumn: //TODO: sorting
+		Queries: queries,
+	}, nil
+}
+*/
