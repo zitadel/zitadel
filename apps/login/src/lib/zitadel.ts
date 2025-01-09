@@ -470,7 +470,6 @@ export async function searchUsers({
   loginSettings,
   organizationId,
 }: SearchUsersCommand) {
-  console.log(loginSettings);
   const queries: SearchQuery[] = [];
   const orQueries: SearchQuery[] = [];
 
