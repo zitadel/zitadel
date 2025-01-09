@@ -49,6 +49,16 @@ message ImprovedPerformanceFeatureFlag {
   ];
 }
 
+message LoginV2FeatureFlag {
+  bool required = 1;
+  optional string base_uri = 2;
+  Source source = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The source where the setting of the feature was defined. The source may be the resource itself or a resource owner through inheritance.";
+    }
+  ];
+}
+
 enum ImprovedPerformance {
   IMPROVED_PERFORMANCE_UNSPECIFIED = 0;
   // Uses the eventstore to query the org by id
@@ -65,4 +75,11 @@ enum ImprovedPerformance {
   // users are checked against verified domains
   // from other organizations.
   IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED = 5;
+}
+
+message LoginV2 {
+  // Require that all users must use the new login UI. If enabled, all users will be redirected to the login V2 regardless of the application's preference.
+  bool required = 1;
+  // Optionally specify a base uri of the login UI. If unspecified the default URI will be used.
+  optional string base_uri = 2;
 }

@@ -10,6 +10,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zitadel/logging"
+
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
@@ -43,7 +45,7 @@ func TestMain(m *testing.M) {
 
 		Instance = integration.NewInstance(ctx)
 
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		SystemCTX = integration.WithSystemAuthorization(ctx)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
@@ -2625,6 +2627,247 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 				assert.Equal(ttt, tt.want.GetAuthMethodTypes(), got.GetAuthMethodTypes())
 				integration.AssertListDetails(ttt, tt.want, got)
 			}, retryDuration, tick, "timeout waiting for expected auth methods result")
+		})
+	}
+}
+
+func TestServer_ListAuthenticationFactors(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *user.ListAuthenticationFactorsRequest
+		want    *user.ListAuthenticationFactorsResponse
+		dep     func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse)
+		wantErr bool
+		ctx     context.Context
+	}{
+		{
+			name: "no auth",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: nil,
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
+				args.UserId = userIDWithoutAuth
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with u2f",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				U2FId := Instance.RegisterUserU2F(CTX, userWithU2F)
+
+				args.UserId = userWithU2F
+				want.Result[0].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FId,
+						Name: "nice name",
+					},
+				}
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with totp, u2f",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_Otp{
+							Otp: &user.AuthFactorOTP{},
+						},
+					},
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
+				U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
+
+				args.UserId = userWithTOTP
+				want.Result[1].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FIdWithTOTP,
+						Name: "nice name",
+					},
+				}
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with totp, u2f filtered",
+			args: &user.ListAuthenticationFactorsRequest{
+				AuthFactors: []user.AuthFactors{user.AuthFactors_U2F},
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "secret").GetUserId()
+				U2FIdWithTOTP := Instance.RegisterUserU2F(CTX, userWithTOTP)
+
+				args.UserId = userWithTOTP
+				want.Result[0].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FIdWithTOTP,
+						Name: "nice name",
+					},
+				}
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with sms",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_OtpSms{
+							OtpSms: &user.AuthFactorOTPSMS{},
+						},
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithSMS := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), gofakeit.Email(), gofakeit.Phone()).GetUserId()
+				Instance.RegisterUserOTPSMS(CTX, userWithSMS)
+
+				args.UserId = userWithSMS
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with email",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Type: &user.AuthFactor_OtpEmail{
+							OtpEmail: &user.AuthFactorOTPEmail{},
+						},
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithEmail := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.GetId(), gofakeit.Email(), gofakeit.Phone()).GetUserId()
+				Instance.RegisterUserOTPEmail(CTX, userWithEmail)
+
+				args.UserId = userWithEmail
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with not ready u2f",
+			args: &user.ListAuthenticationFactorsRequest{},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				_, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
+					UserId: userWithNotReadyU2F,
+					Domain: Instance.Domain,
+				})
+				logging.OnError(err).Panic("Could not register u2f")
+
+				args.UserId = userWithNotReadyU2F
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with not ready u2f state filtered",
+			args: &user.ListAuthenticationFactorsRequest{
+				States: []user.AuthFactorState{user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY},
+			},
+			want: &user.ListAuthenticationFactorsResponse{
+				Result: []*user.AuthFactor{
+					{
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY,
+					},
+				},
+			},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithNotReadyU2F := Instance.CreateHumanUser(CTX).GetUserId()
+				U2FNotReady, err := Instance.Client.UserV2.RegisterU2F(CTX, &user.RegisterU2FRequest{
+					UserId: userWithNotReadyU2F,
+					Domain: Instance.Domain,
+				})
+				logging.OnError(err).Panic("Could not register u2f")
+
+				args.UserId = userWithNotReadyU2F
+				want.Result[0].Type = &user.AuthFactor_U2F{
+					U2F: &user.AuthFactorU2F{
+						Id:   U2FNotReady.GetU2FId(),
+						Name: "",
+					},
+				}
+			},
+			ctx: CTX,
+		},
+		{
+			name: "with no userId",
+			args: &user.ListAuthenticationFactorsRequest{
+				UserId: "",
+			},
+			ctx:     CTX,
+			wantErr: true,
+		},
+		{
+			name: "with no permission",
+			args: &user.ListAuthenticationFactorsRequest{},
+			dep: func(args *user.ListAuthenticationFactorsRequest, want *user.ListAuthenticationFactorsResponse) {
+				userWithTOTP := Instance.CreateHumanUserWithTOTP(CTX, "totp").GetUserId()
+
+				args.UserId = userWithTOTP
+			},
+			ctx:     UserCTX,
+			wantErr: true,
+		},
+		{
+			name: "with unknown user",
+			args: &user.ListAuthenticationFactorsRequest{
+				UserId: "unknown",
+			},
+			want: &user.ListAuthenticationFactorsResponse{},
+			ctx:  CTX,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.dep != nil {
+				tt.dep(tt.args, tt.want)
+			}
+
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.ListAuthenticationFactors(tt.ctx, tt.args)
+				if tt.wantErr {
+					require.Error(ttt, err)
+					return
+				}
+				require.NoError(ttt, err)
+
+				assert.ElementsMatch(t, tt.want.GetResult(), got.GetResult())
+			}, retryDuration, tick, "timeout waiting for expected auth methods result")
+
 		})
 	}
 }

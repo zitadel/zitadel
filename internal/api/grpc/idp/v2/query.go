@@ -96,7 +96,7 @@ func configToPb(config *query.IDPTemplate) *idp_pb.IDPConfig {
 			IsCreationAllowed: config.IsCreationAllowed,
 			IsAutoCreation:    config.IsAutoCreation,
 			IsAutoUpdate:      config.IsAutoUpdate,
-			AutoLinking:       autoLinkingOptionToPb(config.AutoLinking),
+			AutoLinking:       AutoLinkingOptionToPb(config.AutoLinking),
 		},
 	}
 	if config.OAuthIDPTemplate != nil {
@@ -150,7 +150,7 @@ func configToPb(config *query.IDPTemplate) *idp_pb.IDPConfig {
 	return idpConfig
 }
 
-func autoLinkingOptionToPb(linking domain.AutoLinkingOption) idp_pb.AutoLinkingOption {
+func AutoLinkingOptionToPb(linking domain.AutoLinkingOption) idp_pb.AutoLinkingOption {
 	switch linking {
 	case domain.AutoLinkingOptionUnspecified:
 		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED

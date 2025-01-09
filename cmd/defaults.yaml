@@ -198,8 +198,11 @@ Caches:
       AutoPrune:
         Interval: 1m
         TimeOut: 5s
+    # Postgres connector uses the configured database (postgres or cockraochdb) as cache.
+    # It is suitable for deployments with multiple containers.
+    # The cache is enabled by default because it is the default cache states for IdP form callbacks
     Postgres:
-      Enabled: false
+      Enabled: true
       AutoPrune:
         Interval: 15m
         TimeOut: 30s
@@ -311,7 +314,7 @@ Caches:
     # When connector is empty, this cache will be disabled.
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
     # Log enables cache-specific logging. Default to error log to stderr when omitted.
     Log:
       Level: error
@@ -322,7 +325,7 @@ Caches:
   Milestones:
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
     Log:
       Level: error
       AddSource: true
@@ -332,7 +335,17 @@ Caches:
   Organization:
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
+  # IdP callbacks using form POST cache, required for handling them securely and without possible too big request urls.
+  IdPFormCallbacks:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
     Log:
       Level: error
       AddSource: true
@@ -517,9 +530,6 @@ OIDC:
   GrantTypeRefreshToken: true # ZITADEL_OIDC_GRANTTYPEREFRESHTOKEN
   RequestObjectSupported: true # ZITADEL_OIDC_REQUESTOBJECTSUPPORTED
 
-  # Deprecated: The signing algorithm is determined by the generated keys.
-  # Use the web keys resource to generate keys with different algorithms.
-  SigningKeyAlgorithm: RS256 # ZITADEL_OIDC_SIGNINGKEYALGORITHM
   # Sets the default values for lifetime and expiration for OIDC
   # This default can be overwritten in the default instance configuration and for each instance during runtime
   # !!! Changing this after the initial setup will have no impact without a restart !!!
@@ -563,6 +573,7 @@ OIDC:
   DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
+  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
   ProviderConfig:
     MetadataConfig:
       Path: "/metadata" # ZITADEL_SAML_PROVIDERCONFIG_METADATACONFIG_PATH
@@ -578,6 +589,11 @@ SAML:
     #  ContactType: "technical" # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_CONTACTTYPE
     #  Company: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_COMPANY
     #  EmailAddress: hi@zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_EMAILADDRESS
+
+SCIM:
+  # default values whether an email/phone is considered verified when a users email/phone is created or updated
+  EmailVerified: true # ZITADEL_SCIM_EMAILVERIFIED
+  PhoneVerified: true # ZITADEL_SCIM_PHONEVERIFIED
 
 Login:
   LanguageCookieName: zitadel.login.lang # ZITADEL_LOGIN_LANGUAGECOOKIENAME
@@ -597,6 +613,9 @@ Console:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_CONSOLE_LONGCACHE_SHAREDMAXAGE
   InstanceManagementURL: "" # ZITADEL_CONSOLE_INSTANCEMANAGEMENTURL
+  PostHog:
+    URL: "" # ZITADEL_CONSOLE_POSTHOG_URL
+    Token: "" # ZITADEL_CONSOLE_POSTHOG_TOKEN
 
 EncryptionKeys:
   DomainVerification:
@@ -1292,6 +1311,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "events.read"
         - "milestones.read"
+        - "session.read"
         - "session.delete"
         - "action.target.read"
         - "action.target.write"
@@ -1484,6 +1504,43 @@ InternalAuthZ:
         - "project.grant.member.write"
         - "project.grant.member.delete"
         - "session.delete"
+    - Role: "IAM_LOGIN_CLIENT"
+      Permissions:
+        - "iam.read"
+        - "iam.policy.read"
+        - "iam.member.read"
+        - "iam.member.write"
+        - "iam.idp.read"
+        - "iam.feature.read"
+        - "iam.restrictions.read"
+        - "org.read"
+        - "org.member.read"
+        - "org.member.write"
+        - "org.idp.read"
+        - "org.feature.read"
+        - "user.read"
+        - "user.write"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.membership.read"
+        - "user.credential.write"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.grant.read"
+        - "project.grant.member.read"
+        - "project.grant.member.write"
+        - "session.read"
+        - "session.link"
+        - "session.delete"
+        - "userschema.read"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
