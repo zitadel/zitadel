@@ -504,11 +504,15 @@ export async function searchUsers({
 
   const loginNameResult = await userService.listUsers({ queries: queries });
 
-  if (loginNameResult.result.length > 1) {
+  if (!loginNameResult || !loginNameResult.details) {
+    return { error: "An error occurred." };
+  }
+
+  if (loginNameResult.details.totalResult > BigInt(1)) {
     return { error: "Multiple users found" };
   }
 
-  if (loginNameResult.result.length == 1) {
+  if (loginNameResult.details?.totalResult == BigInt(1)) {
     return loginNameResult;
   }
 
@@ -536,7 +540,7 @@ export async function searchUsers({
       emailAndPhoneOrQueries.push(phoneQuery);
     }
 
-    queries.push(
+    emailAndPhoneQueries.push(
       create(SearchQuerySchema, {
         query: {
           case: "orQuery",
@@ -565,8 +569,12 @@ export async function searchUsers({
     queries: emailAndPhoneQueries,
   });
 
+  if (!emailOrPhoneResult || !emailOrPhoneResult.details) {
+    return { error: "An error occurred." };
+  }
+
   if (emailOrPhoneResult.result.length > 1) {
-    return { error: "Multiple users found" };
+    return { error: "Multiple users found." };
   }
 
   if (emailOrPhoneResult.result.length == 1) {
