@@ -87,6 +87,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	id.Configure(config.Machine)
 
+	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
+	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
+
 	return config
 }
 
