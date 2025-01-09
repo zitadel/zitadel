@@ -300,6 +300,7 @@ export async function GET(request: NextRequest) {
     const { authRequest } = await getAuthRequest({ authRequestId });
 
     let organization = "";
+    let suffix = "";
     let idpId = "";
 
     if (authRequest?.scope) {
@@ -326,6 +327,7 @@ export async function GET(request: NextRequest) {
             const orgs = await getOrgsByDomain(orgDomain);
             if (orgs.result && orgs.result.length === 1) {
               organization = orgs.result[0].id ?? "";
+              suffix = orgDomain;
             }
           }
         }
@@ -447,6 +449,9 @@ export async function GET(request: NextRequest) {
         }
         if (organization) {
           loginNameUrl.searchParams.set("organization", organization);
+        }
+        if (suffix) {
+          loginNameUrl.searchParams.set("suffix", suffix);
         }
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {

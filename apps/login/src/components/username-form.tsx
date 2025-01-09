@@ -21,6 +21,7 @@ type Props = {
   authRequestId: string | undefined;
   loginSettings: LoginSettings | undefined;
   organization?: string;
+  suffix?: string;
   submit: boolean;
   allowRegister: boolean;
   children?: ReactNode;
@@ -30,6 +31,7 @@ export function UsernameForm({
   loginName,
   authRequestId,
   organization,
+  suffix,
   loginSettings,
   submit,
   allowRegister,
@@ -104,6 +106,7 @@ export function UsernameForm({
           {...register("loginName", { required: "This field is required" })}
           label={inputLabel}
           data-testid="username-text-input"
+          suffix={suffix}
         />
         {allowRegister && (
           <button

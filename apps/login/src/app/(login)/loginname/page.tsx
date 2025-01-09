@@ -20,6 +20,7 @@ export default async function Page(props: {
   const loginName = searchParams?.loginName;
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
+  const suffix = searchParams?.suffix;
   const submit: boolean = searchParams?.submit === "true";
 
   let defaultOrganization;
@@ -33,6 +34,8 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings(
     organization ?? defaultOrganization,
   );
+
+  const contextLoginSettings = await getLoginSettings(organization);
 
   const identityProviders = await getActiveIdentityProviders(
     organization ?? defaultOrganization,
@@ -54,7 +57,8 @@ export default async function Page(props: {
           loginName={loginName}
           authRequestId={authRequestId}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
-          loginSettings={loginSettings}
+          loginSettings={contextLoginSettings}
+          suffix={suffix}
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
         >
