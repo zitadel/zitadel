@@ -88,6 +88,15 @@ func (e *RemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 	e.BaseEvent = event
 }
 
+func (e *RemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.RemoveSearchFieldsByAggregateAndObject(
+			e.Aggregate(),
+			roleSearchObject(e.Role),
+		),
+	}
+}
+
 func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, role, permission string) *RemovedEvent {
 	return &RemovedEvent{
 		BaseEvent:  eventstore.NewBaseEventForPush(ctx, aggregate, AddedType),

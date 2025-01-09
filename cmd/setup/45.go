@@ -21,7 +21,7 @@ var (
 )
 
 func (mig *InitPermissionFunctions) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(permissionFunctions, "42", "")
+	statements, err := readStatements(permissionFunctions, "45", "")
 	if err != nil {
 		return err
 	}

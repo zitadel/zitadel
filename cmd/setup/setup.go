@@ -196,6 +196,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		&FillFieldsForInstanceDomains{
 			eventstore: eventstoreClient,
 		},
+		&SyncRolePermissions{
+			eventstore:             eventstoreClient,
+			rolePermissionMappings: config.InternalAuthZ.RolePermissionMappings,
+		},
 	}
 
 	for _, step := range []migration.Migration{
@@ -232,9 +236,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
-
-	step := &AddRolePermissions{eventstore: eventstoreClient, rolePermissionMappings: config.InternalAuthZ.RolePermissionMappings}
-	mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		mustExecuteMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")

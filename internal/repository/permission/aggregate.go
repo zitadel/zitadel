@@ -7,11 +7,15 @@ const (
 	AggregateVersion eventstore.Version       = "v1"
 )
 
-func NewAggregate(instanceID string) *eventstore.Aggregate {
+func NewAggregate(aggregateID string) *eventstore.Aggregate {
+	var instanceID string
+	if aggregateID != "SYSTEM" {
+		instanceID = aggregateID
+	}
 	return &eventstore.Aggregate{
-		ID:            instanceID,
+		ID:            aggregateID,
 		Type:          AggregateType,
-		ResourceOwner: instanceID,
+		ResourceOwner: aggregateID,
 		InstanceID:    instanceID,
 		Version:       AggregateVersion,
 	}
