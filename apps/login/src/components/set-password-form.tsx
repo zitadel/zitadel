@@ -237,7 +237,7 @@ export function SetPasswordForm({
             })}
             label="New Password"
             error={errors.password?.message as string}
-            data-testid="password-text-input"
+            data-testid="password-set-text-input"
           />
         </div>
         <div>
@@ -250,7 +250,7 @@ export function SetPasswordForm({
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
-            data-testid="password-confirm-text-input"
+            data-testid="password-set-confirm-text-input"
           />
         </div>
       </div>

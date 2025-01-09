@@ -161,7 +161,7 @@ export function ChangePasswordForm({
             })}
             label="New Password"
             error={errors.password?.message as string}
-            data-testid="password-text-input"
+            data-testid="password-change-text-input"
           />
         </div>
         <div className="">
@@ -174,7 +174,7 @@ export function ChangePasswordForm({
             })}
             label="Confirm Password"
             error={errors.confirmPassword?.message as string}
-            data-testid="password-confirm-text-input"
+            data-testid="password-change-confirm-text-input"
           />
         </div>
       </div>

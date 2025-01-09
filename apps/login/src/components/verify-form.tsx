@@ -115,7 +115,7 @@ export function VerifyForm({
               {t("verify.noCodeReceived")}
             </span>
             <button
-              aria-label="Resend OTP Code"
+              aria-label="Resend Code"
               disabled={loading}
               type="button"
               className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
@@ -134,11 +134,12 @@ export function VerifyForm({
             autoComplete="one-time-code"
             {...register("code", { required: "This field is required" })}
             label="Code"
+            data-testid="code-text-input"
           />
         </div>
 
         {error && (
-          <div className="py-4">
+          <div className="py-4" data-testid="error">
             <Alert>{error}</Alert>
           </div>
         )}
@@ -152,6 +153,7 @@ export function VerifyForm({
             variant={ButtonVariants.Primary}
             disabled={loading || !formState.isValid}
             onClick={handleSubmit(fcn)}
+            data-testid="submit-button"
           >
             {loading && <Spinner className="h-5 w-5 mr-2" />}
             {t("verify.submit")}

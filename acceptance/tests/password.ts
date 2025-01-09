@@ -8,8 +8,7 @@ export async function startChangePassword(page: Page, loginname: string) {
   await page.goto("/password/change?" + new URLSearchParams({ loginName: loginname }));
 }
 
-export async function changePassword(page: Page, loginname: string, password: string) {
-  await startChangePassword(page, loginname);
+export async function changePassword(page: Page, password: string) {
   await changePasswordScreen(page, password, password);
   await page.getByTestId(passwordSubmitButton).click();
 }
