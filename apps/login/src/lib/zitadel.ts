@@ -26,6 +26,7 @@ import { create, Duration } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
@@ -396,6 +397,118 @@ export async function listUsers({
       orQueries.push(phoneQuery);
     }
 
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "orQuery",
+          value: {
+            queries: orQueries,
+          },
+        },
+      }),
+    );
+  }
+
+  if (organizationId) {
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "organizationIdQuery",
+          value: {
+            organizationId,
+          },
+        },
+      }),
+    );
+  }
+  console.log(queries);
+
+  return userService.listUsers({ queries: queries });
+}
+
+export type SearchUsersCommand = {
+  searchValue: string;
+  loginSettings: LoginSettings;
+  organizationId?: string;
+};
+
+const PhoneQuery = (searchValue: string) =>
+  create(SearchQuerySchema, {
+    query: {
+      case: "phoneQuery",
+      value: {
+        number: searchValue,
+        method: TextQueryMethod.EQUALS,
+      },
+    },
+  });
+
+const UserNameQuery = (searchValue: string) =>
+  create(SearchQuerySchema, {
+    query: {
+      case: "userNameQuery",
+      value: {
+        userName: searchValue,
+        method: TextQueryMethod.EQUALS,
+      },
+    },
+  });
+
+const EmailQuery = (searchValue: string) =>
+  create(SearchQuerySchema, {
+    query: {
+      case: "emailQuery",
+      value: {
+        emailAddress: searchValue,
+        method: TextQueryMethod.EQUALS,
+      },
+    },
+  });
+
+export async function searchUsers({
+  searchValue,
+  loginSettings,
+  organizationId,
+}: SearchUsersCommand) {
+  console.log(loginSettings);
+  const queries: SearchQuery[] = [];
+  const orQueries: SearchQuery[] = [];
+
+  // either use loginName or userName, email, phone
+  if (
+    loginSettings.disableLoginWithEmail &&
+    loginSettings.disableLoginWithPhone
+  ) {
+    const userNameQuery = UserNameQuery(searchValue);
+    queries.push(userNameQuery);
+  } else if (loginSettings.disableLoginWithEmail) {
+    const userNameQuery = UserNameQuery(searchValue);
+    orQueries.push(userNameQuery);
+
+    if (searchValue.length <= 20) {
+      const phoneQuery = PhoneQuery(searchValue);
+      orQueries.push(phoneQuery);
+    }
+  } else if (loginSettings.disableLoginWithPhone) {
+    const userNameQuery = UserNameQuery(searchValue);
+    orQueries.push(userNameQuery);
+
+    const emailQuery = EmailQuery(searchValue);
+    orQueries.push(emailQuery);
+  } else {
+    const userNameQuery = UserNameQuery(searchValue);
+    orQueries.push(userNameQuery);
+
+    const emailQuery = EmailQuery(searchValue);
+    orQueries.push(emailQuery);
+
+    if (searchValue.length <= 20) {
+      const phoneQuery = PhoneQuery(searchValue);
+      orQueries.push(phoneQuery);
+    }
+  }
+
+  if (orQueries.length > 0) {
     queries.push(
       create(SearchQuerySchema, {
         query: {

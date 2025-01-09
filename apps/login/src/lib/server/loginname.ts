@@ -16,8 +16,8 @@ import {
   getOrgsByDomain,
   listAuthenticationMethodTypes,
   listIDPLinks,
-  listUsers,
-  ListUsersCommand,
+  searchUsers,
+  SearchUsersCommand,
   startIdentityProviderFlow,
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
@@ -33,20 +33,17 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 export async function sendLoginname(command: SendLoginnameCommand) {
   const loginSettingsByContext = await getLoginSettings(command.organization);
 
-  let listUsersRequest: ListUsersCommand = {
-    userName: command.loginName,
+  if (!loginSettingsByContext) {
+    return { error: "Could not get login settings" };
+  }
+
+  let searchUsersRequest: SearchUsersCommand = {
+    searchValue: command.loginName,
     organizationId: command.organization,
+    loginSettings: loginSettingsByContext,
   };
 
-  if (!loginSettingsByContext?.disableLoginWithEmail) {
-    listUsersRequest.email = command.loginName;
-  }
-
-  if (!loginSettingsByContext?.disableLoginWithPhone) {
-    listUsersRequest.phone = command.loginName;
-  }
-
-  const { result: potentialUsers } = await listUsers(listUsersRequest);
+  const { result: potentialUsers } = await searchUsers(searchUsersRequest);
 
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders(

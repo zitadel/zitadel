@@ -54,6 +54,7 @@ export default async function Page(props: {
           loginName={loginName}
           authRequestId={authRequestId}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
+          loginSettings={loginSettings}
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
         >
