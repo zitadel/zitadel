@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   zitadel-disabled-tls:
@@ -17,7 +15,7 @@ services:
       ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     networks:
@@ -43,16 +41,16 @@ services:
       ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     networks:
       - 'zitadel'
     depends_on:
-      zitadel-init:
-        condition: 'service_completed_successfully'
       db:
         condition: 'service_healthy'
+      zitadel-init:
+        condition: 'service_completed_successfully'
 
   zitadel-enabled-tls:
     extends:
@@ -71,7 +69,7 @@ services:
       ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     volumes:
@@ -109,7 +107,7 @@ services:
       ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel_user
       ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel_pw
       ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: root
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
       ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
     networks:
@@ -125,10 +123,9 @@ services:
     restart: 'always'
     image: postgres:16-alpine
     environment:
-      PGUSER: root
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "zitadel", "-U", "postgres"]
+      test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
       timeout: 60s
       retries: 10

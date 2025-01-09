@@ -6,6 +6,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/v2/settings.proto";
+import "zitadel/idp/v2/idp.proto";
 import "google/protobuf/duration.proto";
 
 message LoginSettings {
@@ -134,6 +135,7 @@ message IdentityProvider {
   string id = 1;
   string name = 2;
   IdentityProviderType type = 3;
+  zitadel.idp.v2.Options options = 4;
 }
 
 enum IdentityProviderType {

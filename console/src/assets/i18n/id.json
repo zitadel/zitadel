@@ -2255,6 +2255,10 @@
       "CLIENTSECRETREGENERATED": "rahasia klien dihasilkan.",
       "DELETED": "Aplikasi dihapus.",
       "CONFIGCHANGED": "Perubahan terdeteksi!"
+    },
+    "LOGINV2": {
+      "USEV2": "Gunakan UI Login baru",
+      "BASEURL": "URL dasar kustom untuk UI Login baru"
     }
   },
   "GENDERS": { "0": "Tidak dikenal", "1": "Perempuan", "2": "Pria", "3": "Lainnya" },

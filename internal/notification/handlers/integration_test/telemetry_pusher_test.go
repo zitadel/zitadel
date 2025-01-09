@@ -89,7 +89,7 @@ func loginToClient(t *testing.T, instance *integration.Instance, clientID, redir
 		}},
 	})
 	require.NoError(t, err)
-	provider, err := instance.CreateRelyingPartyForDomain(iamOwnerCtx, instance.Domain, clientID, redirectURI)
+	provider, err := instance.CreateRelyingPartyForDomain(iamOwnerCtx, instance.Domain, clientID, redirectURI, instance.Users.Get(integration.UserTypeLogin).Username)
 	require.NoError(t, err)
 	callbackURL, err := url.Parse(callback.GetCallbackUrl())
 	require.NoError(t, err)

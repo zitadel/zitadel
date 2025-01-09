@@ -214,7 +214,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "implicit",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					client, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit)
+					client, err := Instance.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit, nil)
 					require.NoError(t, err)
 					authRequestID, err := Instance.CreateOIDCAuthRequestImplicit(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURIImplicit)
 					require.NoError(t, err)

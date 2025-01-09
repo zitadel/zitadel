@@ -64,8 +64,20 @@ func (t *Translator) SupportedLanguages() []language.Tag {
 	return t.allowedLanguages
 }
 
+// AddMessages adds messages to the translator for the given language tag.
+// If the tag is not in the allowed languages, the messages are not added.
 func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {
 	if len(messages) == 0 {
+		return nil
+	}
+	var isAllowed bool
+	for _, allowed := range t.allowedLanguages {
+		if allowed == tag {
+			isAllowed = true
+			break
+		}
+	}
+	if !isAllowed {
 		return nil
 	}
 	i18nMessages := make([]*i18n.Message, len(messages))
