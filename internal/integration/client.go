@@ -271,7 +271,7 @@ func (i *Instance) CreateOrganizationWithUserID(ctx context.Context, name, userI
 	return resp
 }
 
-func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email string) *user_v2.AddHumanUserResponse {
+func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email, phone string) *user_v2.AddHumanUserResponse {
 	resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
@@ -292,7 +292,7 @@ func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email strin
 			},
 		},
 		Phone: &user_v2.SetHumanPhone{
-			Phone: "+41791234567",
+			Phone: phone,
 			Verification: &user_v2.SetHumanPhone_IsVerified{
 				IsVerified: true,
 			},
@@ -327,7 +327,7 @@ func (i *Instance) CreateUserIDPlink(ctx context.Context, userID, externalID, id
 	)
 }
 
-func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) {
+func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) string {
 	reg, err := i.Client.UserV2.CreatePasskeyRegistrationLink(ctx, &user_v2.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user_v2.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
@@ -350,9 +350,10 @@ func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) {
 		PasskeyName:         "nice name",
 	})
 	logging.OnError(err).Panic("create user passkey")
+	return pkr.GetPasskeyId()
 }
 
-func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) {
+func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) string {
 	pkr, err := i.Client.UserV2.RegisterU2F(ctx, &user_v2.RegisterU2FRequest{
 		UserId: userID,
 		Domain: i.Domain,
@@ -368,6 +369,21 @@ func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) {
 		TokenName:           "nice name",
 	})
 	logging.OnError(err).Panic("create user u2f")
+	return pkr.GetU2FId()
+}
+
+func (i *Instance) RegisterUserOTPSMS(ctx context.Context, userID string) {
+	_, err := i.Client.UserV2.AddOTPSMS(ctx, &user_v2.AddOTPSMSRequest{
+		UserId: userID,
+	})
+	logging.OnError(err).Panic("create user sms")
+}
+
+func (i *Instance) RegisterUserOTPEmail(ctx context.Context, userID string) {
+	_, err := i.Client.UserV2.AddOTPEmail(ctx, &user_v2.AddOTPEmailRequest{
+		UserId: userID,
+	})
+	logging.OnError(err).Panic("create user email")
 }
 
 func (i *Instance) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *object.Details {
