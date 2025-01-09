@@ -154,6 +154,40 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       user.details?.resourceOwner,
     );
 
+    // recheck login settings after user discovery, as the search might have been done without org scope
+    if (
+      userLoginSettings?.disableLoginWithEmail &&
+      userLoginSettings?.disableLoginWithPhone
+    ) {
+      if (user.username !== command.loginName) {
+        return { error: "User not found in the system!" };
+      }
+    } else if (userLoginSettings?.disableLoginWithEmail) {
+      const humanUser =
+        potentialUsers[0].type.case === "human"
+          ? potentialUsers[0].type.value
+          : undefined;
+
+      if (
+        user.username !== command.loginName ||
+        humanUser?.phone?.phone !== command.loginName
+      ) {
+        return { error: "User not found in the system!" };
+      }
+    } else if (userLoginSettings?.disableLoginWithPhone) {
+      const humanUser =
+        potentialUsers[0].type.case === "human"
+          ? potentialUsers[0].type.value
+          : undefined;
+
+      if (
+        user.username !== command.loginName ||
+        humanUser?.email?.email !== command.loginName
+      ) {
+        return { error: "User not found in the system!" };
+      }
+    }
+
     const checks = create(ChecksSchema, {
       user: { search: { case: "userId", value: userId } },
     });
