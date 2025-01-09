@@ -444,17 +444,6 @@ const PhoneQuery = (searchValue: string) =>
     },
   });
 
-const UserNameQuery = (searchValue: string) =>
-  create(SearchQuerySchema, {
-    query: {
-      case: "userNameQuery",
-      value: {
-        userName: searchValue,
-        method: TextQueryMethod.EQUALS,
-      },
-    },
-  });
-
 const LoginNameQuery = (searchValue: string) =>
   create(SearchQuerySchema, {
     query: {
@@ -489,15 +478,14 @@ export async function searchUsers({
   suffix,
 }: SearchUsersCommand) {
   const queries: SearchQuery[] = [];
-  const orQueries: SearchQuery[] = [];
 
   // if a suffix is provided, we search for the userName concatenated with the suffix
   if (suffix) {
     const searchValueWithSuffix = `${searchValue}@${suffix}`;
-    const loginNameQuery = UserNameQuery(searchValueWithSuffix);
+    const loginNameQuery = LoginNameQuery(searchValueWithSuffix);
     queries.push(loginNameQuery);
   } else {
-    const loginNameQuery = UserNameQuery(searchValue);
+    const loginNameQuery = LoginNameQuery(searchValue);
     queries.push(loginNameQuery);
   }
 
