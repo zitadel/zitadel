@@ -54,6 +54,7 @@ func mapResource[T sresources.ResourceHolder](router *mux.Router, mw zhttp_middl
 	resourceRouter := router.PathPrefix("/" + path.Join(zhttp.OrgIdInPathVariable, string(handler.ResourceNamePlural()))).Subrouter()
 
 	resourceRouter.Handle("", mw(handleResourceCreatedResponse(adapter.Create))).Methods(http.MethodPost)
+	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.Get))).Methods(http.MethodGet)
 	resourceRouter.Handle("/{id}", mw(handleEmptyResponse(adapter.Delete))).Methods(http.MethodDelete)
 }
 
@@ -67,6 +68,22 @@ func handleResourceCreatedResponse[T sresources.ResourceHolder](next func(*http.
 		resource := entity.GetResource()
 		w.Header().Set(zhttp.Location, resource.Meta.Location)
 		w.WriteHeader(http.StatusCreated)
+
+		err = json.NewEncoder(w).Encode(entity)
+		logging.OnError(err).Warn("scim json response encoding failed")
+		return nil
+	}
+}
+
+func handleResourceResponse[T sresources.ResourceHolder](next func(*http.Request) (T, error)) zhttp_middlware.HandlerFuncWithError {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		entity, err := next(r)
+		if err != nil {
+			return err
+		}
+
+		resource := entity.GetResource()
+		w.Header().Set(zhttp.ContentLocation, resource.Meta.Location)
 
 		err = json.NewEncoder(w).Encode(entity)
 		logging.OnError(err).Warn("scim json response encoding failed")
