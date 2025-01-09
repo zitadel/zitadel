@@ -57,6 +57,7 @@ export function UsernameForm({
       loginName: values.loginName,
       organization,
       authRequestId,
+      suffix,
     })
       .catch(() => {
         setError("An internal error occurred");

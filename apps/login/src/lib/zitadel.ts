@@ -430,6 +430,7 @@ export type SearchUsersCommand = {
   searchValue: string;
   loginSettings: LoginSettings;
   organizationId?: string;
+  suffix?: string;
 };
 
 const PhoneQuery = (searchValue: string) =>
@@ -454,6 +455,17 @@ const UserNameQuery = (searchValue: string) =>
     },
   });
 
+const LoginNameQuery = (searchValue: string) =>
+  create(SearchQuerySchema, {
+    query: {
+      case: "loginNameQuery",
+      value: {
+        loginName: searchValue,
+        method: TextQueryMethod.EQUALS,
+      },
+    },
+  });
+
 const EmailQuery = (searchValue: string) =>
   create(SearchQuerySchema, {
     query: {
@@ -465,55 +477,83 @@ const EmailQuery = (searchValue: string) =>
     },
   });
 
+/**
+ * this is a dedicated search function to search for users from the loginname page
+ * it searches users based on the loginName or userName and org suffix combination, and falls back to email and phone if no users are found
+ *  */
+
 export async function searchUsers({
   searchValue,
   loginSettings,
   organizationId,
+  suffix,
 }: SearchUsersCommand) {
   const queries: SearchQuery[] = [];
   const orQueries: SearchQuery[] = [];
 
-  // either use loginName or userName, email, phone
+  // if a suffix is provided, we search for the userName concatenated with the suffix
+  if (suffix) {
+    const searchValueWithSuffix = `${searchValue}@${suffix}`;
+    const loginNameQuery = UserNameQuery(searchValueWithSuffix);
+    queries.push(loginNameQuery);
+  } else {
+    const loginNameQuery = UserNameQuery(searchValue);
+    queries.push(loginNameQuery);
+  }
+
+  if (organizationId) {
+    queries.push(
+      create(SearchQuerySchema, {
+        query: {
+          case: "organizationIdQuery",
+          value: {
+            organizationId,
+          },
+        },
+      }),
+    );
+  }
+
+  const loginNameResult = await userService.listUsers({ queries: queries });
+
+  if (loginNameResult.result.length > 1) {
+    return { error: "Multiple users found" };
+  }
+
+  if (loginNameResult.result.length == 1) {
+    return loginNameResult;
+  }
+
+  const emailAndPhoneQueries: SearchQuery[] = [];
   if (
     loginSettings.disableLoginWithEmail &&
     loginSettings.disableLoginWithPhone
   ) {
-    const userNameQuery = UserNameQuery(searchValue);
-    queries.push(userNameQuery);
-  } else if (loginSettings.disableLoginWithEmail) {
-    const userNameQuery = UserNameQuery(searchValue);
-    orQueries.push(userNameQuery);
-
-    if (searchValue.length <= 20) {
-      const phoneQuery = PhoneQuery(searchValue);
-      orQueries.push(phoneQuery);
-    }
+    return { error: "No user was found in the system" };
+  } else if (loginSettings.disableLoginWithEmail && searchValue.length <= 20) {
+    const phoneQuery = PhoneQuery(searchValue);
+    emailAndPhoneQueries.push(phoneQuery);
   } else if (loginSettings.disableLoginWithPhone) {
-    const userNameQuery = UserNameQuery(searchValue);
-    orQueries.push(userNameQuery);
-
     const emailQuery = EmailQuery(searchValue);
-    orQueries.push(emailQuery);
+    emailAndPhoneQueries.push(emailQuery);
   } else {
-    const userNameQuery = UserNameQuery(searchValue);
-    orQueries.push(userNameQuery);
+    const emailAndPhoneOrQueries: SearchQuery[] = [];
 
     const emailQuery = EmailQuery(searchValue);
-    orQueries.push(emailQuery);
+    emailAndPhoneOrQueries.push(emailQuery);
 
+    let phoneQuery;
     if (searchValue.length <= 20) {
-      const phoneQuery = PhoneQuery(searchValue);
-      orQueries.push(phoneQuery);
+      phoneQuery = PhoneQuery(searchValue);
+      emailAndPhoneOrQueries.push(phoneQuery);
     }
-  }
 
-  if (orQueries.length > 0) {
     queries.push(
       create(SearchQuerySchema, {
         query: {
           case: "orQuery",
           value: {
-            queries: orQueries,
+            queries: emailAndPhoneOrQueries,
           },
         },
       }),
@@ -533,7 +573,19 @@ export async function searchUsers({
     );
   }
 
-  return userService.listUsers({ queries: queries });
+  const emailOrPhoneResult = await userService.listUsers({
+    queries: emailAndPhoneQueries,
+  });
+
+  if (emailOrPhoneResult.result.length > 1) {
+    return { error: "Multiple users found" };
+  }
+
+  if (emailOrPhoneResult.result.length == 1) {
+    return loginNameResult;
+  }
+
+  return { error: "No user was found in the system" };
 }
 
 export async function getDefaultOrg(): Promise<Organization | null> {

@@ -26,6 +26,7 @@ export type SendLoginnameCommand = {
   loginName: string;
   authRequestId?: string;
   organization?: string;
+  suffix?: string;
 };
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
@@ -41,9 +42,20 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     searchValue: command.loginName,
     organizationId: command.organization,
     loginSettings: loginSettingsByContext,
+    suffix: command.suffix,
   };
 
-  const { result: potentialUsers } = await searchUsers(searchUsersRequest);
+  const searchResult = await searchUsers(searchUsersRequest);
+
+  if ("error" in searchResult && searchResult.error) {
+    return searchResult;
+  }
+
+  if (!("result" in searchResult)) {
+    return { error: "Could not search users" };
+  }
+
+  const { result: potentialUsers } = searchResult;
 
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders(
