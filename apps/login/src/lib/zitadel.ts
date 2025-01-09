@@ -508,11 +508,11 @@ export async function searchUsers({
     return { error: "An error occurred." };
   }
 
-  if (loginNameResult.details.totalResult > BigInt(1)) {
+  if (loginNameResult.result.length > 1) {
     return { error: "Multiple users found" };
   }
 
-  if (loginNameResult.details?.totalResult == BigInt(1)) {
+  if (loginNameResult.result.length == 1) {
     return loginNameResult;
   }
 
