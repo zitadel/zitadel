@@ -34,43 +34,57 @@ func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string,
 }
 
 func (a *instanceInterceptor) Handler(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		a.handleInstance(w, r, next)
-	})
+	return a.HandlerFunc(next)
 }
 
-func (a *instanceInterceptor) HandlerFunc(next http.HandlerFunc) http.HandlerFunc {
+func (a *instanceInterceptor) HandlerFunc(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		a.handleInstance(w, r, next)
-	}
-}
-
-func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Request, next http.Handler) {
-	for _, prefix := range a.ignoredPrefixes {
-		if strings.HasPrefix(r.URL.Path, prefix) {
+		ctx, err := a.setInstanceIfNeeded(r.Context(), r)
+		if err == nil {
+			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 			return
 		}
-	}
-	ctx, err := setInstance(r, a.verifier)
-	if err != nil {
+
 		origin := zitadel_http.DomainContext(r.Context())
 		logging.WithFields("origin", origin.Origin(), "externalDomain", a.externalDomain).WithError(err).Error("unable to set instance")
+
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(a.translator.LocalizeFromRequest(r, zErr.GetMessage(), nil))
 			http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, a.externalDomain, zErr), http.StatusNotFound)
 			return
 		}
+
 		http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, a.externalDomain), http.StatusNotFound)
-		return
 	}
-	r = r.WithContext(ctx)
-	next.ServeHTTP(w, r)
 }
 
-func setInstance(r *http.Request, verifier authz.InstanceVerifier) (_ context.Context, err error) {
-	ctx := r.Context()
+func (a *instanceInterceptor) HandlerFuncWithError(next HandlerFuncWithError) HandlerFuncWithError {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		ctx, err := a.setInstanceIfNeeded(r.Context(), r)
+		if err != nil {
+			origin := zitadel_http.DomainContext(r.Context())
+			logging.WithFields("origin", origin.Origin(), "externalDomain", a.externalDomain).WithError(err).Error("unable to set instance")
+			return err
+		}
+
+		r = r.WithContext(ctx)
+		return next(w, r)
+	}
+}
+
+func (a *instanceInterceptor) setInstanceIfNeeded(ctx context.Context, r *http.Request) (context.Context, error) {
+	for _, prefix := range a.ignoredPrefixes {
+		if strings.HasPrefix(r.URL.Path, prefix) {
+			return ctx, nil
+		}
+	}
+
+	return setInstance(ctx, a.verifier)
+}
+
+func setInstance(ctx context.Context, verifier authz.InstanceVerifier) (_ context.Context, err error) {
 	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

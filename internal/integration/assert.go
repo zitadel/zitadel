@@ -6,6 +6,8 @@ import (
 
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -128,6 +130,13 @@ func AssertResourceListDetails[D ResourceListDetailsMsg](t assert.TestingT, expe
 	}
 }
 
+func AssertGrpcStatus(t assert.TestingT, expected codes.Code, err error) {
+	assert.Error(t, err)
+	statusErr, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, expected, statusErr.Code())
+}
+
 // EqualProto is inspired by [assert.Equal], only that it tests equality of a proto message.
 // A message diff is printed on the error test log if the messages are not equal.
 //
@@ -159,4 +168,10 @@ func diffProto(expected, actual proto.Message) string {
 		panic(err)
 	}
 	return "\n\nDiff:\n" + diff
+}
+
+func AssertMapContains[M ~map[K]V, K comparable, V any](t *testing.T, m M, key K, expectedValue V) {
+	val, exists := m[key]
+	assert.True(t, exists, "Key '%s' should exist in the map", key)
+	assert.Equal(t, expectedValue, val, "Key '%s' should have value '%d'", key, expectedValue)
 }
