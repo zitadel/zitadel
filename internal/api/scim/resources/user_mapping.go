@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*command.AddHuman, error) {
@@ -78,4 +79,55 @@ func (h *UsersHandler) mapPrimaryPhone(scimUser *ScimUser) command.Phone {
 	}
 
 	return command.Phone{}
+}
+
+func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {
+	cascades := make([]*command.CascadingMembership, len(memberships))
+	for i, membership := range memberships {
+		cascades[i] = &command.CascadingMembership{
+			UserID:        membership.UserID,
+			ResourceOwner: membership.ResourceOwner,
+			IAM:           cascadingIAMMembership(membership.IAM),
+			Org:           cascadingOrgMembership(membership.Org),
+			Project:       cascadingProjectMembership(membership.Project),
+			ProjectGrant:  cascadingProjectGrantMembership(membership.ProjectGrant),
+		}
+	}
+	return cascades
+}
+
+func cascadingIAMMembership(membership *query.IAMMembership) *command.CascadingIAMMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingIAMMembership{IAMID: membership.IAMID}
+}
+
+func cascadingOrgMembership(membership *query.OrgMembership) *command.CascadingOrgMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingOrgMembership{OrgID: membership.OrgID}
+}
+
+func cascadingProjectMembership(membership *query.ProjectMembership) *command.CascadingProjectMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectMembership{ProjectID: membership.ProjectID}
+}
+
+func cascadingProjectGrantMembership(membership *query.ProjectGrantMembership) *command.CascadingProjectGrantMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectGrantMembership{ProjectID: membership.ProjectID, GrantID: membership.GrantID}
+}
+
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
+	converted := make([]string, len(userGrants))
+	for i, grant := range userGrants {
+		converted[i] = grant.ID
+	}
+	return converted
 }

@@ -5,7 +5,7 @@ package integration_test
 import (
 	"context"
 	_ "embed"
-	"errors"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
@@ -16,7 +16,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"net/http"
 	"path"
-	"strconv"
 	"testing"
 )
 
@@ -139,20 +138,14 @@ func TestCreateUser(t *testing.T) {
 			}
 
 			if err != nil {
-				assert.IsType(t, new(scim.ScimError), err)
-
-				var scimErr *scim.ScimError
-				errors.As(err, &scimErr)
-				assert.Equal(t, tt.scimErrorType, scimErr.ScimType)
-
 				statusCode := tt.errorStatus
 				if statusCode == 0 {
 					statusCode = http.StatusBadRequest
 				}
-				assert.Equal(t, strconv.Itoa(statusCode), scimErr.Status)
-
+				scimErr := scim.RequireScimError(t, statusCode, err)
+				assert.Equal(t, tt.scimErrorType, scimErr.Error.ScimType)
 				if tt.zitadelErrID != "" {
-					assert.Equal(t, tt.zitadelErrID, scimErr.ZitadelDetail.ID)
+					assert.Equal(t, tt.zitadelErrID, scimErr.Error.ZitadelDetail.ID)
 				}
 
 				return
@@ -175,13 +168,8 @@ func TestCreateUser_duplicate(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, minimalUserJson)
-	require.Error(t, err)
-	assert.IsType(t, new(scim.ScimError), err)
-
-	var scimErr *scim.ScimError
-	errors.As(err, &scimErr)
-	assert.Equal(t, strconv.Itoa(http.StatusConflict), scimErr.Status)
-	assert.Equal(t, "User already exists", scimErr.Detail)
+	scimErr := scim.RequireScimError(t, http.StatusConflict, err)
+	assert.Equal(t, "User already exists", scimErr.Error.Detail)
 
 	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
 	require.NoError(t, err)
@@ -247,4 +235,10 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 
 	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
 	require.NoError(t, err)
+}
+
+func TestCreateUser_anotherOrg(t *testing.T) {
+	org := Instance.CreateOrganization(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), gofakeit.Name(), gofakeit.Email())
+	_, err := Instance.Client.SCIM.Users.Create(CTX, org.OrganizationId, fullUserJson)
+	scim.RequireScimError(t, http.StatusNotFound, err)
 }
