@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4.1.6
+        uses: actions/checkout@v4
 
       - name: Setup Buf
         uses: bufbuild/buf-setup-action@v1.45.0
