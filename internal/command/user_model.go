@@ -137,6 +137,10 @@ func isUserStateInactive(state domain.UserState) bool {
 	return hasUserState(state, domain.UserStateInactive)
 }
 
+func isUserStateActive(state domain.UserState) bool {
+	return hasUserState(state, domain.UserStateActive)
+}
+
 func isUserStateInitial(state domain.UserState) bool {
 	return hasUserState(state, domain.UserStateInitial)
 }
