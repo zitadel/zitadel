@@ -18,6 +18,10 @@ type MemberAddedEvent struct {
 	member.MemberAddedEvent
 }
 
+func (e *MemberAddedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations("project")
+}
+
 func NewProjectMemberAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,

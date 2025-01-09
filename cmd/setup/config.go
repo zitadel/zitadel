@@ -129,6 +129,7 @@ type Steps struct {
 	s40InitPushFunc                         *InitPushFunc
 	s39DeleteStaleOrgFields                 *DeleteStaleOrgFields
 	s41FillFieldsForInstanceDomains         *FillFieldsForInstanceDomains
+	s45InitPermissionFunctions              *InitPermissionFunctions
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

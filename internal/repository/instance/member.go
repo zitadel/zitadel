@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/member"
 )
 
-var (
+const (
 	MemberAddedEventType          = instanceEventTypePrefix + member.AddedEventType
 	MemberChangedEventType        = instanceEventTypePrefix + member.ChangedEventType
 	MemberRemovedEventType        = instanceEventTypePrefix + member.RemovedEventType
@@ -16,6 +16,10 @@ var (
 
 type MemberAddedEvent struct {
 	member.MemberAddedEvent
+}
+
+func (e *MemberAddedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations("instance")
 }
 
 func NewMemberAddedEvent(

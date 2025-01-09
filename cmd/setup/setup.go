@@ -172,6 +172,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s39DeleteStaleOrgFields = &DeleteStaleOrgFields{dbClient: esPusherDBClient}
 	steps.s40InitPushFunc = &InitPushFunc{dbClient: esPusherDBClient}
 	steps.s41FillFieldsForInstanceDomains = &FillFieldsForInstanceDomains{eventstore: eventstoreClient}
+	steps.s45InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -220,9 +221,13 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s36FillV2Milestones,
 		steps.s38BackChannelLogoutNotificationStart,
 		steps.s41FillFieldsForInstanceDomains,
+		steps.s45InitPermissionFunctions,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
+
+	step := &AddRolePermissions{eventstore: eventstoreClient, rolePermissionMappings: config.InternalAuthZ.RolePermissionMappings}
+	mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		mustExecuteMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")

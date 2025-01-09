@@ -7,12 +7,20 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+// Event types
 const (
 	UniqueMember            = "member"
 	AddedEventType          = "member.added"
 	ChangedEventType        = "member.changed"
 	RemovedEventType        = "member.removed"
 	CascadeRemovedEventType = "member.cascade.removed"
+)
+
+// Field table and unique types
+const (
+	memberRoleTypeSuffix  string = "_member_role"
+	MemberRoleRevision    uint8  = 1
+	roleSearchFieldSuffix string = "_role"
 )
 
 func NewAddMemberUniqueConstraint(aggregateID, userID string) *eventstore.UniqueConstraint {
@@ -42,6 +50,32 @@ func (e *MemberAddedEvent) Payload() interface{} {
 
 func (e *MemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+}
+
+func (e *MemberAddedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
+	ops := make([]*eventstore.FieldOperation, len(e.Roles))
+	for i, role := range e.Roles {
+		ops[i] = eventstore.SetField(
+			e.Aggregate(),
+			memberSearchObject(prefix, e.UserID),
+			prefix+roleSearchFieldSuffix,
+			&eventstore.Value{
+				Value:        role,
+				MustBeUnique: false,
+				ShouldIndex:  true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+			eventstore.FieldTypeValue,
+		)
+	}
+	return ops
 }
 
 func NewMemberAddedEvent(
@@ -184,4 +218,12 @@ func CascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	}
 
 	return e, nil
+}
+
+func memberSearchObject(prefix, userID string) eventstore.Object {
+	return eventstore.Object{
+		Type:     prefix + memberRoleTypeSuffix,
+		ID:       userID,
+		Revision: MemberRoleRevision,
+	}
 }
