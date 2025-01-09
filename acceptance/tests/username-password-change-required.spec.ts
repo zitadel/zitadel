@@ -2,10 +2,8 @@ import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
-import { loginScreenExpect, loginWithPassword, startLogin } from "./login";
-import { loginname } from "./loginname";
-import {changePassword, resetPassword, startResetPassword} from "./password";
-import { resetPasswordScreen, resetPasswordScreenExpect } from "./password-screen";
+import { loginScreenExpect, loginWithPassword } from "./login";
+import { changePassword } from "./password";
 import { PasswordUser } from "./user";
 
 // Read from ".env" file.

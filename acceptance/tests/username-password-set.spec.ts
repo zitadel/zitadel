@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 import path from "path";
 import { loginScreenExpect, loginWithPassword, startLogin } from "./login";
 import { loginname } from "./loginname";
-import {changePassword, resetPassword, startResetPassword} from "./password";
-import {changePasswordScreen, resetPasswordScreen, resetPasswordScreenExpect} from "./password-screen";
+import { resetPassword, startResetPassword } from "./password";
+import { resetPasswordScreen, resetPasswordScreenExpect } from "./password-screen";
 import { PasswordUser } from "./user";
 
 // Read from ".env" file.

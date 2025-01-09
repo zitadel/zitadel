@@ -1,16 +1,15 @@
 import { Page } from "@playwright/test";
 import { emailVerifyScreen } from "./email-verify-screen";
-import { getOtpFromSink } from "./sink";
 
 export async function startEmailVerify(page: Page, loginname: string) {
-    await page.goto("/verify");
+  await page.goto("/verify");
 }
 
 export async function emailVerify(page: Page, code: string) {
-    await emailVerifyScreen(page, code);
-    await page.getByTestId("submit-button").click();
+  await emailVerifyScreen(page, code);
+  await page.getByTestId("submit-button").click();
 }
 
 export async function emailVerifyResend(page: Page) {
-    await page.getByTestId("resend-button").click();
+  await page.getByTestId("resend-button").click();
 }
