@@ -521,7 +521,7 @@ export async function searchUsers({
     loginSettings.disableLoginWithEmail &&
     loginSettings.disableLoginWithPhone
   ) {
-    return { error: "No user was found in the system" };
+    return { error: "User not found in the system" };
   } else if (loginSettings.disableLoginWithEmail && searchValue.length <= 20) {
     const phoneQuery = PhoneQuery(searchValue);
     emailAndPhoneQueries.push(phoneQuery);
@@ -581,7 +581,7 @@ export async function searchUsers({
     return loginNameResult;
   }
 
-  return { error: "No user was found in the system" };
+  return { error: "User not found in the system" };
 }
 
 export async function getDefaultOrg(): Promise<Organization | null> {
