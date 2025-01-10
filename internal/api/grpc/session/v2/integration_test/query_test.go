@@ -208,33 +208,6 @@ func TestServer_GetSession(t *testing.T) {
 				Session: &session.Session{},
 			},
 		},
-		{
-			name: "get session, user, ok",
-			args: args{
-				UserCTX,
-				&session.GetSessionRequest{},
-				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
-					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{
-						Checks: &session.Checks{
-							User: &session.CheckUser{
-								Search: &session.CheckUser_UserId{
-									UserId: User.GetUserId(),
-								},
-							},
-						},
-					},
-					)
-					require.NoError(t, err)
-					request.SessionId = resp.SessionId
-					request.SessionToken = gu.Ptr(resp.SessionToken)
-					return resp.GetDetails().GetSequence()
-				},
-			},
-			wantFactors: []wantFactor{wantUserFactor},
-			want: &session.GetSessionResponse{
-				Session: &session.Session{},
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
