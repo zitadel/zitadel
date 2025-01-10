@@ -84,20 +84,34 @@ type SessionsSearchQueries struct {
 func sessionsCheckPermission(ctx context.Context, sessions *Sessions, permissionCheck domain.PermissionCheck) {
 	sessions.Sessions = slices.DeleteFunc(sessions.Sessions,
 		func(session *Session) bool {
-			return sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserFactor, permissionCheck) != nil
+			return sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserAgent, session.UserFactor, permissionCheck) != nil
 		},
 	)
 }
 
-func sessionCheckPermission(ctx context.Context, resourceOwner string, creator string, userFactor SessionUserFactor, permissionCheck domain.PermissionCheck) error {
+func sessionCheckPermission(ctx context.Context, resourceOwner string, creator string, useragent domain.UserAgent, userFactor SessionUserFactor, permissionCheck domain.PermissionCheck) error {
 	data := authz.GetCtxData(ctx)
-	// only check for permission if user is not the creator and not the user the session belongs to
-	if data.UserID != creator && data.UserID != userFactor.UserID {
-		if err := permissionCheck(ctx, domain.PermissionSessionRead, resourceOwner, ""); err != nil {
+	// no permission check necessary if user is creator
+	if data.UserID == creator {
+		return nil
+	}
+	// no permission check necessary if session belongs to the user
+	if userFactor.UserID != "" && data.UserID == userFactor.UserID {
+		return nil
+	}
+	// no permission check necessary if session belongs to the same useragent as used
+	if data.AgentID != "" && useragent.FingerprintID != nil && *useragent.FingerprintID != "" && data.AgentID == *useragent.FingerprintID {
+		return nil
+	}
+	// if session belongs to a user, check for permission on the user resource
+	if userFactor.ResourceOwner != "" {
+		if err := permissionCheck(ctx, domain.PermissionSessionRead, userFactor.ResourceOwner, userFactor.UserID); err != nil {
 			return err
 		}
+		return nil
 	}
-	return nil
+	// default, check for permission on instance
+	return permissionCheck(ctx, domain.PermissionSessionRead, resourceOwner, "")
 }
 
 func (q *SessionsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -221,7 +235,7 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		return nil, err
 	}
 	if sessionToken == "" {
-		if err := sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserFactor, permissionCheck); err != nil {
+		if err := sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserAgent, session.UserFactor, permissionCheck); err != nil {
 			return nil, err
 		}
 		return session, nil

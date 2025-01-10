@@ -208,6 +208,33 @@ func TestServer_GetSession(t *testing.T) {
 				Session: &session.Session{},
 			},
 		},
+		{
+			name: "get session, user, ok",
+			args: args{
+				UserCTX,
+				&session.GetSessionRequest{},
+				func(ctx context.Context, t *testing.T, request *session.GetSessionRequest) uint64 {
+					resp, err := Client.CreateSession(ctx, &session.CreateSessionRequest{
+						Checks: &session.Checks{
+							User: &session.CheckUser{
+								Search: &session.CheckUser_UserId{
+									UserId: User.GetUserId(),
+								},
+							},
+						},
+					},
+					)
+					require.NoError(t, err)
+					request.SessionId = resp.SessionId
+					request.SessionToken = gu.Ptr(resp.SessionToken)
+					return resp.GetDetails().GetSequence()
+				},
+			},
+			wantFactors: []wantFactor{wantUserFactor},
+			want: &session.GetSessionResponse{
+				Session: &session.Session{},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -590,6 +617,79 @@ func TestServer_ListSessions(t *testing.T) {
 				},
 				Sessions: []*session.Session{},
 			},
+		},
+		{
+			name: "list sessions, useragent, ok",
+			args: args{
+				IAMOwnerCTX,
+				&session.ListSessionsRequest{},
+				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
+					info := createSession(ctx, t, User.GetUserId(), "useragent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
+					request.Queries = append(request.Queries,
+						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
+						&session.SearchQuery{Query: &session.SearchQuery_UseragentQuery{UseragentQuery: &session.UserAgentQuery{Id: gu.Ptr("useragent")}}})
+					return []*sessionAttr{info}
+				},
+			},
+			wantExpirationWindow: time.Minute * 5,
+			wantFactors:          []wantFactor{wantUserFactor},
+			want: &session.ListSessionsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				Sessions: []*session.Session{
+					{
+						Metadata: map[string][]byte{"key": []byte("value")},
+						UserAgent: &session.UserAgent{
+							FingerprintId: gu.Ptr("useragent"),
+							Ip:            gu.Ptr("1.2.3.4"),
+							Description:   gu.Ptr("Description"),
+							Header: map[string]*session.UserAgent_HeaderValues{
+								"foo": {Values: []string{"foo", "bar"}},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list sessions, wrong useragent",
+			args: args{
+				IAMOwnerCTX,
+				&session.ListSessionsRequest{},
+				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
+					info := createSession(ctx, t, User.GetUserId(), "useragent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
+					request.Queries = append(request.Queries,
+						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
+						&session.SearchQuery{Query: &session.SearchQuery_UseragentQuery{UseragentQuery: &session.UserAgentQuery{Id: gu.Ptr("wronguseragent")}}})
+					return []*sessionAttr{}
+				},
+			},
+			wantExpirationWindow: time.Minute * 5,
+			wantFactors:          []wantFactor{wantUserFactor},
+			want: &session.ListSessionsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				Sessions: []*session.Session{},
+			},
+		},
+		{
+			name: "list sessions, empty useragent",
+			args: args{
+				IAMOwnerCTX,
+				&session.ListSessionsRequest{},
+				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
+					request.Queries = append(request.Queries,
+						&session.SearchQuery{Query: &session.SearchQuery_UseragentQuery{UseragentQuery: &session.UserAgentQuery{Id: gu.Ptr("")}}})
+					return []*sessionAttr{}
+				},
+			},
+			wantExpirationWindow: time.Minute * 5,
+			wantFactors:          []wantFactor{wantUserFactor},
+			wantErr:              true,
 		},
 	}
 	for _, tt := range tests {

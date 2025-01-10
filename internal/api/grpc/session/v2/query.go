@@ -96,7 +96,10 @@ func sessionQueryToQuery(ctx context.Context, sq *session.SearchQuery) (query.Se
 		if q.UseragentQuery != nil && q.UseragentQuery.GetId() != "" {
 			return query.NewSessionUserAgentFingerprintIDSearchQuery(q.UseragentQuery.GetId())
 		}
-		return query.NewSessionUserAgentFingerprintIDSearchQuery(authz.GetCtxData(ctx).AgentID)
+		if agentID := authz.GetCtxData(ctx).AgentID; agentID != "" {
+			return query.NewSessionUserAgentFingerprintIDSearchQuery(agentID)
+		}
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-x8n23uh", "List.Query.Invalid")
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")
 	}
