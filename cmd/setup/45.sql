@@ -68,7 +68,7 @@ SELECT
     ue.aggregate_id
     , ue.correct_owner
     , jsonb_object_agg(
-        ue.sequence
+        ue.sequence::TEXT --formant to string because crdb is not able to handle int
         , ue.wrong_owner
     ) payload
 FROM
