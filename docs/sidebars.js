@@ -942,6 +942,19 @@ module.exports = {
         },
       ],
     },
+    {
+      type: "category",
+      label: "Stream",
+      collapsed: false,
+      link: {type: "doc", id: "self-hosting/stream/index"},
+      items: [
+        "self-hosting/stream/schema",
+        "self-hosting/stream/config",
+        "self-hosting/stream/debugging",
+        "self-hosting/stream/analytics",
+        "self-hosting/stream/integrations",
+      ],
+    },
   ],
   legal: [
     {

@@ -1,0 +1,53 @@
+---
+title: Consume Streams In Your Application
+sidebar_label: Integrations
+---
+
+Write a record handler in your preferred language to react on specific records.
+If your language has a static type system and a proto generator,
+you can deserialize Zitadel records into versioned record types and ensure backward and forward compatibility.
+
+### Example Stream Configuration
+
+```yaml
+Types:
+  - Type: "APICalls"
+    Enabled: true
+    # Formatting records as "jsonproto" allows to deserialize records into your languages typed representation of it
+    Format: "jsonproto"
+    # Pinning the record version allows you to update Zitadel at any time without breaking your handler.
+    RecordVersion: "v1"
+    # Wrapping the record in a VersionedRecord allows you to conveniently handle all record versions.
+    VersionedRecord: true
+```
+
+### Example Slack Channel Notifier
+
+```go
+import (
+    "github.com/zitadel/logging/records/v1"
+    "github.com/zitadel/logging/records/v2"
+    "google.golang.org/protobuf/encoding/protojson"
+)
+
+func handle(raw []byte) {
+	record := &logging.VersionedRecord{}
+	protojson.Unmarshal([]byte(raw), record)
+	var message string
+	switch r := record.GetRecord().(type) {
+	case *logging.VersionedRecord_RecordV1:
+		if r.RecordV1.GetApi().GetMethod() != "AddOrganization" {
+			return
+		}
+		message = r.RecordV1.GetMessage()
+    case *logging.VersionedRecord_RecordV2:
+        if r.RecordV2.GetApi().GetMethod() != "AddOrganization" {
+            return
+        }
+        message = r.RecordV2.GetText()
+    default:
+        return
+	}
+	slack.Send(message)
+}
+```

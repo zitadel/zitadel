@@ -1,0 +1,60 @@
+---
+title: Analyze Zitadel Data
+sidebar_label: Analytics
+---
+
+Get the insights you need about how your system is used.
+
+## Use an analytics storage
+
+All request scoped log records have a trace_id.
+Using the trace_id, join and aggregate the records together as you like.
+The easiest way to do so is to ingest the streams you need into an analytics storage.
+For example, you can do so by using the format "otel" and run an Otel collector that ingests the logs into your ClickHouse.
+Don't forget to make sure, your streams are configured to redact, remove or anonymize sensitive values and PII.
+
+## Examples
+
+Learn here about how billing relevant Zitadel Cloud metrics are producible to get some inspiration.
+
+### Active Users
+
+To calculate active users over a period of time, we need to distinct count the anonymized user ids in this period.
+
+#### Example Stream Configuration
+
+```yaml
+Types:
+- Type: "Authentications"
+  Enabled: true
+  Format: "otel"
+  SensitiveFields: "remove"
+  PersonallyIdentifiableInformation: "anonymize"
+- Type: "Authorizations"
+  Enabled: true
+  Format: "otel"
+  SensitiveFields: "remove"
+  PersonallyIdentifiableInformation: "anonymize"
+```
+
+#### Example ClickHouse SQL
+
+```sql
+SELECT toMonth(Timestamp) AS month,
+       COUNT(DISTINCT path(Body, "Stream", "AuthZ", "UserID")) AS active_users
+FROM otel_logs
+WHERE path(Resource, "service.name") = "zitadel"
+  AND (
+    (
+        path(Body, "Stream", "AuthN", "Success") = true
+        AND path(Body, "Stream", "AuthN", "Method") IN ("OIDCAccessToken", "OIDCRefreshToken", "SessionAPI", "SAMLResponse")
+    )
+    OR (
+        path(Body, "Stream", "AuthZ", "Success") = true
+        AND path(Body, "Stream", "AuthZ", "UserID") != ""
+    )
+  )
+GROUP BY month
+```
+
+### TODO: Management Requests

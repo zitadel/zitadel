@@ -1,0 +1,19 @@
+---
+title: Read Zitadel Streams
+sidebar_label: Stream
+---
+
+Zitadel by default writes [structured stream records](/docs/self-hosting/stream/schema) to its processes standard error file.
+You can make use of this if you would like to:
+- [Debug runtime or user errors](/docs/self-hosting/stream/debugging)
+- [Analyze usage or bill your customers](/docs/self-hosting/stream/analytics)
+- [Accelerate your auditing processes](/docs/self-hosting/stream/auditing)
+- [Run a custom forward and backward compatible handler for type safe records](/docs/self-hosting/stream/integrations)
+
+[Configure specific streams](/docs/self-hosting/stream/config) to make them fit into your ecosystem.
+
+## Out-of-scope: Runtime Observability
+
+For runtime observability, rather use Zitadels metrics endpoint.
+If you use the official Zitadel Helm chart, you can enable alerts on predefined service level indicators and objectives for sloth.
+This feature is under construction :construction:
