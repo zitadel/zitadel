@@ -119,6 +119,38 @@ func (e *MemberChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 	return nil
 }
 
+// FieldOperations removes the existing membership role fields first and sets the new roles after.
+func (e *MemberChangedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
+	ops := make([]*eventstore.FieldOperation, len(e.Roles)+1)
+	ops[0] = eventstore.RemoveSearchFieldsByAggregateAndObject(
+		e.Aggregate(),
+		memberSearchObject(prefix, e.UserID),
+	)
+
+	for i, role := range e.Roles {
+		ops[i+1] = eventstore.SetField(
+			e.Aggregate(),
+			memberSearchObject(prefix, e.UserID),
+			prefix+roleSearchFieldSuffix,
+			&eventstore.Value{
+				Value:        role,
+				MustBeUnique: false,
+				ShouldIndex:  true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+			eventstore.FieldTypeValue,
+		)
+	}
+	return ops
+}
+
 func NewMemberChangedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
@@ -158,6 +190,15 @@ func (e *MemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
 }
 
+func (e *MemberRemovedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.RemoveSearchFieldsByAggregateAndObject(
+			e.Aggregate(),
+			memberSearchObject(prefix, e.UserID),
+		),
+	}
+}
+
 func NewRemovedEvent(
 	base *eventstore.BaseEvent,
 	userID string,
@@ -194,6 +235,15 @@ func (e *MemberCascadeRemovedEvent) Payload() interface{} {
 
 func (e *MemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveMemberUniqueConstraint(e.Aggregate().ID, e.UserID)}
+}
+
+func (e *MemberCascadeRemovedEvent) FieldOperations(prefix string) []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.RemoveSearchFieldsByAggregateAndObject(
+			e.Aggregate(),
+			memberSearchObject(prefix, e.UserID),
+		),
+	}
 }
 
 func NewCascadeRemovedEvent(

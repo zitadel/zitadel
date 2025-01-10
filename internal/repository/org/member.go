@@ -14,12 +14,16 @@ const (
 	MemberCascadeRemovedEventType = orgEventTypePrefix + member.CascadeRemovedEventType
 )
 
+const (
+	fieldPrefix = "org"
+)
+
 type MemberAddedEvent struct {
 	member.MemberAddedEvent
 }
 
 func (e *MemberAddedEvent) Fields() []*eventstore.FieldOperation {
-	return e.FieldOperations("org")
+	return e.FieldOperations(fieldPrefix)
 }
 
 func NewMemberAddedEvent(
@@ -52,6 +56,10 @@ func MemberAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 type MemberChangedEvent struct {
 	member.MemberChangedEvent
+}
+
+func (e *MemberChangedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
 }
 
 func NewMemberChangedEvent(
@@ -87,6 +95,10 @@ type MemberRemovedEvent struct {
 	member.MemberRemovedEvent
 }
 
+func (e *MemberRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
+}
+
 func NewMemberRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -115,6 +127,10 @@ func MemberRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 type MemberCascadeRemovedEvent struct {
 	member.MemberCascadeRemovedEvent
+}
+
+func (e *MemberCascadeRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
 }
 
 func NewMemberCascadeRemovedEvent(
