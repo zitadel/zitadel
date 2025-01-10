@@ -155,6 +155,19 @@ func (h *UsersHandler) Delete(ctx context.Context, id string) error {
 	return err
 }
 
+func (h *UsersHandler) Get(ctx context.Context, id string) (*ScimUser, error) {
+	user, err := h.query.GetUserByID(ctx, false, id)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata, err := h.queryMetadataForUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return h.mapToScimUser(ctx, user, metadata), nil
+}
+
 func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
 	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {

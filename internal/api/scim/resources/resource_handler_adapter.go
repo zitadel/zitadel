@@ -52,6 +52,11 @@ func (adapter *ResourceHandlerAdapter[T]) Delete(r *http.Request) error {
 	return adapter.handler.Delete(r.Context(), id)
 }
 
+func (adapter *ResourceHandlerAdapter[T]) Get(r *http.Request) (T, error) {
+	id := mux.Vars(r)["id"]
+	return adapter.handler.Get(r.Context(), id)
+}
+
 func (adapter *ResourceHandlerAdapter[T]) readEntityFromBody(r *http.Request) (T, error) {
 	entity := adapter.handler.NewResource()
 	err := json.NewDecoder(r.Body).Decode(entity)
