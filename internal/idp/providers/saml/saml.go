@@ -126,7 +126,7 @@ func ParseMetadata(metadata []byte) (*saml.EntityDescriptor, error) {
 			if _, err := reader.Seek(0, io.SeekStart); err != nil {
 				return nil, err
 			}
-			entities := &saml.EntitiesDescriptor{}
+			entities := &EntitiesDescriptor{}
 			if err := decoder.Decode(entities); err != nil {
 				return nil, err
 			}
@@ -252,4 +252,27 @@ func nameIDFormatFromDomain(format domain.SAMLNameIDFormat) saml.NameIDFormat {
 	default:
 		return saml.UnspecifiedNameIDFormat
 	}
+}
+
+// EntitiesDescriptor is a workaround until we eventually fork the crewjam/saml library, since maintenance on that repo seems to have stopped.
+// This is to be able to handle xsd:duration format using the UnmarshalXML method.
+// crewjam/saml only implements the xsd:dateTime format for EntityDescriptor, but not EntitiesDescriptor.
+type EntitiesDescriptor saml.EntitiesDescriptor
+
+// UnmarshalXML implements xml.Unmarshaler
+func (m *EntitiesDescriptor) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type Alias EntitiesDescriptor
+	aux := &struct {
+		ValidUntil    *saml.RelaxedTime `xml:"validUntil,attr,omitempty"`
+		CacheDuration *saml.Duration    `xml:"cacheDuration,attr,omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(m),
+	}
+	if err := d.DecodeElement(aux, &start); err != nil {
+		return err
+	}
+	m.ValidUntil = (*time.Time)(aux.ValidUntil)
+	m.CacheDuration = (*time.Duration)(aux.CacheDuration)
+	return nil
 }

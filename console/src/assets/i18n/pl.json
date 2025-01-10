@@ -2541,6 +2541,10 @@
       "CLIENTSECRETREGENERATED": "Sekret klienta został wygenerowany.",
       "DELETED": "Aplikacja została usunięta.",
       "CONFIGCHANGED": "Wykryto zmiany!"
+    },
+    "LOGINV2": {
+      "USEV2": "Użyj nowego interfejsu użytkownika logowania",
+      "BASEURL": "Niestandardowy podstawowy adres URL dla nowego interfejsu użytkownika logowania"
     }
   },
   "GENDERS": {

@@ -2566,6 +2566,10 @@
       "CLIENTSECRETREGENERATED": "client secret generated.",
       "DELETED": "App deleted.",
       "CONFIGCHANGED": "Changes detected!"
+    },
+    "LOGINV2": {
+      "USEV2": "Use new Login UI",
+      "BASEURL": "Custom base URL for the new Login UI"
     }
   },
   "GENDERS": {

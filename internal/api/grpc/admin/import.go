@@ -644,7 +644,15 @@ func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	}
 	for _, app := range org.GetOidcApps() {
 		logging.Debugf("import oidcapplication: %s", app.GetAppId())
-		_, err := s.command.AddOIDCApplicationWithID(ctx, management.AddOIDCAppRequestToDomain(app.App), org.GetOrgId(), app.GetAppId())
+		oidcApp, err := management.AddOIDCAppRequestToDomain(app.App)
+		if err != nil {
+			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
+			if isCtxTimeout(ctx) {
+				return err
+			}
+			continue
+		}
+		_, err = s.command.AddOIDCApplicationWithID(ctx, oidcApp, org.GetOrgId(), app.GetAppId())
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {

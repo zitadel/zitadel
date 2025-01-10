@@ -1,6 +1,8 @@
 package project
 
 import (
+	"net/url"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	object_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -62,7 +64,21 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 			AllowedOrigins:           app.AllowedOrigins,
 			SkipNativeAppSuccessPage: app.SkipNativeAppSuccessPage,
 			BackChannelLogoutUri:     app.BackChannelLogoutURI,
+			LoginVersion:             loginVersionToPb(app.LoginVersion, app.LoginBaseURI),
 		},
+	}
+}
+
+func loginVersionToPb(version domain.LoginVersion, baseURI *string) *app_pb.LoginVersion {
+	switch version {
+	case domain.LoginVersionUnspecified:
+		return nil
+	case domain.LoginVersion1:
+		return &app_pb.LoginVersion{Version: &app_pb.LoginVersion_LoginV1{LoginV1: &app_pb.LoginV1{}}}
+	case domain.LoginVersion2:
+		return &app_pb.LoginVersion{Version: &app_pb.LoginVersion_LoginV2{LoginV2: &app_pb.LoginV2{BaseUri: baseURI}}}
+	default:
+		return nil
 	}
 }
 
@@ -309,5 +325,19 @@ func AppQueryToModel(appQuery *app_pb.AppQuery) (query.SearchQuery, error) {
 		return query.NewAppNameSearchQuery(object_grpc.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "APP-Add46", "List.Query.Invalid")
+	}
+}
+
+func LoginVersionToDomain(version *app_pb.LoginVersion) (domain.LoginVersion, string, error) {
+	switch v := version.GetVersion().(type) {
+	case nil:
+		return domain.LoginVersionUnspecified, "", nil
+	case *app_pb.LoginVersion_LoginV1:
+		return domain.LoginVersion1, "", nil
+	case *app_pb.LoginVersion_LoginV2:
+		_, err := url.Parse(v.LoginV2.GetBaseUri())
+		return domain.LoginVersion2, v.LoginV2.GetBaseUri(), err
+	default:
+		return domain.LoginVersionUnspecified, "", nil
 	}
 }

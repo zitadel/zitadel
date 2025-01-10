@@ -2557,6 +2557,10 @@
       "CLIENTSECRETREGENERATED": "client geheim gegenereerd.",
       "DELETED": "App verwijderd.",
       "CONFIGCHANGED": "Wijzigingen gedetecteerd!"
+    },
+    "LOGINV2": {
+      "USEV2": "Nieuwe login-gebruikersinterface gebruiken",
+      "BASEURL": "Aangepaste basis-URL voor de nieuwe login-gebruikersinterface"
     }
   },
   "GENDERS": {
