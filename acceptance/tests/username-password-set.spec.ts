@@ -15,11 +15,14 @@ const test = base.extend<{ user: PasswordUser }>({
   user: async ({ page }, use) => {
     const user = new PasswordUser({
       email: faker.internet.email(),
+      isEmailVerified: true,
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       organization: "",
       phone: faker.phone.number(),
+      isPhoneVerified: false,
       password: "Password1!",
+      passwordChangeRequired: false,
     });
     await user.ensure(page);
     await use(user);
@@ -28,8 +31,6 @@ const test = base.extend<{ user: PasswordUser }>({
 });
 
 test("username and password set login", async ({ user, page }) => {
-  // commented, fix in https://github.com/zitadel/zitadel/pull/8807
-
   const changedPw = "ChangedPw1!";
   await startLogin(page);
   await loginname(page, user.getUsername());

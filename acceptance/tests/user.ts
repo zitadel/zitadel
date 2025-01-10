@@ -4,11 +4,14 @@ import { activateOTP, addTOTP, addUser, getUserByUsername, removeUser } from "./
 
 export interface userProps {
   email: string;
+  isEmailVerified?: boolean;
   firstName: string;
   lastName: string;
   organization: string;
   password: string;
+  passwordChangeRequired?: boolean;
   phone: string;
+  isPhoneVerified?: boolean;
 }
 
 class User {
@@ -77,11 +80,14 @@ export enum OtpType {
 
 export interface otpUserProps {
   email: string;
+  isEmailVerified?: boolean;
   firstName: string;
   lastName: string;
   organization: string;
   password: string;
+  passwordChangeRequired?: boolean;
   phone: string;
+  isPhoneVerified?: boolean;
   type: OtpType;
 }
 
@@ -96,6 +102,9 @@ export class PasswordUserWithOTP extends User {
       organization: props.organization,
       password: props.password,
       phone: props.phone,
+      isEmailVerified: props.isEmailVerified,
+      isPhoneVerified: props.isPhoneVerified,
+      passwordChangeRequired: props.passwordChangeRequired,
     });
     this.type = props.type;
   }
@@ -133,6 +142,8 @@ export interface passkeyUserProps {
   lastName: string;
   organization: string;
   phone: string;
+  isEmailVerified?: boolean;
+  isPhoneVerified?: boolean;
 }
 
 export class PasskeyUser extends User {
@@ -146,6 +157,8 @@ export class PasskeyUser extends User {
       organization: props.organization,
       password: "",
       phone: props.phone,
+      isEmailVerified: props.isEmailVerified,
+      isPhoneVerified: props.isPhoneVerified,
     });
   }
 
