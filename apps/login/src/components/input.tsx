@@ -81,7 +81,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         />
 
         {suffix && (
-          <span className="z-30 absolute right-[1px] bottom-[22px] transform translate-y-1/2 bg-background-light-500 dark:bg-background-dark-500 p-2">
+          <span className="z-30 absolute right-[3px] bottom-[22px] transform translate-y-1/2 bg-background-light-500 dark:bg-background-dark-500 p-2 rounded-sm">
             {suffix}
           </span>
         )}
