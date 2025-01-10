@@ -1,5 +1,11 @@
 # @zitadel/client
 
+## 1.0.3
+
+### Patch Changes
+
+- ef1c801: add missing client transport utility
+
 ## 1.0.2
 
 ### Patch Changes
