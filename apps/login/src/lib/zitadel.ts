@@ -421,7 +421,6 @@ export async function listUsers({
       }),
     );
   }
-  console.log(queries);
 
   return userService.listUsers({ queries: queries });
 }

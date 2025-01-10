@@ -166,34 +166,34 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       user.details?.resourceOwner,
     );
 
+    // compare with the concatenated suffix when set
+    const concatLoginname = command.suffix
+      ? `${command.loginName}@${command.suffix}`
+      : command.loginName;
+
+    const humanUser =
+      potentialUsers[0].type.case === "human"
+        ? potentialUsers[0].type.value
+        : undefined;
+
     // recheck login settings after user discovery, as the search might have been done without org scope
     if (
       userLoginSettings?.disableLoginWithEmail &&
       userLoginSettings?.disableLoginWithPhone
     ) {
-      if (user.username !== command.loginName) {
+      if (user.preferredLoginName !== concatLoginname) {
         return { error: "User not found in the system!" };
       }
     } else if (userLoginSettings?.disableLoginWithEmail) {
-      const humanUser =
-        potentialUsers[0].type.case === "human"
-          ? potentialUsers[0].type.value
-          : undefined;
-
       if (
-        user.username !== command.loginName ||
+        user.preferredLoginName !== concatLoginname ||
         humanUser?.phone?.phone !== command.loginName
       ) {
         return { error: "User not found in the system!" };
       }
     } else if (userLoginSettings?.disableLoginWithPhone) {
-      const humanUser =
-        potentialUsers[0].type.case === "human"
-          ? potentialUsers[0].type.value
-          : undefined;
-
       if (
-        user.username !== command.loginName ||
+        user.preferredLoginName !== concatLoginname ||
         humanUser?.email?.email !== command.loginName
       ) {
         return { error: "User not found in the system!" };
@@ -225,11 +225,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // this can be expected to be an invite as users created in console have a password set.
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      const humanUser =
-        potentialUsers[0].type.case === "human"
-          ? potentialUsers[0].type.value
-          : undefined;
-
       // redirect to /verify invite if no auth method is set and email is not verified
       const inviteCheck = checkInvite(
         session,
