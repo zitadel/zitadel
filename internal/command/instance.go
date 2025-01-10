@@ -380,7 +380,7 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LabelPolicy.ThemeMode,
 		),
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
-		prepareAddRolePermissions(instanceAgg, setup.RolePermissionMappings),
+		// prepareAddRolePermissions(instanceAgg, setup.RolePermissionMappings),
 	}
 }
 
