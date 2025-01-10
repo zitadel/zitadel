@@ -5,7 +5,7 @@ sidebar_label: Integrations
 
 Write a record handler in your preferred language to react on specific records.
 If your language has a static type system and a proto generator,
-you can deserialize Zitadel records into versioned record types and ensure backward and forward compatibility.
+Deserialize Zitadel records into the type logging.VersionedRecord and ensure backward and forward compatibility.
 
 ### Example Stream Configuration
 
@@ -17,11 +17,9 @@ Types:
     Format: "jsonproto"
     # Pinning the record version allows you to update Zitadel at any time without breaking your handler.
     RecordVersion: "v1"
-    # Wrapping the record in a VersionedRecord allows you to conveniently handle all record versions.
-    VersionedRecord: true
 ```
 
-### Example Slack Channel Notifier
+### Example Slack Channel Notifier Implementation in Go
 
 ```go
 import (

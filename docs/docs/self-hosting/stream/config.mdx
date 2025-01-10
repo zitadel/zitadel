@@ -48,7 +48,6 @@ Log:
     Format: "otel"
     # Possible values for RecordVersion: "latest", "v1"
     RecordVersion: "latest"
-    VersionedRecord: true # Wraps the record with an enumerable property key indicating the records version. Is true by default.
     Outputs:
     - Channel: "Stderr"
        Enabled: true # By default, only the Stderr channel is enabled
@@ -71,7 +70,6 @@ Log:
       PersonallyIdentifiableInformation: # Inherits "redact" from default component stream config
       Format: "protojson"
       RecordVersion: "latest" # Possible values: "latest", "v1"
-      VersionedRecord: true # Wraps the record with an enumerable property key indicating the records version. Is true by default.
       Outputs: # Inherits Outputs from default component stream config
     - Type: "HTTPRequests"
       # Inherit Zitadel defaults (disabled, redacted sensitive and PII data to stdout)
