@@ -68,7 +68,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries, nil)
+	res, err := s.query.SearchUsers(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}

@@ -604,25 +604,19 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 	return user, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
-	users, err := q.searchUsers(ctx, queries)
-	if err != nil {
-		return nil, err
-	}
-	if permissionCheck != nil {
-		usersCheckPermission(ctx, users, permissionCheck)
-	}
-	return users, nil
-}
-
-func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries) (users *Users, err error) {
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, checkPermissionV2 bool) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUsersQuery(ctx, q.client)
-	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	stmt, args, err := queries.toQuery(query).Where(eq).
-		ToSql()
+	query = queries.toQuery(query).Where(sq.Eq{
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
+	})
+	if checkPermissionV2 {
+		query = whereInPermittedOrgs(ctx, query, UserResourceOwnerCol.identifier(), domain.PermissionUserRead)
+	}
+
+	stmt, args, err := query.ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
@@ -1351,6 +1345,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
+			/////////// HERE!
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
 			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
