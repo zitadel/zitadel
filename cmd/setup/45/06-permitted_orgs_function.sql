@@ -1,8 +1,12 @@
-CREATE OR REPLACE FUNCTION 
-	eventstore.permitted_orgs(instanceId text, userId text, perm text)
-RETURNS SETOF text AS $$
+CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
+    instanceId TEXT
+    , userId TEXT
+    , perm TEXT
+
+    , org_ids OUT TEXT[]
+) AS $$
 DECLARE
-	matched_roles text[]; -- roles containing permission
+	matched_roles TEXT[]; -- roles containing permission
 BEGIN
 	SELECT array_agg(rp.role) INTO matched_roles
 	FROM eventstore.role_permissions rp
@@ -22,7 +26,7 @@ BEGIN
 		
 		IF has_instance_permission THEN
 			-- Return all organizations
-			RETURN QUERY SELECT o.org_id
+			SELECT array_agg(o.org_id) INTO org_ids
 				FROM eventstore.instance_orgs o
 				WHERE o.instance_id = instanceId;
 			RETURN;
@@ -30,11 +34,15 @@ BEGIN
 	END;
 	
 	-- Return the organizations where permission were granted thru org-level roles
-	RETURN QUERY SELECT DISTINCT om.org_id
+	SELECT array_agg(org_id) INTO org_ids
+	FROM (
+		SELECT DISTINCT om.org_id
 		FROM eventstore.org_members om
 		WHERE om.role = ANY(matched_roles)
 		AND om.instance_id = instanceID
-		AND om.user_id = userId;
+		AND om.user_id = userId
+	);
+    RETURN;
 END;
 $$
 LANGUAGE plpgsql STABLE;

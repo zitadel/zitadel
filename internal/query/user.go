@@ -613,7 +613,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, c
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	})
 	if checkPermissionV2 {
-		query = whereInPermittedOrgs(ctx, query, UserResourceOwnerCol.identifier(), domain.PermissionUserRead)
+		query = wherePermittedOrgs(ctx, query, UserResourceOwnerCol.identifier(), domain.PermissionUserRead)
 	}
 
 	stmt, args, err := query.ToSql()
