@@ -37,5 +37,5 @@ func (mig *TransactionalInstanceDomainTable) Execute(ctx context.Context, _ even
 }
 
 func (mig *TransactionalInstanceDomainTable) String() string {
-	return "47_transactional_instance_domain_table"
+	return "47_transactional_instance_domain_table2"
 }

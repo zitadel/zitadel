@@ -3,6 +3,7 @@ WITH created_subscriber AS (
         subscriptions.subscribers ("name") 
     VALUES 
         ('transactional-instances')
+    ON CONFLICT DO NOTHING
     RETURNING id
 )
 INSERT INTO subscriptions.subscribed_events (
@@ -23,4 +24,5 @@ FROM
         , ('instance', 'instance.iam.project.set', 'reduce_instance_project_set')
         , ('instance', 'instance.iam.console.set', 'reduce_instance_console_set')
     )AS v
+ON CONFLICT DO NOTHING
 ;

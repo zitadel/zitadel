@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION reduce_instance_added("event" eventstore.events2)
-RETURNS VOID
+RETURNS TEXT
 LANGUAGE PLpgSQL
 AS $$
 BEGIN
@@ -19,5 +19,6 @@ BEGIN
         , (event).in_tx_order::INT2
     )
     ON CONFLICT (id) DO NOTHING;
+    RETURN 'OK';
 END;
 $$;

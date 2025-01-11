@@ -1,3 +1,10 @@
+CREATE OR REPLACE FUNCTION subscriptions.queue_previous_events(
+    subscriber_name TEXT
+    , max_position NUMERIC
+)
+RETURNS VOID
+AS $$
+
 WITH active_instances AS (
     SELECT
         instance_id
@@ -16,7 +23,7 @@ WITH active_instances AS (
                 AND event_type = 'instance.removed'
         )
 )
-INSERT INTO "queue" (
+INSERT INTO subscriptions.queue (
     subscriber
     , instance_id
     , aggregate_type
@@ -24,8 +31,9 @@ INSERT INTO "queue" (
     , sequence
     , position
     , in_position_order
-) SELECT
-    'transactional-instances'
+) 
+SELECT
+    s.id
     , e.instance_id
     , e.aggregate_type
     , e.aggregate_id
@@ -33,9 +41,17 @@ INSERT INTO "queue" (
     , e.position
     , e.in_tx_order
 FROM
-    eventstore.events2 e
+    subscriptions.subscribers s
+JOIN subscriptions.subscribed_events se
+  ON se.subscriber = s.id
+JOIN eventstore.events2 e
+  ON (se.instance_id IS NULL OR se.instance_id = e.instance_id)
+ AND (se.all OR (
+    se.aggregate_type = e.aggregate_type
+    AND (
+        se.event_type IS NULL
+        OR se.event_type = e.event_type
+    )))
+ AND ($2 IS NULL OR e.position < $2)
 WHERE
-    e.instance_id IN (SELECT instance_id FROM active_instances)
-    AND e.aggregate_type = 'instance'
-    AND e.event_type IN ('instance.added', 'instance.changed', 'instance.removed', 'instance.default.language.set', 'instance.default.org.set', 'instance.iam.project.set', 'instance.iam.console.set')
-    AND e.aggregate_id IN (SELECT instance_id FROM active_instances);
+    s.name = $1

@@ -1,0 +1,5 @@
+-- CREATE TRIGGER notify_subscribers
+-- AFTER INSERT ON "queue"
+-- DEFERRABLE INITIALLY DEFERRED
+-- FOR EACH ROW
+-- EXECUTE FUNCTION notify_subscriber();

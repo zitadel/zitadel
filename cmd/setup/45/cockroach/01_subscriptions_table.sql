@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS subscriptions.subscribers (
     , name TEXT NOT NULL
     , should_notify BOOLEAN NOT NULL DEFAULT FALSE
     , last_notified_position NUMERIC
+    , allow_reduce BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS subscriptions.subscribed_events (
@@ -13,6 +14,8 @@ CREATE TABLE IF NOT EXISTS subscriptions.subscribed_events (
     , "all" BOOLEAN
     , aggregate_type TEXT
     , event_type TEXT
+
+    , reduce_function TEXT -- if null the events are added to the queue
 
     , CONSTRAINT min_args CHECK (num_nonnulls("all", aggregate_type) = 1)
 
