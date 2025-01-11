@@ -16,9 +16,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -2142,15 +2145,19 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	}
 }
 
-/*
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-		idpID := Instance.AddGenericOAuthProvider(t, CTX)
-	intentID := Instance.CreateIntent(t, CTX, idpID)
-	successfulID, token, changeDate, sequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID.Id, "", "id")
-	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID.Id, "user", "id")
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID.Id, "", "id")
-	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID.Id, "user", "id")
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Instance.CreateSuccessfulSAMLIntent(t, CTX, idpID.Id, "", "id")
+	idpID := Instance.AddGenericOAuthProvider(IamCTX, gofakeit.AppName()).GetId()
+	intentID := Instance.CreateIntent(CTX, idpID).GetIdpIntent().GetIdpIntentId()
+	successfulID, token, changeDate, sequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", "")
+	require.NoError(t, err)
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence, err := sink.SuccessfulOAuthIntent(Instance.ID(), idpID, "id", "user")
+	require.NoError(t, err)
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "id", "")
+	require.NoError(t, err)
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence, err := sink.SuccessfulLDAPIntent(Instance.ID(), idpID, "id", "user")
+	require.NoError(t, err)
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence, err := sink.SuccessfulSAMLIntent(Instance.ID(), idpID, "id", "")
+	require.NoError(t, err)
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderIntentRequest
@@ -2205,7 +2212,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:    idpID.Id,
+					IdpId:    idpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2243,7 +2250,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:    idpID.Id,
+					IdpId:    idpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2287,7 +2294,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							}(),
 						},
 					},
-					IdpId:    idpID.Id,
+					IdpId:    idpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2333,7 +2340,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							}(),
 						},
 					},
-					IdpId:    idpID.Id,
+					IdpId:    idpID,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2370,7 +2377,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 						},
 					},
-					IdpId:    idpID.Id,
+					IdpId:    idpID,
 					UserId:   "id",
 					UserName: "",
 					RawInformation: func() *structpb.Struct {
@@ -2401,7 +2408,6 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 		})
 	}
 }
-*/
 
 func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
