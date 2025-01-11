@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/group"
-	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
 type GroupWriteModel struct {
@@ -45,12 +44,12 @@ func (wm *GroupWriteModel) Reduce() error {
 				continue
 			}
 			wm.State = domain.GroupStateInactive
-		case *project.ProjectReactivatedEvent:
+		case *group.GroupReactivatedEvent:
 			if wm.State == domain.GroupStateRemoved {
 				continue
 			}
 			wm.State = domain.GroupStateActive
-		case *project.ProjectRemovedEvent:
+		case *group.GroupRemovedEvent:
 			wm.State = domain.GroupStateRemoved
 		}
 	}

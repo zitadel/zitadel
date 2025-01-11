@@ -34,7 +34,7 @@ func newGroupProjection(ctx context.Context, config handler.Config) *handler.Han
 }
 
 func (*groupProjection) Name() string {
-	return ProjectProjectionTable
+	return GroupProjectionTable
 }
 
 func (*groupProjection) Init() *old_handler.Check {

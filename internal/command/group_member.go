@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/group"
-	es_user "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -26,13 +25,13 @@ func (c *Commands) AddGroupMember(ctx context.Context, member *domain.Member, re
 	if err != nil {
 		return nil, err
 	}
-
-	// Add group_id entry to users table
-	err = c.addGroupIDToUser(ctx, member.UserID, member.AggregateID)
-	if err != nil {
-		return nil, err
-	}
-
+	/*
+		// Add group_id entry to users table
+		err = c.addGroupIDToUser(ctx, member.UserID, member.AggregateID)
+		if err != nil {
+			return nil, err
+		}
+	*/
 	err = AppendAndReduce(addedMember, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -45,7 +44,7 @@ func (c *Commands) addGroupMember(ctx context.Context, groupAgg *eventstore.Aggr
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if !member.IsValid() {
+	if !member.IsGroupMemberValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-X9n3m", "Errors.Group.Member.Invalid")
 	}
 
@@ -80,13 +79,13 @@ func (c *Commands) ChangeGroupMember(ctx context.Context, member *domain.Member,
 	if err != nil {
 		return nil, err
 	}
-
-	// Add group_id entry to users table
-	err = c.addGroupIDToUser(ctx, member.UserID, member.AggregateID)
-	if err != nil {
-		return nil, err
-	}
-
+	/*
+		// Add group_id entry to users table
+		err = c.addGroupIDToUser(ctx, member.UserID, member.AggregateID)
+		if err != nil {
+			return nil, err
+		}
+	*/
 	err = AppendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -114,13 +113,13 @@ func (c *Commands) RemoveGroupMember(ctx context.Context, groupID, userID, resou
 	if err != nil {
 		return nil, err
 	}
-
-	// Remove group_id entry from users table
-	err = c.removeGroupIDFromUser(ctx, userID, groupID)
-	if err != nil {
-		return nil, err
-	}
-
+	/*
+		// Remove group_id entry from users table
+		err = c.removeGroupIDFromUser(ctx, userID, groupID)
+		if err != nil {
+			return nil, err
+		}
+	*/
 	err = AppendAndReduce(m, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -157,6 +156,7 @@ func (c *Commands) groupMemberWriteModelByID(ctx context.Context, groupID, userI
 	return writeModel, nil
 }
 
+/*
 func (c *Commands) addGroupIDToUser(ctx context.Context, userID, groupID string) error {
 	ctx, span := tracing.NewSpan(ctx)
 	defer span.End()
@@ -208,3 +208,4 @@ func (c *Commands) removeGroupIDFromUser(ctx context.Context, userID, groupID st
 
 	return nil
 }
+*/

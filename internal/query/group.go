@@ -150,7 +150,7 @@ func NewGroupResourceOwnerSearchQuery(value string) (SearchQuery, error) {
 }
 
 func (r *GroupSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
-	query, err := NewProjectResourceOwnerSearchQuery(orgID)
+	query, err := NewGroupResourceOwnerSearchQuery(orgID)
 	if err != nil {
 		return err
 	}
@@ -161,7 +161,7 @@ func (r *GroupSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 func (r *GroupSearchQueries) AppendPermissionQueries(permissions []string) error {
 	if !authz.HasGlobalPermission(permissions) {
 		ids := authz.GetAllPermissionCtxIDs(permissions)
-		query, err := NewProjectIDSearchQuery(ids)
+		query, err := NewGroupIDSearchQuery(ids)
 		if err != nil {
 			return err
 		}
