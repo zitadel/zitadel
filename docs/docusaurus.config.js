@@ -371,13 +371,12 @@ module.exports = {
   themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs", "@docusaurus/theme-mermaid"],
   future: {
     experimental_faster: {
-      swcJsLoader: true,
-      swcJsMinimizer: true,
-      swcHtmlMinimizer: true,
-      lightningCssMinimizer: true,
-      // I disabled rspackBundler because somehow it leaked memory
+      swcJsLoader: false,
+      swcJsMinimizer: false,
+      swcHtmlMinimizer: false,
+      lightningCssMinimizer: false,
       rspackBundler: false,
-      mdxCrossCompilerCache: true,
+      mdxCrossCompilerCache: false,
     },
   },
 };
