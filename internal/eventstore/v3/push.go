@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"fmt"
 
 	"github.com/zitadel/logging"
 
@@ -45,6 +46,7 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		defer conn.Close()
 	}
 
+	fmt.Println("OPEN TX")
 	tx, close, err := es.pushTx(ctx, client)
 	if err != nil {
 		return nil, err
@@ -55,15 +57,18 @@ func (es *Eventstore) writeCommands(ctx context.Context, client database.Context
 		}()
 	}
 
+	fmt.Println("WRITE EVENTS")
 	events, err := writeEvents(ctx, tx, commands)
 	if err != nil {
 		return nil, err
 	}
 
+	fmt.Println("HANDLE UNIQUE CONSTRAINTS")
 	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
 		return nil, err
 	}
 
+	fmt.Println("HANDLE FIELD COMMANDS")
 	err = es.handleFieldCommands(ctx, tx, commands)
 	if err != nil {
 		return nil, err

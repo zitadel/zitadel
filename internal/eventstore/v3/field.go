@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"slices"
 	"strconv"
@@ -168,12 +169,14 @@ func handleFieldFillEvents(ctx context.Context, tx database.Tx, events []eventst
 func handleFieldOperations(ctx context.Context, tx database.Tx, operations []*eventstore.FieldOperation) error {
 	for _, operation := range operations {
 		if operation.Set != nil {
+			fmt.Println(operation.Set)
 			if err := handleFieldSet(ctx, tx, operation.Set); err != nil {
 				return err
 			}
 			continue
 		}
 		if operation.Remove != nil {
+			fmt.Println(operation.Remove)
 			if err := handleSearchDelete(ctx, tx, operation.Remove); err != nil {
 				return err
 			}
