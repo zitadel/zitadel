@@ -16,7 +16,8 @@ import {
   getOrgsByDomain,
   listAuthenticationMethodTypes,
   listIDPLinks,
-  listUsers,
+  searchUsers,
+  SearchUsersCommand,
   startIdentityProviderFlow,
 } from "../zitadel";
 import { createSessionAndUpdateCookie } from "./cookie";
@@ -25,26 +26,36 @@ export type SendLoginnameCommand = {
   loginName: string;
   authRequestId?: string;
   organization?: string;
+  suffix?: string;
 };
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
-  const users = await listUsers({
-    loginName: command.loginName,
+  const loginSettingsByContext = await getLoginSettings(command.organization);
+
+  if (!loginSettingsByContext) {
+    return { error: "Could not get login settings" };
+  }
+
+  let searchUsersRequest: SearchUsersCommand = {
+    searchValue: command.loginName,
     organizationId: command.organization,
-  });
+    loginSettings: loginSettingsByContext,
+    suffix: command.suffix,
+  };
 
-  const loginSettings = await getLoginSettings(command.organization);
+  const searchResult = await searchUsers(searchUsersRequest);
 
-  const potentialUsers = users.result.filter((u) => {
-    const human = u.type.case === "human" ? u.type.value : undefined;
-    return loginSettings?.disableLoginWithEmail
-      ? human?.email?.isVerified && human?.email?.email !== command.loginName
-      : loginSettings?.disableLoginWithPhone
-        ? human?.phone?.isVerified && human?.phone?.phone !== command.loginName
-        : true;
-  });
+  if ("error" in searchResult && searchResult.error) {
+    return searchResult;
+  }
+
+  if (!("result" in searchResult)) {
+    return { error: "Could not search users" };
+  }
+
+  const { result: potentialUsers } = searchResult;
 
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders(
@@ -145,8 +156,49 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   };
 
-  if (potentialUsers.length == 1 && potentialUsers[0].userId) {
+  if (potentialUsers.length > 1) {
+    return { error: "More than one user found. Provide a unique identifier." };
+  } else if (potentialUsers.length == 1 && potentialUsers[0].userId) {
+    const user = potentialUsers[0];
     const userId = potentialUsers[0].userId;
+
+    const userLoginSettings = await getLoginSettings(
+      user.details?.resourceOwner,
+    );
+
+    // compare with the concatenated suffix when set
+    const concatLoginname = command.suffix
+      ? `${command.loginName}@${command.suffix}`
+      : command.loginName;
+
+    const humanUser =
+      potentialUsers[0].type.case === "human"
+        ? potentialUsers[0].type.value
+        : undefined;
+
+    // recheck login settings after user discovery, as the search might have been done without org scope
+    if (
+      userLoginSettings?.disableLoginWithEmail &&
+      userLoginSettings?.disableLoginWithPhone
+    ) {
+      if (user.preferredLoginName !== concatLoginname) {
+        return { error: "User not found in the system!" };
+      }
+    } else if (userLoginSettings?.disableLoginWithEmail) {
+      if (
+        user.preferredLoginName !== concatLoginname ||
+        humanUser?.phone?.phone !== command.loginName
+      ) {
+        return { error: "User not found in the system!" };
+      }
+    } else if (userLoginSettings?.disableLoginWithPhone) {
+      if (
+        user.preferredLoginName !== concatLoginname ||
+        humanUser?.email?.email !== command.loginName
+      ) {
+        return { error: "User not found in the system!" };
+      }
+    }
 
     const checks = create(ChecksSchema, {
       user: { search: { case: "userId", value: userId } },
@@ -163,7 +215,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     // TODO: check if handling of userstate INITIAL is needed
-    if (potentialUsers[0].state === UserState.INITIAL) {
+    if (user.state === UserState.INITIAL) {
       return { error: "Initial User not supported" };
     }
 
@@ -173,11 +225,6 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     // this can be expected to be an invite as users created in console have a password set.
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
-      const humanUser =
-        potentialUsers[0].type.case === "human"
-          ? potentialUsers[0].type.value
-          : undefined;
-
       // redirect to /verify invite if no auth method is set and email is not verified
       const inviteCheck = checkInvite(
         session,
@@ -213,7 +260,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const method = methods.authMethodTypes[0];
       switch (method) {
         case AuthenticationMethodType.PASSWORD: // user has only password as auth method
-          if (!loginSettings?.allowUsernamePassword) {
+          if (!userLoginSettings?.allowUsernamePassword) {
             return {
               error:
                 "Username Password not allowed! Contact your administrator for more information.",
@@ -240,7 +287,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
           };
 
         case AuthenticationMethodType.PASSKEY: // AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSKEY
-          if (loginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
+          if (userLoginSettings?.passkeysType === PasskeysType.NOT_ALLOWED) {
             return {
               error:
                 "Passkeys not allowed! Contact your administrator for more information.",
@@ -303,22 +350,24 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  // user not found, check if register is enabled on organization
-  if (loginSettings?.allowRegister && !loginSettings?.allowUsernamePassword) {
-    // TODO: do we need to handle login hints for IDPs here?
+  // user not found, check if register is enabled on instance / organization context
+  if (
+    loginSettingsByContext?.allowRegister &&
+    !loginSettingsByContext?.allowUsernamePassword
+  ) {
     const resp = await redirectUserToSingleIDPIfAvailable();
     if (resp) {
       return resp;
     }
     return { error: "User not found in the system" };
   } else if (
-    loginSettings?.allowRegister &&
-    loginSettings?.allowUsernamePassword
+    loginSettingsByContext?.allowRegister &&
+    loginSettingsByContext?.allowUsernamePassword
   ) {
     let orgToRegisterOn: string | undefined = command.organization;
 
     if (
-      !loginSettings?.ignoreUnknownUsernames &&
+      !loginSettingsByContext?.ignoreUnknownUsernames &&
       !orgToRegisterOn &&
       command.loginName &&
       ORG_SUFFIX_REGEX.test(command.loginName)
@@ -338,7 +387,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     // do not register user if ignoreUnknownUsernames is set
-    if (orgToRegisterOn && !loginSettings?.ignoreUnknownUsernames) {
+    if (orgToRegisterOn && !loginSettingsByContext?.ignoreUnknownUsernames) {
       const params = new URLSearchParams({ organization: orgToRegisterOn });
 
       if (command.authRequestId) {
@@ -353,7 +402,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
   }
 
-  if (loginSettings?.ignoreUnknownUsernames) {
+  if (loginSettingsByContext?.ignoreUnknownUsernames) {
     const paramsPasswordDefault = new URLSearchParams({
       loginName: command.loginName,
     });

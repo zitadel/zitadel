@@ -1,6 +1,7 @@
 "use client";
 
 import { sendLoginname } from "@/lib/server/loginname";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
@@ -18,7 +19,9 @@ type Inputs = {
 type Props = {
   loginName: string | undefined;
   authRequestId: string | undefined;
+  loginSettings: LoginSettings | undefined;
   organization?: string;
+  suffix?: string;
   submit: boolean;
   allowRegister: boolean;
   children?: ReactNode;
@@ -28,6 +31,8 @@ export function UsernameForm({
   loginName,
   authRequestId,
   organization,
+  suffix,
+  loginSettings,
   submit,
   allowRegister,
   children,
@@ -52,6 +57,7 @@ export function UsernameForm({
       loginName: values.loginName,
       organization,
       authRequestId,
+      suffix,
     })
       .catch(() => {
         setError("An internal error occurred");
@@ -80,6 +86,18 @@ export function UsernameForm({
     }
   }, []);
 
+  let inputLabel = "Loginname";
+  if (
+    loginSettings?.disableLoginWithEmail &&
+    loginSettings?.disableLoginWithPhone
+  ) {
+    inputLabel = "Username";
+  } else if (loginSettings?.disableLoginWithEmail) {
+    inputLabel = "Username or phone number";
+  } else if (loginSettings?.disableLoginWithPhone) {
+    inputLabel = "Username or email";
+  }
+
   return (
     <form className="w-full">
       <div className="">
@@ -87,8 +105,9 @@ export function UsernameForm({
           type="text"
           autoComplete="username"
           {...register("loginName", { required: "This field is required" })}
-          label="Loginname"
+          label={inputLabel}
           data-testid="username-text-input"
+          suffix={suffix}
         />
         {allowRegister && (
           <button
