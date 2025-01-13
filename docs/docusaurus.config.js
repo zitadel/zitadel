@@ -371,12 +371,12 @@ module.exports = {
   themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs", "@docusaurus/theme-mermaid"],
   future: {
     experimental_faster: {
-      swcJsLoader: false,
-      swcJsMinimizer: false,
-      swcHtmlMinimizer: false,
-      lightningCssMinimizer: false,
+      swcJsLoader: true,
+      swcJsMinimizer: true,
+      swcHtmlMinimizer: true,
+      lightningCssMinimizer: true,
       rspackBundler: false,
-      mdxCrossCompilerCache: false,
+      mdxCrossCompilerCache: true,
     },
   },
 };
