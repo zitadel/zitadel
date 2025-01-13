@@ -201,28 +201,6 @@ module.exports = {
       runmeLinkLabel: 'Checkout via Runme'
     },
   },
-  webpack: {
-    jsLoader: (isServer) => ({
-      loader: require.resolve('swc-loader'),
-      options: {
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          transform: {
-            react: {
-              runtime: 'automatic',
-            },
-          },
-          target: 'es2017',
-        },
-        module: {
-          type: isServer ? 'commonjs' : 'es6',
-        },
-      },
-    }),
-  },
   presets: [
     [
       "classic",
@@ -233,9 +211,7 @@ module.exports = {
           sidebarPath: require.resolve("./sidebars.js"),
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
-          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
-          remarkPlugins: [require("mdx-mermaid")],
-          
+          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",          
           docItemComponent:  '@theme/ApiItem'
         },
         theme: {
@@ -374,6 +350,7 @@ module.exports = {
           },
         },
       },
+      
     ],
     require.resolve("docusaurus-plugin-image-zoom"),
     async function myPlugin(context, options) {
@@ -388,5 +365,8 @@ module.exports = {
       };
     },
   ],
-  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  markdown: {
+    mermaid: true,
+  },
+  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs", "@docusaurus/theme-mermaid"],
 };
