@@ -375,7 +375,8 @@ module.exports = {
       swcJsMinimizer: true,
       swcHtmlMinimizer: true,
       lightningCssMinimizer: true,
-      rspackBundler: true,
+      // I disabled rspackBundler because somehow it leaked memory
+      rspackBundler: false,
       mdxCrossCompilerCache: true,
     },
   },
