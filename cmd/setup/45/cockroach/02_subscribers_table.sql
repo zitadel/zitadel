@@ -1,5 +1,3 @@
-CREATE SCHEMA IF NOT EXISTS subscriptions;
-
 CREATE TABLE IF NOT EXISTS subscriptions.subscribers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid()
     , name TEXT NOT NULL

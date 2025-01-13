@@ -8,7 +8,7 @@ DECLARE
     _stream CURSOR FOR
         SELECT
             q.id
-            , 'CALL ' || q.reduce_function || '($1)' AS reduce_function
+            , q.reduce_function AS reduce_function
             , e AS "event"
         FROM
             subscriptions.subscribers s
@@ -36,7 +36,7 @@ BEGIN
         RAISE NOTICE 'execute %', queued_event.reduce_function;
 
         EXECUTE
-            queued_event.reduce_function
+            format('CALL %s($1)', queued_event.reduce_function)
         USING 
             queued_event.event;
 
