@@ -567,7 +567,7 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, true, false, false, false, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, true, false, false, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -912,7 +912,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, true, false, false, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, true, false, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1344,7 +1344,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, true, false, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, true, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1605,7 +1605,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, true, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, true, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -2132,7 +2132,7 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, false, true, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, false, true, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -2442,6 +2442,309 @@ func TestCommandSide_userHumanWriteModel_idpLinks(t *testing.T) {
 				eventstore: tt.fields.eventstore(t),
 			}
 			wm, err := r.userRemoveWriteModel(tt.args.ctx, tt.args.userID)
+			if tt.res.err == nil {
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+			} else if !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, wm)
+			}
+		})
+	}
+}
+
+func TestCommandSide_userHumanWriteModel_metadata(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx    context.Context
+		userID string
+	}
+	type res struct {
+		want *UserV2WriteModel
+		err  func(error) bool
+	}
+
+	userAgg := user.NewAggregate("user1", "org1")
+
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "user added with metadata",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key",
+								[]byte("value"),
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:    true,
+					StateWriteModel:    true,
+					MetadataWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					UserState:              domain.UserStateActive,
+					Metadata: map[string][]byte{
+						"key": []byte("value"),
+					},
+				},
+			},
+		},
+		{
+			name: "user added with multiple metadata",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key2",
+								[]byte("value2"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key3",
+								[]byte("value3"),
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:    true,
+					StateWriteModel:    true,
+					MetadataWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					UserState:              domain.UserStateActive,
+					Metadata: map[string][]byte{
+						"key1": []byte("value1"),
+						"key2": []byte("value2"),
+						"key3": []byte("value3"),
+					},
+				},
+			},
+		},
+		{
+			name: "user added with metadata add and remove",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key2",
+								[]byte("name2"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key3",
+								[]byte("value3"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataRemovedEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key2",
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataRemovedEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key3",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:    true,
+					StateWriteModel:    true,
+					MetadataWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					UserState:              domain.UserStateActive,
+					Metadata: map[string][]byte{
+						"key1": []byte("value1"),
+					},
+				},
+			},
+		},
+		{
+			name: "user added with added metadata and removed all",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key1",
+								[]byte("value1"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataSetEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+								"key2",
+								[]byte("value2"),
+							),
+						),
+						eventFromEventPusher(
+							user.NewMetadataRemovedAllEvent(
+								context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:    true,
+					StateWriteModel:    true,
+					MetadataWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					UserState:              domain.UserStateActive,
+					Metadata:               nil,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, false, false, false, true)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()

@@ -58,6 +58,7 @@ func mapResource[T sresources.ResourceHolder](router *mux.Router, mw zhttp_middl
 	resourceRouter.Handle("/.search", mw(handleJsonResponse(adapter.List))).Methods(http.MethodPost)
 	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.Get))).Methods(http.MethodGet)
 	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.Replace))).Methods(http.MethodPut)
+	resourceRouter.Handle("/{id}", mw(handleEmptyResponse(adapter.Update))).Methods(http.MethodPatch)
 	resourceRouter.Handle("/{id}", mw(handleEmptyResponse(adapter.Delete))).Methods(http.MethodDelete)
 }
 

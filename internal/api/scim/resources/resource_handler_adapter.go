@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/zitadel/zitadel/internal/api/scim/resources/patch"
 	"github.com/zitadel/zitadel/internal/api/scim/serrors"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -38,6 +39,30 @@ func (adapter *ResourceHandlerAdapter[T]) Replace(r *http.Request) (T, error) {
 
 	id := mux.Vars(r)["id"]
 	return adapter.handler.Replace(r.Context(), id, entity)
+}
+
+func (adapter *ResourceHandlerAdapter[T]) Update(r *http.Request) error {
+	request := new(patch.OperationRequest)
+	err := json.NewDecoder(r.Body).Decode(request)
+	if err != nil {
+		if zerrors.IsZitadelError(err) {
+			return err
+		}
+
+		return serrors.ThrowInvalidSyntax(zerrors.ThrowInvalidArgumentf(nil, "SCIM-ucrjson2", "Could not deserialize json: %v", err.Error()))
+	}
+
+	err = request.Validate()
+	if err != nil {
+		return err
+	}
+
+	if len(request.Operations) == 0 {
+		return nil
+	}
+
+	id := mux.Vars(r)["id"]
+	return adapter.handler.Update(r.Context(), id, request.Operations)
 }
 
 func (adapter *ResourceHandlerAdapter[T]) Delete(r *http.Request) error {

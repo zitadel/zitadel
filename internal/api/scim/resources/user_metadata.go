@@ -50,12 +50,7 @@ func (h *UsersHandler) queryMetadataForUser(ctx context.Context, id string) (map
 		return nil, err
 	}
 
-	metadataMap := make(map[metadata.ScopedKey][]byte, len(md.Metadata))
-	for _, entry := range md.Metadata {
-		metadataMap[metadata.ScopedKey(entry.Key)] = entry.Value
-	}
-
-	return metadataMap, nil
+	return metadata.MapListToScopedKeyMap(md.Metadata), nil
 }
 
 func (h *UsersHandler) buildMetadataQueries(ctx context.Context) *query.UserMetadataSearchQueries {
