@@ -7,7 +7,7 @@
     "start": "docusaurus start",
     "start:api": "yarn run generate && docusaurus start",
     "justbuild": "NODE_OPTIONS=--max-old-space-size=8192 DOCUSAURUS_PERF_LOGGER=true docusaurus build",
-    "build": "yarn run generate &&  NODE_OPTIONS=--max-old-space-size=8192 docusaurus build  --profile",
+    "build": "yarn run generate &&  NODE_OPTIONS=--max-old-space-size=8192 docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
