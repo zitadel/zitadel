@@ -63,6 +63,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
+	"github.com/zitadel/zitadel/internal/api/scim"
+	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/console/path"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -317,6 +319,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		authZRepo,
 		keys,
 		permissionCheck,
+		cacheConnectors,
 	)
 	if err != nil {
 		return err
@@ -361,6 +364,7 @@ func startAPIs(
 	authZRepo authz_repo.Repository,
 	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
+	cacheConnectors connector.Connectors,
 ) (*api.API, error) {
 	repo := struct {
 		authz_repo.Repository
@@ -517,6 +521,17 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(saml.HandlerPrefix, samlProvider.HttpHandler())
 
+	apis.RegisterHandlerOnPrefix(
+		schemas.HandlerPrefix,
+		scim.NewServer(
+			commands,
+			queries,
+			verifier,
+			keys.User,
+			&config.SCIM,
+			instanceInterceptor.HandlerFuncWithError,
+			middleware.AuthorizationInterceptor(verifier, config.InternalAuthZ).HandlerFuncWithError))
+
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start console: %w", err)
@@ -542,6 +557,7 @@ func startAPIs(
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
+		cacheConnectors,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login: %w", err)
