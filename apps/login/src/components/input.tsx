@@ -15,6 +15,7 @@ export type TextInputProps = DetailedHTMLProps<
   HTMLInputElement
 > & {
   label: string;
+  suffix?: string;
   placeholder?: string;
   defaultValue?: string;
   error?: string | ReactNode;
@@ -45,6 +46,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       label,
       placeholder,
       defaultValue,
+      suffix,
       required = false,
       error,
       disabled,
@@ -56,7 +58,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     ref,
   ) => {
     return (
-      <label className="flex flex-col text-12px text-input-light-label dark:text-input-dark-label">
+      <label className="relative flex flex-col text-12px text-input-light-label dark:text-input-dark-label">
         <span
           className={`leading-3 mb-1 ${
             error ? "text-warn-light-500 dark:text-warn-dark-500" : ""
@@ -77,6 +79,12 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           onBlur={(e) => onBlur && onBlur(e)}
           {...props}
         />
+
+        {suffix && (
+          <span className="z-30 absolute right-[3px] bottom-[22px] transform translate-y-1/2 bg-background-light-500 dark:bg-background-dark-500 p-2 rounded-sm">
+            @{suffix}
+          </span>
+        )}
 
         <div className="leading-14.5px h-14.5px text-warn-light-500 dark:text-warn-dark-500 flex flex-row items-center text-12px">
           <span>{error ? error : " "}</span>
