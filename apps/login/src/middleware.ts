@@ -10,14 +10,14 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  // escape proxy if the environment is
-  if (
-    !process.env.ZITADEL_API_URL ||
-    !process.env.ZITADEL_USER_ID ||
-    !process.env.ZITADEL_USER_TOKEN
-  ) {
-    return NextResponse.next();
-  }
+  // escape proxy if the environment is setup for multitenancy
+  // if (
+  //   !process.env.ZITADEL_API_URL ||
+  //   !process.env.ZITADEL_USER_ID ||
+  //   !process.env.ZITADEL_USER_TOKEN
+  // ) {
+  //   return NextResponse.next();
+  // }
 
   const INSTANCE_URL = process.env.ZITADEL_API_URL;
   const instanceHost = `${INSTANCE_URL}`.replace("https://", "");
