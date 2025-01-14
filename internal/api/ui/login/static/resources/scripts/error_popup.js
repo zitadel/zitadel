@@ -1,4 +1,4 @@
-setTimeout(removeOverlay, 3000);
+setTimeout(removeOverlay, 5000);
 window.addEventListener('DOMContentLoaded', (event) => {
     document.addEventListener("mousemove", (event) => {removeOverlay()});
     document.addEventListener("click", (event) => {removeOverlay()});
