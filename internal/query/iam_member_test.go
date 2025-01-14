@@ -18,6 +18,7 @@ var (
 		", members.change_date" +
 		", members.sequence" +
 		", members.resource_owner" +
+		", members.user_resource_owner" +
 		", members.user_id" +
 		", members.roles" +
 		", projections.login_names3.login_name" +
@@ -45,6 +46,7 @@ var (
 		"change_date",
 		"sequence",
 		"resource_owner",
+		"user_resource_owner",
 		"user_id",
 		"roles",
 		"login_name",
@@ -97,6 +99,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							testNow,
 							uint64(20211206),
 							"ro",
+							"uro",
 							"user-id",
 							database.TextArray[string]{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
@@ -121,6 +124,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 						ChangeDate:         testNow,
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
+						UserResourceOwner:  "uro",
 						UserID:             "user-id",
 						Roles:              database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
@@ -147,6 +151,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							testNow,
 							uint64(20211206),
 							"ro",
+							"uro",
 							"user-id",
 							database.TextArray[string]{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
@@ -171,6 +176,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 						ChangeDate:         testNow,
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
+						UserResourceOwner:  "uro",
 						UserID:             "user-id",
 						Roles:              database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
@@ -197,6 +203,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							testNow,
 							uint64(20211206),
 							"ro",
+							"uro",
 							"user-id-1",
 							database.TextArray[string]{"role-1", "role-2"},
 							"gigi@caos-ag.zitadel.ch",
@@ -213,6 +220,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 							testNow,
 							uint64(20211206),
 							"ro",
+							"uro",
 							"user-id-2",
 							database.TextArray[string]{"role-1", "role-2"},
 							"machine@caos-ag.zitadel.ch",
@@ -237,6 +245,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 						ChangeDate:         testNow,
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
+						UserResourceOwner:  "uro",
 						UserID:             "user-id-1",
 						Roles:              database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "gigi@caos-ag.zitadel.ch",
@@ -252,6 +261,7 @@ func Test_IAMMemberPrepares(t *testing.T) {
 						ChangeDate:         testNow,
 						Sequence:           20211206,
 						ResourceOwner:      "ro",
+						UserResourceOwner:  "uro",
 						UserID:             "user-id-2",
 						Roles:              database.TextArray[string]{"role-1", "role-2"},
 						PreferredLoginName: "machine@caos-ag.zitadel.ch",
