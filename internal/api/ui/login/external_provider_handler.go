@@ -2,8 +2,10 @@ package login
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 
 	"github.com/crewjam/saml/samlsp"
@@ -619,10 +621,6 @@ func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, a
 // renderExternalNotFoundOption renders a page, where the user is able to edit the IDP data,
 // create a new externalUser of link to existing on (based on the IDP template)
 func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idpLink *domain.UserIDPLink, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	resourceOwner := determineResourceOwner(r.Context(), authReq)
 	if orgIAMPolicy == nil {
 		orgIAMPolicy, err = l.getOrgDomainPolicy(r, resourceOwner)
@@ -656,7 +654,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "ExternalNotFound.Description", err),
 		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
 			externalRegisterFormData: externalRegisterFormData{
 				Email:     human.EmailAddress,
@@ -1248,6 +1246,7 @@ func (l *Login) externalAuthFailed(w http.ResponseWriter, r *http.Request, authR
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
+	err = WrapIdPError(err)
 	if passwordless {
 		l.renderPasswordlessVerification(w, r, authReq, password, err)
 		return
@@ -1387,4 +1386,35 @@ func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.
 			},
 		}, nil,
 	)
+}
+
+// IdPError wraps an error from an external IDP to be able to distinguish it from other errors and to display it
+// more prominent (popup style) .
+// It's used if an error occurs during the login process with an external IDP and local authentication is allowed,
+// respectively used as fallback.
+type IdPError struct {
+	err *zerrors.ZitadelError
+}
+
+func (e *IdPError) Error() string {
+	return e.err.Error()
+}
+
+func (e *IdPError) Unwrap() error {
+	return e.err
+}
+
+func (e *IdPError) Is(target error) bool {
+	_, ok := target.(*IdPError)
+	return ok
+}
+
+func WrapIdPError(err error) *IdPError {
+	zErr := new(zerrors.ZitadelError)
+	id := "LOGIN-JWo3f"
+	// keep the original error id if there is one
+	if errors.As(err, &zErr) {
+		id = zErr.ID
+	}
+	return &IdPError{err: zerrors.CreateZitadelError(err, id, "Errors.User.ExternalIDP.LoginFailedSwitchLocal")}
 }
