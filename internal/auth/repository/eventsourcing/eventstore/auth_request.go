@@ -563,6 +563,15 @@ func (repo *AuthRequestRepo) ResetSelectedIDP(ctx context.Context, authReqID, us
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
+func (repo *AuthRequestRepo) RequestLocalAuth(ctx context.Context, authReqID, userAgentID string) error {
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
+	if err != nil {
+		return err
+	}
+	request.RequestLocalAuth = true
+	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
+}
+
 func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *domain.Human, externalIDP *domain.UserIDPLink, orgMemberRoles []string, authReqID, userAgentID, resourceOwner string, metadatas []*domain.Metadata, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -1059,7 +1068,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		request.PreferredLanguage = gu.Ptr(language.Make(user.HumanView.PreferredLanguage))
 	}
 
-	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
+	isInternalLogin := (request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == "") || request.RequestLocalAuth
 	idps, err := checkExternalIDPsOfUser(ctx, repo.IDPUserLinksProvider, user.ID)
 	if err != nil {
 		return nil, err
@@ -1067,7 +1076,9 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	noLocalAuth := request.LoginPolicy != nil && !request.LoginPolicy.AllowUsernamePassword
 
 	allowedLinkedIDPs := checkForAllowedIDPs(request.AllowedExternalIDPs, idps.Links)
-	if (!isInternalLogin || len(allowedLinkedIDPs) > 0 || noLocalAuth) && len(request.LinkingUsers) == 0 {
+	if (!isInternalLogin || len(allowedLinkedIDPs) > 0 || noLocalAuth) &&
+		len(request.LinkingUsers) == 0 &&
+		!request.RequestLocalAuth {
 		step, err := repo.idpChecked(request, allowedLinkedIDPs, userSession)
 		if err != nil {
 			return nil, err
