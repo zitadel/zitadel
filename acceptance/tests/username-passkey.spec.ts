@@ -12,10 +12,12 @@ const test = base.extend<{ user: PasskeyUser }>({
   user: async ({ page }, use) => {
     const user = new PasskeyUser({
       email: faker.internet.email(),
+      isEmailVerified: true,
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       organization: "",
       phone: faker.phone.number(),
+      isPhoneVerified: false,
     });
     await user.ensure(page);
     await use(user);
