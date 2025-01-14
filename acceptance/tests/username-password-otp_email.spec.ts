@@ -14,11 +14,14 @@ const test = base.extend<{ user: PasswordUserWithOTP; sink: any }>({
   user: async ({ page }, use) => {
     const user = new PasswordUserWithOTP({
       email: faker.internet.email(),
+      isEmailVerified: true,
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
       organization: "",
       phone: faker.phone.number(),
+      isPhoneVerified: false,
       password: "Password1!",
+      passwordChangeRequired: false,
       type: OtpType.email,
     });
 

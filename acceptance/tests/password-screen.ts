@@ -4,6 +4,10 @@ import { getCodeFromSink } from "./sink";
 const codeField = "code-text-input";
 const passwordField = "password-text-input";
 const passwordConfirmField = "password-confirm-text-input";
+const passwordChangeField = "password-change-text-input";
+const passwordChangeConfirmField = "password-change-confirm-text-input";
+const passwordSetField = "password-set-text-input";
+const passwordSetConfirmField = "password-set-confirm-text-input";
 const lengthCheck = "length-check";
 const symbolCheck = "symbol-check";
 const numberCheck = "number-check";
@@ -15,8 +19,8 @@ const matchText = "Matches";
 const noMatchText = "Doesn't match";
 
 export async function changePasswordScreen(page: Page, password1: string, password2: string) {
-  await page.getByTestId(passwordField).pressSequentially(password1);
-  await page.getByTestId(passwordConfirmField).pressSequentially(password2);
+  await page.getByTestId(passwordChangeField).pressSequentially(password1);
+  await page.getByTestId(passwordChangeConfirmField).pressSequentially(password2);
 }
 
 export async function passwordScreen(page: Page, password: string) {
@@ -39,9 +43,21 @@ export async function changePasswordScreenExpect(
   lowercase: boolean,
   equals: boolean,
 ) {
-  await expect(page.getByTestId(passwordField)).toHaveValue(password1);
-  await expect(page.getByTestId(passwordConfirmField)).toHaveValue(password2);
+  await expect(page.getByTestId(passwordChangeField)).toHaveValue(password1);
+  await expect(page.getByTestId(passwordChangeConfirmField)).toHaveValue(password2);
 
+  await checkComplexity(page, length, symbol, number, uppercase, lowercase, equals);
+}
+
+async function checkComplexity(
+  page: Page,
+  length: boolean,
+  symbol: boolean,
+  number: boolean,
+  uppercase: boolean,
+  lowercase: boolean,
+  equals: boolean,
+) {
   await checkContent(page, lengthCheck, length);
   await checkContent(page, symbolCheck, symbol);
   await checkContent(page, numberCheck, number);
@@ -63,8 +79,8 @@ export async function resetPasswordScreen(page: Page, username: string, password
   await page.waitForTimeout(3000);
   const c = await getCodeFromSink(username);
   await page.getByTestId(codeField).pressSequentially(c);
-  await page.getByTestId(passwordField).pressSequentially(password1);
-  await page.getByTestId(passwordConfirmField).pressSequentially(password2);
+  await page.getByTestId(passwordSetField).pressSequentially(password1);
+  await page.getByTestId(passwordSetConfirmField).pressSequentially(password2);
 }
 
 export async function resetPasswordScreenExpect(
@@ -78,5 +94,8 @@ export async function resetPasswordScreenExpect(
   lowercase: boolean,
   equals: boolean,
 ) {
-  await changePasswordScreenExpect(page, password1, password2, length, symbol, number, uppercase, lowercase, equals);
+  await expect(page.getByTestId(passwordSetField)).toHaveValue(password1);
+  await expect(page.getByTestId(passwordSetConfirmField)).toHaveValue(password2);
+
+  await checkComplexity(page, length, symbol, number, uppercase, lowercase, equals);
 }
