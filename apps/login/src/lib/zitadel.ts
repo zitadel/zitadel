@@ -1,22 +1,13 @@
-import { create, createClientFor, Duration } from "@zitadel/client";
+import { create, Duration } from "@zitadel/client";
 import { createServerTransport } from "@zitadel/client/node";
 import { createSystemServiceClient } from "@zitadel/client/v1";
 import { makeReqCtx } from "@zitadel/client/v2";
-import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import {
-  CreateCallbackRequest,
-  OIDCService,
-} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
-import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import {
-  Checks,
-  SessionService,
-} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
@@ -40,13 +31,12 @@ import {
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
-  UserService,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-import { headers } from "next/headers";
-import { getInstanceUrl, systemAPIToken } from "./api";
+import { systemAPIToken } from "./api";
+import { ServiceInitializer } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -57,47 +47,17 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   return callback;
 }
 
-type ServiceClass =
-  | typeof IdentityProviderService
-  | typeof UserService
-  | typeof OrganizationService
-  | typeof SessionService
-  | typeof OIDCService
-  | typeof SettingsService;
+// Example usage
+const serviceInitializer = await ServiceInitializer.getInstance();
 
-async function createServiceForHost<T extends ServiceClass>(service: T) {
-  const _headers = await headers();
-  const host = _headers.get("X-Forwarded-Host");
-  if (!host) {
-    throw new Error("No host header found!");
-  }
-
-  let instanceUrl;
-  try {
-    instanceUrl = await getInstanceUrl(host);
-  } catch (error) {
-    console.error(
-      "Could not get instance url, fallback to ZITADEL_API_URL",
-      error,
-    );
-    instanceUrl = process.env.ZITADEL_API_URL;
-  }
-
-  const systemToken = await systemAPIToken();
-
-  const transport = createServerTransport(systemToken, {
-    baseUrl: instanceUrl,
-  });
-
-  return createClientFor<T>(service)(transport);
-}
-
-const idpService = await createServiceForHost(IdentityProviderService);
-const orgService = await createServiceForHost(OrganizationService);
-export const sessionService = await createServiceForHost(SessionService);
-const userService = await createServiceForHost(UserService);
-const oidcService = await createServiceForHost(OIDCService);
-const settingsService = await createServiceForHost(SettingsService);
+export const {
+  sessionService,
+  idpService,
+  orgService,
+  settingsService,
+  oidcService,
+  userService,
+} = serviceInitializer;
 
 const systemService = async () => {
   const systemToken = await systemAPIToken();
@@ -136,6 +96,8 @@ export async function getInstanceByHost(host: string) {
 }
 
 export async function getBrandingSettings(organization?: string) {
+  const settingsService = serviceInitializer.getSettingsService();
+
   const callback = settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -144,6 +106,8 @@ export async function getBrandingSettings(organization?: string) {
 }
 
 export async function getLoginSettings(orgId?: string) {
+  const settingsService = serviceInitializer.getSettingsService();
+
   const callback = settingsService
     .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -152,6 +116,8 @@ export async function getLoginSettings(orgId?: string) {
 }
 
 export async function listIDPLinks(userId: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.listIDPLinks(
     {
       userId,
@@ -161,6 +127,8 @@ export async function listIDPLinks(userId: string) {
 }
 
 export async function addOTPEmail(userId: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.addOTPEmail(
     {
       userId,
@@ -170,14 +138,20 @@ export async function addOTPEmail(userId: string) {
 }
 
 export async function addOTPSMS(userId: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.addOTPSMS({ userId }, {});
 }
 
 export async function registerTOTP(userId: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.registerTOTP({ userId }, {});
 }
 
 export async function getGeneralSettings() {
+  const settingsService = serviceInitializer.getSettingsService();
+
   const callback = settingsService
     .getGeneralSettings({}, {})
     .then((resp) => resp.supportedLanguages);
@@ -186,6 +160,8 @@ export async function getGeneralSettings() {
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
+  const settingsService = serviceInitializer.getSettingsService();
+
   const callback = settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -194,6 +170,8 @@ export async function getLegalAndSupportSettings(organization?: string) {
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
+  const settingsService = serviceInitializer.getSettingsService();
+
   const callback = settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
     .then((resp) => (resp.settings ? resp.settings : undefined));
@@ -206,6 +184,8 @@ export async function createSessionFromChecks(
   challenges: RequestChallenges | undefined,
   lifetime?: Duration,
 ) {
+  const sessionService = serviceInitializer.getSessionService();
+
   return sessionService.createSession(
     {
       checks: checks,
@@ -224,6 +204,8 @@ export async function createSessionForUserIdAndIdpIntent(
   },
   lifetime?: Duration,
 ) {
+  const sessionService = serviceInitializer.getSessionService();
+
   return sessionService.createSession({
     checks: {
       user: {
@@ -245,6 +227,8 @@ export async function setSession(
   checks?: Checks,
   lifetime?: Duration,
 ) {
+  const sessionService = serviceInitializer.getSessionService();
+
   return sessionService.setSession(
     {
       sessionId,
@@ -265,14 +249,20 @@ export async function getSession({
   sessionId: string;
   sessionToken: string;
 }) {
+  const sessionService = serviceInitializer.getSessionService();
+
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 
 export async function deleteSession(sessionId: string, sessionToken: string) {
+  const sessionService = serviceInitializer.getSessionService();
+
   return sessionService.deleteSession({ sessionId, sessionToken }, {});
 }
 
 export async function listSessions(ids: string[]) {
+  const sessionService = serviceInitializer.getSessionService();
+
   return sessionService.listSessions(
     {
       queries: [
@@ -303,6 +293,8 @@ export async function addHumanUser({
   password,
   organization,
 }: AddHumanUserData) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.addHumanUser({
     email: {
       email,
@@ -323,14 +315,20 @@ export async function addHumanUser({
 }
 
 export async function addHuman(request: AddHumanUserRequest) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.addHumanUser(request);
 }
 
 export async function verifyTOTPRegistration(code: string, userId: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.verifyTOTPRegistration({ code, userId }, {});
 }
 
 export async function getUserByID(userId: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.getUserByID({ userId }, {});
 }
 
@@ -338,10 +336,14 @@ export async function verifyInviteCode(
   userId: string,
   verificationCode: string,
 ) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.verifyInviteCode({ userId, verificationCode }, {});
 }
 
 export async function resendInviteCode(userId: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.resendInviteCode({ userId }, {});
 }
 
@@ -368,6 +370,8 @@ export async function sendEmailCode(
     });
   }
 
+  const userService = serviceInitializer.getUserService();
+
   return userService.sendEmailCode(medium, {});
 }
 
@@ -382,6 +386,8 @@ export async function createInviteCode(userId: string, host: string | null) {
       urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
     };
   }
+
+  const userService = serviceInitializer.getUserService();
 
   return userService.createInviteCode(
     {
@@ -492,6 +498,8 @@ export async function listUsers({
     );
   }
 
+  const userService = serviceInitializer.getUserService();
+
   return userService.listUsers({ queries: queries });
 }
 
@@ -570,6 +578,8 @@ export async function searchUsers({
       }),
     );
   }
+
+  const userService = serviceInitializer.getUserService();
 
   const loginNameResult = await userService.listUsers({ queries: queries });
 
@@ -654,6 +664,8 @@ export async function searchUsers({
 }
 
 export async function getDefaultOrg(): Promise<Organization | null> {
+  const orgService = serviceInitializer.getOrgService();
+
   return orgService
     .listOrganizations(
       {
@@ -672,6 +684,8 @@ export async function getDefaultOrg(): Promise<Organization | null> {
 }
 
 export async function getOrgsByDomain(domain: string) {
+  const orgService = serviceInitializer.getOrgService();
+
   return orgService.listOrganizations(
     {
       queries: [
@@ -694,6 +708,8 @@ export async function startIdentityProviderFlow({
   idpId: string;
   urls: RedirectURLsJson;
 }) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.startIdentityProviderIntent({
     idpId,
     content: {
@@ -707,6 +723,8 @@ export async function retrieveIdentityProviderInformation({
   idpIntentId,
   idpIntentToken,
 }: RetrieveIdentityProviderIntentRequest) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.retrieveIdentityProviderIntent({
     idpIntentId,
     idpIntentToken,
@@ -718,16 +736,22 @@ export async function getAuthRequest({
 }: {
   authRequestId: string;
 }) {
+  const oidcService = serviceInitializer.getOIDCService();
+
   return oidcService.getAuthRequest({
     authRequestId,
   });
 }
 
 export async function createCallback(req: CreateCallbackRequest) {
+  const oidcService = serviceInitializer.getOIDCService();
+
   return oidcService.createCallback(req);
 }
 
 export async function verifyEmail(userId: string, verificationCode: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.verifyEmail(
     {
       userId,
@@ -756,10 +780,14 @@ export async function resendEmailCode(
     request = { ...request, verification: { case: "sendCode", value: medium } };
   }
 
+  const userService = serviceInitializer.getUserService();
+
   return userService.resendEmailCode(request, {});
 }
 
 export function retrieveIDPIntent(id: string, token: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.retrieveIdentityProviderIntent(
     { idpIntentId: id, idpIntentToken: token },
     {},
@@ -767,6 +795,8 @@ export function retrieveIDPIntent(id: string, token: string) {
 }
 
 export function getIDPByID(id: string) {
+  const idpService = serviceInitializer.getIDPService();
+
   return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
 }
 
@@ -778,6 +808,8 @@ export function addIDPLink(
   },
   userId: string,
 ) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.addIDPLink(
     {
       idpLink: {
@@ -813,6 +845,8 @@ export async function passwordReset(
         (authRequestId ? `&authRequestId=${authRequestId}` : ""),
     };
   }
+
+  const userService = serviceInitializer.getUserService();
 
   return userService.passwordReset(
     {
@@ -869,6 +903,8 @@ export async function setUserPassword(
     };
   }
 
+  const userService = serviceInitializer.getUserService();
+
   return userService.setPassword(payload, {}).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
     if (error.code === 9 && error.message) {
@@ -880,6 +916,8 @@ export async function setUserPassword(
 }
 
 export async function setPassword(payload: SetPasswordRequest) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.setPassword(payload, {});
 }
 
@@ -891,15 +929,9 @@ export async function setPassword(payload: SetPasswordRequest) {
  */
 
 // TODO check for token requirements!
-export async function createPasskeyRegistrationLink(
-  userId: string,
-  // token: string,
-) {
-  // const transport = createServerTransport(token, {
-  //   baseUrl: process.env.ZITADEL_API_URL!,
-  // });
+export async function createPasskeyRegistrationLink(userId: string) {
+  const userService = serviceInitializer.getUserService();
 
-  // const service = createUserServiceClient(transport);
   return userService.createPasskeyRegistrationLink({
     userId,
     medium: {
@@ -917,6 +949,8 @@ export async function createPasskeyRegistrationLink(
  */
 
 export async function registerU2F(userId: string, domain: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.registerU2F({
     userId,
     domain,
@@ -932,6 +966,8 @@ export async function registerU2F(userId: string, domain: string) {
 export async function verifyU2FRegistration(
   request: VerifyU2FRegistrationRequest,
 ) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.verifyU2FRegistration(request, {});
 }
 
@@ -943,6 +979,8 @@ export async function getActiveIdentityProviders(
   if (linking_allowed) {
     props.linkingAllowed = linking_allowed;
   }
+  const settingsService = serviceInitializer.getSettingsService();
+
   return settingsService.getActiveIdentityProviders(props, {});
 }
 
@@ -954,6 +992,8 @@ export async function getActiveIdentityProviders(
 export async function verifyPasskeyRegistration(
   request: VerifyPasskeyRegistrationRequest,
 ) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.verifyPasskeyRegistration(request, {});
 }
 
@@ -967,6 +1007,8 @@ export async function registerPasskey(
   code: { id: string; code: string },
   domain: string,
 ) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.registerPasskey({
     userId,
     code,
@@ -980,6 +1022,8 @@ export async function registerPasskey(
  * @returns the newly set email
  */
 export async function listAuthenticationMethodTypes(userId: string) {
+  const userService = serviceInitializer.getUserService();
+
   return userService.listAuthenticationMethodTypes({
     userId,
   });
