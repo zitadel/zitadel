@@ -45,7 +45,8 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-import { systemAPIToken } from "./api";
+import { headers } from "next/headers";
+import { getInstanceUrl, systemAPIToken } from "./api";
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -65,24 +66,22 @@ type ServiceClass =
   | typeof SettingsService;
 
 async function createServiceForHost<T extends ServiceClass>(service: T) {
-  // const host = headers().get("X-Forwarded-Host");
-  // if (!host) {
-  //   throw new Error("No host header found!");
-  // }
+  const _headers = await headers();
+  const host = _headers.get("X-Forwarded-Host");
+  if (!host) {
+    throw new Error("No host header found!");
+  }
 
-  // let instanceUrl;
-  // try {
-  //   instanceUrl = await getInstanceUrl(host);
-  // } catch (error) {
-  //   console.error(
-  //     "Could not get instance url, fallback to ZITADEL_API_URL",
-  //     error,
-  //   );
-  //   instanceUrl = process.env.ZITADEL_API_URL;
-  // }
-
-  // remove in favor of the above
-  const instanceUrl = process.env.ZITADEL_API_URL;
+  let instanceUrl;
+  try {
+    instanceUrl = await getInstanceUrl(host);
+  } catch (error) {
+    console.error(
+      "Could not get instance url, fallback to ZITADEL_API_URL",
+      error,
+    );
+    instanceUrl = process.env.ZITADEL_API_URL;
+  }
 
   const systemToken = await systemAPIToken();
 

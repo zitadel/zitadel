@@ -1,33 +1,37 @@
 declare namespace NodeJS {
   interface ProcessEnv {
     /**
-     * The system api url
+     * Multitenancy: The system api url
      */
     AUDIENCE: string;
 
     /**
-     * The system api service user ID
+     * Multitenancy: The service user id
      */
     SYSTEM_USER_ID: string;
 
     /**
-     * The service user key
+     * Multitenancy: The service user private key
      */
     SYSTEM_USER_PRIVATE_KEY: string;
 
     /**
-     * The instance url
+     * Self hosting: The instance url
      */
     ZITADEL_API_URL: string;
 
     /**
-     * The service user id for the instance
+     * Self hosting: The service user id
      */
     ZITADEL_USER_ID: string;
-
     /**
-     * The service user token for the instance
+     * Self hosting: The service user token
      */
     ZITADEL_USER_TOKEN: string;
+
+    /**
+     * Optional: wheter a user must have verified email
+     */
+    EMAIL_VERIFICATION: string;
   }
 }

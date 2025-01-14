@@ -4,16 +4,14 @@
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "DEBUG",
-    "ZITADEL_API_URL",
-    "ZITADEL_SERVICE_USER_ID",
-    "ZITADEL_SERVICE_USER_TOKEN",
-    "ZITADEL_SYSTEM_API_URL",
-    "ZITADEL_SYSTEM_API_USERID",
-    "ZITADEL_SYSTEM_API_KEY",
-    "ZITADEL_ISSUER",
-    "ZITADEL_ADMIN_TOKEN",
+    "VERCEL_URL",
     "EMAIL_VERIFICATION",
-    "VERCEL_URL"
+    "AUDIENCE",
+    "SYSTEM_USER_ID",
+    "SYSTEM_USER_PRIVATE_KEY",
+    "ZITADEL_API_URL",
+    "ZITADEL_USER_ID",
+    "ZITADEL_USER_TOKEN"
   ],
   "tasks": {
     "generate": {
