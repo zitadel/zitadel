@@ -247,6 +247,19 @@ module.exports = {
   ],
   plugins: [
     [
+      '@scalar/docusaurus',
+      {
+        label: 'Scalar',
+        route: '/scalar',
+        configuration: {
+          spec: {
+            // Put the URL to your OpenAPI document here:
+            url: 'https://cdn.jsdelivr.net/npm/@scalar/galaxy/dist/latest.json',
+          },
+        },
+      },
+    ],
+    [
       'docusaurus-plugin-openapi-docs',
       {
         id: "apiDocs",
