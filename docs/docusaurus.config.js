@@ -253,7 +253,7 @@ module.exports = {
         configuration: {
           spec: {
             // Put the URL to your OpenAPI document here:
-            url: '/docs/foo.swagger.json',
+            url: '/docs/openapi.yaml',
           },
         },
       },

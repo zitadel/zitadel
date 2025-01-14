@@ -10,4 +10,9 @@ plugins:
       - remove_internal_comments=true
       - preserve_rpc_order=true
       - allow_merge=true
-      - merge_file_name=foo
+      - merge_file_name=v2
+  - plugin: buf.build/community/google-gnostic-openapi:v0.7.0
+    out: static
+    opt:
+    - paths=source_relative
+    - title=ZITADEL APIs
