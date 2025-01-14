@@ -592,6 +592,21 @@ func TestServer_ListSessions(t *testing.T) {
 			},
 		},
 		{
+			name: "list sessions, empty creator",
+			args: args{
+				IAMOwnerCTX,
+				&session.ListSessionsRequest{},
+				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
+					request.Queries = append(request.Queries,
+						&session.SearchQuery{Query: &session.SearchQuery_CreatorQuery{CreatorQuery: &session.CreatorQuery{Id: gu.Ptr("")}}})
+					return []*sessionAttr{}
+				},
+			},
+			wantExpirationWindow: time.Minute * 5,
+			wantFactors:          []wantFactor{wantUserFactor},
+			wantErr:              true,
+		},
+		{
 			name: "list sessions, useragent, ok",
 			args: args{
 				IAMOwnerCTX,
@@ -600,7 +615,7 @@ func TestServer_ListSessions(t *testing.T) {
 					info := createSession(ctx, t, User.GetUserId(), "useragent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
 					request.Queries = append(request.Queries,
 						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
-						&session.SearchQuery{Query: &session.SearchQuery_UseragentQuery{UseragentQuery: &session.UserAgentQuery{Id: gu.Ptr("useragent")}}})
+						&session.SearchQuery{Query: &session.SearchQuery_UserAgentQuery{UserAgentQuery: &session.UserAgentQuery{FingerprintId: gu.Ptr("useragent")}}})
 					return []*sessionAttr{info}
 				},
 			},
@@ -635,7 +650,7 @@ func TestServer_ListSessions(t *testing.T) {
 					info := createSession(ctx, t, User.GetUserId(), "useragent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
 					request.Queries = append(request.Queries,
 						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: []string{info.ID}}}},
-						&session.SearchQuery{Query: &session.SearchQuery_UseragentQuery{UseragentQuery: &session.UserAgentQuery{Id: gu.Ptr("wronguseragent")}}})
+						&session.SearchQuery{Query: &session.SearchQuery_UserAgentQuery{UserAgentQuery: &session.UserAgentQuery{FingerprintId: gu.Ptr("wronguseragent")}}})
 					return []*sessionAttr{}
 				},
 			},
@@ -656,7 +671,7 @@ func TestServer_ListSessions(t *testing.T) {
 				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
 					request.Queries = append(request.Queries,
-						&session.SearchQuery{Query: &session.SearchQuery_UseragentQuery{UseragentQuery: &session.UserAgentQuery{Id: gu.Ptr("")}}})
+						&session.SearchQuery{Query: &session.SearchQuery_UserAgentQuery{UserAgentQuery: &session.UserAgentQuery{FingerprintId: gu.Ptr("")}}})
 					return []*sessionAttr{}
 				},
 			},

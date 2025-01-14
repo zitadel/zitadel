@@ -88,16 +88,25 @@ func sessionQueryToQuery(ctx context.Context, sq *session.SearchQuery) (query.Se
 	case *session.SearchQuery_CreationDateQuery:
 		return creationDateQueryToQuery(q.CreationDateQuery)
 	case *session.SearchQuery_CreatorQuery:
-		if q.CreatorQuery != nil && q.CreatorQuery.GetId() != "" {
-			return query.NewSessionCreatorSearchQuery(q.CreatorQuery.GetId())
+		if q.CreatorQuery != nil && q.CreatorQuery.Id != nil {
+			if q.CreatorQuery.GetId() != "" {
+				return query.NewSessionCreatorSearchQuery(q.CreatorQuery.GetId())
+			}
+		} else {
+			if userID := authz.GetCtxData(ctx).UserID; userID != "" {
+				return query.NewSessionCreatorSearchQuery(userID)
+			}
 		}
-		return query.NewSessionCreatorSearchQuery(authz.GetCtxData(ctx).UserID)
-	case *session.SearchQuery_UseragentQuery:
-		if q.UseragentQuery != nil && q.UseragentQuery.GetId() != "" {
-			return query.NewSessionUserAgentFingerprintIDSearchQuery(q.UseragentQuery.GetId())
-		}
-		if agentID := authz.GetCtxData(ctx).AgentID; agentID != "" {
-			return query.NewSessionUserAgentFingerprintIDSearchQuery(agentID)
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-x8n24uh", "List.Query.Invalid")
+	case *session.SearchQuery_UserAgentQuery:
+		if q.UserAgentQuery != nil && q.UserAgentQuery.FingerprintId != nil {
+			if *q.UserAgentQuery.FingerprintId != "" {
+				return query.NewSessionUserAgentFingerprintIDSearchQuery(q.UserAgentQuery.GetFingerprintId())
+			}
+		} else {
+			if agentID := authz.GetCtxData(ctx).AgentID; agentID != "" {
+				return query.NewSessionUserAgentFingerprintIDSearchQuery(agentID)
+			}
 		}
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-x8n23uh", "List.Query.Invalid")
 	default:

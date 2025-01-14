@@ -395,8 +395,8 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 						{Query: &session.SearchQuery_CreatorQuery{
 							CreatorQuery: &session.CreatorQuery{},
 						}},
-						{Query: &session.SearchQuery_UseragentQuery{
-							UseragentQuery: &session.UserAgentQuery{},
+						{Query: &session.SearchQuery_UserAgentQuery{
+							UserAgentQuery: &session.UserAgentQuery{},
 						}},
 					},
 				},
@@ -598,6 +598,17 @@ func Test_sessionQueryToQuery(t *testing.T) {
 			want: mustNewTextQuery(t, query.SessionColumnCreator, "creator", query.TextEquals),
 		},
 		{
+			name: "empty own creator, error",
+			args: args{
+				authz.SetCtxData(context.Background(), authz.CtxData{UserID: ""}),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_CreatorQuery{
+						CreatorQuery: &session.CreatorQuery{},
+					},
+				}},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-x8n24uh", "List.Query.Invalid"),
+		},
+		{
 			name: "creator",
 			args: args{
 				authz.SetCtxData(context.Background(), authz.CtxData{UserID: "creator1"}),
@@ -609,23 +620,56 @@ func Test_sessionQueryToQuery(t *testing.T) {
 			want: mustNewTextQuery(t, query.SessionColumnCreator, "creator2", query.TextEquals),
 		},
 		{
+			name: "empty creator, error",
+			args: args{
+				authz.SetCtxData(context.Background(), authz.CtxData{UserID: "creator1"}),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_CreatorQuery{
+						CreatorQuery: &session.CreatorQuery{Id: gu.Ptr("")},
+					},
+				}},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-x8n24uh", "List.Query.Invalid"),
+		},
+		{
+			name: "empty own useragent, error",
+			args: args{
+				authz.SetCtxData(context.Background(), authz.CtxData{AgentID: ""}),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_UserAgentQuery{
+						UserAgentQuery: &session.UserAgentQuery{},
+					},
+				}},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-x8n23uh", "List.Query.Invalid"),
+		},
+		{
 			name: "own useragent",
 			args: args{
 				authz.SetCtxData(context.Background(), authz.CtxData{AgentID: "agent"}),
 				&session.SearchQuery{
-					Query: &session.SearchQuery_UseragentQuery{
-						UseragentQuery: &session.UserAgentQuery{},
+					Query: &session.SearchQuery_UserAgentQuery{
+						UserAgentQuery: &session.UserAgentQuery{},
 					},
 				}},
 			want: mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent", query.TextEquals),
+		},
+		{
+			name: "empty useragent, error",
+			args: args{
+				authz.SetCtxData(context.Background(), authz.CtxData{AgentID: "agent"}),
+				&session.SearchQuery{
+					Query: &session.SearchQuery_UserAgentQuery{
+						UserAgentQuery: &session.UserAgentQuery{FingerprintId: gu.Ptr("")},
+					},
+				}},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-x8n23uh", "List.Query.Invalid"),
 		},
 		{
 			name: "useragent",
 			args: args{
 				authz.SetCtxData(context.Background(), authz.CtxData{AgentID: "agent1"}),
 				&session.SearchQuery{
-					Query: &session.SearchQuery_UseragentQuery{
-						UseragentQuery: &session.UserAgentQuery{Id: gu.Ptr("agent2")},
+					Query: &session.SearchQuery_UserAgentQuery{
+						UserAgentQuery: &session.UserAgentQuery{FingerprintId: gu.Ptr("agent2")},
 					},
 				}},
 			want: mustNewTextQuery(t, query.SessionColumnUserAgentFingerprintID, "agent2", query.TextEquals),
