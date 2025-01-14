@@ -330,7 +330,7 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, or
 		}
 		queries = append(queries, owner)
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, false)
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries}, nil)
 	if err != nil {
 		return nil, err
 	}

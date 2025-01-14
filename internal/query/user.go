@@ -604,7 +604,18 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 	return user, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, checkPermissionV2 bool) (users *Users, err error) {
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
+	users, err := q.searchUsers(ctx, queries, permissionCheck != nil && authz.GetFeatures(ctx).PermissionCheckV2)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
+		usersCheckPermission(ctx, users, permissionCheck)
+	}
+	return users, nil
+}
+
+func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheckV2 bool) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -612,7 +623,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, c
 	query = queries.toQuery(query).Where(sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	})
-	if checkPermissionV2 {
+	if permissionCheckV2 {
 		query = wherePermittedOrgs(ctx, query, UserResourceOwnerCol.identifier(), domain.PermissionUserRead)
 	}
 
