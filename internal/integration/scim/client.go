@@ -56,6 +56,10 @@ func (c *ResourceClient[T]) Create(ctx context.Context, orgID string, body []byt
 	return c.doWithBody(ctx, http.MethodPost, orgID, "", bytes.NewReader(body))
 }
 
+func (c *ResourceClient[T]) Replace(ctx context.Context, orgID, id string, body []byte) (*T, error) {
+	return c.doWithBody(ctx, http.MethodPut, orgID, id, bytes.NewReader(body))
+}
+
 func (c *ResourceClient[T]) Get(ctx context.Context, orgID, resourceID string) (*T, error) {
 	return c.doWithBody(ctx, http.MethodGet, orgID, resourceID, nil)
 }
