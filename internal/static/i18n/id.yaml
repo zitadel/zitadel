@@ -549,6 +549,12 @@ Errors:
       Invalid: Token tidak valid
       Expired: Token sudah habis masa berlakunya
     InvalidClient: Token tidak dikeluarkan untuk klien ini
+  SAMLRequest:
+    AlreadyExists: SAMLRequest sudah ada
+    NotExisting: SAMLRequest tidak ada
+    WrongLoginClient: SAMLRequest dibuat oleh klien login lainnya
+  SAMLSession:
+    InvalidClient: SAMLResponse tidak dikeluarkan untuk klien ini
   Feature:
     NotExisting: Fitur tidak ada
     TypeNotSupported: Jenis fitur tidak didukung
@@ -594,6 +600,7 @@ Errors:
     FeatureDisabled: Fitur kunci web dinonaktifkan
     NoActive: Tidak ditemukan kunci web aktif
     NotFound: Kunci web tidak ditemukan
+
 AggregateTypes:
   action: Tindakan
   instance: Contoh
@@ -617,6 +624,9 @@ AggregateTypes:
   system: Sistem
   session: Sidang
   web_key: Kunci Web
+  saml_request: Sesi SAML
+  saml_session: Permintaan SAML
+
 EventTypes:
   execution:
     set: Kumpulan eksekusi

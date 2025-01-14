@@ -92,7 +92,9 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled")
 	}
 	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
-		return nil, nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.AuthRequest.WrongLoginClient")
+		if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
+			return nil, nil, err
+		}
 	}
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)

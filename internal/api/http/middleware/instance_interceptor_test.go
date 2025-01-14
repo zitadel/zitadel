@@ -72,7 +72,7 @@ func Test_instanceInterceptor_Handler(t *testing.T) {
 				translator: newZitadelTranslator(),
 			}
 			next := &testHandler{}
-			got := a.HandlerFunc(next.ServeHTTP)
+			got := a.HandlerFunc(next)
 			rr := httptest.NewRecorder()
 			got.ServeHTTP(rr, tt.args.request)
 			assert.Equal(t, tt.res.statusCode, rr.Code)
@@ -136,7 +136,7 @@ func Test_instanceInterceptor_HandlerFunc(t *testing.T) {
 				translator: newZitadelTranslator(),
 			}
 			next := &testHandler{}
-			got := a.HandlerFunc(next.ServeHTTP)
+			got := a.HandlerFunc(next)
 			rr := httptest.NewRecorder()
 			got.ServeHTTP(rr, tt.args.request)
 			assert.Equal(t, tt.res.statusCode, rr.Code)
@@ -145,9 +145,78 @@ func Test_instanceInterceptor_HandlerFunc(t *testing.T) {
 	}
 }
 
+func Test_instanceInterceptor_HandlerFuncWithError(t *testing.T) {
+	type fields struct {
+		verifier authz.InstanceVerifier
+	}
+	type args struct {
+		request *http.Request
+	}
+	type res struct {
+		wantErr bool
+		context context.Context
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"setInstance error",
+			fields{
+				verifier: &mockInstanceVerifier{},
+			},
+			args{
+				request: httptest.NewRequest("", "/url", nil),
+			},
+			res{
+				wantErr: true,
+				context: nil,
+			},
+		},
+		{
+			"setInstance ok",
+			fields{
+				verifier: &mockInstanceVerifier{instanceHost: "host"},
+			},
+			args{
+				request: func() *http.Request {
+					r := httptest.NewRequest("", "/url", nil)
+					r = r.WithContext(zitadel_http.WithDomainContext(r.Context(), &zitadel_http.DomainCtx{InstanceHost: "host"}))
+					return r
+				}(),
+			},
+			res{
+				context: authz.WithInstance(zitadel_http.WithDomainContext(context.Background(), &zitadel_http.DomainCtx{InstanceHost: "host"}), &mockInstance{}),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &instanceInterceptor{
+				verifier:   tt.fields.verifier,
+				translator: newZitadelTranslator(),
+			}
+			var ctx context.Context
+			got := a.HandlerFuncWithError(func(w http.ResponseWriter, r *http.Request) error {
+				ctx = r.Context()
+				return nil
+			})
+			rr := httptest.NewRecorder()
+			err := got(rr, tt.args.request)
+			if (err != nil) != tt.res.wantErr {
+				t.Errorf("got error %v, want %v", err, tt.res.wantErr)
+			}
+
+			assert.Equal(t, tt.res.context, ctx)
+		})
+	}
+}
+
 func Test_setInstance(t *testing.T) {
 	type args struct {
-		r        *http.Request
+		ctx      context.Context
 		verifier authz.InstanceVerifier
 	}
 	type res struct {
@@ -162,10 +231,7 @@ func Test_setInstance(t *testing.T) {
 		{
 			"no domain context, not found error",
 			args{
-				r: func() *http.Request {
-					r := httptest.NewRequest("", "/url", nil)
-					return r
-				}(),
+				ctx:      context.Background(),
 				verifier: &mockInstanceVerifier{},
 			},
 			res{
@@ -176,10 +242,7 @@ func Test_setInstance(t *testing.T) {
 		{
 			"instanceHost found, ok",
 			args{
-				r: func() *http.Request {
-					r := httptest.NewRequest("", "/url", nil)
-					return r.WithContext(zitadel_http.WithDomainContext(r.Context(), &zitadel_http.DomainCtx{InstanceHost: "host", Protocol: "https"}))
-				}(),
+				ctx:      zitadel_http.WithDomainContext(context.Background(), &zitadel_http.DomainCtx{InstanceHost: "host", Protocol: "https"}),
 				verifier: &mockInstanceVerifier{instanceHost: "host"},
 			},
 			res{
@@ -190,10 +253,7 @@ func Test_setInstance(t *testing.T) {
 		{
 			"instanceHost not found, error",
 			args{
-				r: func() *http.Request {
-					r := httptest.NewRequest("", "/url", nil)
-					return r.WithContext(zitadel_http.WithDomainContext(r.Context(), &zitadel_http.DomainCtx{InstanceHost: "fromorigin:9999", Protocol: "https"}))
-				}(),
+				ctx:      zitadel_http.WithDomainContext(context.Background(), &zitadel_http.DomainCtx{InstanceHost: "fromorigin:9999", Protocol: "https"}),
 				verifier: &mockInstanceVerifier{instanceHost: "unknowndomain"},
 			},
 			res{
@@ -204,7 +264,7 @@ func Test_setInstance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := setInstance(tt.args.r, tt.args.verifier)
+			got, err := setInstance(tt.args.ctx, tt.args.verifier)
 			if (err != nil) != tt.res.err {
 				t.Errorf("setInstance() error = %v, wantErr %v", err, tt.res.err)
 				return

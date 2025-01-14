@@ -49,6 +49,7 @@ import (
 	user_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/user/v3alpha"
 	userschema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/userschema/v3alpha"
 	"github.com/zitadel/zitadel/internal/api/grpc/resources/webkey/v3"
+	saml_v2 "github.com/zitadel/zitadel/internal/api/grpc/saml/v2"
 	session_v2 "github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
 	settings_v2 "github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
@@ -62,6 +63,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
+	"github.com/zitadel/zitadel/internal/api/scim"
+	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/console/path"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -316,6 +319,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		authZRepo,
 		keys,
 		permissionCheck,
+		cacheConnectors,
 	)
 	if err != nil {
 		return err
@@ -360,6 +364,7 @@ func startAPIs(
 	authZRepo authz_repo.Repository,
 	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
+	cacheConnectors connector.Connectors,
 ) (*api.API, error) {
 	repo := struct {
 		authz_repo.Repository
@@ -437,7 +442,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL(), assets.AssetAPI(), permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(commands, queries)); err != nil {
@@ -449,7 +454,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, feature_v2beta.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, settings_v2.CreateServer(commands, queries)); err != nil {
@@ -516,6 +521,17 @@ func startAPIs(
 	}
 	apis.RegisterHandlerOnPrefix(saml.HandlerPrefix, samlProvider.HttpHandler())
 
+	apis.RegisterHandlerOnPrefix(
+		schemas.HandlerPrefix,
+		scim.NewServer(
+			commands,
+			queries,
+			verifier,
+			keys.User,
+			&config.SCIM,
+			instanceInterceptor.HandlerFuncWithError,
+			middleware.AuthorizationInterceptor(verifier, config.InternalAuthZ).HandlerFuncWithError))
+
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start console: %w", err)
@@ -530,7 +546,7 @@ func startAPIs(
 		store,
 		consolePath,
 		oidcServer.AuthCallbackURL(),
-		provider.AuthCallbackURL(samlProvider),
+		samlProvider.AuthCallbackURL(),
 		config.ExternalSecure,
 		userAgentInterceptor,
 		op.NewIssuerInterceptor(oidcServer.IssuerFromRequest).Handler,
@@ -541,6 +557,7 @@ func startAPIs(
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
+		cacheConnectors,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login: %w", err)
@@ -553,6 +570,10 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
+		return nil, err
+	}
+	// After SAML provider so that the callback endpoint can be used
+	if err := apis.RegisterService(ctx, saml_v2.CreateServer(commands, queries, samlProvider, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
