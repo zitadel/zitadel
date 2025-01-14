@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/api/scim/serrors"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -53,6 +54,28 @@ func buildMetadataKeyQuery(ctx context.Context, key metadata.Key) query.SearchQu
 	}
 
 	return q
+}
+
+func (h *UsersHandler) mapMetadataToDomain(ctx context.Context, user *ScimUser) (md []*domain.Metadata, skippedMetadata []string, err error) {
+	md = make([]*domain.Metadata, 0, len(metadata.ScimUserRelevantMetadataKeys))
+	for _, key := range metadata.ScimUserRelevantMetadataKeys {
+		var value []byte
+		value, err = getValueForMetadataKey(user, key)
+		if err != nil {
+			return
+		}
+
+		if len(value) > 0 {
+			md = append(md, &domain.Metadata{
+				Key:   string(metadata.ScopeKey(ctx, key)),
+				Value: value,
+			})
+		} else {
+			skippedMetadata = append(skippedMetadata, string(metadata.ScopeKey(ctx, key)))
+		}
+	}
+
+	return
 }
 
 func (h *UsersHandler) mapMetadataToCommands(ctx context.Context, user *ScimUser) ([]*command.AddMetadataEntry, error) {

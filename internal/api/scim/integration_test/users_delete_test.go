@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestDeleteUser_errors(t *testing.T) {
@@ -71,9 +72,12 @@ func TestDeleteUser_ensureReallyDeleted(t *testing.T) {
 	err = Instance.Client.SCIM.Users.Delete(CTX, Instance.DefaultOrg.Id, createUserResp.UserId)
 	scim.RequireScimError(t, http.StatusNotFound, err)
 
-	// try to get user via api => should 404
-	_, err = Instance.Client.UserV2.GetUserByID(CTX, &user.GetUserByIDRequest{UserId: createUserResp.UserId})
-	integration.AssertGrpcStatus(t, codes.NotFound, err)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		// try to get user via api => should 404
+		_, err = Instance.Client.UserV2.GetUserByID(CTX, &user.GetUserByIDRequest{UserId: createUserResp.UserId})
+		integration.AssertGrpcStatus(tt, codes.NotFound, err)
+	}, retryDuration, tick)
 }
 
 func TestDeleteUser_anotherOrg(t *testing.T) {

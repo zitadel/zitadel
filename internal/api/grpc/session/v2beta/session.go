@@ -32,7 +32,7 @@ var (
 )
 
 func (s *Server) GetSession(ctx context.Context, req *session.GetSessionRequest) (*session.GetSessionResponse, error) {
-	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken())
+	res, err := s.query.SessionByID(ctx, true, req.GetSessionId(), req.GetSessionToken(), s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (s *Server) ListSessions(ctx context.Context, req *session.ListSessionsRequ
 	if err != nil {
 		return nil, err
 	}
-	sessions, err := s.query.SearchSessions(ctx, queries)
+	sessions, err := s.query.SearchSessions(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

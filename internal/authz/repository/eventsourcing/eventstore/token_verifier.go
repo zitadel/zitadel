@@ -159,7 +159,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := repo.Query.SessionByID(ctx, true, sessionID, token)
+	session, err := repo.Query.SessionByID(ctx, true, sessionID, token, nil)
 	if err != nil {
 		return "", "", "", err
 	}
