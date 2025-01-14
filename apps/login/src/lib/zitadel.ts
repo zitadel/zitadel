@@ -1,32 +1,22 @@
+import { create, createClientFor, Duration } from "@zitadel/client";
 import { createServerTransport } from "@zitadel/client/node";
-import {
-  createIdpServiceClient,
-  createOIDCServiceClient,
-  createOrganizationServiceClient,
-  createSessionServiceClient,
-  createSettingsServiceClient,
-  createUserServiceClient,
-  makeReqCtx,
-} from "@zitadel/client/v2";
-import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import {
-  AddHumanUserRequest,
-  ResendEmailCodeRequest,
-  ResendEmailCodeRequestSchema,
-  RetrieveIdentityProviderIntentRequest,
-  SendEmailCodeRequestSchema,
-  SetPasswordRequest,
-  SetPasswordRequestSchema,
-  VerifyPasskeyRegistrationRequest,
-  VerifyU2FRegistrationRequest,
-} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-
-import { create, Duration } from "@zitadel/client";
+import { createSystemServiceClient } from "@zitadel/client/v1";
+import { makeReqCtx } from "@zitadel/client/v2";
+import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import {
+  CreateCallbackRequest,
+  OIDCService,
+} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
+import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import {
+  Checks,
+  SessionService,
+} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
@@ -42,19 +32,20 @@ import {
   User,
   UserState,
 } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import {
+  AddHumanUserRequest,
+  ResendEmailCodeRequest,
+  ResendEmailCodeRequestSchema,
+  RetrieveIdentityProviderIntentRequest,
+  SendEmailCodeRequestSchema,
+  SetPasswordRequest,
+  SetPasswordRequestSchema,
+  UserService,
+  VerifyPasskeyRegistrationRequest,
+  VerifyU2FRegistrationRequest,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-
-const transport = createServerTransport(
-  process.env.ZITADEL_SERVICE_USER_TOKEN!,
-  { baseUrl: process.env.ZITADEL_API_URL! },
-);
-
-export const sessionService = createSessionServiceClient(transport);
-export const userService = createUserServiceClient(transport);
-export const oidcService = createOIDCServiceClient(transport);
-export const idpService = createIdpServiceClient(transport);
-export const orgService = createOrganizationServiceClient(transport);
-export const settingsService = createSettingsServiceClient(transport);
+import { systemAPIToken } from "./api";
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -63,6 +54,86 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   cacheLife("hours");
 
   return callback;
+}
+
+type ServiceClass =
+  | typeof IdentityProviderService
+  | typeof UserService
+  | typeof OrganizationService
+  | typeof SessionService
+  | typeof OIDCService
+  | typeof SettingsService;
+
+async function createServiceForHost<T extends ServiceClass>(service: T) {
+  // const host = headers().get("X-Forwarded-Host");
+  // if (!host) {
+  //   throw new Error("No host header found!");
+  // }
+
+  // let instanceUrl;
+  // try {
+  //   instanceUrl = await getInstanceUrl(host);
+  // } catch (error) {
+  //   console.error(
+  //     "Could not get instance url, fallback to ZITADEL_API_URL",
+  //     error,
+  //   );
+  //   instanceUrl = process.env.ZITADEL_API_URL;
+  // }
+
+  // remove in favor of the above
+  const instanceUrl = process.env.ZITADEL_API_URL;
+
+  const systemToken = await systemAPIToken();
+
+  const transport = createServerTransport(systemToken, {
+    baseUrl: instanceUrl,
+  });
+
+  return createClientFor<T>(service)(transport);
+}
+
+const idpService = await createServiceForHost(IdentityProviderService);
+const orgService = await createServiceForHost(OrganizationService);
+export const sessionService = await createServiceForHost(SessionService);
+const userService = await createServiceForHost(UserService);
+const oidcService = await createServiceForHost(OIDCService);
+const settingsService = await createServiceForHost(SettingsService);
+
+const systemService = async () => {
+  const systemToken = await systemAPIToken();
+
+  const transport = createServerTransport(systemToken, {
+    baseUrl: process.env.ZITADEL_API_URL,
+  });
+
+  return createSystemServiceClient(transport);
+};
+
+export async function getInstanceByHost(host: string) {
+  return (await systemService())
+    .listInstances(
+      {
+        queries: [
+          {
+            query: {
+              case: "domainQuery",
+              value: {
+                domains: [host],
+              },
+            },
+          },
+        ],
+      },
+      {},
+    )
+    .then((resp) => {
+      if (resp.result.length !== 1) {
+        throw new Error("Could not find instance");
+      }
+
+      return resp.result[0];
+    });
 }
 
 export async function getBrandingSettings(organization?: string) {
