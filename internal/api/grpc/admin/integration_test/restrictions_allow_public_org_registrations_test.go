@@ -21,8 +21,6 @@ import (
 )
 
 func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
-	t.Parallel()
-
 	instance := integration.NewInstance(CTX)
 	regOrgUrl, err := url.Parse("http://" + instance.Domain + ":8080/ui/login/register/org")
 	require.NoError(t, err)

@@ -35,15 +35,13 @@ func TestMain(m *testing.M) {
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		OwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
-		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeNoPermission)
 		User = Instance.CreateHumanUser(CTX)
 		return m.Run()
 	}())
 }
 
 func TestServer_AddOrganization(t *testing.T) {
-	t.Parallel()
-
 	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
 	tests := []struct {

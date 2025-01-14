@@ -7,12 +7,17 @@ type projection struct {
 	reducers []AggregateReducer
 }
 
-// Name implements Projection
+// ActiveInstances implements [Projection]
+func (p *projection) ActiveInstances() []string {
+	return nil
+}
+
+// Name implements [Projection]
 func (p *projection) Name() string {
 	return p.name
 }
 
-// Reducers implements Projection
+// Reducers implements [Projection]
 func (p *projection) Reducers() []AggregateReducer {
 	return p.reducers
 }

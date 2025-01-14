@@ -264,6 +264,7 @@ RegistrationUser:
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
+  Korean: 한국어
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -306,6 +307,7 @@ ExternalRegistrationUserOverview:
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
+  Korean: 한국어
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -382,6 +384,7 @@ ExternalNotFound:
   Swedish: Svenska
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
+  Korean: 한국어
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:

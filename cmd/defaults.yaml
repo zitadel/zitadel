@@ -68,7 +68,7 @@ Port: 8080 # ZITADEL_PORT
 # It can differ from Port e.g. if a reverse proxy forwards the traffic to ZITADEL
 # Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalPort: 8080 # ZITADEL_EXTERNALPORT
-# ExternalPort is the domain on which end users access ZITADEL.
+# ExternalDomain is the domain on which end users access ZITADEL.
 # Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalDomain: localhost # ZITADEL_EXTERNALDOMAIN
 # ExternalSecure specifies if ZITADEL is exposed externally using HTTPS or HTTP.
@@ -198,8 +198,11 @@ Caches:
       AutoPrune:
         Interval: 1m
         TimeOut: 5s
+    # Postgres connector uses the configured database (postgres or cockraochdb) as cache.
+    # It is suitable for deployments with multiple containers.
+    # The cache is enabled by default because it is the default cache states for IdP form callbacks
     Postgres:
-      Enabled: false
+      Enabled: true
       AutoPrune:
         Interval: 15m
         TimeOut: 30s
@@ -311,7 +314,7 @@ Caches:
     # When connector is empty, this cache will be disabled.
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
     # Log enables cache-specific logging. Default to error log to stderr when omitted.
     Log:
       Level: error
@@ -322,7 +325,27 @@ Caches:
   Milestones:
     Connector: ""
     MaxAge: 1h
-    LastUsage: 10m
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
+  # Organization cache, gettable by primary domain or ID.
+  Organization:
+    Connector: ""
+    MaxAge: 1h
+    LastUseAge: 10m
+    Log:
+      Level: error
+      AddSource: true
+      Formatter:
+        Format: text
+  # IdP callbacks using form POST cache, required for handling them securely and without possible too big request urls.
+  IdPFormCallbacks:
+    Connector: "postgres"
+    MaxAge: 1h
+    LastUseAge: 10m
     Log:
       Level: error
       AddSource: true
@@ -390,6 +413,9 @@ Projections:
   # from HandleActiveInstances duration in the past until the projection's current time
   # If set to 0 (default), every instance is always considered active
   HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
+  # Maximum amount of instances cached as active
+  # If set to 0, every instance is always considered active
+  MaxActiveInstances: 0 # ZITADEL_PROJECTIONS_MAXACTIVEINSTANCES
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     custom_texts:
@@ -413,11 +439,6 @@ Projections:
       TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_LOCKOUT_POLICY_TRANSACTIONDURATION
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
-      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
-      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
-      # Delivery guarantee requirements are higher for quota webhooks
-      # If set to 0 (default), every instance is always considered active
-      HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
       # As quota notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
@@ -428,15 +449,49 @@ Projections:
       BulkLimit: 50
     # The Telemetry projection is used for calling telemetry webhooks
     Telemetry:
-      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
-      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
-      # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
-      # If set to 0 (default), every instance is always considered active
-      HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_HANDLEACTIVEINSTANCES
       # As sending telemetry data doesn't result in database statements, retries don't have any effects
       MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_MAXFAILURECOUNT
       # Telemetry data synchronization is not time critical. Setting RequeueEvery to 55 minutes doesn't annoy the database too much.
       RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
+
+Notifications:
+  # Notifications can be processed by either a sequential mode (legacy) or a new parallel mode.
+  # The parallel mode is currently only recommended for Postgres databases.
+  # For CockroachDB, the sequential mode is recommended, see: https://github.com/zitadel/zitadel/issues/9002
+  # If legacy mode is enabled, the worker config below is ignored.
+  LegacyEnabled: true # ZITADEL_NOTIFICATIONS_LEGACYENABLED
+  # The amount of workers processing the notification request events.
+  # If set to 0, no notification request events will be handled. This can be useful when running in
+  # multi binary / pod setup and allowing only certain executables to process the events.
+  Workers: 1 # ZITADEL_NOTIFIACATIONS_WORKERS
+  # The amount of events a single worker will process in a run.
+  BulkLimit: 10 # ZITADEL_NOTIFIACATIONS_BULKLIMIT
+  # Time interval between scheduled notifications for request events
+  RequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_REQUEUEEVERY
+  # The amount of workers processing the notification retry events.
+  # If set to 0, no notification retry events will be handled. This can be useful when running in
+  # multi binary / pod setup and allowing only certain executables to process the events.
+  RetryWorkers: 1 # ZITADEL_NOTIFIACATIONS_RETRYWORKERS
+  # Time interval between scheduled notifications for retry events
+  RetryRequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_RETRYREQUEUEEVERY
+  # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
+  # from HandleActiveInstances duration in the past until the projection's current time
+  # If set to 0 (default), every instance is always considered active
+  HandleActiveInstances: 0s # ZITADEL_NOTIFIACATIONS_HANDLEACTIVEINSTANCES
+  # The maximum duration a transaction remains open
+  # before it spots left folding additional events
+  # and updates the table.
+  TransactionDuration: 10s # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
+  # Automatically cancel the notification after the amount of failed attempts
+  MaxAttempts: 3 # ZITADEL_NOTIFIACATIONS_MAXATTEMPTS
+  # Automatically cancel the notification if it cannot be handled within a specific time
+  MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
+  # Failed attempts are retried after a confogired delay (with exponential backoff).
+  # Set a minimum and maximum delay and a factor for the backoff
+  MinRetryDelay: 5s  # ZITADEL_NOTIFIACATIONS_MINRETRYDELAY
+  MaxRetryDelay: 1m # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
+  # Any factor below 1 will be set to 1
+  RetryDelayFactor: 1.5 # ZITADEL_NOTIFIACATIONS_RETRYDELAYFACTOR
 
 Auth:
   # See Projections.BulkLimit
@@ -448,10 +503,6 @@ Auth:
     BulkLimit: 100 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
     # See Projections.MaxFailureCount
     FailureCountUntilSkip: 5 #ZITADEL_AUTH_SPOOLER_FAILURECOUNTUNTILSKIP
-    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
-    # from HandleActiveInstances duration in the past until the projections current time
-    # If set to 0 (default), every instance is always considered active
-    HandleActiveInstances: 0s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
   # Defines the amount of auth requests stored in the LRU caches.
   # There are two caches implemented one for id and one for code
   AmountOfCachedAuthRequests: 0 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
@@ -466,10 +517,6 @@ Admin:
     BulkLimit: 200
     # See Projections.MaxFailureCount
     FailureCountUntilSkip: 5
-    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
-    # from HandleActiveInstances duration in the past until the projections current time
-    # If set to 0 (default), every instance is always considered active
-    HandleActiveInstances: 0s
 
 UserAgentCookie:
   Name: zitadel.useragent # ZITADEL_USERAGENTCOOKIE_NAME
@@ -483,9 +530,6 @@ OIDC:
   GrantTypeRefreshToken: true # ZITADEL_OIDC_GRANTTYPEREFRESHTOKEN
   RequestObjectSupported: true # ZITADEL_OIDC_REQUESTOBJECTSUPPORTED
 
-  # Deprecated: The signing algorithm is determined by the generated keys.
-  # Use the web keys resource to generate keys with different algorithms.
-  SigningKeyAlgorithm: RS256 # ZITADEL_OIDC_SIGNINGKEYALGORITHM
   # Sets the default values for lifetime and expiration for OIDC
   # This default can be overwritten in the default instance configuration and for each instance during runtime
   # !!! Changing this after the initial setup will have no impact without a restart !!!
@@ -529,6 +573,7 @@ OIDC:
   DefaultBackChannelLogoutLifetime: 15m # ZITADEL_OIDC_DEFAULTBACKCHANNELLOGOUTLIFETIME
 
 SAML:
+  DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_SAML_DEFAULTLOGINURLV2
   ProviderConfig:
     MetadataConfig:
       Path: "/metadata" # ZITADEL_SAML_PROVIDERCONFIG_METADATACONFIG_PATH
@@ -544,6 +589,11 @@ SAML:
     #  ContactType: "technical" # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_CONTACTTYPE
     #  Company: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_COMPANY
     #  EmailAddress: hi@zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_EMAILADDRESS
+
+SCIM:
+  # default values whether an email/phone is considered verified when a users email/phone is created or updated
+  EmailVerified: true # ZITADEL_SCIM_EMAILVERIFIED
+  PhoneVerified: true # ZITADEL_SCIM_PHONEVERIFIED
 
 Login:
   LanguageCookieName: zitadel.login.lang # ZITADEL_LOGIN_LANGUAGECOOKIENAME
@@ -563,6 +613,9 @@ Console:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_CONSOLE_LONGCACHE_SHAREDMAXAGE
   InstanceManagementURL: "" # ZITADEL_CONSOLE_INSTANCEMANAGEMENTURL
+  PostHog:
+    URL: "" # ZITADEL_CONSOLE_POSTHOG_URL
+    Token: "" # ZITADEL_CONSOLE_POSTHOG_TOKEN
 
 EncryptionKeys:
   DomainVerification:
@@ -589,6 +642,9 @@ EncryptionKeys:
   User:
     EncryptionKeyID: "userKey" # ZITADEL_ENCRYPTIONKEYS_USER_ENCRYPTIONKEYID
     DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_USER_DECRYPTIONKEYIDS (comma separated list)
+  Target:
+    EncryptionKeyID: "targetKey" # ZITADEL_ENCRYPTIONKEYS_TARGET_ENCRYPTIONKEYID
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_TARGET_DECRYPTIONKEYIDS (comma separated list)
   CSRFCookieKeyID: "csrfCookieKey" # ZITADEL_ENCRYPTIONKEYS_CSRFCOOKIEKEYID
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
@@ -866,6 +922,12 @@ DefaultInstance:
       IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEUPPERLETTERS
       IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDEDIGITS
       IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_INITIALIZEUSERCODE_INCLUDESYMBOLS
+    SigningKey:
+      Length: 36 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_LENGTH
+      IncludeLowerLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDELOWERLETTERS
+      IncludeUpperLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDEUPPERLETTERS
+      IncludeDigits: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDEDIGITS
+      IncludeSymbols: false # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_SIGNINGKEY_INCLUDESYMBOLS
   PasswordComplexityPolicy:
     MinLength: 8 # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_MINLENGTH
     HasLowercase: true # ZITADEL_DEFAULTINSTANCE_PASSWORDCOMPLEXITYPOLICY_HASLOWERCASE
@@ -1246,6 +1308,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "events.read"
         - "milestones.read"
+        - "session.read"
         - "session.delete"
         - "action.target.read"
         - "action.target.write"
@@ -1438,6 +1501,43 @@ InternalAuthZ:
         - "project.grant.member.write"
         - "project.grant.member.delete"
         - "session.delete"
+    - Role: "IAM_LOGIN_CLIENT"
+      Permissions:
+        - "iam.read"
+        - "iam.policy.read"
+        - "iam.member.read"
+        - "iam.member.write"
+        - "iam.idp.read"
+        - "iam.feature.read"
+        - "iam.restrictions.read"
+        - "org.read"
+        - "org.member.read"
+        - "org.member.write"
+        - "org.idp.read"
+        - "org.feature.read"
+        - "user.read"
+        - "user.write"
+        - "user.grant.read"
+        - "user.grant.write"
+        - "user.membership.read"
+        - "user.credential.write"
+        - "user.passkey.write"
+        - "user.feature.read"
+        - "policy.read"
+        - "project.read"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.role.read"
+        - "project.app.read"
+        - "project.member.read"
+        - "project.member.write"
+        - "project.grant.read"
+        - "project.grant.member.read"
+        - "project.grant.member.write"
+        - "session.read"
+        - "session.link"
+        - "session.delete"
+        - "userschema.read"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"

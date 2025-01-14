@@ -21,7 +21,6 @@ import (
 )
 
 func TestServer_CreateUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -95,7 +94,7 @@ func TestServer_CreateUser(t *testing.T) {
 		},
 		{
 			name: "user create, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
@@ -230,7 +229,6 @@ func TestServer_CreateUser(t *testing.T) {
 }
 
 func TestServer_PatchUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -296,7 +294,7 @@ func TestServer_PatchUser(t *testing.T) {
 		},
 		{
 			name: "user patch, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.PatchUserRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -650,7 +648,6 @@ func TestServer_PatchUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -737,7 +734,7 @@ func TestServer_DeleteUser(t *testing.T) {
 		},
 		{
 			name: "user delete, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.DeleteUserRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -868,7 +865,6 @@ func unmarshalJSON(data string) *structpb.Struct {
 }
 
 func TestServer_LockUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -954,7 +950,7 @@ func TestServer_LockUser(t *testing.T) {
 		},
 		{
 			name: "user lock, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.LockUserRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -1070,7 +1066,6 @@ func TestServer_LockUser(t *testing.T) {
 }
 
 func TestServer_UnlockUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -1157,7 +1152,7 @@ func TestServer_UnlockUser(t *testing.T) {
 		},
 		{
 			name: "user unlock, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.UnlockUserRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -1253,7 +1248,6 @@ func TestServer_UnlockUser(t *testing.T) {
 }
 
 func TestServer_DeactivateUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -1339,7 +1333,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 		},
 		{
 			name: "user deactivate, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.DeactivateUserRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()
@@ -1455,7 +1449,6 @@ func TestServer_DeactivateUser(t *testing.T) {
 }
 
 func TestServer_ActivateUser(t *testing.T) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -1542,7 +1535,7 @@ func TestServer_ActivateUser(t *testing.T) {
 		},
 		{
 			name: "user activate, no permission",
-			ctx:  instance.WithAuthorization(CTX, integration.UserTypeLogin),
+			ctx:  instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			dep: func(req *user.ActivateUserRequest) error {
 				userResp := instance.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.Id = userResp.GetDetails().GetId()

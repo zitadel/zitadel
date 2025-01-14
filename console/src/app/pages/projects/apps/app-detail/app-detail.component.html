@@ -147,6 +147,22 @@
                   >
                     {{ 'APP.OIDC.REFRESHTOKEN' | translate }}
                   </mat-checkbox>
+
+                  <mat-checkbox
+                    *ngIf="loginV2"
+                    color="primary"
+                    class="rt"
+                    [formControl]="loginV2"
+                    name="loginV2"
+                    matTooltip="{{ 'APP.LOGINV2DESC' | translate }}"
+                  >
+                    {{ 'APP.LOGINV2.USEV2' | translate }}
+                  </mat-checkbox>
+
+                  <cnsl-form-field class="app-formfield">
+                    <cnsl-label>{{ 'APP.LOGINV2.BASEURL' | translate }}</cnsl-label>
+                    <input cnslInput formControlName="loginV2BaseURL" />
+                  </cnsl-form-field>
                 </div>
               </div>
 

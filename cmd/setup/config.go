@@ -42,6 +42,7 @@ type Config struct {
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
 	Projections     projection.Config
+	Notifications   handlers.WorkerConfig
 	Eventstore      *eventstore.Config
 
 	InitProjections InitProjections
@@ -125,6 +126,10 @@ type Steps struct {
 	s36FillV2Milestones                     *FillV3Milestones
 	s37Apps7OIDConfigsBackChannelLogoutURI  *Apps7OIDConfigsBackChannelLogoutURI
 	s38BackChannelLogoutNotificationStart   *BackChannelLogoutNotificationStart
+	s40InitPushFunc                         *InitPushFunc
+	s42Apps7OIDCConfigsLoginVersion         *Apps7OIDCConfigsLoginVersion
+	s43CreateFieldsDomainIndex              *CreateFieldsDomainIndex
+	s44ReplaceCurrentSequencesIndex         *ReplaceCurrentSequencesIndex
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

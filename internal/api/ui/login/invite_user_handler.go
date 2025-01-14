@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -48,6 +49,16 @@ func InviteUserLink(origin, userID, loginName, code, orgID string, authRequestID
 	v.Set(queryOrgID, orgID)
 	v.Set(QueryAuthRequestID, authRequestID)
 	return externalLink(origin) + EndpointInviteUser + "?" + v.Encode()
+}
+
+func InviteUserLinkTemplate(origin, userID, orgID string, authRequestID string) string {
+	return fmt.Sprintf("%s%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
+		externalLink(origin), EndpointInviteUser,
+		queryInviteUserUserID, userID,
+		queryInviteUserLoginName, "{{.LoginName}}",
+		queryInviteUserCode, "{{.Code}}",
+		queryOrgID, orgID,
+		QueryAuthRequestID, authRequestID)
 }
 
 func (l *Login) handleInviteUser(w http.ResponseWriter, r *http.Request) {

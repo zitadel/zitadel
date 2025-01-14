@@ -20,7 +20,7 @@ type Queries interface {
 	GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string) (*query.NotifyUser, error)
 	CustomTextListByTemplate(ctx context.Context, aggregateID, template string, withOwnerRemoved bool) (*query.CustomTexts, error)
 	SearchInstanceDomains(ctx context.Context, queries *query.InstanceDomainSearchQueries) (*query.InstanceDomains, error)
-	SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (*query.Session, error)
+	SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string, check domain.PermissionCheck) (*query.Session, error)
 	NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (*query.NotificationPolicy, error)
 	SearchMilestones(ctx context.Context, instanceIDs []string, queries *query.MilestonesSearchQueries) (*query.Milestones, error)
 	NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*query.DebugNotificationProvider, error)
@@ -31,6 +31,8 @@ type Queries interface {
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
 	GetActiveSigningWebKey(ctx context.Context) (*jose.JSONWebKey, error)
 	ActivePrivateSigningKey(ctx context.Context, t time.Time) (keys *query.PrivateKeys, err error)
+
+	ActiveInstances() []string
 }
 
 type NotificationQueries struct {
