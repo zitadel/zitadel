@@ -155,6 +155,7 @@ As we continue to develop the TypeScript login system, we will provide regular u
 ### Limitations
 
 For the first implementation we have excluded the following features:
+
 - SAML (SP & OP)
 - Generic JWT IDP
 - LDAP IDP
@@ -180,18 +181,19 @@ The simplest way to deploy the new login for yourself is by using the [“Deploy
 
 1. [Create a service user](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat) (ZITADEL_SERVICE_USER_ID) with a PAT in your instance
 2. Give the user IAM_LOGIN_CLIENT Permissions in the default settings (YOUR_DOMAIN/ui/console/instance?id=organizations)
-Note: [Zitadel Manager Guide](https://zitadel.com/docs/guides/manage/console/managers)
+   Note: [Zitadel Manager Guide](https://zitadel.com/docs/guides/manage/console/managers)
 3. Deploy login to Vercel: You can do so, be directly clicking the [“Deploy” button](https://github.com/zitadel/typescript?tab=readme-ov-file#deploy-to-vercel) at the bottom of the readme in our [repository](https://github.com/zitadel/typescript)
 4. If you have used the deploy button in the steps before, you will automatically be asked for this step. Enter the environment variables in Vercel
-    * ZITADEL_SERVICE_USER_ID
-    * PAT
-    * ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
+   - ZITADEL_SERVICE_USER_ID
+   - PAT
+   - ZITADEL_API_URL (Example: https://my-domain.zitadel.cloud, no trailing slash)
 5. Add the domain where your login UI is hosted to the [trusted domains](https://zitadel.com/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) in Zitadel. (Example: my-new-zitadel-login.vercel.app)
 6. Use the new login in your application. You have three different options on how to achieve this
-    1. Enable the new login on your application configuration and add the URL of your login UI, with that settings Zitadel will automatically redirect you to the new login if you call the old one.
-   ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
-    2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
-    3. Change the issuer in the code of your application to the new domain of your login
+   1. Enable the new login on your application configuration and add the URL of your login UI, with that settings Zitadel will automatically redirect you to the new login if you call the old one.
+      ![Login V2 Application Configuration](/img/guides/integrate/login/login-v2-app-config.png)
+   2. Enable the [loginV2 feature](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) on the instance and add the URL of your login. If you enable this feature, the login will be used for every application configured in your Zitadel instance. (Example: https://my-new-zitadel-login.vercel.app)
+   3. Change the issuer in the code of your application to the new domain of your login
+7. Enforce users to have their email verified. By setting `EMAIL_VERIFICATION` to `true` in your environment variables, your users will be enforced to verify their email address before they can log in.
 
 ### Important Notes
 
@@ -200,4 +202,6 @@ As this feature is currently in Beta, please be aware of some potential workarou
 - **Create Users:** The new typescript login is built with the session and the user V2 API, the users V2 API does have some differences to the v1 API, so make sure you create users through the new API.
 - **External IDPs:** If you want to use external identity provider login, such as Login with Google or Apple. You can follow our existing setup guides, just make sure to use the following redirect url: $YOUR-DOMAIN/idps/callback
 - **Passkey/U2F:** Those authentication methods are bound to a domain. As your new login runs on a different domain than the previous login, existing passwordless authentication and u2f (fingerprint, face id, etc.) can’t be used. Also when they are managed through the management console of ZITADEL, they are added on a different domain.
-<br />*Note: If you run the login on a subdomain of your current instance, this problem can be avoided. E.g myinstance.zitadel.cloud and login.myinstance.zitadel.cloud*
+  <br />
+  *Note: If you run the login on a subdomain of your current instance, this problem
+  can be avoided. E.g myinstance.zitadel.cloud and login.myinstance.zitadel.cloud*
