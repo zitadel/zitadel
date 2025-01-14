@@ -1,16 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
-import { getBrandingSettings, settingsService } from "@/lib/zitadel";
-import { makeReqCtx } from "@zitadel/client/v2";
+import { getActiveIdentityProviders, getBrandingSettings } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
-
-function getIdentityProviders(orgId?: string) {
-  return settingsService
-    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
-    .then((resp) => {
-      return resp.identityProviders;
-    });
-}
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -22,7 +13,11 @@ export default async function Page(props: {
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
-  const identityProviders = await getIdentityProviders(organization);
+  const identityProviders = await getActiveIdentityProviders(organization).then(
+    (resp) => {
+      return resp.identityProviders;
+    },
+  );
 
   const branding = await getBrandingSettings(organization);
 
