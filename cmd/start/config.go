@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/saml"
+	scim_config "github.com/zitadel/zitadel/internal/api/scim/config"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
@@ -60,6 +61,7 @@ type Config struct {
 	UserAgentCookie     *middleware.UserAgentCookieConfig
 	OIDC                oidc.Config
 	SAML                saml.Config
+	SCIM                scim_config.Config
 	Login               login.Config
 	Console             console.Config
 	AssetStorage        static_config.AssetStorageConfig
