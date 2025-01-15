@@ -142,10 +142,6 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerFormData, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authRequest)
 	if formData == nil {
 		formData = new(registerFormData)
@@ -156,7 +152,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 
 	resourceOwner := determineResourceOwner(r.Context(), authRequest)
 	data := registerData{
-		baseData:         l.getBaseData(r, authRequest, translator, "RegistrationUser.Title", "RegistrationUser.Description", errID, errMessage),
+		baseData:         l.getBaseData(r, authRequest, translator, "RegistrationUser.Title", "RegistrationUser.Description", err),
 		registerFormData: *formData,
 	}
 
