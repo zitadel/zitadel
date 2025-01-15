@@ -6,7 +6,7 @@ module.exports = {
   baseUrl: "/docs",
   onBrokenLinks: "warn",
   onBrokenAnchors: "warn",
-  onBrokenMarkdownLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "zitadel",
   projectName: "zitadel",
@@ -90,6 +90,16 @@ module.exports = {
           docId: "self-hosting/deploy/overview",
           position: "left",
         },
+        {
+          label: 'Examples',
+          position: 'left',
+          items: [
+            {
+              label: 'hodor',
+              to: '/examples/openapi/',
+            },
+          ],
+          },
         {
           type: "doc",
           docId: "legal",
@@ -187,7 +197,7 @@ module.exports = {
       selector: "div#",
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python", "protobuf", "json", "bash"],
+      additionalLanguages: ["bash", "csharp", "java", "php", "ruby", "scala"],
     },
     colorMode: {
       defaultMode: "dark",
@@ -200,28 +210,6 @@ module.exports = {
       showRunmeLink: false,
       runmeLinkLabel: 'Checkout via Runme'
     },
-  },
-  webpack: {
-    jsLoader: (isServer) => ({
-      loader: require.resolve('swc-loader'),
-      options: {
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          transform: {
-            react: {
-              runtime: 'automatic',
-            },
-          },
-          target: 'es2017',
-        },
-        module: {
-          type: isServer ? 'commonjs' : 'es6',
-        },
-      },
-    }),
   },
   presets: [
     [
@@ -242,151 +230,26 @@ module.exports = {
         },
       })
     ],
+    [
+      'redocusaurus',
+      {
+        openapi: {
+          path: 'static',
+          routeBasePath: '/examples',
+        },
+        specs: [
 
+          { 
+            id: 'v2',
+            spec: './merged-api.yaml',
+            route: '/examples/openapi'
+          }
+        ],
+        theme: {},
+        }
+    ]
   ],
   plugins: [
-    [
-      '@scalar/docusaurus',
-      {
-        label: 'Scalar',
-        route: '/docs/reference',
-        configuration: {
-          spec: {
-            // Put the URL to your OpenAPI document here:
-            url: '/docs/openapi.yaml',
-          },
-        },
-      },
-    ],
-    // [
-    //   'docusaurus-plugin-openapi-docs',
-    //   {
-    //     id: "apiDocs",
-    //     docsPluginId: "classic",
-    //     config: {
-    //       auth: {
-    //         specPath: ".artifacts/openapi/zitadel/auth.swagger.json",
-    //         outputDir: "docs/apis/resources/auth",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "tag",
-    //         },
-    //       },
-    //       mgmt: {
-    //         specPath: ".artifacts/openapi/zitadel/management.swagger.json",
-    //         outputDir: "docs/apis/resources/mgmt",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "tag",
-    //         },
-    //       },
-    //       admin: {
-    //         specPath: ".artifacts/openapi/zitadel/admin.swagger.json",
-    //         outputDir: "docs/apis/resources/admin",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "tag",
-    //         },
-    //       },
-    //       system: {
-    //         specPath: ".artifacts/openapi/zitadel/system.swagger.json",
-    //         outputDir: "docs/apis/resources/system",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "tag",
-    //         },
-    //       },
-    //       user_v2: {
-    //         specPath: ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
-    //         outputDir: "docs/apis/resources/user_service_v2",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       session_v2: {
-    //         specPath: ".artifacts/openapi/zitadel/session/v2/session_service.swagger.json",
-    //         outputDir: "docs/apis/resources/session_service_v2",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       oidc_v2: {
-    //         specPath: ".artifacts/openapi/zitadel/oidc/v2/oidc_service.swagger.json",
-    //         outputDir: "docs/apis/resources/oidc_service_v2",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       settings_v2: {
-    //         specPath: ".artifacts/openapi/zitadel/settings/v2/settings_service.swagger.json",
-    //         outputDir: "docs/apis/resources/settings_service_v2",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       user_schema_v3: {
-    //         specPath: ".artifacts/openapi/zitadel/resources/userschema/v3alpha/user_schema_service.swagger.json",
-    //         outputDir: "docs/apis/resources/user_schema_service_v3",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       user_v3: {
-    //         specPath: ".artifacts/openapi/zitadel/resources/user/v3alpha/user_service.swagger.json",
-    //         outputDir: "docs/apis/resources/user_service_v3",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       action_v3: {
-    //         specPath: ".artifacts/openapi/zitadel/resources/action/v3alpha/action_service.swagger.json",
-    //         outputDir: "docs/apis/resources/action_service_v3",
-    //         sidebarOptions: {
-    //             groupPathsBy: "tag",
-    //             categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       webkey_v3: {
-    //         specPath: ".artifacts/openapi/zitadel/resources/webkey/v3alpha/webkey_service.swagger.json",
-    //         outputDir: "docs/apis/resources/webkey_service_v3",
-    //         sidebarOptions: {
-    //             groupPathsBy: "tag",
-    //             categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       feature_v2: {
-    //         specPath: ".artifacts/openapi/zitadel/feature/v2/feature_service.swagger.json",
-    //         outputDir: "docs/apis/resources/feature_service_v2",
-    //         sidebarOptions: {
-    //             groupPathsBy: "tag",
-    //             categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       org_v2: {
-    //         specPath: ".artifacts/openapi/zitadel/org/v2/org_service.swagger.json",
-    //         outputDir: "docs/apis/resources/org_service_v2",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "auto",
-    //         },
-    //       },
-    //       idp_v2: {
-    //         specPath: ".artifacts/openapi/zitadel/idp/v2/idp_service.swagger.json",
-    //         outputDir: "docs/apis/resources/idp_service_v2",
-    //         sidebarOptions: {
-    //           groupPathsBy: "tag",
-    //           categoryLinkSource: "auto",
-    //         },
-    //       },
-    //     },
-    //   },
-    // ],
     require.resolve("docusaurus-plugin-image-zoom"),
     async function myPlugin(context, options) {
       return {
@@ -401,4 +264,8 @@ module.exports = {
     },
   ],
   themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  future: {
+    // See https://docusaurus.io/blog/releases/3.6
+    experimental_faster: true,
+  },
 };

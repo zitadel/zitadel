@@ -4,15 +4,9 @@ managed:
   enabled: true
 plugins:
   - plugin: buf.build/grpc-ecosystem/openapiv2
-    out: static
+    out: .artifacts
     opt:
       - allow_delete_body
       - remove_internal_comments=true
       - preserve_rpc_order=true
-      - allow_merge=true
-      - merge_file_name=v2
-  - plugin: buf.build/community/google-gnostic-openapi:v0.7.0
-    out: static
-    opt:
-    - paths=source_relative
-    - title=ZITADEL APIs
+      - output_format=yaml

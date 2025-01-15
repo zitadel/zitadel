@@ -1,0 +1,2446 @@
+openapi: 3.0.0
+info:
+  title: Unified API
+  description: Combined API for all services.
+  version: 1.0.0
+security:
+  - OAuth2:
+      - openid
+      - urn:zitadel:iam:org:project:id:zitadel:aud
+externalDocs:
+  description: Detailed information about ZITADEL
+  url: https://zitadel.com/docs
+paths:
+  /v2/users/human:
+    post:
+      summary: Create a new human user
+      description: Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
+      operationId: UserService_AddHumanUser
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2AddHumanUserResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2AddHumanUserRequest'
+      tags:
+        - UserService
+  /v2/users/{userId}:
+    get:
+      summary: User by ID
+      description: Returns the full user object (human or machine) including the profile, email, etc..
+      operationId: UserService_GetUserByID
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2GetUserByIDResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          description: User ID of the user you like to get.
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserService
+    delete:
+      summary: Delete user
+      description: The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found..
+      operationId: UserService_DeleteUser
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2DeleteUserResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserService
+  /v2/users:
+    post:
+      summary: Search Users
+      description: Search for users. By default, we will return all users of your instance that you have permission to read. Make sure to include a limit and sorting for pagination.
+      operationId: UserService_ListUsers
+      responses:
+        '200':
+          description: A list of all users matching the query
+          schema:
+            $ref: '#/definitions/userv2ListUsersResponse'
+        '400':
+          description: invalid list query
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2ListUsersRequest'
+      tags:
+        - UserService
+  /v2/users/{userId}/email:
+    post:
+      summary: Change the user email
+      description: Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
+      operationId: UserService_SetEmail
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2SetEmailResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceSetEmailBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/email/resend:
+    post:
+      summary: Resend code to verify user email
+      description: Resend code to verify user email.
+      operationId: UserService_ResendEmailCode
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2ResendEmailCodeResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceResendEmailCodeBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/email/send:
+    post:
+      summary: Send code to verify user email
+      description: Send code to verify user email.
+      operationId: UserService_SendEmailCode
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2SendEmailCodeResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserServiceSendEmailCodeBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/email/verify:
+    post:
+      summary: Verify the email
+      description: Verify the email with the generated code.
+      operationId: UserService_VerifyEmail
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2VerifyEmailResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceVerifyEmailBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/phone:
+    delete:
+      summary: Delete the user phone
+      description: Delete the phone number of a user.
+      operationId: UserService_RemovePhone
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2RemovePhoneResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceRemovePhoneBody'
+      tags:
+        - UserService
+    post:
+      summary: Set the user phone
+      description: Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
+      operationId: UserService_SetPhone
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2SetPhoneResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceSetPhoneBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/phone/resend:
+    post:
+      summary: Resend code to verify user phone
+      description: Resend code to verify user phone.
+      operationId: UserService_ResendPhoneCode
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2ResendPhoneCodeResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceResendPhoneCodeBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/phone/verify:
+    post:
+      summary: Verify the phone
+      description: Verify the phone with the generated code..
+      operationId: UserService_VerifyPhone
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2VerifyPhoneResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceVerifyPhoneBody'
+      tags:
+        - UserService
+  /v2/users/human/{userId}:
+    put:
+      summary: Update User
+      description: Update all information from a user..
+      operationId: UserService_UpdateHumanUser
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2UpdateHumanUserResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceUpdateHumanUserBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/deactivate:
+    post:
+      summary: Deactivate user
+      description: The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data..
+      operationId: UserService_DeactivateUser
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2DeactivateUserResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceDeactivateUserBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/reactivate:
+    post:
+      summary: Reactivate user
+      description: Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'..
+      operationId: UserService_ReactivateUser
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2ReactivateUserResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceReactivateUserBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/lock:
+    post:
+      summary: Lock user
+      description: The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
+      operationId: UserService_LockUser
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2LockUserResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceLockUserBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/unlock:
+    post:
+      summary: Unlock user
+      description: The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
+      operationId: UserService_UnlockUser
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2UnlockUserResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceUnlockUserBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/passkeys:
+    post:
+      summary: Start the registration of passkey for a user
+      description: Start the registration of a passkey for a user, as a response the public key credential creation options are returned, which are used to verify the passkey..
+      operationId: UserService_RegisterPasskey
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2RegisterPasskeyResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceRegisterPasskeyBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/passkeys/{passkeyId}:
+    delete:
+      summary: Remove passkey from a user
+      description: Remove passkey from a user.
+      operationId: UserService_RemovePasskey
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2RemovePasskeyResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: passkeyId
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserService
+    post:
+      summary: Verify a passkey for a user
+      description: Verify the passkey registration with the public key credential..
+      operationId: UserService_VerifyPasskeyRegistration
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2VerifyPasskeyRegistrationResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: passkeyId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceVerifyPasskeyRegistrationBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/passkeys/registration_link:
+    post:
+      summary: Create a passkey registration link for a user
+      description: Create a passkey registration link which includes a code and either return it or send it to the user..
+      operationId: UserService_CreatePasskeyRegistrationLink
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2CreatePasskeyRegistrationLinkResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceCreatePasskeyRegistrationLinkBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/passkeys/_search:
+    post:
+      summary: List passkeys of an user
+      description: List passkeys of an user
+      operationId: UserService_ListPasskeys
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2ListPasskeysResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserServiceListPasskeysBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/u2f:
+    post:
+      summary: Start the registration of a u2f token for a user
+      description: Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token..
+      operationId: UserService_RegisterU2F
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2RegisterU2FResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceRegisterU2FBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/u2f/{u2fId}:
+    delete:
+      summary: Remove u2f token from a user
+      description: Remove u2f token from a user
+      operationId: UserService_RemoveU2F
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2RemoveU2FResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: u2fId
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserService
+    post:
+      summary: Verify a u2f token for a user
+      description: Verify the u2f token registration with the public key credential..
+      operationId: UserService_VerifyU2FRegistration
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2VerifyU2FRegistrationResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: u2fId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceVerifyU2FRegistrationBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/totp:
+    delete:
+      summary: Remove TOTP generator from a user
+      description: Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second factor afterward.
+      operationId: UserService_RemoveTOTP
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2RemoveTOTPResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserService
+    post:
+      summary: Start the registration of a TOTP generator for a user
+      description: Start the registration of a TOTP generator for a user, as a response a secret returned, which is used to initialize a TOTP app or device..
+      operationId: UserService_RegisterTOTP
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2RegisterTOTPResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceRegisterTOTPBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/totp/verify:
+    post:
+      summary: Verify a TOTP generator for a user
+      description: Verify the TOTP registration with a generated code..
+      operationId: UserService_VerifyTOTPRegistration
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2VerifyTOTPRegistrationResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceVerifyTOTPRegistrationBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/otp_sms:
+    delete:
+      summary: Remove One-Time Password (OTP) SMS from a user
+      description: Remove the configured One-Time Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.
+      operationId: UserService_RemoveOTPSMS
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2RemoveOTPSMSResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserService
+    post:
+      summary: Add OTP SMS for a user
+      description: Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor..
+      operationId: UserService_AddOTPSMS
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2AddOTPSMSResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceAddOTPSMSBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/otp_email:
+    delete:
+      summary: Remove One-Time Password (OTP) Email from a user
+      description: Remove the configured One-Time Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.
+      operationId: UserService_RemoveOTPEmail
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2RemoveOTPEmailResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserService
+    post:
+      summary: Add OTP Email for a user
+      description: Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor..
+      operationId: UserService_AddOTPEmail
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2AddOTPEmailResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceAddOTPEmailBody'
+      tags:
+        - UserService
+  /v2/idp_intents:
+    post:
+      summary: Start flow with an identity provider
+      description: Start a flow with an identity provider, for external login, registration or linking..
+      operationId: UserService_StartIdentityProviderIntent
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2StartIdentityProviderIntentResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2StartIdentityProviderIntentRequest'
+      tags:
+        - UserService
+  /v2/idp_intents/{idpIntentId}:
+    post:
+      summary: Retrieve the information returned by the identity provider
+      description: Retrieve the information returned by the identity provider for registration or updating an existing user with new information..
+      operationId: UserService_RetrieveIdentityProviderIntent
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2RetrieveIdentityProviderIntentResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: idpIntentId
+          description: ID of the idp intent, previously returned on the success response of the IDP callback
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceRetrieveIdentityProviderIntentBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/links:
+    post:
+      summary: Add link to an identity provider to an user
+      description: Add link to an identity provider to an user..
+      operationId: UserService_AddIDPLink
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2AddIDPLinkResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceAddIDPLinkBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/links/_search:
+    post:
+      summary: List links to an identity provider of an user
+      description: List links to an identity provider of an user.
+      operationId: UserService_ListIDPLinks
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2ListIDPLinksResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserServiceListIDPLinksBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/links/{idpId}/{linkedUserId}:
+    delete:
+      summary: Remove link of an identity provider to an user
+      description: Remove link of an identity provider to an user.
+      operationId: UserService_RemoveIDPLink
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2RemoveIDPLinkResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: idpId
+          in: path
+          required: true
+          type: string
+        - name: linkedUserId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserServiceRemoveIDPLinkBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/password_reset:
+    post:
+      summary: Request a code to reset a password
+      description: Request a code to reset a password..
+      operationId: UserService_PasswordReset
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2PasswordResetResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServicePasswordResetBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/password:
+    post:
+      summary: Change password
+      description: Change the password of a user with either a verification code or the current password..
+      operationId: UserService_SetPassword
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2SetPasswordResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/userv2UserServiceSetPasswordBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/authentication_methods:
+    get:
+      summary: List all possible authentication methods of a user
+      description: List all possible authentication methods of a user like password, passwordless, (T)OTP and more..
+      operationId: UserService_ListAuthenticationMethodTypes
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/userv2ListAuthenticationMethodTypesResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: domainQuery.includeWithoutDomain
+          description: List also auth method types without domain information like passkey and U2F added through V1 APIs / Login UI.
+          in: query
+          required: false
+          type: boolean
+        - name: domainQuery.domain
+          description: List only auth methods with specific domain.
+          in: query
+          required: false
+          type: string
+      tags:
+        - UserService
+  /v2/users/{userId}/authentication_factors/_search:
+    post:
+      operationId: UserService_ListAuthenticationFactors
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2ListAuthenticationFactorsResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: authFactors
+          description: Specify the Auth Factors you are interested in
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - OTP
+              - OTP_SMS
+              - OTP_EMAIL
+              - U2F
+          collectionFormat: multi
+        - name: states
+          description: Specify the state of the Auth Factors
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+            enum:
+              - AUTH_FACTOR_STATE_UNSPECIFIED
+              - AUTH_FACTOR_STATE_NOT_READY
+              - AUTH_FACTOR_STATE_READY
+              - AUTH_FACTOR_STATE_REMOVED
+          collectionFormat: multi
+      tags:
+        - UserService
+  /v2/users/{userId}/invite_code:
+    post:
+      summary: Create an invite code for a user
+      description: Create an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
+      operationId: UserService_CreateInviteCode
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2CreateInviteCodeResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserServiceCreateInviteCodeBody'
+      tags:
+        - UserService
+  /v2/users/{userId}/invite_code/resend:
+    post:
+      summary: Resend an invite code for a user
+      description: |-
+        Resend an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
+        A resend is only possible if a code has been created previously and sent to the user. If there is no code or it was directly returned, an error will be returned.
+      operationId: UserService_ResendInviteCode
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2ResendInviteCodeResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+      tags:
+        - UserService
+  /v2/users/{userId}/invite_code/verify:
+    post:
+      summary: Verify an invite code for a user
+      description: |-
+        Verify the invite code of a user previously issued. This will set their email to a verified state and
+        allow the user to set up their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
+      operationId: UserService_VerifyInviteCode
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/v2VerifyInviteCodeResponse'
+        '403':
+          description: Returned when the user does not have permission to access the resource.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        '404':
+          description: Returned when the resource does not exist.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+        default:
+          description: An unexpected error response.
+          schema:
+            $ref: '#/definitions/rpcStatus'
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserServiceVerifyInviteCodeBody'
+      tags:
+        - UserService
+components:
+  schemas:
+    zitadelobjectv2Organization:
+      type: object
+      properties:
+        orgId:
+          type: string
+        orgDomain:
+          type: string
+    userv2Gender:
+      type: string
+      enum:
+        - GENDER_UNSPECIFIED
+        - GENDER_FEMALE
+        - GENDER_MALE
+        - GENDER_DIVERSE
+      default: GENDER_UNSPECIFIED
+    userv2SetHumanProfile:
+      type: object
+      properties:
+        givenName:
+          type: string
+          example: Minnie
+          maxLength: 200
+          minLength: 1
+        familyName:
+          type: string
+          example: Mouse
+          maxLength: 200
+          minLength: 1
+        nickName:
+          type: string
+          example: Mini
+          maxLength: 200
+        displayName:
+          type: string
+          example: Minnie Mouse
+          maxLength: 200
+        preferredLanguage:
+          type: string
+          example: en
+          maxLength: 10
+        gender:
+          $ref: '#/components/schemas/userv2Gender'
+          example: GENDER_FEMALE
+      required:
+        - givenName
+        - familyName
+    userv2SendEmailVerificationCode:
+      type: object
+      properties:
+        urlTemplate:
+          type: string
+          example: https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}
+          description: |-
+            Optionally set a url_template, which will be used in the verification mail sent by ZITADEL to guide the user to your verification page.
+            If no template is set, the default ZITADEL url will be used.
+
+            The following placeholders can be used: UserID, OrgID, Code
+          maxLength: 200
+          minLength: 1
+    userv2ReturnEmailVerificationCode:
+      type: object
+    userv2SetHumanEmail:
+      type: object
+      properties:
+        email:
+          type: string
+          example: mini@mouse.com
+          maxLength: 200
+          minLength: 1
+        sendCode:
+          $ref: '#/components/schemas/userv2SendEmailVerificationCode'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnEmailVerificationCode'
+        isVerified:
+          type: boolean
+      required:
+        - email
+    userv2SendPhoneVerificationCode:
+      type: object
+    userv2ReturnPhoneVerificationCode:
+      type: object
+    userv2SetHumanPhone:
+      type: object
+      properties:
+        phone:
+          type: string
+          example: '+41791234567'
+          maxLength: 200
+        sendCode:
+          $ref: '#/components/schemas/userv2SendPhoneVerificationCode'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnPhoneVerificationCode'
+        isVerified:
+          type: boolean
+    userv2SetMetadataEntry:
+      type: object
+      properties:
+        key:
+          type: string
+          example: my-key
+          maxLength: 200
+          minLength: 1
+        value:
+          type: string
+          format: byte
+          example: VGhpcyBpcyBteSB0ZXN0IHZhbHVl
+          description: The value has to be base64 encoded.
+          maxLength: 500000
+          minLength: 1
+      required:
+        - key
+        - value
+    userv2Password:
+      type: object
+      properties:
+        password:
+          type: string
+          example: Secr3tP4ssw0rd!
+          maxLength: 200
+          minLength: 1
+        changeRequired:
+          type: boolean
+      required:
+        - password
+    userv2HashedPassword:
+      type: object
+      properties:
+        hash:
+          type: string
+          example: $2a$12$lJ08fqVr8bFJilRVnDT9QeULI7YW.nT3iwUv6dyg0aCrfm3UY8XR2
+          description: '"Encoded hash of a password in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"'
+          maxLength: 200
+          minLength: 1
+        changeRequired:
+          type: boolean
+      required:
+        - hash
+    userv2IDPLink:
+      type: object
+      properties:
+        idpId:
+          type: string
+          example: d654e6ba-70a3-48ef-a95d-37c8d8a7901a
+          description: ID of the identity provider
+          maxLength: 200
+          minLength: 1
+        userId:
+          type: string
+          example: '6516849804890468048461403518'
+          description: ID of the user of the identity provider
+          maxLength: 200
+          minLength: 1
+        userName:
+          type: string
+          example: user@external.com
+          description: username of the user of the identity provider
+          maxLength: 200
+          minLength: 1
+    userv2AddHumanUserRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: d654e6ba-70a3-48ef-a95d-37c8d8a7901a
+          description: optionally set your own id unique for the user.
+          maxLength: 200
+          minLength: 1
+        username:
+          type: string
+          example: minnie-mouse
+          description: optionally set a unique username, if none is provided the email will be used.
+          maxLength: 200
+          minLength: 1
+        organization:
+          $ref: '#/components/schemas/zitadelobjectv2Organization'
+        profile:
+          $ref: '#/components/schemas/userv2SetHumanProfile'
+        email:
+          $ref: '#/components/schemas/userv2SetHumanEmail'
+        phone:
+          $ref: '#/components/schemas/userv2SetHumanPhone'
+        metadata:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/userv2SetMetadataEntry'
+        password:
+          $ref: '#/components/schemas/userv2Password'
+        hashedPassword:
+          $ref: '#/components/schemas/userv2HashedPassword'
+        idpLinks:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/userv2IDPLink'
+        totpSecret:
+          type: string
+          example: TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK
+          description: |-
+            An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
+            Currently no other options are supported, and if anything different is used the validation will fail.
+          maxLength: 200
+          minLength: 1
+      required:
+        - profile
+        - email
+    objectv2ListQuery:
+      type: object
+      properties:
+        offset:
+          type: string
+          format: uint64
+          example: '0'
+        limit:
+          type: integer
+          format: int64
+          example: 100
+          description: Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If the limit exceeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.
+        asc:
+          type: boolean
+          description: default is descending
+      description: Object unspecific list filters like offset, limit and asc/desc.
+      title: General List Query
+    userv2UserFieldName:
+      type: string
+      enum:
+        - USER_FIELD_NAME_UNSPECIFIED
+        - USER_FIELD_NAME_USER_NAME
+        - USER_FIELD_NAME_FIRST_NAME
+        - USER_FIELD_NAME_LAST_NAME
+        - USER_FIELD_NAME_NICK_NAME
+        - USER_FIELD_NAME_DISPLAY_NAME
+        - USER_FIELD_NAME_EMAIL
+        - USER_FIELD_NAME_STATE
+        - USER_FIELD_NAME_TYPE
+        - USER_FIELD_NAME_CREATION_DATE
+      default: USER_FIELD_NAME_UNSPECIFIED
+    objectv2TextQueryMethod:
+      type: string
+      enum:
+        - TEXT_QUERY_METHOD_EQUALS
+        - TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE
+        - TEXT_QUERY_METHOD_STARTS_WITH
+        - TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE
+        - TEXT_QUERY_METHOD_CONTAINS
+        - TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE
+        - TEXT_QUERY_METHOD_ENDS_WITH
+        - TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE
+      default: TEXT_QUERY_METHOD_EQUALS
+    userv2UserNameQuery:
+      type: object
+      properties:
+        userName:
+          type: string
+          example: gigi-giraffe
+          maxLength: 200
+          minLength: 1
+        method:
+          $ref: '#/components/schemas/objectv2TextQueryMethod'
+          description: defines which text equality method is used
+      description: Query for users with a specific user name.
+      required:
+        - userName
+    userv2FirstNameQuery:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: Gigi
+          maxLength: 200
+          minLength: 1
+        method:
+          $ref: '#/components/schemas/objectv2TextQueryMethod'
+          description: defines which text equality method is used
+      description: Query for users with a specific first name.
+      required:
+        - firstName
+    userv2LastNameQuery:
+      type: object
+      properties:
+        lastName:
+          type: string
+          example: Giraffe
+          maxLength: 200
+          minLength: 1
+        method:
+          $ref: '#/components/schemas/objectv2TextQueryMethod'
+          description: defines which text equality method is used
+      description: Query for users with a specific last name.
+      required:
+        - lastName
+    userv2NickNameQuery:
+      type: object
+      properties:
+        nickName:
+          type: string
+          example: Gigi
+          maxLength: 200
+          minLength: 1
+        method:
+          $ref: '#/components/schemas/objectv2TextQueryMethod'
+          description: defines which text equality method is used
+      description: Query for users with a specific nickname.
+      required:
+        - nickName
+    userv2DisplayNameQuery:
+      type: object
+      properties:
+        displayName:
+          type: string
+          example: Gigi Giraffe
+          maxLength: 200
+          minLength: 1
+        method:
+          $ref: '#/components/schemas/objectv2TextQueryMethod'
+          description: defines which text equality method is used
+      description: Query for users with a specific display name.
+      required:
+        - displayName
+    userv2EmailQuery:
+      type: object
+      properties:
+        emailAddress:
+          type: string
+          example: gigi@zitadel.com
+          description: email address of the user
+          maxLength: 200
+        method:
+          $ref: '#/components/schemas/objectv2TextQueryMethod'
+          description: defines which text equality method is used
+      description: Query for users with a specific email.
+      required:
+        - emailAddress
+    userv2UserState:
+      type: string
+      enum:
+        - USER_STATE_UNSPECIFIED
+        - USER_STATE_ACTIVE
+        - USER_STATE_INACTIVE
+        - USER_STATE_DELETED
+        - USER_STATE_LOCKED
+        - USER_STATE_INITIAL
+      default: USER_STATE_UNSPECIFIED
+    userv2StateQuery:
+      type: object
+      properties:
+        state:
+          $ref: '#/components/schemas/userv2UserState'
+          description: current state of the user
+      description: Query for users with a specific state.
+      required:
+        - state
+    userv2Type:
+      type: string
+      enum:
+        - TYPE_UNSPECIFIED
+        - TYPE_HUMAN
+        - TYPE_MACHINE
+      default: TYPE_UNSPECIFIED
+    userv2TypeQuery:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/userv2Type'
+          description: the type of the user
+      description: Query for users with a specific type.
+      required:
+        - type
+    userv2LoginNameQuery:
+      type: object
+      properties:
+        loginName:
+          type: string
+          example: gigi@zitadel.cloud
+          maxLength: 200
+          minLength: 1
+        method:
+          $ref: '#/components/schemas/objectv2TextQueryMethod'
+          description: defines which text equality method is used
+      description: Query for users with a specific state.
+      required:
+        - loginName
+    userv2InUserIDQuery:
+      type: object
+      properties:
+        userIds:
+          type: array
+          example:
+            - '69629023906488334'
+            - '69622366012355662'
+          items:
+            type: string
+          description: the ids of the users to include
+      description: Query for users with ID in list of IDs.
+    zitadeluserv2SearchQuery:
+      type: object
+      properties:
+        userNameQuery:
+          $ref: '#/components/schemas/userv2UserNameQuery'
+        firstNameQuery:
+          $ref: '#/components/schemas/userv2FirstNameQuery'
+        lastNameQuery:
+          $ref: '#/components/schemas/userv2LastNameQuery'
+        nickNameQuery:
+          $ref: '#/components/schemas/userv2NickNameQuery'
+        displayNameQuery:
+          $ref: '#/components/schemas/userv2DisplayNameQuery'
+        emailQuery:
+          $ref: '#/components/schemas/userv2EmailQuery'
+        stateQuery:
+          $ref: '#/components/schemas/userv2StateQuery'
+        typeQuery:
+          $ref: '#/components/schemas/userv2TypeQuery'
+        loginNameQuery:
+          $ref: '#/components/schemas/userv2LoginNameQuery'
+        inUserIdsQuery:
+          $ref: '#/components/schemas/userv2InUserIDQuery'
+        orQuery:
+          $ref: '#/components/schemas/userv2OrQuery'
+        andQuery:
+          $ref: '#/components/schemas/userv2AndQuery'
+        notQuery:
+          $ref: '#/components/schemas/userv2NotQuery'
+        inUserEmailsQuery:
+          $ref: '#/components/schemas/userv2InUserEmailsQuery'
+        organizationIdQuery:
+          $ref: '#/components/schemas/userv2OrganizationIdQuery'
+        phoneQuery:
+          $ref: '#/components/schemas/userv2PhoneQuery'
+    userv2OrQuery:
+      type: object
+      properties:
+        queries:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/zitadeluserv2SearchQuery'
+          description: the sub queries to 'OR'
+      description: Connect multiple sub-condition with and OR operator.
+    userv2AndQuery:
+      type: object
+      properties:
+        queries:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/zitadeluserv2SearchQuery'
+          description: the sub queries to 'AND'
+      description: Connect multiple sub-condition with and AND operator.
+    userv2NotQuery:
+      type: object
+      properties:
+        query:
+          $ref: '#/components/schemas/zitadeluserv2SearchQuery'
+          description: the sub query to negate (NOT)
+      description: Negate the sub-condition.
+    userv2InUserEmailsQuery:
+      type: object
+      properties:
+        userEmails:
+          type: array
+          example:
+            - test@example.com
+            - test@example.org
+          items:
+            type: string
+          description: the emails of the users to include
+      description: Query for users with email in list of emails.
+    userv2OrganizationIdQuery:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          example: '69629023906488334'
+          maxLength: 200
+          minLength: 1
+      description: Query for users under a specific organization as resource owner.
+      required:
+        - organizationId
+    userv2PhoneQuery:
+      type: object
+      properties:
+        number:
+          type: string
+          example: '+41791234567'
+          description: Phone number of the user
+          maxLength: 20
+          minLength: 1
+        method:
+          $ref: '#/components/schemas/objectv2TextQueryMethod'
+          description: defines which text equality method is used
+      description: Query for users with a specific phone.
+      required:
+        - number
+    userv2ListUsersRequest:
+      type: object
+      properties:
+        query:
+          $ref: '#/components/schemas/objectv2ListQuery'
+          title: list limitations and ordering
+        sortingColumn:
+          $ref: '#/components/schemas/userv2UserFieldName'
+          title: the field the result is sorted
+        queries:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/zitadeluserv2SearchQuery'
+          title: criteria the client is looking for
+    userv2UserServiceSetEmailBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: mini@mouse.com
+          maxLength: 200
+          minLength: 1
+        sendCode:
+          $ref: '#/components/schemas/userv2SendEmailVerificationCode'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnEmailVerificationCode'
+        isVerified:
+          type: boolean
+      required:
+        - email
+    userv2UserServiceResendEmailCodeBody:
+      type: object
+      properties:
+        sendCode:
+          $ref: '#/components/schemas/userv2SendEmailVerificationCode'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnEmailVerificationCode'
+    UserServiceSendEmailCodeBody:
+      type: object
+      properties:
+        sendCode:
+          $ref: '#/components/schemas/userv2SendEmailVerificationCode'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnEmailVerificationCode'
+    userv2UserServiceVerifyEmailBody:
+      type: object
+      properties:
+        verificationCode:
+          type: string
+          example: SKJd342k
+          description: '"the verification code generated during the set email request"'
+          maxLength: 20
+          minLength: 1
+      required:
+        - verificationCode
+    userv2UserServiceSetPhoneBody:
+      type: object
+      properties:
+        phone:
+          type: string
+          example: '+41791234567'
+          maxLength: 200
+          minLength: 1
+        sendCode:
+          $ref: '#/components/schemas/userv2SendPhoneVerificationCode'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnPhoneVerificationCode'
+        isVerified:
+          type: boolean
+      required:
+        - phone
+    userv2UserServiceRemovePhoneBody:
+      type: object
+    userv2UserServiceResendPhoneCodeBody:
+      type: object
+      properties:
+        sendCode:
+          $ref: '#/components/schemas/userv2SendPhoneVerificationCode'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnPhoneVerificationCode'
+    userv2UserServiceVerifyPhoneBody:
+      type: object
+      properties:
+        verificationCode:
+          type: string
+          example: SKJd342k
+          description: '"the verification code generated during the set phone request"'
+          maxLength: 20
+          minLength: 1
+      required:
+        - verificationCode
+    userv2SetPassword:
+      type: object
+      properties:
+        password:
+          $ref: '#/components/schemas/userv2Password'
+        hashedPassword:
+          $ref: '#/components/schemas/userv2HashedPassword'
+        currentPassword:
+          type: string
+          example: Secr3tP4ssw0rd!
+          maxLength: 200
+          minLength: 1
+        verificationCode:
+          type: string
+          example: SKJd342k
+          description: '"the verification code generated during password reset request"'
+          maxLength: 20
+          minLength: 1
+      required:
+        - currentPassword
+        - verificationCode
+    userv2UserServiceUpdateHumanUserBody:
+      type: object
+      properties:
+        username:
+          type: string
+          example: minnie-mouse
+          maxLength: 200
+          minLength: 1
+        profile:
+          $ref: '#/components/schemas/userv2SetHumanProfile'
+        email:
+          $ref: '#/components/schemas/userv2SetHumanEmail'
+        phone:
+          $ref: '#/components/schemas/userv2SetHumanPhone'
+        password:
+          $ref: '#/components/schemas/userv2SetPassword'
+    userv2UserServiceDeactivateUserBody:
+      type: object
+    userv2UserServiceReactivateUserBody:
+      type: object
+    userv2UserServiceLockUserBody:
+      type: object
+    userv2UserServiceUnlockUserBody:
+      type: object
+    userv2PasskeyRegistrationCode:
+      type: object
+      properties:
+        id:
+          type: string
+          example: e2a48d6a-362b-4db6-a1fb-34feab84dc62
+          description: '"id to the one time code generated by ZITADEL"'
+          maxLength: 200
+        code:
+          type: string
+          example: SomeSpecialCode
+          description: '"one time code generated by ZITADEL"'
+          maxLength: 200
+      required:
+        - id
+        - code
+    userv2PasskeyAuthenticator:
+      type: string
+      enum:
+        - PASSKEY_AUTHENTICATOR_UNSPECIFIED
+        - PASSKEY_AUTHENTICATOR_PLATFORM
+        - PASSKEY_AUTHENTICATOR_CROSS_PLATFORM
+      default: PASSKEY_AUTHENTICATOR_UNSPECIFIED
+    userv2UserServiceRegisterPasskeyBody:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/userv2PasskeyRegistrationCode'
+          description: '"one time code generated by ZITADEL; required to start the passkey registration without user authentication"'
+        authenticator:
+          $ref: '#/components/schemas/userv2PasskeyAuthenticator'
+          description: '"Optionally specify the authenticator type of the passkey device (platform or cross-platform). If none is provided, both values are allowed."'
+        domain:
+          type: string
+          description: '"Domain on which the user is authenticated."'
+    userv2UserServiceVerifyPasskeyRegistrationBody:
+      type: object
+      properties:
+        publicKeyCredential:
+          type: object
+          example:
+            id: pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00
+            rawId: pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00
+            response:
+              attestationObject: o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0
+              clientDataJSON: eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ
+            type: public-key
+          description: 'PublicKeyCredential Interface. Generated helper methods populate the field from JSON created by a WebauthN client. See also:  https://www.w3.org/TR/webauthn/#publickeycredential'
+          maxLength: 1048576
+          minLength: 55
+        passkeyName:
+          type: string
+          example: fido key
+          maxLength: 200
+          minLength: 1
+      required:
+        - publicKeyCredential
+        - passkeyName
+    userv2SendPasskeyRegistrationLink:
+      type: object
+      properties:
+        urlTemplate:
+          type: string
+          example: https://example.com/passkey/register?userID={{.UserID}}&orgID={{.OrgID}}&codeID={{.CodeID}}&code={{.Code}}
+          description: |-
+            Optionally set a url_template, which will be used in the mail sent by ZITADEL to guide the user to your passkey registration page.
+            If no template is set, the default ZITADEL url will be used.
+
+            The following placeholders can be used: UserID, OrgID, CodeID, Code
+          maxLength: 200
+          minLength: 1
+    userv2ReturnPasskeyRegistrationCode:
+      type: object
+    userv2UserServiceCreatePasskeyRegistrationLinkBody:
+      type: object
+      properties:
+        sendLink:
+          $ref: '#/components/schemas/userv2SendPasskeyRegistrationLink'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnPasskeyRegistrationCode'
+    UserServiceListPasskeysBody:
+      type: object
+    userv2UserServiceRegisterU2FBody:
+      type: object
+      properties:
+        domain:
+          type: string
+          description: '"Domain on which the user is authenticated."'
+    userv2UserServiceVerifyU2FRegistrationBody:
+      type: object
+      properties:
+        publicKeyCredential:
+          type: object
+          example:
+            id: pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00
+            rawId: pawVarF4xPxLFmfCnRkwXWeTrKGzabcAi92LEI1WC00
+            response:
+              attestationObject: o2NmbXRmcGFja2VkZ2F0dFN0bXSiY2FsZyZjc2lnWEcwRQIgRKS3VpeE9tfExXRzkoUKnG4rQWPvtSSt4YtDGgTx32oCIQDPey-2YJ4uIg-QCM4jj6aE2U3tgMFM_RP7Efx6xRu3JGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAADju76085Yhmlt1CEOHkwLQAIKWsFWqxeMT8SxZnwp0ZMF1nk6yhs2m3AIvdixCNVgtNpQECAyYgASFYIMGUDSP2FAQn2MIfPMy7cyB_Y30VqixVgGULTBtFjfRiIlggjUGfQo3_-CrMmH3S-ZQkFKWKnNBQEAMkFtG-9A4zqW0
+              clientDataJSON: eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQlhXdHh0WGxJeFZZa0pHT1dVaUVmM25zby02aXZKdWw2YmNmWHdMVlFIayIsIm9yaWdpbiI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAifQ
+            type: public-key
+          description: 'PublicKeyCredential Interface. Generated helper methods populate the field from JSON created by a WebauthN client. See also:  https://www.w3.org/TR/webauthn/#publickeycredential'
+          maxLength: 1048576
+          minLength: 55
+        tokenName:
+          type: string
+          example: fido key
+          maxLength: 200
+          minLength: 1
+      required:
+        - publicKeyCredential
+        - tokenName
+    userv2UserServiceRegisterTOTPBody:
+      type: object
+    userv2UserServiceVerifyTOTPRegistrationBody:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '123456'
+          description: Code generated by TOTP app or device
+      required:
+        - code
+    userv2UserServiceAddOTPSMSBody:
+      type: object
+    userv2UserServiceAddOTPEmailBody:
+      type: object
+    userv2RedirectURLs:
+      type: object
+      properties:
+        successUrl:
+          type: string
+          example: https://custom.com/login/idp/success
+          description: URL on which the user will be redirected after a successful login
+          maxLength: 2048
+          minLength: 1
+        failureUrl:
+          type: string
+          example: https://custom.com/login/idp/fail
+          description: URL on which the user will be redirected after a failed login
+          maxLength: 2048
+          minLength: 1
+    userv2LDAPCredentials:
+      type: object
+      properties:
+        username:
+          type: string
+          example: username
+          description: Username used to login through LDAP
+          maxLength: 200
+          minLength: 1
+        password:
+          type: string
+          example: Password1!
+          description: Password used to login through LDAP
+          maxLength: 200
+          minLength: 1
+    userv2StartIdentityProviderIntentRequest:
+      type: object
+      properties:
+        idpId:
+          type: string
+          example: '163840776835432705'
+          description: ID for existing identity provider
+          maxLength: 200
+          minLength: 1
+        urls:
+          $ref: '#/components/schemas/userv2RedirectURLs'
+        ldap:
+          $ref: '#/components/schemas/userv2LDAPCredentials'
+    userv2UserServiceRetrieveIdentityProviderIntentBody:
+      type: object
+      properties:
+        idpIntentToken:
+          type: string
+          example: SJKL3ioIDpo342ioqw98fjp3sdf32wahb=
+          description: token of the idp intent, previously returned on the success response of the IDP callback
+          maxLength: 200
+          minLength: 1
+    userv2UserServiceAddIDPLinkBody:
+      type: object
+      properties:
+        idpLink:
+          $ref: '#/components/schemas/userv2IDPLink'
+    UserServiceListIDPLinksBody:
+      type: object
+      properties:
+        query:
+          $ref: '#/components/schemas/objectv2ListQuery'
+          title: list limitations and ordering
+    UserServiceRemoveIDPLinkBody:
+      type: object
+    userv2NotificationType:
+      type: string
+      enum:
+        - NOTIFICATION_TYPE_Unspecified
+        - NOTIFICATION_TYPE_Email
+        - NOTIFICATION_TYPE_SMS
+      default: NOTIFICATION_TYPE_Unspecified
+    userv2SendPasswordResetLink:
+      type: object
+      properties:
+        notificationType:
+          $ref: '#/components/schemas/userv2NotificationType'
+        urlTemplate:
+          type: string
+          example: https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}
+          description: |-
+            Optionally set a url_template, which will be used in the password reset mail sent by ZITADEL to guide the user to your password change page.
+            If no template is set, the default ZITADEL url will be used.
+
+            The following placeholders can be used: UserID, OrgID, Code
+          maxLength: 200
+          minLength: 1
+    userv2ReturnPasswordResetCode:
+      type: object
+    userv2UserServicePasswordResetBody:
+      type: object
+      properties:
+        sendLink:
+          $ref: '#/components/schemas/userv2SendPasswordResetLink'
+        returnCode:
+          $ref: '#/components/schemas/userv2ReturnPasswordResetCode'
+    userv2UserServiceSetPasswordBody:
+      type: object
+      properties:
+        newPassword:
+          $ref: '#/components/schemas/userv2Password'
+        currentPassword:
+          type: string
+          example: Secr3tP4ssw0rd!
+          maxLength: 200
+          minLength: 1
+        verificationCode:
+          type: string
+          example: SKJd342k
+          description: '"the verification code generated during password reset request"'
+          maxLength: 20
+          minLength: 1
+      required:
+        - currentPassword
+        - verificationCode
+    v2SendInviteCode:
+      type: object
+      properties:
+        urlTemplate:
+          type: string
+          example: https://example.com/user/invite?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}
+          description: |-
+            Optionally set a url_template, which will be used in the invite mail sent by ZITADEL to guide the user to your invitation page.
+            If no template is set, the default ZITADEL url will be used.
+
+            The following placeholders can be used: UserID, OrgID, Code
+          maxLength: 200
+          minLength: 1
+        applicationName:
+          type: string
+          example: CustomerPortal
+          description: |-
+            Optionally set an application name, which will be used in the invite mail sent by ZITADEL.
+            If no application name is set, ZITADEL will be used as default.
+          maxLength: 200
+          minLength: 1
+    v2ReturnInviteCode:
+      type: object
+    UserServiceCreateInviteCodeBody:
+      type: object
+      properties:
+        sendCode:
+          $ref: '#/components/schemas/v2SendInviteCode'
+        returnCode:
+          $ref: '#/components/schemas/v2ReturnInviteCode'
+    UserServiceVerifyInviteCodeBody:
+      type: object
+      properties:
+        verificationCode:
+          type: string
+          example: SKJd342k
+          description: '"the verification code generated during the invite code request"'
+          maxLength: 20
+          minLength: 1
+      required:
+        - verificationCode
+basePath: /
+securityDefinitions:
+  OAuth2:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: $CUSTOM-DOMAIN/oauth/v2/authorize
+    tokenUrl: $CUSTOM-DOMAIN/oauth/v2/token
+    scopes:
+      openid: openid
+      urn:zitadel:iam:org:project:id:zitadel:aud: urn:zitadel:iam:org:project:id:zitadel:aud
+schemes:
+  - https
+  - http
+consumes:
+  - application/json
+  - application/grpc
+  - application/grpc-web+proto
+produces:
+  - application/json
+  - application/grpc
+  - application/grpc-web+proto
+definitions:
+  $ref: ../.artifacts/zitadel/user/v2/user_service.swagger.yaml#/definitions
