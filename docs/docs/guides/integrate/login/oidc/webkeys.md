@@ -1,6 +1,6 @@
 ---
 title: OpenID Connect and Oauth2 web keys
-sidebar_label: Web keys
+sidebar_label: Web keys [Beta]
 ---
 
 Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
