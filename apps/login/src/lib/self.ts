@@ -2,6 +2,7 @@
 
 import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
+import { headers } from "next/headers";
 import { getSessionCookieById } from "./cookies";
 import { getSession } from "./zitadel";
 
@@ -21,9 +22,16 @@ export async function setMyPassword({
   sessionId: string;
   password: string;
 }) {
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const { session } = await getSession({
+    host,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });

@@ -12,6 +12,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -24,27 +25,37 @@ export default async function Page(props: {
   const { userId, loginName, organization, authRequestId, code, initial } =
     searchParams;
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
   if (loginName) {
     session = await loadMostRecentSession({
-      loginName,
-      organization,
+      host,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     });
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({ host, organization });
 
-  const passwordComplexity = await getPasswordComplexitySettings(
-    session?.factors?.user?.organizationId,
-  );
+  const passwordComplexity = await getPasswordComplexitySettings({
+    host,
+    organization: session?.factors?.user?.organizationId,
+  });
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({ host, organization });
 
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
-    const userResponse = await getUserByID(userId);
+    const userResponse = await getUserByID({ host, userId });
     user = userResponse.user;
 
     if (user?.type.case === "human") {

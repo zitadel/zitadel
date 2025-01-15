@@ -45,7 +45,12 @@ type ResetPasswordCommand = {
 export async function resetPassword(command: ResetPasswordCommand) {
   const host = (await headers()).get("host");
 
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const users = await listUsers({
+    host,
     loginName: command.loginName,
     organizationId: command.organization,
   });
@@ -59,7 +64,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
   const userId = users.result[0].userId;
 
-  return passwordReset(userId, host, command.authRequestId);
+  return passwordReset({ userId, host, authRequestId: command.authRequestId });
 }
 
 export type UpdateSessionCommand = {
@@ -70,6 +75,12 @@ export type UpdateSessionCommand = {
 };
 
 export async function sendPassword(command: UpdateSessionCommand) {
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
     organization: command.organization,
@@ -83,6 +94,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   if (!sessionCookie) {
     const users = await listUsers({
+      host,
       loginName: command.loginName,
       organizationId: command.organization,
     });
@@ -95,7 +107,10 @@ export async function sendPassword(command: UpdateSessionCommand) {
         password: { password: command.checks.password?.password },
       });
 
-      loginSettings = await getLoginSettings(command.organization);
+      loginSettings = await getLoginSettings({
+        host,
+        organization: command.organization,
+      });
 
       session = await createSessionAndUpdateCookie(
         checks,
@@ -120,7 +135,10 @@ export async function sendPassword(command: UpdateSessionCommand) {
       return { error: "Could not create session for user" };
     }
 
-    const userResponse = await getUserByID(session?.factors?.user?.id);
+    const userResponse = await getUserByID({
+      host,
+      userId: session?.factors?.user?.id,
+    });
 
     if (!userResponse.user) {
       return { error: "User not found in the system" };
@@ -130,9 +148,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
   }
 
   if (!loginSettings) {
-    loginSettings = await getLoginSettings(
-      command.organization ?? session.factors?.user?.organizationId,
-    );
+    loginSettings = await getLoginSettings({
+      host,
+      organization:
+        command.organization ?? session.factors?.user?.organizationId,
+    });
   }
 
   if (!session?.factors?.user?.id || !sessionCookie) {
@@ -173,9 +193,10 @@ export async function sendPassword(command: UpdateSessionCommand) {
   // if password, check if user has MFA methods
   let authMethods;
   if (command.checks && command.checks.password && session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes(
-      session.factors.user.id,
-    );
+    const response = await listAuthenticationMethodTypes({
+      host,
+      userId: session.factors.user.id,
+    });
     if (response.authMethodTypes && response.authMethodTypes.length) {
       authMethods = response.authMethodTypes;
     }
@@ -227,15 +248,27 @@ export async function changePassword(command: {
   userId: string;
   password: string;
 }) {
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   // check for init state
-  const { user } = await getUserByID(command.userId);
+  const { user } = await getUserByID({ host, userId: command.userId });
 
   if (!user || user.userId !== command.userId) {
     return { error: "Could not send Password Reset Link" };
   }
   const userId = user.userId;
 
-  return setUserPassword(userId, command.password, user, command.code);
+  return setUserPassword({
+    host,
+    userId,
+    password: command.password,
+    user,
+    code: command.code,
+  });
 }
 
 type CheckSessionAndSetPasswordCommand = {
@@ -247,9 +280,16 @@ export async function checkSessionAndSetPassword({
   sessionId,
   password,
 }: CheckSessionAndSetPasswordCommand) {
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const { session } = await getSession({
+    host,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -266,9 +306,10 @@ export async function checkSessionAndSetPassword({
   });
 
   // check if the user has no password set in order to set a password
-  const authmethods = await listAuthenticationMethodTypes(
-    session.factors.user.id,
-  );
+  const authmethods = await listAuthenticationMethodTypes({
+    host,
+    userId: session.factors.user.id,
+  });
 
   if (!authmethods) {
     return { error: "Could not load auth methods" };
@@ -285,9 +326,10 @@ export async function checkSessionAndSetPassword({
     (method) => !authmethods.authMethodTypes.includes(method),
   );
 
-  const loginSettings = await getLoginSettings(
-    session.factors.user.organizationId,
-  );
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: session.factors.user.organizationId,
+  });
 
   const forceMfa = !!(
     loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly
@@ -295,7 +337,7 @@ export async function checkSessionAndSetPassword({
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
   if (forceMfa && hasNoMFAMethods) {
-    return setPassword(payload).catch((error) => {
+    return setPassword({ host, payload }).catch((error) => {
       // throw error if failed precondition (ex. User is not yet initialized)
       if (error.code === 9 && error.message) {
         return { error: "Failed precondition" };
