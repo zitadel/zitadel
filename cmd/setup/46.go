@@ -16,7 +16,7 @@ type InitPermissionFunctions struct {
 }
 
 var (
-	//go:embed 45/*.sql
+	//go:embed 46/*.sql
 	permissionFunctions embed.FS
 )
 
@@ -35,5 +35,5 @@ func (mig *InitPermissionFunctions) Execute(ctx context.Context, _ eventstore.Ev
 }
 
 func (*InitPermissionFunctions) String() string {
-	return "45_init_permission_functions"
+	return "46_init_permission_functions"
 }
