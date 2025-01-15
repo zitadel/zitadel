@@ -20,75 +20,8 @@ package zitadel.auth.v1;
 
 option go_package ="github.com/zitadel/zitadel/pkg/grpc/auth";
 
-option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-    info: {
-        title: "Authentication API aka Auth";
-        version: "1.0";
-        description: "The authentication API is used for all operations on the currently authenticated user.";
-        contact:{
-            name: "ZITADEL"
-            url: "https://zitadel.com"
-            email: "hi@zitadel.com"
-        }
-        license: {
-            name: "Apache License 2.0",
-            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE"
-        };
-    };
-    schemes: HTTPS;
-
-    consumes: "application/json";
-    consumes: "application/grpc";
-    consumes: "application/grpc-web+proto";
-
-    produces: "application/json";
-    produces: "application/grpc";
-    produces: "application/grpc-web+proto";
-
-    host: "$CUSTOM-DOMAIN";
-    base_path: "/auth/v1";
-
-    external_docs: {
-        description: "Detailed information about ZITADEL",
-        url: "https://zitadel.com/docs"
-    }
-
-    security_definitions: {
-        security: {
-            key: "BasicAuth";
-            value: {
-                type: TYPE_BASIC;
-            }
-        }
-        security: {
-            key: "OAuth2";
-            value: {
-                type: TYPE_OAUTH2;
-                flow: FLOW_ACCESS_CODE;
-                authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-                token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
-                scopes: {
-                    scope: {
-                        key: "openid";
-                        value: "openid";
-                    }
-                }
-            }
-        }
-    }
-    security: {
-        security_requirement: {
-            key: "OAuth2";
-            value: {
-                scope: "openid";
-            }
-        }
-    }
-};
-
-
 service AuthService {
-    option (google.api.api_visibility).restriction = "OLD";
+    option (google.api.api_visibility).restriction = "v1";
     rpc Healthz(HealthzRequest) returns (HealthzResponse) {
         option (google.api.http) = {
             get: "/healthz"

@@ -15,98 +15,12 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "google/api/visibility.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
-option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-  info: {
-    title: "Settings Service";
-    version: "2.0";
-    description: "This API is intended to manage settings in a ZITADEL instance.";
-    contact:{
-      name: "ZITADEL"
-      url: "https://zitadel.com"
-      email: "hi@zitadel.com"
-    }
-    license: {
-      name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
-    };
-  };
-  schemes: HTTPS;
-  schemes: HTTP;
-
-  consumes: "application/json";
-  consumes: "application/grpc";
-
-  produces: "application/json";
-  produces: "application/grpc";
-
-  consumes: "application/grpc-web+proto";
-  produces: "application/grpc-web+proto";
-
-  host: "$CUSTOM-DOMAIN";
-  base_path: "/";
-
-  external_docs: {
-    description: "Detailed information about ZITADEL",
-    url: "https://zitadel.com/docs"
-  }
-  security_definitions: {
-    security: {
-      key: "OAuth2";
-      value: {
-        type: TYPE_OAUTH2;
-        flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
-        scopes: {
-          scope: {
-            key: "openid";
-            value: "openid";
-          }
-          scope: {
-            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
-            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
-          }
-        }
-      }
-    }
-  }
-  security: {
-    security_requirement: {
-      key: "OAuth2";
-      value: {
-        scope: "openid";
-        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
-      }
-    }
-  }
-  responses: {
-    key: "403";
-    value: {
-      description: "Returned when the user does not have permission to access the resource.";
-      schema: {
-        json_schema: {
-          ref: "#/definitions/rpcStatus";
-        }
-      }
-    }
-  }
-  responses: {
-    key: "404";
-    value: {
-      description: "Returned when the resource does not exist.";
-      schema: {
-        json_schema: {
-          ref: "#/definitions/rpcStatus";
-        }
-      }
-    }
-  }
-};
-
 service SettingsService {
+  option (google.api.api_visibility).restriction = "v2";
 
   // Get basic information over the instance
   rpc GetGeneralSettings (GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
@@ -121,7 +35,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get basic information over the instance";
+    tags: "Settings";
+    summary: "Get basic information over the instance";
       description: "Return the basic information of the instance for the requested context"
       responses: {
         key: "200"
@@ -145,7 +60,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the login settings";
+    tags: "Settings";
+    summary: "Get the login settings";
       description: "Return the settings for the requested context"
       responses: {
         key: "200"
@@ -169,7 +85,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the current active identity providers";
+    tags: "Settings";
+    summary: "Get the current active identity providers";
       description: "Return the current active identity providers for the requested context"
       responses: {
         key: "200"
@@ -193,7 +110,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the password complexity settings";
+    tags: "Settings";
+    summary: "Get the password complexity settings";
       description: "Return the password complexity settings for the requested context"
       responses: {
         key: "200"
@@ -217,7 +135,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the password expiry settings";
+    tags: "Settings";
+    summary: "Get the password expiry settings";
       description: "Return the password expiry settings for the requested context"
       responses: {
         key: "200"
@@ -241,7 +160,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the current active branding settings";
+    tags: "Settings";
+    summary: "Get the current active branding settings";
       description: "Return the current active branding settings for the requested context"
       responses: {
         key: "200"
@@ -265,7 +185,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the domain settings";
+    tags: "Settings";
+    summary: "Get the domain settings";
       description: "Return the domain settings for the requested context"
       responses: {
         key: "200"
@@ -289,7 +210,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the legal and support settings";
+    tags: "Settings";
+    summary: "Get the legal and support settings";
       description: "Return the legal settings for the requested context"
       responses: {
         key: "200"
@@ -313,7 +235,8 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the lockout settings";
+    tags: "Settings";
+    summary: "Get the lockout settings";
       description: "Return the lockout settings for the requested context, which define when a user will be locked"
       responses: {
         key: "200"

@@ -91,19 +91,10 @@ module.exports = {
           position: "left",
         },
         {
-          label: 'Examples',
-          position: 'left',
-          items: [
-            {
-              label: 'v2-raw',
-              to: '/examples/v2-raw/',
-            },
-            {
-              label: 'v2',
-              to: '/examples/v2/',
-            },
-          ],
-          },
+          to: "/redocusaurus/v2",
+          label: "/redocusaurus/v2",
+          position: "left",
+        },
         {
           type: "doc",
           docId: "legal",
@@ -239,21 +230,29 @@ module.exports = {
       {
         specs: [
           { 
-            id: 'v2-raw',
-            spec: './.artifacts/zitadel.swagger.yaml',
-            route: '/examples/v2-raw'
-          },
-          { 
             id: 'v2',
-            spec: './merged-api.yaml',
-            route: '/examples/v2'
-          }
+            spec: './static/zitadel.swagger.yaml',
+            route: '/redocusaurus/v2'
+          },
         ],
         theme: {},
         }
     ]
   ],
   plugins: [
+    [
+    '@scalar/docusaurus',
+    {
+      label: '/scalar/v2',
+      route: '/docs/scalar/v2',
+      configuration: {
+        spec: {
+          // Put the URL to your OpenAPI document here:
+          url: '/docs/zitadel.swagger.yaml',
+        },
+      },
+    },
+    ],
     require.resolve("docusaurus-plugin-image-zoom"),
     async function myPlugin(context, options) {
       return {

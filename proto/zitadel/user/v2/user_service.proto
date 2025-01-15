@@ -21,101 +21,9 @@ import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
-option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-  info: {
-    title: "User Service";
-    version: "2.0";
-    description: "This API is intended to manage users in a ZITADEL instance.";
-    contact:{
-      name: "ZITADEL"
-      url: "https://zitadel.com"
-      email: "hi@zitadel.com"
-    }
-    license: {
-      name: "Apache 2.0",
-      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
-    };
-  };
-  tags: [
-        {
-            name: "Users"
-        }
-    ];
-  schemes: HTTPS;
-  schemes: HTTP;
-
-  consumes: "application/json";
-  consumes: "application/grpc";
-
-  produces: "application/json";
-  produces: "application/grpc";
-
-  consumes: "application/grpc-web+proto";
-  produces: "application/grpc-web+proto";
-
-  host: "$CUSTOM-DOMAIN";
-  base_path: "/";
-
-  external_docs: {
-    description: "Detailed information about ZITADEL",
-    url: "https://zitadel.com/docs"
-  }
-  security_definitions: {
-    security: {
-      key: "OAuth2";
-      value: {
-        type: TYPE_OAUTH2;
-        flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
-        scopes: {
-          scope: {
-            key: "openid";
-            value: "openid";
-          }
-          scope: {
-            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
-            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
-          }
-        }
-      }
-    }
-  }
-  security: {
-    security_requirement: {
-      key: "OAuth2";
-      value: {
-        scope: "openid";
-        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
-      }
-    }
-  }
-  responses: {
-    key: "403";
-    value: {
-      description: "Returned when the user does not have permission to access the resource.";
-      schema: {
-        json_schema: {
-          ref: "#/definitions/rpcStatus";
-        }
-      }
-    }
-  }
-  responses: {
-    key: "404";
-    value: {
-      description: "Returned when the resource does not exist.";
-      schema: {
-        json_schema: {
-          ref: "#/definitions/rpcStatus";
-        }
-      }
-    }
-  }
-};
-
 service UserService {
-
+  option (google.api.api_visibility).restriction = "v2";
+  
   // Create a new human user
   //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
@@ -190,7 +98,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200";
         value: {
           description: "A list of all users matching the query";
@@ -226,7 +135,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -251,7 +161,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -276,7 +187,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -301,7 +213,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -326,7 +239,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -351,6 +265,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users";
       summary: "Delete the user phone";
       description: "Delete the phone number of a user."
       responses: {
@@ -378,7 +293,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -403,7 +319,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -428,7 +345,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -453,7 +371,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -478,7 +397,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -503,7 +423,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -528,7 +449,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -552,7 +474,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -576,7 +499,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -600,7 +524,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -624,7 +549,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -649,7 +575,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -672,7 +599,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -696,7 +624,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -720,7 +649,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -743,6 +673,7 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users";
       summary: "Remove u2f token from a user";
       description: "Remove u2f token from a user"
       responses: {
@@ -769,7 +700,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -793,7 +725,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -816,7 +749,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -840,7 +774,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -863,7 +798,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -887,7 +823,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -910,7 +847,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -935,7 +873,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -960,7 +899,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -985,7 +925,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1010,7 +951,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1035,7 +977,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1060,7 +1003,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1085,7 +1029,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1109,7 +1054,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1130,7 +1076,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1155,7 +1102,8 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1180,7 +1128,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
@@ -1206,7 +1155,8 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
+    tags: "Users";
+    responses: {
         key: "200"
         value: {
           description: "OK";
