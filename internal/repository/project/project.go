@@ -16,6 +16,7 @@ const (
 	ProjectDeactivatedType = projectEventTypePrefix + "deactivated"
 	ProjectReactivatedType = projectEventTypePrefix + "reactivated"
 	ProjectRemovedType     = projectEventTypePrefix + "removed"
+	ProjectOwnerCorrected  = projectEventTypePrefix + "owner.corrected"
 
 	ProjectSearchType       = "project"
 	ProjectObjectRevision   = uint8(1)
