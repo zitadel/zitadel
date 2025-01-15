@@ -95,8 +95,8 @@ module.exports = {
           position: 'left',
           items: [
             {
-              label: 'user',
-              to: '/examples/user/',
+              label: 'v2-raw',
+              to: '/examples/v2-raw/',
             },
             {
               label: 'v2',
@@ -239,9 +239,9 @@ module.exports = {
       {
         specs: [
           { 
-            id: 'user',
-            spec: './.artifacts/zitadel/user/v2/user_service.swagger.yaml',
-            route: '/examples/user'
+            id: 'v2-raw',
+            spec: './.artifacts/zitadel.swagger.yaml',
+            route: '/examples/v2-raw'
           },
           { 
             id: 'v2',

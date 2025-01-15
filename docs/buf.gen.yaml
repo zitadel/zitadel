@@ -9,4 +9,7 @@ plugins:
       - allow_delete_body
       - remove_internal_comments=true
       - preserve_rpc_order=true
+      - visibility_restriction_selectors=PREVIEW
       - output_format=yaml
+      - allow_merge=true
+      - merge_file_name=zitadel

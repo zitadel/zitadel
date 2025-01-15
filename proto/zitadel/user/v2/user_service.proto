@@ -12,6 +12,7 @@ import "zitadel/user/v2/password.proto";
 import "zitadel/user/v2/user.proto";
 import "zitadel/user/v2/query.proto";
 import "google/api/annotations.proto";
+import "google/api/visibility.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
@@ -35,6 +36,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
     };
   };
+  tags: [
+        {
+            name: "Users"
+        }
+    ];
   schemes: HTTPS;
   schemes: HTTP;
 
@@ -130,6 +136,7 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users";
       responses: {
         key: "200"
         value: {
@@ -143,6 +150,7 @@ service UserService {
   //
   // Returns the full user object (human or machine) including the profile, email, etc..
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
+    option (google.api.method_visibility).restriction = "PREVIEW";
     option (google.api.http) = {
       get: "/v2/users/{user_id}"
     };
@@ -155,17 +163,7 @@ service UserService {
         success_code: 200
       }
     };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200"
-        value: {
-          description: "OK";
-        }
-      };
-    };
   }
-
   // Search Users
   //
   // Search for users. By default, we will return all users of your instance that you have permission to read. Make sure to include a limit and sorting for pagination.
