@@ -3,35 +3,13 @@ info:
   title: Unified API
   description: Combined API for all services.
   version: 1.0.0
-basePath: /
 externalDocs:
   description: Detailed information about ZITADEL
   url: https://zitadel.com/docs
-securityDefinitions:
-  OAuth2:
-    type: oauth2
-    flow: accessCode
-    authorizationUrl: $CUSTOM-DOMAIN/oauth/v2/authorize
-    tokenUrl: $CUSTOM-DOMAIN/oauth/v2/token
-    scopes:
-      openid: openid
-      urn:zitadel:iam:org:project:id:zitadel:aud: urn:zitadel:iam:org:project:id:zitadel:aud
-security:
-  - OAuth2:
-      - openid
-      - urn:zitadel:iam:org:project:id:zitadel:aud
-schemes:
-  - https
-  - http
-consumes:
-  - application/json
-  - application/grpc
-  - application/grpc-web+proto
-produces:
-  - application/json
-  - application/grpc
-  - application/grpc-web+proto
 paths:
-  $ref: "../.artifacts/zitadel/user/v2/user_service.swagger.yaml#/paths"
+  /users:
+    $ref: "../.artifacts/zitadel/user/v2/user_service.swagger.yaml#/paths"
+  /sessions:
+    $ref: "../.artifacts/zitadel/session/v2/session_service.swagger.yaml#/paths"
 definitions:
   $ref: "../.artifacts/zitadel/user/v2/user_service.swagger.yaml#/definitions"

@@ -95,8 +95,12 @@ module.exports = {
           position: 'left',
           items: [
             {
-              label: 'hodor',
-              to: '/examples/openapi/',
+              label: 'user',
+              to: '/examples/user/',
+            },
+            {
+              label: 'v2',
+              to: '/examples/v2/',
             },
           ],
           },
@@ -233,16 +237,16 @@ module.exports = {
     [
       'redocusaurus',
       {
-        openapi: {
-          path: 'static',
-          routeBasePath: '/examples',
-        },
         specs: [
-
+          { 
+            id: 'user',
+            spec: './.artifacts/zitadel/user/v2/user_service.swagger.yaml',
+            route: '/examples/user'
+          },
           { 
             id: 'v2',
             spec: './merged-api.yaml',
-            route: '/examples/openapi'
+            route: '/examples/v2'
           }
         ],
         theme: {},
