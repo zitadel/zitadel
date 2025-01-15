@@ -7,6 +7,7 @@ import {
   ChecksSchema,
   CheckTOTPSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { headers } from "next/headers";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
@@ -24,6 +25,12 @@ export type SetOTPCommand = {
 };
 
 export async function setOTP(command: SetOTPCommand) {
+  const host = (await headers()).get("host");
+
+  if (!host) {
+    throw new Error("Could not get domain");
+  }
+
   const recentSession = command.sessionId
     ? await getSessionCookieById({ sessionId: command.sessionId }).catch(
         (error) => {
@@ -57,7 +64,10 @@ export async function setOTP(command: SetOTPCommand) {
     });
   }
 
-  const loginSettings = await getLoginSettings(command.organization);
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: command.organization,
+  });
 
   return setSessionAndUpdateCookie(
     recentSession,

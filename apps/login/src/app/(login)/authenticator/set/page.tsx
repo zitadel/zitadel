@@ -67,8 +67,11 @@ export default async function Page(props: {
     organization?: string,
   ) {
     return loadMostRecentSession({
-      loginName,
-      organization,
+      host,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     }).then((session) => {
       return getAuthMethodsAndUser(host, session);
     });
