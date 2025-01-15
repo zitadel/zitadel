@@ -400,7 +400,7 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 		if alreadyHandled {
 			return nil
 		}
-		s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "")
+		s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "", nil)
 		if err != nil {
 			return err
 		}
@@ -496,7 +496,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		if alreadyHandled {
 			return nil
 		}
-		s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "")
+		s, err := u.queries.SessionByID(ctx, true, e.Aggregate().ID, "", nil)
 		if err != nil {
 			return err
 		}

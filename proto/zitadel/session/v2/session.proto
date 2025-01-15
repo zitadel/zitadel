@@ -136,6 +136,8 @@ message SearchQuery {
     IDsQuery ids_query = 1;
     UserIDQuery user_id_query = 2;
     CreationDateQuery creation_date_query = 3;
+    CreatorQuery creator_query = 4;
+    UserAgentQuery user_agent_query = 5;
   }
 }
 
@@ -157,9 +159,33 @@ message CreationDateQuery {
   ];
 }
 
+message CreatorQuery {
+  // ID of the user who created the session. If empty, the calling user's ID is used.
+  optional string id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message UserAgentQuery {
+  // Finger print id of the user agent used for the session.
+  // Set an empty fingerprint_id to use the user agent from the call.
+  // If the user agent is not available from the current token, an error will be returned.
+  optional string fingerprint_id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
 message UserAgent {
   optional string fingerprint_id = 1;
-  optional string ip  = 2;
+  optional string ip = 2;
   optional string description = 3;
 
   // A header may have multiple values.
@@ -169,7 +195,7 @@ message UserAgent {
   message HeaderValues {
     repeated string values = 1;
   }
-  map<string,HeaderValues> header = 4;
+  map<string, HeaderValues> header = 4;
 }
 
 enum SessionFieldName {
