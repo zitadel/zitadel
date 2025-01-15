@@ -13,6 +13,9 @@ var AuthMapping = authz.MethodMapping{
 	"GET:/scim/v2/" + http.OrgIdInPathVariable + "/Users/{id}": {
 		Permission: domain.PermissionUserRead,
 	},
+	"PUT:/scim/v2/" + http.OrgIdInPathVariable + "/Users/{id}": {
+		Permission: domain.PermissionUserWrite,
+	},
 	"DELETE:/scim/v2/" + http.OrgIdInPathVariable + "/Users/{id}": {
 		Permission: domain.PermissionUserDelete,
 	},

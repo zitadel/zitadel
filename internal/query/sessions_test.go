@@ -15,6 +15,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -71,6 +72,10 @@ var (
 		` projections.sessions8.otp_sms_checked_at,` +
 		` projections.sessions8.otp_email_checked_at,` +
 		` projections.sessions8.metadata,` +
+		` projections.sessions8.user_agent_fingerprint_id,` +
+		` projections.sessions8.user_agent_ip,` +
+		` projections.sessions8.user_agent_description,` +
+		` projections.sessions8.user_agent_header,` +
 		` projections.sessions8.expiration,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions8` +
@@ -129,6 +134,10 @@ var (
 		"otp_sms_checked_at",
 		"otp_email_checked_at",
 		"metadata",
+		"user_agent_fingerprint_id",
+		"user_agent_ip",
+		"user_agent_description",
+		"user_agent_header",
 		"expiration",
 		"count",
 	}
@@ -186,6 +195,10 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							"fingerPrintID",
+							"1.2.3.4",
+							"agentDescription",
+							[]byte(`{"foo":["foo","bar"]}`),
 							testNow,
 						},
 					},
@@ -233,6 +246,12 @@ func Test_SessionsPrepare(t *testing.T) {
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
+						UserAgent: domain.UserAgent{
+							FingerprintID: gu.Ptr("fingerPrintID"),
+							IP:            net.IPv4(1, 2, 3, 4),
+							Description:   gu.Ptr("agentDescription"),
+							Header:        http.Header{"foo": []string{"foo", "bar"}},
+						},
 						Expiration: testNow,
 					},
 				},
@@ -267,6 +286,10 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							"fingerPrintID",
+							"1.2.3.4",
+							"agentDescription",
+							[]byte(`{"foo":["foo","bar"]}`),
 							testNow,
 						},
 						{
@@ -290,6 +313,10 @@ func Test_SessionsPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							"fingerPrintID",
+							"1.2.3.4",
+							"agentDescription",
+							[]byte(`{"foo":["foo","bar"]}`),
 							testNow,
 						},
 					},
@@ -337,6 +364,12 @@ func Test_SessionsPrepare(t *testing.T) {
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
+						UserAgent: domain.UserAgent{
+							FingerprintID: gu.Ptr("fingerPrintID"),
+							IP:            net.IPv4(1, 2, 3, 4),
+							Description:   gu.Ptr("agentDescription"),
+							Header:        http.Header{"foo": []string{"foo", "bar"}},
+						},
 						Expiration: testNow,
 					},
 					{
@@ -375,6 +408,12 @@ func Test_SessionsPrepare(t *testing.T) {
 						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
+						},
+						UserAgent: domain.UserAgent{
+							FingerprintID: gu.Ptr("fingerPrintID"),
+							IP:            net.IPv4(1, 2, 3, 4),
+							Description:   gu.Ptr("agentDescription"),
+							Header:        http.Header{"foo": []string{"foo", "bar"}},
 						},
 						Expiration: testNow,
 					},
@@ -551,5 +590,159 @@ func prepareSessionQueryTesting(t *testing.T, token string) func(context.Context
 			require.Equal(t, tokenID, token)
 			return session, err
 		}
+	}
+}
+
+func Test_sessionCheckPermission(t *testing.T) {
+	type args struct {
+		ctx             context.Context
+		resourceOwner   string
+		creator         string
+		useragent       domain.UserAgent
+		userFactor      SessionUserFactor
+		permissionCheck domain.PermissionCheck
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "permission check, no user in context",
+			args: args{
+				ctx:             authz.NewMockContextWithAgent("instance", "org", "", ""),
+				resourceOwner:   "instance",
+				creator:         "creator",
+				permissionCheck: expectedFailedPermissionCheck("instance", ""),
+			},
+			wantErr: true,
+		},
+		{
+			name: "permission check, factor, no user in context",
+			args: args{
+				ctx:             authz.NewMockContextWithAgent("instance", "org", "", ""),
+				resourceOwner:   "instance",
+				creator:         "creator",
+				userFactor:      SessionUserFactor{ResourceOwner: "resourceowner", UserID: "user"},
+				permissionCheck: expectedFailedPermissionCheck("resourceowner", "user"),
+			},
+			wantErr: true,
+		},
+		{
+			name: "no permission check, creator",
+			args: args{
+				ctx:           authz.NewMockContextWithAgent("instance", "org", "user", "agent"),
+				resourceOwner: "instance",
+				creator:       "user",
+			},
+			wantErr: false,
+		},
+		{
+			name: "no permission check, same user",
+			args: args{
+				ctx:           authz.NewMockContextWithAgent("instance", "org", "user", "agent"),
+				resourceOwner: "instance",
+				creator:       "creator",
+				userFactor:    SessionUserFactor{UserID: "user"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "no permission check, same useragent",
+			args: args{
+				ctx:           authz.NewMockContextWithAgent("instance", "org", "user1", "agent"),
+				resourceOwner: "instance",
+				creator:       "creator",
+				userFactor:    SessionUserFactor{UserID: "user2"},
+				useragent: domain.UserAgent{
+					FingerprintID: gu.Ptr("agent"),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "permission check, factor",
+			args: args{
+				ctx:           authz.NewMockContextWithAgent("instance", "org", "user", "agent"),
+				resourceOwner: "instance",
+				creator:       "not-user",
+				useragent: domain.UserAgent{
+					FingerprintID: gu.Ptr("not-agent"),
+				},
+				userFactor:      SessionUserFactor{UserID: "user2", ResourceOwner: "resourceowner2"},
+				permissionCheck: expectedSuccessfulPermissionCheck("resourceowner2", "user2"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "permission check, factor, error",
+			args: args{
+				ctx:           authz.NewMockContextWithAgent("instance", "org", "user", "agent"),
+				resourceOwner: "instance",
+				creator:       "not-user",
+				useragent: domain.UserAgent{
+					FingerprintID: gu.Ptr("not-agent"),
+				},
+				userFactor:      SessionUserFactor{UserID: "user2", ResourceOwner: "resourceowner2"},
+				permissionCheck: expectedFailedPermissionCheck("resourceowner2", "user2"),
+			},
+			wantErr: true,
+		},
+		{
+			name: "permission check",
+			args: args{
+				ctx:           authz.NewMockContextWithAgent("instance", "org", "user", "agent"),
+				resourceOwner: "instance",
+				creator:       "not-user",
+				useragent: domain.UserAgent{
+					FingerprintID: gu.Ptr("not-agent"),
+				},
+				userFactor:      SessionUserFactor{},
+				permissionCheck: expectedSuccessfulPermissionCheck("instance", ""),
+			},
+			wantErr: false,
+		},
+		{
+			name: "permission check, error",
+			args: args{
+				ctx:           authz.NewMockContextWithAgent("instance", "org", "user", "agent"),
+				resourceOwner: "instance",
+				creator:       "not-user",
+				useragent: domain.UserAgent{
+					FingerprintID: gu.Ptr("not-agent"),
+				},
+				userFactor:      SessionUserFactor{},
+				permissionCheck: expectedFailedPermissionCheck("instance", ""),
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := sessionCheckPermission(tt.args.ctx, tt.args.resourceOwner, tt.args.creator, tt.args.useragent, tt.args.userFactor, tt.args.permissionCheck)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
+func expectedSuccessfulPermissionCheck(resourceOwner, userID string) func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+		if orgID == resourceOwner && resourceID == userID {
+			return nil
+		}
+		return fmt.Errorf("permission check failed: %s %s", orgID, resourceID)
+	}
+}
+
+func expectedFailedPermissionCheck(resourceOwner, userID string) func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+		if orgID == resourceOwner && resourceID == userID {
+			return fmt.Errorf("permission check failed: %s %s", orgID, resourceID)
+		}
+		return nil
 	}
 }

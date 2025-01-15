@@ -13,17 +13,19 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	guser "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	"golang.org/x/text/language"
 	"net/http"
 	"path"
 	"testing"
+	"time"
 )
 
 func TestGetUser(t *testing.T) {
 	tests := []struct {
 		name        string
-		buildUserID func() (userID string, deleteUser bool)
+		buildUserID func() string
+		cleanup     func(userID string)
 		ctx         context.Context
 		want        *resources.ScimUser
 		wantErr     bool
@@ -43,8 +45,8 @@ func TestGetUser(t *testing.T) {
 		},
 		{
 			name: "unknown user id",
-			buildUserID: func() (string, bool) {
-				return "unknown", false
+			buildUserID: func() string {
+				return "unknown"
 			},
 			errorStatus: http.StatusNotFound,
 			wantErr:     true,
@@ -67,10 +69,14 @@ func TestGetUser(t *testing.T) {
 		},
 		{
 			name: "created via scim",
-			buildUserID: func() (string, bool) {
-				user, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+			buildUserID: func() string {
+				createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
 				require.NoError(t, err)
-				return user.ID, true
+				return createdUser.ID
+			},
+			cleanup: func(userID string) {
+				_, err := Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: userID})
+				require.NoError(t, err)
 			},
 			want: &resources.ScimUser{
 				ExternalID: "701984",
@@ -176,9 +182,9 @@ func TestGetUser(t *testing.T) {
 		},
 		{
 			name: "scoped externalID",
-			buildUserID: func() (string, bool) {
+			buildUserID: func() string {
 				// create user without provisioning domain
-				user, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+				createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
 				require.NoError(t, err)
 
 				// set provisioning domain of service user
@@ -191,12 +197,22 @@ func TestGetUser(t *testing.T) {
 
 				// set externalID for provisioning domain
 				_, err = Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
-					Id:    user.ID,
+					Id:    createdUser.ID,
 					Key:   "urn:zitadel:scim:fooBar:externalId",
 					Value: []byte("100-scopedExternalId"),
 				})
 				require.NoError(t, err)
-				return user.ID, true
+				return createdUser.ID
+			},
+			cleanup: func(userID string) {
+				_, err := Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: userID})
+				require.NoError(t, err)
+
+				_, err = Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
+					Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
+					Key: "urn:zitadel:scim:provisioning_domain",
+				})
+				require.NoError(t, err)
 			},
 			want: &resources.ScimUser{
 				ExternalID: "100-scopedExternalId",
@@ -211,37 +227,40 @@ func TestGetUser(t *testing.T) {
 			}
 
 			var userID string
-			var deleteUserAfterTest bool
 			if tt.buildUserID != nil {
-				userID, deleteUserAfterTest = tt.buildUserID()
+				userID = tt.buildUserID()
 			} else {
 				createUserResp := Instance.CreateHumanUser(CTX)
 				userID = createUserResp.UserId
 			}
 
-			user, err := Instance.Client.SCIM.Users.Get(ctx, Instance.DefaultOrg.Id, userID)
-			if tt.wantErr {
-				statusCode := tt.errorStatus
-				if statusCode == 0 {
-					statusCode = http.StatusBadRequest
+			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+			var fetchedUser *resources.ScimUser
+			var err error
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				fetchedUser, err = Instance.Client.SCIM.Users.Get(ctx, Instance.DefaultOrg.Id, userID)
+				if tt.wantErr {
+					statusCode := tt.errorStatus
+					if statusCode == 0 {
+						statusCode = http.StatusBadRequest
+					}
+
+					scim.RequireScimError(ttt, statusCode, err)
+					return
 				}
 
-				scim.RequireScimError(t, statusCode, err)
-				return
-			}
+				assert.Equal(ttt, userID, fetchedUser.ID)
+				assert.EqualValues(ttt, []schemas.ScimSchemaType{"urn:ietf:params:scim:schemas:core:2.0:User"}, fetchedUser.Schemas)
+				assert.Equal(ttt, schemas.ScimResourceTypeSingular("User"), fetchedUser.Resource.Meta.ResourceType)
+				assert.Equal(ttt, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, Instance.DefaultOrg.Id, "Users", fetchedUser.ID), fetchedUser.Resource.Meta.Location)
+				assert.Nil(ttt, fetchedUser.Password)
+				if !integration.PartiallyDeepEqual(tt.want, fetchedUser) {
+					ttt.Errorf("GetUser() got = %#v, want %#v", fetchedUser, tt.want)
+				}
+			}, retryDuration, tick)
 
-			assert.Equal(t, userID, user.ID)
-			assert.EqualValues(t, []schemas.ScimSchemaType{"urn:ietf:params:scim:schemas:core:2.0:User"}, user.Schemas)
-			assert.Equal(t, schemas.ScimResourceTypeSingular("User"), user.Resource.Meta.ResourceType)
-			assert.Equal(t, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, Instance.DefaultOrg.Id, "Users", user.ID), user.Resource.Meta.Location)
-			assert.Nil(t, user.Password)
-			if !integration.PartiallyDeepEqual(tt.want, user) {
-				t.Errorf("keysFromArgs() got = %v, want %v", user, tt.want)
-			}
-
-			if deleteUserAfterTest {
-				_, err = Instance.Client.UserV2.DeleteUser(CTX, &guser.DeleteUserRequest{UserId: user.ID})
-				require.NoError(t, err)
+			if tt.cleanup != nil {
+				tt.cleanup(fetchedUser.ID)
 			}
 		})
 	}
