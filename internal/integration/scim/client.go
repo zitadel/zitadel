@@ -18,10 +18,10 @@ import (
 )
 
 type Client struct {
-	Users *ResourceClient
+	Users *ResourceClient[resources.ScimUser]
 }
 
-type ResourceClient struct {
+type ResourceClient[T any] struct {
 	client       *http.Client
 	baseUrl      string
 	resourceName string
@@ -44,7 +44,7 @@ func NewScimClient(target string) *Client {
 	target = "http://" + target + schemas.HandlerPrefix
 	client := &http.Client{}
 	return &Client{
-		Users: &ResourceClient{
+		Users: &ResourceClient[resources.ScimUser]{
 			client:       client,
 			baseUrl:      target,
 			resourceName: "Users",
@@ -52,23 +52,43 @@ func NewScimClient(target string) *Client {
 	}
 }
 
-func (c *ResourceClient) Create(ctx context.Context, orgID string, body []byte) (*resources.ScimUser, error) {
-	user := new(resources.ScimUser)
-	err := c.doWithBody(ctx, http.MethodPost, orgID, "", bytes.NewReader(body), user)
-	return user, err
+func (c *ResourceClient[T]) Create(ctx context.Context, orgID string, body []byte) (*T, error) {
+	return c.doWithBody(ctx, http.MethodPost, orgID, "", bytes.NewReader(body))
 }
 
-func (c *ResourceClient) doWithBody(ctx context.Context, method, orgID, url string, body io.Reader, responseEntity interface{}) error {
-	req, err := http.NewRequestWithContext(ctx, method, c.buildURL(orgID, url), body)
+func (c *ResourceClient[T]) Replace(ctx context.Context, orgID, id string, body []byte) (*T, error) {
+	return c.doWithBody(ctx, http.MethodPut, orgID, id, bytes.NewReader(body))
+}
+
+func (c *ResourceClient[T]) Get(ctx context.Context, orgID, resourceID string) (*T, error) {
+	return c.doWithBody(ctx, http.MethodGet, orgID, resourceID, nil)
+}
+
+func (c *ResourceClient[T]) Delete(ctx context.Context, orgID, id string) error {
+	return c.do(ctx, http.MethodDelete, orgID, id)
+}
+
+func (c *ResourceClient[T]) do(ctx context.Context, method, orgID, url string) error {
+	req, err := http.NewRequestWithContext(ctx, method, c.buildURL(orgID, url), nil)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Set(zhttp.ContentType, middleware.ContentTypeScim)
-	return c.doReq(req, responseEntity)
+	return c.doReq(req, nil)
 }
 
-func (c *ResourceClient) doReq(req *http.Request, responseEntity interface{}) error {
+func (c *ResourceClient[T]) doWithBody(ctx context.Context, method, orgID, url string, body io.Reader) (*T, error) {
+	req, err := http.NewRequestWithContext(ctx, method, c.buildURL(orgID, url), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set(zhttp.ContentType, middleware.ContentTypeScim)
+	responseEntity := new(T)
+	return responseEntity, c.doReq(req, responseEntity)
+}
+
+func (c *ResourceClient[T]) doReq(req *http.Request, responseEntity *T) error {
 	addTokenAsHeader(req)
 
 	resp, err := c.client.Do(req)
@@ -120,7 +140,7 @@ func readScimError(resp *http.Response) error {
 	return scimErr
 }
 
-func (c *ResourceClient) buildURL(orgID, segment string) string {
+func (c *ResourceClient[T]) buildURL(orgID, segment string) string {
 	if segment == "" {
 		return c.baseUrl + "/" + path.Join(orgID, c.resourceName)
 	}

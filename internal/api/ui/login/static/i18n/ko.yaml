@@ -505,6 +505,10 @@ Errors:
       CreationNotAllowed: 이 제공자에서는 새 사용자 생성을 허용하지 않습니다
       LinkingNotAllowed: 이 제공자에서는 사용자를 연결할 수 없습니다
       NoOptionAllowed: 이 제공자에서는 생성과 연결이 모두 허용되지 않습니다. 관리자에게 문의하세요.
+      LoginFailedSwitchLocal: |
+        외부 IDP에서 로그인에 실패했습니다. 로컬 로그인으로 돌아갑니다.
+
+        오류 세부 정보: {{.Details}}
     GrantRequired: 로그인 불가. 사용자는 애플리케이션에서 최소한 하나의 권한이 필요합니다. 관리자에게 문의하세요.
     ProjectRequired: 로그인 불가. 사용자의 조직이 프로젝트에 허가되어야 합니다. 관리자에게 문의하세요.
   IdentityProvider:

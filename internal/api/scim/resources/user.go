@@ -7,7 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	scim_config "github.com/zitadel/zitadel/internal/api/scim/config"
-	schemas2 "github.com/zitadel/zitadel/internal/api/scim/schemas"
+	scim_schemas "github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
@@ -22,26 +22,26 @@ type UsersHandler struct {
 
 type ScimUser struct {
 	*Resource
-	ID                string                    `json:"id"`
-	ExternalID        string                    `json:"externalId,omitempty"`
-	UserName          string                    `json:"userName,omitempty"`
-	Name              *ScimUserName             `json:"name,omitempty"`
-	DisplayName       string                    `json:"displayName,omitempty"`
-	NickName          string                    `json:"nickName,omitempty"`
-	ProfileUrl        *schemas2.HttpURL         `json:"profileUrl,omitempty"`
-	Title             string                    `json:"title,omitempty"`
-	PreferredLanguage language.Tag              `json:"preferredLanguage,omitempty"`
-	Locale            string                    `json:"locale,omitempty"`
-	Timezone          string                    `json:"timezone,omitempty"`
-	Active            bool                      `json:"active,omitempty"`
-	Emails            []*ScimEmail              `json:"emails,omitempty"`
-	PhoneNumbers      []*ScimPhoneNumber        `json:"phoneNumbers,omitempty"`
-	Password          *schemas2.WriteOnlyString `json:"password,omitempty"`
-	Ims               []*ScimIms                `json:"ims,omitempty"`
-	Addresses         []*ScimAddress            `json:"addresses,omitempty"`
-	Photos            []*ScimPhoto              `json:"photos,omitempty"`
-	Entitlements      []*ScimEntitlement        `json:"entitlements,omitempty"`
-	Roles             []*ScimRole               `json:"roles,omitempty"`
+	ID                string                        `json:"id"`
+	ExternalID        string                        `json:"externalId,omitempty"`
+	UserName          string                        `json:"userName,omitempty"`
+	Name              *ScimUserName                 `json:"name,omitempty"`
+	DisplayName       string                        `json:"displayName,omitempty"`
+	NickName          string                        `json:"nickName,omitempty"`
+	ProfileUrl        *scim_schemas.HttpURL         `json:"profileUrl,omitempty"`
+	Title             string                        `json:"title,omitempty"`
+	PreferredLanguage language.Tag                  `json:"preferredLanguage,omitempty"`
+	Locale            string                        `json:"locale,omitempty"`
+	Timezone          string                        `json:"timezone,omitempty"`
+	Active            *bool                         `json:"active,omitempty"`
+	Emails            []*ScimEmail                  `json:"emails,omitempty"`
+	PhoneNumbers      []*ScimPhoneNumber            `json:"phoneNumbers,omitempty"`
+	Password          *scim_schemas.WriteOnlyString `json:"password,omitempty"`
+	Ims               []*ScimIms                    `json:"ims,omitempty"`
+	Addresses         []*ScimAddress                `json:"addresses,omitempty"`
+	Photos            []*ScimPhoto                  `json:"photos,omitempty"`
+	Entitlements      []*ScimEntitlement            `json:"entitlements,omitempty"`
+	Roles             []*ScimRole                   `json:"roles,omitempty"`
 }
 
 type ScimEntitlement struct {
@@ -59,10 +59,10 @@ type ScimRole struct {
 }
 
 type ScimPhoto struct {
-	Value   schemas2.HttpURL `json:"value"`
-	Display string           `json:"display,omitempty"`
-	Type    string           `json:"type"`
-	Primary bool             `json:"primary,omitempty"`
+	Value   scim_schemas.HttpURL `json:"value"`
+	Display string               `json:"display,omitempty"`
+	Type    string               `json:"type"`
+	Primary bool                 `json:"primary,omitempty"`
 }
 
 type ScimAddress struct {
@@ -108,12 +108,12 @@ func NewUsersHandler(
 	return &UsersHandler{command, query, userCodeAlg, config}
 }
 
-func (h *UsersHandler) ResourceNameSingular() schemas2.ScimResourceTypeSingular {
-	return schemas2.UserResourceType
+func (h *UsersHandler) ResourceNameSingular() scim_schemas.ScimResourceTypeSingular {
+	return scim_schemas.UserResourceType
 }
 
-func (h *UsersHandler) ResourceNamePlural() schemas2.ScimResourceTypePlural {
-	return schemas2.UsersResourceType
+func (h *UsersHandler) ResourceNamePlural() scim_schemas.ScimResourceTypePlural {
+	return scim_schemas.UsersResourceType
 }
 
 func (u *ScimUser) GetResource() *Resource {
@@ -124,8 +124,8 @@ func (h *UsersHandler) NewResource() *ScimUser {
 	return new(ScimUser)
 }
 
-func (h *UsersHandler) SchemaType() schemas2.ScimSchemaType {
-	return schemas2.IdUser
+func (h *UsersHandler) SchemaType() scim_schemas.ScimSchemaType {
+	return scim_schemas.IdUser
 }
 
 func (h *UsersHandler) Create(ctx context.Context, user *ScimUser) (*ScimUser, error) {
@@ -140,7 +140,73 @@ func (h *UsersHandler) Create(ctx context.Context, user *ScimUser) (*ScimUser, e
 		return nil, err
 	}
 
-	user.ID = addHuman.Details.ID
-	user.Resource = buildResource(ctx, h, addHuman.Details)
-	return user, err
+	h.mapAddCommandToScimUser(ctx, user, addHuman)
+	return user, nil
+}
+
+func (h *UsersHandler) Replace(ctx context.Context, id string, user *ScimUser) (*ScimUser, error) {
+	user.ID = id
+	changeHuman, err := h.mapToChangeHuman(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.command.ChangeUserHuman(ctx, changeHuman, h.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+
+	h.mapChangeCommandToScimUser(ctx, user, changeHuman)
+	return user, nil
+}
+
+func (h *UsersHandler) Delete(ctx context.Context, id string) error {
+	memberships, grants, err := h.queryUserDependencies(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	_, err = h.command.RemoveUserV2(ctx, id, memberships, grants...)
+	return err
+}
+
+func (h *UsersHandler) Get(ctx context.Context, id string) (*ScimUser, error) {
+	user, err := h.query.GetUserByID(ctx, false, id)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata, err := h.queryMetadataForUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return h.mapToScimUser(ctx, user, metadata), nil
+}
+
+func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
+	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	grants, err := h.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{userGrantUserQuery},
+	}, true)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	membershipsUserQuery, err := query.NewMembershipUserIDQuery(userID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	memberships, err := h.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{membershipsUserQuery},
+	}, false)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), nil
 }
