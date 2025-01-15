@@ -13,6 +13,7 @@ It uses a aggregate_id as first argument which may be and instance_id or 'SYSTEM
 for system level permissions.
 */
 WITH target AS (
+	-- unmarshal JSON representation into flattened tabular data
 	SELECT
 		key AS role,
 		jsonb_array_elements_text(value) AS permission
