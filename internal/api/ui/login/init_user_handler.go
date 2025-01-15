@@ -131,17 +131,13 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, loginName string, code string, passwordSet bool, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	if authReq != nil {
 		userID = authReq.UserID
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, translator, "InitUser.Title", "InitUser.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InitUser.Title", "InitUser.Description", err),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
@@ -179,7 +175,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, translator, "InitUserDone.Title", "InitUserDone.Description", "", "")
+	data := l.getUserData(r, authReq, translator, "InitUserDone.Title", "InitUserDone.Description", nil)
 	if authReq == nil {
 		l.customTexts(r.Context(), translator, orgID)
 	}

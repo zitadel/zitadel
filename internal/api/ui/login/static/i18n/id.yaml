@@ -464,6 +464,10 @@ Errors:
       CreationNotAllowed: Pembuatan pengguna baru tidak diperbolehkan pada penyedia ini
       LinkingNotAllowed: Menautkan pengguna tidak diperbolehkan di penyedia ini
       NoOptionAllowed: 'Pembuatan tautan tidak diperbolehkan pada penyedia ini. '
+      LoginFailedSwitchLocal: |
+        Gagal masuk ke Penyedia ID Eksternal. Kembali ke login lokal.
+    
+        Detail kesalahan: {{.Details}}
     GrantRequired: 'Masuk tidak dapat dilakukan. '
     ProjectRequired: 'Masuk tidak dapat dilakukan. '
   IdentityProvider:

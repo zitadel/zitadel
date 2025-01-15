@@ -504,6 +504,10 @@ Errors:
       CreationNotAllowed: Erstellen eines neuen Benutzers mit diesem Provider ist nicht erlaubt
       LinkingNotAllowed: Verknüpfen eines Benutzers mit diesem Provider ist nicht erlaubt
       NoOptionAllowed: Weder Erstellung noch Verknüpfung ist für diesen Provider erlaubt. Bitte wenden Sie sich an Ihren Administrator.
+      LoginFailedSwitchLocal: |
+        Anmeldung beim externen Identitätsanbieter fehlgeschlagen. Zurück zur lokalen Anmeldung.
+
+        Fehlerdetails: {{.Details}}
     GrantRequired: Die Anmeldung an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte wende dich an deinen Administrator.
     ProjectRequired: Die Anmeldung an dieser Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte wende dich an deinen Administrator.
   IdentityProvider:

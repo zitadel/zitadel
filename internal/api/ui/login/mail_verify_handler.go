@@ -145,17 +145,13 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 }
 
 func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, passwordInit bool, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	if userID == "" && authReq != nil {
 		userID = authReq.UserID
 	}
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:     l.getBaseData(r, authReq, translator, "EmailVerification.Title", "EmailVerification.Description", errID, errMessage),
+		baseData:     l.getBaseData(r, authReq, translator, "EmailVerification.Title", "EmailVerification.Description", err),
 		UserID:       userID,
 		profileData:  l.getProfileData(authReq),
 		Code:         code,
@@ -191,7 +187,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, translator, "EmailVerificationDone.Title", "EmailVerificationDone.Description", "", ""),
+		baseData:    l.getBaseData(r, authReq, translator, "EmailVerificationDone.Title", "EmailVerificationDone.Description", nil),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq == nil {

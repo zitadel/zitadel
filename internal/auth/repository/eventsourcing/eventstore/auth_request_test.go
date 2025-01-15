@@ -2263,6 +2263,86 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			[]domain.NextStep{&domain.LinkUsersStep{}},
 			nil,
 		},
+		{
+			"local auth requested (passwordless and password set up), passwordless step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordSet:        true,
+					IsEmailVerified:    true,
+					MFAMaxSetUp:        int32(domain.MFALevelMultiFactor),
+					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					idps: []*query.IDPUserLink{{IDPID: "IDPConfigID"}},
+				},
+			},
+			args{
+				&domain.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LoginPolicy: &domain.LoginPolicy{
+						PasswordlessType: domain.PasswordlessTypeAllowed,
+					},
+					AllowedExternalIDPs: []*domain.IDPProvider{
+						{
+							IDPConfigID: "IDPConfigID",
+						},
+					},
+					RequestLocalAuth: true,
+				}, false},
+			[]domain.NextStep{
+				&domain.PasswordlessStep{
+					PasswordSet: true,
+				},
+			},
+			nil,
+		},
+		{
+			"local auth requested (password set up), password step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					idps: []*query.IDPUserLink{{IDPID: "IDPConfigID"}},
+				},
+			},
+			args{
+				&domain.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LoginPolicy: &domain.LoginPolicy{
+						PasswordlessType: domain.PasswordlessTypeAllowed,
+					},
+					AllowedExternalIDPs: []*domain.IDPProvider{
+						{
+							IDPConfigID: "IDPConfigID",
+						},
+					},
+					RequestLocalAuth: true,
+				}, false},
+			[]domain.NextStep{
+				&domain.PasswordStep{},
+			},
+			nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
