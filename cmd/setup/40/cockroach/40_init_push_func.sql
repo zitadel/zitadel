@@ -69,9 +69,6 @@ BEGIN
         -- crdb does not support EXIT WHEN NOT FOUND
         EXIT WHEN instance_id IS NULL;
 
-        -- get latest aggregate state
-        current_sequence := NULL;
-        current_owner := NULL;
         SELECT 
             * 
         INTO
