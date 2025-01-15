@@ -44,6 +44,10 @@ var (
 		name:  projection.MemberResourceOwner,
 		table: instanceMemberTable,
 	}
+	InstanceMemberUserResourceOwner = Column{
+		name:  projection.MemberUserResourceOwner,
+		table: instanceMemberTable,
+	}
 	InstanceMemberInstanceID = Column{
 		name:  projection.MemberInstanceID,
 		table: instanceMemberTable,
@@ -96,6 +100,7 @@ func prepareInstanceMembersQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			InstanceMemberChangeDate.identifier(),
 			InstanceMemberSequence.identifier(),
 			InstanceMemberResourceOwner.identifier(),
+			InstanceMemberUserResourceOwner.identifier(),
 			InstanceMemberUserID.identifier(),
 			InstanceMemberRoles.identifier(),
 			LoginNameNameCol.identifier(),
@@ -138,6 +143,7 @@ func prepareInstanceMembersQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					&member.ChangeDate,
 					&member.Sequence,
 					&member.ResourceOwner,
+					&member.UserResourceOwner,
 					&member.UserID,
 					&member.Roles,
 					&preferredLoginName,

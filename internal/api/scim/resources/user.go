@@ -140,8 +140,23 @@ func (h *UsersHandler) Create(ctx context.Context, user *ScimUser) (*ScimUser, e
 		return nil, err
 	}
 
-	user.ID = addHuman.Details.ID
-	user.Resource = buildResource(ctx, h, addHuman.Details)
+	h.mapAddCommandToScimUser(ctx, user, addHuman)
+	return user, nil
+}
+
+func (h *UsersHandler) Replace(ctx context.Context, id string, user *ScimUser) (*ScimUser, error) {
+	user.ID = id
+	changeHuman, err := h.mapToChangeHuman(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.command.ChangeUserHuman(ctx, changeHuman, h.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+
+	h.mapChangeCommandToScimUser(ctx, user, changeHuman)
 	return user, nil
 }
 

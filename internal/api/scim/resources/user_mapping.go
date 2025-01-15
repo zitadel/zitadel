@@ -17,14 +17,22 @@ import (
 )
 
 func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*command.AddHuman, error) {
-	// zitadel has its own state mechanism
-	// ignore scimUser.Active
 	human := &command.AddHuman{
 		Username:    scimUser.UserName,
 		NickName:    scimUser.NickName,
 		DisplayName: scimUser.DisplayName,
-		Email:       h.mapPrimaryEmail(scimUser),
-		Phone:       h.mapPrimaryPhone(scimUser),
+	}
+
+	if scimUser.Active != nil && !*scimUser.Active {
+		human.SetInactive = true
+	}
+
+	if email := h.mapPrimaryEmail(scimUser); email != nil {
+		human.Email = *email
+	}
+
+	if phone := h.mapPrimaryPhone(scimUser); phone != nil {
+		human.Phone = *phone
 	}
 
 	md, err := h.mapMetadataToCommands(ctx, scimUser)
@@ -46,6 +54,9 @@ func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*
 		// over the formatted name assignment
 		if human.DisplayName == "" {
 			human.DisplayName = scimUser.Name.Formatted
+		} else {
+			// update user to match the actual stored value
+			scimUser.Name.Formatted = human.DisplayName
 		}
 	}
 
@@ -57,34 +68,144 @@ func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*
 	return human, nil
 }
 
-func (h *UsersHandler) mapPrimaryEmail(scimUser *ScimUser) command.Email {
+func (h *UsersHandler) mapToChangeHuman(ctx context.Context, scimUser *ScimUser) (*command.ChangeHuman, error) {
+	human := &command.ChangeHuman{
+		ID:       scimUser.ID,
+		Username: &scimUser.UserName,
+		Profile: &command.Profile{
+			NickName:    &scimUser.NickName,
+			DisplayName: &scimUser.DisplayName,
+		},
+		Email: h.mapPrimaryEmail(scimUser),
+		Phone: h.mapPrimaryPhone(scimUser),
+	}
+
+	if scimUser.Active != nil {
+		if *scimUser.Active {
+			human.State = gu.Ptr(domain.UserStateActive)
+		} else {
+			human.State = gu.Ptr(domain.UserStateInactive)
+		}
+	}
+
+	md, mdRemovedKeys, err := h.mapMetadataToDomain(ctx, scimUser)
+	if err != nil {
+		return nil, err
+	}
+	human.Metadata = md
+	human.MetadataKeysToRemove = mdRemovedKeys
+
+	if scimUser.Password != nil {
+		human.Password = &command.Password{
+			Password: scimUser.Password.String(),
+		}
+		scimUser.Password = nil
+	}
+
+	if scimUser.Name != nil {
+		human.Profile.FirstName = &scimUser.Name.GivenName
+		human.Profile.LastName = &scimUser.Name.FamilyName
+
+		// the direct mapping displayName => displayName has priority
+		// over the formatted name assignment
+		if *human.Profile.DisplayName == "" {
+			human.Profile.DisplayName = &scimUser.Name.Formatted
+		} else {
+			// update user to match the actual stored value
+			scimUser.Name.Formatted = *human.Profile.DisplayName
+		}
+	}
+
+	if err := domain.LanguageIsDefined(scimUser.PreferredLanguage); err != nil {
+		human.Profile.PreferredLanguage = &language.English
+		scimUser.PreferredLanguage = language.English
+	}
+
+	return human, nil
+}
+
+func (h *UsersHandler) mapPrimaryEmail(scimUser *ScimUser) *command.Email {
 	for _, email := range scimUser.Emails {
 		if !email.Primary {
 			continue
 		}
 
-		return command.Email{
+		return &command.Email{
 			Address:  domain.EmailAddress(email.Value),
 			Verified: h.config.EmailVerified,
 		}
 	}
 
-	return command.Email{}
+	return nil
 }
 
-func (h *UsersHandler) mapPrimaryPhone(scimUser *ScimUser) command.Phone {
+func (h *UsersHandler) mapPrimaryPhone(scimUser *ScimUser) *command.Phone {
 	for _, phone := range scimUser.PhoneNumbers {
 		if !phone.Primary {
 			continue
 		}
 
-		return command.Phone{
+		return &command.Phone{
 			Number:   domain.PhoneNumber(phone.Value),
 			Verified: h.config.PhoneVerified,
 		}
 	}
 
-	return command.Phone{}
+	return nil
+}
+
+func (h *UsersHandler) mapAddCommandToScimUser(ctx context.Context, user *ScimUser, addHuman *command.AddHuman) {
+	user.ID = addHuman.Details.ID
+	user.Resource = buildResource(ctx, h, addHuman.Details)
+	user.Password = nil
+
+	// ZITADEL supports only one (primary) phone number or email.
+	// Therefore, only the primary one should be returned.
+	// Note that the phone number might also be reformatted.
+	if addHuman.Phone.Number != "" {
+		user.PhoneNumbers = []*ScimPhoneNumber{
+			{
+				Value:   string(addHuman.Phone.Number),
+				Primary: true,
+			},
+		}
+	}
+
+	if addHuman.Email.Address != "" {
+		user.Emails = []*ScimEmail{
+			{
+				Value:   string(addHuman.Email.Address),
+				Primary: true,
+			},
+		}
+	}
+}
+
+func (h *UsersHandler) mapChangeCommandToScimUser(ctx context.Context, user *ScimUser, changeHuman *command.ChangeHuman) {
+	user.ID = changeHuman.Details.ID
+	user.Resource = buildResource(ctx, h, changeHuman.Details)
+	user.Password = nil
+
+	// ZITADEL supports only one (primary) phone number or email.
+	// Therefore, only the primary one should be returned.
+	// Note that the phone number might also be reformatted.
+	if changeHuman.Phone != nil {
+		user.PhoneNumbers = []*ScimPhoneNumber{
+			{
+				Value:   string(changeHuman.Phone.Number),
+				Primary: true,
+			},
+		}
+	}
+
+	if changeHuman.Email != nil {
+		user.Emails = []*ScimEmail{
+			{
+				Value:   string(changeHuman.Email.Address),
+				Primary: true,
+			},
+		}
+	}
 }
 
 func (h *UsersHandler) mapToScimUser(ctx context.Context, user *query.User, md map[metadata.ScopedKey][]byte) *ScimUser {

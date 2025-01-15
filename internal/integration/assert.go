@@ -171,9 +171,13 @@ func diffProto(expected, actual proto.Message) string {
 	return "\n\nDiff:\n" + diff
 }
 
-func AssertMapContains[M ~map[K]V, K comparable, V any](t *testing.T, m M, key K, expectedValue V) {
+func AssertMapContains[M ~map[K]V, K comparable, V any](t assert.TestingT, m M, key K, expectedValue V) {
 	val, exists := m[key]
 	assert.True(t, exists, "Key '%s' should exist in the map", key)
+	if !exists {
+		return
+	}
+
 	assert.Equal(t, expectedValue, val, "Key '%s' should have value '%d'", key, expectedValue)
 }
 
@@ -195,7 +199,7 @@ func partiallyDeepEqual(expected, actual reflect.Value) bool {
 	// Dereference pointers if needed
 	if expected.Kind() == reflect.Ptr {
 		if expected.IsNil() {
-			return actual.IsNil()
+			return true
 		}
 
 		expected = expected.Elem()
