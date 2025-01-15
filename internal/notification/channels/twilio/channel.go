@@ -2,6 +2,7 @@ package twilio
 
 import (
 	"errors"
+	"slices"
 
 	"github.com/twilio/twilio-go"
 	twilioClient "github.com/twilio/twilio-go/client"
@@ -30,12 +31,18 @@ func InitChannel(config Config) channels.NotificationChannel {
 
 			resp, err := client.VerifyV2.CreateVerification(config.VerifyServiceSID, params)
 
+			// In case of certain errors, we should not retry sending the verification code.
+			// Codes can be defined in the runtime configuration.
+			//
+			// By default, we cancel the notification if there were too many attempts to send a verification code
+			// (more than 5 times) without a verification check, as even retries with backoff might not solve
+			// the problem.
+			// https://www.twilio.com/docs/api/errors/60203
+			//
+			// The same applies to if Twilio blocked the delivery because of fraud suspicion.
+			// https://www.twilio.com/docs/api/errors/60410
 			var twilioErr *twilioClient.TwilioRestError
-			if errors.As(err, &twilioErr) && twilioErr.Code == 60203 {
-				// If there were too many attempts to send a verification code (more than 5 times)
-				// without a verification check, even retries with backoff might not solve the problem.
-				// Instead, let the user initiate the verification again (e.g. using "resend code")
-				// https://www.twilio.com/docs/api/errors/60203
+			if errors.As(err, &twilioErr) && slices.Contains(config.CancelErrorCodes, twilioErr.Code) {
 				logging.WithFields("error", twilioErr.Message, "code", twilioErr.Code).Warn("twilio create verification error")
 				return channels.NewCancelError(twilioErr)
 			}

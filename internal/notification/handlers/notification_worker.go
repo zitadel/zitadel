@@ -55,6 +55,11 @@ type WorkerConfig struct {
 	MinRetryDelay       time.Duration
 	MaxRetryDelay       time.Duration
 	RetryDelayFactor    float32
+	CancelOn            CancelEvents
+}
+
+type CancelEvents struct {
+	TwilioErrorCodes []int
 }
 
 // nowFunc makes [time.Now] mockable

@@ -1562,6 +1562,7 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 			f.userDataCrypto,
 			smtpAlg,
 			f.SMSTokenCrypto,
+			f.cancelOn,
 		),
 		otpEmailTmpl: defaultOTPEmailTemplate,
 		channels: &notificationChannels{

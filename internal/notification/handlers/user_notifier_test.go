@@ -1717,6 +1717,7 @@ type fields struct {
 	es             *eventstore.Eventstore
 	userDataCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto crypto.EncryptionAlgorithm
+	cancelOn       CancelEvents
 }
 type fieldsWorker struct {
 	queries        *mock.MockQueries
@@ -1727,6 +1728,7 @@ type fieldsWorker struct {
 	now            nowFunc
 	backOff        func(current time.Duration) time.Duration
 	maxAttempts    uint8
+	cancelOn       CancelEvents
 }
 type args struct {
 	event eventstore.Event
@@ -1760,6 +1762,7 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			f.userDataCrypto,
 			smtpAlg,
 			f.SMSTokenCrypto,
+			f.cancelOn,
 		),
 		otpEmailTmpl: defaultOTPEmailTemplate,
 	}

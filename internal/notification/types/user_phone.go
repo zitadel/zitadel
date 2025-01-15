@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/templates"
@@ -33,7 +34,9 @@ func generateSms(
 	smsChannels, config, err := channels.SMS(ctx)
 	logging.OnError(err).Error("could not create sms channel")
 	if smsChannels == nil || smsChannels.Len() == 0 {
-		return zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
+		return zchannels.NewCancelError(
+			zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent"),
+		)
 	}
 	recipient := user.VerifiedPhone
 	if lastPhone {
@@ -85,5 +88,7 @@ func generateSms(
 		}
 		return webhookChannels.HandleMessage(message)
 	}
-	return zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
+	return zchannels.NewCancelError(
+		zerrors.ThrowPreconditionFailed(nil, "PHONE-83nof", "Errors.Notification.Channels.NotPresent"),
+	)
 }

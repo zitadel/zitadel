@@ -12,6 +12,7 @@ type Config struct {
 	Token            string
 	SenderNumber     string
 	VerifyServiceSID string
+	CancelErrorCodes []int
 }
 
 func (t *Config) IsValid() bool {
