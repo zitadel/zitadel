@@ -1,1 +1,1 @@
--- DROP INDEX IF EXISTS eventstore.es_wm;
+DROP INDEX IF EXISTS eventstore.es_wm;
