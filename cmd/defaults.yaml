@@ -805,7 +805,7 @@ Quotas:
 
 Eventstore:
   # Sets the maximum duration of transactions pushing events
-  PushTimeout: 30s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
+  PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
   # Maximum amount of push retries in case of primary key violation on the sequence
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
 
