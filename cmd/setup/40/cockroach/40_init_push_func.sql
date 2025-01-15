@@ -89,12 +89,28 @@ $$;
 
 CREATE OR REPLACE FUNCTION eventstore.push(commands eventstore.command[]) RETURNS SETOF eventstore.events2 AS $$
     INSERT INTO eventstore.events2
-    SELECT * FROM eventstore.commands_to_events2(commands) ORDER BY in_tx_order;
+    SELECT
+        ("e").instance_id
+        , ("e").aggregate_type
+        , ("e").aggregate_id
+        , ("e").event_type
+        , ("e").sequence
+        , ("e").revision
+        , ("e").created_at
+        , ("e").payload
+        , ("e").creator
+        , ("e").owner
+        , ("e")."position"
+        , ("e").in_tx_order
+    FROM 
+        UNNEST(eventstore.commands_to_events2(commands)) e 
+    ORDER BY 
+        in_tx_order
     RETURNING *
 $$ LANGUAGE SQL;
 
 /*
-select * from eventstore.commands_to_events(
+select (c).* from UNNEST(eventstore.commands_to_events2(
 ARRAY[
     ROW('', 'system', 'SYSTEM', 'ct1', 1, '{"key": "value"}', 'c1', 'SYSTEM')
     , ROW('', 'system', 'SYSTEM', 'ct2', 1, '{"key": "value"}', 'c1', 'SYSTEM')
@@ -103,5 +119,7 @@ ARRAY[
     , ROW('289525561255060732', 'oidc_session', 'V2_289575178579535100', 'ct3', 1, '{"key": "value"}', 'c1', '289575074711790844')
     , ROW('', 'system', 'SYSTEM', 'ct3', 1, '{"key": "value"}', 'c1', 'SYSTEM')
 ]::eventstore.command[]
-) c;
+) )c;
 */
+
+
