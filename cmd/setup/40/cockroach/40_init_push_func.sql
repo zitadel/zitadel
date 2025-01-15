@@ -10,6 +10,37 @@ CREATE TYPE IF NOT EXISTS eventstore.command AS (
     , owner TEXT
 );
 
+CREATE OR REPLACE FUNCTION eventstore.latest_aggregate_state(
+    instance_id TEXT
+    , aggregate_type TEXT
+    , aggregate_id TEXT
+    
+    , sequence OUT BIGINT
+    , owner OUT TEXT
+)
+    LANGUAGE 'plpgsql'
+AS $$
+    BEGIN
+        SELECT
+            COALESCE(e.sequence, 0) AS sequence
+            , e.owner
+        INTO
+            sequence
+            , owner
+        FROM
+            eventstore.events2 e
+        WHERE
+            e.instance_id = $1
+            AND e.aggregate_type = $2
+            AND e.aggregate_id = $3
+        ORDER BY 
+            e.sequence DESC
+        LIMIT 1;
+
+        RETURN;
+    END;
+$$;
+
 CREATE OR REPLACE FUNCTION eventstore.commands_to_events2(commands eventstore.command[])
     RETURNS eventstore.events2[]
     LANGUAGE 'plpgsql'
@@ -39,21 +70,18 @@ BEGIN
         EXIT WHEN instance_id IS NULL;
 
         -- get latest aggregate state
-        SELECT
-            COALESCE(e.sequence, 0) AS sequence
-            , e.owner
+        current_sequence := NULL;
+        current_owner := NULL;
+        SELECT 
+            * 
         INTO
             current_sequence
             , current_owner 
-        FROM
-            eventstore.events2 e
-        WHERE
-            e.instance_id = instance_id
-            AND e.aggregate_type = aggregate_type
-            AND e.aggregate_id = aggregate_id
-        ORDER BY 
-            e.sequence DESC
-        LIMIT 1;
+        FROM eventstore.latest_aggregate_state(
+            instance_id
+            , aggregate_type
+            , aggregate_id
+        );
 
         -- RETURN QUERY is not supported by crdb: https://github.com/cockroachdb/cockroach/issues/105240
         SELECT 
