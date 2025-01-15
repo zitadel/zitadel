@@ -2,6 +2,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { getActiveIdentityProviders, getBrandingSettings } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -13,13 +14,20 @@ export default async function Page(props: {
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
-  const identityProviders = await getActiveIdentityProviders(organization).then(
-    (resp) => {
-      return resp.identityProviders;
-    },
-  );
+  const host = (await headers()).get("host");
 
-  const branding = await getBrandingSettings(organization);
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const identityProviders = await getActiveIdentityProviders({
+    host,
+    orgId: organization,
+  }).then((resp) => {
+    return resp.identityProviders;
+  });
+
+  const branding = await getBrandingSettings({ host, organization });
 
   return (
     <DynamicTheme branding={branding}>

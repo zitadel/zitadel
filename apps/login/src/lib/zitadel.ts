@@ -1,4 +1,6 @@
 import { Client, create, Duration } from "@zitadel/client";
+import { createServerTransport } from "@zitadel/client/node";
+import { createSystemServiceClient } from "@zitadel/client/v1";
 import { makeReqCtx } from "@zitadel/client/v2";
 import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
@@ -42,6 +44,7 @@ import {
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
+import { systemAPIToken } from "./api";
 import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
@@ -70,15 +73,15 @@ async function cacheWrapper<T>(callback: Promise<T>) {
 // const settingsService: Client<typeof SettingsService> =
 //   await createServiceForHost(SettingsService, host);
 
-// const systemService = async () => {
-//   const systemToken = await systemAPIToken();
+const systemService = async () => {
+  const systemToken = await systemAPIToken();
 
-//   const transport = createServerTransport(systemToken, {
-//     baseUrl: process.env.ZITADEL_API_URL,
-//   });
+  const transport = createServerTransport(systemToken, {
+    baseUrl: process.env.ZITADEL_API_URL,
+  });
 
-//   return createSystemServiceClient(transport);
-// };
+  return createSystemServiceClient(transport);
+};
 
 export async function getInstanceByHost(host: string) {
   return (await systemService())
@@ -125,16 +128,16 @@ export async function getBrandingSettings({
 
 export async function getLoginSettings({
   host,
-  orgId,
+  organization,
 }: {
   host: string;
-  orgId?: string;
+  organization?: string;
 }) {
   const settingsService: Client<typeof SettingsService> =
     await createServiceForHost(SettingsService, host);
 
   const callback = settingsService
-    .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
+    .getLoginSettings({ ctx: makeReqCtx(organization) }, {})
     .then((resp) => (resp.settings ? resp.settings : undefined));
 
   return useCache ? cacheWrapper(callback) : callback;

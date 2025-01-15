@@ -16,6 +16,7 @@ import {
 } from "@/lib/zitadel";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -27,19 +28,25 @@ export default async function Page(props: {
 
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
-  const sessionWithData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+  const host = (await headers()).get("host");
 
-  async function getAuthMethodsAndUser(session?: Session) {
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const sessionWithData = sessionId
+    ? await loadSessionById(host, sessionId, organization)
+    : await loadSessionByLoginname(host, loginName, organization);
+
+  async function getAuthMethodsAndUser(host: string, session?: Session) {
     const userId = session?.factors?.user?.id;
 
     if (!userId) {
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes(userId).then((methods) => {
-      return getUserByID(userId).then((user) => {
+    return listAuthenticationMethodTypes({ host, userId }).then((methods) => {
+      return getUserByID({ host, userId }).then((user) => {
         const humanUser =
           user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
@@ -55,6 +62,7 @@ export default async function Page(props: {
   }
 
   async function loadSessionByLoginname(
+    host: string,
     loginName?: string,
     organization?: string,
   ) {
@@ -62,17 +70,22 @@ export default async function Page(props: {
       loginName,
       organization,
     }).then((session) => {
-      return getAuthMethodsAndUser(session);
+      return getAuthMethodsAndUser(host, session);
     });
   }
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      host,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(sessionResponse.session);
+      return getAuthMethodsAndUser(host, sessionResponse.session);
     });
   }
 
@@ -80,18 +93,21 @@ export default async function Page(props: {
     return <Alert>{tError("unknownContext")}</Alert>;
   }
 
-  const branding = await getBrandingSettings(
-    sessionWithData.factors?.user?.organizationId,
-  );
+  const branding = await getBrandingSettings({
+    host,
+    organization: sessionWithData.factors?.user?.organizationId,
+  });
 
-  const loginSettings = await getLoginSettings(
-    sessionWithData.factors?.user?.organizationId,
-  );
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: sessionWithData.factors?.user?.organizationId,
+  });
 
-  const identityProviders = await getActiveIdentityProviders(
-    sessionWithData.factors?.user?.organizationId,
-    true,
-  ).then((resp) => {
+  const identityProviders = await getActiveIdentityProviders({
+    host,
+    orgId: sessionWithData.factors?.user?.organizationId,
+    linking_allowed: true,
+  }).then((resp) => {
     return resp.identityProviders;
   });
 

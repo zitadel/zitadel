@@ -9,6 +9,7 @@ import {
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 async function loadSessions() {
@@ -35,9 +36,15 @@ export default async function Page(props: {
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg({ host });
     if (org) {
       defaultOrganization = org.id;
     }
@@ -45,9 +52,10 @@ export default async function Page(props: {
 
   let sessions = await loadSessions();
 
-  const branding = await getBrandingSettings(
-    organization ?? defaultOrganization,
-  );
+  const branding = await getBrandingSettings({
+    host,
+    organization: organization ?? defaultOrganization,
+  });
 
   const params = new URLSearchParams();
 

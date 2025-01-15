@@ -22,6 +22,12 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "otp" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const {
     loginName, // send from password page
     userId, // send from email link
@@ -35,12 +41,17 @@ export default async function Page(props: {
   const { method } = params;
 
   const session = sessionId
-    ? await loadSessionById(sessionId, organization)
+    ? await loadSessionById(host, sessionId, organization)
     : await loadMostRecentSession({ loginName, organization });
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      host,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -51,15 +62,15 @@ export default async function Page(props: {
   }
 
   // email links do not come with organization, thus we need to use the session's organization
-  const branding = await getBrandingSettings(
-    organization ?? session?.factors?.user?.organizationId,
-  );
+  const branding = await getBrandingSettings({
+    host,
+    organization: organization ?? session?.factors?.user?.organizationId,
+  });
 
-  const loginSettings = await getLoginSettings(
-    organization ?? session?.factors?.user?.organizationId,
-  );
-
-  const host = (await headers()).get("host");
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: organization ?? session?.factors?.user?.organizationId,
+  });
 
   return (
     <DynamicTheme branding={branding}>

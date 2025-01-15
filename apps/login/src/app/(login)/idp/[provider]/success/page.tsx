@@ -23,6 +23,7 @@ import {
   AddHumanUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
@@ -37,13 +38,19 @@ export default async function Page(props: {
   const { id, token, authRequestId, organization, link } = searchParams;
   const { provider } = params;
 
-  const branding = await getBrandingSettings(organization);
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const branding = await getBrandingSettings({ host, organization });
 
   if (!provider || !id || !token) {
     return loginFailed(branding, "IDP context missing");
   }
 
-  const intent = await retrieveIDPIntent(id, token);
+  const intent = await retrieveIDPIntent({ host, id, token });
 
   const { idpInformation, userId } = intent;
 
@@ -63,7 +70,7 @@ export default async function Page(props: {
     return loginFailed(branding, "IDP information missing");
   }
 
-  const idp = await getIDPByID(idpInformation.idpId);
+  const idp = await getIDPByID({ host, id: idpInformation.idpId });
   const options = idp?.config?.options;
 
   if (!idp) {
@@ -80,14 +87,15 @@ export default async function Page(props: {
 
     let idpLink;
     try {
-      idpLink = await addIDPLink(
-        {
+      idpLink = await addIDPLink({
+        host,
+        idp: {
           id: idpInformation.idpId,
           userId: idpInformation.userId,
           userName: idpInformation.userName,
         },
         userId,
-      );
+      });
     } catch (error) {
       console.error(error);
       return linkingFailed(branding);
@@ -111,19 +119,20 @@ export default async function Page(props: {
     const email = PROVIDER_MAPPING[providerType](idpInformation).email?.email;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
-      foundUser = await listUsers({ email }).then((response) => {
+      foundUser = await listUsers({ host, email }).then((response) => {
         return response.result ? response.result[0] : null;
       });
     } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
       foundUser = await listUsers(
         options.autoLinking === AutoLinkingOption.USERNAME
-          ? { userName: idpInformation.userName }
-          : { email },
+          ? { host, userName: idpInformation.userName }
+          : { host, email },
       ).then((response) => {
         return response.result ? response.result[0] : null;
       });
     } else {
       foundUser = await listUsers({
+        host,
         userName: idpInformation.userName,
         email,
       }).then((response) => {
@@ -134,14 +143,15 @@ export default async function Page(props: {
     if (foundUser) {
       let idpLink;
       try {
-        idpLink = await addIDPLink(
-          {
+        idpLink = await addIDPLink({
+          host,
+          idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
             userName: idpInformation.userName,
           },
-          foundUser.userId,
-        );
+          userId: foundUser.userId,
+        });
       } catch (error) {
         console.error(error);
         return linkingFailed(branding);
@@ -175,11 +185,14 @@ export default async function Page(props: {
       const suffix = matched?.[1] ?? "";
 
       // this just returns orgs where the suffix is set as primary domain
-      const orgs = await getOrgsByDomain(suffix);
+      const orgs = await getOrgsByDomain({ host, domain: suffix });
       const orgToCheckForDiscovery =
         orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
-      const orgLoginSettings = await getLoginSettings(orgToCheckForDiscovery);
+      const orgLoginSettings = await getLoginSettings({
+        host,
+        organization: orgToCheckForDiscovery,
+      });
       if (orgLoginSettings?.allowDomainDiscovery) {
         orgToRegisterOn = orgToCheckForDiscovery;
       }
@@ -196,7 +209,7 @@ export default async function Page(props: {
       });
     }
 
-    const newUser = await addHuman(userData);
+    const newUser = await addHuman({ host, request: userData });
 
     if (newUser) {
       return (
