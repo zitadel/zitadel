@@ -10,6 +10,7 @@ import {
   getSession,
 } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -22,13 +23,27 @@ export default async function Page(props: {
   const { loginName, altPassword, authRequestId, organization, sessionId } =
     searchParams;
 
-  const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({ loginName, organization });
+  const host = (await headers()).get("host");
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const sessionFactors = sessionId
+    ? await loadSessionById(host, sessionId, organization)
+    : await loadMostRecentSession({
+        host,
+        sessionParams: { loginName, organization },
+      });
+
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      host,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -38,9 +53,9 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({ host, organization });
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({ host, organization });
 
   return (
     <DynamicTheme branding={branding}>

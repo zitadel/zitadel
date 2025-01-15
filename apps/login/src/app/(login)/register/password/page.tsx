@@ -9,6 +9,7 @@ import {
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -20,8 +21,14 @@ export default async function Page(props: {
   let { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg({ host });
     if (org) {
       organization = org.id;
     }
@@ -29,13 +36,15 @@ export default async function Page(props: {
 
   const missingData = !firstname || !lastname || !email;
 
-  const legal = await getLegalAndSupportSettings(organization);
-  const passwordComplexitySettings =
-    await getPasswordComplexitySettings(organization);
+  const legal = await getLegalAndSupportSettings({ host, organization });
+  const passwordComplexitySettings = await getPasswordComplexitySettings({
+    host,
+    organization,
+  });
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({ host, organization });
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({ host, organization });
 
   return missingData ? (
     <DynamicTheme branding={branding}>

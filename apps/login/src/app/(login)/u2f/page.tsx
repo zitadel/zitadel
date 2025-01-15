@@ -6,6 +6,7 @@ import { getSessionCookieById } from "@/lib/cookies";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -17,15 +18,29 @@ export default async function Page(props: {
 
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
-  const branding = await getBrandingSettings(organization);
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const branding = await getBrandingSettings({ host, organization });
 
   const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({ loginName, organization });
+    ? await loadSessionById(host, sessionId, organization)
+    : await loadMostRecentSession({
+        host,
+        sessionParams: { loginName, organization },
+      });
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      host,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {

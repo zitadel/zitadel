@@ -9,6 +9,7 @@ import {
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -23,29 +24,38 @@ export default async function Page(props: {
   const suffix = searchParams?.suffix;
   const submit: boolean = searchParams?.submit === "true";
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg({ host });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const loginSettings = await getLoginSettings(
-    organization ?? defaultOrganization,
-  );
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: organization ?? defaultOrganization,
+  });
 
-  const contextLoginSettings = await getLoginSettings(organization);
+  const contextLoginSettings = await getLoginSettings({ host, organization });
 
-  const identityProviders = await getActiveIdentityProviders(
-    organization ?? defaultOrganization,
-  ).then((resp) => {
+  const identityProviders = await getActiveIdentityProviders({
+    host,
+    orgId: organization ?? defaultOrganization,
+  }).then((resp) => {
     return resp.identityProviders;
   });
 
-  const branding = await getBrandingSettings(
-    organization ?? defaultOrganization,
-  );
+  const branding = await getBrandingSettings({
+    host,
+    organization: organization ?? defaultOrganization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

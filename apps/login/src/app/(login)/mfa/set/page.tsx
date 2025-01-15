@@ -15,6 +15,7 @@ import {
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 function isSessionValid(session: Partial<Session>): {
   valid: boolean;
@@ -49,19 +50,25 @@ export default async function Page(props: {
     sessionId,
   } = searchParams;
 
-  const sessionWithData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+  const host = (await headers()).get("host");
 
-  async function getAuthMethodsAndUser(session?: Session) {
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const sessionWithData = sessionId
+    ? await loadSessionById(host, sessionId, organization)
+    : await loadSessionByLoginname(host, loginName, organization);
+
+  async function getAuthMethodsAndUser(host: string, session?: Session) {
     const userId = session?.factors?.user?.id;
 
     if (!userId) {
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes(userId).then((methods) => {
-      return getUserByID(userId).then((user) => {
+    return listAuthenticationMethodTypes({ host, userId }).then((methods) => {
+      return getUserByID({ host, userId }).then((user) => {
         const humanUser =
           user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
@@ -77,31 +84,41 @@ export default async function Page(props: {
   }
 
   async function loadSessionByLoginname(
+    host: string,
     loginName?: string,
     organization?: string,
   ) {
     return loadMostRecentSession({
-      loginName,
-      organization,
+      host,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     }).then((session) => {
-      return getAuthMethodsAndUser(session);
+      return getAuthMethodsAndUser(host, session);
     });
   }
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      host,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(sessionResponse.session);
+      return getAuthMethodsAndUser(host, sessionResponse.session);
     });
   }
 
-  const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(
-    sessionWithData.factors?.user?.organizationId,
-  );
+  const branding = await getBrandingSettings({ host, organization });
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: sessionWithData.factors?.user?.organizationId,
+  });
 
   const { valid } = isSessionValid(sessionWithData);
 

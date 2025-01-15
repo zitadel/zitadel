@@ -18,12 +18,17 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-async function loadSession(loginName: string, authRequestId?: string) {
+async function loadSession(
+  host: string,
+  loginName: string,
+  authRequestId?: string,
+) {
   const recent = await getMostRecentCookieWithLoginname({ loginName });
 
   if (authRequestId) {
-    return createCallback(
-      create(CreateCallbackRequestSchema, {
+    return createCallback({
+      host,
+      req: create(CreateCallbackRequestSchema, {
         authRequestId,
         callbackKind: {
           case: "session",
@@ -33,17 +38,19 @@ async function loadSession(loginName: string, authRequestId?: string) {
           }),
         },
       }),
-    ).then(({ callbackUrl }) => {
+    }).then(({ callbackUrl }) => {
       return redirect(callbackUrl);
     });
   }
-  return getSession({ sessionId: recent.id, sessionToken: recent.token }).then(
-    (response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    },
-  );
+  return getSession({
+    host,
+    sessionId: recent.id,
+    sessionToken: recent.token,
+  }).then((response) => {
+    if (response?.session) {
+      return response.session;
+    }
+  });
 }
 
 export default async function Page(props: { searchParams: Promise<any> }) {

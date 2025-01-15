@@ -5,6 +5,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -17,12 +18,21 @@ export default async function Page(props: {
   const { loginName, prompt, organization, authRequestId, userId } =
     searchParams;
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const session = await loadMostRecentSession({
-    loginName,
-    organization,
+    host,
+    sessionParams: {
+      loginName,
+      organization,
+    },
   });
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({ host, organization });
 
   return (
     <DynamicTheme branding={branding}>

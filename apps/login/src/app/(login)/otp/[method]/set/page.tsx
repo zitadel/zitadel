@@ -14,6 +14,7 @@ import {
 } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -31,18 +32,27 @@ export default async function Page(props: {
     searchParams;
   const { method } = params;
 
-  const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(organization);
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const branding = await getBrandingSettings({ host, organization });
+  const loginSettings = await getLoginSettings({ host, organization });
 
   const session = await loadMostRecentSession({
-    loginName,
-    organization,
+    host,
+    sessionParams: {
+      loginName,
+      organization,
+    },
   });
 
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      await registerTOTP(session.factors.user.id)
+      await registerTOTP({ host, userId: session.factors.user.id })
         .then((resp) => {
           if (resp) {
             totpResponse = resp;
@@ -53,14 +63,18 @@ export default async function Page(props: {
         });
     } else if (method === "sms") {
       // does not work
-      await addOTPSMS(session.factors.user.id).catch((error) => {
-        error = new Error("Could not add OTP via SMS");
-      });
+      await addOTPSMS({ host, userId: session.factors.user.id }).catch(
+        (error) => {
+          error = new Error("Could not add OTP via SMS");
+        },
+      );
     } else if (method === "email") {
       // works
-      await addOTPEmail(session.factors.user.id).catch((error) => {
-        error = new Error("Could not add OTP via Email");
-      });
+      await addOTPEmail({ host, userId: session.factors.user.id }).catch(
+        (error) => {
+          error = new Error("Could not add OTP via Email");
+        },
+      );
     } else {
       throw new Error("Invalid method");
     }

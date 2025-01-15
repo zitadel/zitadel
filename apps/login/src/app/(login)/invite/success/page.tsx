@@ -5,6 +5,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getBrandingSettings, getDefaultOrg, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 export default async function Page(props: {
@@ -16,8 +17,14 @@ export default async function Page(props: {
 
   let { userId, organization } = searchParams;
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   if (!organization) {
-    const org = await getDefaultOrg();
+    const org = await getDefaultOrg({ host });
     if (!org) {
       throw new Error("No default organization found");
     }
@@ -25,12 +32,12 @@ export default async function Page(props: {
     organization = org.id;
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({ host, organization });
 
   let user: User | undefined;
   let human: HumanUser | undefined;
   if (userId) {
-    const userResponse = await getUserByID(userId);
+    const userResponse = await getUserByID({ host, userId });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {

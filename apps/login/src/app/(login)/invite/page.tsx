@@ -8,6 +8,7 @@ import {
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -18,8 +19,14 @@ export default async function Page(props: {
 
   let { firstname, lastname, email, organization } = searchParams;
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   if (!organization) {
-    const org = await getDefaultOrg();
+    const org = await getDefaultOrg({ host });
     if (!org) {
       throw new Error("No default organization found");
     }
@@ -27,12 +34,14 @@ export default async function Page(props: {
     organization = org.id;
   }
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({ host, organization });
 
-  const passwordComplexitySettings =
-    await getPasswordComplexitySettings(organization);
+  const passwordComplexitySettings = await getPasswordComplexitySettings({
+    host,
+    organization,
+  });
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({ host, organization });
 
   return (
     <DynamicTheme branding={branding}>

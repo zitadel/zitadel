@@ -11,6 +11,7 @@ import {
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -22,41 +23,58 @@ export default async function Page(props: {
 
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(host, sessionId, organization)
+    : await loadSessionByLoginname(host, loginName, organization);
 
   async function loadSessionByLoginname(
+    host: string,
     loginName?: string,
     organization?: string,
   ) {
     return loadMostRecentSession({
-      loginName,
-      organization,
+      host,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     }).then((session) => {
       if (session && session.factors?.user?.id) {
-        return listAuthenticationMethodTypes(session.factors.user.id).then(
-          (methods) => {
-            return {
-              factors: session?.factors,
-              authMethods: methods.authMethodTypes ?? [],
-            };
-          },
-        );
+        return listAuthenticationMethodTypes({
+          host,
+          userId: session.factors.user.id,
+        }).then((methods) => {
+          return {
+            factors: session?.factors,
+            authMethods: methods.authMethodTypes ?? [],
+          };
+        });
       }
     });
   }
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      host,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes(
-          response.session.factors.user.id,
-        ).then((methods) => {
+        return listAuthenticationMethodTypes({
+          host,
+          userId: response.session.factors.user.id,
+        }).then((methods) => {
           return {
             factors: response.session?.factors,
             authMethods: methods.authMethodTypes ?? [],
@@ -66,7 +84,7 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({ host, organization });
 
   return (
     <DynamicTheme branding={branding}>

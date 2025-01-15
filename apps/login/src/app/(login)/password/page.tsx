@@ -11,6 +11,7 @@ import {
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -22,9 +23,15 @@ export default async function Page(props: {
 
   let { loginName, organization, authRequestId, alt } = searchParams;
 
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg({ host });
 
     if (org) {
       defaultOrganization = org.id;
@@ -35,20 +42,25 @@ export default async function Page(props: {
   let sessionFactors;
   try {
     sessionFactors = await loadMostRecentSession({
-      loginName,
-      organization,
+      host,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     });
   } catch (error) {
     // ignore error to continue to show the password form
     console.warn(error);
   }
 
-  const branding = await getBrandingSettings(
-    organization ?? defaultOrganization,
-  );
-  const loginSettings = await getLoginSettings(
-    organization ?? defaultOrganization,
-  );
+  const branding = await getBrandingSettings({
+    host,
+    organization: organization ?? defaultOrganization,
+  });
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: organization ?? defaultOrganization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

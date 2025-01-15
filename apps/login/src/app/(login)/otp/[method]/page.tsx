@@ -42,7 +42,10 @@ export default async function Page(props: {
 
   const session = sessionId
     ? await loadSessionById(host, sessionId, organization)
-    : await loadMostRecentSession({ loginName, organization });
+    : await loadMostRecentSession({
+        host,
+        sessionParams: { loginName, organization },
+      });
 
   async function loadSessionById(
     host: string,

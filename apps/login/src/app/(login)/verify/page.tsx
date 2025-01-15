@@ -13,6 +13,7 @@ import {
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
@@ -23,7 +24,13 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const { userId, loginName, code, organization, authRequestId, invite } =
     searchParams;
 
-  const branding = await getBrandingSettings(organization);
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const branding = await getBrandingSettings({ host, organization });
 
   let sessionFactors;
   let user: User | undefined;
@@ -34,12 +41,16 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
-      loginName,
-      organization,
+      host,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
       await sendEmailCode({
+        host,
         userId: sessionFactors?.factors?.user?.id,
         authRequestId,
       }).catch((error) => {
@@ -50,6 +61,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   } else if ("userId" in searchParams && userId) {
     if (doSend) {
       await sendEmailCode({
+        host,
         userId,
         authRequestId,
       }).catch((error) => {

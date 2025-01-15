@@ -191,19 +191,32 @@ type resendVerifyEmailCommand = {
 export async function resendVerification(command: resendVerifyEmailCommand) {
   const host = (await headers()).get("host");
 
+  if (!host) {
+    return { error: "No host found" };
+  }
+
   return command.isInvite
-    ? resendInviteCode(command.userId)
-    : resendEmailCode(command.userId, host, command.authRequestId);
+    ? resendInviteCode({ host, userId: command.userId })
+    : resendEmailCode({
+        userId: command.userId,
+        host,
+        authRequestId: command.authRequestId,
+      });
 }
 
 type sendEmailCommand = {
+  host: string;
   userId: string;
   authRequestId?: string;
 };
 
 export async function sendEmailCode(command: sendEmailCommand) {
   const host = (await headers()).get("host");
-  return zitadelSendEmailCode(command.userId, host, command.authRequestId);
+  return zitadelSendEmailCode({
+    userId: command.userId,
+    host: command.host,
+    authRequestId: command.authRequestId,
+  });
 }
 
 export type SendVerificationRedirectWithoutCheckCommand = {
