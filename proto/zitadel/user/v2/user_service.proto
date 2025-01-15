@@ -163,6 +163,16 @@ service UserService {
         success_code: 200
       }
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
   }
   // Search Users
   //

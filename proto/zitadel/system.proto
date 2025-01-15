@@ -9,6 +9,7 @@ import "zitadel/auth_n_key.proto";
 import "zitadel/feature.proto";
 
 import "google/api/annotations.proto";
+import "google/api/visibility.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -92,6 +93,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service SystemService {
+  option (google.api.api_visibility).restriction = "OLD";
   //Indicates if ZITADEL is running.
   // It respondes as soon as ZITADEL started
   rpc Healthz(HealthzRequest) returns (HealthzResponse) {

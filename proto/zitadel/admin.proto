@@ -18,6 +18,7 @@ import "zitadel/milestone/v1/milestone.proto";
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/api/visibility.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
@@ -203,6 +204,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service AdminService {
+    option (google.api.api_visibility).restriction = "OLD";
     rpc Healthz(HealthzRequest) returns (HealthzResponse) {
         option (google.api.http) = {
             get: "/healthz";
