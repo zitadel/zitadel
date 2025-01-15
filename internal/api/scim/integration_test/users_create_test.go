@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
+	"github.com/zitadel/zitadel/internal/test"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
@@ -55,6 +56,104 @@ var (
 
 	//go:embed testdata/users_create_test_invalid_timezone.json
 	invalidTimeZoneUserJson []byte
+
+	fullUser = &resources.ScimUser{
+		ExternalID: "701984",
+		UserName:   "bjensen@example.com",
+		Name: &resources.ScimUserName{
+			Formatted:       "Babs Jensen", // DisplayName takes precedence in Zitadel
+			FamilyName:      "Jensen",
+			GivenName:       "Barbara",
+			MiddleName:      "Jane",
+			HonorificPrefix: "Ms.",
+			HonorificSuffix: "III",
+		},
+		DisplayName: "Babs Jensen",
+		NickName:    "Babs",
+		ProfileUrl:  test.Must(schemas.ParseHTTPURL("http://login.example.com/bjensen")),
+		Emails: []*resources.ScimEmail{
+			{
+				Value:   "bjensen@example.com",
+				Primary: true,
+			},
+		},
+		Addresses: []*resources.ScimAddress{
+			{
+				Type:          "work",
+				StreetAddress: "100 Universal City Plaza",
+				Locality:      "Hollywood",
+				Region:        "CA",
+				PostalCode:    "91608",
+				Country:       "USA",
+				Formatted:     "100 Universal City Plaza\nHollywood, CA 91608 USA",
+				Primary:       true,
+			},
+			{
+				Type:          "home",
+				StreetAddress: "456 Hollywood Blvd",
+				Locality:      "Hollywood",
+				Region:        "CA",
+				PostalCode:    "91608",
+				Country:       "USA",
+				Formatted:     "456 Hollywood Blvd\nHollywood, CA 91608 USA",
+			},
+		},
+		PhoneNumbers: []*resources.ScimPhoneNumber{
+			{
+				Value:   "+415555555555",
+				Primary: true,
+			},
+		},
+		Ims: []*resources.ScimIms{
+			{
+				Value: "someaimhandle",
+				Type:  "aim",
+			},
+			{
+				Value: "twitterhandle",
+				Type:  "X",
+			},
+		},
+		Photos: []*resources.ScimPhoto{
+			{
+				Value: *test.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/F")),
+				Type:  "photo",
+			},
+		},
+		Roles: []*resources.ScimRole{
+			{
+				Value:   "my-role-1",
+				Display: "Rolle 1",
+				Type:    "main-role",
+				Primary: true,
+			},
+			{
+				Value:   "my-role-2",
+				Display: "Rolle 2",
+				Type:    "secondary-role",
+				Primary: false,
+			},
+		},
+		Entitlements: []*resources.ScimEntitlement{
+			{
+				Value:   "my-entitlement-1",
+				Display: "Entitlement 1",
+				Type:    "main-entitlement",
+				Primary: true,
+			},
+			{
+				Value:   "my-entitlement-2",
+				Display: "Entitlement 2",
+				Type:    "secondary-entitlement",
+				Primary: false,
+			},
+		},
+		Title:             "Tour Guide",
+		PreferredLanguage: language.MustParse("en-US"),
+		Locale:            "en-US",
+		Timezone:          "America/Los_Angeles",
+		Active:            gu.Ptr(true),
+	}
 )
 
 func TestCreateUser(t *testing.T) {
@@ -95,103 +194,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			name: "full user",
 			body: fullUserJson,
-			want: &resources.ScimUser{
-				ExternalID: "701984",
-				UserName:   "bjensen@example.com",
-				Name: &resources.ScimUserName{
-					Formatted:       "Babs Jensen", // DisplayName takes precedence in Zitadel
-					FamilyName:      "Jensen",
-					GivenName:       "Barbara",
-					MiddleName:      "Jane",
-					HonorificPrefix: "Ms.",
-					HonorificSuffix: "III",
-				},
-				DisplayName: "Babs Jensen",
-				NickName:    "Babs",
-				ProfileUrl:  integration.Must(schemas.ParseHTTPURL("http://login.example.com/bjensen")),
-				Emails: []*resources.ScimEmail{
-					{
-						Value:   "bjensen@example.com",
-						Primary: true,
-					},
-				},
-				Addresses: []*resources.ScimAddress{
-					{
-						Type:          "work",
-						StreetAddress: "100 Universal City Plaza",
-						Locality:      "Hollywood",
-						Region:        "CA",
-						PostalCode:    "91608",
-						Country:       "USA",
-						Formatted:     "100 Universal City Plaza\nHollywood, CA 91608 USA",
-						Primary:       true,
-					},
-					{
-						Type:          "home",
-						StreetAddress: "456 Hollywood Blvd",
-						Locality:      "Hollywood",
-						Region:        "CA",
-						PostalCode:    "91608",
-						Country:       "USA",
-						Formatted:     "456 Hollywood Blvd\nHollywood, CA 91608 USA",
-					},
-				},
-				PhoneNumbers: []*resources.ScimPhoneNumber{
-					{
-						Value:   "+415555555555",
-						Primary: true,
-					},
-				},
-				Ims: []*resources.ScimIms{
-					{
-						Value: "someaimhandle",
-						Type:  "aim",
-					},
-					{
-						Value: "twitterhandle",
-						Type:  "X",
-					},
-				},
-				Photos: []*resources.ScimPhoto{
-					{
-						Value: *integration.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/F")),
-						Type:  "photo",
-					},
-				},
-				Roles: []*resources.ScimRole{
-					{
-						Value:   "my-role-1",
-						Display: "Rolle 1",
-						Type:    "main-role",
-						Primary: true,
-					},
-					{
-						Value:   "my-role-2",
-						Display: "Rolle 2",
-						Type:    "secondary-role",
-						Primary: false,
-					},
-				},
-				Entitlements: []*resources.ScimEntitlement{
-					{
-						Value:   "my-entitlement-1",
-						Display: "Entitlement 1",
-						Type:    "main-entitlement",
-						Primary: true,
-					},
-					{
-						Value:   "my-entitlement-2",
-						Display: "Entitlement 2",
-						Type:    "secondary-entitlement",
-						Primary: false,
-					},
-				},
-				Title:             "Tour Guide",
-				PreferredLanguage: language.MustParse("en-US"),
-				Locale:            "en-US",
-				Timezone:          "America/Los_Angeles",
-				Active:            gu.Ptr(true),
-			},
+			want: fullUser,
 		},
 		{
 			name:          "missing userName",
@@ -290,7 +293,7 @@ func TestCreateUser(t *testing.T) {
 			assert.Nil(t, createdUser.Password)
 
 			if tt.want != nil {
-				if !integration.PartiallyDeepEqual(tt.want, createdUser) {
+				if !test.PartiallyDeepEqual(tt.want, createdUser) {
 					t.Errorf("CreateUser() got = %v, want %v", createdUser, tt.want)
 				}
 
@@ -299,7 +302,7 @@ func TestCreateUser(t *testing.T) {
 					// ensure the user is really stored and not just returned to the caller
 					fetchedUser, err := Instance.Client.SCIM.Users.Get(CTX, Instance.DefaultOrg.Id, createdUser.ID)
 					require.NoError(ttt, err)
-					if !integration.PartiallyDeepEqual(tt.want, fetchedUser) {
+					if !test.PartiallyDeepEqual(tt.want, fetchedUser) {
 						ttt.Errorf("GetUser() got = %v, want %v", fetchedUser, tt.want)
 					}
 				}, retryDuration, tick)
@@ -315,6 +318,7 @@ func TestCreateUser_duplicate(t *testing.T) {
 	_, err = Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, minimalUserJson)
 	scimErr := scim.RequireScimError(t, http.StatusConflict, err)
 	assert.Equal(t, "User already exists", scimErr.Error.Detail)
+	assert.Equal(t, "uniqueness", scimErr.Error.ScimType)
 
 	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
 	require.NoError(t, err)
@@ -341,19 +345,19 @@ func TestCreateUser_metadata(t *testing.T) {
 			mdMap[md.Result[i].Key] = string(md.Result[i].Value)
 		}
 
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:name.honorificPrefix", "Ms.")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:timezone", "America/Los_Angeles")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:photos", `[{"value":"https://photos.example.com/profilephoto/72930000000Ccne/F","type":"photo"},{"value":"https://photos.example.com/profilephoto/72930000000Ccne/T","type":"thumbnail"}]`)
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:addresses", `[{"type":"work","streetAddress":"100 Universal City Plaza","locality":"Hollywood","region":"CA","postalCode":"91608","country":"USA","formatted":"100 Universal City Plaza\nHollywood, CA 91608 USA","primary":true},{"type":"home","streetAddress":"456 Hollywood Blvd","locality":"Hollywood","region":"CA","postalCode":"91608","country":"USA","formatted":"456 Hollywood Blvd\nHollywood, CA 91608 USA"}]`)
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:entitlements", `[{"value":"my-entitlement-1","display":"Entitlement 1","type":"main-entitlement","primary":true},{"value":"my-entitlement-2","display":"Entitlement 2","type":"secondary-entitlement"}]`)
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:externalId", "701984")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:name.middleName", "Jane")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:name.honorificSuffix", "III")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:profileURL", "http://login.example.com/bjensen")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:title", "Tour Guide")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:locale", "en-US")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:ims", `[{"value":"someaimhandle","type":"aim"},{"value":"twitterhandle","type":"X"}]`)
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:roles", `[{"value":"my-role-1","display":"Rolle 1","type":"main-role","primary":true},{"value":"my-role-2","display":"Rolle 2","type":"secondary-role"}]`)
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:name.honorificPrefix", "Ms.")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:timezone", "America/Los_Angeles")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:photos", `[{"value":"https://photos.example.com/profilephoto/72930000000Ccne/F","type":"photo"},{"value":"https://photos.example.com/profilephoto/72930000000Ccne/T","type":"thumbnail"}]`)
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:addresses", `[{"type":"work","streetAddress":"100 Universal City Plaza","locality":"Hollywood","region":"CA","postalCode":"91608","country":"USA","formatted":"100 Universal City Plaza\nHollywood, CA 91608 USA","primary":true},{"type":"home","streetAddress":"456 Hollywood Blvd","locality":"Hollywood","region":"CA","postalCode":"91608","country":"USA","formatted":"456 Hollywood Blvd\nHollywood, CA 91608 USA"}]`)
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:entitlements", `[{"value":"my-entitlement-1","display":"Entitlement 1","type":"main-entitlement","primary":true},{"value":"my-entitlement-2","display":"Entitlement 2","type":"secondary-entitlement"}]`)
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:externalId", "701984")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:name.middleName", "Jane")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:name.honorificSuffix", "III")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:profileURL", "http://login.example.com/bjensen")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:title", "Tour Guide")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:locale", "en-US")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:ims", `[{"value":"someaimhandle","type":"aim"},{"value":"twitterhandle","type":"X"}]`)
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:roles", `[{"value":"my-role-1","display":"Rolle 1","type":"main-role","primary":true},{"value":"my-role-2","display":"Rolle 2","type":"secondary-role"}]`)
 	}, retryDuration, tick)
 }
 
