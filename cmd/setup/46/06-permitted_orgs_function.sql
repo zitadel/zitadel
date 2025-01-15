@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
     , org_ids OUT TEXT[]
 )
 	LANGUAGE 'plpgsql'
-	STABLE PARALLEL SAFE
+	STABLE
 AS $$
 DECLARE
 	matched_roles TEXT[]; -- roles containing permission
