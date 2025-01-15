@@ -168,6 +168,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: dbClient}
 	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: dbClient}
 	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: dbClient}
+	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -222,6 +223,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s36FillV2Milestones,
 		steps.s38BackChannelLogoutNotificationStart,
 		steps.s44ReplaceCurrentSequencesIndex,
+		steps.s45CorrectProjectOwners,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
