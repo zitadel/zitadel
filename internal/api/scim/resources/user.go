@@ -140,8 +140,23 @@ func (h *UsersHandler) Create(ctx context.Context, user *ScimUser) (*ScimUser, e
 		return nil, err
 	}
 
-	user.ID = addHuman.Details.ID
-	user.Resource = buildResource(ctx, h, addHuman.Details)
+	h.mapAddCommandToScimUser(ctx, user, addHuman)
+	return user, nil
+}
+
+func (h *UsersHandler) Replace(ctx context.Context, id string, user *ScimUser) (*ScimUser, error) {
+	user.ID = id
+	changeHuman, err := h.mapToChangeHuman(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.command.ChangeUserHuman(ctx, changeHuman, h.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+
+	h.mapChangeCommandToScimUser(ctx, user, changeHuman)
 	return user, nil
 }
 
@@ -153,6 +168,19 @@ func (h *UsersHandler) Delete(ctx context.Context, id string) error {
 
 	_, err = h.command.RemoveUserV2(ctx, id, memberships, grants...)
 	return err
+}
+
+func (h *UsersHandler) Get(ctx context.Context, id string) (*ScimUser, error) {
+	user, err := h.query.GetUserByID(ctx, false, id)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata, err := h.queryMetadataForUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return h.mapToScimUser(ctx, user, metadata), nil
 }
 
 func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {

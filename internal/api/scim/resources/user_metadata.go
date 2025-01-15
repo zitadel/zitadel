@@ -12,8 +12,71 @@ import (
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/api/scim/serrors"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func (h *UsersHandler) queryMetadataForUser(ctx context.Context, id string) (map[metadata.ScopedKey][]byte, error) {
+	queries := h.buildMetadataQueries(ctx)
+
+	md, err := h.query.SearchUserMetadata(ctx, false, id, queries, false)
+	if err != nil {
+		return nil, err
+	}
+
+	metadataMap := make(map[metadata.ScopedKey][]byte, len(md.Metadata))
+	for _, entry := range md.Metadata {
+		metadataMap[metadata.ScopedKey(entry.Key)] = entry.Value
+	}
+
+	return metadataMap, nil
+}
+
+func (h *UsersHandler) buildMetadataQueries(ctx context.Context) *query.UserMetadataSearchQueries {
+	keyQueries := make([]query.SearchQuery, len(metadata.ScimUserRelevantMetadataKeys))
+	for i, key := range metadata.ScimUserRelevantMetadataKeys {
+		keyQueries[i] = buildMetadataKeyQuery(ctx, key)
+	}
+
+	queries := &query.UserMetadataSearchQueries{
+		SearchRequest: query.SearchRequest{},
+		Queries:       []query.SearchQuery{query.Or(keyQueries...)},
+	}
+	return queries
+}
+
+func buildMetadataKeyQuery(ctx context.Context, key metadata.Key) query.SearchQuery {
+	scopedKey := metadata.ScopeKey(ctx, key)
+	q, err := query.NewUserMetadataKeySearchQuery(string(scopedKey), query.TextEquals)
+	if err != nil {
+		logging.Panic("Error build user metadata query for key " + key)
+	}
+
+	return q
+}
+
+func (h *UsersHandler) mapMetadataToDomain(ctx context.Context, user *ScimUser) (md []*domain.Metadata, skippedMetadata []string, err error) {
+	md = make([]*domain.Metadata, 0, len(metadata.ScimUserRelevantMetadataKeys))
+	for _, key := range metadata.ScimUserRelevantMetadataKeys {
+		var value []byte
+		value, err = getValueForMetadataKey(user, key)
+		if err != nil {
+			return
+		}
+
+		if len(value) > 0 {
+			md = append(md, &domain.Metadata{
+				Key:   string(metadata.ScopeKey(ctx, key)),
+				Value: value,
+			})
+		} else {
+			skippedMetadata = append(skippedMetadata, string(metadata.ScopeKey(ctx, key)))
+		}
+	}
+
+	return
+}
 
 func (h *UsersHandler) mapMetadataToCommands(ctx context.Context, user *ScimUser) ([]*command.AddMetadataEntry, error) {
 	md := make([]*command.AddMetadataEntry, 0, len(metadata.ScimUserRelevantMetadataKeys))
@@ -51,7 +114,17 @@ func getValueForMetadataKey(user *ScimUser, key metadata.Key) ([]byte, error) {
 	case metadata.KeyAddresses:
 		fallthrough
 	case metadata.KeyRoles:
-		return json.Marshal(value)
+		val, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+
+		// null is considered no value
+		if len(val) == 4 && string(val) == "null" {
+			return nil, nil
+		}
+
+		return val, nil
 
 	// http url values
 	case metadata.KeyProfileUrl:
@@ -147,4 +220,37 @@ func getRawValueForMetadataKey(user *ScimUser, key metadata.Key) interface{} {
 
 	logging.Panicf("Unknown or unsupported metadata key %s", key)
 	return nil
+}
+
+func extractScalarMetadata(ctx context.Context, md map[metadata.ScopedKey][]byte, key metadata.Key) string {
+	val, ok := md[metadata.ScopeKey(ctx, key)]
+	if !ok {
+		return ""
+	}
+
+	return string(val)
+}
+
+func extractHttpURLMetadata(ctx context.Context, md map[metadata.ScopedKey][]byte, key metadata.Key) *schemas.HttpURL {
+	val, ok := md[metadata.ScopeKey(ctx, key)]
+	if !ok {
+		return nil
+	}
+
+	url, err := schemas.ParseHTTPURL(string(val))
+	if err != nil {
+		logging.OnError(err).Warn("Failed to parse scim url metadata for " + key)
+		return nil
+	}
+
+	return url
+}
+
+func extractJsonMetadata(ctx context.Context, md map[metadata.ScopedKey][]byte, key metadata.Key, v interface{}) error {
+	val, ok := md[metadata.ScopeKey(ctx, key)]
+	if !ok {
+		return nil
+	}
+
+	return json.Unmarshal(val, v)
 }
