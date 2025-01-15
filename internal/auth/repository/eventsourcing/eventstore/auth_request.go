@@ -1065,8 +1065,10 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return nil, err
 	}
 	noLocalAuth := request.LoginPolicy != nil && !request.LoginPolicy.AllowUsernamePassword
-	if (!isInternalLogin || len(idps.Links) > 0 || noLocalAuth) && len(request.LinkingUsers) == 0 {
-		step, err := repo.idpChecked(request, idps.Links, userSession)
+
+	allowedLinkedIDPs := checkForAllowedIDPs(request.AllowedExternalIDPs, idps.Links)
+	if (!isInternalLogin || len(allowedLinkedIDPs) > 0 || noLocalAuth) && len(request.LinkingUsers) == 0 {
+		step, err := repo.idpChecked(request, allowedLinkedIDPs, userSession)
 		if err != nil {
 			return nil, err
 		}
@@ -1144,6 +1146,19 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		steps = append(steps, &domain.LoginSucceededStep{})
 	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
+}
+
+func checkForAllowedIDPs(allowedIDPs []*domain.IDPProvider, idps []*query.IDPUserLink) (_ []string) {
+	allowedLinkedIDPs := make([]string, 0, len(idps))
+	// only use allowed linked idps
+	for _, idp := range idps {
+		for _, allowedIdP := range allowedIDPs {
+			if idp.IDPID == allowedIdP.IDPConfigID {
+				allowedLinkedIDPs = append(allowedLinkedIDPs, allowedIdP.IDPConfigID)
+			}
+		}
+	}
+	return allowedLinkedIDPs
 }
 
 func passwordAgeChangeRequired(policy *domain.PasswordAgePolicy, changed time.Time) bool {
@@ -1299,7 +1314,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(ctx context.Context, request *do
 	return &domain.PasswordStep{}
 }
 
-func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []*query.IDPUserLink, userSession *user_model.UserSessionView) (domain.NextStep, error) {
+func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []string, userSession *user_model.UserSessionView) (domain.NextStep, error) {
 	if checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
 		request.IDPLoginChecked = true
 		request.AuthTime = userSession.ExternalLoginVerification
@@ -1307,15 +1322,27 @@ func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []*que
 	}
 	// use the explicitly set IdP first
 	if request.SelectedIDPConfigID != "" {
-		return &domain.ExternalLoginStep{SelectedIDPConfigID: request.SelectedIDPConfigID}, nil
+		// only use the explicitly set IdP if allowed
+		for _, allowedIdP := range request.AllowedExternalIDPs {
+			if request.SelectedIDPConfigID == allowedIdP.IDPConfigID {
+				return &domain.ExternalLoginStep{SelectedIDPConfigID: request.SelectedIDPConfigID}, nil
+			}
+		}
+		// error if the explicitly set IdP is not allowed, to avoid misinterpretation with usage of another IdP
+		return nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-LWif2", "Errors.Org.IdpNotExisting")
 	}
 	// reuse the previously used IdP from the session
 	if userSession.SelectedIDPConfigID != "" {
-		return &domain.ExternalLoginStep{SelectedIDPConfigID: userSession.SelectedIDPConfigID}, nil
+		// only use the previously used IdP if allowed
+		for _, allowedIdP := range request.AllowedExternalIDPs {
+			if userSession.SelectedIDPConfigID == allowedIdP.IDPConfigID {
+				return &domain.ExternalLoginStep{SelectedIDPConfigID: userSession.SelectedIDPConfigID}, nil
+			}
+		}
 	}
-	// then use an existing linked IdP of the user
+	// then use an existing linked and allowed IdP of the user
 	if len(idps) > 0 {
-		return &domain.ExternalLoginStep{SelectedIDPConfigID: idps[0].IDPID}, nil
+		return &domain.ExternalLoginStep{SelectedIDPConfigID: idps[0]}, nil
 	}
 	// if the user did not link one, then just use one of the configured IdPs of the org
 	if len(request.AllowedExternalIDPs) > 0 {
