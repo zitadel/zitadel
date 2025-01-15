@@ -1,13 +1,17 @@
-import { create, Duration } from "@zitadel/client";
-import { createServerTransport } from "@zitadel/client/node";
-import { createSystemServiceClient } from "@zitadel/client/v1";
+import { Client, create, Duration } from "@zitadel/client";
 import { makeReqCtx } from "@zitadel/client/v2";
+import { IdentityProviderService } from "@zitadel/proto/zitadel/idp/v2/idp_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
+import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import {
+  Checks,
+  SessionService,
+} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { SettingsService } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { SendEmailVerificationCodeSchema } from "@zitadel/proto/zitadel/user/v2/email_pb";
 import type { RedirectURLsJson } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import {
@@ -31,12 +35,12 @@ import {
   SendEmailCodeRequestSchema,
   SetPasswordRequest,
   SetPasswordRequestSchema,
+  UserService,
   VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { unstable_cacheLife as cacheLife } from "next/cache";
-import { systemAPIToken } from "./api";
-import { ServiceInitializer } from "./service";
+import { createServiceForHost } from "./service";
 
 const useCache = process.env.DEBUG !== "true";
 
@@ -47,27 +51,32 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   return callback;
 }
 
-// Example usage
-const serviceInitializer = await ServiceInitializer.getInstance();
+// const idpService: Client<typeof IdentityProviderService> =
+//   await createServiceForHost(IdentityProviderService, host);
+// const orgService: Client<typeof OrganizationService> =
+//   await createServiceForHost(OrganizationService, host);
+// const sessionService: Client<typeof SessionService> =
+//   await createServiceForHost(SessionService, host);
+// const userService: Client<typeof UserService> = await createServiceForHost(
+//   UserService,
+//   host,
+// );
+// const oidcService: Client<typeof OIDCService> = await createServiceForHost(
+//   OIDCService,
+//   host,
+// );
+// const settingsService: Client<typeof SettingsService> =
+//   await createServiceForHost(SettingsService, host);
 
-export const {
-  sessionService,
-  idpService,
-  orgService,
-  settingsService,
-  oidcService,
-  userService,
-} = serviceInitializer;
+// const systemService = async () => {
+//   const systemToken = await systemAPIToken();
 
-const systemService = async () => {
-  const systemToken = await systemAPIToken();
+//   const transport = createServerTransport(systemToken, {
+//     baseUrl: process.env.ZITADEL_API_URL,
+//   });
 
-  const transport = createServerTransport(systemToken, {
-    baseUrl: process.env.ZITADEL_API_URL,
-  });
-
-  return createSystemServiceClient(transport);
-};
+//   return createSystemServiceClient(transport);
+// };
 
 export async function getInstanceByHost(host: string) {
   return (await systemService())
@@ -96,7 +105,8 @@ export async function getInstanceByHost(host: string) {
 }
 
 export async function getBrandingSettings(organization?: string) {
-  const settingsService = serviceInitializer.getSettingsService();
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, host);
 
   const callback = settingsService
     .getBrandingSettings({ ctx: makeReqCtx(organization) }, {})
@@ -106,7 +116,8 @@ export async function getBrandingSettings(organization?: string) {
 }
 
 export async function getLoginSettings(orgId?: string) {
-  const settingsService = serviceInitializer.getSettingsService();
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, host);
 
   const callback = settingsService
     .getLoginSettings({ ctx: makeReqCtx(orgId) }, {})
@@ -116,7 +127,10 @@ export async function getLoginSettings(orgId?: string) {
 }
 
 export async function listIDPLinks(userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.listIDPLinks(
     {
@@ -127,7 +141,10 @@ export async function listIDPLinks(userId: string) {
 }
 
 export async function addOTPEmail(userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.addOTPEmail(
     {
@@ -138,19 +155,26 @@ export async function addOTPEmail(userId: string) {
 }
 
 export async function addOTPSMS(userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.addOTPSMS({ userId }, {});
 }
 
 export async function registerTOTP(userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.registerTOTP({ userId }, {});
 }
 
 export async function getGeneralSettings() {
-  const settingsService = serviceInitializer.getSettingsService();
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, host);
 
   const callback = settingsService
     .getGeneralSettings({}, {})
@@ -160,7 +184,8 @@ export async function getGeneralSettings() {
 }
 
 export async function getLegalAndSupportSettings(organization?: string) {
-  const settingsService = serviceInitializer.getSettingsService();
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, host);
 
   const callback = settingsService
     .getLegalAndSupportSettings({ ctx: makeReqCtx(organization) }, {})
@@ -170,7 +195,8 @@ export async function getLegalAndSupportSettings(organization?: string) {
 }
 
 export async function getPasswordComplexitySettings(organization?: string) {
-  const settingsService = serviceInitializer.getSettingsService();
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, host);
 
   const callback = settingsService
     .getPasswordComplexitySettings({ ctx: makeReqCtx(organization) })
@@ -184,7 +210,8 @@ export async function createSessionFromChecks(
   challenges: RequestChallenges | undefined,
   lifetime?: Duration,
 ) {
-  const sessionService = serviceInitializer.getSessionService();
+  const sessionService: Client<typeof SessionService> =
+    await createServiceForHost(SessionService, host);
 
   return sessionService.createSession(
     {
@@ -204,7 +231,8 @@ export async function createSessionForUserIdAndIdpIntent(
   },
   lifetime?: Duration,
 ) {
-  const sessionService = serviceInitializer.getSessionService();
+  const sessionService: Client<typeof SessionService> =
+    await createServiceForHost(SessionService, host);
 
   return sessionService.createSession({
     checks: {
@@ -227,7 +255,8 @@ export async function setSession(
   checks?: Checks,
   lifetime?: Duration,
 ) {
-  const sessionService = serviceInitializer.getSessionService();
+  const sessionService: Client<typeof SessionService> =
+    await createServiceForHost(SessionService, host);
 
   return sessionService.setSession(
     {
@@ -249,19 +278,22 @@ export async function getSession({
   sessionId: string;
   sessionToken: string;
 }) {
-  const sessionService = serviceInitializer.getSessionService();
+  const sessionService: Client<typeof SessionService> =
+    await createServiceForHost(SessionService, host);
 
   return sessionService.getSession({ sessionId, sessionToken }, {});
 }
 
 export async function deleteSession(sessionId: string, sessionToken: string) {
-  const sessionService = serviceInitializer.getSessionService();
+  const sessionService: Client<typeof SessionService> =
+    await createServiceForHost(SessionService, host);
 
   return sessionService.deleteSession({ sessionId, sessionToken }, {});
 }
 
 export async function listSessions(ids: string[]) {
-  const sessionService = serviceInitializer.getSessionService();
+  const sessionService: Client<typeof SessionService> =
+    await createServiceForHost(SessionService, host);
 
   return sessionService.listSessions(
     {
@@ -293,7 +325,10 @@ export async function addHumanUser({
   password,
   organization,
 }: AddHumanUserData) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.addHumanUser({
     email: {
@@ -315,19 +350,28 @@ export async function addHumanUser({
 }
 
 export async function addHuman(request: AddHumanUserRequest) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.addHumanUser(request);
 }
 
 export async function verifyTOTPRegistration(code: string, userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.verifyTOTPRegistration({ code, userId }, {});
 }
 
 export async function getUserByID(userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.getUserByID({ userId }, {});
 }
@@ -336,13 +380,19 @@ export async function verifyInviteCode(
   userId: string,
   verificationCode: string,
 ) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.verifyInviteCode({ userId, verificationCode }, {});
 }
 
 export async function resendInviteCode(userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.resendInviteCode({ userId }, {});
 }
@@ -370,7 +420,10 @@ export async function sendEmailCode(
     });
   }
 
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.sendEmailCode(medium, {});
 }
@@ -387,7 +440,10 @@ export async function createInviteCode(userId: string, host: string | null) {
     };
   }
 
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.createInviteCode(
     {
@@ -498,7 +554,10 @@ export async function listUsers({
     );
   }
 
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.listUsers({ queries: queries });
 }
@@ -579,7 +638,10 @@ export async function searchUsers({
     );
   }
 
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   const loginNameResult = await userService.listUsers({ queries: queries });
 
@@ -664,7 +726,8 @@ export async function searchUsers({
 }
 
 export async function getDefaultOrg(): Promise<Organization | null> {
-  const orgService = serviceInitializer.getOrgService();
+  const orgService: Client<typeof OrganizationService> =
+    await createServiceForHost(OrganizationService, host);
 
   return orgService
     .listOrganizations(
@@ -684,7 +747,8 @@ export async function getDefaultOrg(): Promise<Organization | null> {
 }
 
 export async function getOrgsByDomain(domain: string) {
-  const orgService = serviceInitializer.getOrgService();
+  const orgService: Client<typeof OrganizationService> =
+    await createServiceForHost(OrganizationService, host);
 
   return orgService.listOrganizations(
     {
@@ -708,7 +772,10 @@ export async function startIdentityProviderFlow({
   idpId: string;
   urls: RedirectURLsJson;
 }) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.startIdentityProviderIntent({
     idpId,
@@ -723,7 +790,10 @@ export async function retrieveIdentityProviderInformation({
   idpIntentId,
   idpIntentToken,
 }: RetrieveIdentityProviderIntentRequest) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.retrieveIdentityProviderIntent({
     idpIntentId,
@@ -750,7 +820,10 @@ export async function createCallback(req: CreateCallbackRequest) {
 }
 
 export async function verifyEmail(userId: string, verificationCode: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.verifyEmail(
     {
@@ -780,13 +853,19 @@ export async function resendEmailCode(
     request = { ...request, verification: { case: "sendCode", value: medium } };
   }
 
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.resendEmailCode(request, {});
 }
 
 export function retrieveIDPIntent(id: string, token: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.retrieveIdentityProviderIntent(
     { idpIntentId: id, idpIntentToken: token },
@@ -795,7 +874,8 @@ export function retrieveIDPIntent(id: string, token: string) {
 }
 
 export function getIDPByID(id: string) {
-  const idpService = serviceInitializer.getIDPService();
+  const idpService: Client<typeof IdentityProviderService> =
+    await createServiceForHost(IdentityProviderService, host);
 
   return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
 }
@@ -808,7 +888,10 @@ export function addIDPLink(
   },
   userId: string,
 ) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.addIDPLink(
     {
@@ -846,7 +929,10 @@ export async function passwordReset(
     };
   }
 
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.passwordReset(
     {
@@ -903,7 +989,10 @@ export async function setUserPassword(
     };
   }
 
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.setPassword(payload, {}).catch((error) => {
     // throw error if failed precondition (ex. User is not yet initialized)
@@ -916,7 +1005,10 @@ export async function setUserPassword(
 }
 
 export async function setPassword(payload: SetPasswordRequest) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.setPassword(payload, {});
 }
@@ -930,7 +1022,10 @@ export async function setPassword(payload: SetPasswordRequest) {
 
 // TODO check for token requirements!
 export async function createPasskeyRegistrationLink(userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.createPasskeyRegistrationLink({
     userId,
@@ -949,7 +1044,10 @@ export async function createPasskeyRegistrationLink(userId: string) {
  */
 
 export async function registerU2F(userId: string, domain: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.registerU2F({
     userId,
@@ -966,7 +1064,10 @@ export async function registerU2F(userId: string, domain: string) {
 export async function verifyU2FRegistration(
   request: VerifyU2FRegistrationRequest,
 ) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.verifyU2FRegistration(request, {});
 }
@@ -979,7 +1080,8 @@ export async function getActiveIdentityProviders(
   if (linking_allowed) {
     props.linkingAllowed = linking_allowed;
   }
-  const settingsService = serviceInitializer.getSettingsService();
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, host);
 
   return settingsService.getActiveIdentityProviders(props, {});
 }
@@ -992,7 +1094,10 @@ export async function getActiveIdentityProviders(
 export async function verifyPasskeyRegistration(
   request: VerifyPasskeyRegistrationRequest,
 ) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.verifyPasskeyRegistration(request, {});
 }
@@ -1007,7 +1112,10 @@ export async function registerPasskey(
   code: { id: string; code: string },
   domain: string,
 ) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.registerPasskey({
     userId,
@@ -1022,7 +1130,10 @@ export async function registerPasskey(
  * @returns the newly set email
  */
 export async function listAuthenticationMethodTypes(userId: string) {
-  const userService = serviceInitializer.getUserService();
+  const userService: Client<typeof UserService> = await createServiceForHost(
+    UserService,
+    host,
+  );
 
   return userService.listAuthenticationMethodTypes({
     userId,
