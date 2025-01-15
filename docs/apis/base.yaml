@@ -7,5 +7,6 @@ externalDocs:
   description: Detailed information about ZITADEL
   url: https://zitadel.com/docs
 paths:
-  /Users:
     $ref: "../.artifacts/zitadel.swagger.yaml#/paths"
+definitions:
+    $ref: "../.artifacts/zitadel.swagger.yaml#/definitions"

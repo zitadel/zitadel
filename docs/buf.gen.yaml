@@ -11,5 +11,6 @@ plugins:
       - preserve_rpc_order=true
       - visibility_restriction_selectors=PREVIEW
       - output_format=yaml
+      - disable_service_tags=true
       - allow_merge=true
       - merge_file_name=zitadel

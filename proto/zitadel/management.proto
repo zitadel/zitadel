@@ -44,98 +44,6 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             url: "https://github.com/zitadel/zitadel/blob/main/LICENSE"
         }
     };
-    tags: [
-        {
-            name: "Actions"
-        },
-        {
-            name: "Applications",
-            description: "Applications are the entry point to your project. Users either login into one of your clients and interact with them directly or use one of your APIs. All applications share the roles and authorizations of their project."
-        },
-        {
-            name: "Authentication Methods"
-        },
-        {
-            name: "Authorization"
-        },
-        {
-            name: "Branding"
-        },
-        {
-            name: "Domain Settings"
-        },
-        {
-            name: "General"
-        },
-        {
-            name: "Identity Providers"
-        },
-        {
-            name: "Global"
-        },
-        {
-            name: "Login Settings"
-        },
-        {
-            name: "Login Texts"
-        },
-        {
-            name: "Members"
-        },
-        {
-            name: "Message Texts"
-        },
-        {
-            name: "Notification Settings"
-        },
-        {
-            name: "Organizations"
-        },
-        {
-            name: "Organization Metadata"
-        },
-        {
-            name: "Password Settings"
-        },
-        {
-            name: "Privacy Settings"
-        },
-        {
-            name: "Projects",
-            description: "Projects are vessels for different applications/clients sharing the same role context."
-        },
-        {
-            name: "Project Grants",
-            description: "A project that is granted to another organization, so the other organization has access to it and can manage the user authorizations, is called a project grant."
-        },
-        {
-            name: "Project Roles"
-        },
-        {
-            name: "Settings"
-        },
-        {
-            name: "Users",
-            description: "ZITADEL knows two different types of users: Users (Human) and Service Users (Machine Accounts)"
-        },
-        {
-            name: "User Grants",
-            description: "User grants are the roles a user has for a specific project and organization."
-        },
-        {
-            name: "User Human"
-        },
-        {
-            name: "User Machine"
-        },
-        {
-            name: "User Metadata",
-            description: "Metadata is a key/value list to enrich the user object with any data needed. The data is not interpreted by ZITADEL itself."
-        },
-        {
-            name: "ZITADEL Administrators"
-        }
-    ];
     schemes: HTTPS;
 
     consumes: "application/json";
@@ -209,7 +117,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Healthz";
             description: "The health endpoint allows an external system to probe if ZITADEL management API is alive"
-            tags: "General";
+            tags: "Hodor";
             responses: {
                 key: "200"
                 value: {

@@ -35,42 +35,6 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             url: "https://github.com/zitadel/zitadel/blob/main/LICENSE"
         };
     };
-    tags: [
-        {
-            name: "General"
-        },
-        {
-            name: "Policies",
-            description: "Policies are settings that are made on either an instance or organization level of ZITADEL. The policies will have an impact on what a user is allowed to do or what should be shown to the user."
-        },
-        {
-            name: "User"
-        },
-        {
-            name: "User Authentication Factor"
-        },
-        {
-            name: "User Authorizations/Grants"
-        },
-        {
-            name: "User Email"
-        },
-        {
-            name: "User Metadata"
-        },
-        {
-            name: "User Phone"
-        },
-        {
-            name: "User Profile"
-        },
-        {
-            name: "User Social Login"
-        },
-        {
-            name: "User Tokens"
-        }
-    ];
     schemes: HTTPS;
 
     consumes: "application/json";
