@@ -9,6 +9,7 @@ import {
   resendInviteCode,
   verifyEmail,
   verifyInviteCode,
+  verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
@@ -18,8 +19,39 @@ import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
+import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
+
+export async function verifyTOTP(
+  code: string,
+  loginName?: string,
+  organization?: string,
+) {
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  return loadMostRecentSession({
+    host,
+    sessionParams: {
+      loginName,
+      organization,
+    },
+  }).then((session) => {
+    if (session?.factors?.user?.id) {
+      return verifyTOTPRegistration({
+        host,
+        code,
+        userId: session.factors.user.id,
+      });
+    } else {
+      throw Error("No user id found in session.");
+    }
+  });
+}
 
 type VerifyUserByEmailCommand = {
   userId: string;
