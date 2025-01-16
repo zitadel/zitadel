@@ -1,0 +1,14 @@
+# NOTE: Only supports options marked as "Supported in Redoc CE"
+# See https://redocly.com/docs/cli/configuration/ for more information.
+
+extends:
+  - recommended
+
+rules:
+  no-unused-components: error
+
+theme:
+  # See https://redocly.com/docs/redoc/config/
+  openapi:
+    disableSearch: true
+    sortTagsAlphabetically: true
