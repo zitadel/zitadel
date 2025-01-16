@@ -334,6 +334,10 @@ func (c *Commands) changeDefaultDomain(ctx context.Context, orgID, newName strin
 				if err != nil {
 					return nil, err
 				}
+				// rename of organization resulting in no change in the domain
+				if newDefaultDomain == defaultDomain {
+					return nil, nil
+				}
 				events := []eventstore.Command{
 					org.NewDomainAddedEvent(ctx, orgAgg, newDefaultDomain),
 					org.NewDomainVerifiedEvent(ctx, orgAgg, newDefaultDomain),
