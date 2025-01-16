@@ -3,85 +3,15 @@ title: Configure Streams
 sidebar_label: Config
 ---
 
-Use the tools you already have running to consume your Zitadel data.
+import CodeBlock from '@theme/CodeBlock';
+import DefaultConfig from "!!raw-loader!./default_config.yaml";
 
-In the Zitadel source code, Golangs standard logging library slog is used to write stream records.
-Stream records can be considered as a subset of application logs.
-The terminology "stream records" helps differentiate these logs from conventional application logs.
-Unlike conventional application logs, stream records have strong schema guarantees and various configuration options.
-This empowers you to easily distribute your Zitadel data throughout your diverse ecosystem.
-All you need to ingest streams from Zitadels stdout into your favourite storage system is a running log collector.
+The Zitadel config allows for fine-grained configuration of streams.
+Stream configurations can be applied to individual groups of streams.
+For example, single records can be emitted multiple times with different formats.
 
-## Configure Zitadel Logs
+<details open>
+    <summary>Default Config</summary>
+    <CodeBlock language="yaml">{DefaultConfig}</CodeBlock>
+</details>
 
-```yaml
-Log:
-  # Possible values for Level with Format zitadel:
-  # "debug", "info", "warn", "error"
-  # The default level is "info"
-  # If the value is higher than "info", all streams except partially the Exceptions stream are disabled.
-  # Only Exception records for runtime errors or warnings have a higher severity than "info",
-  # Exception records for user errors have severity "info".
-  Level: "info"
-  Formatter:
-    # Possible values for Format:
-    # "text", "json", "zitadel"
-    # The default format is "zitadel"
-    # "json" and "zitadel" formatted records are written as ndjson (newline delimited JSON)
-    Format: "zitadel"
-  Data:
-    FieldMap: # FieldMap is undefined by default
-      message: "msg" # prints the Records "message" at the key "message"
-      service: "serviceContext.service" # prints the Records "service" field in a group "serviceContext" at the "service" key
-      version: "serviceContext.version" # prints the Records "version" field in a group "serviceContext" at the "version" key
-      exception.description: "error" # prints the Exceptions stream records "description" field at the root level at the "error" key
-  Streams:
-    # By default, all streams are disabled. Set this to true to change this default for all streams.
-    Enabled: # false by default for all streams
-    # Possible values for SensitiveFields:
-    # "redact", "remove", "write"
-    SensitiveFields: "redact"
-    # Possible values for PersonallyIdentifiableInformation
-    # "redact", "anonymize", "remove", "write"
-    PersonallyIdentifiableInformation: "redact"
-    # Possible values for Format are "protojson", "otel" and "google_cloud_logging". Default is "protojson"
-    Format: "otel"
-    # Possible values for RecordVersion: "latest", "v1"
-    RecordVersion: "latest"
-    Outputs:
-    - Channel: "Stderr"
-       Enabled: true # By default, only the Stderr channel is enabled
-    - Channel: "Stdout"
-      Enabled: false
-    # - Channel: "GRPC"
-    #   Enabled: false # support for setting Enabled to true for this Channel is 🚧 under construction
-    #   Config:
-    #     Target: "example.com:443"
-    #     Headers:
-    #       "X-My-Auth-Header": "my symmetric key"
-    # - Channel: "HTTPS" # 🚧 under construction
-    # - Channel: "ClickHouse" # 🚧 under construction
-    # - Channel: "S3" # 🚧 under construction
-    # - Channel: "GCS" # 🚧 under construction
-    Types:
-    - Type: "Exceptions"
-      Enabled: true # Is false by default
-      SensitiveFields: "remove" # Overwrites default component stream config value of "redact"
-      PersonallyIdentifiableInformation: # Inherits "redact" from default component stream config
-      Format: "protojson"
-      RecordVersion: "latest" # Possible values: "latest", "v1"
-      Outputs: # Inherits Outputs from default component stream config
-    - Type: "HTTPRequests"
-      # Inherit Zitadel defaults (disabled, redacted sensitive and PII data to stdout)
-      # All options like Exceptions
-      # The same applies to all other streams
-    - Type: "APICalls"
-      Format: "otel"
-      # The same stream can be written multiple times with different configurations
-    - Type: "APICalls"
-      Format: "raw"
-    - Type: "Authentications"
-    - Type: "Authorizations"
-    # - Type: "Events" # 🚧 under construction
-    # - Type: "Actions" # 🚧 under construction
-```

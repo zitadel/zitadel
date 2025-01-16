@@ -1,0 +1,77 @@
+---
+title: Rely On Strictly Typed Schemas
+sidebar_label: Schemas
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import Example from "!!raw-loader!./example_request_http_record.js";
+import Reference from "!!raw-loader!./reference.js";
+
+By default, all stream records have flat properties.
+This makes them easy to access in any log collection rule.
+Also, it allows to map record fields directly to easily accessible database columns.
+
+For example, an request_http stream record could look like this:
+
+<details open>
+    <summary>Example</summary>
+    <CodeBlock language="js">{Example}</CodeBlock>
+</details>
+
+## Schema Evolution
+
+The log records schemas are defined in Protobuf, so that strict types and structures can be guaranteed.
+If a streams schema is changed in a backward incompatible way, its version is bumped.
+The Zitadel runtime configuration allows to pin the written streams versions.
+This allows downstream tools to update their code before new stream versions are produced.
+
+## Base Stream Record
+
+The following baseStreamRecord shows which fields are potentially set in all stream records.
+The properties "stream" and "version" define what additional fields are potentially available in the record.
+Possible values for "stream":
+
+- [request_grpc](#request_grpc)
+- [request_http](#request_http)
+- [runtime_version](#runtime_version)
+- [runtime_service](#runtime_service)
+- [action_targetcall](#action_targetcall)
+- [action_trigger_grpc_request](#action_trigger_grpc_request)
+- [action_trigger_grpc_response](#action_trigger_grpc_response)
+- [action_trigger_event](#action_trigger_event)
+- [action_trigger_function](#action_trigger_function)
+- [event](#event)
+- [notification](#notification)
+
+### request
+
+# TODO: :warning: Split the reference.js into many files and map them to the following linkable sections :construction:
+
+<details open>
+    <summary>reference.js</summary>
+    <CodeBlock language="js">{Reference}</CodeBlock>
+</details>
+
+#### request_grpc
+#### request_http
+
+### runtime
+
+#### runtime_version
+
+#### runtime_service
+
+### action
+
+#### action_targetcall
+
+#### action_trigger
+
+##### action_trigger_grpc_request
+##### action_trigger_grpc_response
+##### action_trigger_event
+##### action_trigger_function
+
+# event
+
+# notification

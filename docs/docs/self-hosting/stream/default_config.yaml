@@ -1,0 +1,48 @@
+Log:
+  # Possible values for Level with Format zitadel:
+  # "debug", "info", "warn", "error"
+  # The default level is "info"
+  # The Level field only takes effect for "runtime_" prefixed streams.
+  Level: "info"
+  Formatter:
+    # Format is used for all streams that have no other Format explicitly configured.
+    # Possible values for Format:
+    # "text", "json", "flat_snake", "proto_json"
+    # The default format is "flat_snake"
+    # "json" and "flat_snake" formatted records are written as ndjson (newline delimited JSON)
+
+    # flat_snake formatted stream records have flat properties in snake_case
+    # This makes them easy to access in any log collection rule.
+    # Also, it allows to map record fields directly to easily accessible database columns.
+    Format: "flat_snake"
+  Data:
+    FieldMap: # FieldMap is undefined by default
+      observed_time: "ts" # changes the key "observed_time" to "ts"
+      user_id: "" # removes the property "user_id"
+  Stream:
+  - Enabled: true
+    # Pattern allows fine-granular configuration of streams.
+    # "request_grpc"
+    # "request_http"
+    # "runtime_version"
+    # "runtime_service"
+    # "action_targetcall"
+    # "action_trigger_grpc_request"
+    # "action_trigger_grpc_response"
+    # "action_trigger_event"
+    # "action_trigger_function"
+    # "event"
+    # "notification"
+    # Learn more about specific streams and their fields in the stream schema reference at https://zitadel.com/docs/self-hosting/streams/reference
+    # By default, all runtime streams are enabled
+    Pattern: "runtime_*"
+    # Possible values for RecordVersion: "latest", "v1"
+    RecordVersion: "latest"
+    # Possible values for SensitiveFields:
+    # "redact", "remove", "write"
+    SensitiveFields: "redact"
+    # Possible values for PersonallyIdentifiableInformation
+    # "redact", "anonymize", "remove", "write"
+    PersonallyIdentifiableInformation: "redact"
+    # Format overwrites the Log.Formatter.Format value
+    Format:
