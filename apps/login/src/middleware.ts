@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
     instanceUrl = await getInstanceUrl(host);
   } catch (error) {
     console.error(
-      "Could not get instance url, fallback to ZITADEL_API_URL",
+      `[Middleware]: Could not get instance url of ${host}, fallback to ZITADEL_API_URL ${process.env.ZITADEL_API_URL}`,
       error,
     );
     instanceUrl = process.env.ZITADEL_API_URL;

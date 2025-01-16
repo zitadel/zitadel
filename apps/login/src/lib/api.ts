@@ -9,7 +9,15 @@ export async function getInstanceUrl(host: string): Promise<string> {
     return process.env.ZITADEL_API_URL || "";
   }
 
-  const instance = await getInstanceByHost(host);
+  const instance = await getInstanceByHost(host).catch((error) => {
+    console.error(`Could not get instance by host ${host}`, error);
+    return null;
+  });
+
+  if (!instance) {
+    throw new Error("No instance found");
+  }
+
   const generatedDomain = instance.domains.find(
     (domain) => domain.generated === true,
   );
