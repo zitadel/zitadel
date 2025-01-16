@@ -25,7 +25,7 @@ export async function createServiceForHost<T extends ServiceClass>(
     instanceUrl = await getInstanceUrl(host);
   } catch (error) {
     console.error(
-      "Could not get instance url, fallback to ZITADEL_API_URL",
+      `Could not get instance url for ${host}, fallback to ZITADEL_API_URL`,
       error,
     );
     instanceUrl = process.env.ZITADEL_API_URL;
