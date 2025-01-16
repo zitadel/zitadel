@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { getInstanceUrl } from "./lib/api";
 
@@ -19,10 +20,16 @@ export async function middleware(request: NextRequest) {
   // ) {
   //   return NextResponse.next();
   // }
+  const _headers = await headers();
+  const _host = _headers.get("host");
+
+  console.log("host", _host);
+
+  const host = _host || request.nextUrl.host;
 
   let instanceUrl;
   try {
-    instanceUrl = await getInstanceUrl(request.nextUrl.host);
+    instanceUrl = await getInstanceUrl(host);
   } catch (error) {
     console.error(
       "Could not get instance url, fallback to ZITADEL_API_URL",
