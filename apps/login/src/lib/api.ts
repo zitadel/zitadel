@@ -2,6 +2,13 @@ import { importPKCS8, SignJWT } from "jose";
 import { getInstanceByHost } from "./zitadel";
 
 export async function getInstanceUrl(host: string): Promise<string> {
+  const [hostname, port] = host.split(":");
+
+  if (hostname === "localhost") {
+    console.log("fallback to ZITADEL_API_URL");
+    return process.env.ZITADEL_API_URL || "";
+  }
+
   const instance = await getInstanceByHost(host);
   const generatedDomain = instance.domains.find(
     (domain) => domain.generated === true,
