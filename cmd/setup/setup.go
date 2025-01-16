@@ -169,7 +169,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: dbClient}
 	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: dbClient}
 	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
-	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: esPusherDBClient}
+	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
