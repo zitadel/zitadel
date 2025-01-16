@@ -27,7 +27,7 @@ func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, auth
 		descriptionI18nKey = "SelectAccount.DescriptionLinking"
 	}
 	data := userSelectionData{
-		baseData: l.getBaseData(r, authReq, translator, titleI18nKey, descriptionI18nKey, "", ""),
+		baseData: l.getBaseData(r, authReq, translator, titleI18nKey, descriptionI18nKey, nil),
 		Users:    selectionData.Users,
 		Linking:  linking,
 	}
