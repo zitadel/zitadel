@@ -207,6 +207,31 @@ module.exports = {
           items: [
             "guides/integrate/login/login-users",
             {
+              type: "link",
+              href: "/docs/guides/integrate/login/login-users#zitadels-session-api",
+              label: "Session API"
+            },
+            {
+              type: "category",
+              label: "Hosted Login",
+              link: {
+                type: "doc",
+                id: "guides/integrate/login/hosted-login"
+              },
+              items: [
+                {
+                  type: "link",
+                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta",
+                  label: "Login V2 [Beta]"
+                },
+              ]
+            },
+            {
+              type: "link",
+              href: "/docs/guides/integrate/login/login-users#build-a-custom-login-ui-to-authenticate-users",
+              label: "Custom Login UI",
+            },
+            {
               type: "category",
               label: "OpenID Connect",
               collapsed: true,

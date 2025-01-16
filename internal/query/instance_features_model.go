@@ -75,6 +75,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceDisableUserTokenEvent,
 			feature_v2.InstanceEnableBackChannelLogout,
 			feature_v2.InstanceLoginVersion,
+			feature_v2.InstancePermissionCheckV2,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -139,6 +140,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.EnableBackChannelLogout.set(level, event.Value)
 	case feature.KeyLoginV2:
 		features.LoginV2.set(level, event.Value)
+	case feature.KeyPermissionCheckV2:
+		features.PermissionCheckV2.set(level, event.Value)
 	}
 	return nil
 }

@@ -502,6 +502,10 @@ Errors:
       CreationNotAllowed: A criação de um novo usuário não é permitida neste provedor
       LinkingNotAllowed: A vinculação de um usuário não é permitida neste provedor
       NoOptionAllowed: Nem criação nem vinculação são permitidas neste fornecedor. Contate o seu administrador.
+      LoginFailedSwitchLocal: |
+        Falha no login no provedor de identidade externo. Retornando ao login local.
+
+        Detalhes do erro: {{.Details}}
     GrantRequired: Login não é possível. O usuário precisa ter pelo menos uma permissão no aplicativo. Entre em contato com o administrador.
     ProjectRequired: Login não é possível. A organização do usuário precisa ser concedida ao projeto. Entre em contato com o administrador.
   IdentityProvider:

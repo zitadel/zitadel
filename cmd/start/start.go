@@ -63,6 +63,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
+	"github.com/zitadel/zitadel/internal/api/scim"
+	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/console/path"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -440,7 +442,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(), idp.SAMLRootURL(), assets.AssetAPI(), permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(commands, queries)); err != nil {
@@ -452,7 +454,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, feature_v2beta.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, settings_v2.CreateServer(commands, queries)); err != nil {
@@ -518,6 +520,17 @@ func startAPIs(
 		return nil, fmt.Errorf("unable to start saml provider: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(saml.HandlerPrefix, samlProvider.HttpHandler())
+
+	apis.RegisterHandlerOnPrefix(
+		schemas.HandlerPrefix,
+		scim.NewServer(
+			commands,
+			queries,
+			verifier,
+			keys.User,
+			&config.SCIM,
+			instanceInterceptor.HandlerFuncWithError,
+			middleware.AuthorizationInterceptor(verifier, config.InternalAuthZ).HandlerFuncWithError))
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {

@@ -70,6 +70,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemDisableUserTokenEvent,
 			feature_v2.SystemEnableBackChannelLogout,
 			feature_v2.SystemLoginVersion,
+			feature_v2.SystemPermissionCheckV2,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -113,6 +114,9 @@ func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 		features.EnableBackChannelLogout = &v
 	case feature.KeyLoginV2:
 		features.LoginV2 = value.(*feature.LoginV2)
+	case feature.KeyPermissionCheckV2:
+		v := value.(bool)
+		features.PermissionCheckV2 = &v
 	}
 }
 
@@ -130,6 +134,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DisableUserTokenEvent, f.DisableUserTokenEvent, feature_v2.SystemDisableUserTokenEvent)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.EnableBackChannelLogout, f.EnableBackChannelLogout, feature_v2.SystemEnableBackChannelLogout)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginV2, f.LoginV2, feature_v2.SystemLoginVersion)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.PermissionCheckV2, f.PermissionCheckV2, feature_v2.SystemPermissionCheckV2)
 	return cmds
 }
 
