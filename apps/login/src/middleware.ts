@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getInstanceUrl } from "./lib/api";
 
 export const config = {
   matcher: [
@@ -19,8 +20,18 @@ export async function middleware(request: NextRequest) {
   //   return NextResponse.next();
   // }
 
-  const INSTANCE_URL = process.env.ZITADEL_API_URL;
-  const instanceHost = `${INSTANCE_URL}`.replace("https://", "");
+  let instanceUrl;
+  try {
+    instanceUrl = await getInstanceUrl(request.nextUrl.host);
+  } catch (error) {
+    console.error(
+      "Could not get instance url, fallback to ZITADEL_API_URL",
+      error,
+    );
+    instanceUrl = process.env.ZITADEL_API_URL;
+  }
+
+  const instanceHost = `${instanceUrl}`.replace("https://", "");
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-zitadel-login-client", process.env.ZITADEL_USER_ID);
@@ -36,7 +47,7 @@ export async function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
-  request.nextUrl.href = `${INSTANCE_URL}${request.nextUrl.pathname}${request.nextUrl.search}`;
+  request.nextUrl.href = `${instanceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
   return NextResponse.rewrite(request.nextUrl, {
     request: {
       headers: requestHeaders,
