@@ -68,7 +68,7 @@ const systemService = async () => {
 
 export async function getInstanceByHost(host: string) {
   const system = await systemService();
-  return system
+  const callback = system
     .listInstances(
       {
         queries: [
@@ -91,6 +91,8 @@ export async function getInstanceByHost(host: string) {
 
       return resp.result[0];
     });
+
+  return useCache ? cacheWrapper(callback) : callback;
 }
 
 export async function getBrandingSettings({
