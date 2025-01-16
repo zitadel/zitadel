@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -316,14 +317,6 @@ func (g *groupMemberProjection) reduceRemoved(event eventstore.Event) (*handler.
 	)
 }
 
-func (g *groupMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*user.UserRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-bZB60", "reduce.wrong.event.type %s", user.UserRemovedType)
-	}
-	return reduceGroupMemberRemoved(e, withGroupMemberCond(GroupMemberUserIDCol, e.Aggregate().ID))
-}
-
 func (g *groupMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
@@ -342,4 +335,40 @@ func (g *groupMemberProjection) reduceGroupRemoved(event eventstore.Event) (*han
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-OHVFM", "reduce.wrong.event.type %s", group.GroupRemovedType)
 	}
 	return reduceGroupMemberRemoved(e, withGroupMemberCond(GroupMemberGroupIDCol, e.Aggregate().ID))
+}
+
+func (g *groupMemberProjection) reduceUserAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*group.MemberAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-chy6O", "reduce.wrong.event.type %s", group.MemberAddedType)
+	}
+
+	config := reduceGroupMemberConfig{
+		cols: []handler.Column{
+			handler.NewCol(GroupIDsCol, sql.NullString{String: "array_append(group_ids, '" + e.Aggregate().ID + "')", Valid: true}),
+		},
+		conds: []handler.Condition{
+			handler.NewCond(UserIDCol, e.UserID),
+		},
+	}
+
+	return handler.NewUpdateStatement(e, config.cols, config.conds), nil
+}
+
+func (g *groupMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*group.MemberRemovedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fKAOi", "reduce.wrong.event.type %s", group.MemberRemovedType)
+	}
+
+	config := reduceGroupMemberConfig{
+		cols: []handler.Column{
+			handler.NewCol(GroupIDsCol, sql.NullString{String: "array_remove(group_ids, '" + e.Aggregate().ID + "')", Valid: true}),
+		},
+		conds: []handler.Condition{
+			handler.NewCond(UserIDCol, e.UserID),
+		},
+	}
+
+	return handler.NewUpdateStatement(e, config.cols, config.conds), nil
 }

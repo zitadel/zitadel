@@ -203,10 +203,6 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 				out.AppendClaims(domain.OrgIDClaim, claim)
 				setUserInfoOrgClaims(user, out)
 			}
-			if claim, ok := strings.CutPrefix(s, domain.GroupIDScope); ok {
-				out.AppendClaims(domain.GroupIDScope, claim)
-				setUserInfoGroupClaims(user, out)
-			}
 		}
 	}
 	return out
