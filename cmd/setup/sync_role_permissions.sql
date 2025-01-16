@@ -9,7 +9,7 @@ against a passed role permission mapping as JSON, created from Zitadel's config:
 	"FOO_BAR": ["foo.bar", "bar.foo"]
  }
 
-It uses a aggregate_id as first argument which may be and instance_id or 'SYSTEM'
+It uses an aggregate_id as first argument which may be an instance_id or 'SYSTEM'
 for system level permissions.
 */
 WITH target AS (

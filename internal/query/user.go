@@ -1356,7 +1356,6 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
-			/////////// HERE!
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
 			LeftJoin("("+loginNamesQuery+") AS "+userLoginNamesTable.alias+" ON "+
