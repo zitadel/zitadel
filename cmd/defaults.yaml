@@ -1121,6 +1121,7 @@ DefaultInstance:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
     # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
     # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
+    # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
     # A value of "0s" means that all events are available.
@@ -1184,6 +1185,9 @@ InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
   # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write"]}]'
   # Beware that if you configure the RolePermissionMappings by environment variable, all the default RolePermissionMappings are lost.
+  #
+  # Warning: RolePermissionMappings are synhronized to the database.
+  # Changes here will only be applied after running `zitadel setup` or `zitadel start-from-setup`.
   RolePermissionMappings:
     - Role: "SYSTEM_OWNER"
       Permissions:
