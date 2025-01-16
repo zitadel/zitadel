@@ -84,7 +84,8 @@ const systemService = async () => {
 };
 
 export async function getInstanceByHost(host: string) {
-  return (await systemService())
+  const system = await systemService();
+  return system
     .listInstances(
       {
         queries: [

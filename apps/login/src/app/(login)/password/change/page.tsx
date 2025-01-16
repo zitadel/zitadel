@@ -9,10 +9,17 @@ import {
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "password" });
@@ -22,19 +29,24 @@ export default async function Page(props: {
 
   // also allow no session to be found (ignoreUnkownUsername)
   const sessionFactors = await loadMostRecentSession({
-    loginName,
-    organization,
+    host,
+    sessionParams: {
+      loginName,
+      organization,
+    },
   });
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({ host, organization });
 
-  const passwordComplexity = await getPasswordComplexitySettings(
-    sessionFactors?.factors?.user?.organizationId,
-  );
+  const passwordComplexity = await getPasswordComplexitySettings({
+    host,
+    organization: sessionFactors?.factors?.user?.organizationId,
+  });
 
-  const loginSettings = await getLoginSettings(
-    sessionFactors?.factors?.user?.organizationId,
-  );
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: sessionFactors?.factors?.user?.organizationId,
+  });
 
   return (
     <DynamicTheme branding={branding}>
