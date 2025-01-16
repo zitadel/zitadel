@@ -29,14 +29,10 @@ runtimeBaseStreamRecord = {
   "runtime_attributes_userid": "1234567890123",
 }
 
-// if stream is runtime_service
-// A record is only written once in a runtime lifecycle
-runtimeServiceRecord = {
+// if stream is runtime_log
+runtimeLogRecord = {
   ...runtimeBaseStreamRecord, // all fields from runtimeBaseStreamRecord
-
-  "runtime_service_name": "zitadel",
-  "runtime_service_version": "v2.67.2",
-  "runtime_service_process": "sdsf321ew6f5", // For example Pod ID
+  // no additional properties
 }
 
 // if stream is runtime_error
@@ -47,6 +43,16 @@ runtimeErrorRecord = {
   "runtime_error_stack": "line1\nline2\nline3",
   "runtime_error_i18n_key": "Errors.User.NotFound", // If error is of type ZitadelError
   "runtime_error_type": "InternalError", // If error is of type ZitadelError
+}
+
+// if stream is runtime_service
+// A record is only written once in a runtime lifecycle
+runtimeServiceRecord = {
+  ...runtimeBaseStreamRecord, // all fields from runtimeBaseStreamRecord
+
+  "runtime_service_name": "zitadel",
+  "runtime_service_version": "v2.67.2",
+  "runtime_service_process": "sdsf321ew6f5", // For example Pod ID
 }
 
 // These fields are present in streams that have the request_ prefix

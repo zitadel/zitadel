@@ -2,7 +2,7 @@ Log:
   # Possible values for Level with Format zitadel:
   # "debug", "info", "warn", "error"
   # The default level is "info"
-  # The Level field only takes effect for "runtime_" prefixed streams.
+  # The level field is used to filter "runtime_log" and "runtime_error" streams.
   Level: "info"
   Formatter:
     # Format is used for all streams that have no other Format explicitly configured.
@@ -24,7 +24,8 @@ Log:
     # Pattern allows fine-granular configuration of streams.
     # "request_grpc"
     # "request_http"
-    # "runtime_version"
+    # "runtime_log"
+    # "runtime_error"
     # "runtime_service"
     # "action_targetcall"
     # "action_trigger_grpc_request"
@@ -35,14 +36,18 @@ Log:
     # "notification"
     # Learn more about specific streams and their fields in the stream schema reference at https://zitadel.com/docs/self-hosting/streams/reference
     # By default, all runtime streams are enabled
-    Pattern: "runtime_*"
+    Stream: "runtime_log"
     # Possible values for RecordVersion: "latest", "v1"
     RecordVersion: "latest"
     # Possible values for SensitiveFields:
     # "redact", "remove", "write"
-    SensitiveFields: "redact"
+    # SensitiveFields: "redact" # Under construction
     # Possible values for PersonallyIdentifiableInformation
     # "redact", "anonymize", "remove", "write"
-    PersonallyIdentifiableInformation: "redact"
+    # PersonallyIdentifiableInformation: "redact" # Under construction
     # Format overwrites the Log.Formatter.Format value
-    Format:
+    # Format: # Under construction
+  - Enabled: true
+    Stream: "runtime_error"
+  - Enabled: true
+    Stream: "runtime_service"
