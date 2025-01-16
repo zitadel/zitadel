@@ -174,6 +174,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: queryDBClient}
 	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: esPusherDBClient}
 	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
+	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -195,6 +196,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		},
 		&FillFieldsForInstanceDomains{
 			eventstore: eventstoreClient,
+		},
+		&SyncRolePermissions{
+			eventstore:             eventstoreClient,
+			rolePermissionMappings: config.InternalAuthZ.RolePermissionMappings,
 		},
 	}
 
@@ -229,6 +234,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s38BackChannelLogoutNotificationStart,
 		steps.s44ReplaceCurrentSequencesIndex,
 		steps.s45CorrectProjectOwners,
+		steps.s46InitPermissionFunctions,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
