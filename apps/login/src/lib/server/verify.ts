@@ -31,11 +31,25 @@ type VerifyUserByEmailCommand = {
 };
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const verifyResponse = command.isInvite
-    ? await verifyInviteCode(command.userId, command.code).catch(() => {
+    ? await verifyInviteCode({
+        host,
+        userId: command.userId,
+        verificationCode: command.code,
+      }).catch(() => {
         return { error: "Could not verify invite" };
       })
-    : await verifyEmail(command.userId, command.code).catch(() => {
+    : await verifyEmail({
+        host,
+        userId: command.userId,
+        verificationCode: command.code,
+      }).catch(() => {
         return { error: "Could not verify email" };
       });
 
@@ -63,6 +77,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     session = await getSession({
+      host,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -75,7 +90,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       return { error: "Could not create session for user" };
     }
 
-    const userResponse = await getUserByID(session?.factors?.user?.id);
+    const userResponse = await getUserByID({
+      host,
+      userId: session?.factors?.user?.id,
+    });
 
     if (!userResponse?.user) {
       return { error: "Could not load user" };
@@ -83,7 +101,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     user = userResponse.user;
   } else {
-    const userResponse = await getUserByID(command.userId);
+    const userResponse = await getUserByID({ host, userId: command.userId });
 
     if (!userResponse || !userResponse.user) {
       return { error: "Could not load user" };
@@ -119,9 +137,15 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { error: "Could not load user" };
   }
 
-  const loginSettings = await getLoginSettings(user.details?.resourceOwner);
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: user.details?.resourceOwner,
+  });
 
-  const authMethodResponse = await listAuthenticationMethodTypes(user.userId);
+  const authMethodResponse = await listAuthenticationMethodTypes({
+    host,
+    userId: user.userId,
+  });
 
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
     return { error: "Could not load possible authenticators" };
@@ -230,6 +254,12 @@ export type SendVerificationRedirectWithoutCheckCommand = {
 export async function sendVerificationRedirectWithoutCheck(
   command: SendVerificationRedirectWithoutCheckCommand,
 ) {
+  const host = (await headers()).get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   if (!("loginName" in command || "userId" in command)) {
     return { error: "No userId, nor loginname provided" };
   }
@@ -250,6 +280,7 @@ export async function sendVerificationRedirectWithoutCheck(
     }
 
     session = await getSession({
+      host,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -262,7 +293,10 @@ export async function sendVerificationRedirectWithoutCheck(
       return { error: "Could not create session for user" };
     }
 
-    const userResponse = await getUserByID(session?.factors?.user?.id);
+    const userResponse = await getUserByID({
+      host,
+      userId: session?.factors?.user?.id,
+    });
 
     if (!userResponse?.user) {
       return { error: "Could not load user" };
@@ -270,7 +304,7 @@ export async function sendVerificationRedirectWithoutCheck(
 
     user = userResponse.user;
   } else if ("userId" in command) {
-    const userResponse = await getUserByID(command.userId);
+    const userResponse = await getUserByID({ host, userId: command.userId });
 
     if (!userResponse?.user) {
       return { error: "Could not load user" };
@@ -306,7 +340,10 @@ export async function sendVerificationRedirectWithoutCheck(
     return { error: "Could not load user" };
   }
 
-  const authMethodResponse = await listAuthenticationMethodTypes(user.userId);
+  const authMethodResponse = await listAuthenticationMethodTypes({
+    host,
+    userId: user.userId,
+  });
 
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
     return { error: "Could not load possible authenticators" };
@@ -328,7 +365,10 @@ export async function sendVerificationRedirectWithoutCheck(
     return { redirect: `/authenticator/set?${params}` };
   }
 
-  const loginSettings = await getLoginSettings(user.details?.resourceOwner);
+  const loginSettings = await getLoginSettings({
+    host,
+    organization: user.details?.resourceOwner,
+  });
 
   // redirect to mfa factor if user has one, or redirect to set one up
   const mfaFactorCheck = checkMFAFactors(

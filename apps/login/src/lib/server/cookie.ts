@@ -31,6 +31,7 @@ export async function createSessionAndUpdateCookie(
   checks: Checks,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
+  lifetime?: Duration,
 ): Promise<Session> {
   const host = (await headers()).get("host");
 
@@ -42,6 +43,7 @@ export async function createSessionAndUpdateCookie(
     host,
     checks,
     challenges,
+    lifetime,
   });
 
   if (createdSession) {
