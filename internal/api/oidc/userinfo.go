@@ -203,6 +203,10 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 				out.AppendClaims(domain.OrgIDClaim, claim)
 				setUserInfoOrgClaims(user, out)
 			}
+			if claim, ok := strings.CutPrefix(s, domain.GroupIDScope); ok {
+				out.AppendClaims(domain.GroupIDScope, claim)
+				setUserInfoGroupClaims(user, out)
+			}
 		}
 	}
 	return out
@@ -282,6 +286,17 @@ func setUserInfoOrgClaims(user *query.OIDCUserInfo, out *oidc.UserInfo) {
 }
 
 func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
+	if roles != nil && len(roles.projects) > 0 {
+		if roles, ok := roles.projects[roles.requestProjectID]; ok {
+			userInfo.AppendClaims(ClaimProjectRoles, roles)
+		}
+		for projectID, roles := range roles.projects {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
+		}
+	}
+}
+
+func setUserInfoGroupClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	if roles != nil && len(roles.projects) > 0 {
 		if roles, ok := roles.projects[roles.requestProjectID]; ok {
 			userInfo.AppendClaims(ClaimProjectRoles, roles)

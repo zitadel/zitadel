@@ -11,6 +11,8 @@ const (
 	AudSuffix             = ":aud"
 	ProjectScopeZITADEL   = ProjectIDScope + ProjectIDScopeZITADEL + AudSuffix
 	SelectIDPScope        = "urn:zitadel:iam:org:idp:id:"
+
+	GroupIDScope = "urn:zitadel:iam:org:group:id:"
 )
 
 // TODO: Change AuthRequest to interface and let oidcauthreqesut implement it

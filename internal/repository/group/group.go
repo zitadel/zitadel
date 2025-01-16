@@ -289,7 +289,7 @@ func (e *GroupReactivatedEvent) Fields() []*eventstore.FieldOperation {
 			groupSearchObject(e.Aggregate().ID),
 			GroupStateSearchField,
 			&eventstore.Value{
-				Value:       domain.GroupStateRemoved,
+				Value:       domain.GroupStateActive,
 				ShouldIndex: true,
 			},
 

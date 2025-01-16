@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/group"
+
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -172,15 +173,14 @@ func (c *Commands) groupAggregateByID(ctx context.Context, groupID, resourceOwne
 	if err != nil {
 		return nil, domain.GroupStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-MDQqF", "Errors.Group.NotFound")
 	}
-	/* Why ?
+
 	if len(result) == 0 {
-		_ = projection.GroupGrantFields.Trigger(ctx)
+		// _ = projection.GroupGrantFields.Trigger(ctx)
 		result, err = c.groupState(ctx, groupID, resourceOwner)
 		if err != nil || len(result) == 0 {
 			return nil, domain.GroupStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-V2Mza", "Errors.Group.NotFound")
 		}
 	}
-	*/
 
 	var state domain.GroupState
 	err = result[0].Value.Unmarshal(&state)
@@ -264,12 +264,7 @@ func (c *Commands) DeactivateGroup(ctx context.Context, groupID string, resource
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-223N9", "Errors.Group.NotFound")
 	}
 	if state != domain.GroupStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-nlf66", "Errors.Group.NotActive")
-	}
-
-	pushedEvents, err := c.eventstore.Push(ctx, group.NewGroupDeactivatedEvent(ctx, groupAgg))
-	if err != nil {
-		return nil, err
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-nle66", "Errors.Group.NotActive")
 	}
 
 	existingGroup, err := c.getGroupWriteModelByID(ctx, groupID, resourceOwner)
@@ -281,6 +276,11 @@ func (c *Commands) DeactivateGroup(ctx context.Context, groupID string, resource
 	}
 	if existingGroup.State != domain.GroupStateActive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-nlf66", "Errors.Group.NotActive")
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, group.NewGroupDeactivatedEvent(ctx, groupAgg))
+	if err != nil {
+		return nil, err
 	}
 
 	return &domain.ObjectDetails{

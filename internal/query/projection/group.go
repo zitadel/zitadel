@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	GroupProjectionTable = "projections.group"
+	GroupProjectionTable = "projections.group14"
 
 	GroupColumnID            = "id"
 	GroupColumnCreationDate  = "creation_date"

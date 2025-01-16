@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	GroupMemberProjectionTable   = "projections.group_members"
+	GroupMemberProjectionTable   = "projections.group_members14"
 	GroupMemberGroupIDCol        = "group_id"
 	GroupMemberUserIDCol         = "user_id"
 	GroupMemberUserResourceOwner = "user_resource_owner"
