@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS eventstore.events2_current_sequence;

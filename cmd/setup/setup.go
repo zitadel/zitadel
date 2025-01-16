@@ -171,6 +171,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: esPusherDBClient, esClient: eventstoreClient}
 	steps.s40InitPushFunc = &InitPushFunc{dbClient: esPusherDBClient}
 	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: esPusherDBClient}
+	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: queryDBClient}
+	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: esPusherDBClient}
+	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
+	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -192,6 +196,10 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		},
 		&FillFieldsForInstanceDomains{
 			eventstore: eventstoreClient,
+		},
+		&SyncRolePermissions{
+			eventstore:             eventstoreClient,
+			rolePermissionMappings: config.InternalAuthZ.RolePermissionMappings,
 		},
 	}
 
@@ -224,6 +232,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s35AddPositionToIndexEsWm,
 		steps.s36FillV2Milestones,
 		steps.s38BackChannelLogoutNotificationStart,
+		steps.s44ReplaceCurrentSequencesIndex,
+		steps.s45CorrectProjectOwners,
+		steps.s46InitPermissionFunctions,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -242,6 +253,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s33SMSConfigs3TwilioAddVerifyServiceSid,
 		steps.s37Apps7OIDConfigsBackChannelLogoutURI,
 		steps.s42Apps7OIDCConfigsLoginVersion,
+		steps.s43CreateFieldsDomainIndex,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
