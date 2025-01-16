@@ -13,8 +13,8 @@ end
 
 -- max-age must be checked manually
 local expiry = getCall("HGET", object_id, "expiry")
-if not (expiry == nil) and expiry > 0 then
-    if getTime() > expiry then
+if not (expiry == nil) and tonumber(expiry) > 0 then
+    if getTime() > tonumber(expiry) then
         remove(object_id)
         return nil
     end
