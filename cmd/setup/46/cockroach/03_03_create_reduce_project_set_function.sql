@@ -1,10 +1,9 @@
-CREATE OR REPLACE FUNCTION reduce_instance_default_language_set("event" eventstore.events2)
-RETURNS VOID
+CREATE OR REPLACE PROCEDURE reduce_instance_project_set("event" eventstore.events2)
 LANGUAGE PLpgSQL
 AS $$
 BEGIN
     UPDATE instances SET
-        default_language = (event).payload->>'language'
+        iam_project_id = (event).payload->>'iamProjectId'
         , change_date = (event).created_at
         , latest_position = (event).position
         , latest_in_position_order = (event).in_tx_order::INT2

@@ -1,0 +1,1 @@
+SELECT subscriptions.queue_previous_events('transactional-instances', NULL);

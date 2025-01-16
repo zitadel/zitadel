@@ -1,10 +1,9 @@
-CREATE OR REPLACE FUNCTION reduce_instance_changed("event" eventstore.events2)
-RETURNS VOID
+CREATE OR REPLACE PROCEDURE reduce_instance_default_org_set("event" eventstore.events2)
 LANGUAGE PLpgSQL
 AS $$
 BEGIN
     UPDATE instances SET
-        "name" = (event).payload->>'name'
+        default_org_id = (event).payload->>'orgId'
         , change_date = (event).created_at
         , latest_position = (event).position
         , latest_in_position_order = (event).in_tx_order::INT2

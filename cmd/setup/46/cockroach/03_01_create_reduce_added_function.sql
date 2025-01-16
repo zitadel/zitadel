@@ -1,5 +1,4 @@
-CREATE OR REPLACE FUNCTION reduce_instance_added("event" eventstore.events2)
-RETURNS TEXT
+CREATE OR REPLACE PROCEDURE reduce_instance_added("event" eventstore.events2)
 LANGUAGE PLpgSQL
 AS $$
 BEGIN
@@ -19,6 +18,5 @@ BEGIN
         , (event).in_tx_order::INT2
     )
     ON CONFLICT (id) DO NOTHING;
-    RETURN 'OK';
 END;
 $$;
