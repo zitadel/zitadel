@@ -99,6 +99,13 @@ message SetInstanceFeaturesRequest{
       description: "Specify the login UI for all users and applications regardless of their preference.";
     }
   ];
+
+  optional bool permission_check_v2 = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -210,6 +217,12 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If the flag is set, all users will be redirected to the login V2 regardless of the application's preference.";
+    }
+  ];
+
+  FeatureFlag permission_check_v2 = 15 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.";
     }
   ];
 }

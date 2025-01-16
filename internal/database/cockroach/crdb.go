@@ -3,7 +3,6 @@ package cockroach
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -14,7 +13,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
@@ -74,19 +72,16 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 	return connector, nil
 }
 
-func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, *pgxpool.Pool, error) {
+func (c *Config) Connect(useAdmin bool) (*sql.DB, *pgxpool.Pool, error) {
 	dialect.RegisterAfterConnect(func(ctx context.Context, c *pgx.Conn) error {
 		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
 		// This is needed to fill the fields table of the eventstore during eventstore.Push.
 		_, err := c.Exec(ctx, "SET enable_multiple_modifications_of_table = on")
 		return err
 	})
-	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
-	if err != nil {
-		return nil, nil, err
-	}
+	connConfig := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns)
 
-	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
+	config, err := pgxpool.ParseConfig(c.String(useAdmin))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -99,18 +94,6 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 				}
 			}
 			return nil
-		}
-	}
-
-	// For the pusher we set the app name with the instance ID
-	if purpose == dialect.DBPurposeEventPusher {
-		config.BeforeAcquire = func(ctx context.Context, conn *pgx.Conn) bool {
-			return setAppNameWithID(ctx, conn, purpose, authz.GetInstance(ctx).InstanceID())
-		}
-		config.AfterRelease = func(conn *pgx.Conn) bool {
-			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-			defer cancel()
-			return setAppNameWithID(ctx, conn, purpose, "IDLE")
 		}
 	}
 
@@ -195,7 +178,7 @@ func (c *Config) checkSSL(user User) {
 	}
 }
 
-func (c Config) String(useAdmin bool, appName string) string {
+func (c Config) String(useAdmin bool) string {
 	user := c.User
 	if useAdmin {
 		user = c.Admin.User
@@ -206,7 +189,7 @@ func (c Config) String(useAdmin bool, appName string) string {
 		"port=" + strconv.Itoa(int(c.Port)),
 		"user=" + user.Username,
 		"dbname=" + c.Database,
-		"application_name=" + appName,
+		"application_name=" + dialect.DefaultAppName,
 		"sslmode=" + user.SSL.Mode,
 	}
 	if c.Options != "" {
@@ -231,12 +214,4 @@ func (c Config) String(useAdmin bool, appName string) string {
 	}
 
 	return strings.Join(fields, " ")
-}
-
-func setAppNameWithID(ctx context.Context, conn *pgx.Conn, purpose dialect.DBPurpose, id string) bool {
-	// needs to be set like this because psql complains about parameters in the SET statement
-	query := fmt.Sprintf("SET application_name = '%s_%s'", purpose.AppName(), id)
-	_, err := conn.Exec(ctx, query)
-	logging.OnError(err).Warn("failed to set application name")
-	return err == nil
 }

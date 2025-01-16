@@ -23,6 +23,7 @@ const (
 	KeyDisableUserTokenEvent
 	KeyEnableBackChannelLogout
 	KeyLoginV2
+	KeyPermissionCheckV2
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -52,6 +53,7 @@ type Features struct {
 	DisableUserTokenEvent           bool                      `json:"disable_user_token_event,omitempty"`
 	EnableBackChannelLogout         bool                      `json:"enable_back_channel_logout,omitempty"`
 	LoginV2                         LoginV2                   `json:"login_v2,omitempty"`
+	PermissionCheckV2               bool                      `json:"permission_check_v2,omitempty"`
 }
 
 type ImprovedPerformanceType int32

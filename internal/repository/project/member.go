@@ -14,8 +14,16 @@ var (
 	MemberCascadeRemovedType = projectEventTypePrefix + member.CascadeRemovedEventType
 )
 
+const (
+	fieldPrefix = "project"
+)
+
 type MemberAddedEvent struct {
 	member.MemberAddedEvent
+}
+
+func (e *MemberAddedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
 }
 
 func NewProjectMemberAddedEvent(
@@ -48,6 +56,10 @@ func MemberAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 type MemberChangedEvent struct {
 	member.MemberChangedEvent
+}
+
+func (e *MemberChangedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
 }
 
 func NewProjectMemberChangedEvent(
@@ -83,6 +95,10 @@ type MemberRemovedEvent struct {
 	member.MemberRemovedEvent
 }
 
+func (e *MemberRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
+}
+
 func NewProjectMemberRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -112,6 +128,10 @@ func MemberRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 type MemberCascadeRemovedEvent struct {
 	member.MemberCascadeRemovedEvent
+}
+
+func (e *MemberCascadeRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
 }
 
 func NewProjectMemberCascadeRemovedEvent(
