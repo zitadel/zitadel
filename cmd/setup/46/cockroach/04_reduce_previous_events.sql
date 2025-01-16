@@ -1,28 +1,21 @@
-SELECT subscriptions.reduce_events_in_queue('transactional-instances');
+BEGIN;
 
-WITH RECURSIVE queued_events(subscriber_id UUID, offset INT) AS (
-    SELECT 
-        id
-        , 0 
+DECLARE queued_events CURSOR FOR 
+    SELECT
+        q.id
+        , e AS "event"
     FROM
-        subscriptions.subscribers
+        subscriptions.queue q
+    JOIN
+        eventstore.events2 e
+        ON e.instance_id = q.instance_id
+        AND e.aggregate_type = q.aggregate_type
+        AND e.aggregate_id = q.aggregate_id
+        AND e."sequence" = q.sequence
     WHERE
-        name = 'transactional-instances'
-    UNION ALL
-    WITH queued_event AS (
-        SELECT
-            q.id AS queue_id
-            , e AS "event" 
-        FROM
-            subscriptions.queue q
-        WHERE
-            q.subscriber = subscriber_id
-        ORDER BY
-            position
-            , in_tx_order
-        LIMIT 1
-        OFFSET offset
-    ), reduce AS (
-        CALL reduce_instance_event((SELECT queue_id FROM queued_event), (SELECT "event" FROM queued_event))
-    ) SELECT id, offset+1 FROM queued_events
-) select * from queued_events;
+        q.subscriber = (SELECT id FROM subscriptions.subscribers WHERE name = 'transactional-instances');
+
+OPEN queued_events;
+
+
+CLOSE queued_events;

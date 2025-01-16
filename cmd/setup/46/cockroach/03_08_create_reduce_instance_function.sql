@@ -1,3 +1,24 @@
+CREATE OR REPLACE PROCEDURE reduce_instance_events(
+    _queued_events CURSOR
+)
+LANGUAGE PLpgSQL
+AS $$
+DECLARE
+    "event" eventstore.events2;
+    queue_id UUID;
+BEGIN
+    OPEN _queued_events;
+    LOOP
+        FETCH _queued_events INTO queue_id, "event";
+        EXIT WHEN "event" IS NULL;
+
+        CALL reduce_instance_event(queue_id, "event");
+    END LOOP;
+    CLOSE _queued_events;
+END;
+$$;
+
+
 CREATE OR REPLACE PROCEDURE reduce_instance_event(
     queue_id UUID
     , "event" eventstore.events2
