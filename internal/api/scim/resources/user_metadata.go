@@ -4,6 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"time"
+	// import timezone database to ensure it is available at runtime
+	// data is required to validate time zones.
+	_ "time/tzdata"
 
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
