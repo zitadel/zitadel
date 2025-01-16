@@ -101,6 +101,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 				BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 			},
 		},
+		PermissionCheckV2: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetSystemFeaturesResponse{
 		Details: &object.Details{
@@ -152,6 +156,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 			Source:   feature_pb.Source_SOURCE_SYSTEM,
+		},
+		PermissionCheckV2: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 	}
 	got := systemFeaturesToPb(arg)
@@ -252,6 +260,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 				BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 			},
 		},
+		PermissionCheckV2: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -311,6 +323,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 			Source:   feature_pb.Source_SOURCE_INSTANCE,
+		},
+		PermissionCheckV2: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 	}
 	got := instanceFeaturesToPb(arg)
