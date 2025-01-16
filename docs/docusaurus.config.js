@@ -246,6 +246,7 @@ module.exports = {
       label: '/scalar/v2',
       route: '/docs/scalar/v2',
       configuration: {
+        tagsSorter: 'alpha',
         spec: {
           // Put the URL to your OpenAPI document here:
           url: '/docs/zitadel.swagger.yaml',
