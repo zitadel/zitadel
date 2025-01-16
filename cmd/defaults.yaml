@@ -492,16 +492,6 @@ Notifications:
   MaxRetryDelay: 1m # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
   # Any factor below 1 will be set to 1
   RetryDelayFactor: 1.5 # ZITADEL_NOTIFIACATIONS_RETRYDELAYFACTOR
-  # Define cases on which the notification will directly be cancelled without retries.
-  CancelOn:
-    TwilioErrorCodes:
-      # Cancel the notification if there were too many attempts to send a verification code (more than 5 times)
-      # without a verification check, as even retries with backoff might not solve the problem.
-      # https://www.twilio.com/docs/api/errors/60203
-      - 60203
-      # Cancel the notification if Twilio blocked the delivery because of fraud suspicion.
-      # https://www.twilio.com/docs/api/errors/60410
-      - 60410
 
 Auth:
   # See Projections.BulkLimit

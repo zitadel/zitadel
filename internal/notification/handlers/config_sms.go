@@ -38,7 +38,6 @@ func (n *NotificationQueries) GetActiveSMSConfig(ctx context.Context) (*sms.Conf
 				Token:            token,
 				SenderNumber:     config.TwilioConfig.SenderNumber,
 				VerifyServiceSID: config.TwilioConfig.VerifyServiceSID,
-				CancelErrorCodes: n.CancelOn.TwilioErrorCodes,
 			},
 		}, nil
 	}

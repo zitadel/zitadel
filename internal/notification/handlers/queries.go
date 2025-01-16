@@ -45,7 +45,6 @@ type NotificationQueries struct {
 	UserDataCrypto     crypto.EncryptionAlgorithm
 	SMTPPasswordCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto     crypto.EncryptionAlgorithm
-	CancelOn           CancelEvents
 }
 
 func NewNotificationQueries(
@@ -58,7 +57,6 @@ func NewNotificationQueries(
 	userDataCrypto crypto.EncryptionAlgorithm,
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
-	cancelOn CancelEvents,
 ) *NotificationQueries {
 	return &NotificationQueries{
 		Queries:            baseQueries,
@@ -70,6 +68,5 @@ func NewNotificationQueries(
 		UserDataCrypto:     userDataCrypto,
 		SMTPPasswordCrypto: smtpPasswordCrypto,
 		SMSTokenCrypto:     smsTokenCrypto,
-		CancelOn:           cancelOn,
 	}
 }
