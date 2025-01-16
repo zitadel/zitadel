@@ -56,28 +56,11 @@ async function cacheWrapper<T>(callback: Promise<T>) {
   return callback;
 }
 
-// const idpService: Client<typeof IdentityProviderService> =
-//   await createServiceForHost(IdentityProviderService, host);
-// const orgService: Client<typeof OrganizationService> =
-//   await createServiceForHost(OrganizationService, host);
-// const sessionService: Client<typeof SessionService> =
-//   await createServiceForHost(SessionService, host);
-// const userService: Client<typeof UserService> = await createServiceForHost(
-//   UserService,
-//   host,
-// );
-// const oidcService: Client<typeof OIDCService> = await createServiceForHost(
-//   OIDCService,
-//   host,
-// );
-// const settingsService: Client<typeof SettingsService> =
-//   await createServiceForHost(SettingsService, host);
-
 const systemService = async () => {
   const systemToken = await systemAPIToken();
 
   const transport = createServerTransport(systemToken, {
-    baseUrl: process.env.ZITADEL_API_URL,
+    baseUrl: process.env.AUDIENCE,
   });
 
   return createSystemServiceClient(transport);
