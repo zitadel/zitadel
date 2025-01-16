@@ -530,9 +530,6 @@ OIDC:
   GrantTypeRefreshToken: true # ZITADEL_OIDC_GRANTTYPEREFRESHTOKEN
   RequestObjectSupported: true # ZITADEL_OIDC_REQUESTOBJECTSUPPORTED
 
-  # Deprecated: The signing algorithm is determined by the generated keys.
-  # Use the web keys resource to generate keys with different algorithms.
-  SigningKeyAlgorithm: RS256 # ZITADEL_OIDC_SIGNINGKEYALGORITHM
   # Sets the default values for lifetime and expiration for OIDC
   # This default can be overwritten in the default instance configuration and for each instance during runtime
   # !!! Changing this after the initial setup will have no impact without a restart !!!
@@ -593,6 +590,11 @@ SAML:
     #  Company: ZITADEL # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_COMPANY
     #  EmailAddress: hi@zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_EMAILADDRESS
 
+SCIM:
+  # default values whether an email/phone is considered verified when a users email/phone is created or updated
+  EmailVerified: true # ZITADEL_SCIM_EMAILVERIFIED
+  PhoneVerified: true # ZITADEL_SCIM_PHONEVERIFIED
+
 Login:
   LanguageCookieName: zitadel.login.lang # ZITADEL_LOGIN_LANGUAGECOOKIENAME
   CSRFCookieName: zitadel.login.csrf # ZITADEL_LOGIN_CSRFCOOKIENAME
@@ -611,6 +613,9 @@ Console:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_CONSOLE_LONGCACHE_SHAREDMAXAGE
   InstanceManagementURL: "" # ZITADEL_CONSOLE_INSTANCEMANAGEMENTURL
+  PostHog:
+    URL: "" # ZITADEL_CONSOLE_POSTHOG_URL
+    Token: "" # ZITADEL_CONSOLE_POSTHOG_TOKEN
 
 EncryptionKeys:
   DomainVerification:

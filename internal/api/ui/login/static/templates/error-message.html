@@ -1,10 +1,9 @@
 {{ define "error-message" }}
 {{if .ErrMessage }}
-<div class="lgn-error" title="{{.ErrID}}">
+<div class="lgn-error dialog_content" title="{{.ErrID}}">
     <i class="lgn-icon-exclamation-circle-solid lgn-warn"></i>
-    <p class="lgn-error-message">
-        {{ .ErrMessage }}
-    </p>
+    <p class="lgn-error-message">{{ .ErrMessage }}</p>
 </div>
+<div id="dialog_overlay" class="dialog_overlay {{if .ErrPopup}}show{{end}}"></div>
 {{end}}
-{{ end }}
+{{end}}

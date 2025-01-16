@@ -5,7 +5,6 @@ package session_test
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
@@ -14,7 +13,6 @@ import (
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -29,63 +27,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
-var (
-	CTX             context.Context
-	IAMOwnerCTX     context.Context
-	Instance        *integration.Instance
-	Client          session.SessionServiceClient
-	User            *user.AddHumanUserResponse
-	DeactivatedUser *user.AddHumanUserResponse
-	LockedUser      *user.AddHumanUserResponse
-)
-
-func TestMain(m *testing.M) {
-	os.Exit(func() int {
-		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
-		defer cancel()
-
-		Instance = integration.NewInstance(ctx)
-		Client = Instance.Client.SessionV2
-
-		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
-		IAMOwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		User = createFullUser(CTX)
-		DeactivatedUser = createDeactivatedUser(CTX)
-		LockedUser = createLockedUser(CTX)
-		return m.Run()
-	}())
-}
-
-func createFullUser(ctx context.Context) *user.AddHumanUserResponse {
-	userResp := Instance.CreateHumanUser(ctx)
-	Instance.Client.UserV2.VerifyEmail(ctx, &user.VerifyEmailRequest{
-		UserId:           userResp.GetUserId(),
-		VerificationCode: userResp.GetEmailCode(),
-	})
-	Instance.Client.UserV2.VerifyPhone(ctx, &user.VerifyPhoneRequest{
-		UserId:           userResp.GetUserId(),
-		VerificationCode: userResp.GetPhoneCode(),
-	})
-	Instance.SetUserPassword(ctx, userResp.GetUserId(), integration.UserPassword, false)
-	Instance.RegisterUserPasskey(ctx, userResp.GetUserId())
-	return userResp
-}
-
-func createDeactivatedUser(ctx context.Context) *user.AddHumanUserResponse {
-	userResp := Instance.CreateHumanUser(ctx)
-	_, err := Instance.Client.UserV2.DeactivateUser(ctx, &user.DeactivateUserRequest{UserId: userResp.GetUserId()})
-	logging.OnError(err).Fatal("deactivate human user")
-	return userResp
-}
-
-func createLockedUser(ctx context.Context) *user.AddHumanUserResponse {
-	userResp := Instance.CreateHumanUser(ctx)
-	_, err := Instance.Client.UserV2.LockUser(ctx, &user.LockUserRequest{UserId: userResp.GetUserId()})
-	logging.OnError(err).Fatal("lock human user")
-	return userResp
-}
-
-func verifyCurrentSession(t testing.TB, id, token string, sequence uint64, window time.Duration, metadata map[string][]byte, userAgent *session.UserAgent, expirationWindow time.Duration, userID string, factors ...wantFactor) *session.Session {
+func verifyCurrentSession(t *testing.T, id, token string, sequence uint64, window time.Duration, metadata map[string][]byte, userAgent *session.UserAgent, expirationWindow time.Duration, userID string, factors ...wantFactor) *session.Session {
 	t.Helper()
 	require.NotEmpty(t, id)
 	require.NotEmpty(t, token)
@@ -96,15 +38,25 @@ func verifyCurrentSession(t testing.TB, id, token string, sequence uint64, windo
 	})
 	require.NoError(t, err)
 	s := resp.GetSession()
+	want := &session.Session{
+		Id:        id,
+		Sequence:  sequence,
+		Metadata:  metadata,
+		UserAgent: userAgent,
+	}
+	verifySession(t, s, want, window, expirationWindow, userID, factors...)
+	return s
+}
 
-	assert.Equal(t, id, s.GetId())
+func verifySession(t assert.TestingT, s *session.Session, want *session.Session, window time.Duration, expirationWindow time.Duration, userID string, factors ...wantFactor) {
+	assert.Equal(t, want.Id, s.GetId())
 	assert.WithinRange(t, s.GetCreationDate().AsTime(), time.Now().Add(-window), time.Now().Add(window))
 	assert.WithinRange(t, s.GetChangeDate().AsTime(), time.Now().Add(-window), time.Now().Add(window))
-	assert.Equal(t, sequence, s.GetSequence())
-	assert.Equal(t, metadata, s.GetMetadata())
+	assert.Equal(t, want.Sequence, s.GetSequence())
+	assert.Equal(t, want.Metadata, s.GetMetadata())
 
-	if !proto.Equal(userAgent, s.GetUserAgent()) {
-		t.Errorf("user agent =\n%v\nwant\n%v", s.GetUserAgent(), userAgent)
+	if !proto.Equal(want.UserAgent, s.GetUserAgent()) {
+		t.Errorf("user agent =\n%v\nwant\n%v", s.GetUserAgent(), want.UserAgent)
 	}
 	if expirationWindow == 0 {
 		assert.Nil(t, s.GetExpirationDate())
@@ -113,7 +65,6 @@ func verifyCurrentSession(t testing.TB, id, token string, sequence uint64, windo
 	}
 
 	verifyFactors(t, s.GetFactors(), window, userID, factors)
-	return s
 }
 
 type wantFactor int
@@ -129,7 +80,7 @@ const (
 	wantOTPEmailFactor
 )
 
-func verifyFactors(t testing.TB, factors *session.Factors, window time.Duration, userID string, want []wantFactor) {
+func verifyFactors(t assert.TestingT, factors *session.Factors, window time.Duration, userID string, want []wantFactor) {
 	for _, w := range want {
 		switch w {
 		case wantUserFactor:
@@ -194,8 +145,15 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 		},
 		{
-			name: "user agent",
+			name: "full session",
 			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: User.GetUserId(),
+						},
+					},
+				},
 				Metadata: map[string][]byte{"foo": []byte("bar")},
 				UserAgent: &session.UserAgent{
 					FingerprintId: gu.Ptr("fingerPrintID"),
@@ -205,19 +163,12 @@ func TestServer_CreateSession(t *testing.T) {
 						"foo": {Values: []string{"foo", "bar"}},
 					},
 				},
+				Lifetime: durationpb.New(5 * time.Minute),
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.ID(),
-				},
-			},
-			wantUserAgent: &session.UserAgent{
-				FingerprintId: gu.Ptr("fingerPrintID"),
-				Ip:            gu.Ptr("1.2.3.4"),
-				Description:   gu.Ptr("Description"),
-				Header: map[string]*session.UserAgent_HeaderValues{
-					"foo": {Values: []string{"foo", "bar"}},
 				},
 			},
 		},
@@ -228,40 +179,6 @@ func TestServer_CreateSession(t *testing.T) {
 				Lifetime: durationpb.New(-5 * time.Minute),
 			},
 			wantErr: true,
-		},
-		{
-			name: "lifetime",
-			req: &session.CreateSessionRequest{
-				Metadata: map[string][]byte{"foo": []byte("bar")},
-				Lifetime: durationpb.New(5 * time.Minute),
-			},
-			want: &session.CreateSessionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-			},
-			wantExpirationWindow: 5 * time.Minute,
-		},
-		{
-			name: "with user",
-			req: &session.CreateSessionRequest{
-				Checks: &session.Checks{
-					User: &session.CheckUser{
-						Search: &session.CheckUser_UserId{
-							UserId: User.GetUserId(),
-						},
-					},
-				},
-				Metadata: map[string][]byte{"foo": []byte("bar")},
-			},
-			want: &session.CreateSessionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.ID(),
-				},
-			},
-			wantFactors: []wantFactor{wantUserFactor},
 		},
 		{
 			name: "deactivated user",
@@ -340,8 +257,6 @@ func TestServer_CreateSession(t *testing.T) {
 			}
 			require.NoError(t, err)
 			integration.AssertDetails(t, tt.want, got)
-
-			verifyCurrentSession(t, got.GetSessionId(), got.GetSessionToken(), got.GetDetails().GetSequence(), time.Minute, tt.req.GetMetadata(), tt.wantUserAgent, tt.wantExpirationWindow, User.GetUserId(), tt.wantFactors...)
 		})
 	}
 }
@@ -946,21 +861,30 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", createResp.GetSessionToken()))
-	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: createResp.GetSessionId()})
-	require.Error(t, err)
-	require.Nil(t, sessionResp)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: createResp.GetSessionId()})
+		if !assert.Error(tt, err) {
+			return
+		}
+		assert.Nil(tt, sessionResp)
+	}, retryDuration, tick)
 }
 
 func Test_ZITADEL_API_success(t *testing.T) {
 	id, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
-
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
-	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.NoError(t, err)
 
-	webAuthN := sessionResp.GetSession().GetFactors().GetWebAuthN()
-	require.NotNil(t, id, webAuthN.GetVerifiedAt().AsTime())
-	require.True(t, webAuthN.GetUserVerified())
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+		if !assert.NoError(tt, err) {
+			return
+		}
+		webAuthN := sessionResp.GetSession().GetFactors().GetWebAuthN()
+		assert.NotNil(tt, id, webAuthN.GetVerifiedAt().AsTime())
+		assert.True(tt, webAuthN.GetUserVerified())
+	}, retryDuration, tick)
 }
 
 func Test_ZITADEL_API_session_not_found(t *testing.T) {
@@ -968,18 +892,30 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 
 	// test session token works
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
-	_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.NoError(t, err)
+
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+		if !assert.NoError(tt, err) {
+			return
+		}
+	}, retryDuration, tick)
 
 	//terminate the session and test it does not work anymore
-	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+	_, err := Client.DeleteSession(CTX, &session.DeleteSessionRequest{
 		SessionId:    id,
 		SessionToken: gu.Ptr(token),
 	})
 	require.NoError(t, err)
+
 	ctx = integration.WithAuthorizationToken(context.Background(), token)
-	_, err = Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.Error(t, err)
+	retryDuration, tick = integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+		if !assert.Error(tt, err) {
+			return
+		}
+	}, retryDuration, tick)
 }
 
 func Test_ZITADEL_API_session_expired(t *testing.T) {
@@ -987,8 +923,13 @@ func Test_ZITADEL_API_session_expired(t *testing.T) {
 
 	// test session token works
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
-	_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.NoError(t, err)
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(ctx, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+		if !assert.NoError(tt, err) {
+			return
+		}
+	}, retryDuration, tick)
 
 	// ensure session expires and does not work anymore
 	time.Sleep(20 * time.Second)

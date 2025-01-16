@@ -1228,7 +1228,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
 					queries:  queries,
@@ -1264,7 +1264,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 				Domains: []*query.InstanceDomain{{
 					Domain:    instancePrimaryDomain,
@@ -1306,7 +1306,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
 					queries:  queries,
@@ -1350,7 +1350,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 				}},
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
 					queries:  queries,
@@ -1386,7 +1386,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
 			return fields{
 					queries:  queries,
@@ -1445,7 +1445,7 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 				Content:              expectContent,
 			}
 			expectTemplateWithNotifyUserQueriesSMS(queries)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
 			return fields{
 					queries:  queries,
@@ -1481,7 +1481,7 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 				Content:              expectContent,
 			}
 			expectTemplateWithNotifyUserQueriesSMS(queries)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 				Domains: []*query.InstanceDomain{{
 					Domain:    instancePrimaryDomain,

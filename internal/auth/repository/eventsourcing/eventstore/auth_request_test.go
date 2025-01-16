@@ -1247,12 +1247,200 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			args{&domain.AuthRequest{
 				UserID:              "UserID",
 				SelectedIDPConfigID: "IDPConfigID",
+				AllowedExternalIDPs: []*domain.IDPProvider{{IDPConfigID: "IDPConfigID"}},
 				LoginPolicy: &domain.LoginPolicy{
 					AllowUsernamePassword:     false,
 					SecondFactorCheckLifetime: 18 * time.Hour,
 				}}, false},
 			[]domain.NextStep{&domain.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
 			nil,
+		},
+		{
+			"external user (idp selected, not allowed, no external verification), error",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{&domain.AuthRequest{
+				UserID:              "UserID",
+				SelectedIDPConfigID: "IDPConfigID",
+				AllowedExternalIDPs: []*domain.IDPProvider{},
+				LoginPolicy: &domain.LoginPolicy{
+					AllowUsernamePassword:     false,
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				}}, false},
+			nil,
+			zerrors.IsPreconditionFailed,
+		},
+		{
+			"external user (idp link, no external verification), external login step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					[]*query.IDPUserLink{
+						{IDPID: "IDPConfigID"},
+					},
+				},
+			},
+			args{&domain.AuthRequest{
+				UserID:              "UserID",
+				SelectedIDPConfigID: "",
+				AllowedExternalIDPs: []*domain.IDPProvider{{IDPConfigID: "IDPConfigID"}},
+				LoginPolicy: &domain.LoginPolicy{
+					AllowUsernamePassword:     false,
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				}}, false},
+			[]domain.NextStep{&domain.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
+			nil,
+		},
+		{
+			"external user (idp link not allowed, no external verification), external login step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					[]*query.IDPUserLink{
+						{IDPID: "IDPConfigID1"},
+					},
+				},
+			},
+			args{&domain.AuthRequest{
+				UserID:              "UserID",
+				SelectedIDPConfigID: "",
+				AllowedExternalIDPs: []*domain.IDPProvider{{IDPConfigID: "IDPConfigID2"}},
+				LoginPolicy: &domain.LoginPolicy{
+					AllowUsernamePassword:     false,
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				}}, false},
+			[]domain.NextStep{&domain.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID2"}},
+			nil,
+		},
+		{
+			"external user (idp link not allowed, none allowed, no external verification), external login step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					[]*query.IDPUserLink{
+						{IDPID: "IDPConfigID1"},
+					},
+				},
+			},
+			args{&domain.AuthRequest{
+				UserID:              "UserID",
+				SelectedIDPConfigID: "",
+				AllowedExternalIDPs: []*domain.IDPProvider{},
+				LoginPolicy: &domain.LoginPolicy{
+					AllowUsernamePassword:     false,
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				}}, false},
+			nil,
+			zerrors.IsPreconditionFailed,
+		},
+		{
+			"external user (no idp allowed, no external verification), error",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{&domain.AuthRequest{
+				UserID:              "UserID",
+				SelectedIDPConfigID: "",
+				AllowedExternalIDPs: []*domain.IDPProvider{},
+				LoginPolicy: &domain.LoginPolicy{
+					AllowUsernamePassword:     false,
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				}}, false},
+			nil,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"external user (only idp available, no external verification), external login step",
@@ -1281,13 +1469,49 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 			},
 			args{&domain.AuthRequest{
-				UserID: "UserID",
+				UserID:              "UserID",
+				AllowedExternalIDPs: []*domain.IDPProvider{{IDPConfigID: "IDPConfigID"}},
 				LoginPolicy: &domain.LoginPolicy{
 					AllowUsernamePassword:     false,
 					SecondFactorCheckLifetime: 18 * time.Hour,
 				}}, false},
 			[]domain.NextStep{&domain.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
 			nil,
+		}, {
+			"external user (only idp available, no allowed, no external verification), external login step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					idps: []*query.IDPUserLink{{IDPID: "IDPConfigID"}},
+				},
+			},
+			args{&domain.AuthRequest{
+				UserID:              "UserID",
+				AllowedExternalIDPs: []*domain.IDPProvider{},
+				LoginPolicy: &domain.LoginPolicy{
+					AllowUsernamePassword:     false,
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				}}, false},
+			nil,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"external user (external verification set), callback",
@@ -2037,6 +2261,86 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					},
 				}, false},
 			[]domain.NextStep{&domain.LinkUsersStep{}},
+			nil,
+		},
+		{
+			"local auth requested (passwordless and password set up), passwordless step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordSet:        true,
+					IsEmailVerified:    true,
+					MFAMaxSetUp:        int32(domain.MFALevelMultiFactor),
+					PasswordlessTokens: user_view_model.WebAuthNTokens{&user_view_model.WebAuthNView{ID: "id", State: int32(user_model.MFAStateReady)}},
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					idps: []*query.IDPUserLink{{IDPID: "IDPConfigID"}},
+				},
+			},
+			args{
+				&domain.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LoginPolicy: &domain.LoginPolicy{
+						PasswordlessType: domain.PasswordlessTypeAllowed,
+					},
+					AllowedExternalIDPs: []*domain.IDPProvider{
+						{
+							IDPConfigID: "IDPConfigID",
+						},
+					},
+					RequestLocalAuth: true,
+				}, false},
+			[]domain.NextStep{
+				&domain.PasswordlessStep{
+					PasswordSet: true,
+				},
+			},
+			nil,
+		},
+		{
+			"local auth requested (password set up), password step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{
+					idps: []*query.IDPUserLink{{IDPID: "IDPConfigID"}},
+				},
+			},
+			args{
+				&domain.AuthRequest{
+					UserID:              "UserID",
+					SelectedIDPConfigID: "IDPConfigID",
+					LoginPolicy: &domain.LoginPolicy{
+						PasswordlessType: domain.PasswordlessTypeAllowed,
+					},
+					AllowedExternalIDPs: []*domain.IDPProvider{
+						{
+							IDPConfigID: "IDPConfigID",
+						},
+					},
+					RequestLocalAuth: true,
+				}, false},
+			[]domain.NextStep{
+				&domain.PasswordStep{},
+			},
 			nil,
 		},
 	}

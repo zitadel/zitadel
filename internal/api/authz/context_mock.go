@@ -7,6 +7,11 @@ func NewMockContext(instanceID, orgID, userID string) context.Context {
 	return context.WithValue(ctx, instanceKey, &instance{id: instanceID})
 }
 
+func NewMockContextWithAgent(instanceID, orgID, userID, agentID string) context.Context {
+	ctx := context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID, AgentID: agentID})
+	return context.WithValue(ctx, instanceKey, &instance{id: instanceID})
+}
+
 func NewMockContextWithPermissions(instanceID, orgID, userID string, permissions []string) context.Context {
 	ctx := context.WithValue(context.Background(), dataKey, CtxData{UserID: userID, OrgID: orgID})
 	ctx = context.WithValue(ctx, instanceKey, &instance{id: instanceID})
