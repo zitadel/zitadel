@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS subscriptions.subscribed_events (
 
     , reduce_function TEXT -- if null the events are added to the queue
 
-    -- , UNIQUE NULLS NOT DISTINCT (subscriber, instance_id, "all", aggregate_type, event_type, reduce_function)
+    -- ,TODO: UNIQUE NULLS NOT DISTINCT (subscriber, instance_id, "all", aggregate_type, event_type, reduce_function)
     , CHECK (CASE WHEN "all" THEN aggregate_type IS NULL ELSE aggregate_type IS NOT NULL END)
     , CONSTRAINT subscribers_fk FOREIGN KEY (subscriber) REFERENCES subscriptions.subscribers(id) ON DELETE CASCADE
 );
