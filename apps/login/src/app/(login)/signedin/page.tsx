@@ -15,6 +15,7 @@ import {
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -58,14 +59,20 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "signedin" });
 
-  const { loginName, authRequestId, organization } = searchParams;
-  const sessionFactors = await loadSession(loginName, authRequestId);
+  const host = (await headers()).get("host");
 
-  const branding = await getBrandingSettings(organization);
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const { loginName, authRequestId, organization } = searchParams;
+  const sessionFactors = await loadSession(host, loginName, authRequestId);
+
+  const branding = await getBrandingSettings({ host, organization });
 
   let loginSettings;
   if (!authRequestId) {
-    loginSettings = await getLoginSettings(organization);
+    loginSettings = await getLoginSettings({ host, organization });
   }
 
   return (
