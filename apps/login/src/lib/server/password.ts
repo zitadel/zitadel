@@ -28,6 +28,7 @@ import {
   SetPasswordRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
+import { getInstanceUrl } from "../api";
 import { getNextUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
 import {
@@ -346,15 +347,29 @@ export async function checkSessionAndSetPassword({
       }
     });
   } else {
-    const myUserService = (sessionToken: string) => {
-      return createUserServiceClient(
-        createServerTransport(sessionToken, {
-          baseUrl: process.env.ZITADEL_API_URL!,
-        }),
-      );
+    const transport = async (host: string, token: string) => {
+      let instanceUrl;
+      try {
+        instanceUrl = await getInstanceUrl(host);
+      } catch (error) {
+        console.error(
+          `Could not get instance url for ${host}, fallback to ZITADEL_API_URL`,
+          error,
+        );
+        instanceUrl = process.env.ZITADEL_API_URL;
+      }
+
+      return createServerTransport(token, {
+        baseUrl: instanceUrl,
+      });
     };
 
-    const selfService = await myUserService(`${sessionCookie.token}`);
+    const myUserService = async (host: string, sessionToken: string) => {
+      const transportPromise = await transport(host, sessionToken);
+      return createUserServiceClient(transportPromise);
+    };
+
+    const selfService = await myUserService(host, `${sessionCookie.token}`);
 
     return selfService
       .setPassword(

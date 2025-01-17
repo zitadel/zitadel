@@ -3,16 +3,30 @@
 import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { headers } from "next/headers";
+import { getInstanceUrl } from "./api";
 import { getSessionCookieById } from "./cookies";
 import { getSession } from "./zitadel";
 
-const transport = (token: string) =>
-  createServerTransport(token, {
-    baseUrl: process.env.ZITADEL_API_URL!,
-  });
+const transport = async (host: string, token: string) => {
+  let instanceUrl;
+  try {
+    instanceUrl = await getInstanceUrl(host);
+  } catch (error) {
+    console.error(
+      `Could not get instance url for ${host}, fallback to ZITADEL_API_URL`,
+      error,
+    );
+    instanceUrl = process.env.ZITADEL_API_URL;
+  }
 
-const myUserService = (sessionToken: string) => {
-  return createUserServiceClient(transport(sessionToken));
+  return createServerTransport(token, {
+    baseUrl: instanceUrl,
+  });
+};
+
+const myUserService = async (host: string, sessionToken: string) => {
+  const transportPromise = await transport(host, sessionToken);
+  return createUserServiceClient(transportPromise);
 };
 
 export async function setMyPassword({
@@ -40,7 +54,7 @@ export async function setMyPassword({
     return { error: "Could not load session" };
   }
 
-  const service = await myUserService(`${sessionCookie.token}`);
+  const service = await myUserService(host, `${sessionCookie.token}`);
 
   if (!session?.factors?.user?.id) {
     return { error: "No user id found in session" };
