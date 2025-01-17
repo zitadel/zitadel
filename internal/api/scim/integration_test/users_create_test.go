@@ -5,22 +5,24 @@ package integration_test
 import (
 	"context"
 	_ "embed"
+	"net/http"
+	"path"
+	"testing"
+	"time"
+
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
+	"google.golang.org/grpc/codes"
+
 	"github.com/zitadel/zitadel/internal/api/scim/resources"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
-	"golang.org/x/text/language"
-	"google.golang.org/grpc/codes"
-	"net/http"
-	"path"
-	"testing"
-	"time"
 )
 
 var (
