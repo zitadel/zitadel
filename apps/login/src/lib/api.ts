@@ -4,10 +4,10 @@ import { getInstanceByHost } from "./zitadel";
 export async function getInstanceUrl(host: string): Promise<string> {
   const [hostname, port] = host.split(":");
 
-  // if (hostname === "localhost") {
-  //   console.log("fallback to ZITADEL_API_URL");
-  //   return process.env.ZITADEL_API_URL || "";
-  // }
+  if (hostname === "localhost") {
+    console.log("fallback to ZITADEL_API_URL");
+    return process.env.ZITADEL_API_URL || "";
+  }
 
   const instance = await getInstanceByHost(host).catch((error) => {
     console.error(`Could not get instance by host ${host}`, error);
