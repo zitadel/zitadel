@@ -14,11 +14,14 @@ import (
 )
 
 type ChangeHuman struct {
-	ID       string
-	Username *string
-	Profile  *Profile
-	Email    *Email
-	Phone    *Phone
+	ID                   string
+	State                *domain.UserState
+	Username             *string
+	Profile              *Profile
+	Email                *Email
+	Phone                *Phone
+	Metadata             []*domain.Metadata
+	MetadataKeysToRemove []string
 
 	Password *Password
 
@@ -98,6 +101,15 @@ func (h *ChangeHuman) Changed() bool {
 		return true
 	}
 	if h.Password != nil {
+		return true
+	}
+	if h.State != nil {
+		return true
+	}
+	if len(h.Metadata) > 0 {
+		return true
+	}
+	if len(h.MetadataKeysToRemove) > 0 {
 		return true
 	}
 	return false
@@ -229,6 +241,10 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		)
 	}
 
+	if human.SetInactive {
+		cmds = append(cmds, user.NewUserDeactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate))
+	}
+
 	if len(cmds) == 0 {
 		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
 		return nil
@@ -270,6 +286,7 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		}
 	}
 
+	userAgg := UserAggregateFromWriteModelCtx(ctx, &existingHuman.WriteModel)
 	cmds := make([]eventstore.Command, 0)
 	if human.Username != nil {
 		cmds, err = c.changeUsername(ctx, cmds, existingHuman, *human.Username)
@@ -299,6 +316,58 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		cmds, err = c.changeUserPassword(ctx, cmds, existingHuman, human.Password)
 		if err != nil {
 			return err
+		}
+	}
+
+	for _, md := range human.Metadata {
+		cmd, err := c.setUserMetadata(ctx, userAgg, md)
+		if err != nil {
+			return err
+		}
+
+		cmds = append(cmds, cmd)
+	}
+
+	for _, mdKey := range human.MetadataKeysToRemove {
+		cmd, err := c.removeUserMetadata(ctx, userAgg, mdKey)
+		if err != nil {
+			return err
+		}
+
+		cmds = append(cmds, cmd)
+	}
+
+	if human.State != nil {
+		// only allow toggling between active and inactive
+		// any other target state is not supported
+		// the existing human's state has to be the
+		switch {
+		case isUserStateActive(*human.State):
+			if isUserStateActive(existingHuman.UserState) {
+				// user is already active => no change needed
+				break
+			}
+
+			// do not allow switching from other states than active (e.g. locked)
+			if !isUserStateInactive(existingHuman.UserState) {
+				return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex1", "Errors.User.State.Invalid")
+			}
+
+			cmds = append(cmds, user.NewUserReactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate))
+		case isUserStateInactive(*human.State):
+			if isUserStateInactive(existingHuman.UserState) {
+				// user is already inactive => no change needed
+				break
+			}
+
+			// do not allow switching from other states than active (e.g. locked)
+			if !isUserStateActive(existingHuman.UserState) {
+				return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex2", "Errors.User.State.Invalid")
+			}
+
+			cmds = append(cmds, user.NewUserDeactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate))
+		default:
+			return zerrors.ThrowInvalidArgumentf(nil, "USER2-statex3", "Errors.User.State.Invalid")
 		}
 	}
 

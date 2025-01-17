@@ -1,0 +1,15 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "name": {
+    "familyName": "Ross",
+    "givenName": "Bethany"
+  },
+  "emails": [
+    {
+      "value": "user1@example.com",
+      "primary": true
+    }
+  ]
+}

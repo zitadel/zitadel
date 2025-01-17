@@ -505,6 +505,10 @@ Errors:
       CreationNotAllowed: Creation of a new user is not allowed on this provider
       LinkingNotAllowed: Linking of a user is not allowed on this provider
       NoOptionAllowed: Neither creation of linking is allowed on this provider. Please contact your administrator.
+      LoginFailedSwitchLocal: |
+        Login at External IDP failed. Falling back to local login.
+                
+        Error details: {{.Details}}
     GrantRequired: Login not possible. The user is required to have at least one grant on the application. Please contact your administrator.
     ProjectRequired: Login not possible. The organization of the user must be granted to the project. Please contact your administrator.
   IdentityProvider:
