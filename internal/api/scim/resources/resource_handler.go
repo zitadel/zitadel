@@ -14,9 +14,9 @@ import (
 )
 
 type ResourceHandler[T ResourceHolder] interface {
+	SchemaType() schemas.ScimSchemaType
 	ResourceNameSingular() schemas.ScimResourceTypeSingular
 	ResourceNamePlural() schemas.ScimResourceTypePlural
-	SchemaType() schemas.ScimSchemaType
 	NewResource() T
 
 	Create(ctx context.Context, resource T) (T, error)
@@ -28,6 +28,7 @@ type ResourceHandler[T ResourceHolder] interface {
 }
 
 type Resource struct {
+	ID      string                   `json:"-"`
 	Schemas []schemas.ScimSchemaType `json:"schemas"`
 	Meta    *ResourceMeta            `json:"meta"`
 }
@@ -41,7 +42,12 @@ type ResourceMeta struct {
 }
 
 type ResourceHolder interface {
+	SchemasHolder
 	GetResource() *Resource
+}
+
+type SchemasHolder interface {
+	GetSchemas() []schemas.ScimSchemaType
 }
 
 func buildResource[T ResourceHolder](ctx context.Context, handler ResourceHandler[T], details *domain.ObjectDetails) *Resource {
@@ -51,17 +57,18 @@ func buildResource[T ResourceHolder](ctx context.Context, handler ResourceHandle
 	}
 
 	return &Resource{
+		ID:      details.ID,
 		Schemas: []schemas.ScimSchemaType{handler.SchemaType()},
 		Meta: &ResourceMeta{
 			ResourceType: handler.ResourceNameSingular(),
 			Created:      created,
 			LastModified: details.EventDate.UTC(),
 			Version:      strconv.FormatUint(details.Sequence, 10),
-			Location:     buildLocation(ctx, handler, details.ID),
+			Location:     buildLocation(ctx, handler.ResourceNamePlural(), details.ID),
 		},
 	}
 }
 
-func buildLocation[T ResourceHolder](ctx context.Context, handler ResourceHandler[T], id string) string {
-	return http.DomainContext(ctx).Origin() + path.Join(schemas.HandlerPrefix, authz.GetCtxData(ctx).OrgID, string(handler.ResourceNamePlural()), id)
+func buildLocation(ctx context.Context, resourceName schemas.ScimResourceTypePlural, id string) string {
+	return http.DomainContext(ctx).Origin() + path.Join(schemas.HandlerPrefix, authz.GetCtxData(ctx).OrgID, string(resourceName), id)
 }

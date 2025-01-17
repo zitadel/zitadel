@@ -124,6 +124,13 @@ func (h *UsersHandler) ResourceNamePlural() scim_schemas.ScimResourceTypePlural 
 func (u *ScimUser) GetResource() *Resource {
 	return u.Resource
 }
+func (u *ScimUser) GetSchemas() []scim_schemas.ScimSchemaType {
+	if u.Resource == nil {
+		return nil
+	}
+
+	return u.Resource.Schemas
+}
 
 func (h *UsersHandler) NewResource() *ScimUser {
 	return new(ScimUser)
