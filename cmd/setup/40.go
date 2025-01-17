@@ -48,5 +48,5 @@ func (mig *InitPushFunc) Execute(ctx context.Context, _ eventstore.Event) (err e
 }
 
 func (mig *InitPushFunc) String() string {
-	return "40_init_push_func_v3"
+	return "40_init_push_func_v4"
 }
