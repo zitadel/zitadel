@@ -15,6 +15,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+const (
+	aggregateTypeNotification = "notification"
+)
+
 func InitChannel(config Config) channels.NotificationChannel {
 	client := twilio.NewRestClientWithParams(twilio.ClientParams{Username: config.SID, Password: config.Token})
 	logging.Debug("successfully initialized twilio sms channel")
@@ -78,17 +82,18 @@ func userAndNotificationIDsFromEvent(event eventstore.Event) (userID, notificati
 
 	// we cannot cast to the actual event type because of circular dependencies
 	// so we just check the type...
-	if event.Aggregate().Type != "notification" {
+	if event.Aggregate().Type != aggregateTypeNotification {
+		// in case it's not a notification event, we can directly return the aggregate ID (as it's a user event)
 		return aggID, ""
 	}
-	// ...and unmarshal the event data into a struct that contains the fields we need
+	// ...and unmarshal the event data from the notification event into a struct that contains the fields we need
 	var data struct {
 		Request struct {
 			UserID string `json:"userID"`
 		} `json:"request"`
 	}
 	if err := event.Unmarshal(&data); err != nil {
-		return aggID, ""
+		return "", aggID
 	}
 	return data.Request.UserID, aggID
 }
