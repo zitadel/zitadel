@@ -4,12 +4,23 @@ UPDATE subscriptions.subscribers
 SET allow_reduce = TRUE
 WHERE name = 'transactional-instances';
 
-SELECT subscriptions.reduce_events_in_queue('transactional-instances');
+DECLARE queued_events CURSOR FOR 
+    SELECT
+        q.id
+        , q.instance_id
+        , q.aggregate_type
+        , q.aggregate_id
+        , q.sequence
+        , q.event_type
+    FROM
+        subscriptions.queue q
+    WHERE
+        q.subscriber = (SELECT id FROM subscriptions.subscribers WHERE name = 'transactional-instances')
+    ORDER BY
+        q.position
+        , q.in_position_order
+    ;
 
-CREATE TRIGGER reduce_instance_events
-AFTER INSERT ON "queue"
-FOR EACH ROW
-WHEN (NEW).subscriber = 'transactional-instances'
-EXECUTE FUNCTION reduce_instance_events();
+CALL reduce_instance_queued_events('queued_events');
 
 COMMIT;

@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS subscriptions."queue" (
     , position NUMERIC NOT NULL
     , in_position_order INT2 NOT NULL
 
+    , subscriber_name TEXT NOT NULL -- crdb specific
+    , event_type TEXT NOT NULL -- crdb specific
+
     , allow_reduce BOOLEAN NOT NULL DEFAULT FALSE
     , reduce_function TEXT
 

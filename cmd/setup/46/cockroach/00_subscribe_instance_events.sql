@@ -3,6 +3,7 @@ WITH created_subscriber AS (
         subscriptions.subscribers ("name") 
     VALUES 
         ('transactional-instances')
+    ON CONFLICT DO NOTHING
     RETURNING id
 )
 INSERT INTO subscriptions.subscribed_events (

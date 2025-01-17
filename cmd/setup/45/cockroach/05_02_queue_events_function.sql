@@ -5,23 +5,27 @@ AS $$
 BEGIN
     INSERT INTO subscriptions.queue (
         subscriber
+        , subscriber_name
         , instance_id
         , aggregate_type
         , aggregate_id
         , sequence
         , position
         , in_position_order
+        , event_type
         , allow_reduce
         , reduce_function
     )
     SELECT
         s.id
+        , s.name
         , (NEW).instance_id
         , (NEW).aggregate_type
         , (NEW).aggregate_id
         , (NEW)."sequence"
         , (NEW).position
         , (NEW).in_tx_order
+        , (NEW).event_type
         , s.allow_reduce AND se.reduce_function IS NOT NULL
         , se.reduce_function
     FROM

@@ -1,13 +1,13 @@
-CREATE OR REPLACE FUNCTION subscriptions.queue_previous_events(
+CREATE OR REPLACE PROCEDURE subscriptions.queue_previous_events(
     subscriber_name TEXT
     , max_position NUMERIC
 )
-RETURNS VOID
 LANGUAGE PLpgSQL
 AS $$
 BEGIN
     INSERT INTO subscriptions.queue (
         subscriber
+        , subscriber_name
         , instance_id
         , aggregate_type
         , aggregate_id
@@ -18,6 +18,7 @@ BEGIN
     ) 
     SELECT
         s.id
+        , s.name
         , e.instance_id
         , e.aggregate_type
         , e.aggregate_id
