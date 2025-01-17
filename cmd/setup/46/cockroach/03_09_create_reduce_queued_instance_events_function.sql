@@ -4,32 +4,19 @@ CREATE OR REPLACE PROCEDURE reduce_instance_queued_events(
 LANGUAGE PLpgSQL
 AS $$
 DECLARE
-    id UUID;
-    instance_id TEXT;
-    aggregate_type TEXT;
-    aggregate_id TEXT;
-    event_type TEXT;
-    "sequence" INT8;
+    _id UUID;
+    _event eventstore.events2;
 BEGIN
     LOOP
         FETCH NEXT _queued_events INTO 
-            id
-            , instance_id
-            , aggregate_type
-            , aggregate_id
-            , event_type
-            , sequence;
-        
-        EXIT WHEN id IS NULL;
+            _id
+            , _event
+        ;
+        EXIT WHEN _event IS NULL;
 
-        CALL reduce_instance_event(
-            id
-            , instance_id
-            , aggregate_type
-            , aggregate_id
-            , sequence
-            , event_type
-        );
+        SELECT reduce_instance_event(_event);
+
+        DELETE FROM subscriptions.queue WHERE id = _id;
     END LOOP;
     CLOSE _queued_events;
 END;

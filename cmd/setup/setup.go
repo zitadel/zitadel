@@ -205,7 +205,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s40InitPushFunc,
 		steps.s45EventQueue,
 		steps.s46TransactionalInstanceTable,
-		// steps.s47TransactionalInstanceDomainTable,
+		steps.s47TransactionalInstanceDomainTable,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,

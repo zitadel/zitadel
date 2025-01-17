@@ -7,13 +7,16 @@ WHERE name = 'transactional-instances';
 DECLARE queued_events CURSOR FOR 
     SELECT
         q.id
-        , q.instance_id
-        , q.aggregate_type
-        , q.aggregate_id
-        , q.sequence
-        , q.event_type
+        , e
     FROM
         subscriptions.queue q
+    JOIN
+        eventstore.events2 e
+    ON
+        q.instance_id = e.instance_id
+        AND q.aggregate_type = e.aggregate_type
+        AND q.aggregate_id = e.aggregate_id
+        AND q.sequence = e.sequence
     WHERE
         q.subscriber = (SELECT id FROM subscriptions.subscribers WHERE name = 'transactional-instances')
     ORDER BY

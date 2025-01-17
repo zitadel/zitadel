@@ -14,7 +14,7 @@ DECLARE queued_events CURSOR FOR
         AND q.aggregate_id = e.aggregate_id
         AND q.sequence = e.sequence
     WHERE
-        q.subscriber = (SELECT id FROM subscriptions.subscribers WHERE name = 'transactional-instances')
+        q.subscriber = (SELECT id FROM subscriptions.subscribers WHERE name = 'transactional-instance-domains')
     ORDER BY
         q.position
         , q.in_position_order
