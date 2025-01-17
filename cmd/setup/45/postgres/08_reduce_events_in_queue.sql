@@ -1,7 +1,6 @@
-CREATE OR REPLACE FUNCTION subscriptions.reduce_events_in_queue(
-    subscriber_name TEXT
+CREATE OR REPLACE PROCEDURE subscriptions.reduce_events_in_queue(
+    _subscriber_name TEXT
 )
-RETURNS VOID
 LANGUAGE PLpgSQL
 AS $$
 DECLARE
@@ -21,7 +20,7 @@ DECLARE
             AND e.aggregate_id = q.aggregate_id
             AND e."sequence" = q.sequence
         WHERE
-            s.name = subscriber_name
+            s.name = _subscriber_name
         ORDER BY 
             q.position
             , q.in_position_order;

@@ -12,7 +12,6 @@ BEGIN
         , sequence
         , position
         , in_position_order
-        , event_type
         , allow_reduce
         , reduce_function
     )
@@ -25,7 +24,6 @@ BEGIN
         , (NEW)."sequence"
         , (NEW).position
         , (NEW).in_tx_order
-        , (NEW).event_type
         , s.allow_reduce AND se.reduce_function IS NOT NULL
         , se.reduce_function
     FROM

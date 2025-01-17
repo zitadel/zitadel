@@ -1,8 +1,7 @@
-CREATE OR REPLACE FUNCTION subscriptions.queue_previous_events(
-    subscriber_name TEXT
-    , max_position NUMERIC
+CREATE OR REPLACE PROCEDURE subscriptions.queue_previous_events(
+    _subscriber_name TEXT
+    , _max_position NUMERIC
 )
-RETURNS VOID
 LANGUAGE PLpgSQL
 AS $$
 BEGIN
@@ -37,9 +36,9 @@ BEGIN
                 se.event_type IS NULL
                 OR se.event_type = e.event_type
             )))
-        AND ($2 IS NULL OR e.position < $2)
+        AND (_max_position IS NULL OR e.position < _max_position)
     WHERE
-        s.name = $1
+        s.name = _subscriber_name
     ON CONFLICT DO NOTHING;
 END;
 $$;

@@ -3,12 +3,12 @@ RETURNS TRIGGER
 LANGUAGE PLpgSQL
 AS $$
 DECLARE
-    "event" eventstore.events2;
+    _event eventstore.events2;
 BEGIN
     SELECT
         *
     INTO
-        "event"
+        _event
     FROM
         eventstore.events2 e
     WHERE
@@ -20,13 +20,8 @@ BEGIN
     EXECUTE 
         format('CALL %s($1)', NEW.reduce_function)
     USING
-        "event";
+        _event;
 
-    DELETE FROM 
-        subscriptions.queue
-    WHERE
-        id = NEW.id;
-
-    RETURN NEW;
+    RETURN NULL;
 END;
 $$;

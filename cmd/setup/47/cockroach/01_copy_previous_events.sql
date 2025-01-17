@@ -1,1 +1,1 @@
-SELECT subscriptions.queue_previous_events('transactional-instance-domains', NULL);
+CALL subscriptions.queue_previous_events('transactional-instance-domains', NULL);
