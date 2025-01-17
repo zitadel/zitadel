@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	MemberAddedType          = projectEventTypePrefix + member.AddedEventType
-	MemberChangedType        = projectEventTypePrefix + member.ChangedEventType
-	MemberRemovedType        = projectEventTypePrefix + member.RemovedEventType
-	MemberCascadeRemovedType = projectEventTypePrefix + member.CascadeRemovedEventType
+	MemberAddedEventType          = projectEventTypePrefix + member.AddedEventType
+	MemberChangedEventType        = projectEventTypePrefix + member.ChangedEventType
+	MemberRemovedEventType        = projectEventTypePrefix + member.RemovedEventType
+	MemberCascadeRemovedEventType = projectEventTypePrefix + member.CascadeRemovedEventType
 )
 
 const (
@@ -37,7 +37,7 @@ func NewProjectMemberAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				MemberAddedType,
+				MemberAddedEventType,
 			),
 			userID,
 			roles...,
@@ -74,7 +74,7 @@ func NewProjectMemberChangedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				MemberChangedType,
+				MemberChangedEventType,
 			),
 			userID,
 			roles...,
@@ -110,7 +110,7 @@ func NewProjectMemberRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				MemberRemovedType,
+				MemberRemovedEventType,
 			),
 			userID,
 		),
@@ -145,7 +145,7 @@ func NewProjectMemberCascadeRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				MemberCascadeRemovedType,
+				MemberCascadeRemovedEventType,
 			),
 			userID,
 		),
