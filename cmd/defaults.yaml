@@ -110,24 +110,13 @@ PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
 Database:
-  # ZITADEL manages three database connection pools.
-  # The *ConnRatio settings define the ratio of how many connections from
-  # MaxOpenConns and MaxIdleConns are used to push events and spool projections.
-  # Remaining connection are used for queries (search).
-  # Values may not be negative and the sum of the ratios must always be less than 1.
-  # For example this defaults define 15 MaxOpenConns overall.
-  # - 15*0.2=3 connections are allocated to the event pusher;
-  # - 15*0.135=2 connections are allocated to the projection spooler;
-  # - 15-(3+2)=10 connections are remaining for queries;
-  EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
-  ProjectionSpoolerConnRatio: 0.135 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
   # CockroachDB is the default database of ZITADEL
   cockroach:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
     Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
     Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 15 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 12 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
+    MaxOpenConns: 5 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 2 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
@@ -1132,6 +1121,7 @@ DefaultInstance:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
     # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
     # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
+    # PermissionCheckV2: false # ZITADEL_DEFAULTINSTANCE_FEATURES_PERMISSIONCHECKV2
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
     # A value of "0s" means that all events are available.
@@ -1195,6 +1185,9 @@ InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
   # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write"]}]'
   # Beware that if you configure the RolePermissionMappings by environment variable, all the default RolePermissionMappings are lost.
+  #
+  # Warning: RolePermissionMappings are synhronized to the database.
+  # Changes here will only be applied after running `zitadel setup` or `zitadel start-from-setup`.
   RolePermissionMappings:
     - Role: "SYSTEM_OWNER"
       Permissions:
