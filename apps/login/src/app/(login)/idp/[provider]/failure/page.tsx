@@ -1,10 +1,14 @@
+import { Alert, AlertType } from "@/components/alert";
 import { ChooseAuthenticatorToLogin } from "@/components/choose-authenticator-to-login";
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { UserAvatar } from "@/components/user-avatar";
 import {
   getBrandingSettings,
   getLoginSettings,
+  getUserByID,
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
+import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -23,7 +27,18 @@ export default async function Page(props: {
   const loginSettings = await getLoginSettings(organization);
 
   let authMethods: AuthenticationMethodType[] = [];
+  let user: User | undefined = undefined;
+  let human: HumanUser | undefined = undefined;
+
   if (userId) {
+    const userResponse = await getUserByID(userId);
+    if (userResponse) {
+      user = userResponse.user;
+      if (user?.type.case === "human") {
+        human = user.type.value as HumanUser;
+      }
+    }
+
     const authMethodsResponse = await listAuthenticationMethodTypes(userId);
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
@@ -42,14 +57,24 @@ export default async function Page(props: {
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
         <h1>{t("loginError.title")}</h1>
-        <p className="ztdl-p">{t("loginError.description")}</p>
+        <Alert type={AlertType.ALERT}>{t("loginError.description")}</Alert>
 
         {userId && authMethods.length && (
-          <ChooseAuthenticatorToLogin
-            authMethods={sessionWithData.authMethods}
-            loginSettings={loginSettings}
-            params={params}
-          ></ChooseAuthenticatorToLogin>
+          <>
+            {user && human && (
+              <UserAvatar
+                loginName={user.preferredLoginName}
+                displayName={human?.profile?.displayName}
+                showDropdown={false}
+              />
+            )}
+
+            <ChooseAuthenticatorToLogin
+              authMethods={authMethods}
+              loginSettings={loginSettings}
+              params={params}
+            ></ChooseAuthenticatorToLogin>
+          </>
         )}
       </div>
     </DynamicTheme>
