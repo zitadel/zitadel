@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	zchannels "github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
@@ -27,7 +28,9 @@ func generateEmail(
 	emailChannels, config, err := channels.Email(ctx)
 	logging.OnError(err).Error("could not create email channel")
 	if emailChannels == nil || emailChannels.Len() == 0 {
-		return zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
+		return zchannels.NewCancelError(
+			zerrors.ThrowPreconditionFailed(nil, "MAIL-w8nfow", "Errors.Notification.Channels.NotPresent"),
+		)
 	}
 	recipient := user.VerifiedEmail
 	if lastEmail {
@@ -67,7 +70,9 @@ func generateEmail(
 		}
 		return webhookChannels.HandleMessage(message)
 	}
-	return zerrors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
+	return zchannels.NewCancelError(
+		zerrors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent"),
+	)
 }
 
 func mapNotifyUserToArgs(user *query.NotifyUser, args map[string]interface{}) map[string]interface{} {
