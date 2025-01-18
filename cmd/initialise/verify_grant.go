@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -34,6 +35,11 @@ func VerifyGrant(databaseName, username string) func(context.Context, *database.
 	return func(ctx context.Context, db *database.DB) error {
 		logging.WithFields("user", username, "database", databaseName).Info("verify grant")
 
-		return exec(ctx, db, fmt.Sprintf(grantStmt, databaseName, username), nil)
+		// the connection string is used to grant the user access to the public schema
+		config := db.Pool.Config().ConnConfig
+		config.Database = databaseName
+		conn := strings.Replace(config.ConnString(), "dbname=postgres", fmt.Sprintf("dbname=%s", databaseName), 1)
+
+		return exec(ctx, db, fmt.Sprintf(grantStmt, databaseName, username, conn), nil)
 	}
 }
