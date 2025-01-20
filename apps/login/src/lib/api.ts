@@ -1,4 +1,4 @@
-import { importPKCS8, SignJWT } from "jose";
+import { newSystemToken } from "@zitadel/client/node";
 import { getInstanceDomainByHost } from "./zitadel";
 
 export async function getInstanceUrl(host: string): Promise<string> {
@@ -30,14 +30,11 @@ export async function systemAPIToken() {
 
   const decodedToken = Buffer.from(key, "base64").toString("utf-8");
 
-  const token = new SignJWT({})
-    .setProtectedHeader({ alg: "RS256" })
-    .setIssuedAt()
-    .setExpirationTime("1h")
-    .setIssuer(userID)
-    .setSubject(userID)
-    .setAudience(audience)
-    .sign(await importPKCS8(decodedToken, "RS256"));
+  const token = newSystemToken({
+    audience: audience,
+    subject: userID,
+    key: decodedToken,
+  });
 
   return token;
 }

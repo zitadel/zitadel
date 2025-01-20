@@ -11,7 +11,8 @@
     "SYSTEM_USER_PRIVATE_KEY",
     "ZITADEL_API_URL",
     "ZITADEL_USER_ID",
-    "ZITADEL_USER_TOKEN"
+    "ZITADEL_USER_TOKEN",
+    "ZITADEL_SYSTEM_API_USERID"
   ],
   "tasks": {
     "generate": {
