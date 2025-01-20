@@ -33,9 +33,14 @@ introspect: ensure_modules bundle
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/introspection.js --vus ${VUS} --duration ${DURATION} --out csv=output/introspect_${DATE}.csv
 
+.PHONY: oidc_session
+oidc_session: ensure_key_pair ensure_modules bundle
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/oidc_session.js --iterations 1
+	# --vus ${VUS} --duration ${DURATION} --out csv=output/add_session_${DATE}.csv
+
 .PHONY: add_session
-add_session: bundle
-	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/session.js --vus ${VUS} --duration ${DURATION} --out csv=output/add_session_${DATE}.csv
+add_session: ensure_modules bundle
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/add_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/add_session_${DATE}.csv
 
 .PHONY: machine_jwt_profile_grant
 machine_jwt_profile_grant: ensure_modules ensure_key_pair bundle

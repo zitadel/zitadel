@@ -172,8 +172,8 @@ export function addMachinePat(userId: string, org: Org, accessToken: string): Pr
 }
 
 export type MachineSecret = {
-    clientId: string;
-    clientSecret: string;
+  clientId: string;
+  clientSecret: string;
 };
 
 const addMachineSecretTrend = new Trend('user_add_machine_secret_duration', true);
@@ -204,20 +204,23 @@ export type MachineKey = {
 const addMachineKeyTrend = new Trend('user_add_machine_key_duration', true);
 export function addMachineKey(userId: string, org: Org, accessToken: string, publicKey?: string): Promise<MachineKey> {
   return new Promise((resolve, reject) => {
-    let response = http.asyncRequest('POST', url(`/management/v1/users/${userId}/keys`), 
-    JSON.stringify({
-      type: 'KEY_TYPE_JSON',
-      userId: userId,
-      // base64 encoded public key
-      publicKey: publicKey
-    }), 
-    {
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'x-zitadel-orgid': org.organizationId,
+    let response = http.asyncRequest(
+      'POST',
+      url(`/management/v1/users/${userId}/keys`),
+      JSON.stringify({
+        type: 'KEY_TYPE_JSON',
+        userId: userId,
+        // base64 encoded public key
+        publicKey: publicKey,
+      }),
+      {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'x-zitadel-orgid': org.organizationId,
+        },
       },
-    });
+    );
     response.then((res) => {
       check(res, {
         'generate machine key status ok': (r) => r.status === 200,

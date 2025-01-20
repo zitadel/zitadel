@@ -21,10 +21,26 @@ export function loginByUsernamePassword(user: User) {
 }
 
 const initLoginTrend = new Trend('login_ui_init_login_duration', true);
-function initLogin(): Response {
-  const response = http.get(url('/oauth/v2/authorize', { searchParams: Client() }));
+export function initLogin(setLoginClientHeader?: boolean): Response {
+  let params = {};
+  let expectedStatus = 200;
+  if (setLoginClientHeader) {
+    params = {
+      headers: {
+        'x-zitadel-login-client': Client().client_id
+      },
+      redirects: 0
+    };
+    expectedStatus = 302;
+  }
+
+  const response = http.get(url('/oauth/v2/authorize', { 
+    searchParams: Client()
+  }),
+  params
+  );
   check(response, {
-    'authorize status ok': (r) => r.status == 200 || fail(`init login failed: ${r}`),
+    'authorize status ok': (r) => r.status == expectedStatus || fail(`init login failed: ${JSON.stringify(r)}`),
   });
   initLoginTrend.add(response.timings.duration);
   return response;

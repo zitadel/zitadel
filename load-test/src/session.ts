@@ -17,10 +17,10 @@ export function createSession(user: User, org: Org, accessToken: string): Promis
       url('/v2beta/sessions'),
       JSON.stringify({
         checks: {
-            user: {
-                userId: user.userId,
-            }
-        }
+          user: {
+            userId: user.userId,
+          },
+        },
       }),
       {
         headers: {
