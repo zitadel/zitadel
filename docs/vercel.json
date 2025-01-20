@@ -1,4 +1,5 @@
 {
+    "buildCommand": "turbo build",
     "github": {
         "enabled": true
       },

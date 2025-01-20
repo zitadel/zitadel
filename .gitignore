@@ -69,6 +69,7 @@ docs/docs/apis/proto
 /internal/api/ui/login/static/resources/themes/zitadel/css/zitadel.css.map
 zitadel-*-*
 
+
 # local
 build/local/*.env
 migrations/cockroach/migrate_cloud.go
@@ -89,3 +90,4 @@ load-test/yarn-error.log
 load-test/dist
 load-test/output/*
 .vercel
+.turbo

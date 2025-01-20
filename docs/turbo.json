@@ -1,0 +1,15 @@
+{
+    "extends": ["//"],
+    "tasks": {
+      "generate": {
+        "outputs": ["static/apis/**"],
+        "inputs": ["../proto/**"],
+        "cache": true
+      },
+      "build": {
+        "dependsOn": ["generate"],
+        "outputs": ["build/**"],
+        "cache": true
+      }
+    }
+  }

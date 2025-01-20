@@ -231,7 +231,7 @@ module.exports = {
         specs: [
           { 
             id: 'v2',
-            spec: './static/zitadel.swagger.yaml',
+            spec: './static/apis/zitadel.swagger.yaml',
             route: '/redocusaurus/v2'
           },
         ],
@@ -249,7 +249,7 @@ module.exports = {
         tagsSorter: 'alpha',
         spec: {
           // Put the URL to your OpenAPI document here:
-          url: '/docs/zitadel.swagger.yaml',
+          url: '/docs/apis/zitadel.swagger.yaml',
         },
       },
     },
