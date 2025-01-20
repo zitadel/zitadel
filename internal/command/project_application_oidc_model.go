@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"reflect"
+	"slices"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -276,13 +276,13 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	changes := make([]project.OIDCConfigChanges, 0)
 	var err error
 
-	if !reflect.DeepEqual(wm.RedirectUris, redirectURIS) {
+	if !slices.Equal(wm.RedirectUris, redirectURIS) {
 		changes = append(changes, project.ChangeRedirectURIs(redirectURIS))
 	}
-	if !reflect.DeepEqual(wm.ResponseTypes, responseTypes) {
+	if !slices.Equal(wm.ResponseTypes, responseTypes) {
 		changes = append(changes, project.ChangeResponseTypes(responseTypes))
 	}
-	if !reflect.DeepEqual(wm.GrantTypes, grantTypes) {
+	if !slices.Equal(wm.GrantTypes, grantTypes) {
 		changes = append(changes, project.ChangeGrantTypes(grantTypes))
 	}
 	if wm.ApplicationType != appType {
@@ -291,7 +291,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	if wm.AuthMethodType != authMethodType {
 		changes = append(changes, project.ChangeAuthMethodType(authMethodType))
 	}
-	if !reflect.DeepEqual(wm.PostLogoutRedirectUris, postLogoutRedirectURIs) {
+	if !slices.Equal(wm.PostLogoutRedirectUris, postLogoutRedirectURIs) {
 		changes = append(changes, project.ChangePostLogoutRedirectURIs(postLogoutRedirectURIs))
 	}
 	if wm.OIDCVersion != oidcVersion {
@@ -315,7 +315,7 @@ func (wm *OIDCApplicationWriteModel) NewChangedEvent(
 	if wm.ClockSkew != clockSkew {
 		changes = append(changes, project.ChangeClockSkew(clockSkew))
 	}
-	if !reflect.DeepEqual(wm.AdditionalOrigins, additionalOrigins) {
+	if !slices.Equal(wm.AdditionalOrigins, additionalOrigins) {
 		changes = append(changes, project.ChangeAdditionalOrigins(additionalOrigins))
 	}
 	if wm.SkipNativeAppSuccessPage != skipNativeAppSuccessPage {
