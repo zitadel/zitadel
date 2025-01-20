@@ -66,9 +66,9 @@ const systemService = async () => {
   return createSystemServiceClient(transport);
 };
 
-export async function getInstanceByHost(host: string): Promise<string> {
+export async function getInstanceDomainByHost(host: string): Promise<string> {
   // const system = await systemService();
-  // const callback = system
+  // const callbacks = system
   //   .listInstances(
   //     {
   //       queries: [
@@ -89,7 +89,15 @@ export async function getInstanceByHost(host: string): Promise<string> {
   //       throw new Error("Could not find instance");
   //     }
 
-  //     return resp.result[0];
+  //     const generatedDomain = resp.result[0].domains.find(
+  //       (domain) => domain.generated === true,
+  //     );
+
+  //     if (!generatedDomain) {
+  //       throw new Error("Could not find generated domain");
+  //     }
+
+  //     return generatedDomain.domain;
   //   });
 
   const mockFcn = async (host: string) => {

@@ -1,5 +1,5 @@
 import { importPKCS8, SignJWT } from "jose";
-import { getInstanceByHost } from "./zitadel";
+import { getInstanceDomainByHost } from "./zitadel";
 
 export async function getInstanceUrl(host: string): Promise<string> {
   const [hostname, port] = host.split(":");
@@ -9,26 +9,18 @@ export async function getInstanceUrl(host: string): Promise<string> {
     return process.env.ZITADEL_API_URL || "";
   }
 
-  const instance = await getInstanceByHost(host).catch((error) => {
+  const instanceDomain = await getInstanceDomainByHost(host).catch((error) => {
     console.error(`Could not get instance by host ${host}`, error);
     return null;
   });
 
-  if (!instance) {
+  if (!instanceDomain) {
     throw new Error("No instance found");
   }
 
-  const generatedDomain = instance.domains.find(
-    (domain) => domain.generated === true,
-  );
+  console.log(`host: ${host}, api: ${instanceDomain}`);
 
-  if (!generatedDomain?.domain) {
-    throw new Error("No generated domain found");
-  }
-
-  console.log(`host: ${host}, api: ${generatedDomain?.domain}`);
-
-  return generatedDomain?.domain;
+  return instanceDomain;
 }
 
 export async function systemAPIToken() {
