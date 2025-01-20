@@ -66,31 +66,42 @@ const systemService = async () => {
   return createSystemServiceClient(transport);
 };
 
-export async function getInstanceByHost(host: string) {
-  const system = await systemService();
-  const callback = system
-    .listInstances(
-      {
-        queries: [
-          {
-            query: {
-              case: "domainQuery",
-              value: {
-                domains: [host],
-              },
-            },
-          },
-        ],
-      },
-      {},
-    )
-    .then((resp) => {
-      if (resp.result.length !== 1) {
-        throw new Error("Could not find instance");
-      }
+export async function getInstanceByHost(host: string): Promise<string> {
+  // const system = await systemService();
+  // const callback = system
+  //   .listInstances(
+  //     {
+  //       queries: [
+  //         {
+  //           query: {
+  //             case: "domainQuery",
+  //             value: {
+  //               domains: [host],
+  //             },
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     {},
+  //   )
+  //   .then((resp) => {
+  //     if (resp.result.length !== 1) {
+  //       throw new Error("Could not find instance");
+  //     }
 
-      return resp.result[0];
-    });
+  //     return resp.result[0];
+  //   });
+
+  const mockFcn = async (host: string) => {
+    switch (host) {
+      case "multitenancy-qa.vercel.app":
+        return "https://another-i8pcvz.zitadel.app";
+      default:
+        return process.env.ZITADEL_API_URL;
+    }
+  };
+
+  const callback = mockFcn(host);
 
   return useCache ? cacheWrapper(callback) : callback;
 }
