@@ -14,3 +14,28 @@ plugins:
       - disable_service_tags=true
       - allow_merge=true
       - merge_file_name=zitadel
+  - plugin: buf.build/grpc-ecosystem/openapiv2
+    out: static/apis
+    opt:
+      - allow_delete_body
+      - remove_internal_comments=true
+      - preserve_rpc_order=true
+      - visibility_restriction_selectors=v1
+      - visibility_restriction_selectors=v2
+      - output_format=yaml
+      - disable_service_tags=true
+      - allow_merge=true
+      - merge_file_name=current
+  - plugin: buf.build/grpc-ecosystem/openapiv2
+    out: static/apis
+    opt:
+      - allow_delete_body
+      - remove_internal_comments=true
+      - preserve_rpc_order=true
+      - visibility_restriction_selectors=v1
+      - visibility_restriction_selectors=v2
+      - visibility_restriction_selectors=v3
+      - output_format=yaml
+      - disable_service_tags=true
+      - allow_merge=true
+      - merge_file_name=all

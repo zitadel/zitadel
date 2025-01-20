@@ -534,19 +534,6 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "Core Resources",
-      collapsed: false,
-      link: {
-        type: "doc",
-        id: "apis/apis/index",
-      },
-      items: [
-        "apis/v2",
-        "apis/v3"
-      ],
-    },
-    {
-      type: "category",
       label: "Sign In Users ",
       collapsed: false,
       items: [

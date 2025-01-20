@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "pnpm generate && docusaurus start",
-    "build": "pnpm generate && docusaurus build",
+    "start": "docusaurus start",
+    "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear && rm -rf static/apis",

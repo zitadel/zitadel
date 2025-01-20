@@ -91,11 +91,6 @@ module.exports = {
           position: "left",
         },
         {
-          to: "/redocusaurus/v2",
-          label: "/redocusaurus/v2",
-          position: "left",
-        },
-        {
           type: "doc",
           docId: "legal",
           label: "Legal",
@@ -225,31 +220,46 @@ module.exports = {
         },
       })
     ],
-    [
-      'redocusaurus',
-      {
-        specs: [
-          { 
-            id: 'v2',
-            spec: './static/apis/zitadel.swagger.yaml',
-            route: '/redocusaurus/v2'
-          },
-        ],
-        theme: {},
-        }
-    ]
   ],
   plugins: [
     [
     '@scalar/docusaurus',
     {
-      label: '/scalar/v2',
-      route: '/docs/scalar/v2',
+      id: 'zitadel',
+      label: '/scalar/zitadel',
+      route: '/docs/scalar/zitadel',
       configuration: {
         tagsSorter: 'alpha',
         spec: {
-          // Put the URL to your OpenAPI document here:
           url: '/docs/apis/zitadel.swagger.yaml',
+        },
+      },
+    },
+    ],
+    [
+      '@scalar/docusaurus',
+    {
+      id: 'current',
+      label: '/scalar/current',
+      route: '/docs/scalar/current',
+      configuration: {
+        tagsSorter: 'alpha',
+        spec: {
+          url: '/docs/apis/current.swagger.yaml',
+        },
+      },
+    },
+    ],
+    [
+      '@scalar/docusaurus',
+    {
+      id: 'new',
+      label: '/scalar/new',
+      route: '/docs/scalar/new',
+      configuration: {
+        tagsSorter: 'alpha',
+        spec: {
+          url: '/docs/apis/all.swagger.yaml',
         },
       },
     },
