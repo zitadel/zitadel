@@ -26,9 +26,9 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -102,26 +102,22 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
-	queryDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeQuery)
-	logging.OnError(err).Fatal("unable to connect to database")
-	esPusherDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect to database")
-	projectionDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeProjectionSpooler)
+	dbClient, err := database.Connect(config.Database, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
-	esV3 := new_es.NewEventstore(esPusherDBClient)
+	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
+	esV3 := new_es.NewEventstore(dbClient)
 	config.Eventstore.Pusher = esV3
 	config.Eventstore.Searcher = esV3
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 
 	logging.OnError(err).Fatal("unable to start eventstore")
-	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(queryDBClient, &es_v4_pg.Config{
+	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
 	}))
 
-	steps.s1ProjectionTable = &ProjectionTable{dbClient: queryDBClient.DB}
-	steps.s2AssetsTable = &AssetTable{dbClient: queryDBClient.DB}
+	steps.s1ProjectionTable = &ProjectionTable{dbClient: dbClient.DB}
+	steps.s2AssetsTable = &AssetTable{dbClient: dbClient.DB}
 
 	steps.FirstInstance.Skip = config.ForMirror || steps.FirstInstance.Skip
 	steps.FirstInstance.instanceSetup = config.DefaultInstance
@@ -129,7 +125,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
 	steps.FirstInstance.oidcEncryptionKey = config.EncryptionKeys.OIDC
 	steps.FirstInstance.masterKey = masterKey
-	steps.FirstInstance.db = queryDBClient
+	steps.FirstInstance.db = dbClient
 	steps.FirstInstance.es = eventstoreClient
 	steps.FirstInstance.defaults = config.SystemDefaults
 	steps.FirstInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
@@ -137,44 +133,46 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
 
-	steps.s5LastFailed = &LastFailed{dbClient: queryDBClient.DB}
-	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: queryDBClient.DB}
-	steps.s7LogstoreTables = &LogstoreTables{dbClient: queryDBClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
-	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: queryDBClient}
-	steps.CorrectCreationDate.dbClient = esPusherDBClient
-	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: queryDBClient}
-	steps.s13FixQuotaProjection = &FixQuotaConstraints{dbClient: queryDBClient}
-	steps.s14NewEventsTable = &NewEventsTable{dbClient: esPusherDBClient}
-	steps.s15CurrentStates = &CurrentProjectionState{dbClient: queryDBClient}
-	steps.s16UniqueConstraintsLower = &UniqueConstraintToLower{dbClient: queryDBClient}
-	steps.s17AddOffsetToUniqueConstraints = &AddOffsetToCurrentStates{dbClient: queryDBClient}
-	steps.s18AddLowerFieldsToLoginNames = &AddLowerFieldsToLoginNames{dbClient: queryDBClient}
-	steps.s19AddCurrentStatesIndex = &AddCurrentSequencesIndex{dbClient: queryDBClient}
-	steps.s20AddByUserSessionIndex = &AddByUserIndexToSession{dbClient: queryDBClient}
-	steps.s21AddBlockFieldToLimits = &AddBlockFieldToLimits{dbClient: queryDBClient}
-	steps.s22ActiveInstancesIndex = &ActiveInstanceEvents{dbClient: queryDBClient}
-	steps.s23CorrectGlobalUniqueConstraints = &CorrectGlobalUniqueConstraints{dbClient: esPusherDBClient}
-	steps.s24AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: queryDBClient}
-	steps.s25User11AddLowerFieldsToVerifiedEmail = &User11AddLowerFieldsToVerifiedEmail{dbClient: esPusherDBClient}
-	steps.s26AuthUsers3 = &AuthUsers3{dbClient: esPusherDBClient}
-	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: esPusherDBClient}
-	steps.s28AddFieldTable = &AddFieldTable{dbClient: esPusherDBClient}
+	steps.s5LastFailed = &LastFailed{dbClient: dbClient.DB}
+	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: dbClient.DB}
+	steps.s7LogstoreTables = &LogstoreTables{dbClient: dbClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
+	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: dbClient}
+	steps.CorrectCreationDate.dbClient = dbClient
+	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: dbClient}
+	steps.s13FixQuotaProjection = &FixQuotaConstraints{dbClient: dbClient}
+	steps.s14NewEventsTable = &NewEventsTable{dbClient: dbClient}
+	steps.s15CurrentStates = &CurrentProjectionState{dbClient: dbClient}
+	steps.s16UniqueConstraintsLower = &UniqueConstraintToLower{dbClient: dbClient}
+	steps.s17AddOffsetToUniqueConstraints = &AddOffsetToCurrentStates{dbClient: dbClient}
+	steps.s18AddLowerFieldsToLoginNames = &AddLowerFieldsToLoginNames{dbClient: dbClient}
+	steps.s19AddCurrentStatesIndex = &AddCurrentSequencesIndex{dbClient: dbClient}
+	steps.s20AddByUserSessionIndex = &AddByUserIndexToSession{dbClient: dbClient}
+	steps.s21AddBlockFieldToLimits = &AddBlockFieldToLimits{dbClient: dbClient}
+	steps.s22ActiveInstancesIndex = &ActiveInstanceEvents{dbClient: dbClient}
+	steps.s23CorrectGlobalUniqueConstraints = &CorrectGlobalUniqueConstraints{dbClient: dbClient}
+	steps.s24AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: dbClient}
+	steps.s25User11AddLowerFieldsToVerifiedEmail = &User11AddLowerFieldsToVerifiedEmail{dbClient: dbClient}
+	steps.s26AuthUsers3 = &AuthUsers3{dbClient: dbClient}
+	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: dbClient}
+	steps.s28AddFieldTable = &AddFieldTable{dbClient: dbClient}
 	steps.s29FillFieldsForProjectGrant = &FillFieldsForProjectGrant{eventstore: eventstoreClient}
 	steps.s30FillFieldsForOrgDomainVerified = &FillFieldsForOrgDomainVerified{eventstore: eventstoreClient}
-	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: esPusherDBClient}
-	steps.s32AddAuthSessionID = &AddAuthSessionID{dbClient: esPusherDBClient}
-	steps.s33SMSConfigs3TwilioAddVerifyServiceSid = &SMSConfigs3TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
-	steps.s34AddCacheSchema = &AddCacheSchema{dbClient: queryDBClient}
-	steps.s35AddPositionToIndexEsWm = &AddPositionToIndexEsWm{dbClient: esPusherDBClient}
-	steps.s36FillV2Milestones = &FillV3Milestones{dbClient: queryDBClient, eventstore: eventstoreClient}
-	steps.s37Apps7OIDConfigsBackChannelLogoutURI = &Apps7OIDConfigsBackChannelLogoutURI{dbClient: esPusherDBClient}
-	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: esPusherDBClient, esClient: eventstoreClient}
-	steps.s40InitPushFunc = &InitPushFunc{dbClient: esPusherDBClient}
-	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: esPusherDBClient}
-	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: queryDBClient}
-	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: esPusherDBClient}
+	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: dbClient}
+	steps.s32AddAuthSessionID = &AddAuthSessionID{dbClient: dbClient}
+	steps.s33SMSConfigs3TwilioAddVerifyServiceSid = &SMSConfigs3TwilioAddVerifyServiceSid{dbClient: dbClient}
+	steps.s34AddCacheSchema = &AddCacheSchema{dbClient: dbClient}
+	steps.s35AddPositionToIndexEsWm = &AddPositionToIndexEsWm{dbClient: dbClient}
+	steps.s36FillV2Milestones = &FillV3Milestones{dbClient: dbClient, eventstore: eventstoreClient}
+	steps.s37Apps7OIDConfigsBackChannelLogoutURI = &Apps7OIDConfigsBackChannelLogoutURI{dbClient: dbClient}
+	steps.s38BackChannelLogoutNotificationStart = &BackChannelLogoutNotificationStart{dbClient: dbClient, esClient: eventstoreClient}
+	steps.s40InitPushFunc = &InitPushFunc{dbClient: dbClient}
+	steps.s42Apps7OIDCConfigsLoginVersion = &Apps7OIDCConfigsLoginVersion{dbClient: dbClient}
+	steps.s43CreateFieldsDomainIndex = &CreateFieldsDomainIndex{dbClient: dbClient}
+	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: dbClient}
+	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
+	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: dbClient}
 
-	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
+	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
 
 	repeatableSteps := []migration.RepeatableMigration{
@@ -192,8 +190,16 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		&DeleteStaleOrgFields{
 			eventstore: eventstoreClient,
 		},
-		&FillFieldsForInstanceDomains{
+		&RepeatableFillFields{
 			eventstore: eventstoreClient,
+			handlers: []*handler.FieldHandler{
+				projection.InstanceDomainFields,
+				projection.MembershipFields,
+			},
+		},
+		&SyncRolePermissions{
+			eventstore:             eventstoreClient,
+			rolePermissionMappings: config.InternalAuthZ.RolePermissionMappings,
 		},
 	}
 
@@ -227,6 +233,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s36FillV2Milestones,
 		steps.s38BackChannelLogoutNotificationStart,
 		steps.s44ReplaceCurrentSequencesIndex,
+		steps.s45CorrectProjectOwners,
+		steps.s46InitPermissionFunctions,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -256,8 +264,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			ctx,
 			eventstoreClient,
 			eventstoreV4,
-			queryDBClient,
-			projectionDBClient,
+			dbClient,
+			dbClient,
 			masterKey,
 			config,
 		)

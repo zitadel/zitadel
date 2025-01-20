@@ -58,9 +58,9 @@ func (wm *ProjectMemberWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(wm.MemberWriteModel.AggregateID).
-		EventTypes(project.MemberAddedType,
-			project.MemberChangedType,
-			project.MemberRemovedType,
-			project.MemberCascadeRemovedType).
+		EventTypes(project.MemberAddedEventType,
+			project.MemberChangedEventType,
+			project.MemberRemovedEventType,
+			project.MemberCascadeRemovedEventType).
 		Builder()
 }

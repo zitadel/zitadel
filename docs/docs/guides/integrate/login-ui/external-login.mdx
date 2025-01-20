@@ -152,7 +152,7 @@ curl --request POST \
 If you didn't get a user ID in the parameters of your success page, you know that there is no existing user in ZITADEL with that provider, and you can register a new user or link it to an existing account (read the next section).
 
 Fill the IdP links in the create user request to add a user with an external login provider.
-The idpId is the ID of the provider in ZITADEL, the idpExternalId is the ID of the user in the external identity provider; usually, this is sent in the “sub”.
+The idpId is the ID of the provider in ZITADEL, the userId is the ID of the user in the external identity provider; usually, this is sent in the “sub”.
 The display name is used to list the linkings on the users.
 
 [Create User API Documentation](/docs/apis/resources/user_service_v2/user-service-add-human-user)
@@ -181,8 +181,8 @@ curl --request POST \
   "idpLinks": [
     {
       "idpId": "218528353504723201",
-      "idpExternalId": "111392805975715856637",
-      "displayName": "Minnie Mouse"
+      "userId": "111392805975715856637",
+      "userName": "Minnie Mouse"
     }
   ]
 }'
@@ -205,8 +205,8 @@ curl --request POST \
   --data '{
 	"idpLink": {
     "idpId": "218528353504723201",
-    "idpExternalId": "1113928059757158566371",
-    "displayName": "Minnie Mouse"
+    "userId": "1113928059757158566371",
+    "userName": "Minnie Mouse"
   }
 }'
 ```
