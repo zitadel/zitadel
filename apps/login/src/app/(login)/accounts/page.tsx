@@ -12,13 +12,14 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
-async function loadSessions() {
-  const ids = await getAllSessionCookieIds();
+async function loadSessions(host: string) {
+  const ids: (string | undefined)[] = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
-    const response = await listSessions(
-      ids.filter((id: string | undefined) => !!id),
-    );
+    const response = await listSessions({
+      host,
+      ids: ids.filter((id) => !!id) as string[],
+    });
     return response?.sessions ?? [];
   } else {
     console.info("No session cookie found.");
@@ -50,7 +51,7 @@ export default async function Page(props: {
     }
   }
 
-  let sessions = await loadSessions();
+  let sessions = await loadSessions(host);
 
   const branding = await getBrandingSettings({
     host,

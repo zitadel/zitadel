@@ -362,13 +362,12 @@ export async function deleteSession({
   return sessionService.deleteSession({ sessionId, sessionToken }, {});
 }
 
-export async function listSessions({
-  host,
-  ids,
-}: {
+type ListSessionsCommand = {
   host: string;
   ids: string[];
-}) {
+};
+
+export async function listSessions({ host, ids }: ListSessionsCommand) {
   const sessionService: Client<typeof SessionService> =
     await createServiceForHost(SessionService, host);
 
