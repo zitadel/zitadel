@@ -226,40 +226,12 @@ module.exports = {
     '@scalar/docusaurus',
     {
       id: 'zitadel',
-      label: '/scalar/zitadel',
-      route: '/docs/scalar/zitadel',
+      label: 'API Reference',
+      route: '/docs/reference',
       configuration: {
         tagsSorter: 'alpha',
         spec: {
-          url: '/docs/apis/zitadel.swagger.yaml',
-        },
-      },
-    },
-    ],
-    [
-      '@scalar/docusaurus',
-    {
-      id: 'current',
-      label: '/scalar/current',
-      route: '/docs/scalar/current',
-      configuration: {
-        tagsSorter: 'alpha',
-        spec: {
-          url: '/docs/apis/current.swagger.yaml',
-        },
-      },
-    },
-    ],
-    [
-      '@scalar/docusaurus',
-    {
-      id: 'new',
-      label: '/scalar/new',
-      route: '/docs/scalar/new',
-      configuration: {
-        tagsSorter: 'alpha',
-        spec: {
-          url: '/docs/apis/all.swagger.yaml',
+          url: '/docs/apis/zitadel.swagger.json',
         },
       },
     },

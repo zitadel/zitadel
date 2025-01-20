@@ -21,7 +21,7 @@
     "@docusaurus/theme-search-algolia": "^3.7.0",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.0.13",
-    "@scalar/docusaurus": "^0.4.181",
+    "@scalar/docusaurus": "^0.4.184",
     "autoprefixer": "^10.4.20",
     "clsx": "^2.0.0",
     "docusaurus-plugin-image-zoom": "^2.0.0",
