@@ -34,6 +34,7 @@ service ZITADELWebKeys {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Webkey (preview)";
       summary: "Generate a web key pair for the instance";
       description: "Generate a private and public key pair. The private key can be used to sign OIDC tokens after activation. The public key can be used to valite OIDC tokens."
       responses: {
@@ -60,6 +61,7 @@ service ZITADELWebKeys {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Webkey (preview)";
       summary: "Activate a signing key for the instance";
       description: "Switch the active signing web key. The previously active key will be deactivated. Note that the JWKs OIDC endpoint returns a cacheable response. Therefore it is not advised to activate a key that has been created within the cache duration (default is 5min), as the public key may not have been propagated to caches and clients yet."
       responses: {
@@ -86,6 +88,7 @@ service ZITADELWebKeys {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Webkey (preview)";
       summary: "Delete a web key pair for the instance";
       description: "Delete a web key pair. Only inactive keys can be deleted. Once a key is deleted, any tokens signed by this key will be invalid."
       responses: {
@@ -112,6 +115,7 @@ service ZITADELWebKeys {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Webkey (preview)";
       summary: "List web key details for the instance";
       description: "List web key details for the instance"
       responses: {

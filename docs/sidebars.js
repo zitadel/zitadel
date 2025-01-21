@@ -574,6 +574,15 @@ module.exports = {
       ],
     },
     {
+      type: "category",
+      label: "Actions (preview)",
+      collapsed: false,
+      items: [
+        "apis/actions/v3/usage",
+        "apis/actions/v3/testing-locally",
+      ],
+    },
+    {
       type: "doc",
       label: "gRPC Status Codes",
       id: "apis/statuscodes",

@@ -10,6 +10,7 @@ plugins:
       - remove_internal_comments=true
       - preserve_rpc_order=true
       - visibility_restriction_selectors=stable
+      - visibility_restriction_selectors=preview
       - output_format=json
       - disable_service_tags=true
       - allow_merge=true

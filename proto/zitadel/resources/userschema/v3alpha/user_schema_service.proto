@@ -35,6 +35,7 @@ service ZITADELUserSchemas {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users Schema (preview)";
       responses: {
         key: "200";
         value: {
@@ -70,6 +71,7 @@ service ZITADELUserSchemas {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users Schema (preview)";
       responses: {
         key: "200"
         value: {
@@ -98,6 +100,7 @@ service ZITADELUserSchemas {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users Schema (preview)";
       responses: {
         key: "201";
         value: {
@@ -128,6 +131,7 @@ service ZITADELUserSchemas {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users Schema (preview)";
       responses: {
         key: "200";
         value: {
@@ -152,6 +156,7 @@ service ZITADELUserSchemas {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users Schema (preview)";
       responses: {
         key: "200";
         value: {
@@ -176,6 +181,7 @@ service ZITADELUserSchemas {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users Schema (preview)";
       responses: {
         key: "200";
         value: {
@@ -200,6 +206,7 @@ service ZITADELUserSchemas {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users Schema (preview)";
       responses: {
         key: "200";
         value: {
