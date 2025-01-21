@@ -35,6 +35,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification"
@@ -70,6 +71,7 @@ type ProjectionsConfig struct {
 	Destination    database.Config
 	Projections    projection.Config
 	Notifications  handlers.WorkerConfig
+	Executions     execution.WorkerConfig
 	EncryptionKeys *encryption.EncryptionKeyConfig
 	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config
@@ -225,6 +227,14 @@ func projections(
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		client,
 	)
+	execution.Register(
+		ctx,
+		config.Projections.Customizations["executions"],
+		config.Executions,
+		queries,
+		es,
+		client,
+	)
 
 	config.Auth.Spooler.Client = client
 	config.Auth.Spooler.Eventstore = es
@@ -294,6 +304,13 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 		err = notification.ProjectInstance(ctx)
 		if err != nil {
 			logging.WithFields("instance", instance).OnError(err).Info("trigger notification failed")
+			failedInstances <- instance
+			continue
+		}
+
+		err = execution.ProjectInstance(ctx)
+		if err != nil {
+			logging.WithFields("instance", instance).OnError(err).Info("trigger executions failed")
 			failedInstances <- instance
 			continue
 		}

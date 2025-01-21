@@ -3,26 +3,37 @@ package execution
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/notification/handlers"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
 var (
-	executionProjection  *handler.Handler
-	conditionProjections []*handler.Handler
+	projections []*handler.Handler
+	worker      *Worker
 )
 
 func Register(
 	ctx context.Context,
 	executionsCustomConfig projection.CustomConfig,
+	workerConfig WorkerConfig,
+	queries *query.Queries,
+	es *eventstore.Eventstore,
+	client *database.DB,
 ) {
-	executionProjection = NewExecutionsHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), conditionProjections)
+	q := NewExecutionsQueries(queries, client)
+	projections = append(projections, NewExecutionsHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), es, queries))
+	worker = NewWorker(workerConfig, client, q)
 }
 
 func Start(ctx context.Context) {
-	executionProjection.Start(ctx)
+	for _, projection := range projections {
+		projection.Start(ctx)
+	}
+	worker.Start(ctx)
 }
 
 func ProjectInstance(ctx context.Context) error {

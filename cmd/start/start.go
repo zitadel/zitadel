@@ -82,13 +82,14 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
-	"github.com/zitadel/zitadel/internal/logstore/emitters/execution"
-	"github.com/zitadel/zitadel/internal/logstore/emitters/stdout"
+	emit_execution "github.com/zitadel/zitadel/internal/logstore/emitters/execution"
+	emit_stdout "github.com/zitadel/zitadel/internal/logstore/emitters/stdout"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/notification"
@@ -264,11 +265,11 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	defer commands.Close(ctx) // wait for background jobs
 
 	clock := clockpkg.New()
-	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())
+	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, emit_stdout.NewStdoutEmitter[*record.ExecutionLog]())
 	if err != nil {
 		return err
 	}
-	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.Quotas.Execution, execution.NewDatabaseLogStorage(queryDBClient, commands, queries))
+	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.Quotas.Execution, emit_execution.NewDatabaseLogStorage(queryDBClient, commands, queries))
 	if err != nil {
 		return err
 	}
@@ -300,6 +301,16 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		queryDBClient,
 	)
 	notification.Start(ctx)
+
+	execution.Register(
+		ctx,
+		config.Projections.Customizations["executions"],
+		config.Executions,
+		queries,
+		eventstoreClient,
+		queryDBClient,
+	)
+	execution.Start(ctx)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
