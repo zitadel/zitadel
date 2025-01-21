@@ -24,4 +24,4 @@ plugins:
       - output_format=json
       - disable_service_tags=true
       - allow_merge=true
-      - merge_file_name=archive
+      - merge_file_name=deprecated

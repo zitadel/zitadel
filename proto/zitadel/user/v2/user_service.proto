@@ -509,7 +509,7 @@ service UserService {
     };
   }
 
-  // Verify Passkey
+  // Verify Passkey Registration
   //
   // Verify the passkey with the public key credential.
   rpc VerifyPasskeyRegistration (VerifyPasskeyRegistrationRequest) returns (VerifyPasskeyRegistrationResponse) {
@@ -1039,7 +1039,7 @@ service UserService {
     };
   }
 
-  // List Auth Methods
+  // List Authentication Methods
   //
   // List all configured authentication methods of a user like password, passwordless, (T)OTP and more.
   rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
@@ -1064,7 +1064,7 @@ service UserService {
     };
   }
 
-  // List Auth Methods
+  // List Authentication Factors
   //
   //
   rpc ListAuthenticationFactors(ListAuthenticationFactorsRequest) returns (ListAuthenticationFactorsResponse) {

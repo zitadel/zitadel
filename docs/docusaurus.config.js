@@ -85,6 +85,21 @@ module.exports = {
           position: "left",
         },
         {
+          type: 'dropdown',
+          label: 'Reference',
+          position: 'left',
+          items: [
+            {
+              label: 'Current',
+              to: 'reference',
+            },
+            {
+              label: 'Deprecated',
+              to: 'reference/deprecated',
+            }
+          ],
+        },
+        {
           type: "doc",
           label: "Self-Hosting",
           docId: "self-hosting/deploy/overview",
@@ -228,6 +243,7 @@ module.exports = {
       id: 'current',
       label: 'API Reference',
       route: '/docs/reference',
+      showNavLink: false,
       configuration: {
         tagsSorter: 'alpha',
         hideModels: true,
@@ -243,6 +259,7 @@ module.exports = {
         id: 'deprecated',
         label: 'API Reference (Deprecated)',
         route: '/docs/reference/deprecated',
+        showNavLink: false,
         configuration: {
           tagsSorter: 'alpha',
           hideModels: true,
