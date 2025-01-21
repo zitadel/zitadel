@@ -31,13 +31,13 @@ DefaultInstance:
 
 You can restrict the maximum age of events returned by the following APIs:
 
-- [Events Search](/apis/resources/admin/admin-service-list-events), See also the [Event API guide](/guides/integrate/zitadel-apis/event-api)
-- [My User History](/apis/resources/auth/auth-service-list-my-user-changes)
-- [A Users History](/apis/resources/mgmt/management-service-list-user-changes)
-- [An Applications History](/apis/resources/mgmt/management-service-list-app-changes)
-- [An Organizations History](/apis/resources/mgmt/management-service-list-org-changes)
-- [A Projects History](/apis/resources/mgmt/management-service-list-project-changes)
-- [A Project Grants History](/apis/resources/mgmt/management-service-list-project-grant-changes)
+- [Events Search](/reference/deprecated#tag/events/POST/admin/v1/events/_search), See also the [Event API guide](/guides/integrate/zitadel-apis/event-api)
+- [My User History](/reference/deprecated#tag/my-user/POST/auth/v1/users/me/changes/_search)
+- [A Users History](/reference/deprecated#tag/management-service/POST/management/v1/users/{userId}/changes/_search)
+- [An Applications History](/reference/deprecated#tag/applications/POST/management/v1/projects/{projectId}/apps/{appId}/changes/_search)
+- [An Organizations History](/reference/deprecated#tag/organizations/POST/management/v1/orgs/me/changes/_search)
+- [A Projects History](/reference/deprecated#tag/projects/POST/management/v1/projects/{projectId}/changes/_search)
+- [A Project Grants History](/reference/deprecated#tag/projects/POST/management/v1/projects/{projectId}/grants/{grantId}/changes/_search)
 
 You can set a global default limit as well as a default limit [for new virtual instances](/concepts/structure/instance#multiple-virtual-instances) in the ZITADEL configuration.
 The following snippets shows the defaults:

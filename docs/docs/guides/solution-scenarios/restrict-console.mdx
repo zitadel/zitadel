@@ -47,7 +47,7 @@ Start by granting the organization of your managers, that should be able to acce
 To avoid accidental lock-out, the [default project](/docs/concepts/structure/projects#default-project) hides the checkbox "Check Project on Authentication" in the Console:
 ![Default Project](/img/guides/solution-scenarios/console-default-project.png)
 
-You need to use the [update project API call](/docs/apis/resources/mgmt/management-service-update-project) to set the configuration on the project.
+You need to use the [update project API call](/docs/reference/deprecated#tag/management-service/PUT/management/v1/projects/{id}) to set the configuration on the project.
 
 First you need a user with manager permissions to change the project settings in that organization.
 This means either you add the manager to the organization or you use a manager on the instance level with "IAM-OWNER" permissions.

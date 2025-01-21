@@ -60,7 +60,7 @@ Via Console:
 
 Via APIs:
 
-* [Create User (Machine)](/docs/apis/resources/mgmt/management-service-add-machine-user)
+* [Create User (Machine)](/docs/reference/deprecated#tag/users/POST/management/v1/users/)
 
 ## 2. Grant a Manager role to the service user
 

@@ -40,7 +40,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
 <Tabs>
   <TabItem value="sms" label="SMS" default>
 
-  First [add a new SMS Provider of type HTTP](/apis/resources/admin/admin-service-add-sms-provider-http) to create a new HTTP provider that can be used to send SMS messages:
+  First [add a new SMS Provider of type HTTP](/reference/deprecated#tag/admin-service/POST/admin/v1/sms/http) to create a new HTTP provider that can be used to send SMS messages:
 
   ```bash
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/sms/http' \
@@ -57,7 +57,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   The result will contain an ID of the provider that we need in the next step.
 
   You can configure multiple SMS providers at the same time.
-  To use the HTTP provider you need to [activate the SMS provider](/apis/resources/admin/admin-service-activate-sms-provider): 
+  To use the HTTP provider you need to [activate the SMS provider](/reference/deprecated#tag/admin-service/POST/admin/v1/sms/{id}/_activate): 
 
   ```bash
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/sms/:id/_activate' \
@@ -69,12 +69,12 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
 
   The `id` is the provider's ID from the previous step.
 
-  See full API reference for [SMS Providers](/apis/resources/admin/sms-provider) for more details.
+  See full API reference for [SMS Providers](/reference/deprecated#tag/sms-providers) for more details.
 
   </TabItem>
   <TabItem value="email" label="Email">
 
-    First [add a new Email Provider of type HTTP](/apis/resources/admin/admin-service-add-email-provider-http) to create a new HTTP provider that can be used to send SMS messages:
+    First [add a new Email Provider of type HTTP](/reference/deprecated#tag/email-providers/POST/admin/v1/email/) to create a new HTTP provider that can be used to send SMS messages:
 
   ```bash
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/email/http' \
@@ -91,7 +91,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
   The result will contain an ID of the provider that we need in the next step.
 
   You can configure multiple Email providers at the same time.
-  To use the HTTP provider you need to [activate the Email provider](/apis/resources/admin/admin-service-activate-email-provider):
+  To use the HTTP provider you need to [activate the Email provider](/reference/deprecated#tag/email-providers/POST/admin/v1/email/{id}/_activate):
 
   ```bash
   curl -L 'https://$CUSTOM-DOMAIN/admin/v1/email/:id/_activate' \
@@ -103,7 +103,7 @@ A provider with HTTP type will send the messages and the data to a pre-defined w
 
   The `id` is the provider's ID from the previous step.
 
-  See full API reference for [Email Providers](/apis/resources/admin/admin-service-list-email-providers) for more details.
+  See full API reference for [Email Providers](/reference/deprecated#tag/email-providers/POST/admin/v1/email/_search) for more details.
 
   </TabItem>
 </Tabs>

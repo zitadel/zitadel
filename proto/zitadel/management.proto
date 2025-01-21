@@ -39,7 +39,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Healthz";
             description: "The health endpoint allows an external system to probe if ZITADEL management API is alive"
-            tags: "Management"
+            tags: ["Healthz", "Management Service"];
             responses: {
                 key: "200"
                 value: {
@@ -61,7 +61,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Instance information";
             description: "Some needed settings made in ZITADEL like the global organization id or ZITADEL project ID "
-            tags: "Management"
+            tags: ["Instances", "Management Service"];
             responses: {
                 key: "200"
                 value: {
@@ -83,7 +83,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Supported Languages";
             description: "Use GetSupportedLanguages on the admin service instead."
-            tags: "Management"
+            tags: ["Languages", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -107,7 +107,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "User by ID";
             description: "Returns the full user object (human or machine) including the profile, email, etc.\n\nDeprecated: please use user service v2 GetUserByID"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -139,7 +139,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User by login name (globally)";
             description: "Get a user by login name searched over all organizations. The request only returns data if the login name matches exactly.\n\nDeprecated: please use user service v2 ListUsers, with LoginNameQuery"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -162,7 +162,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             summary: "Search Users";
             description: "Search for users within an organization. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination.\n\nDeprecated: please use user service v2 ListUsers"
@@ -205,7 +205,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "Get User History";
             description: "Returns a list of changes/events that have happened on the user. It's the history of the user. Make sure to send a limit."
             parameters: {
@@ -230,7 +230,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             summary: "Check for existing user";
             description: "Returns if a user with the requested email or username is unique. So you can create the user. \n\nDeprecated: please use user service v2 ListUsers, is unique when no user is returned"
@@ -259,7 +259,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Create User (Human)";
             description: "Create a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: use ImportHumanUser"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -286,7 +286,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create/Import User (Human)";
             description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login.\n\nDeprecated: please use user service v2 [AddHumanUser](apis/resources/user_service_v2/user-service-add-human-user.api.mdx)"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -312,7 +312,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create User (Machine)";
             description: "Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             responses: {
                 key: "200"
                 value: {
@@ -344,7 +344,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deactivate user";
             description: "The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data.\n\nDeprecated: please use user service v2 DeactivateUser"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -377,7 +377,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Reactivate user";
             description: "Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'.\n\nDeprecated: please use user service v2 ReactivateUser"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -410,7 +410,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Lock user";
             description: "The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.),\n\nDeprecated: please use user service v2 LockUser"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -443,7 +443,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Unlock user";
             description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'.\n\nDeprecated: please use user service v2 UnlockUser"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -475,7 +475,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete user";
             description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found.\n\nDeprecated: please use user service v2 RemoveUser"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -508,7 +508,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Change user name";
             description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward.\n\nDeprecated: please use user service v2 UpdateHumanUser"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -538,7 +538,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             summary: "Set User Metadata";
             description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
             parameters: {
@@ -563,7 +563,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             summary: "Bulk Set User Metadata";
             description: "Add or update multiple metadata values for a user. Make sure the values are base64 encoded."
             parameters: {
@@ -588,7 +588,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             summary: "Search User Metadata";
             description: "Get the metadata of a user filtered by your query."
             parameters: {
@@ -612,7 +612,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             summary: "Get User Metadata By Key";
             description: "Get a metadata object from a user by a specific key."
             parameters: {
@@ -636,7 +636,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             summary: "Delete User Metadata By Key";
             description: "Remove a metadata object from a user with a specific key."
             parameters: {
@@ -661,7 +661,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             summary: "Bulk Delete Metadata";
             description: "Remove a list of metadata objects from a user with a list of keys."
             parameters: {
@@ -688,7 +688,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Profile (Human)";
             description: "Get basic information like first_name and last_name of a user.\n\nDeprecated: please use user service v2 GetUserByID"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -721,7 +721,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Profile (Human)";
             description: "Update the profile information from a user. The profile includes basic information like first_name and last_name.\n\nDeprecated: please use user service v2 UpdateHumanUser"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -753,7 +753,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Email (Human)";
             description: "Get the email address and the verification state of the address.\n\nDeprecated: please use user service v2 GetUserByID"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -786,7 +786,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Email (Human)";
             description: "Change the email address of a user. If the state is set to not verified, the user will get a verification email.\n\nDeprecated: please use user service v2 SetEmail"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -820,7 +820,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Resend User Initialization Email";
             description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address.\n\nDeprecated: not used anymore in user state"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -853,7 +853,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Resend User Email Verification";
             description: "Resend the email verification notification to the given email address of the user.\n\nDeprecated: please use user service v2 ResendEmailCode"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -885,7 +885,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Phone (Human)";
             description: "Get the phone number and the verification state of the number. The phone number is only for informational purposes and to send messages, not for Authentication (2FA).\n\nDeprecated: please use user service v2 GetUserByID"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -918,7 +918,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update User Phone (Human)";
             description: "Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA).\n\nDeprecated: please use user service v2 SetPhone"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -950,7 +950,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove User Phone (Human)";
             description: "Remove the configured phone number of a user.\n\nDeprecated: please use user service v2 SetPhone"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -983,7 +983,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Resend User Phone Verification";
             description: "Resend the notification for the verification of the phone number, to the number stored on the user.\n\nDeprecated: please use user service v2 ResendPhoneCode"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1014,7 +1014,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete User Avatar (Human)";
             description: "Removes the avatar that is currently set on the user."
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             responses: {
                 key: "200"
                 value: {
@@ -1045,7 +1045,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Set Human Initial Password\n\nDeprecated: please use user service v2 SetPassword";
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -1072,7 +1072,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Set User Password";
             description: "Set a new password for a user. Per default, the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login.\n\nDeprecated: please use user service v2 SetPassword"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1105,7 +1105,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Send Reset Password Notification";
             description: "The user will receive an email with a link to change the password.\n\nDeprecated: please use user service v2 PasswordReset"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1137,7 +1137,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get User Authentication Factors (2FA/MFA)";
             description: "Get a list of authentication factors the user has set. Including Second Factors (2FA) and Multi-Factors (MFA).\n\nDeprecated: please use user service v2 ListAuthenticationMethodTypes"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1169,7 +1169,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP";
             description: "Remove the configured One-Time Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.\n\nDeprecated: please use user service v2 RemoveTOTP"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1201,7 +1201,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor U2F";
             description: "Remove the configured Universal Second Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc.\n\nDeprecated: please use user service v2 RemoveU2F"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1233,7 +1233,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP SMS";
             description: "Remove the configured One-Time Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPSMS"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1265,7 +1265,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP SMS";
             description: "Remove the configured One-Time Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward.\n\nDeprecated: please use user service v2 RemoveOTPEmail"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1297,7 +1297,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Search Passwordless/Passkey authentication";
             description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token.\n\nDeprecated: please use user service v2 ListPasskeys"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1328,7 +1328,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Add Passwordless/Passkey Registration Link";
             description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone\n\nDeprecated: please use user service v2 RegisterPasskey"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1360,7 +1360,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Send Passwordless/Passkey Registration Link";
             description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone.\n\nDeprecated: please use user service v2 RegisterPasskey"
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             responses: {
                 key: "200"
@@ -1393,7 +1393,7 @@ service ManagementService {
             summary: "Delete Passwordless/Passkey";
             description: "Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.).\n\nDeprecated: please use user service v2 RemovePasskey"
             deprecated: true;
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             responses: {
                 key: "200"
                 value: {
@@ -1424,7 +1424,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Update Machine User";
             description: "Change a service account/machine user. It is used for accounts with non-interactive authentication possibilities."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             responses: {
                 key: "200"
                 value: {
@@ -1455,7 +1455,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create Secret for Machine User";
             description: "Create a new secret for a machine user/service account. It is used to authenticate the user (client credential grant)."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
             responses: {
                 key: "200"
                 value: {
@@ -1485,7 +1485,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete Secret of Machine User";
             description: "Delete a secret of a machine user/service account. The user will not be able to authenticate with the secret afterward."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1515,7 +1516,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get Machine user Key By ID";
             description: "Get a specific Key of a machine user by its id. Machine keys are used to authenticate with jwt profile authentication."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1546,7 +1548,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get Machine user Key By ID";
             description: "Get the list of keys of a machine user. Machine keys are used to authenticate with jwt profile authentication."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1577,7 +1580,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create Key for machine user";
             description: "If a public key is not supplied, a new key is generated and will be returned in the response. Make sure to store the returned key. If an RSA public key is supplied, the private key is omitted from the response. Machine keys are used to authenticate with jwt profile."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1607,7 +1611,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete Key for machine user";
             description: "Delete a specific key from a user. The user will not be able to authenticate with that key afterward."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1637,7 +1642,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get a Personal-Access-Token (PAT) by ID";
             description: "Returns the PAT for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1668,7 +1674,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get a Personal-Access-Token (PAT) by ID";
             description: "Returns a list of PATs for a user, currently only available for machine users/service accounts. PATs are ready-to-use tokens and can be sent directly in the authentication header."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1699,7 +1706,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create a Personal-Access-Token (PAT)";
             description: "Generates a new PAT for the user. Currently only available for machine users. The token will be returned in the response, make sure to store it. PATs are ready-to-use tokens and can be sent directly in the authentication header."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1729,7 +1737,8 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get a Personal-Access-Token (PAT) by ID";
             description: "Delete a PAT from a user. Afterward, the user will not be able to authenticate with that token anymore."
-            tags: "Management";
+            tags: ["Users", "Management Service"];
+            
             responses: {
                 key: "200"
                 value: {
@@ -1760,7 +1769,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "List Social Logins";
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             description: "Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.).\n\nDeprecated: please use user service v2 ListLinkedIDPs"
             parameters: {
@@ -1786,7 +1795,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Social Login";
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             deprecated: true;
             description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate.\n\nDeprecated: please use user service v2 RemoveLinkedIDP"
             parameters: {
@@ -1811,7 +1820,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "List ZITADEL Permissions";
             description: "Show all the permissions the user has in ZITADEL (ZITADEL Manager)."
             parameters: {
@@ -1837,7 +1846,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get My Organization";
             description: "Returns the organization that is sent in the x-zitadel-orgid. If no header is set the organization of the authenticated user will be returned."
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -1859,7 +1868,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Get Organization By Domain";
             description: "Search an organization by the domain, overall organizations. The domain must match exactly."
         };
@@ -1876,7 +1885,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Get Organization History";
             description: "Returns a list of changes/events that have happened in the organization. It's the history of the organization. Make sure to send a limit."
             parameters: {
@@ -1901,7 +1910,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Create Organization";
             description: "Create a new organization. Based on the given name a domain will be generated to be able to identify users within an organization."
             parameters: {
@@ -1926,7 +1935,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Update Organization";
             description: "Change the name of the organization."
             parameters: {
@@ -1951,7 +1960,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Deactivate Organization";
             description: "Sets the state of my organization to deactivated. Users of this organization will not be able to log in."
             parameters: {
@@ -1976,7 +1985,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Reactivate Organization";
             description: "Set the state of my organization to active. The state of the organization has to be deactivated to perform the request. Users of this organization will be able to log in again."
             parameters: {
@@ -2000,7 +2009,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Delete Organization";
             description: "Deletes my organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
             parameters: {
@@ -2025,7 +2034,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Organizations", "Management Service"];
+            
             summary: "Set Organization Metadata";
             description: "This endpoint either adds or updates a metadata value for the requested key. Make sure the value is base64 encoded."
             parameters: {
@@ -2050,7 +2060,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Organizations", "Management Service"];
+            
             summary: "Bulk Set Organization Metadata";
             description: "This endpoint sets a list of metadata to the organization. Make sure the values are base64 encoded."
             parameters: {
@@ -2075,7 +2086,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Organizations", "Management Service"];
+            
             summary: "Search Organization Metadata";
             description: "Get the metadata of an organization filtered by your query."
             parameters: {
@@ -2099,7 +2111,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Organizations", "Management Service"];
+            
             summary: "Get Organization Metadata By Key";
             description: "Get a metadata object from an organization by a specific key."
             parameters: {
@@ -2123,7 +2136,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Organizations", "Management Service"];
+            
             summary: "Delete Organization Metadata By Key";
             description: "Remove a metadata object from an organization with a specific key."
             parameters: {
@@ -2148,7 +2162,8 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Organizations", "Management Service"];
+            
             summary: "Bulk Delete Metadata";
             description: "Remove a list of metadata objects from an organization with a list of keys."
             parameters: {
@@ -2173,7 +2188,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Search Domains";
             description: "Returns the list of registered domains of an organization. The domains are used to identify to which organization a user belongs."
             parameters: {
@@ -2198,7 +2213,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Add Domain";
             description: "Add a new domain to an organization. The domains are used to identify to which organization a user belongs."
             parameters: {
@@ -2222,7 +2237,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Remove Domain";
             description: "Delete a new domain from an organization. The domains are used to identify to which organization a user belongs. If the uses use the domain for login, this will not be possible afterwards. They have to use another domain instead."
             parameters: {
@@ -2247,7 +2262,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Generate Domain Verification";
             description: "Generate a new file to be able to verify your domain with DNS or HTTP challenge."
             parameters: {
@@ -2272,7 +2287,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Verify Domain";
             description: "Make sure you have added the required verification to your domain, depending on the method you have chosen (HTTP or DNS challenge). ZITADEL will check it and set the domain as verified if it was successful. A verify domain has to be unique."
             parameters: {
@@ -2296,7 +2311,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Organizations", "Management Service"];
             summary: "Set Primary Domain";
             description: "Set a domain as primary. It has to be verified to be able to be set as primary. The primary domain will be shown as suffix on the usernames as preferred loginname on this organization."
             parameters: {
@@ -2320,8 +2335,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
-            tags: "Management";
+            tags: ["Members", "Management Service"];
             summary: "List Organization Member Roles";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the organization level."
             parameters: {
@@ -2346,8 +2360,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
-            tags: "Management";
+            tags: ["Members", "Management Service"];
             summary: "List Organization Members";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the organization level, matching the search queries. The search queries will be AND linked."
             parameters: {
@@ -2372,7 +2385,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Members", "Management Service"];
             summary: "Add Organization Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the organization level with one or multiple roles."
             parameters: {
@@ -2397,7 +2410,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Members", "Management Service"];
             summary: "Update Organization Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
             parameters: {
@@ -2421,7 +2434,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Members", "Management Service"];
             summary: "Remove Organization Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (iam, project)"
             parameters: {
@@ -2446,7 +2459,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Get Project By ID";
             description: "Returns a project owned by the organization (no granted projects). A Project is a vessel for different applications sharing the same role context."
             parameters: {
@@ -2471,7 +2484,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Get Granted Project By ID";
             description: "Returns a project owned by another organization and granted to my organization. A Project is a vessel for different applications sharing the same role context."
             parameters: {
@@ -2496,7 +2509,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Search Project";
             description: "Lists projects my organization is the owner of (no granted projects). A Project is a vessel for different applications sharing the same role context."
             parameters: {
@@ -2521,7 +2534,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Search Granted Project";
             description: "Lists projects my organization got granted from another organization. A Project is a vessel for different applications sharing the same role context."
             parameters: {
@@ -2546,7 +2559,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Search Granted Project Roles";
             description: "Lists the roles a granted projects has. These are the roles, that have been granted by the owner organization to my organization."
             parameters: {
@@ -2571,7 +2584,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Project History";
             description: "Returns a list of changes/events that have happened on the project. It's the history of the project. Make sure to send a limit."
             parameters: {
@@ -2596,7 +2609,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Create Project";
             description: "Create a new project. A Project is a vessel for different applications sharing the same role context."
             parameters: {
@@ -2622,7 +2635,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Update Project";
             description: "Update a project and its settings. A Project is a vessel for different applications sharing the same role context."
             parameters: {
@@ -2648,7 +2661,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Deactivate Project";
             description: "Set the state of a project to deactivated. Request returns an error if the project is already deactivated."
             parameters: {
@@ -2674,7 +2687,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Reactivate Project";
             description: "Set the state of a project to active. Request returns an error if the project is not deactivated."
             parameters: {
@@ -2699,7 +2712,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Remove Project";
             description: "Project and all its sub-resources like project grants, applications, roles and user grants will be removed."
             parameters: {
@@ -2725,7 +2738,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Search Project Roles";
             description: "Returns all roles of a project matching the search query."
             parameters: {
@@ -2751,7 +2764,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Add Project Role";
             description: "Add a new project role to a project. The key must be unique within the project."
             parameters: {
@@ -2777,7 +2790,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Bulk Add Project Role";
             description: "Add a list of roles to a project. The keys must be unique within the project."
             parameters: {
@@ -2803,7 +2816,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Change Project Role";
             description: "Change a project role. The key is not editable. If a key should change, remove the role and create a new one."
             parameters: {
@@ -2828,7 +2841,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Remove Project Role";
             description: "Removes the role from the project and on every resource it has a dependency. This includes project grants and user grants."
             parameters: {
@@ -2852,8 +2865,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
-            tags: "Management";
+            tags: ["Projects", "Members", "Management Service"];
             summary: "List Project Member Roles";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the project level."
             parameters: {
@@ -2879,8 +2891,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
-            tags: "Management";
+            tags: ["Projects", "Members", "Management Service"];
             summary: "List Project Members";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project level, matching the search queries. The search queries will be AND linked."
             parameters: {
@@ -2906,7 +2917,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Members", "Management Service"];
             summary: "Add Project Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project level with one or multiple roles."
             parameters: {
@@ -2932,7 +2943,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Members", "Management Service"];
             summary: "Update Project Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
             parameters: {
@@ -2957,7 +2968,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Members", "Management Service"];
             summary: "Remove Project Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an project level. The user can still have roles on another level (iam, organization)"
             parameters: {
@@ -2982,7 +2993,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Get Application By ID";
             description: "Get an application of any type (OIDC, API, SAML)"
             parameters: {
@@ -3008,7 +3019,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Search Applications";
             description: "Returns all applications within a project, that match the query."
             parameters: {
@@ -3033,7 +3044,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Application History";
             description: "Returns a list of changes/events that have happened on the application. It's the history of the app. Make sure to send a limit."
             parameters: {
@@ -3059,7 +3070,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Create Application (OIDC)";
             description: "Create a new OIDC client. The client id will be generated and returned in the response. Depending on the chosen configuration also a secret will be returned."
             parameters: {
@@ -3085,7 +3096,7 @@ service ManagementService {
     };
 
       option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-          tags: "Management";
+          tags: ["Applications", "Management Service"];
           summary: "Create Application (SAML)";
           description: "Create a new SAML client. Returns an entity ID"
           parameters: {
@@ -3111,7 +3122,7 @@ service ManagementService {
         };
 
       option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-          tags: "Management";
+          tags: ["Applications", "Management Service"];
           summary: "Create Application (API)";
           description: "Create a new API client. The client id will be generated and returned in the response. Depending on the chosen configuration also a secret will be generated and returned."
           parameters: {
@@ -3138,7 +3149,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Update Application";
             description: "Update the basic information of an application. This doesn't include information that are dependent on the application type (OIDC, API, SAML)"
             parameters: {
@@ -3164,7 +3175,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Update OIDC Application Config";
             description: "Update the OIDC specific configuration of an application."
             parameters: {
@@ -3190,7 +3201,7 @@ service ManagementService {
     };
 
       option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-          tags: "Management";
+          tags: ["Applications", "Management Service"];
           summary: "Update SAML Application Config";
           description: "Update the SAML specific configuration of an application."
           parameters: {
@@ -3216,7 +3227,7 @@ service ManagementService {
         };
 
       option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-          tags: "Management";
+          tags: ["Applications", "Management Service"];
           summary: "Update API Application Config";
           description: "Update the OIDC-specific configuration of an application."
           parameters: {
@@ -3242,7 +3253,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Deactivate Application";
             description: "Set the state of an application to deactivated. It is not possible to request tokens for deactivated apps. Request returns an error if the application is already deactivated."
             parameters: {
@@ -3268,7 +3279,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Reactivate Application";
             description: "Set the state of an application to active. Request returns an error if the application is not deactivated."
             parameters: {
@@ -3293,7 +3304,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Remove Application";
             description: "Remove an application. It is not possible to request tokens for removed apps. Request returns an error if the application is already deactivated."
             parameters: {
@@ -3319,7 +3330,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Generate New OIDC Client Secret";
             description: "Generates a new client secret for the OIDC application, make sure to save the response"
             parameters: {
@@ -3345,7 +3356,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Generate New API Client Secret";
             description: "Generates a new client secret for the API application, make sure to save the response"
             parameters: {
@@ -3370,7 +3381,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Get Application Key By ID";
             description: "Returns an application key. Keys are used for authorizing API Applications."
             parameters: {
@@ -3396,7 +3407,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "List Application Keys";
             description: "Search application keys. Keys are used for authorizing API Applications."
             parameters: {
@@ -3422,7 +3433,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Create Application Key";
             description: "Create a new application key, they are used for authorizing API Applications. Key details will be returned in the response, make sure to save it."
             parameters: {
@@ -3447,7 +3458,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Applications", "Management Service"];
             summary: "Delete Application Key";
             description: "Remove an application key. The API application will not be able to authorize with the key anymore."
             parameters: {
@@ -3472,7 +3483,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Project Grant History";
             description: "Returns a list of changes/events that have happened on the project grant. It's the history of the project. Make sure to send a limit."
             parameters: {
@@ -3496,7 +3507,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Project Grant By ID";
             description: "Returns a project grant. A project grant is when the organization grants its project to another organization."
             parameters: {
@@ -3522,7 +3533,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Search Project Grants from Project";
             description: "Returns a list of project grants for a specific project. A project grant is when the organization grants its project to another organization."
             parameters: {
@@ -3547,7 +3558,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Search Project Grants";
             description: "Returns a list of project grants. A project grant is when the organization grants its project to another organization."
             parameters: {
@@ -3572,7 +3583,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Add Project Grant";
             description: "Grant a project to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization"
             parameters: {
@@ -3597,7 +3608,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Change Project Grant";
             description: "Change the roles of the project that is granted to another organization. The project grant will allow the granted organization to access the project and manage the authorizations for its users. Project Grant will be listed in the granted project of the granted organization"
             parameters: {
@@ -3622,7 +3633,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Deactivate Project Grant";
             description: "Set the state of the project grant to deactivated. The grant has to be active to be able to deactivate."
             parameters: {
@@ -3647,7 +3658,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Reactivate Project Grant";
             description: "Set the state of the project grant to active. The grant has to be deactivated to be able to reactivate."
             parameters: {
@@ -3671,7 +3682,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Management Service"];
             summary: "Remove Project Grant";
             description: "Remove a project grant. All user grants for this project grant will also be removed. A user will not have access to the project afterward (if permissions are checked)."
             parameters: {
@@ -3695,8 +3706,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
-            tags: "Management";
+            tags: ["Projects", "Members", "Management Service"];
             summary: "List Project Grant Member Roles";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the project grant level."
             parameters: {
@@ -3721,8 +3731,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
-            tags: "Management";
+            tags: ["Projects", "Members", "Management Service"];
             summary: "List Project Grant Members";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the project grant level, matching the search queries. The search queries will be AND linked."
             parameters: {
@@ -3747,7 +3756,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Members", "Management Service"];
             summary: "Add Project Grant Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list on the project grant level with one or multiple roles."
             parameters: {
@@ -3772,7 +3781,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Members", "Management Service"];
             summary: "Update Project Grant Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
             parameters: {
@@ -3796,7 +3805,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Projects", "Members", "Management Service"];
             summary: "Remove Project Grant Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on a project grant level. The user can still have roles on another level (iam, organization, project)"
             parameters: {
@@ -3820,7 +3829,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "User Grant By ID";
             description: "Returns a user grant per ID. A user grant is a role a user has for a specific project and organization."
             parameters: {
@@ -3845,7 +3854,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "Search User Grants";
             description: "Returns a list of user grants that match the search queries. User grants are the roles users have for a specific project and organization."
             parameters: {
@@ -3870,7 +3879,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "Add User Grant";
             description: "Add a user grant for a specific user. User grants are the roles users have for a specific project and organization."
             parameters: {
@@ -3895,7 +3904,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "Update User Grants";
             description: "Update the roles of a user grant. User grants are the roles users have for a specific project and organization."
             parameters: {
@@ -3920,7 +3929,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "Deactivate User Grant";
             description: "Deactivate the user grant. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested. An error will be returned if the user grant is already deactivated."
             parameters: {
@@ -3945,7 +3954,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "Reactivate User Grant";
             description: "Reactivate a deactivated user grant. The user will be able to use the granted project again. An error will be returned if the user grant is not deactivated."
             parameters: {
@@ -3969,7 +3978,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "Remove User Grant";
             description: "Removes the user grant from the user. The user will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested."
             parameters: {
@@ -3994,7 +4003,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Users", "Management Service"];
             summary: "Bulk Remove User Grants";
             description: "Remove a list of user grants. The users will not be able to use the granted project anymore. Also, the roles will not be included in the tokens when requested."
             parameters: {
@@ -4021,7 +4030,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get Org IAM Policy";
             description: "Use Get Domain Settings instead"
-            tags: "Management"
+            tags: ["Policies", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -4044,7 +4053,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Domain Policy";
             description: "Returns the domain policy (this policy is managed by the IAM administrator)";
             parameters: {
@@ -4068,7 +4077,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Login Settings";
             description: "Returns the login settings defined on the organization level. It will trigger as soon as the organization is identified (scope, user identification). The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
             parameters: {
@@ -4092,7 +4101,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Default Login Settings";
             description: "Returns the default login settings defined on the instance level. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
             parameters: {
@@ -4117,7 +4126,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Create Custom Login Settings";
             description: "Create login settings for the organization and therefore overwrite the default settings for this organization. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
             parameters: {
@@ -4142,7 +4151,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Update Custom Login Settings";
             description: "Change the login settings for the organization, that overwrites the default settings for this organization. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
             parameters: {
@@ -4166,7 +4175,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Reset Custom Login Settings to Default";
             description: "Remove the custom settings from the organization. The default settings of the instance will be triggered afterward. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI.";
             parameters: {
@@ -4191,7 +4200,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "List Linked Identity Providers";
             description: "Returns a list of identity providers that are linked in the login policy. This means, that they are configured for the organization and will be shown to the users. They will be shown if the organization is identified (per scope or user)."
             parameters: {
@@ -4216,7 +4225,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "Add Linked Identity Provider";
             description: "Add/link a pre-configured identity provider to the login settings of the organization. This means that it will be shown to the users on the login page. They will be shown if the organization is identified (per scope or user)."
             parameters: {
@@ -4240,7 +4249,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "Remove Linked Identity Provider";
             description: "Remove an identity provider from the login settings of the organization. This means that it will not be shown to the users on the login page."
             parameters: {
@@ -4264,7 +4273,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "List Second Factors (2FA)";
             description: "Returns a list of second factors (2FA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called the second factor as it is used after a password. In the UI we generalize it as multi-factor."
             parameters: {
@@ -4289,7 +4298,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "Add Second Factor (2FA)";
             description: "Add a new second factor (2FA) to the login settings of the organization. Users will have the possibility to authenticate with the configured factor afterward. Authentication factors are used as an additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called a second factor as it is used as an additional authentication after a password. In the UI we generalize this as multi-factor."
             parameters: {
@@ -4313,7 +4322,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "Remove Second Factor (2FA)";
             description: "Remove a configured second factor (2FA) from the login settings of the organization. Users will not be able to authenticate with the configured factor afterward. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called the second factor as it is used after a password. In the UI we generalize it as multi-factor."
             parameters: {
@@ -4337,7 +4346,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "List Multi-factors (MFA)";
             description: "Returns a list of multi-factors (MFA) configured on the login settings of the organization. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             parameters: {
@@ -4362,7 +4371,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "Add Multi-Factor (MFA)";
             description: "Add a multi-factor (MFA) to the login settings of the organization. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             parameters: {
@@ -4386,7 +4395,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Settings", "Management Service"];
             summary: "Remove Multi-factor (MFA)";
             description: "Remove a multi-factor (MFA) from the login settings of the organization. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             parameters: {
@@ -4410,7 +4419,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Password Complexity Settings";
             description: "Returns the password complexity settings configured on the organization. The settings specify how a password should look (characters, length, etc.)"
             parameters: {
@@ -4434,7 +4443,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Default Password Complexity Settings";
             description: "Returns the default password complexity settings configured on the instance. The settings specify how a password should look (characters, length, etc.)"
             parameters: {
@@ -4459,7 +4468,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Create Password Complexity Settings";
             description: "Create new password complexity settings for the organization. This will overwrite the settings of the instance for this organization. The settings specify how a password should look (characters, length, etc.)"
             parameters: {
@@ -4484,7 +4493,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Update Password Complexity Settings";
             description: "Update the password complexity settings of the organization. The settings specify how a password should look (characters, length, etc.)"
             parameters: {
@@ -4508,7 +4517,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Reset Password Complexity Settings to Default";
             description: "Remove the password complexity settings of the organization and therefore use the default settings on the instance. The settings specify how a password should look (characters, length, etc.)"
             parameters: {
@@ -4532,7 +4541,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Password Age Settings";
             description: "Returns the password age settings configured on the organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
@@ -4556,7 +4565,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Default Password Age Settings";
             description: "Returns the default password age settings configured on the instance. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
@@ -4581,7 +4590,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Add Password Age Settings";
             description: "Create new password age settings for the organization. This will overwrite the settings of the instance for this organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
@@ -4606,7 +4615,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Update Password Age Settings";
             description: "Update the password age settings of the organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
@@ -4630,7 +4639,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Reset Password Age Settings to Default";
             description: "Remove the password age settings of the organization and therefore use the default settings on the instance.. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
@@ -4654,7 +4663,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Password Lockout Settings";
             description: "Returns the password lockout settings configured on the organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
             parameters: {
@@ -4678,7 +4687,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Default Password Lockout Settings";
             description: "Returns the default password lockout settings configured on the instance. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
             parameters: {
@@ -4703,7 +4712,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Add Password Lockout Settings";
             description: "Add new password lockout settings on the organization level. This will overwrite the settings set on the instance for this organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
             parameters: {
@@ -4728,7 +4737,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Update Password Lockout Settings";
             description: "Update the password lockout settings configured on the organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
             parameters: {
@@ -4752,7 +4761,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Reset Password Lockout Settings to Default";
             description: "Remove the password lockout settings from the organization. The settings configured on the instance will trigger afterward for this organization. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
             parameters: {
@@ -4776,7 +4785,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Privacy Settings";
             description: "Returns the privacy settings configured on the organization. To be able to trigger the correct policy make sure to identify which organization should be requested on the login/register (organization scope). The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
             parameters: {
@@ -4800,7 +4809,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Default Privacy Settings";
             description: "Returns the default privacy settings configured on the instance. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
             parameters: {
@@ -4825,7 +4834,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Add Privacy Settings";
             description: "Add a custom privacy policy for the organization. The configuration of the instance will be overwritten. Variable {{.Lang}} can be set to have different links based on the language. Make sure to identify which settings should be triggered by sending the organization scope. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
             parameters: {
@@ -4850,7 +4859,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Update Privacy Settings";
             description: "Update the custom privacy policy for the organization. Variable {{.Lang}} can be set to have different links based on the language. Make sure to identify which settings should be triggered by sending the organization scope. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
             parameters: {
@@ -4874,7 +4883,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Reset Privacy Settings to Default";
             description: "The settings from the organization will be removed and therefore the default settings configured on the instance will be triggered. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
             parameters: {
@@ -4898,7 +4907,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Notification Settings";
             description: "Return the notification settings configured on the organization. It overwrites the default settings configured on the instance for this organization. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             parameters: {
@@ -4922,7 +4931,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Default Notification Settings";
             description: "Return the default notification settings configured on the instance. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             parameters: {
@@ -4947,7 +4956,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Add Notification Settings";
             description: "Create notification settings for the organization and therefore overwrite the default settings for this organization. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             parameters: {
@@ -4972,7 +4981,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Update Notification Settings";
             description: "Update notification settings configured for the organization. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             parameters: {
@@ -4996,7 +5005,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Reset Notification Settings to Default";
             description: "The settings configured will be removed from the organization. Therefore the settings from the instance will trigger for the users of this organization afterward. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             parameters: {
@@ -5020,7 +5029,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Private Labeling/Branding Settings";
             description: "Returns the currently active private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             parameters: {
@@ -5044,7 +5053,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Preview Private Labeling/Branding Settings";
             description: "Returns the preview private labeling/branding configured on the organization. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             parameters: {
@@ -5068,7 +5077,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Get Default Private Labeling/Branding Settings";
             description: "Returns the default private labeling/branding configured on the instance. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             parameters: {
@@ -5093,7 +5102,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Create Labeling/Branding Settings";
             description: "Create the private labeling/branding configured on the organization. Make sure to activate it so it will be shown to the users. The settings will trigger if the organization has been identified (organization scope, user). Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             parameters: {
@@ -5118,7 +5127,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Update Labeling/Branding Settings";
             description: "Update the preview private labeling/branding configured on the organization. The settings will trigger if the organization has been identified (organization scope, user). The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             parameters: {
@@ -5144,7 +5153,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Activate Labeling/Branding Settings";
             description: "Activates the preview private labeling/branding configured on the organization. It will be shown to the users afterward. The settings will trigger if the organization has been identified (organization scope, user). Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             parameters: {
@@ -5168,7 +5177,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Remove Logo Light";
             description: "Removes the logo of the light theme from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
             parameters: {
@@ -5192,7 +5201,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Remove Logo Dark";
             description: "Removes the logo of the dark theme from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
             parameters: {
@@ -5216,7 +5225,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Remove Icon Light";
             description: "Removes the icon of the light theme from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
             parameters: {
@@ -5240,7 +5249,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Remove Icon Dark";
             description: "Removes the icon of the dark theme from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
             parameters: {
@@ -5264,7 +5273,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Remove Font";
             description: "Removes the font from the configured label policy/branding of the organization. It will only be shown on the preview. Make sure to activate your changes afterward."
             parameters: {
@@ -5288,7 +5297,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management";
+            tags: ["Settings", "Management Service"];
             summary: "Reset Labeling/Branding Settings";
             description: "Removes the label policy/branding of the organization and therefore the default settings from the instance will be shown to the users."
             parameters: {
@@ -5312,7 +5321,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Init Message Text";
             description: "Get the custom text of the initialize-user message/email that is set on the organization. The email is sent when a user is created and has either no password or a non-verified email address."
             parameters: {
@@ -5336,7 +5345,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Init Message Text";
             description: "Get the default text of the initialize-user message/email that is set either on the instance or in the filesystem of ZITADEL. The email is sent when a user is created and has either no password or a non-verified email address."
             parameters: {
@@ -5361,7 +5370,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Custom Init Message Text";
             description: "Set the custom text of the initialize-user message/email the default texts will be overwritten for the organization. The email is sent when a user is created and has either no password or a non-verified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -5385,7 +5394,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Init Message Text to Default";
             description: "Removes the custom text of the initialize-user message/email that is overwritten on the organization and triggers the default text instead."
             parameters: {
@@ -5409,7 +5418,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Password Reset Message Text";
             description: "Get the custom text of the password reset message/email that is set on the organization. The email is sent when a user triggers the password forgot-request."
             parameters: {
@@ -5433,7 +5442,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Password Reset Message Text";
             description: "Get the default text of the password reset message/email that is set on the instance or in the files of ZITADEL. The email is sent when a user triggers the password forgot-request."
             parameters: {
@@ -5458,7 +5467,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Custom Password Reset Message Text";
             description: "Set the custom text of the password reset user message/email for the organization. The email is sent when a user triggers the password forgot-request. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -5482,7 +5491,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Password Reset Message Text to Default";
             description: "Removes the custom text of the password reset user message/email and the default will trigger afterward."
             parameters: {
@@ -5506,7 +5515,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Verify Email Message Text";
             description: "Get the custom text of the verify-email message/email that is set on the organization. The email is sent when a user adds a new non-verified email address."
             parameters: {
@@ -5530,7 +5539,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Verify Email Message Text";
             description: "Get the default text of the verify-email message/email that is set on the instance or as translation files in ZITADEL itself. The email is sent when a user adds a new non-verified email address."
             parameters: {
@@ -5555,7 +5564,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Default Verify Email Message Text";
             description: "Set the custom text of the verify-email user message/email for the organization. The email is sent when a user adds a new nonverified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -5579,7 +5588,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Verify Email Message Text to Default";
             description: "Removes the custom text of the email verify message/email and therefore the default settings will trigger afterward."
             parameters: {
@@ -5603,7 +5612,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Verify Phone Message Text";
             description: "Get the custom text of the verify-phone message that is set on the organization. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
             parameters: {
@@ -5627,7 +5636,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Verify Phone Message Text";
             description: "Get the default text of the verify-phone message that is set on the instance or as translation files in ZITADEL itself. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
             parameters: {
@@ -5652,7 +5661,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Custom Verify Phone Reset Message Text";
             description: "Set the custom text of the verify-phone message for the organization. The message is sent when a user adds a new non-verified phone number and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -5676,7 +5685,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Verify Phone Message Text to Default";
             description: "Removes the custom text of the verify-phone message from the organization and therefore the default texts will trigger for the users afterward."
             parameters: {
@@ -5700,7 +5709,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Verify SMS OTP Message Text";
             description: "Get the custom text of the verify SMS OTP message that is set on the organization. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
             parameters: {
@@ -5724,7 +5733,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Verify SMS OTP Message Text";
             description: "Get the default text of the verify SMS OTP message that is set on the instance or as translation files in ZITADEL itself. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
             parameters: {
@@ -5749,7 +5758,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Custom Verify SMS OTP Reset Message Text";
             description: "Set the custom text of the verify SMS OTP message for the organization. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -5773,7 +5782,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Verify SMS OTP Message Text to Default";
             description: "Removes the custom text of the verify SMS OTP message from the organization and therefore the default texts will trigger for the users afterward."
             parameters: {
@@ -5797,7 +5806,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Verify Email OTP Message Text";
             description: "Get the custom text of the verify Email OTP message that is set on the organization. The message is sent when an Email One-time password should be verified and a notification provider is configured."
             parameters: {
@@ -5821,7 +5830,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Verify Email OTP Message Text";
             description: "Get the default text of the verify Email OTP message that is set on the instance or as translation files in ZITADEL itself. The message is sent when an Email One-time password should be verified and a notification provider is configured."
             parameters: {
@@ -5846,7 +5855,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Custom Verify Email OTP Reset Message Text";
             description: "Set the custom text of the verify Email OTP message for the organization. The message is sent when an Email One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -5870,7 +5879,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Verify Email OTP Message Text to Default";
             description: "Removes the custom text of the verify Email OTP message from the organization and therefore the default texts will trigger for the users afterward."
             parameters: {
@@ -5894,7 +5903,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Domain Claimed Message Text";
             description: "Get the custom text of the domain claimed message/email that is configured on the organization. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
             parameters: {
@@ -5918,7 +5927,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Domain Claimed Message Text";
             description: "Get the default text of the domain claimed message/email that is set on the instance or as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
             parameters: {
@@ -5943,7 +5952,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Custom Domain Claimed Message Text";
             description: "Set the custom text of the domain claimed message/email for the organization. The message/email is sent when an organization claims a domain and a user of this domain exists in another organization. The Following Variables can be used: {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -5967,7 +5976,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Domain Claimed Message Text to Default";
             description: "Removes the custom text of the domain claimed message that is configured on the organization and triggers the text from the instance or translation files in ZITADEL."
             parameters: {
@@ -5991,7 +6000,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Passwordless Registration Message Text";
             description: "Get the custom text of the passwordless/passkey registration message/email that is configured on the organization. The message is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device."
             parameters: {
@@ -6015,7 +6024,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Passwordless Registration Message Text";
             description: "Get the default text of the domain claimed message/email that is configured on the instance or as translation files in ZITADEL. The message is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device."
             parameters: {
@@ -6040,7 +6049,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Default Passwordless Registration Message Text";
             description: "Set the custom text of the passwordless/passkey registration message/email for the organization. The message/email is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -6064,7 +6073,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Passwordless Registration Message Text to Default";
             description: "Removes the custom text of the passwordless/passkey registration from the organization and therefore the default configuration from the instance or translation files will be triggered for the users."
             parameters: {
@@ -6088,7 +6097,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Password Change Message Text";
             description: "Get the custom text of the password-changed message/email that is configured on the organization. The message is sent when the password of a user has been changed."
             parameters: {
@@ -6112,7 +6121,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Password Change Message Text";
             description: "Get the default text of the password-changed message/email that is configured on the instance or as translation files in ZITADEL itself. The message is sent when the password of a user has been changed."
             parameters: {
@@ -6137,7 +6146,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Custom Password Changed Message Text";
             description: "Set the custom text of the password-changed message/email for the organization. The message/email is sent when the password of a user has been changed.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
             parameters: {
@@ -6161,7 +6170,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Password Changed Message Text to Default";
             description: "Removes the custom text of the password-changed message from the organization and therefore the default texts from the instance or translation files will be triggered for the users."
             parameters: {
@@ -6185,7 +6194,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Invite User Message Text";
             description: "Get the custom text of the password-changed message/email that is configured on the organization. The message is sent when an invite code email is requested."
             parameters: {
@@ -6209,7 +6218,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Invite User Message Text";
             description: "Get the default text of the invite user message/email that is configured on the instance or as translation files in ZITADEL itself. The message is sent when an invite code email is requested."
             parameters: {
@@ -6234,7 +6243,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Custom Invite User Message Text";
             description: "Set the custom text of the invite user message/email for the organization. The message is sent when an invite code email is requested. The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}} {{.ApplicationName}}"
             parameters: {
@@ -6258,7 +6267,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Invite User Message Text to Default";
             description: "Removes the custom text of the invite user message from the organization and therefore the default texts from the instance or translation files will be triggered for the users."
             parameters: {
@@ -6282,7 +6291,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Custom Login Text";
             description: "Get the custom texts for the login and register UI of ZITADEL, which are configured on the organization. The text from the organization will trigger as soon as the organization is identified (organization scope or user)."
             parameters: {
@@ -6306,7 +6315,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Get Default Login Text";
             description: "Get the default texts for the login and register UI of ZITADEL, which are configured on the instance or as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured. Or if the organization context is not given."
             parameters: {
@@ -6331,7 +6340,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Set Default Login Text";
             description: "Set the custom texts for the login and register UI of ZITADEL for the organization."
             parameters: {
@@ -6355,7 +6364,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Texts", "Management Service"];
             summary: "Reset Custom Login Text to Default";
             description: "Removes the custom texts for the login and register UI from the organization and therefore the configuration of the instance or the translation files in ZITADEL itself will trigger."
             parameters: {
@@ -6381,7 +6390,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Get Identity Provider (IDP) by ID";
             description: "Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc that is configured on the organization.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6407,7 +6416,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Search Identity Providers (IDPs)";
             description: "Returns a list of identity providers (social/enterprise login) configured on the organization. e.g Google, AzureAD, etc.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6433,7 +6442,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Add OIDC Identity Provider (IDP)";
             description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. The provider has to be OIDC-compliant. This configuration can only be used by the organization itself.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6459,7 +6468,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Add JWT Identity Provider (IDP)";
             description: "Create a new identity provider configuration on the organization to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6485,7 +6494,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Deactivate Identity Provider (IDP)";
             description: "Sets the state of the provider to inactive. It can only be called for the provider with the state active. Users will not be able to log in with the given provider afterward. It might cause troubles if it is the only authentication method of the user.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6511,7 +6520,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Reactivate Identity Provider (IDP)";
             description: "Deprecated: Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to log in again with the given provider.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6536,7 +6545,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Identity Provider (IDP)";
             description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to log in with the provider afterward. If it is their only authentication possibility it might cause problems.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6562,7 +6571,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Update Identity Provider (IDP)";
             description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterward.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6588,7 +6597,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Update OIDC Identity Provider (IDP)";
             description: "Update the OIDC-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6614,7 +6623,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Deprecated: Update JWT Identity Provider (IDP)";
             description: "Update the JWT-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward.";
-            tags: "Management"
+            tags: ["Deprecated", "Management Service"];
             deprecated: true;
             parameters: {
                 headers: {
@@ -6640,7 +6649,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "List Identity Providers";
             description: "";
             parameters: {
@@ -6665,7 +6674,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Get Identity Provider By ID";
             description: "";
             parameters: {
@@ -6691,7 +6700,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add Generic OAuth Identity Provider";
             description: "";
             parameters: {
@@ -6717,7 +6726,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update Generic OAuth Identity Provider";
             description: "";
             parameters: {
@@ -6743,7 +6752,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add Generic OIDC Identity Provider";
             description: "";
             parameters: {
@@ -6769,7 +6778,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update Generic OIDC Identity Provider";
             description: "";
             parameters: {
@@ -6795,7 +6804,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Migrate Generic OIDC Identity Provider";
             description: "";
             parameters: {
@@ -6821,7 +6830,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add JWT Identity Provider";
             description: "";
             parameters: {
@@ -6847,7 +6856,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update JWT Identity Provider";
             description: "";
             parameters: {
@@ -6873,7 +6882,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add Azure AD Identity Provider";
             description: "";
             parameters: {
@@ -6899,7 +6908,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update Azure AD Identity Provider";
             description: "";
             parameters: {
@@ -6925,7 +6934,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add GitHub Identity Provider";
             description: "";
             parameters: {
@@ -6951,7 +6960,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update GitHub Identity Provider";
             description: "";
             parameters: {
@@ -6977,7 +6986,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add GitHub Enterprise Identity Provider";
             description: "";
             parameters: {
@@ -7003,7 +7012,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update GitHub Enterprise Identity Provider";
             description: "";
             parameters: {
@@ -7029,7 +7038,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add GitLab Identity Provider";
             description: "";
             parameters: {
@@ -7055,7 +7064,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update GitLab Identity Provider";
             description: "";
             parameters: {
@@ -7081,7 +7090,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add GitLab Selfhosted Identity Provider";
             description: "";
             parameters: {
@@ -7107,7 +7116,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update GitLab Selfhosted Identity Provider";
             description: "";
             parameters: {
@@ -7133,7 +7142,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add Google Identity Provider";
             description: "";
             parameters: {
@@ -7159,7 +7168,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update Google Identity Provider";
             description: "";
             parameters: {
@@ -7185,7 +7194,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add LDAP Identity Provider";
             description: "";
             parameters: {
@@ -7211,7 +7220,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update LDAP Identity Provider";
             description: "";
             parameters: {
@@ -7237,7 +7246,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add Apple Identity Provider";
             description: "";
             parameters: {
@@ -7263,7 +7272,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update Apple Identity Provider";
             description: "";
             parameters: {
@@ -7289,7 +7298,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Add SAML Identity Provider";
             description: "";
             parameters: {
@@ -7315,7 +7324,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Update SAML Identity Provider";
             description: "";
             parameters: {
@@ -7341,7 +7350,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Regenerate SAML Identity Provider Certificate";
             description: "";
             parameters: {
@@ -7367,7 +7376,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Identity Providers", "Management Service"];
             summary: "Delete Identity Provider";
             description: "";
             parameters: {
@@ -7392,7 +7401,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Search Actions";
             description: "Returns a list of actions matching the query. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
@@ -7416,7 +7425,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Get Action By ID";
             description: "Returns an action by id. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
@@ -7441,7 +7450,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Create Action";
             description: "Create a new ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
@@ -7466,7 +7475,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Update Action";
             description: "Update an existing ZITADEL action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
@@ -7491,7 +7500,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Deactivate Action";
             description: "Deactivate an existing action. The action will not be executed if configured in a flow. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
@@ -7516,7 +7525,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Reactivate Action";
             description: "Reactivate an existing action that is deactivated. The action will be executed again if configured in a flow. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
@@ -7541,7 +7550,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Delete Action";
             description: "Remove an existing action. Actions are custom code written in javascript, that can be run at a specified point/flow/trigger in ZITADEL."
             parameters: {
@@ -7565,7 +7574,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Search Flow Types";
             parameters: {
                 headers: {
@@ -7588,7 +7597,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "List Flow Trigger Types";
             parameters: {
                 headers: {
@@ -7611,7 +7620,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Get Flow";
             description: "Returns a flow. Flows are the links between an action and a specific point during a user interaction with ZITADEL."
             parameters: {
@@ -7635,7 +7644,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Clear Flow";
             parameters: {
                 headers: {
@@ -7659,7 +7668,7 @@ service ManagementService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Management"
+            tags: ["Actions", "Management Service"];
             summary: "Set Trigger Actions";
             parameters: {
                 headers: {

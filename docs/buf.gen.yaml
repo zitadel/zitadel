@@ -22,6 +22,6 @@ plugins:
       - preserve_rpc_order=true
       - visibility_restriction_selectors=deprecated
       - output_format=json
-      - disable_service_tags=true
       - allow_merge=true
+      - disable_service_tags=true
       - merge_file_name=deprecated

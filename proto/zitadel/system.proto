@@ -29,7 +29,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Healthz", "System Service"];
       responses: {
         key: "200";
         value: {
@@ -57,7 +57,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Instances", "System Service"];
     };
   }
 
@@ -72,7 +72,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Instances", "System Service"];
     };
   }
 
@@ -90,7 +90,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Instances", "System Service"];
     };
   }
 
@@ -106,7 +106,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Instances", "System Service"];
     };
   }
 
@@ -123,7 +123,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Instances", "System Service"];
     };
   }
 
@@ -139,7 +139,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Instances", "System Service"];
     };
   }
 
@@ -157,7 +157,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Members", "System Service"];
     };
   }
 
@@ -173,7 +173,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Domains", "System Service"];
     };
   }
 
@@ -191,7 +191,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Domains", "System Service"];
     };
   }
 
@@ -207,7 +207,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Domains", "System Service"];
     };
   }
 
@@ -222,7 +222,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Domains", "System Service"];
     };
   }
 
@@ -238,7 +238,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Domains", "System Service"];
     };
   }
 
@@ -256,7 +256,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Views", "System Service"];
       responses: {
         key: "200";
         value: {
@@ -280,7 +280,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Views", "System Service"];
       responses: {
         key: "200";
         value: {
@@ -304,7 +304,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Events", "System Service"];
       responses: {
         key: "200";
         value: {
@@ -328,7 +328,7 @@ service SystemService {
       permission: "system.debug.delete";
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "System";
+      tags: ["Events", "System Service"];
       responses: {
         key: "200";
         value: {
@@ -354,7 +354,7 @@ service SystemService {
   // Deprecated: use SetQuota instead
   rpc AddQuota(AddQuotaRequest) returns (AddQuotaResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["System"];
+      tags: ["Quotas", "System Service"];
     };
 
     option (google.api.http) = {
@@ -371,7 +371,7 @@ service SystemService {
   // Creates a new quota if it doesn't exist for the specified unit
   rpc SetQuota(SetQuotaRequest) returns (SetQuotaResponse) {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["System"];
+      tags: ["Quotas", "System Service"];
     };
 
     option (google.api.http) = {
@@ -386,10 +386,6 @@ service SystemService {
 
   // Removes a quota
   rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["System"];
-    };
-
     option (google.api.http) = {
       delete: "/system/v1/instances/{instance_id}/quotas/{unit}"
     };
@@ -397,6 +393,11 @@ service SystemService {
     option (zitadel.v1.auth_option) = {
       permission: "system.quota.delete";
     };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Quotas", "System Service"];
+    };
+
   }
 
   // Set a feature flag on an instance
@@ -411,8 +412,9 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["System"];
+      tags: ["Instances", "Features", "System Service"];
     };
+
   }
 
   // Sets instance level limits
@@ -427,7 +429,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["System"];
+      tags: ["Limits", "System Service"];
       responses: {
         key: "200";
         value: {
@@ -460,7 +462,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["System"];
+      tags: ["Limits", "System Service"];
       responses: {
         key: "200";
         value: {
@@ -494,7 +496,7 @@ service SystemService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: ["System"];
+      tags: ["Limits", "System Service"];
       responses: {
         key: "200";
         value: {

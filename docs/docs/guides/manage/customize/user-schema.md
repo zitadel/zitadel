@@ -18,7 +18,7 @@ but still allow it for your customers.
 Please be aware that User Schema is in a [preview stage](/support/software-release-cycles-support#preview) not feature complete
 and therefore not generally available.
 
-Do not use it for production yet. To test it out, you need to enable the `UserSchema` [feature flag](/apis/resources/feature_service_v2/feature-service).
+Do not use it for production yet. To test it out, you need to enable the `UserSchema` [feature flag](/reference#tag/features).
 :::
 
 ## Create your first schema

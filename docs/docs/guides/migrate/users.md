@@ -7,7 +7,7 @@ Migrating users from an existing system, while minimizing impact on said users, 
 
 ## Individual Users
 
-Creating individual users can be done with this endpoint: [ImportHumanUser](/docs/apis/resources/mgmt/management-service-import-human-user).
+Creating individual users can be done with this endpoint: [ImportHumanUser](/docs/reference/deprecated#tag/management-service/POST/management/v1/users/human).
 Please also consult our [guide](/docs/guides/manage/user/reg-create-user) on how to create users.
 
 ```json
@@ -42,7 +42,7 @@ Please also consult our [guide](/docs/guides/manage/user/reg-create-user) on how
 
 ## Bulk import
 
-For bulk import use the [import endpoint](/docs/apis/resources/admin/admin-service-import-data) on the admin API:
+For bulk import use the [import endpoint](/docs/reference/deprecated#tag/importexport) on the admin API:
 
 ```json
 {
@@ -238,7 +238,7 @@ Use metadata to store additional attributes of the users, such as organizational
 
 :::info
 Metadata must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Metadata](/docs/apis/resources/mgmt/user-metadata)
+[API reference: User Metadata](/docs/reference/deprecated#tag/management-service/DELETE/management/v1/users/{id}/metadata/{key)
 :::
 
 Request metadata from the userinfo endpoint by passing the required [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) in your auth request.
@@ -250,5 +250,5 @@ You can assign roles from owned or granted projects to a user.
 
 :::info
 Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Authorization / Grants](/docs/apis/resources/auth/user-authorizations-grants)
+[API reference: User Authorization / Grants](/docs/reference/deprecated#tag/my-user)
 :::

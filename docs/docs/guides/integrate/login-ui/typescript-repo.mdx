@@ -123,7 +123,7 @@ In order to run the new login app, make sure to follow the instructions in the [
 #### How to setup domains for OIDC
 
 When setting up the new login app for OIDC, the domain must be registered on your instance and use https.
-To register your login domain on your instance, [add](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain) your domain on your instances trusted domains.
+To register your login domain on your instance, [add](/docs/reference/deprecated#tag/admin-service/POST/admin/v1/trusted_domains) your domain on your instances trusted domains.
 
 #### OIDC Proxy
 
@@ -144,6 +144,6 @@ To deploy your own version on Vercel, navigate to your instance and create a ser
 Copy its id from the overview and set it as `ZITADEL_SERVICE_USER_ID`.
 Then create a personal access token (PAT), copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_OWNER` permissions.
 Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
-Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/docs/apis/resources/admin/admin-service-add-instance-trusted-domain).
+Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/docs/reference/deprecated#tag/admin-service/POST/admin/v1/trusted_domains).
 
 ![Deploy to Vercel](/img/deploy-to-vercel.png)

@@ -40,7 +40,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Healthz";
             description: "The health endpoint allows an external system to probe if ZITADEL system API is alive. Response as soon as ZITADLE is running."
-            tags: "Admin";
+            tags: ["Healthz", "Admin Service"];
             responses: {
                 key: "200";
                 value: {
@@ -66,7 +66,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Languages", "Admin Service"];
             summary: "Supported Languages";
             description: "The supported/default languages of the system will be returned by the language abbreviation."
         };
@@ -84,7 +84,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Allowed Languages";
             description: "If the languages are restricted, only those are returned. Else, all supported languages are returned."
-            tags: "Admin";
+            tags: ["Languages", "Admin Service"];
         };
     }
 
@@ -98,7 +98,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Languages", "Admin Service"];
             summary: "Set Default Languages";
             description: "Set the language that is used as a fallback/default if the user has configured something that is not provided by ZITADEL."
         };
@@ -114,7 +114,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Languages", "Admin Service"];
             summary: "Get Default Languages";
             description: "Returns the language that is used as a fallback/default if the user has configured something that is not provided by ZITADEL."
         };
@@ -130,7 +130,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Instances", "Domains", "Admin Service"];
             summary: "Get My Instance";
             description: "Returns the details about the current instance such as the name, version, domains, etc."
         };
@@ -146,7 +146,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Instances", "Domains", "Admin Service"];
             summary: "List Instance Domains";
             description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are the URLs where ZITADEL is running."
         };
@@ -162,7 +162,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Instances", "Domains", "Admin Service"];
             summary: "List Instance Trusted Domains";
             description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
@@ -179,7 +179,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Instances", "Domains", "Admin Service"];
             summary: "Add an Instance Trusted Domain";
             description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
@@ -195,7 +195,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Instances", "Domains", "Admin Service"];
             summary: "Remove an Instance Trusted Domain";
             description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
@@ -212,7 +212,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Secrets", "Admin Service"];
             summary: "List Secret Generators";
             description: "Lists all the configured secret generators. The generators define how a secret should look when generated in ZITADEL. E.g Email verification code, phone verification code, etc."
         };
@@ -228,7 +228,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Secrets", "Admin Service"];
             summary: "Get Secret Generator";
             description: "Get a specific secret generator by its type (e.g PasswordResetCode). A generator defines how a secret should look when generating in ZITADEL."
         };
@@ -245,7 +245,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Secrets", "Admin Service"];
             summary: "Update Secret Generator";
             description: "Change a specific secret generator configuration by its type (e.g PasswordResetCode). A generator defines how a secret should look when generating in ZITADEL."
         };
@@ -266,7 +266,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -286,7 +286,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -307,7 +307,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -328,7 +328,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -349,7 +349,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -370,7 +370,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             summary: "Activate SMTP Provider";
             description: "Activate an SMTP provider."
             deprecated: true;
@@ -393,7 +393,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -413,7 +413,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -434,7 +434,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -455,7 +455,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -476,7 +476,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMTP Providers", "Admin Service"];
             deprecated: true;
         };
     }
@@ -492,7 +492,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "List Email providers";
             description: "Returns a list of Email providers."
         };
@@ -508,7 +508,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Get active Email provider";
             description: "Returns the active Email provider from the system. This is used to send E-Mails to the users."
         };
@@ -524,7 +524,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Get Email provider by its id";
             description: "Get a specific Email provider by its ID.";
         };
@@ -541,7 +541,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Add SMTP Email provider";
             description: "Add a new SMTP Email provider if nothing is set yet."
         };
@@ -558,7 +558,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Update SMTP Email provider";
             description: "Update the SMTP Email provider, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
         };
@@ -575,7 +575,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Add HTTP Email provider";
             description: "Add a new HTTP Email provider if nothing is set yet."
         };
@@ -592,7 +592,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Update HTTP Email provider";
             description: "Update the HTTP Email provider, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured HTTP."
         };
@@ -609,7 +609,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Update SMTP Password";
             description: "Update the SMTP password that is used for the host, be aware that this will be activated as soon as it is saved. So the users will get notifications from the newly configured SMTP."
         };
@@ -626,7 +626,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Activate Email Provider";
             description: "Activate an Email provider."
         };
@@ -643,7 +643,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Deactivate Email Provider";
             description: "Deactivate an Email provider. After deactivating the provider, the users will not be able to receive Email notifications from that provider anymore."
         };
@@ -659,7 +659,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Remove Email provider";
             description: "Remove the Email provider, be aware that the users will not get an E-Mail if no provider is set."
         };
@@ -676,7 +676,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Test SMTP Email Provider";
             description: "Test an SMTP Email provider identified by its ID. After testing the provider, the users will receive information about the test results."
         };
@@ -693,7 +693,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Email Providers", "Admin Service"];
             summary: "Test SMTP Email Provider";
             description: "Test an SMTP Email provider. After testing the provider, the users will receive information about the test results."
         };
@@ -710,7 +710,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "List SMS Providers";
             description: "Returns a list of configured SMS providers."
         };
@@ -726,7 +726,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Get SMS Provider";
             description: "Get a specific SMS provider by its ID."
         };
@@ -743,7 +743,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Add Twilio SMS Provider";
             description: "Configure a new SMS provider of the type Twilio. A provider has to be activated to be able to send notifications."
         };
@@ -760,7 +760,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Update Twilio SMS Provider";
             description: "Change the configuration of an SMS provider of the type Twilio.  A provider has to be activated to be able to send notifications."
         };
@@ -777,7 +777,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Update Twilio SMS Provider Token";
             description: "Change the token of the SMS provider of the type Twilio."
         };
@@ -794,7 +794,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Add HTTP SMS Provider";
             description: "Configure a new SMS provider of the type HTTP. A provider has to be activated to be able to send notifications."
         };
@@ -811,7 +811,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Update HTTP SMS Provider";
             description: "Change the configuration of an SMS provider of the type HTTP. A provider has to be activated to be able to send notifications."
         };
@@ -828,7 +828,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Activate SMS Provider";
             description: "Activate an SMS provider. After activating a provider, the users will be able to receive SMS notifications."
         };
@@ -845,7 +845,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Deactivate SMS Provider";
             description: "Deactivate an SMS provider. After deactivating the provider, the users will not be able to receive SMS notifications from that provider anymore. If it was the last activated they will not get notifications at all"
         };
@@ -861,7 +861,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["SMS Providers", "Admin Service"];
             summary: "Remove SMS Provider" ;
             description: "Delete an SMS provider. If the provider was still active the users will not receive notifications from that provider anymore."
         };
@@ -877,7 +877,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get OIDC Settings";
             description: "The OIDC Settings define the lifetimes of the different tokens in OIDC."
         };
@@ -894,7 +894,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Add OIDC Settings";
             description: "Create new OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and clients."
         };
@@ -911,7 +911,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Add OIDC Settings";
             description: "Update existing OIDC settings. The OIDC Settings define the lifetimes of the different tokens in OIDC. These settings are used for all organizations and clients."
         };
@@ -927,7 +927,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Notification Providers", "Admin Service"];
             summary: "Get Notification Provider Filesystem";
             description: "Returns a filesystem notification provider if configured. This provider is only used for testing purposes. The notifications will be written to the filesystem."
         };
@@ -943,7 +943,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Notification Providers", "Admin Service"];
             summary: "Get Notification Provider Log";
             description: "Returns a log notification provider if configured. This provider is only used for testing purposes. The notifications will be written to the logs."
         };
@@ -959,7 +959,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get Security Settings";
             description: "Returns the security settings of the ZITADEL instance."
         };
@@ -976,7 +976,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Set Security Settings";
             description: "Set the security settings of the ZITADEL instance."
         };
@@ -992,7 +992,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Organizations", "Admin Service"];
             summary: "Get Organization By ID";
             description: "Returns an organization by its ID. Make sure the user has the permissions to access the organization."
             responses: {
@@ -1014,7 +1014,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Organizations", "Admin Service"];
             summary: "Is Organization Unique";
             description: "Checks if an organization with the searched parameters already exists or not."
             responses: {
@@ -1042,7 +1042,8 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Organizations", "Admin Service"];
+            tags: ["Settings", "Admin Service"];
             summary: "Set Default Organization";
             description: "Sets the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization."
         };
@@ -1058,7 +1059,8 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Organizations", "Admin Service"];
+            tags: ["Settings", "Admin Service"];
             summary: "Get Default Organization";
             description: "Get the default organization of the ZITADEL instance. If no specific organization is given on the register form, a user will be registered to the default organization."
         };
@@ -1075,7 +1077,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Organizations", "Admin Service"];
             summary: "Search Organization";
             description: "Returns a list of organizations that match the requesting filters. All filters are applied with an AND condition."
             responses: {
@@ -1109,7 +1111,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Organizations", "Admin Service"];
             summary: "Setup Organization";
             description: "Create a new organization with an administrative user. If no specific roles are sent for the first user, the user will get the role ORG_OWNER."
             responses: {
@@ -1141,7 +1143,7 @@ service AdminService {
             permission: "iam.write";
         };
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Organizations", "Admin Service"];
             summary: "Remove Organization";
             description: "Deletes the organization and all its resources (Users, Projects, Grants to and from the org). Users of this organization will not be able to log in."
             responses: {
@@ -1175,7 +1177,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Get Identity Provider (IDP) by ID";
             description: "Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc.";
             deprecated: true;
@@ -1210,7 +1212,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Search Identity Providers (IDP)";
             description: "Returns a list of identity providers (social/enterprise login) configured on an instance level. e.g Google, AzureAD, etc.";
             deprecated: true;
@@ -1245,7 +1247,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Add OIDC Identity Provider (IDP)";
             description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. The provider has to be OIDC compliant.";
             deprecated: true;
@@ -1280,7 +1282,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Add JWT Identity Provider (IDP)";
             description: "Create a new identity provider configuration to enable your users to log in with social/enterprise login. JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as a federated identity. You have to provide an endpoint where ZITADEL can get the existing JWT token.";
             deprecated: true;
@@ -1315,7 +1317,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Update Identity Provider (IDP)";
             description: "Update an existing IDP. All fields are updated. If you do not send a value in a field, it will be empty afterward.";
             deprecated: true;
@@ -1349,7 +1351,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Deactivate Identity Provider (IDP)";
             description: "Sets the state of the provider to inactive. It can only be called for the provider with the state active. Users will not be able to log in with the given provider afterward. It might cause troubles if it is the only authentication method of the user.";
             deprecated: true;
@@ -1383,7 +1385,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Reactivate Identity Provider (IDP)";
             description: "Sets the state of the provider to active. It can only be called for providers with the state inactive. Users will not be able to log in again with the given provider.";
             deprecated: true;
@@ -1417,7 +1419,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Remove Identity Provider (IDP)";
             description: "Removes the identity provider permanently. All links to the given IDP on users will be deleted as well. They will not be able to log in with the provider afterward. If it is their only authentication possibility it might cause problems.";
             deprecated: true;
@@ -1452,7 +1454,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Update OIDC Identity Provider (IDP)";
             description: "Update the OIDC-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward.";
             deprecated: true;
@@ -1498,7 +1500,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Deprecated: Update JWT Identity Provider (IDP)";
             description: "Update the JWT-specific configuration of an identity provider. All fields will be updated. If a field has no value it will be empty afterward.";
             deprecated: true;
@@ -1546,7 +1548,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "List Identity Providers";
             description: "Returns a list of identity providers (social/enterprise login) configured on an instance level. e.g Google, AzureAD, etc.";
         };
@@ -1563,7 +1565,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Get Identity Provider By ID";
             description: "";
         };
@@ -1581,7 +1583,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add Generic OAuth Identity Provider";
             description: "";
         };
@@ -1599,7 +1601,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update Generic OAuth Identity Provider";
             description: "";
         };
@@ -1617,7 +1619,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add Generic OIDC Identity Provider";
             description: "";
         };
@@ -1635,7 +1637,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update Generic OIDC Identity Provider";
             description: "";
         };
@@ -1653,7 +1655,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Migrate Generic OIDC Identity Provider";
             description: "";
         };
@@ -1671,7 +1673,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add JWT Identity Provider";
             description: "";
         };
@@ -1689,7 +1691,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update JWT Identity Provider";
             description: "";
         };
@@ -1707,7 +1709,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add AzureAD Identity Provider";
             description: "";
         };
@@ -1725,7 +1727,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update AzureAD Identity Provider";
             description: "";
         };
@@ -1743,7 +1745,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add GitHub Identity Provider";
             description: "";
         };
@@ -1761,7 +1763,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update GitHub Identity Provider";
             description: "";
         };
@@ -1779,7 +1781,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add GitHub Enterprise Identity Provider";
             description: "";
         };
@@ -1797,7 +1799,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update GitHub Enterprise Identity Provider";
             description: "";
         };
@@ -1815,7 +1817,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add GitLab Identity Provider";
             description: "";
         };
@@ -1833,7 +1835,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update GitLab Identity Provider";
             description: "";
         };
@@ -1851,7 +1853,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add GitLab Selfhost Identity Provider";
             description: "";
         };
@@ -1869,7 +1871,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update GitLab Selfhost Identity Provider";
             description: "";
         };
@@ -1887,7 +1889,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add Google Identity Provider";
             description: "";
         };
@@ -1905,7 +1907,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update Google Identity Provider";
             description: "";
         };
@@ -1923,7 +1925,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add LDAP Identity Provider";
             description: "";
         };
@@ -1941,7 +1943,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update LDAP Identity Provider";
             description: "";
         };
@@ -1959,7 +1961,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add Apple Identity Provider";
             description: "";
         };
@@ -1977,7 +1979,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update Apple Identity Provider";
             description: "";
         };
@@ -1995,7 +1997,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Add SAML Identity Provider";
             description: "";
         };
@@ -2013,7 +2015,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Update SAML Identity Provider";
             description: "";
         };
@@ -2031,7 +2033,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Regenerate SAML Identity Provider Certificate";
             description: "";
         };
@@ -2049,7 +2051,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Identity Providers", "Admin Service"];
             summary: "Delete Identity Provider";
             description: "";
         };
@@ -2065,7 +2067,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get Org IAM Policy";
             description: "Use Get Domain Settings instead"
             deprecated: true;
@@ -2083,7 +2085,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Update Org IAM Policy";
             description: "Use Update Domain Settings instead";
             deprecated: true;
@@ -2100,7 +2102,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get Org IAM Policy";
             description: "Use GetDomain Settings for Organization instead";
             deprecated: true;
@@ -2118,7 +2120,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Add Custom Org IAM Policy";
             description: "Use Get Domain Settings for Organization instead"
             deprecated: true;
@@ -2136,7 +2138,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Update Custom Org IAM Policy";
             description: "Use Get Domain Settings for Organization instead"
             deprecated: true;
@@ -2153,7 +2155,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Reset Domain Settings of Organization";
             description: "Use Reset Domain Settings of Organization instead"
             deprecated: true;
@@ -2170,7 +2172,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get Domain Settings";
             description: "Returns the domain settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation.."
             responses: {
@@ -2193,7 +2195,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Update Domain Settings";
             description: "Update the domain settings configured as default on the instance. Domain settings specify how ZITADEL should handle domains, usernames, emails and validation. It affects all organizations that do not have overwritten settings."
             responses: {
@@ -2215,7 +2217,8 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
+            tags: ["Organizations", "Admin Service"];
             summary: "Get Domain Settings for Organization";
             description: "Get the domain settings configured on a specific organization. If the organization doesn't have a custom setting, the default will be returned. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
@@ -2238,7 +2241,8 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
+            tags: ["Organizations", "Admin Service"];
             summary: "Set a Domain Settings for an Organization";
             description: "Create the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
@@ -2261,7 +2265,8 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
+            tags: ["Organizations", "Admin Service"];
             summary: "Update Domain Settings for Organization";
             description: "Update the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
@@ -2283,7 +2288,8 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
+            tags: ["Organizations", "Admin Service"];
             summary: "Reset Domain Settings of Organization";
             description: "Resets the domain settings configured on a specific organization to the settings configured on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
@@ -2305,7 +2311,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Get Private Labeling/Branding Settings";
             description: "Returns the currently active private labeling/branding configured on the instance level. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
@@ -2327,7 +2333,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Get Preview Private Labeling/Branding Settings";
             description: "Returns the preview private labeling/branding configured on the instance level. The preview is used to show you how it will look like, and not activate it directly for your users. In the future, it should be possible to send a preview mail and have a look at the preview login. The settings will trigger if the organization has not overwritten the settings or if no specific organization is called on the login UI. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
@@ -2350,7 +2356,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Update Labeling/Branding Settings";
             description: "Update the preview private labeling/branding configured on the instance level. It affects all organizations, that don't overwrite the settings. The preview is used to show you how it will look like, make sure to activate it as soon as you are happy with the configuration. Define what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
             responses: {
@@ -2373,7 +2379,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Activate Labeling/Branding Settings";
             description: "Activates the preview private labeling/branding configured on the instance level. It will be shown to the users afterward. It affects all organizations, that don't overwrite the settings. Defines what colors, fonts, and logo should be used for the Login/Register UI, E-Mails and Console."
         };
@@ -2389,7 +2395,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Remove Logo Light";
             description: "Removes the logo of the light theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
@@ -2405,7 +2411,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Remove Logo Dark";
             description: "Removes the logo of the dark theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
@@ -2421,7 +2427,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Remove Icon Light";
             description: "Removes the icon of the light theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
@@ -2437,7 +2443,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Remove Icon Dark";
             description: "Removes the icon of the dark theme from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
@@ -2453,7 +2459,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Branding", "Admin Service"];
             summary: "Remove Font";
             description: "Removes the font from the configured label policy/branding of the instance. It will only be shown on the preview. Make sure to activate your changes afterward."
         };
@@ -2469,7 +2475,8 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
+            tags: ["Settings", "Admin Service"];
             summary: "Get Login Settings";
             description: "Returns the login settings defined on the instance level. It will trigger for all organizations, that don't overwrite the settings. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI."
             responses: {
@@ -2492,7 +2499,8 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
+            tags: ["Settings", "Admin Service"];
             summary: "Update Login Settings";
             description: "Update the default login settings defined on the instance level. It will trigger for all organizations, that don't overwrite the settings. The login policy defines what kind of authentication possibilities the user should have. Generally speaking the behavior of the login and register UI."
             responses: {
@@ -2515,7 +2523,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "List Linked Identity Providers";
             description: "Returns a list of identity providers that are linked in the login policy. This means, that they are configured for the instance and will be shown to the users. It affects all organizations, without custom login settings."
             responses: {
@@ -2538,7 +2546,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "Add Linked Identity Provider";
             description: "Add/link a pre-configured identity provider to the login settings of the instance. This means that it will be shown to the users on the login page. It affects all organizations, without custom login settings."
             responses: {
@@ -2560,7 +2568,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "Remove Linked Identity Provider";
             description: "Remove an identity provider from the login settings of the instance. This means that it will not be shown to the users on the login page. It affects all organizations, without custom login settings."
             responses: {
@@ -2582,7 +2590,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "List Second Factors (2FA)";
             description: "Returns a list of second factors (2FA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called the second factor as it is used after a password. In the UI we generalize it as multi-factor."
             responses: {
@@ -2605,7 +2613,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "Add Second Factor (2FA)";
             description: "Add a new second factor (2FA) to the login settings of the instance. Users will have the possibility to authenticate with the configured factor afterward. It affects all organizations, without custom login settings. Authentication factors are used as an additional factor to add more security to your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called a second factor as it is used as an additional authentication after a password. In the UI we generalize this as multi-factor."
             responses: {
@@ -2638,7 +2646,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "Remove Second Factor (2FA)";
             description: "Remove a configured second factor (2FA) from the login settings of the instance. It affects all organizations, without custom login settings. Users will not be able to authenticate with the configured factor afterward. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc). Per definition, it is called the second factor as it is used after a password. In the UI we generalize it as multi-factor."
             responses: {
@@ -2671,7 +2679,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "List Multi-factors (MFA)";
             description: "Returns a list of multi-factors (MFA) configured on the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multifactor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
@@ -2694,7 +2702,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "Add Multi-Factor (MFA)";
             description: "Add a multi-factor (MFA) to the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
@@ -2727,7 +2735,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin"
+            tags: ["Settings", "Admin Service"];
             summary: "Remove Multi-factor (MFA)";
             description: "Remove a multi-factor (MFA) from the login settings of the instance. It affects all organizations, without custom login settings. Authentication factors are used as an additional layer of security for your users (e.g. Authentication App, FingerPrint, Windows Hello, etc).  Per definition, it is called multi-factor factor or passwordless as it is used as first and second authentication and a password is not necessary. In the UI we generalize it as passwordless or passkey."
             responses: {
@@ -2760,7 +2768,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get Password Complexity Settings";
             description: "Returns the password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify how a password should look (characters, length, etc.)"
             responses: {
@@ -2783,7 +2791,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Update Password Complexity Settings";
             description: "Updates the default password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify how a password should look (characters, length, etc.)"
             responses: {
@@ -2816,7 +2824,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get Password Age Settings";
             description: "Returns the password age settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             responses: {
@@ -2839,7 +2847,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Update Password Age Settings";
             description: "Updates the default password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             responses: {
@@ -2872,7 +2880,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get Password Lockout Settings";
             description: "Returns the password lockout settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
             responses: {
@@ -2895,7 +2903,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Update Password Lockout Settings";
             description: "Update the password lockout settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify when a user should be locked (e.g how many password attempts). The user has to be unlocked by an administrator afterward."
         };
@@ -2911,7 +2919,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Get Privacy Settings";
             description: "Returns the privacy settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings."
             responses: {
@@ -2934,7 +2942,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Update Privacy Settings";
             description: "Update the privacy settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the terms and services, privacy policy, etc. A registering user has to accept the configured settings. Variable {{.Lang}} can be set to have different links based on the language."
             responses: {
@@ -2968,7 +2976,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Add Notification Settings";
             description: "Add new notification settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             responses: {
@@ -2990,7 +2998,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Return Notification Settings";
             description: "Return the notification settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             responses: {
@@ -3013,7 +3021,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Settings", "Admin Service"];
             summary: "Update Notification Settings";
             description: "Update the notification settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify if notifications should be sent to the users on specific triggers (e.g password changed)."
             responses: {
@@ -3046,7 +3054,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Init Message Text";
             description: "Get the default text of the initialize-user message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non-verified email address."
         };
@@ -3062,7 +3070,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Init Message Text";
             description: "Get the custom text of the initialize-user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non-verified email address."
         };
@@ -3079,7 +3087,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Custom Init Message Text";
             description: "Set the custom text of the initialize-user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user is created and has either no password or a non-verified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3095,7 +3103,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Init Message Text to Default";
             description: "Removes the custom text of the initialize-user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3111,7 +3119,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Password Reset Message Text";
             description: "Get the default text of the password reset message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot-request."
         };
@@ -3127,7 +3135,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Password Reset Message Text";
             description: "Get the custom text of the password reset message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot-request."
         };
@@ -3144,7 +3152,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Custom Password Reset Message Text";
             description: "Set the custom text of the password reset user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user triggers the password forgot-request. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3160,7 +3168,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Password Reset Message Text to Default";
             description: "Removes the custom text of the password reset user message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3176,7 +3184,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Verify Email Message Text";
             description: "Get the default text of the verify-email message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non-verified email address."
         };
@@ -3192,7 +3200,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Verify Email Message Text";
             description: "Get the custom text of the verify-email message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new non-verified email address."
         };
@@ -3209,7 +3217,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Verify Email Message Text";
             description: "Set the custom text of the verify email user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The email is sent when a user adds a new nonverified email address. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3225,7 +3233,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Verify Email Message Text to Default";
             description: "Removes the custom text of the email verify message/email that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3241,7 +3249,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Verify Phone Message Text";
             description: "Get the default text of the verify-phone message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
         };
@@ -3257,7 +3265,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Verify Phone Message Text";
             description: "Get the custom text of the verify-phone message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non-verified phone number and a notification provider is configured."
         };
@@ -3274,7 +3282,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Verify Phone Reset Message Text";
             description: "Set the custom text of the verify-phone user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user adds a new non-verified phone number and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3290,7 +3298,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Verify Phone Message Text to Default";
             description: "Removes the custom text of the verify-phone message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3307,7 +3315,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Verify SMS OTP Message Text";
             description: "Get the default text of the verify SMS OTP message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
         };
@@ -3323,7 +3331,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Verify SMS OTP Message Text";
             description: "Get the custom text of the verify SMS OTP message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
         };
@@ -3340,7 +3348,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Verify SMS OTP Reset Message Text";
             description: "Set the custom text of the verify SMS OTP user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3356,7 +3364,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Verify SMS OTP Message Text to Default";
             description: "Removes the custom text of the verify SMS OTP message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3373,7 +3381,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Verify SMS OTP Message Text";
             description: "Get the default text of the verify Email OTP message that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
         };
@@ -3389,7 +3397,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Verify SMS OTP Message Text";
             description: "Get the custom text of the Email OTP message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured."
         };
@@ -3406,7 +3414,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Verify SMS OTP Reset Message Text";
             description: "Set the custom text of the Email OTP user message that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an SMS One-time password should be verified and a notification provider is configured. The Following Variables can be used: {{.Code}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3422,7 +3430,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Verify SMS OTP Message Text to Default";
             description: "Removes the custom text of the Email OTP message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3438,7 +3446,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Domain Claimed Message Text";
             description: "Get the default text of the domain claimed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
         };
@@ -3454,7 +3462,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Domain Claimed Message Text";
             description: "Get the custom text of the domain claimed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an organization claims a domain and a user of this domain exists in another organization."
         };
@@ -3471,7 +3479,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Domain Claimed Message Text";
             description: "Set the custom text of the domain claimed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message/email is sent when an organization claims a domain and a user of this domain exists in another organization. The Following Variables can be used: {{.Domain}} {{.TempUsername}} {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3487,7 +3495,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Domain Claimed Message Text to Default";
             description: "Removes the custom text of the domain claimed message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3503,7 +3511,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Passwordless Registration Message Text";
             description: "Get the default text of the domain claimed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device."
         };
@@ -3519,7 +3527,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Passwordless Registration Message Text";
             description: "Get the custom text of the passwordless/passkey registration message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device."
         };
@@ -3536,7 +3544,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Passwordless Registration Message Text";
             description: "Set the custom text of the passwordless/passkey registration message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message/email is sent when a user requests passwordless/passkey registration as email, to be able to configure on another device.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3552,7 +3560,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Passwordless Registration Message Text to Default";
             description: "Removes the custom text of the passwordless/passkey registration message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3568,7 +3576,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Password Change Message Text";
             description: "Get the default text of the password-changed message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when the password of a user has been changed."
         };
@@ -3584,7 +3592,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Password Change Message Text";
             description: "Get the custom text of the password-changed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when the password of a user has been changed."
         };
@@ -3601,7 +3609,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Password Changed Message Text";
             description: "Set the custom text of the password-changed message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message/email is sent when the password of a user has been changed.  The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}}"
         };
@@ -3617,7 +3625,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Password Changed Message Text to Default";
             description: "Removes the custom text of the password-changed message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3633,7 +3641,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Invite User Message Text";
             description: "Get the default text of the invite user message/email that is stored as translation files in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an invite code email is requested."
         };
@@ -3649,7 +3657,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Invite User Message Text";
             description: "Get the custom text of the invite user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an invite code email is requested."
         };
@@ -3666,7 +3674,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Invite User Message Text";
             description: "Set the custom text of the invite user message/email that is overwritten on the instance as settings/database. The text will be sent to the users of all organizations, that do not have a custom text configured. The message is sent when an invite code email is requested. The Following Variables can be used: {{.UserName}} {{.FirstName}} {{.LastName}} {{.NickName}} {{.DisplayName}} {{.LastEmail}} {{.VerifiedEmail}} {{.LastPhone}} {{.VerifiedPhone}} {{.PreferredLoginName}} {{.LoginNames}} {{.ChangeDate}} {{.CreationDate}} {{.ApplicationName}}"
         };
@@ -3682,7 +3690,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Invite User Message Text to Default";
             description: "Removes the custom text of the invite user message that is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be sent to the users of all organizations, that do not have a custom text configured."
         };
@@ -3698,7 +3706,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Default Login Text";
             description: "Get the default texts for the login and register UI of ZITADEL, which are stored as translation files in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
@@ -3714,7 +3722,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Get Custom Login Text";
             description: "Get the custom texts for the login and register UI of ZITADEL, which is overwritten on the instance as settings/database. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
@@ -3731,7 +3739,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Set Default Login Text";
             description: "Set the custom texts for the login and register UI of ZITADEL, which is overwritten on the instance as settings/database. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
@@ -3747,7 +3755,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Texts", "Admin Service"];
             summary: "Reset Custom Login Text to Default";
             description: "Removes the custom texts for the login and register UI of ZITADEL, which is overwritten on the instance and triggers the text from the translation files stored in ZITADEL itself. The text will be shown to the users of all organizations, that do not have a custom text configured."
         };
@@ -3763,7 +3771,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Members", "Admin Service"];
             summary: "List IAM Member Roles";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all roles possible for a ZITADEL member on the instance level."
             responses: {
@@ -3786,7 +3794,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Members", "Admin Service"];
             summary: "List IAM Members";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request returns all users with memberships on the instance level, matching the search queries. The search queries will be AND linked."
             responses: {
@@ -3811,7 +3819,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Members", "Admin Service"];
             summary: "Add IAM Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request adds a new user to the members list with one or multiple roles."
             responses: {
@@ -3845,7 +3853,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Members", "Admin Service"];
             summary: "Update IAM Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
             responses: {
@@ -3878,7 +3886,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Members", "Admin Service"];
             summary: "Remove IAM Member";
             description: "Members are users with permission to administrate ZITADEL on different levels. This request removes a user from the members list on an instance level. The user can still have roles on another level (organization, project)"
             responses: {
@@ -3911,7 +3919,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Views", "Admin Service"];
             summary: "List Views/Projections";
             description: "Returns all stored read models of ZITADEL. Views are used for search optimization and optimizing request latencies. They represent the delta of the event that happened on the objects"
             responses: {
@@ -3933,7 +3941,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Events", "Admin Service"];
             summary: "List Failed Events";
             description: "Returns a list of events that could not be proceeded in the views/projections. Some events need several retries till they succeed. For example, if the SMTP-API wasn't able to send an email the first time."
             responses: {
@@ -3955,7 +3963,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Events", "Admin Service"];
             summary: "Remove Failed Events";
             description: "Removes the event from the failed evens view, but not from the change stream. This call is useful if the system was able to process the event after some retries. e.g. if the second try of sending an email was successful. the first try produced a failed event. You can find out if it worked on the `failure_count` "
             responses: {
@@ -3990,7 +3998,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Import/Export", "Admin Service"];
             summary: "Import Data";
             description: "Import data on an instance level to ZITADEL. It can be either directly in the request or you can point to a file on an S3 storage, from which the data should be loaded."
         };
@@ -4007,7 +4015,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Import/Export", "Admin Service"];
             summary: "Export Data";
             description: "Export data on an instance level to ZITADEL. It can be either directly exported in the response or you can point to a file on an S3 storage, where the data should be written."
         };
@@ -4024,7 +4032,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Events", "Admin Service"];
             summary: "Event types";
             description: "Returns a list of the possible event types in ZITADEL. This is used to filter the event types in the list events request."
         };
@@ -4041,7 +4049,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Events", "Admin Service"];
             summary: "Search Events";
             description: "Returns a list of the possible event types in ZITADEL. This is used to filter the event types in the list events request."
         };
@@ -4058,7 +4066,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Events", "Admin Service"];
             summary: "List Aggregate Types";
             description: "Returns a list of the possible aggregate types in ZITADEL. This is used to filter the aggregate types in the list events request."
         };
@@ -4075,10 +4083,6 @@ service AdminService {
         option (zitadel.v1.auth_option) = {
             permission: "iam.feature.write";
         };
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
-        };
-
     }
 
     rpc ListMilestones(ListMilestonesRequest) returns (ListMilestonesResponse) {
@@ -4092,7 +4096,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Admin";
+            tags: ["Milestones", "Admin Service"];
             summary: "Search Milestones";
             description: "Returns a list of reached instance usage milestones."
         };
@@ -4110,7 +4114,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: ["Admin"];
+            tags: ["Feature Restrictions"];
             summary: "Restrict the instances features";
             description: "Undefined values don't change the current restriction. Zero values remove the current restriction.";
             responses: {
@@ -4139,7 +4143,7 @@ service AdminService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: ["Admin"];
+            tags: ["Feature Restrictions"];
             summary: "Get the current feature restrictions for the instance";
             description: "Undefined values mean that the feature is not restricted. If restrictions were never set, the instances features are not restricted, all properties are undefined and the details object is empty.";
             responses: {
@@ -9037,4 +9041,3 @@ message GetRestrictionsResponse {
         }
     ];
 }
-
