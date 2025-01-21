@@ -51,7 +51,7 @@ The endpoint will redirect you to the domain of your UI on the path /login and a
 ### Get Auth Request by ID
 
 With the ID from the redirect before you will now be able to get the information of the auth request.
-[Get Auth Request By ID Documentation](/docs/apis/resources/oidc_service_v2/oidc-service-get-auth-request)
+[Get Auth Request By ID Documentation](/docs/reference#tag/openid-connect-oidc_v2/oidc-service-get-auth-request)
 
 ```bash
 curl --request GET \
@@ -95,7 +95,7 @@ On the create and update user session request you will always get a session toke
 
 The latest session token has to be sent to the following request:
 
-Read more about the [Finalize Auth Request Documentation](/docs/apis/resources/oidc_service_v2/oidc-service-create-callback)
+Read more about the [Finalize Auth Request Documentation](/docs/reference#tag/openid-connect-oidc_v2/oidc-service-create-callback)
 
 Make sure that the authorization header is from the same account that you originally sent in the client id header ```x-zitadel-login-client: <userid>``` on the authorize endpoint.
 ```bash

@@ -42,7 +42,7 @@ _Note that the illustration is just a representation of the architecture and may
 The flow starts by the `/authorize` endpoint which is intercepted by the login and forwarded to ZITADEL.
 ZITADEL interprets the request and specifically redirects back to the login app.
 It does so by redirecting to `/login`.
-The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service_v2/oidc-service-get-auth-request#get-oidc-auth-request-details).
+The login is then able to load an [AuthRequest](/docs/reference#tag/openid-connect-oidc_v2/oidc-service-get-auth-request#get-oidc-auth-request-details).
 
 The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings up the `/loginname` page.
 The /loginname page allows to enter loginname or email of a user which is then used to search for a user.
@@ -52,7 +52,7 @@ While the users continues and provides more information, the cookie is hydrated 
 The communication from the browser to the server is done by [NextJS Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations).
 The OIDC Auth request is always passed in the url to have a context to the ongoing authentication flow.
 
-If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service_v2/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
+If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/docs/reference#tag/openid-connect-oidc_v2/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
 The application can then request a token calling the /token endpoint of the login which is proxied to the ZITADEL API.
 
 ### Implemented features
