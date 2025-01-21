@@ -34,6 +34,7 @@ service ZITADELDebugEvents {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Debug Events (preview)";
       summary: "Create a set of debug events.";
       description: "Create a set of debug events which will be pushed to the eventstore and reduced to the projection."
       responses: {
@@ -57,6 +58,7 @@ service ZITADELDebugEvents {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Debug Events (preview)";
       responses: {
         key: "200"
         value: {
@@ -78,6 +80,7 @@ service ZITADELDebugEvents {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Debug Events (preview)";
       responses: {
         key: "200"
         value: {
