@@ -30,6 +30,14 @@ export default async function Page(props: {
   let user: User | undefined = undefined;
   let human: HumanUser | undefined = undefined;
 
+  const params = new URLSearchParams({});
+  if (organization) {
+    params.set("organization", organization);
+  }
+  if (userId) {
+    params.set("userId", userId);
+  }
+
   if (userId) {
     const userResponse = await getUserByID(userId);
     if (userResponse) {
@@ -37,20 +45,16 @@ export default async function Page(props: {
       if (user?.type.case === "human") {
         human = user.type.value as HumanUser;
       }
+
+      if (user?.preferredLoginName) {
+        params.set("loginName", user.preferredLoginName);
+      }
     }
 
     const authMethodsResponse = await listAuthenticationMethodTypes(userId);
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
     }
-  }
-
-  const params = new URLSearchParams({});
-  if (organization) {
-    params.set("organization", organization);
-  }
-  if (userId) {
-    params.set("userId", userId);
   }
 
   return (
