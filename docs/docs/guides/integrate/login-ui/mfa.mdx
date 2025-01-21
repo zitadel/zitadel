@@ -93,7 +93,7 @@ curl --request POST \
 To be able to check the TOTP you need a session with a checked user. This can either happen before the TOTP check or at the same time.
 In this example we do two separate requests. So the first step is to create a new Sessions.
 
-More detailed information about the API: [Create new session Documentation](/apis/resources/session_service_v2/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/reference#tag/sessionssession-service-create-session)
 
 Example Request
 
@@ -131,7 +131,7 @@ Example Response
 Now you can show the code field to the user, where the code needs to be entered from the Authenticator App.
 With that code you have to update the existing session with a totp check.
 
-More detailed information about the API: [Update session Documentation](/apis/resources/session_service_v2/session-service-set-session)
+More detailed information about the API: [Update session Documentation](/reference#tag/sessionssession-service-set-session)
 
 Example Request
 ```bash
@@ -231,7 +231,7 @@ To be able to check the SMS Code you need a session with a checked user.
 When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
 You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
 
-More detailed information about the API: [Create new session Documentation](/apis/resources/session_service_v2/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/reference#tag/sessionssession-service-create-session)
 
 Example Request
 
@@ -319,7 +319,7 @@ To be able to check the Email Code you need a session with a checked user.
 When creating the session you can already start the sms challenge, this will only be executed if the user check was successful.
 You can tell the challenge, if the code should be returned (returnCode: true) or if ZITADEL should send it (returnCode: false).
 
-More detailed information about the API: [Create new session Documentation](/apis/resources/session_service_v2/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/reference#tag/sessionssession-service-create-session)
 
 Example Request
 
@@ -491,7 +491,7 @@ In the creat session request you can check for the user and directly initiate th
 For U2F you can choose between "USER_VERIFICATION_REQUIREMENT_PREFERRED" and "USER_VERIFICATION_REQUIREMENT_DISCOURAGED" for the challenge.
 Best practice is using discouraged, as this doesn't require the user to enter a PIN. With `preferred` the user might be prompted for the PIN, but it is not necessary.
 
-More detailed information about the API: [Create new session Documentation](/apis/resources/session_service_v2/session-service-create-session)
+More detailed information about the API: [Create new session Documentation](/reference#tag/sessionssession-service-create-session)
 
 Example Request
 

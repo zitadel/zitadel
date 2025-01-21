@@ -80,7 +80,7 @@ Response Example:
 ### Perform Login
 
 After you have initialized the OIDC flow you can implement the login.
-Implement all the steps you like the user the go trough by [creating](/docs/apis/resources/session_service_v2/session-service-create-session) and [updating](/docs/apis/resources/session_service/session-service-set-session) the user-session.
+Implement all the steps you like the user the go trough by [creating](/docs/reference#tag/sessionssession-service-create-session) and [updating](/docs/apis/resources/session_service/session-service-set-session) the user-session.
 
 Read the following resources for more information about the different checks:
 - [Username and Password](./username-password)
@@ -145,4 +145,4 @@ In case the ZITADEL backend is not able to determine which session to terminate 
 
 ```/logout?post_logout_redirect=```
 
-Prompt the user to select a session, terminate it using the [corresponding endpoint](/docs/apis/resources/session_service_v2/session-service-delete-session) and send the user to the `post_logout_redirect` URL.
+Prompt the user to select a session, terminate it using the [corresponding endpoint](/docs/reference#tag/sessionssession-service-delete-session) and send the user to the `post_logout_redirect` URL.
