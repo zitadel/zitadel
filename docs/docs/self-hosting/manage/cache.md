@@ -157,7 +157,7 @@ Caches:
 
 ### Instance
 
-All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/docs/apis/resources/system/system-service), the instance can be resolved by its ID. An instance object contains many of the [default settings](/docs/guides/manage/console/default-settings):
+All HTTP and gRPC requests sent to ZITADEL receive an instance context. The instance is usually resolved by the domain from the request. In some cases, like the [system service](/docs/reference/deprecated#tag/system), the instance can be resolved by its ID. An instance object contains many of the [default settings](/docs/guides/manage/console/default-settings):
 
 - Instance [features](/docs/guides/manage/console/default-settings#features)
 - Instance domains: generated and [custom](/docs/guides/manage/cloud/instances#add-custom-domain)

@@ -9,10 +9,10 @@ The usage control features are currently limited to the instance level only.
 
 ## Block Instances
 
-You can block an instance using the [system API](/apis/resources/system/limits).
+You can block an instance using the [system API](/reference/deprecated#tag/system/PUT/system/v1/instances/{instanceId}/limits).
 
 Most requests to a blocked instance are rejected with the HTTP status *429 Too Many Requests* or the gRPC status *8 Resource Exhausted*.
-However, requests to the [system API](/apis/introduction#system) are still allowed.
+However, requests to the [system API](/reference/deprecated#tag/system) are still allowed.
 Requests to paths with the prefix */ui/login* return a redirect with HTTP status *302 Found* to */ui/console*, where the user is guided to *InstanceManagementURL*.
 Blocked HTTP requests additionally set a cookie to make it easy to block traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
 
@@ -55,7 +55,7 @@ DefaultInstance:
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
 ```
 
-You can also set a limit for [a specific virtual instance](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/apis/resources/system/limits).
+You can also set a limit for [a specific virtual instance](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/reference/deprecated#tag/system/PUT/system/v1/instances/{instanceId}/limits).
 
 ## Quotas
 
@@ -85,7 +85,7 @@ Quotas:
       MaxBulkSize: 0 # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MAXBULKSIZE
 ```
 
-Once you have activated the quotas feature, you can configure quotas [for your virtual instances](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/apis/resources/system/quotas) or the *DefaultInstances.Quotas* section.
+Once you have activated the quotas feature, you can configure quotas [for your virtual instances](/concepts/structure/instance#multiple-virtual-instances) using the [system API](/reference/deprecated#tag/system/POST/system/v1/instances/{instanceId}/quotas) or the *DefaultInstances.Quotas* section.
 The following snippets shows the defaults:
 
 ```yaml
