@@ -36,7 +36,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get basic information over the instance";
+    summary: "Get Instance Settings";
       description: "Return the basic information of the instance for the requested context"
       responses: {
         key: "200"
@@ -61,7 +61,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get the login settings";
+    summary: "Get Login Settings";
       description: "Return the settings for the requested context"
       responses: {
         key: "200"
@@ -86,7 +86,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get the current active identity providers";
+    summary: "Get Active Identity Providers";
       description: "Return the current active identity providers for the requested context"
       responses: {
         key: "200"
@@ -111,7 +111,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get the password complexity settings";
+    summary: "Get Password Complexity";
       description: "Return the password complexity settings for the requested context"
       responses: {
         key: "200"
@@ -136,7 +136,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get the password expiry settings";
+    summary: "Get Password Expiry";
       description: "Return the password expiry settings for the requested context"
       responses: {
         key: "200"
@@ -161,7 +161,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get the current active branding settings";
+    summary: "Get Branding";
       description: "Return the current active branding settings for the requested context"
       responses: {
         key: "200"
@@ -186,7 +186,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get the domain settings";
+    summary: "Get Domain";
       description: "Return the domain settings for the requested context"
       responses: {
         key: "200"
@@ -211,7 +211,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get the legal and support settings";
+    summary: "Get Legal and Support";
       description: "Return the legal settings for the requested context"
       responses: {
         key: "200"
@@ -236,7 +236,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Settings";
-    summary: "Get the lockout settings";
+    summary: "Get Lockout";
       description: "Return the lockout settings for the requested context, which define when a user will be locked"
       responses: {
         key: "200"
@@ -261,7 +261,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Settings";
-      summary: "Get Security Settings";
+      summary: "Get Security";
       description: "Returns the security settings of the ZITADEL instance."
     };
   }
@@ -281,7 +281,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Settings";
-      summary: "Set Security Settings";
+      summary: "Set Security";
       description: "Set the security settings of the ZITADEL instance."
     };
   }

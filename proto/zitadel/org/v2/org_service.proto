@@ -26,7 +26,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2;org";
 service OrganizationService {
   option (google.api.api_visibility).restriction = "v2, stable";
 
-  // Create an Organization
+  // Create Organization
   //
   // Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER.
   rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse) {

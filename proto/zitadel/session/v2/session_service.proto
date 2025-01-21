@@ -20,7 +20,6 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2;session";
 service SessionService {
   option (google.api.api_visibility).restriction = "v2, stable";
 
-  // Search sessions
   rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {
     option (google.api.http) = {
       post: "/v2/sessions/search"
@@ -35,7 +34,7 @@ service SessionService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Sessions";
-    summary: "Search sessions";
+    summary: "Search Sessions";
       description: "Search for sessions"
       responses: {
         key: "200"
@@ -71,7 +70,7 @@ service SessionService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Sessions";
-    summary: "Get a session";
+    summary: "Get Session";
       description: "Get a session and all its information like the time of the user or password verification"
       responses: {
         key: "200"
@@ -100,7 +99,7 @@ service SessionService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Sessions";
-    summary: "Create a new session";
+    summary: "Create Session";
       description: "Create a new session. A token will be returned, which is required for further updates of the session."
       responses: {
         key: "200"
@@ -126,7 +125,7 @@ service SessionService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Sessions";
-    summary: "Update an existing session";
+    summary: "Update Session";
       description: "Update an existing session with new information."
       responses: {
         key: "200"
@@ -152,7 +151,7 @@ service SessionService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
     tags: "Sessions";
-    summary: "Terminate an existing session";
+    summary: "Terminate Session";
       description: "Terminate your own session or if granted any other session."
       responses: {
         key: "200"

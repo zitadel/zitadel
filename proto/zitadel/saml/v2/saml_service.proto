@@ -28,7 +28,7 @@ service SAMLService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Security Assertion Markup Language (SAML)";
-      summary: "Get SAML Request details";
+      summary: "Get SAML Request";
       description: "Get SAML Request details by ID. Returns details that are parsed from the application's SAML Request."
       responses: {
         key: "200"
@@ -53,7 +53,7 @@ service SAMLService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Security Assertion Markup Language (SAML)";
-      summary: "Finalize a SAML Request and get the response.";
+      summary: "Finalize Request";
       description: "Finalize a SAML Request and get the response definition for success or failure. The response must be handled as per the SAML definition to inform the application about the success or failure. On success, the response contains details for the application to obtain the SAMLResponse. This method can only be called once for an SAML request."
       responses: {
         key: "200"

@@ -27,6 +27,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
 // Setting a removed field will effectively result in a no-op.
 service FeatureService {
   option (google.api.api_visibility).restriction = "v2, stable";
+
   rpc SetSystemFeatures (SetSystemFeaturesRequest) returns (SetSystemFeaturesResponse) {
     option (google.api.http) = {
       put: "/v2/features/system"
@@ -41,7 +42,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Set system level features";
+      summary: "Set Systemm Features";
       description: "Configure and set features that apply to the complete system. Only fields present in the request are set or unset."
       responses: {
         key: "200"
@@ -65,7 +66,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Reset system level features";
+      summary: "Reset System Features";
       description: "Deletes ALL configured features for the system, reverting the behaviors to system defaults."
       responses: {
         key: "200"
@@ -89,7 +90,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Get system level features";
+      summary: "Get System Features";
       description: "Returns all configured features for the system. Unset fields mean the feature is the current system default."
       responses: {
         key: "200"
@@ -114,7 +115,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Set instance level features";
+      summary: "Set Instance Features";
       description: "Configure and set features that apply to a complete instance. Only fields present in the request are set or unset."
       responses: {
         key: "200"
@@ -138,7 +139,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Reset instance level features";
+      summary: "Reset Instance Features";
       description: "Deletes ALL configured features for an instance, reverting the behaviors to system defaults."
       responses: {
         key: "200"
@@ -162,7 +163,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Get instance level features";
+      summary: "Get Instance Features";
       description: "Returns all configured features for an instance. Unset fields mean the feature is the current system default."
       responses: {
         key: "200"
@@ -187,7 +188,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Set organization level features";
+      summary: "Set Organization Features";
       description: "Configure and set features that apply to a complete instance. Only fields present in the request are set or unset."
       responses: {
         key: "200"
@@ -211,7 +212,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Reset organization level features";
+      summary: "Reset Organization Features";
       description: "Deletes ALL configured features for an organization, reverting the behaviors to instance defaults."
       responses: {
         key: "200"
@@ -235,7 +236,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Get organization level features";
+      summary: "Get Organization Features";
       description: "Returns all configured features for an organization. Unset fields mean the feature is the current instance default."
       responses: {
         key: "200"
@@ -260,7 +261,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Set user level features";
+      summary: "Set User Features";
       description: "Configure and set features that apply to an user. Only fields present in the request are set or unset."
       responses: {
         key: "200"
@@ -284,7 +285,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Reset user level features";
+      summary: "Reset User Features";
       description: "Deletes ALL configured features for a user, reverting the behaviors to organization defaults."
       responses: {
         key: "200"
@@ -308,7 +309,7 @@ service FeatureService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "Features";
-      summary: "Get organization level features";
+      summary: "Get User Features";
       description: "Returns all configured features for an organization. Unset fields mean the feature is the current instance default."
       responses: {
         key: "200"

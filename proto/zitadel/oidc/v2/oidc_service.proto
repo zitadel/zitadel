@@ -28,7 +28,7 @@ service OIDCService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "OpenID Connect (OIDC)";
-      summary: "Get OIDC Auth Request details";
+      summary: "Get Auth Request";
       description: "Get OIDC Auth Request details by ID, obtained from the redirect URL. Returns details that are parsed from the application's Auth Request."
       responses: {
         key: "200"
@@ -53,7 +53,7 @@ service OIDCService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "OpenID Connect (OIDC)";
-      summary: "Finalize an Auth Request and get the callback URL.";
+      summary: "Finalize Auth Request";
       description: "Finalize an Auth Request and get the callback URL for success or failure. The user must be redirected to the URL in order to inform the application about the success or failure. On success, the URL contains details for the application to obtain the tokens. This method can only be called once for an Auth request."
       responses: {
         key: "200"

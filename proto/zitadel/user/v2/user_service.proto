@@ -54,9 +54,9 @@ service UserService {
     };
   }
 
-  // User by ID
+  // Get User
   //
-  // Returns the full user object (human or machine) including the profile, email, etc..
+  // Returns the full user object (human or machine) including the profile, email, etc.
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.method_visibility).restriction = "PREVIEW";
     option (google.api.http) = {
@@ -121,7 +121,7 @@ service UserService {
 
   // Change Email
   //
-  // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
+  // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email.
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email"
@@ -225,7 +225,7 @@ service UserService {
 
   // Set Phone
   //
-  // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
+  // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms.
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone"
@@ -305,7 +305,7 @@ service UserService {
 
   // Verify Phone
   //
-  // Verify the phone with the generated code..
+  // Verify the phone with the generated code.
   rpc VerifyPhone (VerifyPhoneRequest) returns (VerifyPhoneResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/verify"
@@ -331,7 +331,7 @@ service UserService {
 
   // Update User
   //
-  // Update all information from a user..
+  // Update all information from a user.
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
       put: "/v2/users/human/{user_id}"
@@ -357,7 +357,7 @@ service UserService {
 
   // Deactivate User
   //
-  // The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data..
+  // The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data.
   rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/deactivate"
@@ -409,7 +409,7 @@ service UserService {
 
   // Lock User
   //
-  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
+  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.).
   rpc LockUser(LockUserRequest) returns (LockUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/lock"
@@ -435,7 +435,7 @@ service UserService {
 
   // Unlock User
   //
-  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
+  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.).
   rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/unlock"
@@ -461,7 +461,7 @@ service UserService {
 
   // Delete User
   //
-  // The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found..
+  // The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found.
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}"
@@ -536,7 +536,7 @@ service UserService {
 
   // Create Passkey Registration Link
   //
-  // Create a passkey registration link which includes a code and either return it or send it to the user..
+  // Create a passkey registration link which includes a code and either return it or send it to the user.
   rpc CreatePasskeyRegistrationLink (CreatePasskeyRegistrationLinkRequest) returns (CreatePasskeyRegistrationLinkResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/passkeys/registration_link"
@@ -611,7 +611,7 @@ service UserService {
 
   // Register U2F
   //
-  // Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token..
+  // Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token.
   rpc RegisterU2F (RegisterU2FRequest) returns (RegisterU2FResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/u2f"
@@ -636,7 +636,7 @@ service UserService {
 
   // Verify U2F
   //
-  // Verify the u2f token registration with the public key credential..
+  // Verify the u2f token registration with the public key credential.
   rpc VerifyU2FRegistration (VerifyU2FRegistrationRequest) returns (VerifyU2FRegistrationResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/u2f/{u2f_id}"
@@ -687,7 +687,7 @@ service UserService {
 
   // Register TOTP
   //
-  // Start the registration of a TOTP generator for a user, as a response a secret returned, which is used to initialize a TOTP app or device..
+  // Start the registration of a TOTP generator for a user, as a response a secret returned, which is used to initialize a TOTP app or device.
   rpc RegisterTOTP (RegisterTOTPRequest) returns (RegisterTOTPResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/totp"
@@ -712,7 +712,7 @@ service UserService {
 
   // Verify TOTP
   //
-  // Verify the TOTP registration with a generated code..
+  // Verify the TOTP registration with a generated code.
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/totp/verify"
@@ -761,7 +761,7 @@ service UserService {
 
   // Register SMS OTP
   //
-  // Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor..
+  // Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor.
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/otp_sms"
@@ -810,7 +810,7 @@ service UserService {
 
   // Register Email OTP
   //
-  // Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor..
+  // Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor.
   rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/otp_email"
@@ -859,7 +859,7 @@ service UserService {
 
   // Start IDP Intent
   //
-  // Start a flow with an identity provider, for external login, registration or linking..
+  // Start a flow with an identity provider, for external login, registration or linking.
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
       post: "/v2/idp_intents"
@@ -885,7 +885,7 @@ service UserService {
 
   // Retrieve IDP Intent
   //
-  // Retrieve the information returned by the identity provider for registration or updating an existing user with new information..
+  // Retrieve the information returned by the identity provider for registration or updating an existing user with new information.
   rpc RetrieveIdentityProviderIntent (RetrieveIdentityProviderIntentRequest) returns (RetrieveIdentityProviderIntentResponse) {
     option (google.api.http) = {
       post: "/v2/idp_intents/{idp_intent_id}"
@@ -911,7 +911,7 @@ service UserService {
 
   // Link IDP
   //
-  // Add link to an identity provider to an user..
+  // Add link to an identity provider to an user.
   rpc AddIDPLink (AddIDPLinkRequest) returns (AddIDPLinkResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/links"
@@ -989,7 +989,7 @@ service UserService {
 
   // Request Password Reset
   //
-  // Request a code to reset a password..
+  // Request a code to reset a password.
   rpc PasswordReset (PasswordResetRequest) returns (PasswordResetResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/password_reset"
@@ -1015,7 +1015,7 @@ service UserService {
 
   // Change Password
   //
-  // Change the password of a user with either a verification code or the current password..
+  // Change the password of a user with either a verification code or the current password.
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/password"
@@ -1041,7 +1041,7 @@ service UserService {
 
   // List Auth Methods
   //
-  // List all configured authentication methods of a user like password, passwordless, (T)OTP and more..
+  // List all configured authentication methods of a user like password, passwordless, (T)OTP and more.
   rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
     option (google.api.http) = {
       get: "/v2/users/{user_id}/authentication_methods"
