@@ -21,7 +21,7 @@ ZITADEL uses public key verification when API calls are made or when the userInf
 endpoints are called with a JWT access token.
 
 :::info
-Web keys are an [experimental](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable the `web_key` [feature](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) before using it.
+Web keys are an [experimental](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable the `web_key` [feature](/docs/reference#tag/features/PUT/v2/features/instance) before using it.
 :::
 
 ### JSON Web Key
@@ -94,7 +94,7 @@ This allows the keys to be distributed to the instance's apps and caches.
 Once a key is deactivated, its public key will remain available for token verification until the web key is deleted.
 Delayed deletion makes sure tokens that were signed before the key got deactivated remain valid.
 
-When the `web_key` [feature](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) is enabled the first time,
+When the `web_key` [feature](/docs/reference#tag/features/PUT/v2/features/instance) is enabled the first time,
 two web key pairs are created with one activated.
 
 ### Creation

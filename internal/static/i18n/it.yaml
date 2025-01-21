@@ -588,7 +588,7 @@ Errors:
     Data:
       Invalid: Dati non validi per lo schema utente
   TokenExchange:
-    FeatureDisabled: La funzionalità di scambio token è disabilitata per la tua istanza. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    FeatureDisabled: La funzionalità di scambio token è disabilitata per la tua istanza. https://zitadel.com/docs/reference#tag/features/PUT/v2/features/instance
     Token:
       Missing: Manca il gettone
       Invalid: Il token non è valido

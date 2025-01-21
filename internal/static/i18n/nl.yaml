@@ -588,7 +588,7 @@ Errors:
     Data:
       Invalid: Податоците не се валидни за корисничка шема
   TokenExchange:
-    FeatureDisabled: De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    FeatureDisabled: De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/reference#tag/features/PUT/v2/features/instance
     Token:
       Missing: Token ontbreekt
       Invalid: Token is ongeldig

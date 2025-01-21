@@ -589,7 +589,7 @@ Errors:
     Data:
       Invalid: 사용자 스키마에 대한 데이터가 유효하지 않습니다
   TokenExchange:
-    FeatureDisabled: 토큰 교환 기능이 인스턴스에서 비활성화되어 있습니다. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    FeatureDisabled: 토큰 교환 기능이 인스턴스에서 비활성화되어 있습니다. https://zitadel.com/docs/reference#tag/features/PUT/v2/features/instance
     Token:
       Missing: 토큰이 누락되었습니다
       Invalid: 토큰이 유효하지 않습니다
