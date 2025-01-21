@@ -265,6 +265,7 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Turkish: Türkçe
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -384,6 +385,7 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Turkish: Türkçe
 
 DeviceAuth:
   Title: Autorizzazione del dispositivo
