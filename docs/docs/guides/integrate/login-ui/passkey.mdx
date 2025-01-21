@@ -27,7 +27,7 @@ When you want to send a link to your user, that enables them to register a new p
 
 If you asked ZITADEL to send the link to the user please make sure to populate the link with the needed values that point towards your registration UI.
 
-More detailed information about the API: [Send Registration Link Documentation](/apis/resources/user_service_v2/user-service-create-passkey-registration-link)
+More detailed information about the API: [Send Registration Link Documentation](/reference#tag/users/user-service-create-passkey-registration-link)
 
 Request Example:
 Send either the sendLink or the returnCode (empty message) in the request body, depending on the use case you have.
@@ -74,7 +74,7 @@ By specifying the authenticator type you can choose if the passkey should be cro
 
 The API response will provide you the public key credential options, this will be used by the browser to obtain a signed challenge.
 
-More detailed information about the API: [Start Passkey Registration Documentation](/apis/resources/user_service_v2/user-service-register-passkey)
+More detailed information about the API: [Start Passkey Registration Documentation](/reference#tag/users/user-service-register-passkey)
 
 Request Example:
 The code only has to be filled if the user did get a registration code.
@@ -179,7 +179,7 @@ Include the public key credential you got from the browser in your request.
 You can give the Passkey a name, which makes it easier for the user to identify the registered authentication methods.
 Example: Google Pixel, iCloud Keychain, Yubikey, etc
 
-More detailed information about the API: [Verify Passkey Registration Documentation](/apis/resources/user_service_v2/user-service-verify-passkey-registration)
+More detailed information about the API: [Verify Passkey Registration Documentation](/reference#tag/users/user-service-verify-passkey-registration)
 
 Example Request:
 
