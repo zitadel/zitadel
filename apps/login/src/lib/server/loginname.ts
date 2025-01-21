@@ -128,7 +128,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const identityProviderType = idpTypeToIdentityProviderType(idpType);
       const provider = idpTypeToSlug(identityProviderType);
 
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ userId });
 
       if (command.authRequestId) {
         params.set("authRequestId", command.authRequestId);
