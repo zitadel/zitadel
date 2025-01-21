@@ -89,3 +89,9 @@ load-test/yarn-error.log
 load-test/dist
 load-test/output/*
 .vercel
+
+# non-IDE dev
+.env
+run.sh
+docker-compose.yaml
+main
