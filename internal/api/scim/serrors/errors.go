@@ -49,6 +49,13 @@ const (
 	// ScimTypeInvalidSyntax The request body message structure was invalid or did
 	// not conform to the request schema.
 	ScimTypeInvalidSyntax scimErrorType = "invalidSyntax"
+
+	// ScimTypeInvalidFilter The specified filter syntax as invalid, or the
+	// specified attribute and filter comparison combination is not supported.
+	ScimTypeInvalidFilter scimErrorType = "invalidFilter"
+
+	// ScimTypeUniqueness One or more of the attribute values are already in use or are reserved.
+	ScimTypeUniqueness scimErrorType = "uniqueness"
 )
 
 var translator *i18n.Translator
@@ -83,6 +90,22 @@ func ThrowInvalidSyntax(parent error) error {
 		Parent:   parent,
 		ScimType: ScimTypeInvalidSyntax,
 	}
+}
+
+func ThrowInvalidFilter(parent error) error {
+	return &wrappedScimError{
+		Parent:   parent,
+		ScimType: ScimTypeInvalidFilter,
+	}
+}
+
+func IsScimOrZitadelError(err error) bool {
+	return IsScimError(err) || zerrors.IsZitadelError(err)
+}
+
+func IsScimError(err error) bool {
+	var scimErr *wrappedScimError
+	return errors.As(err, &scimErr)
 }
 
 func (err *scimError) Error() string {
@@ -134,6 +157,8 @@ func mapErrorToScimErrorType(err error) scimErrorType {
 	switch {
 	case zerrors.IsErrorInvalidArgument(err):
 		return ScimTypeInvalidValue
+	case zerrors.IsErrorAlreadyExists(err):
+		return ScimTypeUniqueness
 	default:
 		return ""
 	}

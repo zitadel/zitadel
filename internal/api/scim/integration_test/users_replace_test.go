@@ -19,6 +19,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
+	"github.com/zitadel/zitadel/internal/test"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
@@ -78,7 +79,7 @@ func TestReplaceUser(t *testing.T) {
 				},
 				DisplayName: "Babs Jensen-updated",
 				NickName:    "Babs-updated",
-				ProfileUrl:  integration.Must(schemas.ParseHTTPURL("http://login.example.com/bjensen-updated")),
+				ProfileUrl:  test.Must(schemas.ParseHTTPURL("http://login.example.com/bjensen-updated")),
 				Emails: []*resources.ScimEmail{
 					{
 						Value:   "bjensen-replaced-full@example.com",
@@ -124,11 +125,11 @@ func TestReplaceUser(t *testing.T) {
 				},
 				Photos: []*resources.ScimPhoto{
 					{
-						Value: *integration.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/F-updated")),
+						Value: *test.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/F-updated")),
 						Type:  "photo-updated",
 					},
 					{
-						Value: *integration.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/T-updated")),
+						Value: *test.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/T-updated")),
 						Type:  "thumbnail-updated",
 					},
 				},
@@ -247,7 +248,7 @@ func TestReplaceUser(t *testing.T) {
 			assert.Equal(t, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, Instance.DefaultOrg.Id, "Users", createdUser.ID), replacedUser.Resource.Meta.Location)
 			assert.Nil(t, createdUser.Password)
 
-			if !integration.PartiallyDeepEqual(tt.want, replacedUser) {
+			if !test.PartiallyDeepEqual(tt.want, replacedUser) {
 				t.Errorf("ReplaceUser() got = %#v, want %#v", replacedUser, tt.want)
 			}
 
@@ -256,7 +257,7 @@ func TestReplaceUser(t *testing.T) {
 				// ensure the user is really stored and not just returned to the caller
 				fetchedUser, err := Instance.Client.SCIM.Users.Get(CTX, Instance.DefaultOrg.Id, replacedUser.ID)
 				require.NoError(ttt, err)
-				if !integration.PartiallyDeepEqual(tt.want, fetchedUser) {
+				if !test.PartiallyDeepEqual(tt.want, fetchedUser) {
 					ttt.Errorf("GetUser() got = %#v, want %#v", fetchedUser, tt.want)
 				}
 			}, retryDuration, tick)
@@ -316,8 +317,8 @@ func TestReplaceUser_scopedExternalID(t *testing.T) {
 		}
 
 		// both external IDs should be present on the user
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:externalId", "701984")
-		integration.AssertMapContains(tt, mdMap, "urn:zitadel:scim:fooBazz:externalId", "replaced-external-id")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:externalId", "701984")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:fooBazz:externalId", "replaced-external-id")
 	}, retryDuration, tick)
 
 	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})

@@ -109,6 +109,10 @@ func NewOrQuery(queries ...SearchQuery) (*OrQuery, error) {
 	return &OrQuery{queries: queries}, nil
 }
 
+func (q *OrQuery) Prepend(queries ...SearchQuery) {
+	q.queries = append(queries, q.queries...)
+}
+
 func (q *OrQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
@@ -145,6 +149,10 @@ func (q *AndQuery) comp() sq.Sqlizer {
 		and[i] = query.comp()
 	}
 	return and
+}
+
+func (q *AndQuery) Prepend(queries ...SearchQuery) {
+	q.queries = append(queries, q.queries...)
 }
 
 type NotQuery struct {
@@ -406,8 +414,12 @@ func (q *NumberQuery) comp() sq.Sqlizer {
 		return sq.NotEq{q.Column.identifier(): q.Number}
 	case NumberLess:
 		return sq.Lt{q.Column.identifier(): q.Number}
+	case NumberLessOrEqual:
+		return sq.LtOrEq{q.Column.identifier(): q.Number}
 	case NumberGreater:
 		return sq.Gt{q.Column.identifier(): q.Number}
+	case NumberGreaterOrEqual:
+		return sq.GtOrEq{q.Column.identifier(): q.Number}
 	case NumberListContains:
 		return &listContains{col: q.Column, args: []interface{}{q.Number}}
 	case numberCompareMax:
@@ -423,7 +435,9 @@ const (
 	NumberEquals NumberComparison = iota
 	NumberNotEquals
 	NumberLess
+	NumberLessOrEqual
 	NumberGreater
+	NumberGreaterOrEqual
 	NumberListContains
 
 	numberCompareMax
@@ -586,6 +600,57 @@ func (q *BoolQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 func (q *BoolQuery) comp() sq.Sqlizer {
 	return sq.Eq{q.Column.identifier(): q.Value}
+}
+
+type BytesComparison int
+
+const (
+	BytesEquals BytesComparison = iota
+	BytesNotEquals
+	bytesCompareMax
+)
+
+type BytesQuery struct {
+	Column  Column
+	Compare BytesComparison
+	Value   []byte
+}
+
+func NewBytesQuery(col Column, values []byte, comparison BytesComparison) (*BytesQuery, error) {
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+
+	if comparison < 0 || comparison >= bytesCompareMax {
+		return nil, ErrInvalidCompare
+	}
+
+	return &BytesQuery{
+		Column:  col,
+		Value:   values,
+		Compare: comparison,
+	}, nil
+}
+
+func (q *BytesQuery) Col() Column {
+	return q.Column
+}
+
+func (q *BytesQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *BytesQuery) comp() sq.Sqlizer {
+	switch q.Compare {
+	case BytesEquals:
+		return sq.Eq{q.Column.identifier(): q.Value}
+	case BytesNotEquals:
+		return sq.NotEq{q.Column.identifier(): q.Value}
+	case bytesCompareMax:
+		return nil
+	}
+
+	return nil
 }
 
 type TimestampComparison int
