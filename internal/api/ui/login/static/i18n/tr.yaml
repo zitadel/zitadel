@@ -1,0 +1,525 @@
+Login:
+  Title: Hoş geldiniz!
+  Description: Giriş bilgilerinizi girin.
+  TitleLinking: Kullanıcı bağlantısı için giriş yapın
+  DescriptionLinking: Harici kullanıcıyı bağlamak için giriş bilgilerinizi girin.
+  LoginNameLabel: Giriş Adı
+  UsernamePlaceHolder: kullanıcı adı
+  LoginnamePlaceHolder: kullanıcı adı@domain
+  ExternalUserDescription: Harici kullanıcı ile giriş yapın.
+  MustBeMemberOfOrg: Kullanıcı {{.OrgName}} organizasyonunun üyesi olmalıdır.
+  RegisterButtonText: Kaydol
+  NextButtonText: Sonraki
+
+LDAP:
+  Title: Giriş Yap
+  Description: Giriş bilgilerinizi girin.
+  LoginNameLabel: Giriş Adı
+  PasswordLabel: Şifre
+  NextButtonText: Sonraki
+
+SelectAccount:
+  Title: Hesap Seçin
+  Description: Hesabınızı kullanın
+  TitleLinking: Kullanıcı bağlantısı için hesap seçin
+  DescriptionLinking: Harici kullanıcıyı bağlamak için hesabınızı seçin.
+  OtherUser: Diğer Kullanıcı
+  SessionState0: aktif
+  SessionState1: Çıkış yapıldı
+  MustBeMemberOfOrg: Kullanıcı {{.OrgName}} organizasyonunun üyesi olmalıdır.
+
+Password:
+  Title: Şifre
+  Description: Giriş bilgilerinizi girin.
+  PasswordLabel: Şifre
+  MinLength: En az
+  MinLengthp2: karakter uzunluğunda olmalıdır.
+  MaxLength: 70 karakterden daha kısa olmalıdır.
+  HasUppercase: Büyük harf içermelidir.
+  HasLowercase: Küçük harf içermelidir.
+  HasNumber: Bir rakam içermelidir.
+  HasSymbol: Bir sembol içermelidir.
+  Confirmation: Şifre doğrulaması eşleşti.
+  ResetLinkText: Şifreyi sıfırla
+  BackButtonText: Geri
+  NextButtonText: Sonraki
+
+UsernameChange:
+  Title: Kullanıcı Adı Değiştir
+  Description: Yeni kullanıcı adınızı belirleyin
+  UsernameLabel: Kullanıcı adı
+  CancelButtonText: İptal
+  NextButtonText: Sonraki
+
+UsernameChangeDone:
+  Title: Kullanıcı Adı Değiştirildi
+  Description: Kullanıcı adınız başarıyla değiştirildi.
+  NextButtonText: Sonraki
+
+InitPassword:
+  Title: Şifre Belirle
+  Description: Yeni şifrenizi belirlemek için aşağıdaki forma gelen kodu girin.
+  CodeLabel: Kod
+  NewPasswordLabel: Yeni Şifre
+  NewPasswordConfirmLabel: Şifreyi Onayla
+  ResendButtonText: Kodu Yeniden Gönder
+  NextButtonText: Sonraki
+
+InitPasswordDone:
+  Title: Şifre Belirlendi
+  Description: Şifre başarıyla belirlendi
+  NextButtonText: Sonraki
+  CancelButtonText: İptal
+
+InitUser:
+  Title: Kullanıcıyı Etkinleştir
+  Description: E-postanızı aşağıdaki kod ile doğrulayın ve şifrenizi belirleyin.
+  CodeLabel: Kod
+  NewPasswordLabel: Yeni Şifre
+  NewPasswordConfirm: Şifreyi Onayla
+  NextButtonText: Sonraki
+  ResendButtonText: Kodu Yeniden Gönder
+
+InitUserDone:
+  Title: Kullanıcı Etkinleştirildi
+  Description: E-posta doğrulandı ve şifre başarıyla belirlendi
+  NextButtonText: Sonraki
+  CancelButtonText: İptal
+
+InviteUser:
+  Title: Kullanıcıyı Etkinleştir
+  Description: E-postanızı aşağıdaki kod ile doğrulayın ve şifrenizi belirleyin.
+  CodeLabel: Kod
+  NewPasswordLabel: Yeni Şifre
+  NewPasswordConfirm: Şifreyi Onayla
+  NextButtonText: Sonraki
+  ResendButtonText: Kodu Yeniden Gönder
+
+InitMFAPrompt:
+  Title: 2-Faktörlü Kurulum
+  Description: 2 faktörlü kimlik doğrulama, kullanıcı hesabınız için ek güvenlik sağlar. Bu, yalnızca sizin hesabınıza erişiminiz olmasını garanti eder.
+  Provider0: Kimlik Doğrulayıcı Uygulama (Google/Microsoft Authenticator, Authy gibi)
+  Provider1: Cihaza Bağlı (FaceID, Windows Hello, Parmak İzi gibi)
+  Provider3: OTP SMS
+  Provider4: OTP E-posta
+  NextButtonText: Sonraki
+  SkipButtonText: Atla
+
+InitMFAOTP:
+  Title: 2-Faktörlü Doğrulama
+  Description: 2 faktörlü kimlik doğrulamanızı oluşturun. Bir kimlik doğrulayıcı uygulama indirin, eğer henüz yoksa.
+  OTPDescription: Kimlik doğrulayıcı uygulamanızla (örneğin Google/Microsoft Authenticator, Authy) kodu tarayın veya sırrı kopyalayıp aşağıya girin.
+  SecretLabel: Sır
+  CodeLabel: Kod
+  NextButtonText: Sonraki
+  CancelButtonText: İptal
+
+InitMFAOTPSMS:
+  Title: 2-Faktörlü Doğrulama
+  DescriptionPhone: 2 faktörlü kimlik doğrulamanızı oluşturun. Telefon numaranızı girerek doğrulama yapın.
+  DescriptionCode: 2 faktörlü kimlik doğrulamanızı oluşturun. Alınan kodu girin.
+  PhoneLabel: Telefon
+  CodeLabel: Kod
+  EditButtonText: Düzenle
+  ResendButtonText: Kodu Yeniden Gönder
+  NextButtonText: Sonraki
+
+InitMFAU2F:
+  Title: Güvenlik Anahtarı Ekle
+  Description: Bir güvenlik anahtarı, telefonunuza entegre edilebilen, Bluetooth kullanan veya bilgisayarınızın USB bağlantısına takılabilen bir doğrulama yöntemidir.
+  TokenNameLabel: Güvenlik anahtarının / cihazının adı
+  NotSupported: WebAuthN tarayıcınız tarafından desteklenmiyor. Lütfen güncel olduğundan emin olun ya da farklı bir tarayıcı (Chrome, Safari, Firefox gibi) kullanın.
+  RegisterTokenButtonText: Güvenlik anahtarı ekle
+  ErrorRetry: Yeniden deneyin, yeni bir istek oluşturun veya farklı bir yöntem seçin.
+
+InitMFADone:
+  Title: 2-Faktörlü Doğrulama Başarılı
+  Description: Harika! 2 faktörlü kimlik doğrulamanızı başarıyla ayarladınız ve hesabınızı çok daha güvenli hale getirdiniz. Bu faktör her girişte girilmelidir.
+  NextButtonText: Sonraki
+  CancelButtonText: İptal
+
+MFAProvider:
+  Provider0: Kimlik Doğrulayıcı Uygulama (Google/Microsoft Authenticator, Authy gibi)
+  Provider1: Cihaza Bağlı (FaceID, Windows Hello, Parmak İzi gibi)
+  Provider3: OTP SMS
+  Provider4: OTP E-posta
+  ChooseOther: veya başka bir seçenek seçin
+
+VerifyMFAOTP:
+  Title: 2-Faktörlü Doğrulama
+  Description: İkinci faktörünüzü doğrulayın
+  CodeLabel: Kod
+  NextButtonText: Sonraki
+
+VerifyOTP:
+  Title: 2-Faktörlü Doğrulama
+  Description: İkinci faktörünüzü doğrulayın
+  CodeLabel: Kod
+  ResendButtonText: Kodu Yeniden Gönder
+  NextButtonText: Sonraki
+
+VerifyMFAU2F:
+  Title: 2-Faktörlü Doğrulama
+  Description: Kayıtlı cihazla (FaceID, Windows Hello, Parmak İzi gibi) 2 faktörlü doğrulamanızı yapın
+  NotSupported: WebAuthN tarayıcınız tarafından desteklenmiyor. Tarayıcınızın en son sürümünü kullandığınızdan emin olun veya desteklenen bir tarayıcıya geçin (Chrome, Safari, Firefox gibi).
+  ErrorRetry: Yeniden deneyin, yeni bir istek oluşturun veya farklı bir yöntem seçin.
+  ValidateTokenButtonText: 2-Faktörlü Doğrulamayı Doğrula
+
+Passwordless:
+  Title: Şifresiz Giriş
+  Description: Cihazınızın sağladığı kimlik doğrulama yöntemleriyle (FaceID, Windows Hello veya Parmak İzi gibi) giriş yapın.
+  NotSupported: WebAuthN tarayıcınız tarafından desteklenmiyor. Lütfen güncel olduğundan emin olun veya farklı bir tarayıcı kullanın (Chrome, Safari, Firefox gibi).
+  ErrorRetry: Yeniden deneyin, yeni bir istek oluşturun veya farklı bir yöntem seçin.
+  LoginWithPwButtonText: Şifre ile Giriş Yap
+  ValidateTokenButtonText: Şifresiz giriş yap
+
+PasswordlessPrompt:
+  Title: Şifresiz Kurulum
+  Description: Şifresiz giriş kurulumunu yapmak ister misiniz? (Cihazınızın kimlik doğrulama yöntemleri, FaceID, Windows Hello veya Parmak İzi gibi)
+  DescriptionInit: Şifresiz giriş kurulumunu yapmanız gerekiyor. Cihazınızı kaydetmek için verilen bağlantıyı kullanın.
+  PasswordlessButtonText: Şifresiz geçiş
+  NextButtonText: Sonraki
+  SkipButtonText: Atla
+
+PasswordlessRegistration:
+  Title: Şifresiz Kurulum
+  Description: Kimlik doğrulamanızı ekleyin. Bir ad (örneğin, MyMobilePhone, MacBook vb.) girin ve ardından 'Şifresiz kaydet' butonuna tıklayın.
+  TokenNameLabel: Cihazın adı
+  NotSupported: WebAuthN tarayıcınız tarafından desteklenmiyor. Lütfen güncel olduğundan emin olun veya farklı bir tarayıcı kullanın (Chrome, Safari, Firefox gibi).
+  RegisterTokenButtonText: Şifresiz kaydet
+  ErrorRetry: Yeniden deneyin, yeni bir istek oluşturun veya farklı bir yöntem seçin.
+
+PasswordlessRegistrationDone:
+  Title: Şifresiz Kurulum
+  Description: Şifresiz giriş için cihaz başarıyla eklendi.
+  DescriptionClose: Bu pencereyi kapatabilirsiniz.
+  NextButtonText: Sonraki
+  CancelButtonText: İptal
+
+PasswordChange:
+  Title: Şifre Değiştir
+  Description: Şifrenizi değiştirin. Eski ve yeni şifrenizi girin.
+  ExpiredDescription: Şifreniz süresi dolmuş ve değiştirilmesi gerekiyor. Eski ve yeni şifrenizi girin.
+  OldPasswordLabel: Eski Şifre
+  NewPasswordLabel: Yeni Şifre
+  NewPasswordConfirmLabel: Şifreyi onayla
+  CancelButtonText: İptal
+  NextButtonText: Sonraki
+  Footer: Alt bilgi
+
+PasswordChangeDone:
+  Title: Şifre Değiştirildi
+  Description: Şifreniz başarıyla değiştirildi.
+  NextButtonText: Sonraki
+
+PasswordResetDone:
+  Title: Şifre Sıfırlama Bağlantısı Gönderildi
+  Description: Şifrenizi sıfırlamak için e-postanızı kontrol edin.
+  NextButtonText: Sonraki
+
+EmailVerification:
+  Title: E-Posta Doğrulaması
+  Description: E-posta adresinizi doğrulamak için size bir e-posta gönderdik. Aşağıdaki koda girin.
+  CodeLabel: Kod
+  NextButtonText: Sonraki
+  ResendButtonText: Kodu Yeniden Gönder
+
+EmailVerificationDone:
+  Title: E-Posta Doğrulaması
+  Description: E-posta adresiniz başarıyla doğrulandı.
+  NextButtonText: Sonraki
+  CancelButtonText: İptal
+  LoginButtonText: Giriş Yap
+
+RegisterOption:
+  Title: Kayıt Seçenekleri
+  Description: Kayıt için tercih ettiğiniz yöntemi seçin
+  RegisterUsernamePasswordButtonText: Kullanıcı adı ve şifre ile
+  ExternalLoginDescription: ya da harici bir kullanıcı ile kayıt olun
+  LoginButtonText: Giriş Yap
+
+RegistrationUser:
+  Title: Kayıt
+  Description: Kullanıcı verilerinizi girin. E-posta adresiniz giriş adınız olarak kullanılacaktır.
+  DescriptionOrgRegister: Kullanıcı verilerinizi girin.
+  EmailLabel: E-posta
+  UsernameLabel: Kullanıcı adı
+  FirstnameLabel: Ad
+  LastnameLabel: Soyad
+  LanguageLabel: Dil
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Turkish: Türkçe
+  GenderLabel: Cinsiyet
+  Female: Kadın
+  Male: Erkek
+  Diverse: diverse / X
+  PasswordLabel: Şifre
+  PasswordConfirmLabel: Şifreyi onayla
+  TosAndPrivacyLabel: Şartlar ve koşullar
+  TosConfirm: Kabul ediyorum
+  TosLinkText: TOS
+  PrivacyConfirm: Kabul ediyorum
+  PrivacyLinkText: gizlilik politikası
+  ExternalLogin: ya da harici bir kullanıcı ile kayıt olun
+  BackButtonText: Giriş Yap
+  NextButtonText: Sonraki
+
+ExternalRegistrationUserOverview:
+  Title: Harici Kullanıcı Kaydı
+  Description: Seçilen sağlayıcıdan kullanıcı verilerinizi aldık. Şimdi bunları değiştirebilir veya tamamlayabilirsiniz.
+  EmailLabel: E-posta
+  UsernameLabel: Kullanıcı adı
+  FirstnameLabel: Ad
+  LastnameLabel: Soyad
+  NicknameLabel: Takma ad
+  PhoneLabel: Telefon numarası
+  LanguageLabel: Dil
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Turkish: Türkçe
+  TosAndPrivacyLabel: Şartlar ve koşullar
+  TosConfirm: Kabul ediyorum
+  TosLinkText: TOS
+  PrivacyConfirm: Kabul ediyorum
+  PrivacyLinkText: gizlilik politikası
+  ExternalLogin: ya da harici bir kullanıcı ile kayıt olun
+  BackButtonText: Geri
+  NextButtonText: Kaydet
+
+RegistrationOrg:
+  Title: Organizasyon Kaydı
+  Description: Organizasyon adınızı ve kullanıcı verilerinizi girin.
+  OrgNameLabel: Organizasyon adı
+  EmailLabel: E-posta
+  UsernameLabel: Kullanıcı adı
+  FirstnameLabel: Ad
+  LastnameLabel: Soyad
+  PasswordLabel: Şifre
+  PasswordConfirmLabel: Şifreyi onayla
+  TosAndPrivacyLabel: Şartlar ve koşullar
+  TosConfirm: Kabul ediyorum
+  TosLinkText: TOS
+  PrivacyConfirm: Kabul ediyorum
+  PrivacyLinkText: gizlilik politikası
+  SaveButtonText: Organizasyon oluştur
+
+LoginSuccess:
+  Title: Giriş Başarılı
+  AutoRedirectDescription: Uygulamanıza otomatik olarak yönlendirileceksiniz. Eğer yönlendirilmezseniz, aşağıdaki butona tıklayın. Ardından pencereyi kapatabilirsiniz.
+  RedirectedDescription: Bu pencereyi şimdi kapatabilirsiniz.
+  NextButtonText: Sonraki
+
+LogoutDone:
+  Title: Çıkış Yapıldı
+  Description: Başarıyla çıkış yaptınız.
+  LoginButtonText: Giriş Yap
+
+LinkingUserPrompt:
+  Title: Mevcut Kullanıcı Bulundu
+  Description: "Mevcut hesabınızı bağlamak ister misiniz?"
+  LinkButtonText: Bağla
+  OtherButtonText: Diğer seçenekler
+
+LinkingUsersDone:
+  Title: Kullanıcı Bağlandı
+  Description: Kullanıcı bağlandı.
+  CancelButtonText: İptal
+  NextButtonText: Sonraki
+
+ExternalNotFound:
+  Title: Harici Kullanıcı Bulunamadı
+  Description: Harici kullanıcı bulunamadı. Kullanıcınızı bağlamak veya yeni birini otomatik kaydetmek ister misiniz?
+  LinkButtonText: Bağla
+  AutoRegisterButtonText: Kaydol
+  TosAndPrivacyLabel: Şartlar ve koşullar
+  TosConfirm: Kabul ediyorum
+  TosLinkText: TOS
+  PrivacyConfirm: Kabul ediyorum
+  PrivacyLinkText: gizlilik politikası
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  Indonesian: Bahasa Indonesia
+  Hungarian: Magyar
+  Korean: 한국어
+  Turkish: Türkçe
+
+DeviceAuth:
+  Title: Cihaz Yetkilendirmesi
+  UserCode:
+    Label: Kullanıcı Kodu
+    Description: Cihazda görünen kullanıcı kodunu girin.
+    ButtonNext: Sonraki
+  Action:
+    Description: Cihaza erişim izni verin.
+    GrantDevice: Cihaza erişim vermek üzeresiniz
+    AccessToScopes: aşağıdaki izinlere erişim
+    Button:
+      Allow: İzin Ver
+      Deny: Reddet
+  Done:
+    Description: Tamamlandı.
+    Approved: Cihaz yetkilendirmesi onaylandı. Şimdi cihaza geri dönebilirsiniz.
+    Denied: Cihaz yetkilendirmesi reddedildi. Şimdi cihaza geri dönebilirsiniz.
+
+Footer:
+  PoweredBy: Güçlü
+  Tos: TOS
+  PrivacyPolicy: Gizlilik politikası
+  Help: Yardım
+  SupportEmail: Destek E-postası
+
+SignIn: "{{.Provider}} ile giriş yap"
+
+Errors:
+  Internal: Dahili bir hata oluştu
+  AuthRequest:
+    NotFound: Kimlik doğrulama isteği bulunamadı
+    UserAgentNotCorresponding: Kullanıcı ajanı uyuşmuyor
+    UserAgentNotFound: Kullanıcı ajanı ID'si bulunamadı
+    TokenNotFound: Token bulunamadı
+    RequestTypeNotSupported: İstek türü desteklenmiyor
+    MissingParameters: Gerekli parametreler eksik
+  User:
+    NotFound: Kullanıcı bulunamadı
+    AlreadyExists: Kullanıcı zaten mevcut
+    Inactive: Kullanıcı devre dışı
+    NotFoundOnOrg: Kullanıcı seçilen organizasyonda bulunamadı
+    NotAllowedOrg: Kullanıcı gerekli organizasyonun üyesi değil
+    NotMatchingUserID: Kullanıcı ve kimlik doğrulama isteğindeki kullanıcı uyuşmuyor
+    UserIDMissing: KullanıcıID'si boş
+    Invalid: Geçersiz kullanıcı verisi
+    DomainNotAllowedAsUsername: Alan adı zaten rezerve edilmiş ve kullanıcı adı olarak kullanılamaz
+    NotAllowedToLink: Kullanıcı harici giriş sağlayıcı ile bağlantı yapmaya izinli değil
+    Profile:
+      NotFound: Profil bulunamadı
+      NotChanged: Profil değişmedi
+      Empty: Profil boş
+      FirstNameEmpty: Profildeki verilen ad boş
+      LastNameEmpty: Profildeki soyad boş
+      IDMissing: Profildeki ID eksik
+    Email:
+      NotFound: E-posta bulunamadı
+      Invalid: Geçersiz e-posta
+      AlreadyVerified: E-posta zaten doğrulandı
+      NotChanged: E-posta değiştirilmedi
+      Empty: E-posta boş
+      IDMissing: E-posta ID'si eksik
+    Phone:
+      NotFound: Telefon bulunamadı
+      Invalid: Geçersiz telefon
+      AlreadyVerified: Telefon zaten doğrulandı
+      Empty: Telefon boş
+      NotChanged: Telefon değiştirilmedi
+    Address:
+      NotFound: Adres bulunamadı
+      NotChanged: Adres değiştirilmedi
+    Username:
+      AlreadyExists: Kullanıcı adı zaten alındı
+      Reserved: Kullanıcı adı zaten alınmış
+      Empty: Kullanıcı adı boş
+    Password:
+      ConfirmationWrong: Şifre doğrulaması yanlış
+      Empty: Şifre boş
+      Invalid: Geçersiz şifre
+      InvalidAndLocked: Şifre geçersiz ve kullanıcı kilitlendi, lütfen yöneticinizle iletişime geçin
+      NotChanged: Yeni şifre mevcut şifrenizle aynı olamaz
+    UsernameOrPassword:
+      Invalid: Kullanıcı adı veya şifre geçersiz
+    PasswordComplexityPolicy:
+      NotFound: Şifre politikası bulunamadı
+      MinLength: Şifre çok kısa
+      HasLower: Şifre küçük harf içermeli
+      HasUpper: Şifre büyük harf içermeli
+      HasNumber: Şifre rakam içermeli
+      HasSymbol: Şifre sembol içermeli
+    Code:
+      Expired: Kodun süresi dolmuş
+      Invalid: Kod geçersiz
+      Empty: Kod boş
+      CryptoCodeNil: Kripto kodu yok
+      NotFound: Kod bulunamadı
+      GeneratorAlgNotSupported: Desteklenmeyen jeneratör algoritması
+    EmailVerify:
+      UserIDEmpty: KullanıcıID'si boş
+    ExternalData:
+      CouldNotRead: Harici veri doğru şekilde okunamadı
+    MFA:
+      NoProviders: Mevcut multifaktör sağlayıcıları yok
+      OTP:
+        AlreadyReady: Multifaktör OTP (Tek Kullanımlık Şifre) zaten ayarlandı
+        NotExisting: Multifaktör OTP (Tek Kullanımlık Şifre) mevcut değil
+        InvalidCode: Geçersiz kod
+        NotReady: Multifaktör OTP (Tek Kullanımlık Şifre) hazır değil
+    Locked: Kullanıcı kilitli
+    SomethingWentWrong: Bir şeyler yanlış gitti
+    NotActive: Kullanıcı aktif değil
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP Türü uygulanmamış
+      NotAllowed: Harici Giriş Sağlayıcı izinli değil
+      IDPConfigIDEmpty: Kimlik Sağlayıcı Konfigürasyonu ID'si boş
+      ExternalUserIDEmpty: Harici Kullanıcı ID'si boş
+      UserDisplayNameEmpty: Kullanıcı Görüntüleme Adı boş
+      NoExternalUserData: Harici Kullanıcı Verisi alınamadı
+      CreationNotAllowed: Yeni kullanıcı oluşturulmasına bu sağlayıcıda izin verilmiyor
+      LinkingNotAllowed: Kullanıcı bağlama işlemi bu sağlayıcıda izinli değil
+      NoOptionAllowed: Bu sağlayıcıda ne kullanıcı oluşturma ne de bağlama işlemi yapılabilir. Lütfen yöneticinizle iletişime geçin.
+    GrantRequired: Giriş yapılamaz. Kullanıcının uygulama üzerinde en az bir yetkilendirmesi olması gerekiyor. Lütfen yöneticinizle iletişime geçin.
+    ProjectRequired: Giriş yapılamaz. Kullanıcının organizasyonunun projeye yetkilendirilmesi gerekir. Lütfen yöneticinizle iletişime geçin.
+  IdentityProvider:
+    InvalidConfig: Kimlik Sağlayıcı yapılandırması geçersiz
+  IAM:
+    LockoutPolicy:
+      NotExisting: Kilitlenme politikası mevcut değil
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Kayıt yapılmasına izin verilmiyor
+  DeviceAuth:
+    NotExisting: Kullanıcı kodu mevcut değil
+
+optional: (opsiyonel)

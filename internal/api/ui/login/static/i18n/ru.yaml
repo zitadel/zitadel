@@ -265,6 +265,7 @@ RegistrationUser:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Turkish: Türkçe
   GenderLabel: Пол
   Female: Женский
   Male: Мужской
@@ -308,6 +309,7 @@ ExternalRegistrationUserOverview:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Turkish: Türkçe
   TosAndPrivacyLabel: Условия использования
   TosConfirm: Я согласен с
   TosLinkText: Пользовательским соглашением
@@ -385,6 +387,7 @@ ExternalNotFound:
   Indonesian: Bahasa Indonesia
   Hungarian: Magyar
   Korean: 한국어
+  Turkish: Türkçe
   
 DeviceAuth:
   Title: Авторизация устройства
