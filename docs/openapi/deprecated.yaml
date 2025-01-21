@@ -1,0 +1,4 @@
+decorators:
+  remove-unused-components: on
+  info-override:
+    title: Better title than before

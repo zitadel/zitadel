@@ -7,9 +7,12 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
-    "clear": "docusaurus clear && rm -rf static/apis",
+    "clear": "docusaurus clear && rm -rf static/apis && rm -rf .artifacts",
     "serve": "docusaurus serve",
-    "generate": "buf generate ../proto"
+    "generate": "pnpm run generate:proto && npm run generate:current && npm run generate:deprecated",
+    "generate:proto": "buf generate ../proto",
+    "generate:current": "swagger2openapi --outfile .artifacts/apis/current.json .artifacts/apis/current.swagger.json && redocly bundle --config=./openapi/current.yaml .artifacts/apis/current.json -o static/apis/current.json",
+    "generate:deprecated": "swagger2openapi --outfile .artifacts/apis/deprecated.json .artifacts/apis/deprecated.swagger.json && redocly bundle --config=./openapi/deprecated.yaml .artifacts/apis/deprecated.json -o static/apis/deprecated.json"
   },
   "dependencies": {
     "@bufbuild/buf": "^1.49.0",
@@ -54,6 +57,8 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.7.0",
     "@docusaurus/types": "^3.7.0",
+    "@redocly/cli": "^1.27.2",
+    "swagger2openapi": "^7.0.8",
     "tailwindcss": "^3.4.17"
   }
 }

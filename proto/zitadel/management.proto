@@ -28,15 +28,6 @@ package zitadel.management.v1;
 
 option go_package ="github.com/zitadel/zitadel/pkg/grpc/management";
 
-option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-    extensions: {
-		key: "x-zitadel-orgid"
-		value: {
-			string_value: "$YOUR-ORGANIZATION"
-		},
-    };
-};
-
 service ManagementService {
     option (google.api.api_visibility).restriction = "v1, deprecated";
     

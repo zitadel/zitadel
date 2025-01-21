@@ -1,0 +1,6 @@
+decorators:
+  remove-unused-components: on
+  info-override:
+    title: ZITADEL API
+    version: v2
+    description: This is the ZITADEL API

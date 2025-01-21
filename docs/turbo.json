@@ -10,6 +10,10 @@
         "dependsOn": ["generate"],
         "outputs": ["build/**"],
         "cache": true
+      },
+      "start": {
+        "dependsOn": ["generate"],
+        "cache": false
       }
     }
   }

@@ -247,8 +247,12 @@ module.exports = {
       configuration: {
         tagsSorter: 'alpha',
         hideModels: true,
+        isEditable: false,
+        hideDarkModeToggle: true,
+        hideClientButton: true,
+        defaultOpenAllTags: false,
         spec: {
-          url: '/docs/apis/current.swagger.json',
+          url: '/docs/apis/current.json',
         },
       },
     },
@@ -263,8 +267,12 @@ module.exports = {
         configuration: {
           tagsSorter: 'alpha',
           hideModels: true,
+          isEditable: false,
+          hideDarkModeToggle: true,
+          hideClientButton: true,
+          defaultOpenAllTags: false,
           spec: {
-            url: '/docs/apis/deprecated.swagger.json',
+            url: '/docs/apis/deprecated.json',
           },
         },
       },
