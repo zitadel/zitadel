@@ -26,7 +26,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta;feature"
 // reserving the proto field number. Such removal is not considered a breaking change.
 // Setting a removed field will effectively result in a no-op.
 service FeatureService {
-  option (google.api.api_visibility).restriction = "v2beta";
+  option (google.api.api_visibility).restriction = "v2beta, graduated";
   rpc SetSystemFeatures (SetSystemFeaturesRequest) returns (SetSystemFeaturesResponse) {
     option (google.api.http) = {
       put: "/v2beta/features/system"

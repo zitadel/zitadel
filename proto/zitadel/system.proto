@@ -20,12 +20,12 @@ package zitadel.system.v1;
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/system";
 
 service SystemService {
-  option (google.api.api_visibility).restriction = "v1";
+  option (google.api.api_visibility).restriction = "v1, deprecated";
   //Indicates if ZITADEL is running.
   // It respondes as soon as ZITADEL started
   rpc Healthz(HealthzRequest) returns (HealthzResponse) {
     option (google.api.http) = {
-      get: "/healthz";
+      get: "/system/v1/healthz";
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -48,7 +48,7 @@ service SystemService {
   // Returns a list of ZITADEL instances
   rpc ListInstances(ListInstancesRequest) returns (ListInstancesResponse) {
     option (google.api.http) = {
-      post: "/instances/_search"
+      post: "/system/v1/instances/_search"
       body: "*"
     };
 
@@ -60,7 +60,7 @@ service SystemService {
   // Returns the detail of an instance
   rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
     option (google.api.http) = {
-      get: "/instances/{instance_id}";
+      get: "/system/v1/instances/{instance_id}";
     };
 
     option (zitadel.v1.auth_option) = {
@@ -73,7 +73,7 @@ service SystemService {
   // This might take some time
   rpc AddInstance(AddInstanceRequest) returns (AddInstanceResponse) {
     option (google.api.http) = {
-      post: "/instances"
+      post: "/system/v1/instances"
       body: "*"
     };
 
@@ -85,7 +85,7 @@ service SystemService {
   // Updates name of an existing instance
   rpc UpdateInstance(UpdateInstanceRequest) returns (UpdateInstanceResponse) {
     option (google.api.http) = {
-      put: "/instances/{instance_id}"
+      put: "/system/v1/instances/{instance_id}"
       body: "*"
     };
 
@@ -98,7 +98,7 @@ service SystemService {
   // This might take some time
   rpc CreateInstance(CreateInstanceRequest) returns (CreateInstanceResponse) {
     option (google.api.http) = {
-      post: "/instances/_create"
+      post: "/system/v1/instances/_create"
       body: "*"
     };
 
@@ -111,7 +111,7 @@ service SystemService {
   // This might take some time
   rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
     option (google.api.http) = {
-      delete: "/instances/{instance_id}"
+      delete: "/system/v1/instances/{instance_id}"
     };
 
     option (zitadel.v1.auth_option) = {
@@ -124,7 +124,7 @@ service SystemService {
   // Deprecated: Use the Admin APIs ListIAMMembers instead
   rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
     option (google.api.http) = {
-      post: "/instances/{instance_id}/members/_search";
+      post: "/system/v1/instances/{instance_id}/members/_search";
       body: "*";
     };
 
@@ -136,7 +136,7 @@ service SystemService {
   //Checks if a domain exists
   rpc ExistsDomain(ExistsDomainRequest) returns (ExistsDomainResponse) {
     option (google.api.http) = {
-      post: "/domains/{domain}/_exists";
+      post: "/system/v1/domains/{domain}/_exists";
       body: "*"
     };
 
@@ -150,7 +150,7 @@ service SystemService {
   // Deprecated: Use the Admin APIs ListInstanceDomains on the admin API instead
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
     option (google.api.http) = {
-      post: "/instances/{instance_id}/domains/_search";
+      post: "/system/v1/instances/{instance_id}/domains/_search";
       body: "*"
     };
 
@@ -162,7 +162,7 @@ service SystemService {
   // Adds a domain to an instance
   rpc AddDomain(AddDomainRequest) returns (AddDomainResponse) {
     option (google.api.http) = {
-      post: "/instances/{instance_id}/domains";
+      post: "/system/v1/instances/{instance_id}/domains";
       body: "*"
     };
 
@@ -174,7 +174,7 @@ service SystemService {
   // Removes the domain of an instance
   rpc RemoveDomain(RemoveDomainRequest) returns (RemoveDomainResponse) {
     option (google.api.http) = {
-      delete: "/instances/{instance_id}/domains/{domain}";
+      delete: "/system/v1/instances/{instance_id}/domains/{domain}";
     };
 
     option (zitadel.v1.auth_option) = {
@@ -185,7 +185,7 @@ service SystemService {
   // Sets the primary domain of an instance
   rpc SetPrimaryDomain(SetPrimaryDomainRequest) returns (SetPrimaryDomainResponse) {
     option (google.api.http) = {
-      post: "/instances/{instance_id}/domains/_set_primary";
+      post: "/system/v1/instances/{instance_id}/domains/_set_primary";
       body: "*"
     };
 
@@ -199,7 +199,7 @@ service SystemService {
   // they represent the delta of the event happend on the objects
   rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
     option (google.api.http) = {
-      post: "/views/_search";
+      post: "/system/v1/views/_search";
       body: "*"
     };
 
@@ -224,7 +224,7 @@ service SystemService {
   // Search requests will return wrong results until all deltas are recomputed
   rpc ClearView(ClearViewRequest) returns (ClearViewResponse) {
     option (google.api.http) = {
-      post: "/views/{database}/{view_name}";
+      post: "/system/v1/views/{database}/{view_name}";
     };
 
     option (zitadel.v1.auth_option) = {
@@ -247,7 +247,7 @@ service SystemService {
   // For example if the SMTP-API wasn't able to send an email at the first time
   rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
     option (google.api.http) = {
-      post: "/failedevents/_search";
+      post: "/system/v1/failedevents/_search";
       body: "*"
     };
 
@@ -273,7 +273,7 @@ service SystemService {
   // failed event. You can find out if it worked on the `failure_count`
   rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
     option (google.api.http) = {
-      delete: "/failedevents/{database}/{view_name}/{failed_sequence}";
+      delete: "/system/v1/failedevents/{database}/{view_name}/{failed_sequence}";
     };
 
     option (zitadel.v1.auth_option) = {
@@ -310,7 +310,7 @@ service SystemService {
     };
 
     option (google.api.http) = {
-      post: "/instances/{instance_id}/quotas"
+      post: "/system/v1/instances/{instance_id}/quotas"
       body: "*"
     };
 
@@ -327,7 +327,7 @@ service SystemService {
     };
 
     option (google.api.http) = {
-      put: "/instances/{instance_id}/quotas"
+      put: "/system/v1/instances/{instance_id}/quotas"
       body: "*"
     };
 
@@ -343,7 +343,7 @@ service SystemService {
     };
 
     option (google.api.http) = {
-      delete: "/instances/{instance_id}/quotas/{unit}"
+      delete: "/system/v1/instances/{instance_id}/quotas/{unit}"
     };
 
     option (zitadel.v1.auth_option) = {
@@ -354,7 +354,7 @@ service SystemService {
   // Set a feature flag on an instance
   rpc SetInstanceFeature(SetInstanceFeatureRequest) returns (SetInstanceFeatureResponse) {
     option (google.api.http) = {
-      put: "/instances/{instance_id}/features/{feature_id}"
+      put: "/system/v1/instances/{instance_id}/features/{feature_id}"
       body: "*"
     };
 
@@ -366,7 +366,7 @@ service SystemService {
   // Sets instance level limits
   rpc SetLimits(SetLimitsRequest) returns (SetLimitsResponse) {
     option (google.api.http) = {
-      put: "/instances/{instance_id}/limits"
+      put: "/system/v1/instances/{instance_id}/limits"
       body: "*"
     };
 
@@ -399,7 +399,7 @@ service SystemService {
   // Sets many instance level limits
   rpc BulkSetLimits(BulkSetLimitsRequest) returns (BulkSetLimitsResponse) {
     option (google.api.http) = {
-      put: "/instances/limits/_bulk"
+      put: "/system/v1/instances/limits/_bulk"
       body: "*"
     };
 
@@ -434,7 +434,7 @@ service SystemService {
   // Resets instance level limits
   rpc ResetLimits(ResetLimitsRequest) returns (ResetLimitsResponse) {
     option (google.api.http) = {
-      delete: "/instances/{instance_id}/limits"
+      delete: "/system/v1/instances/{instance_id}/limits"
     };
 
     option (zitadel.v1.auth_option) = {

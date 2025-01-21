@@ -14,7 +14,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/saml/v2;saml";
 
 service SAMLService {
-  option (google.api.api_visibility).restriction = "v2";
+  option (google.api.api_visibility).restriction = "v2, stable";
   rpc GetSAMLRequest (GetSAMLRequestRequest) returns (GetSAMLRequestResponse) {
     option (google.api.http) = {
       get: "/v2/saml/saml_requests/{saml_request_id}"
@@ -27,7 +27,7 @@ service SAMLService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "SAML";
+      tags: "Security Assertion Markup Language (SAML)";
       summary: "Get SAML Request details";
       description: "Get SAML Request details by ID. Returns details that are parsed from the application's SAML Request."
       responses: {
@@ -52,7 +52,7 @@ service SAMLService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "SAML";
+      tags: "Security Assertion Markup Language (SAML)";
       summary: "Finalize a SAML Request and get the response.";
       description: "Finalize a SAML Request and get the response definition for success or failure. The response must be handled as per the SAML definition to inform the application about the success or failure. On success, the response contains details for the application to obtain the SAMLResponse. This method can only be called once for an SAML request."
       responses: {

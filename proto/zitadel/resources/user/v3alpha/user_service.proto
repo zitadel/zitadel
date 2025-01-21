@@ -20,7 +20,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
 
 service ZITADELUsers {
-  option (google.api.api_visibility).restriction = "v3alpha";
+  option (google.api.api_visibility).restriction = "v3alpha, preview";
 
   // Search users
   //
@@ -39,6 +39,7 @@ service ZITADELUsers {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users (preview)";
       responses: {
         key: "200";
         value: {

@@ -18,7 +18,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2;session";
 
 service SessionService {
-  option (google.api.api_visibility).restriction = "v2";
+  option (google.api.api_visibility).restriction = "v2, stable";
 
   // Search sessions
   rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {

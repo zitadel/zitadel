@@ -17,7 +17,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha;debug_events";
 
 service ZITADELDebugEvents {
-  option (google.api.api_visibility).restriction = "v3alpha";
+  option (google.api.api_visibility).restriction = "v3alpha, preview";
   rpc CreateDebugEvents(CreateDebugEventsRequest) returns (CreateDebugEventsResponse) {
     option (google.api.http) = {
       post: "/"

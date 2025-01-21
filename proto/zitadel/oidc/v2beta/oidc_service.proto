@@ -14,7 +14,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta;oidc";
 
 service OIDCService {
-  option (google.api.api_visibility).restriction = "v2beta";
+  option (google.api.api_visibility).restriction = "v2beta, graduated";
   rpc GetAuthRequest (GetAuthRequestRequest) returns (GetAuthRequestResponse) {
     option (google.api.http) = {
       get: "/v2beta/oidc/auth_requests/{auth_request_id}"

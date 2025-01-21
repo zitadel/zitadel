@@ -225,17 +225,34 @@ module.exports = {
     [
     '@scalar/docusaurus',
     {
-      id: 'zitadel',
+      id: 'current',
       label: 'API Reference',
       route: '/docs/reference',
       configuration: {
         tagsSorter: 'alpha',
+        hideModels: true,
         spec: {
-          url: '/docs/apis/zitadel.swagger.json',
+          url: '/docs/apis/current.swagger.json',
         },
       },
     },
     ],
+    [
+      '@scalar/docusaurus',
+      {
+        id: 'deprecated',
+        label: 'API Reference (Deprecated)',
+        route: '/docs/reference/deprecated',
+        configuration: {
+          tagsSorter: 'alpha',
+          hideModels: true,
+          spec: {
+            url: '/docs/apis/deprecated.swagger.json',
+          },
+        },
+      },
+      ],
+      
     require.resolve("docusaurus-plugin-image-zoom"),
     async function myPlugin(context, options) {
       return {

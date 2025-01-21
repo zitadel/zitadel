@@ -20,7 +20,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
 
 service SettingsService {
-  option (google.api.api_visibility).restriction = "v2";
+  option (google.api.api_visibility).restriction = "v2, stable";
 
   // Get basic information over the instance
   rpc GetGeneralSettings (GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {

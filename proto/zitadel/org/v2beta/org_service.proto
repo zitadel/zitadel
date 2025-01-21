@@ -23,7 +23,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2beta;org";
 
 service OrganizationService {
-  option (google.api.api_visibility).restriction = "v2beta";
+  option (google.api.api_visibility).restriction = "v2beta, graduated";
 
   // Create a new organization and grant the user(s) permission to manage it
   rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse) {

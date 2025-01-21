@@ -17,7 +17,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha;webkey";
 
 service ZITADELWebKeys {
-  option (google.api.api_visibility).restriction = "v3alpha";
+  option (google.api.api_visibility).restriction = "v3alpha, preview";
   rpc CreateWebKey(CreateWebKeyRequest) returns (CreateWebKeyResponse) {
     option (google.api.http) = {
       post: "/resources/v3alpha/web_keys"

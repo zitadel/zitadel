@@ -38,7 +38,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service ManagementService {
-    option (google.api.api_visibility).restriction = "v1";
+    option (google.api.api_visibility).restriction = "v1, deprecated";
     
     rpc Healthz(HealthzRequest) returns (HealthzResponse) {
         option (google.api.http) = {
@@ -92,7 +92,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Supported Languages";
             description: "Use GetSupportedLanguages on the admin service instead."
-            tags: "Deprecated";
+            tags: "Languages";
             deprecated: true;
             responses: {
                 key: "200"
@@ -116,7 +116,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "User by ID";
             description: "Returns the full user object (human or machine) including the profile, email, etc.\n\nDeprecated: please use user service v2 GetUserByID"
-            tags: "Deprecated";
+            tags: "Users v1";
             deprecated: true;
             responses: {
                 key: "200"

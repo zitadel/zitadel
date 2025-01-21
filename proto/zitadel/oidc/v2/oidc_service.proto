@@ -14,7 +14,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2;oidc";
 
 service OIDCService {
-  option (google.api.api_visibility).restriction = "v2";
+  option (google.api.api_visibility).restriction = "v2, stable";
   rpc GetAuthRequest (GetAuthRequestRequest) returns (GetAuthRequestResponse) {
     option (google.api.http) = {
       get: "/v2/oidc/auth_requests/{auth_request_id}"
@@ -27,7 +27,7 @@ service OIDCService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "OIDC";
+      tags: "OpenID Connect (OIDC)";
       summary: "Get OIDC Auth Request details";
       description: "Get OIDC Auth Request details by ID, obtained from the redirect URL. Returns details that are parsed from the application's Auth Request."
       responses: {
@@ -52,7 +52,7 @@ service OIDCService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "OIDC";
+      tags: "OpenID Connect (OIDC)";
       summary: "Finalize an Auth Request and get the callback URL.";
       description: "Finalize an Auth Request and get the callback URL for success or failure. The user must be redirected to the URL in order to inform the application about the success or failure. On success, the URL contains details for the application to obtain the tokens. This method can only be called once for an Auth request."
       responses: {

@@ -14,7 +14,7 @@ import "zitadel/idp/v2/idp.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/idp/v2;idp";
 
 service IdentityProviderService {
-  option (google.api.api_visibility).restriction = "v2";
+  option (google.api.api_visibility).restriction = "v2, stable";
 
   // Get identity provider (IdP) by ID
   //
@@ -31,7 +31,7 @@ service IdentityProviderService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Idps";
+      tags: "Identity Providers";
       responses: {
         key: "200"
         value: {
