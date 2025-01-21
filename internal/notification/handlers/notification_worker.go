@@ -178,7 +178,19 @@ func (w *NotificationWorker) reduceNotificationRetry(ctx, txCtx context.Context,
 	), err)
 }
 
-func (w *NotificationWorker) sendNotification(ctx, txCtx context.Context, tx *sql.Tx, request notification.Request, notifyUser *query.NotifyUser, e eventstore.Event) error {
+type requestEvent interface {
+	Aggregate() *eventstore.Aggregate
+	GetRequest() notification.Request
+}
+
+func (w *NotificationWorker) sendNotification(
+	ctx,
+	txCtx context.Context,
+	tx *sql.Tx,
+	request notification.Request,
+	notifyUser *query.NotifyUser,
+	requestEvent requestEvent,
+) error {
 	ctx, err := enrichCtx(ctx, request.TriggeredAtOrigin)
 	if err != nil {
 		return channels.NewCancelError(err)
@@ -210,16 +222,21 @@ func (w *NotificationWorker) sendNotification(ctx, txCtx context.Context, tx *sq
 	}
 
 	generatorInfo := new(senders.CodeGeneratorInfo)
+	// Pull the _actual_ triggering event type from the request event
+	triggeringEventType := requestEvent.GetRequest().EventType
+
 	var notify types.Notify
+
 	switch request.NotificationType {
 	case domain.NotificationTypeEmail:
 		template, err := w.queries.MailTemplateByOrg(ctx, notifyUser.ResourceOwner, false)
 		if err != nil {
 			return err
 		}
-		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, e)
+
+		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, triggeringEventType)
 	case domain.NotificationTypeSms:
-		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, e, generatorInfo)
+		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, triggeringEventType, generatorInfo)
 	}
 
 	args := request.Args.ToMap()
@@ -232,16 +249,16 @@ func (w *NotificationWorker) sendNotification(ctx, txCtx context.Context, tx *sq
 	if err := notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel); err != nil {
 		return err
 	}
-	err = w.commands.NotificationSent(txCtx, tx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
+	err = w.commands.NotificationSent(txCtx, tx, requestEvent.Aggregate().ID, requestEvent.Aggregate().ResourceOwner)
 	if err != nil {
 		// In case the notification event cannot be pushed, we most likely cannot create a retry or cancel event.
 		// Therefore, we'll only log the error and also do not need to try to push to the user / session.
-		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
+		logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", requestEvent.Aggregate().ID).
 			OnError(err).Error("could not set sent notification event")
 		return nil
 	}
 	err = sentHandler(txCtx, w.commands, request.NotificationAggregateID(), request.NotificationAggregateResourceOwner(), generatorInfo, args)
-	logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
+	logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", requestEvent.Aggregate().ID).
 		OnError(err).Error("could not set notification event on aggregate")
 	return nil
 }

@@ -39,7 +39,7 @@ func SendEmail(
 	translator *i18n.Translator,
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
 ) Notify {
 	return func(
 		urlTmpl string,
@@ -66,7 +66,7 @@ func SendEmail(
 			data,
 			args,
 			allowUnverifiedNotificationChannel,
-			triggeringEvent,
+			triggeringEventType,
 		)
 	}
 }
@@ -102,7 +102,7 @@ func SendSMS(
 	translator *i18n.Translator,
 	user *query.NotifyUser,
 	colors *query.LabelPolicy,
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
 	generatorInfo *senders.CodeGeneratorInfo,
 ) Notify {
 	return func(
@@ -124,7 +124,7 @@ func SendSMS(
 			data,
 			args,
 			allowUnverifiedNotificationChannel,
-			triggeringEvent,
+			triggeringEventType,
 			generatorInfo,
 		)
 	}
@@ -135,7 +135,7 @@ func SendJSON(
 	webhookConfig webhook.Config,
 	channels ChannelChains,
 	serializable interface{},
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
 ) Notify {
 	return func(_ string, _ map[string]interface{}, _ string, _ bool) error {
 		return handleWebhook(
@@ -143,7 +143,7 @@ func SendJSON(
 			webhookConfig,
 			channels,
 			serializable,
-			triggeringEvent,
+			triggeringEventType,
 		)
 	}
 }
@@ -153,7 +153,7 @@ func SendSecurityTokenEvent(
 	setConfig set.Config,
 	channels ChannelChains,
 	token any,
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
 ) Notify {
 	return func(_ string, _ map[string]interface{}, _ string, _ bool) error {
 		return handleSecurityTokenEvent(
@@ -161,7 +161,7 @@ func SendSecurityTokenEvent(
 			setConfig,
 			channels,
 			token,
-			triggeringEvent,
+			triggeringEventType,
 		)
 	}
 }

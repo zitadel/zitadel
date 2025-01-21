@@ -25,7 +25,7 @@ func countMessages(ctx context.Context, channel channels.NotificationChannel, su
 
 func addCount(ctx context.Context, metricName string, message channels.Message, err error) {
 	labels := map[string]attribute.Value{
-		"triggering_event_typey": attribute.StringValue(string(message.GetTriggeringEvent().Type())),
+		"triggering_event_typey": attribute.StringValue(string(message.GetTriggeringEventType())),
 		"instance":               attribute.StringValue(authz.GetInstance(ctx).InstanceID()),
 	}
 	if err != nil {

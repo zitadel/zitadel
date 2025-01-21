@@ -56,6 +56,10 @@ type RequestedEvent struct {
 	Request `json:"request"`
 }
 
+func (e *RequestedEvent) GetRequest() Request {
+	return e.Request
+}
+
 func (e *RequestedEvent) TriggerOrigin() string {
 	return e.TriggeredAtOrigin
 }
@@ -184,6 +188,10 @@ type RetryRequestedEvent struct {
 
 func (e *RetryRequestedEvent) Payload() interface{} {
 	return e
+}
+
+func (e *RetryRequestedEvent) GetRequest() Request {
+	return e.Request
 }
 
 func (e *RetryRequestedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {

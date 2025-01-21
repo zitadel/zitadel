@@ -1539,11 +1539,11 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
 	if w.err == nil {
 		if w.message != nil {
-			w.message.TriggeringEvent = a.event
+			w.message.TriggeringEventType = a.event.Type()
 			channel.EXPECT().HandleMessage(w.message).Return(nil)
 		}
 		if w.messageSMS != nil {
-			w.messageSMS.TriggeringEvent = a.event
+			w.messageSMS.TriggeringEventType = a.event.Type()
 			channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
 				message.VerificationID = gu.Ptr(verificationID)
 				return nil
