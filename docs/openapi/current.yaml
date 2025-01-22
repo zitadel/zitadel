@@ -30,9 +30,15 @@ servers:
         description: Instance name assigned by ZITADEL Cloud
 components:
   securitySchemes:
-    openId:
-      type: openIdConnect
-      openIdConnectUrl: /.well-known/openid-configuration
-    bearerAuth: # arbitrary name for the security scheme
+    oAuth2AuthCode:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/v2/authorize
+          tokenUrl: /oauth/v2/token
+          scopes:
+            openid: openid
+            urn:zitadel:iam:org:project:id:zitadel:aud: urn:zitadel:iam:org:project:id:zitadel:aud
+    bearerAuth:
       type: http
       scheme: bearer
