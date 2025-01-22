@@ -15,7 +15,6 @@
         }
     ],
     "redirects": [
-        { "source": "/", "destination": "/docs" },
         { "source": "/docs/category/apis/:slug*", "destination": "/docs/apis/:slug*", "permanent": true },
         { "source": "/docs/apis/mgmt/:slug*", "destination": "/docs/reference/deprecated#tag/management-service/:slug*", "permanent": true },
         { "source": "/docs/apis/auth/:slug*", "destination": "/docs/reference/deprecated#tag/auth-service/:slug*", "permanent": true },
