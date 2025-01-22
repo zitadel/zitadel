@@ -18,6 +18,17 @@
             "destination": "/:match*"
         }
     ],
+    "headers": [
+            {
+            "source": "/(.*)",
+            "headers": [
+                {
+                "key": "x-vercel-enable-rewrite-caching",
+                "value": "1"
+                }
+            ]
+        }
+    ],
     "redirects": [
         { "source": "/", "destination": "/docs" },
         { "source": "/docs/category/apis/:slug*", "destination": "/docs/apis/:slug*", "permanent": true },
