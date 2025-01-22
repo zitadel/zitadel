@@ -106,33 +106,6 @@ type CustomHTTPResponse interface {
 
 type RegisterGatewayFunc func(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error
 
-func CreateGatewayWithPrefix(
-	ctx context.Context,
-	g WithGatewayPrefix,
-	port uint16,
-	hostHeaders []string,
-	accessInterceptor *http_mw.AccessInterceptor,
-	tlsConfig *tls.Config,
-) (http.Handler, string, error) {
-	runtimeMux := runtime.NewServeMux(serveMuxOptions(hostHeaders)...)
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
-		grpc.WithChainUnaryInterceptor(
-			client_middleware.DefaultTracingClient(),
-			client_middleware.UnaryActivityClientInterceptor(),
-		),
-	}
-	connection, err := dial(ctx, port, opts)
-	if err != nil {
-		return nil, "", err
-	}
-	err = g.RegisterGateway()(ctx, runtimeMux, connection)
-	if err != nil {
-		return nil, "", fmt.Errorf("failed to register grpc gateway: %w", err)
-	}
-	return addInterceptors(runtimeMux, accessInterceptor), g.GatewayPathPrefix(), nil
-}
-
 func CreateGateway(
 	ctx context.Context,
 	port uint16,
