@@ -208,6 +208,20 @@ func (h *UsersHandler) mapChangeCommandToScimUser(ctx context.Context, user *Sci
 	}
 }
 
+func (h *UsersHandler) mapToScimUsers(ctx context.Context, users []*query.User, md map[string]map[metadata.ScopedKey][]byte) []*ScimUser {
+	result := make([]*ScimUser, len(users))
+	for i, user := range users {
+		userMetadata, ok := md[user.ID]
+		if !ok {
+			userMetadata = make(map[metadata.ScopedKey][]byte)
+		}
+
+		result[i] = h.mapToScimUser(ctx, user, userMetadata)
+	}
+
+	return result
+}
+
 func (h *UsersHandler) mapToScimUser(ctx context.Context, user *query.User, md map[metadata.ScopedKey][]byte) *ScimUser {
 	scimUser := &ScimUser{
 		Resource:     h.buildResourceForQuery(ctx, user),
@@ -363,4 +377,12 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 		converted[i] = grant.ID
 	}
 	return converted
+}
+
+func usersToIDs(users []*query.User) []string {
+	ids := make([]string, len(users))
+	for i, user := range users {
+		ids[i] = user.ID
+	}
+	return ids
 }

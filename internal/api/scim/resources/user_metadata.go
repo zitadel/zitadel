@@ -20,6 +20,28 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+func (h *UsersHandler) queryMetadataForUsers(ctx context.Context, userIds []string) (map[string]map[metadata.ScopedKey][]byte, error) {
+	queries := h.buildMetadataQueries(ctx)
+
+	md, err := h.query.SearchUserMetadataForUsers(ctx, false, userIds, queries)
+	if err != nil {
+		return nil, err
+	}
+
+	metadataMap := make(map[string]map[metadata.ScopedKey][]byte, len(md.Metadata))
+	for _, entry := range md.Metadata {
+		userMetadata, ok := metadataMap[entry.UserID]
+		if !ok {
+			userMetadata = make(map[metadata.ScopedKey][]byte)
+			metadataMap[entry.UserID] = userMetadata
+		}
+
+		userMetadata[metadata.ScopedKey(entry.Key)] = entry.Value
+	}
+
+	return metadataMap, nil
+}
+
 func (h *UsersHandler) queryMetadataForUser(ctx context.Context, id string) (map[metadata.ScopedKey][]byte, error) {
 	queries := h.buildMetadataQueries(ctx)
 
@@ -108,15 +130,11 @@ func getValueForMetadataKey(user *ScimUser, key metadata.Key) ([]byte, error) {
 
 	switch key {
 	// json values
-	case metadata.KeyEntitlements:
-		fallthrough
-	case metadata.KeyIms:
-		fallthrough
-	case metadata.KeyPhotos:
-		fallthrough
-	case metadata.KeyAddresses:
-		fallthrough
-	case metadata.KeyRoles:
+	case metadata.KeyRoles,
+		metadata.KeyAddresses,
+		metadata.KeyEntitlements,
+		metadata.KeyIms,
+		metadata.KeyPhotos:
 		val, err := json.Marshal(value)
 		if err != nil {
 			return nil, err
@@ -134,21 +152,14 @@ func getValueForMetadataKey(user *ScimUser, key metadata.Key) ([]byte, error) {
 		return []byte(value.(*schemas.HttpURL).String()), nil
 
 	// raw values
-	case metadata.KeyProvisioningDomain:
-		fallthrough
-	case metadata.KeyExternalId:
-		fallthrough
-	case metadata.KeyMiddleName:
-		fallthrough
-	case metadata.KeyHonorificSuffix:
-		fallthrough
-	case metadata.KeyHonorificPrefix:
-		fallthrough
-	case metadata.KeyTitle:
-		fallthrough
-	case metadata.KeyLocale:
-		fallthrough
-	case metadata.KeyTimezone:
+	case metadata.KeyTimezone,
+		metadata.KeyLocale,
+		metadata.KeyTitle,
+		metadata.KeyHonorificPrefix,
+		metadata.KeyHonorificSuffix,
+		metadata.KeyMiddleName,
+		metadata.KeyExternalId,
+		metadata.KeyProvisioningDomain:
 		valueStr := value.(string)
 		if valueStr == "" {
 			return nil, nil
