@@ -4,11 +4,10 @@ package integration_test
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/integration"
 	"os"
 	"testing"
 	"time"
-
-	"github.com/zitadel/zitadel/internal/integration"
 )
 
 var (

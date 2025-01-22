@@ -28,7 +28,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -190,12 +189,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		&DeleteStaleOrgFields{
 			eventstore: eventstoreClient,
 		},
-		&RepeatableFillFields{
+		&FillFieldsForInstanceDomains{
 			eventstore: eventstoreClient,
-			handlers: []*handler.FieldHandler{
-				projection.InstanceDomainFields,
-				projection.MembershipFields,
-			},
 		},
 		&SyncRolePermissions{
 			eventstore:             eventstoreClient,

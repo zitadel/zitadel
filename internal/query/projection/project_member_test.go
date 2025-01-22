@@ -32,7 +32,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 		args: args{
 			event: getEvent(
 				testEvent(
-					project.MemberAddedEventType,
+					project.MemberAddedType,
 					project.AggregateType,
 					[]byte(`{
 					"userId": "user-id",
@@ -56,7 +56,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						project.MemberAddedEventType,
+						project.MemberAddedType,
 						project.AggregateType,
 						[]byte(`{
 					"userId": "user-id",
@@ -110,7 +110,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						project.MemberAddedEventType,
+						project.MemberAddedType,
 						project.AggregateType,
 						[]byte(`{
 					"userId": "user-id",
@@ -176,7 +176,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						project.MemberChangedEventType,
+						project.MemberChangedType,
 						project.AggregateType,
 						[]byte(`{
 					"userId": "user-id",
@@ -210,7 +210,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						project.MemberCascadeRemovedEventType,
+						project.MemberCascadeRemovedType,
 						project.AggregateType,
 						[]byte(`{
 					"userId": "user-id"
@@ -240,7 +240,7 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						project.MemberRemovedEventType,
+						project.MemberRemovedType,
 						project.AggregateType,
 						[]byte(`{
 					"userId": "user-id"
