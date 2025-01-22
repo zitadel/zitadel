@@ -11,8 +11,8 @@
     "serve": "docusaurus serve",
     "generate": "pnpm run generate:proto && npm run generate:current && npm run generate:deprecated",
     "generate:proto": "buf generate ../proto",
-    "generate:current": "swagger2openapi --outfile .artifacts/apis/current.json .artifacts/apis/current.swagger.json && redocly bundle --config=./openapi/current.yaml .artifacts/apis/current.json -o static/apis/current.json",
-    "generate:deprecated": "swagger2openapi --outfile .artifacts/apis/deprecated.json .artifacts/apis/deprecated.swagger.json && redocly bundle --config=./openapi/deprecated.yaml .artifacts/apis/deprecated.json -o static/apis/deprecated.json"
+    "generate:current": "swagger2openapi --outfile .artifacts/apis/current.json .artifacts/apis/current.swagger.json && redocly join --without-x-tag-groups ./openapi/current.yaml .artifacts/apis/current.json -o static/apis/current.json",
+    "generate:deprecated": "swagger2openapi --outfile .artifacts/apis/deprecated.json .artifacts/apis/deprecated.swagger.json && redocly join --without-x-tag-groups ./openapi/deprecated.yaml .artifacts/apis/deprecated.json -o static/apis/deprecated.json"
   },
   "dependencies": {
     "@bufbuild/buf": "^1.49.0",

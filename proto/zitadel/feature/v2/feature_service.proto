@@ -66,12 +66,6 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      extensions: {
-        key: "x-tagGroups";
-        value {
-            string_value: "hodor";
-        }
-      };
       tags: "Features";
       summary: "Reset System Features";
       description: "Deletes ALL configured features for the system, reverting the behaviors to system defaults."
