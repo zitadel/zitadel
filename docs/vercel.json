@@ -12,21 +12,6 @@
         {
             "source": "/docs/proxy/api/event",
             "destination": "https://plausible.io/api/event"
-        },
-        { 
-            "source": "/docs/:match*",
-            "destination": "/:match*"
-        }
-    ],
-    "headers": [
-            {
-            "source": "/docs/:match*",
-            "headers": [
-                {
-                "key": "x-vercel-enable-rewrite-caching",
-                "value": "1"
-                }
-            ]
         }
     ],
     "redirects": [
