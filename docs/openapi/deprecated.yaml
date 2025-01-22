@@ -1,4 +1,13 @@
 decorators:
   remove-unused-components: on
   info-override:
-    title: Better title than before
+    title: Deprecated API from ZITADEL
+    version: v1
+    description: This is the deprecated but still available API for ZITADEL. Please consider to switch to the current API
+    contact:
+      name: ZITADEL
+      url: https://zitadel.com
+      email: hi@zitadel.com
+    license:
+      name: Apache 2.0
+      url: https://github.com/zitadel/zitadel/blob/main/LICENSE

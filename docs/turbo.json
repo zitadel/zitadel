@@ -3,7 +3,7 @@
     "tasks": {
       "generate": {
         "outputs": ["static/apis/**"],
-        "inputs": ["../proto/**", "buf.gen.yaml"],
+        "inputs": ["../proto/**", "buf.gen.yaml", "openapi/**"],
         "cache": true
       },
       "build": {

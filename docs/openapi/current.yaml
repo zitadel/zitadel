@@ -1,6 +1,13 @@
 decorators:
   remove-unused-components: on
   info-override:
-    title: ZITADEL API
+    title: Current API from ZITADEL
     version: v2
-    description: This is the ZITADEL API
+    description: This is the recommended API for ZITADEL if you start implementing a new project.
+    contact:
+      name: ZITADEL
+      url: https://zitadel.com
+      email: hi@zitadel.com
+    license:
+      name: Apache 2.0
+      url: https://github.com/zitadel/zitadel/blob/main/LICENSE
