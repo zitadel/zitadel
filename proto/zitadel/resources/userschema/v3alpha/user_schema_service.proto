@@ -17,7 +17,7 @@ import "google/api/visibility.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha;userschema";
 
 service ZITADELUserSchemas {
-  option (google.api.api_visibility).restriction = "v3alpha, preview";
+  option (google.api.api_visibility).restriction = "v3alpha, internal";
 
   // Search user schemas
   //
