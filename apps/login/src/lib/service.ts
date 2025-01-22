@@ -20,20 +20,24 @@ export async function createServiceForHost<T extends ServiceClass>(
   service: T,
   host: string,
 ) {
-  let instanceUrl;
+  let instanceUrl, token;
   try {
     instanceUrl = await getInstanceUrl(host);
+    token = await systemAPIToken();
   } catch (error) {
     console.error(
       `Could not get instance url for ${host}, fallback to ZITADEL_API_URL`,
       error,
     );
     instanceUrl = process.env.ZITADEL_API_URL;
+    token = process.env.ZITADEL_SERVICE_USER_TOKEN;
   }
 
-  const systemToken = await systemAPIToken();
+  if (!instanceUrl || !token) {
+    throw new Error("No instance url or token found");
+  }
 
-  const transport = createServerTransport(systemToken, {
+  const transport = createServerTransport(token, {
     baseUrl: instanceUrl,
   });
 
