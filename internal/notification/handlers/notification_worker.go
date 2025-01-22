@@ -436,6 +436,7 @@ func (w *NotificationWorker) searchEvents(ctx context.Context, tx *sql.Tx, retry
 		Builder().
 		ExcludeAggregateIDs().
 		EventTypes(notification.RetryRequestedType, notification.CanceledType, notification.SentType).
+		AggregateTypes(notification.AggregateType).
 		Builder()
 	//nolint:staticcheck
 	return w.es.Filter(ctx, searchQuery)
@@ -454,6 +455,7 @@ func (w *NotificationWorker) searchRetryEvents(ctx context.Context, tx *sql.Tx) 
 		Builder().
 		ExcludeAggregateIDs().
 		EventTypes(notification.CanceledType, notification.SentType).
+		AggregateTypes(notification.AggregateType).
 		Builder()
 	//nolint:staticcheck
 	events, err := w.es.Filter(ctx, searchQuery)
