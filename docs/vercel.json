@@ -20,7 +20,7 @@
     ],
     "headers": [
             {
-            "source": "/(.*)",
+            "source": "/docs/:match*",
             "headers": [
                 {
                 "key": "x-vercel-enable-rewrite-caching",
