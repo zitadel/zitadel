@@ -141,7 +141,7 @@ export class JWTProfileRequest implements TokenRequest {
     });
     return {
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-      scope: 'openid',
+      scope: 'openid urn:zitadel:iam:org:project:id:zitadel:aud',
       assertion: `${assertion}`,
     };
   }
@@ -197,11 +197,11 @@ export async function finalizeAuthRequest(id: string, session: any, tokens: any)
       Authorization: `Bearer ${tokens.accessToken}`,
       'Content-Type': 'application/json',
       // 'Accept': 'application/json',
-      'x-zitadel-login-client': Client().client_id
+      'x-zitadel-login-client': tokens.info.client_id,
     }
   });
   check(res, {
-    'authorize status ok': (r) => r.status == 200 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
+    'finalize aurh request status ok': (r) => r.status == 200 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
   });
   finalizeAuthRequestTrend.add(res.timings.duration);
 

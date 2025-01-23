@@ -14,7 +14,7 @@ export function createSession(user: User, org: Org, accessToken: string): Promis
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest(
       'POST',
-      url('/v2beta/sessions'),
+      url('/v2/sessions'),
       JSON.stringify({
         checks: {
           user: {

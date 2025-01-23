@@ -21,13 +21,13 @@ export function loginByUsernamePassword(user: User) {
 }
 
 const initLoginTrend = new Trend('login_ui_init_login_duration', true);
-export function initLogin(setLoginClientHeader?: boolean): Response {
+export function initLogin(clientId?: string): Response {
   let params = {};
   let expectedStatus = 200;
-  if (setLoginClientHeader) {
+  if (clientId) {
     params = {
       headers: {
-        'x-zitadel-login-client': Client().client_id
+        'x-zitadel-login-client': clientId
       },
       redirects: 0
     };
