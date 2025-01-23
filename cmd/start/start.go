@@ -398,7 +398,7 @@ func startAPIs(
 		return nil, err
 	}
 
-	accessStdoutEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Access.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.AccessLog]())
+	accessStdoutEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Access.Stdout.Enabled}, emit_stdout.NewStdoutEmitter[*record.AccessLog]())
 	if err != nil {
 		return nil, err
 	}

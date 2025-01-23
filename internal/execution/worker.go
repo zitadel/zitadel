@@ -78,7 +78,7 @@ func (w *Worker) log(workerID int) *logging.Entry {
 }
 
 func (w *Worker) queryInstances(ctx context.Context) ([]string, error) {
-	return w.queries.ActiveInstances(), nil
+	return w.queries.ActiveInstancesWithFeatureFlag(ctx), nil
 }
 
 func (w *Worker) triggerInstances(ctx context.Context, instances []string, workerID int) {
@@ -120,33 +120,32 @@ func (w *Worker) trigger(ctx context.Context, workerID int) (err error) {
 	w.log(workerID).
 		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
 		WithField("events", len(eventExecutions.EventExecutions)).
-		Info("handling execution events")
+		Info("handling event executions")
 
 	for _, event := range eventExecutions.EventExecutions {
-		w.createSavepoint(txCtx, tx, event, workerID)
-		w.removeEventExecution(ctx, tx, event, workerID)
-		if err := w.reduceEventExecution(ctx, event); err != nil {
-			event.WithLogFields(w.log(workerID).OnError(err)).Error("could not handle execution event")
-			// if we have an error, we rollback to the savepoint and continue with the next event
-			// we use the txCtx to make sure we can rollback the transaction in case the ctx is canceled
-			w.rollbackToSavepoint(txCtx, tx, event, workerID)
+		if err := w.removeEventExecution(ctx, tx, event, workerID); err != nil {
+			event.WithLogFields(w.log(workerID).OnError(err)).Error("could not handle removal of execution event entry")
+			return err
 		}
+
+		if err := w.reduceEventExecution(ctx, event); err != nil {
+			event.WithLogFields(w.log(workerID).OnError(err)).Error("could not handle event execution")
+			return err
+		}
+
 		// if the context is canceled, we stop the processing
-		if ctx.Err() != nil {
+		if err := ctx.Err(); err != nil {
+			event.WithLogFields(w.log(workerID).OnError(err)).Error("timeout handle event executions")
 			return nil
 		}
 	}
+
+	w.log(workerID).
+		WithField("instanceID", authz.GetInstance(ctx).InstanceID()).
+		WithField("events", len(eventExecutions.EventExecutions)).
+		Info("end handling event executions")
+
 	return nil
-}
-
-func (w *Worker) createSavepoint(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) {
-	_, err := tx.ExecContext(ctx, "SAVEPOINT execution")
-	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not create savepoint for event")
-}
-
-func (w *Worker) rollbackToSavepoint(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) {
-	_, err := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT execution")
-	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not rollback to savepoint for event")
 }
 
 func (w *Worker) reduceEventExecution(ctx context.Context, event *EventExecution) (err error) {
@@ -166,25 +165,33 @@ func (w *Worker) reduceEventExecution(ctx context.Context, event *EventExecution
 	return err
 }
 
-func (w *Worker) removeEventExecution(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) {
-	_, err := tx.ExecContext(ctx, removeEventExecution)
+func (w *Worker) removeEventExecution(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) error {
+	_, err := tx.ExecContext(ctx, removeEventExecution,
+		event.Aggregate.InstanceID,
+		event.Aggregate.ResourceOwner,
+		event.Aggregate.Type,
+		event.Aggregate.Version,
+		event.Aggregate.ID,
+		event.Sequence,
+		event.EventType,
+	)
 	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not remove event execution for event")
+	return err
 }
 
 var _ ContextInfo = &ContextInfoEvent{}
 
 type ContextInfoEvent struct {
-	AggregateID   string  `json:"aggregateID,omitempty"`
-	AggregateType string  `json:"aggregateType,omitempty"`
-	ResourceOwner string  `json:"resourceOwner,omitempty"`
-	InstanceID    string  `json:"instanceID,omitempty"`
-	Version       string  `json:"version,omitempty"`
-	Sequence      uint64  `json:"sequence,omitempty"`
-	EventType     string  `json:"event_type,omitempty"`
-	CreatedAt     string  `json:"created_at,omitempty"`
-	Position      float64 `json:"position,omitempty"`
-	UserID        string  `json:"userID,omitempty"`
-	EventPayload  []byte  `json:"event_payload,omitempty"`
+	AggregateID   string `json:"aggregateID,omitempty"`
+	AggregateType string `json:"aggregateType,omitempty"`
+	ResourceOwner string `json:"resourceOwner,omitempty"`
+	InstanceID    string `json:"instanceID,omitempty"`
+	Version       string `json:"version,omitempty"`
+	Sequence      uint64 `json:"sequence,omitempty"`
+	EventType     string `json:"event_type,omitempty"`
+	CreatedAt     string `json:"created_at,omitempty"`
+	UserID        string `json:"userID,omitempty"`
+	EventPayload  []byte `json:"event_payload,omitempty"`
 }
 
 func (c *ContextInfoEvent) GetHTTPRequestBody() []byte {

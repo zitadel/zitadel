@@ -16,6 +16,17 @@ var (
 	worker      *Worker
 )
 
+func Create(
+	ctx context.Context,
+	executionsCustomConfig projection.CustomConfig,
+	queries *query.Queries,
+	es *eventstore.Eventstore,
+) {
+	projections = []*handler.Handler{
+		NewExecutionsHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), es, queries),
+	}
+}
+
 func Register(
 	ctx context.Context,
 	executionsCustomConfig projection.CustomConfig,
@@ -24,8 +35,8 @@ func Register(
 	es *eventstore.Eventstore,
 	client *database.DB,
 ) {
+	Create(ctx, executionsCustomConfig, queries, es)
 	q := NewExecutionsQueries(queries, client)
-	projections = append(projections, NewExecutionsHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), es, queries))
 	worker = NewWorker(workerConfig, client, q)
 }
 
@@ -34,6 +45,15 @@ func Start(ctx context.Context) {
 		projection.Start(ctx)
 	}
 	worker.Start(ctx)
+}
+
+func Init(ctx context.Context) error {
+	for _, p := range projections {
+		if err := p.Init(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func ProjectInstance(ctx context.Context) error {

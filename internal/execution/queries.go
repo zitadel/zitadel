@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"slices"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -20,23 +21,42 @@ type Queries interface {
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
 	GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string) (*query.NotifyUser, error)
 	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
+	GetInstanceFeatures(ctx context.Context, cascade bool) (_ *query.InstanceFeatures, err error)
 
 	ActiveInstances() []string
+	ActiveInstancesWithFeatureFlag(ctx context.Context, featureFlag bool) []string
 }
 
 type ExecutionsQueries struct {
 	Queries
-	client *database.DB
+	queries *query.Queries
+	client  *database.DB
 }
 
 func NewExecutionsQueries(
-	baseQueries Queries,
+	baseQueries *query.Queries,
 	client *database.DB,
 ) *ExecutionsQueries {
 	return &ExecutionsQueries{
-		Queries: baseQueries,
+		queries: baseQueries,
 		client:  client,
 	}
+}
+
+func (q *ExecutionsQueries) ActiveInstancesWithFeatureFlag(ctx context.Context) []string {
+	instanceIDs := q.queries.ActiveInstances()
+	slices.DeleteFunc(instanceIDs, func(s string) bool {
+		features, err := q.queries.GetInstanceFeatures(ctx, true)
+		if err != nil {
+			return true
+		}
+		if features == nil || !features.Actions.Value {
+			return true
+		}
+		return false
+	})
+
+	return instanceIDs
 }
 
 type EventExecutions struct {
@@ -64,17 +84,16 @@ func scanEventExecution(rows *sql.Rows) (*EventExecutions, error) {
 	var count uint64
 	for rows.Next() {
 		e := new(EventExecution)
-		agg := new(eventstore.Aggregate)
+		e.Aggregate = new(eventstore.Aggregate)
 		err := rows.Scan(
-			&agg.InstanceID,
-			&agg.ResourceOwner,
-			&agg.Type,
-			&agg.Version,
-			&agg.ID,
+			&e.Aggregate.InstanceID,
+			&e.Aggregate.ResourceOwner,
+			&e.Aggregate.Type,
+			&e.Aggregate.Version,
+			&e.Aggregate.ID,
 			&e.Sequence,
 			&e.EventType,
 			&e.CreatedAt,
-			&e.Position,
 			&e.UserID,
 			&e.EventData,
 			&e.TargetsData,

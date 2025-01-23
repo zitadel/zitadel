@@ -177,6 +177,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
+	execution.Create(ctx, config.Projections.Customizations["executions"], nil, eventstoreClient)
 
 	repeatableSteps := []migration.RepeatableMigration{
 		&externalConfigChange{
@@ -473,13 +474,11 @@ func initProjections(
 		err := migration.Migrate(ctx, eventstoreClient, p)
 		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
 	}
-	execution.Register(
+	execution.Create(
 		ctx,
 		config.Projections.Customizations["executions"],
-		config.Executions,
 		queries,
 		eventstoreClient,
-		queryDBClient,
 	)
 	for _, p := range execution.Projections() {
 		err := migration.Migrate(ctx, eventstoreClient, p)

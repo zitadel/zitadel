@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"slices"
 	"strings"
 	"time"
 
@@ -26,8 +27,7 @@ const (
 	ExecutionAggregateID      = "aggregate_id"
 	ExecutionSequence         = "sequence"
 	ExecutionEventType        = "event_type"
-	ExecutionCreatedAt        = "create_at"
-	ExecutionPosition         = "position"
+	ExecutionCreatedAt        = "created_at"
 	ExecutionEventUserIDCol   = "user_id"
 	ExecutionEventDataCol     = "event_data"
 	ExecutionTargetsDataCol   = "targets_data"
@@ -35,14 +35,14 @@ const (
 
 type executionsHandler struct {
 	es    *eventstore.Eventstore
-	query Queries
+	query *query.Queries
 }
 
 func NewExecutionsHandler(
 	ctx context.Context,
 	config handler.Config,
 	es *eventstore.Eventstore,
-	query Queries,
+	query *query.Queries,
 ) *handler.Handler {
 	return handler.NewHandler(ctx, &config, &executionsHandler{es: es, query: query})
 }
@@ -60,14 +60,13 @@ func (*executionsHandler) Init() *old_handler.Check {
 			handler.NewColumn(ExecutionAggregateVersion, handler.ColumnTypeText),
 			handler.NewColumn(ExecutionAggregateID, handler.ColumnTypeText),
 			handler.NewColumn(ExecutionSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(ExecutionCreatedAt, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionPosition, handler.ColumnTypeText),
+			handler.NewColumn(ExecutionCreatedAt, handler.ColumnTypeTimestamp),
 			handler.NewColumn(ExecutionEventType, handler.ColumnTypeText),
 			handler.NewColumn(ExecutionEventUserIDCol, handler.ColumnTypeText),
 			handler.NewColumn(ExecutionEventDataCol, handler.ColumnTypeJSONB),
 			handler.NewColumn(ExecutionTargetsDataCol, handler.ColumnTypeJSONB),
 		},
-			handler.NewPrimaryKey(ExecutionInstanceID, ExecutionResourceOwner, ExecutionAggregateID, ExecutionPosition),
+			handler.NewPrimaryKey(ExecutionInstanceID, ExecutionResourceOwner, ExecutionAggregateID, ExecutionSequence),
 		),
 	)
 }
@@ -78,50 +77,75 @@ func (u *executionsHandler) Reducers() []handler.AggregateReducer {
 	aggList := make(map[eventstore.AggregateType][]eventstore.EventType)
 	for _, eventType := range eventTypes {
 		aggType := eventstore.AggregateTypeFromEventType(eventstore.EventType(eventType))
-		agg, ok := aggList[aggType]
+		aggEventTypes, ok := aggList[aggType]
 		if !ok {
 			aggList[aggType] = []eventstore.EventType{eventstore.EventType(eventType)}
 		} else {
 			found := false
-			for _, aggEventType := range agg {
+			for _, aggEventType := range aggEventTypes {
 				if aggEventType == eventstore.EventType(eventType) {
 					found = true
 				}
 			}
 			if !found {
-				agg = append(agg, eventstore.EventType(eventType))
+				aggList[aggType] = append(aggList[aggType], eventstore.EventType(eventType))
 			}
 		}
 	}
 
 	aggReducers := make([]handler.AggregateReducer, len(aggList))
-	for aggType, agg := range aggList {
-		eventReducers := make([]handler.EventReducer, len(agg))
-		for _, eventType := range agg {
-			eventReducers = append(eventReducers,
-				handler.EventReducer{
-					Event:  eventType,
-					Reduce: u.reduce,
-				},
-			)
+	i := 0
+	for aggType, aggEventTypes := range aggList {
+		eventReducers := make([]handler.EventReducer, len(aggEventTypes))
+		for j, eventType := range aggEventTypes {
+			eventReducers[j] = handler.EventReducer{
+				Event:  eventType,
+				Reduce: u.reduce,
+			}
 		}
-		aggReducers = append(aggReducers,
-			handler.AggregateReducer{
-				Aggregate:     aggType,
-				EventReducers: eventReducers,
-			},
-		)
+		aggReducers[i] = handler.AggregateReducer{
+			Aggregate:     aggType,
+			EventReducers: eventReducers,
+		}
+		i++
 	}
 	return aggReducers
 }
 
-func groupFromEventType(s string) string {
-	parts := strings.Split(s, "/")
-	return parts[1]
+func groupsFromEventType(s string) []string {
+	parts := strings.Split(s, ".")
+	groups := make([]string, len(parts))
+	groupBase := ""
+	for i, part := range parts {
+		if groupBase == "" {
+			groupBase = part
+		} else {
+			groupBase = groupBase + "." + part
+		}
+
+		if groupBase == s {
+			groups[i] = groupBase
+		} else {
+			groups[i] = groupBase + ".*"
+		}
+	}
+	// sort to end up with the most specific group first
+	slices.SortFunc(parts, func(a, b string) int {
+		return strings.Compare(a, b) * -1
+	})
+	return groups
 }
 
 func idsForEventType(eventType string) []string {
-	return []string{exec_repo.ID(domain.ExecutionTypeEvent, eventType), exec_repo.ID(domain.ExecutionTypeEvent, groupFromEventType(eventType)), exec_repo.IDAll(domain.ExecutionTypeEvent)}
+	ids := make([]string, 0)
+	for _, group := range groupsFromEventType(eventType) {
+		ids = append(ids,
+			exec_repo.ID(domain.ExecutionTypeEvent, group),
+		)
+	}
+	return append(ids,
+		exec_repo.IDAll(domain.ExecutionTypeEvent),
+	)
 }
 
 func (u *executionsHandler) reduce(e eventstore.Event) (*handler.Statement, error) {
@@ -130,6 +154,11 @@ func (u *executionsHandler) reduce(e eventstore.Event) (*handler.Statement, erro
 	targets, err := u.query.TargetsByExecutionID(ctx, idsForEventType(string(e.Type())))
 	if err != nil {
 		return nil, err
+	}
+
+	// no execution from worker necessary
+	if len(targets) == 0 {
+		return handler.NewNoOpStatement(e), nil
 	}
 
 	ee, err := NewEventExecution(e, targets)
@@ -148,7 +177,6 @@ type EventExecution struct {
 	Sequence    uint64
 	EventType   eventstore.EventType
 	CreatedAt   time.Time
-	Position    float64
 	UserID      string
 	EventData   []byte
 	TargetsData []byte
@@ -164,7 +192,6 @@ func NewEventExecution(e eventstore.Event, targets []*query.ExecutionTarget) (*E
 		Sequence:    e.Sequence(),
 		EventType:   e.Type(),
 		CreatedAt:   e.CreatedAt(),
-		Position:    e.Position(),
 		UserID:      e.Creator(),
 		EventData:   e.DataAsBytes(),
 		TargetsData: targetsData,
@@ -181,7 +208,6 @@ func (e *EventExecution) Columns() []handler.Column {
 		handler.NewCol(ExecutionSequence, e.Sequence),
 		handler.NewCol(ExecutionEventType, e.EventType),
 		handler.NewCol(ExecutionCreatedAt, e.CreatedAt),
-		handler.NewCol(ExecutionPosition, e.Position),
 		handler.NewCol(ExecutionEventUserIDCol, e.UserID),
 		handler.NewCol(ExecutionEventDataCol, e.EventData),
 		handler.NewCol(ExecutionTargetsDataCol, e.TargetsData),
@@ -190,7 +216,7 @@ func (e *EventExecution) Columns() []handler.Column {
 
 func (e *EventExecution) Targets() ([]Target, error) {
 	var execTargets []*query.ExecutionTarget
-	if err := json.Unmarshal(e.TargetsData, execTargets); err != nil {
+	if err := json.Unmarshal(e.TargetsData, &execTargets); err != nil {
 		return nil, err
 	}
 	targets := make([]Target, len(execTargets))
@@ -210,7 +236,6 @@ func (e *EventExecution) ContextInfo() *ContextInfoEvent {
 		Sequence:      e.Sequence,
 		EventType:     string(e.EventType),
 		CreatedAt:     e.CreatedAt.Format(time.RFC3339Nano),
-		Position:      e.Position,
 		UserID:        e.UserID,
 		EventPayload:  e.EventData,
 	}

@@ -227,13 +227,11 @@ func projections(
 		config.OIDC.DefaultBackChannelLogoutLifetime,
 		client,
 	)
-	execution.Register(
+	execution.Create(
 		ctx,
 		config.Projections.Customizations["executions"],
-		config.Executions,
 		queries,
 		es,
-		client,
 	)
 
 	config.Auth.Spooler.Client = client
