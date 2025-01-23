@@ -168,7 +168,7 @@ export async function token(request: TokenRequest): Promise<Tokens> {
     });
 }
 
-const authRequestBiIDTrend = new Trend('oidc_auth_requst_by_id_duration', true);
+const authRequestBiIDTrend = new Trend('oidc_auth_request_by_id_duration', true);
 export async function authRequestByID(id: string, tokens: any): Promise<Response> {
   const response = http.get(url(`/v2/oidc/auth_requests/${id}`), {
     headers: {
