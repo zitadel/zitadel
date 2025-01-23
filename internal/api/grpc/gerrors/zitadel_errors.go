@@ -25,14 +25,7 @@ func ZITADELToGRPCError(err error) error {
 	msg := key
 	msg += " (" + id + ")"
 
-	var errorInfo protoadapt.MessageV1
-
-	wpe := errorAsWrongPasswordError(zitadelErr.Parent)
-	if wpe == nil {
-		errorInfo = &message.ErrorDetail{Id: id, Message: key}
-	} else {
-		errorInfo = &message.CredentialsCheckError{Id: id, Message: key, FailedAttempts: wpe.FailedAttempts}
-	}
+	errorInfo := getErrorInfo(id, key, zitadelErr.Parent)
 
 	s, err := status.New(code, msg).WithDetails(errorInfo)
 	if err != nil {
@@ -83,10 +76,15 @@ func ExtractZITADELError(err error) (zitadelErr *zerrors.ZitadelError, c codes.C
 	}
 }
 
-func errorAsWrongPasswordError(err error) *commandErrors.WrongPasswordError {
+func getErrorInfo(id, key string, err error) protoadapt.MessageV1 {
+	var errorInfo protoadapt.MessageV1
+
 	var wpe *commandErrors.WrongPasswordError
 	if errors.As(err, &wpe) {
-		return wpe
+		errorInfo = &message.CredentialsCheckError{Id: id, Message: key, FailedAttempts: wpe.FailedAttempts}
+	} else {
+		errorInfo = &message.ErrorDetail{Id: id, Message: key}
 	}
-	return nil
+
+	return errorInfo
 }

@@ -43,6 +43,19 @@ func TestCaosToGRPCError(t *testing.T) {
 	}
 }
 
+func Test_getErrorInfo(t *testing.T) {
+	tests := []struct {
+		name string
+		id   string
+		key  string
+		err  error
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+		})
+	}
+}
+
 func Test_Extract(t *testing.T) {
 	type args struct {
 		err error
