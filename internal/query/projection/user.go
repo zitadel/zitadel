@@ -301,17 +301,25 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.MachineSecretRemovedType,
 					Reduce: p.reduceMachineSecretRemoved,
 				},
+				// {
+				// 	Event:  user.UserGroupAddedType,
+				// 	Reduce: p.reduceGroupMemberAdded,
+				// },
+				// {
+				// 	Event:  user.UserGroupRemovedType,
+				// 	Reduce: p.reduceGroupMemberRemoved,
+				// },
 			},
 		},
 		{
 			Aggregate: group.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
-					Event:  group.MemberAddedType,
+					Event:  user.UserGroupAddedType,
 					Reduce: p.reduceGroupMemberAdded,
 				},
 				{
-					Event:  group.MemberRemovedType,
+					Event:  user.UserGroupRemovedType,
 					Reduce: p.reduceGroupMemberRemoved,
 				},
 			},
@@ -1148,38 +1156,68 @@ func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.St
 }
 
 // Group Member Add/Remove Events
-func (p *userProjection) reduceGroupMemberAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.MemberAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-chy6O", "reduce.wrong.event.type %s", group.MemberAddedType)
-	}
 
+func reduceUserGroupAdded(e user.UserGroupAddedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
 	config := reduceGroupMemberConfig{
 		cols: []handler.Column{
-			handler.NewCol(GroupIDsCol, sql.NullString{String: "array_append(group_ids, '" + e.Aggregate().ID + "')", Valid: true}),
+			handler.NewArrayAppendCol(GroupIDsCol, e.GroupID),
+			/* TODO Need to update change date, currently getting: (ERROR: column \"change_date\" is of type timestamp with time zone but expression is of type text (SQLSTATE 42804))"
+			// handler.NewCol(UserChangeDateCol, e.CreationDate()),
+			// handler.NewCol(UserSequenceCol, e.Sequence()),
+			*/
 		},
 		conds: []handler.Condition{
-			handler.NewCond(UserIDCol, e.UserID),
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+		}}
+	for _, opt := range opts {
+		config = opt(config)
+	}
+	return handler.NewUpdateStatement(&e, config.cols, config.conds), nil
+}
+
+func reduceUserGroupRemoved(e user.UserGroupRemovedEvent, opts ...reduceGroupMemberOpt) (*handler.Statement, error) {
+	config := reduceGroupMemberConfig{
+		cols: []handler.Column{
+			handler.NewArrayRemoveCol(GroupIDsCol, e.GroupID),
+			// handler.NewCol(UserChangeDateCol, e.CreatedAt()),
+			// handler.NewCol(UserSequenceCol, e.Sequence()),
 		},
+		conds: []handler.Condition{
+			handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+		}}
+
+	for _, opt := range opts {
+		config = opt(config)
 	}
 
-	return handler.NewUpdateStatement(e, config.cols, config.conds), nil
+	return handler.NewUpdateStatement(&e, config.cols, config.conds), nil
+}
+
+func (p *userProjection) reduceGroupMemberAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserGroupAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "GROUP-vhy1O", "reduce.wrong.event.type %s", user.UserGroupAddedType)
+	}
+	// groupID := e.Aggregate().ID
+
+	return reduceUserGroupAdded(
+		*e,
+		// withGroupMemberCond(GroupIDsCol, groupID),
+	)
 }
 
 func (p *userProjection) reduceGroupMemberRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.MemberRemovedEvent)
+	e, ok := event.(*user.UserGroupRemovedEvent)
+	// e, ok := event.(*group.MemberAddedEvent)
 	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fKAOi", "reduce.wrong.event.type %s", group.MemberRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "GROUP-aqz1O", "reduce.wrong.event.type %s", user.UserGroupRemovedType)
 	}
+	groupID := e.Aggregate().ID
 
-	config := reduceGroupMemberConfig{
-		cols: []handler.Column{
-			handler.NewCol(GroupIDsCol, sql.NullString{String: "array_remove(group_ids, '" + e.Aggregate().ID + "')", Valid: true}),
-		},
-		conds: []handler.Condition{
-			handler.NewCond(UserIDCol, e.UserID),
-		},
-	}
-
-	return handler.NewUpdateStatement(e, config.cols, config.conds), nil
+	return reduceUserGroupRemoved(
+		*e,
+		withGroupMemberCond(GroupIDsCol, groupID),
+	)
 }

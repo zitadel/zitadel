@@ -14,4 +14,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, MemberChangedType, MemberChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MemberRemovedType, MemberRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MemberCascadeRemovedType, MemberCascadeRemovedEventMapper)
+	// eventstore.RegisterFilterEventMapper(AggregateType, UserGroupMemberAddedType, UserGroupEventMapper)
 }

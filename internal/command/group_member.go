@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/group"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -15,8 +16,17 @@ func (c *Commands) AddGroupMember(ctx context.Context, member *domain.Member, re
 	defer func() { span.EndWithError(err) }()
 
 	addedMember := NewGroupMemberWriteModel(member.AggregateID, member.UserID, resourceOwner)
+	addedGroupMember := NewUserGroupMemberWriteModel(member.AggregateID, member.UserID, resourceOwner)
+
 	groupAgg := GroupAggregateFromWriteModel(&addedMember.WriteModel)
+	userGroupAgg := GroupAggregateFromWriteModel(&addedGroupMember.WriteModel)
+
 	event, err := c.addGroupMember(ctx, groupAgg, addedMember, member)
+	if err != nil {
+		return nil, err
+	}
+
+	userEvent, err := c.addUserGroupMember(ctx, userGroupAgg, addedGroupMember, member.AggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -25,18 +35,21 @@ func (c *Commands) AddGroupMember(ctx context.Context, member *domain.Member, re
 	if err != nil {
 		return nil, err
 	}
-	/*
-		// Add group_id entry to users table
-		err = c.addGroupIDToUser(ctx, member.UserID, member.AggregateID)
-		if err != nil {
-			return nil, err
-		}
-	*/
+
+	userPushedEvents, err := c.eventstore.Push(ctx, userEvent)
+	if err != nil {
+		return nil, err
+	}
+
 	err = AppendAndReduce(addedMember, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
 
+	err = AppendAndReduce(addedGroupMember, userPushedEvents...)
+	if err != nil {
+		return nil, err
+	}
 	return groupMemberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
@@ -63,6 +76,29 @@ func (c *Commands) addGroupMember(ctx context.Context, groupAgg *eventstore.Aggr
 	return group.NewGroupMemberAddedEvent(ctx, groupAgg, member.UserID), nil
 }
 
+func (c *Commands) addUserGroupMember(ctx context.Context, userGroupAgg *eventstore.Aggregate, addedGroup *UserGroupMemberWriteModel, group string) (_ eventstore.Command, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if group == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-Y1n3m", "Errors.Group.Invalid")
+	}
+
+	err = c.checkGroupExists(ctx, addedGroup.GroupID, addedGroup.ResourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	err = c.eventstore.FilterToQueryReducer(ctx, addedGroup)
+	if err != nil {
+		return nil, err
+	}
+	if addedGroup.State == domain.GroupStateActive {
+		return nil, zerrors.ThrowAlreadyExists(nil, "GROUP-QvYJ2", "Errors.Group.Member.AlreadyExists")
+	}
+
+	return user.NewUserGroupAddedEvent(ctx, userGroupAgg, group), nil
+}
+
 // ChangeGroupMember updates an existing member
 func (c *Commands) ChangeGroupMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
 	if !member.IsValid() {
@@ -79,13 +115,7 @@ func (c *Commands) ChangeGroupMember(ctx context.Context, member *domain.Member,
 	if err != nil {
 		return nil, err
 	}
-	/*
-		// Add group_id entry to users table
-		err = c.addGroupIDToUser(ctx, member.UserID, member.AggregateID)
-		if err != nil {
-			return nil, err
-		}
-	*/
+
 	err = AppendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err

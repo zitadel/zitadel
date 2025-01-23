@@ -38,7 +38,6 @@ func GroupGrantsToIDs(groupGrants *query.GroupGrants) []string {
 	return converted
 }
 
-// Need to fix -->
 func AddGroupMemberRequestToDomain(ctx context.Context, req *mgmt_pb.AddGroupMemberRequest) *domain.Member {
 	return domain.NewMember(req.GroupId, req.UserId)
 }

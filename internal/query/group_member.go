@@ -55,10 +55,6 @@ var (
 		name:  projection.GroupMemberGroupIDCol,
 		table: groupMemberTable,
 	}
-	GroupMemberRoles = Column{
-		name:  projection.MemberRolesCol,
-		table: groupMemberTable,
-	}
 	GroupMemberCreationDate = Column{
 		name:  projection.MemberCreationDate,
 		table: groupMemberTable,
@@ -128,7 +124,7 @@ func prepareGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			GroupMemberResourceOwner.identifier(),
 			GroupMemberUserID.identifier(),
 			GroupMemberGroupID.identifier(),
-			GroupMemberRoles.identifier(),
+			// GroupMemberRoles.identifier(),
 
 			LoginNameNameCol.identifier(),
 			HumanEmailCol.identifier(),
@@ -172,7 +168,7 @@ func prepareGroupMembersQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&groupMember.ResourceOwner,
 					&groupMember.UserID,
 					&groupMember.GroupID,
-					&groupMember.Roles,
+					// &groupMember.Roles,
 					&preferredLoginName,
 					&email,
 					&firstName,

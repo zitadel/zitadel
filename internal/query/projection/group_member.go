@@ -2,7 +2,6 @@ package projection
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -12,7 +11,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -63,11 +61,43 @@ func withGroupMemberCond(cond string, value interface{}) reduceGroupMemberOpt {
 	}
 }
 
+type groupMemberProjection struct {
+	es handler.EventStore
+}
+
+func newGroupMemberProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, &groupMemberProjection{es: config.Eventstore})
+}
+
+func (*groupMemberProjection) Name() string {
+	return GroupMemberProjectionTable
+}
+
+func (*groupMemberProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable(
+			groupMemberColumns, // handler.NewColumn(GroupMemberGroupIDCol, handler.ColumnTypeText),
+			handler.NewPrimaryKey(GroupMemberInstanceID, GroupMemberGroupIDCol, GroupMemberUserIDCol),
+			handler.WithIndex(handler.NewIndex("user_id", []string{GroupMemberUserIDCol})),
+			handler.WithIndex(
+				handler.NewIndex("gm_instance", []string{GroupMemberInstanceID},
+					handler.WithInclude(
+						GroupMemberCreationDate,
+						GroupMemberChangeDate,
+						GroupMemberSequence,
+						GroupMemberResourceOwner,
+					),
+				),
+			),
+		),
+	)
+}
+
 func reduceGroupMemberAdded(e group.MemberAddedEvent, userResourceOwner string, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		cols: []handler.Column{
 			handler.NewCol(GroupMemberUserIDCol, e.UserID),
-			handler.NewCol(GroupMemberGroupIDCol, e.UserID),
+			// handler.NewCol(GroupMemberGroupIDCol, e.GroupID),
 			handler.NewCol(GroupMemberUserResourceOwner, userResourceOwner),
 			handler.NewCol(GroupMemberCreationDate, e.CreatedAt()),
 			handler.NewCol(GroupMemberChangeDate, e.CreatedAt()),
@@ -175,40 +205,6 @@ func setGroupMemberContext(aggregate *eventstore.Aggregate) context.Context {
 	return authz.WithInstanceID(context.Background(), aggregate.InstanceID)
 }
 
-type groupMemberProjection struct {
-	es handler.EventStore
-}
-
-func newGroupMemberProjection(ctx context.Context, config handler.Config) *handler.Handler {
-	return handler.NewHandler(ctx, &config, &groupMemberProjection{es: config.Eventstore})
-}
-
-func (*groupMemberProjection) Name() string {
-	return GroupMemberProjectionTable
-}
-
-func (*groupMemberProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
-		handler.NewTable(
-			append(groupMemberColumns,
-				handler.NewColumn(GroupMemberGroupIDCol, handler.ColumnTypeText),
-			),
-			handler.NewPrimaryKey(GroupMemberInstanceID, GroupMemberGroupIDCol, GroupMemberUserIDCol),
-			handler.WithIndex(handler.NewIndex("user_id", []string{GroupMemberUserIDCol})),
-			handler.WithIndex(
-				handler.NewIndex("gm_instance", []string{GroupMemberInstanceID},
-					handler.WithInclude(
-						GroupMemberCreationDate,
-						GroupMemberChangeDate,
-						GroupMemberSequence,
-						GroupMemberResourceOwner,
-					),
-				),
-			),
-		),
-	)
-}
-
 func (g *groupMemberProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
@@ -236,15 +232,16 @@ func (g *groupMemberProjection) Reducers() []handler.AggregateReducer {
 				},
 			},
 		},
-		{
-			Aggregate: user.AggregateType,
-			EventReducers: []handler.EventReducer{
-				{
-					Event:  user.UserRemovedType,
-					Reduce: g.reduceUserRemoved,
-				},
-			},
-		},
+		// TODO: Need to implement this.
+		// {
+		// 	Aggregate: user.AggregateType,
+		// 	EventReducers: []handler.EventReducer{
+		// 		{
+		// 			Event:  user.UserRemovedType,
+		// 			Reduce: p.reduceUserRemoved,
+		// 		},
+		// 	},
+		// },
 		{
 			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
@@ -337,38 +334,3 @@ func (g *groupMemberProjection) reduceGroupRemoved(event eventstore.Event) (*han
 	return reduceGroupMemberRemoved(e, withGroupMemberCond(GroupMemberGroupIDCol, e.Aggregate().ID))
 }
 
-func (g *groupMemberProjection) reduceUserAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.MemberAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-chy6O", "reduce.wrong.event.type %s", group.MemberAddedType)
-	}
-
-	config := reduceGroupMemberConfig{
-		cols: []handler.Column{
-			handler.NewCol(GroupIDsCol, sql.NullString{String: "array_append(group_ids, '" + e.Aggregate().ID + "')", Valid: true}),
-		},
-		conds: []handler.Condition{
-			handler.NewCond(UserIDCol, e.UserID),
-		},
-	}
-
-	return handler.NewUpdateStatement(e, config.cols, config.conds), nil
-}
-
-func (g *groupMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*group.MemberRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fKAOi", "reduce.wrong.event.type %s", group.MemberRemovedType)
-	}
-
-	config := reduceGroupMemberConfig{
-		cols: []handler.Column{
-			handler.NewCol(GroupIDsCol, sql.NullString{String: "array_remove(group_ids, '" + e.Aggregate().ID + "')", Valid: true}),
-		},
-		conds: []handler.Condition{
-			handler.NewCond(UserIDCol, e.UserID),
-		},
-	}
-
-	return handler.NewUpdateStatement(e, config.cols, config.conds), nil
-}

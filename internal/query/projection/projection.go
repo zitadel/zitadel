@@ -284,6 +284,7 @@ func newProjectionsList() {
 		UserMetadataProjection,
 		UserAuthMethodProjection,
 		GroupGrantProjection,
+		GroupMemberProjection,
 		InstanceProjection,
 		SecretGeneratorProjection,
 		SMTPConfigProjection,

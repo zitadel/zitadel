@@ -4349,35 +4349,6 @@ service ManagementService {
             };
         };
     }
-    /* Not needed as we don't have any roles attached to the group members
-    rpc UpdateGroupMember(UpdateProjectMemberRequest) returns (UpdateGroupMemberResponse) {
-        option (google.api.http) = {
-            put: "/projects/{project_id}/members/{user_id}"
-            body: "*"
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "project.member.write"
-            check_field_name: "ProjectId"
-        };
-
-        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Projects";
-            tags: "Members";
-            tags: "ZITADEL Administrators";
-            summary: "Update Project Member";
-            description: "Members are users with permission to administrate ZITADEL on different levels. This request changes the roles of an existing member. The whole roles list will be updated. Make sure to include roles that you don't want to change (remove)."
-            parameters: {
-                headers: {
-                    name: "x-zitadel-orgid";
-                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
-                    type: STRING,
-                    required: false;
-                };
-            };
-        };
-    }
-    */
 
     rpc RemoveGroupMember(RemoveGroupMemberRequest) returns (RemoveGroupMemberResponse) {
         option (google.api.http) = {

@@ -8,14 +8,23 @@ import (
 )
 
 var (
-	MemberAddedType          = groupEventTypePrefix + member.AddedEventType
+	MemberAddedType = groupEventTypePrefix + member.AddedEventType
+	// UserGroupMemberAddedType = eventstore.EventType("user.group.") + member.AddedEventType
 	MemberChangedType        = groupEventTypePrefix + member.ChangedEventType
 	MemberRemovedType        = groupEventTypePrefix + member.RemovedEventType
 	MemberCascadeRemovedType = groupEventTypePrefix + member.CascadeRemovedEventType
 )
 
+const (
+	fieldPrefix = "group"
+)
+
 type MemberAddedEvent struct {
 	member.MemberAddedEvent
+}
+
+func (e *MemberAddedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
 }
 
 func NewGroupMemberAddedEvent(
@@ -46,6 +55,10 @@ func MemberAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 type MemberChangedEvent struct {
 	member.MemberChangedEvent
+}
+
+func (e *MemberChangedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
 }
 
 func NewGroupMemberChangedEvent(
@@ -79,6 +92,10 @@ type MemberRemovedEvent struct {
 	member.MemberRemovedEvent
 }
 
+func (e *MemberRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
+}
+
 func NewGroupMemberRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -95,6 +112,10 @@ func NewGroupMemberRemovedEvent(
 			userID,
 		),
 	}
+}
+
+func (e *MemberCascadeRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return e.FieldOperations(fieldPrefix)
 }
 
 func MemberRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
