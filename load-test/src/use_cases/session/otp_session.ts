@@ -1,10 +1,9 @@
 import { loginByUsernamePassword } from '../../login_ui';
 import { createOrg, removeOrg } from '../../org';
-import { User, createHuman } from '../../user';
+import { createHuman, setEmailOTPOnHuman, User } from '../../user';
 import { Trend } from 'k6/metrics';
 import { Config, MaxVUs } from '../../config';
-import { createSession } from '../../session';
-import { check } from 'k6';
+import { createSession, setSession } from '../../session';
 
 export async function setup() {
   const tokens = loginByUsernamePassword(Config.admin as User);
@@ -18,26 +17,39 @@ export async function setup() {
   });
 
   const humans = (await Promise.all(humanPromises)).map((user) => {
+    setEmailOTPOnHuman(user, org, tokens.accessToken!);
     return { userId: user.userId, loginName: user.loginNames[0], password: 'Password1!' };
   });
   console.log(`setup: ${humans.length} users created`);
-  return { tokens, users: humans, org };
+
+  return { tokens, org, users: humans };
 }
 
-const addSessionTrend = new Trend('add_session_duration', true);
+// implements the flow described in
+// https://zitadel.com/docs/guides/integrate/login-ui/oidc-standard
+const otpSessionTrend = new Trend('otp_session_duration', true);
 export default async function (data: any) {
   const start = new Date();
-  const session = await createSession(data.org, data.tokens.accessToken, {
+  let session = await createSession(data.org, data.tokens.accessToken, {
     user: {
-      userId: data.users[__VU - 1].userId,
+      loginName: data.users[__VU - 1].loginName,
+    },
+  });
+  const sessionId = (session as any).sessionId;
+
+  session = await setSession(sessionId, session, data.tokens.accessToken, {
+    otpEmail: {
+      return_code: {},
     },
   });
 
-  check(session, {
-    'add session is status ok': (s) => s.id !== '',
+  session = await setSession(sessionId, session, data.tokens.accessToken, null, {
+    otpEmail: {
+      code: session.challenges.otpEmail,
+    },
   });
 
-  addSessionTrend.add(new Date().getTime() - start.getTime());
+  otpSessionTrend.add(new Date().getTime() - start.getTime());
 }
 
 export function teardown(data: any) {

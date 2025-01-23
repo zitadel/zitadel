@@ -38,7 +38,11 @@ export default async function (data: any) {
     'auth request id returned': (s) => s !== '',
   });
 
-  const session = await createSession(data.user, data.org, data.tokens.accessToken);
+  const session = await createSession(data.org, data.tokens.accessToken, {
+    user: {
+      userId: data.user.userId,
+    },
+  });
   await finalizeAuthRequest(authRequestId!, session, data.tokens!);
 
   addSessionTrend.add(new Date().getTime() - start.getTime());
