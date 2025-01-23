@@ -183,6 +183,35 @@ func (h *UsersHandler) Get(ctx context.Context, id string) (*ScimUser, error) {
 	return h.mapToScimUser(ctx, user, metadata), nil
 }
 
+func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListResponse[*ScimUser], error) {
+	q, err := h.buildListQuery(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.Count == 0 {
+		count, err := h.query.CountUsers(ctx, q)
+		if err != nil {
+			return nil, err
+		}
+
+		return newListResponse(count, q.SearchRequest, make([]*ScimUser, 0)), nil
+	}
+
+	users, err := h.query.SearchUsers(ctx, q, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata, err := h.queryMetadataForUsers(ctx, usersToIDs(users.Users))
+	if err != nil {
+		return nil, err
+	}
+
+	scimUsers := h.mapToScimUsers(ctx, users.Users, metadata)
+	return newListResponse(users.SearchResponse.Count, q.SearchRequest, scimUsers), nil
+}
+
 func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
 	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
 	if err != nil {
