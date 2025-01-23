@@ -18,6 +18,7 @@ import localeNl from '@angular/common/locales/nl';
 import localeSv from '@angular/common/locales/sv';
 import localeHu from '@angular/common/locales/hu';
 import localeKo from '@angular/common/locales/ko';
+import localeTr from '@angular/common/locales/tr';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -111,6 +112,8 @@ registerLocaleData(localeHu);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/hu.json'));
 registerLocaleData(localeKo);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ko.json'));
+registerLocaleData(localeTr);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/tr.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
