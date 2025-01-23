@@ -18,7 +18,7 @@ func ZITADELToGRPCError(err error) error {
 	if err == nil {
 		return nil
 	}
-	code, key, id, ok := ExtractZITADELError(err)
+	zitadelErr, code, key, id, ok := ExtractZITADELError(err)
 	if !ok {
 		return status.Convert(err).Err()
 	}
@@ -27,7 +27,7 @@ func ZITADELToGRPCError(err error) error {
 
 	var errorInfo protoadapt.MessageV1
 
-	wpe := errorAsWrongPasswordError(err)
+	wpe := errorAsWrongPasswordError(zitadelErr.Parent)
 	if wpe == nil {
 		errorInfo = &message.ErrorDetail{Id: id, Message: key}
 	} else {
@@ -43,43 +43,43 @@ func ZITADELToGRPCError(err error) error {
 	return s.Err()
 }
 
-func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {
+func ExtractZITADELError(err error) (zitadelErr *zerrors.ZitadelError, c codes.Code, msg, id string, ok bool) {
 	if err == nil {
-		return codes.OK, "", "", false
+		return nil, codes.OK, "", "", false
 	}
 	connErr := new(pgconn.ConnectError)
 	if ok := errors.As(err, &connErr); ok {
-		return codes.Internal, "db connection error", "", true
+		return nil, codes.Internal, "db connection error", "", true
 	}
-	zitadelErr := new(zerrors.ZitadelError)
+	zitadelErr = new(zerrors.ZitadelError)
 	if ok := errors.As(err, &zitadelErr); !ok {
-		return codes.Unknown, err.Error(), "", false
+		return nil, codes.Unknown, err.Error(), "", false
 	}
 	switch {
 	case zerrors.IsErrorAlreadyExists(err):
-		return codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsDeadlineExceeded(err):
-		return codes.DeadlineExceeded, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.DeadlineExceeded, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsInternal(err):
-		return codes.Internal, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.Internal, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsErrorInvalidArgument(err):
-		return codes.InvalidArgument, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.InvalidArgument, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsNotFound(err):
-		return codes.NotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.NotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsPermissionDenied(err):
-		return codes.PermissionDenied, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.PermissionDenied, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsPreconditionFailed(err):
-		return codes.FailedPrecondition, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.FailedPrecondition, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsUnauthenticated(err):
-		return codes.Unauthenticated, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.Unauthenticated, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsUnavailable(err):
-		return codes.Unavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.Unavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsUnimplemented(err):
-		return codes.Unimplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.Unimplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	case zerrors.IsResourceExhausted(err):
-		return codes.ResourceExhausted, zitadelErr.GetMessage(), zitadelErr.GetID(), true
+		return zitadelErr, codes.ResourceExhausted, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	default:
-		return codes.Unknown, err.Error(), "", false
+		return zitadelErr, codes.Unknown, err.Error(), "", false
 	}
 }
 

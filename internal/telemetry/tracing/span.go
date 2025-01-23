@@ -41,6 +41,6 @@ func (s *Span) SetStatusByError(err error) {
 		)
 	}
 
-	code, msg, id, _ := gerrors.ExtractZITADELError(err)
+	_, code, msg, id, _ := gerrors.ExtractZITADELError(err)
 	s.span.SetAttributes(attribute.Int("grpc_code", int(code)), attribute.String("grpc_msg", msg), attribute.String("error_id", id))
 }
