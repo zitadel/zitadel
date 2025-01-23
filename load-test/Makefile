@@ -41,6 +41,10 @@ oidc_session: ensure_key_pair ensure_modules bundle
 otp_session: ensure_key_pair ensure_modules bundle
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/otp_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/otp_session_${DATE}.csv
 
+.PHONY: password_session
+password_session: ensure_key_pair ensure_modules bundle
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/password_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/otp_session_${DATE}.csv
+
 .PHONY: add_session
 add_session: ensure_modules bundle
 	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/add_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/add_session_${DATE}.csv
