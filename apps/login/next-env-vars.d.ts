@@ -23,11 +23,11 @@ declare namespace NodeJS {
     /**
      * Self hosting: The service user id
      */
-    ZITADEL_USER_ID: string;
+    ZITADEL_SERVICE_USER_ID: string;
     /**
      * Self hosting: The service user token
      */
-    ZITADEL_USER_TOKEN: string;
+    ZITADEL_SERVICE_USER_TOKEN: string;
 
     /**
      * Optional: wheter a user must have verified email
