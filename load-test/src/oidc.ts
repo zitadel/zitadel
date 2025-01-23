@@ -175,11 +175,10 @@ export async function authRequestByID(id: string, tokens: any): Promise<Response
       Authorization: `Bearer ${tokens.accessToken}`,
     },
   });
-  authRequestBiIDTrend.add(response.timings.duration);
   check(response, {
     'authorize status ok': (r) => r.status == 200 || fail(`auth request by failed: ${JSON.stringify(r)}`),
   });
-  // initLoginTrend.add(response.timings.duration);
+  authRequestBiIDTrend.add(response.timings.duration);
   return response;
 }
 
