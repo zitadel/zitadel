@@ -432,7 +432,7 @@ func convertLoginPasswapErr(passwordCheckFailedCount uint64, err error) error {
 		wrongPasswordError := &commandErrors.WrongPasswordError{
 			FailedAttempts: int32(passwordCheckFailedCount),
 		}
-		err = fmt.Errorf("%s: %w", err, wrongPasswordError)
+		err = fmt.Errorf("%s: %w", err.Error(), wrongPasswordError)
 		return ErrPasswordInvalid(err)
 	}
 	return zerrors.ThrowInternal(err, "COMMAND-CahN2", "Errors.Internal")

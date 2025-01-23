@@ -80,7 +80,7 @@ func getErrorInfo(id, key string, err error) protoadapt.MessageV1 {
 	var errorInfo protoadapt.MessageV1
 
 	var wpe *commandErrors.WrongPasswordError
-	if errors.As(err, &wpe) {
+	if err != nil && errors.As(err, &wpe) {
 		errorInfo = &message.CredentialsCheckError{Id: id, Message: key, FailedAttempts: wpe.FailedAttempts}
 	} else {
 		errorInfo = &message.ErrorDetail{Id: id, Message: key}
