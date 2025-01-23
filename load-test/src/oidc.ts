@@ -202,7 +202,7 @@ export async function finalizeAuthRequest(id: string, session: any, tokens: any)
     },
   );
   check(res, {
-    'finalize aurh request status ok': (r) => r.status == 200 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
+    'finalize auth request status ok': (r) => r.status == 200 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
   });
   finalizeAuthRequestTrend.add(res.timings.duration);
 
