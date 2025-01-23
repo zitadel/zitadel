@@ -170,36 +170,38 @@ export async function token(request: TokenRequest): Promise<Tokens> {
 
 const authRequestBiIDTrend = new Trend('oidc_auth_requst_by_id_duration', true);
 export async function authRequestByID(id: string, tokens: any): Promise<Response> {
-    const response = http.get(url(`/v2/oidc/auth_requests/${id}`), 
-      { 
-        headers: {
-          Authorization: `Bearer ${tokens.accessToken}`,
-        }
-      }
-    );
-    authRequestBiIDTrend.add(response.timings.duration);
-    check(response, {
-      'authorize status ok': (r) => r.status == 200 || fail(`auth request by failed: ${JSON.stringify(r)}`),
-    });
-    // initLoginTrend.add(response.timings.duration);
-    return response;
+  const response = http.get(url(`/v2/oidc/auth_requests/${id}`), {
+    headers: {
+      Authorization: `Bearer ${tokens.accessToken}`,
+    },
+  });
+  authRequestBiIDTrend.add(response.timings.duration);
+  check(response, {
+    'authorize status ok': (r) => r.status == 200 || fail(`auth request by failed: ${JSON.stringify(r)}`),
+  });
+  // initLoginTrend.add(response.timings.duration);
+  return response;
 }
 
 const finalizeAuthRequestTrend = new Trend('oidc_auth_requst_by_id_duration', true);
 export async function finalizeAuthRequest(id: string, session: any, tokens: any): Promise<Response> {
-  const res = await http.post(url(`/v2/oidc/auth_requests/${id}`),
-  JSON.stringify({session: {
-    sessionId: session.sessionId,
-    sessionToken: session.sessionToken
-  }}),
-  {
-    headers: {
-      Authorization: `Bearer ${tokens.accessToken}`,
-      'Content-Type': 'application/json',
-      // 'Accept': 'application/json',
-      'x-zitadel-login-client': tokens.info.client_id,
-    }
-  });
+  const res = await http.post(
+    url(`/v2/oidc/auth_requests/${id}`),
+    JSON.stringify({
+      session: {
+        sessionId: session.sessionId,
+        sessionToken: session.sessionToken,
+      },
+    }),
+    {
+      headers: {
+        Authorization: `Bearer ${tokens.accessToken}`,
+        'Content-Type': 'application/json',
+        // 'Accept': 'application/json',
+        'x-zitadel-login-client': tokens.info.client_id,
+      },
+    },
+  );
   check(res, {
     'finalize aurh request status ok': (r) => r.status == 200 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
   });

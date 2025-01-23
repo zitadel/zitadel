@@ -27,17 +27,18 @@ export function initLogin(clientId?: string): Response {
   if (clientId) {
     params = {
       headers: {
-        'x-zitadel-login-client': clientId
+        'x-zitadel-login-client': clientId,
       },
-      redirects: 0
+      redirects: 0,
     };
     expectedStatus = 302;
   }
 
-  const response = http.get(url('/oauth/v2/authorize', { 
-    searchParams: Client()
-  }),
-  params
+  const response = http.get(
+    url('/oauth/v2/authorize', {
+      searchParams: Client(),
+    }),
+    params,
   );
   check(response, {
     'authorize status ok': (r) => r.status == expectedStatus || fail(`init login failed: ${JSON.stringify(r)}`),

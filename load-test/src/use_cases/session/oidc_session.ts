@@ -23,7 +23,7 @@ export async function setup() {
   await addIAMMember(loginUser.userId, ['IAM_LOGIN_CLIENT'], adminTokens.accessToken!);
   const tokens = await token(new JWTProfileRequest(loginUser.userId, loginUserKey.keyId));
 
-  return { tokens, user: loginUser, key: loginUserKey, org, adminTokens};
+  return { tokens, user: loginUser, key: loginUserKey, org, adminTokens };
 }
 
 // implements the flow described in
@@ -40,7 +40,7 @@ export default async function (data: any) {
 
   const session = await createSession(data.user, data.org, data.tokens.accessToken);
   await finalizeAuthRequest(authRequestId!, session, data.tokens!);
-  
+
   addSessionTrend.add(new Date().getTime() - start.getTime());
 }
 
