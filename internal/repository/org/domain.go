@@ -295,22 +295,9 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 
 func (e *DomainRemovedEvent) Fields() []*eventstore.FieldOperation {
 	return []*eventstore.FieldOperation{
-		eventstore.SetField(
+		eventstore.RemoveSearchFieldsByAggregateAndObject(
 			e.Aggregate(),
 			domainSearchObject(e.Domain),
-			OrgDomainVerifiedSearchField,
-			&eventstore.Value{
-				Value:       false,
-				ShouldIndex: false,
-			},
-
-			eventstore.FieldTypeInstanceID,
-			eventstore.FieldTypeResourceOwner,
-			eventstore.FieldTypeAggregateType,
-			eventstore.FieldTypeAggregateID,
-			eventstore.FieldTypeObjectType,
-			eventstore.FieldTypeObjectID,
-			eventstore.FieldTypeFieldName,
 		),
 	}
 }

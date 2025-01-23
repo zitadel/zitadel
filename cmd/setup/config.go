@@ -135,6 +135,7 @@ type Steps struct {
 	s44ReplaceCurrentSequencesIndex         *ReplaceCurrentSequencesIndex
 	s45CorrectProjectOwners                 *CorrectProjectOwners
 	s46InitPermissionFunctions              *InitPermissionFunctions
+	s47CleanupOrgDomainRemoved              *CleanupOrgDomainRemoved
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
