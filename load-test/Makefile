@@ -35,8 +35,7 @@ introspect: ensure_modules bundle
 
 .PHONY: oidc_session
 oidc_session: ensure_key_pair ensure_modules bundle
-	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/oidc_session.js --iterations 1
-	# --vus ${VUS} --duration ${DURATION} --out csv=output/add_session_${DATE}.csv
+	${K6} run --summary-trend-stats "min,avg,max,p(50),p(95),p(99)" dist/oidc_session.js --vus ${VUS} --duration ${DURATION} --out csv=output/oidc_session_${DATE}.csv
 
 .PHONY: add_session
 add_session: ensure_modules bundle

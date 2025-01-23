@@ -179,27 +179,31 @@ export async function authRequestByID(id: string, tokens: any): Promise<Response
     );
     authRequestBiIDTrend.add(response.timings.duration);
     check(response, {
-      'authorize status ok': (r) => r.status == 200 || fail(`init login failed: ${r}`),
+      'authorize status ok': (r) => r.status == 200 || fail(`auth request by failed: ${JSON.stringify(r)}`),
     });
     // initLoginTrend.add(response.timings.duration);
     return response;
 }
 
+const finalizeAuthRequestTrend = new Trend('oidc_auth_requst_by_id_duration', true);
 export async function finalizeAuthRequest(id: string, session: any, tokens: any): Promise<Response> {
-  const body = {
-    session: {
-      sessionId: session.id,
-      sessionToken: session.sessionToken,
-    }
-  }
-  return http.post(url(`/v2/oidc/auth_requests/${id}`),
-  JSON.stringify({session: session}),
+  const res = await http.post(url(`/v2/oidc/auth_requests/${id}`),
+  JSON.stringify({session: {
+    sessionId: session.sessionId,
+    sessionToken: session.sessionToken
+  }}),
   {
     headers: {
       Authorization: `Bearer ${tokens.accessToken}`,
-      // 'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      // 'Accept': 'application/json',
       'x-zitadel-login-client': Client().client_id
     }
   });
+  check(res, {
+    'authorize status ok': (r) => r.status == 200 || fail(`finalize auth request failed: ${JSON.stringify(r)}`),
+  });
+  finalizeAuthRequestTrend.add(res.timings.duration);
+
+  return res;
 }
