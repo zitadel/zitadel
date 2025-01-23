@@ -94,6 +94,14 @@ func TestListUser(t *testing.T) {
 			errorType: "invalidValue",
 		},
 		{
+			name: "custom sort field",
+			req: &scim.ListRequest{
+				SortBy: gu.Ptr("externalid"),
+			},
+			wantErr:   true,
+			errorType: "invalidValue",
+		},
+		{
 			name: "unknown filter field",
 			req: &scim.ListRequest{
 				Filter: gu.Ptr(`fooBar eq "10"`),
