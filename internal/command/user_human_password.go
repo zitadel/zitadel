@@ -367,7 +367,7 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 	}
 	if wm.UserState == domain.UserStateLocked {
 		wrongPasswordError := &commandErrors.WrongPasswordError{
-			FailedAttempts: int32(wm.PasswordCheckFailedCount) + 1,
+			FailedAttempts: int32(wm.PasswordCheckFailedCount),
 		}
 		return nil, zerrors.ThrowPreconditionFailed(wrongPasswordError, "COMMAND-JLK35", "Errors.User.Locked")
 	}
@@ -389,7 +389,7 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 	}
 	if wm.UserState == domain.UserStateLocked {
 		wrongPasswordError := &commandErrors.WrongPasswordError{
-			FailedAttempts: int32(wm.PasswordCheckFailedCount) + 1,
+			FailedAttempts: int32(wm.PasswordCheckFailedCount),
 		}
 		return nil, zerrors.ThrowPreconditionFailed(wrongPasswordError, "COMMAND-SFA3t", "Errors.User.Locked")
 	}
