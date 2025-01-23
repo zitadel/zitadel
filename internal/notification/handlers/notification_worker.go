@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"math/rand/v2"
 	"slices"
 	"strings"
@@ -55,6 +56,7 @@ type WorkerConfig struct {
 	MinRetryDelay       time.Duration
 	MaxRetryDelay       time.Duration
 	RetryDelayFactor    float32
+	LockToSingleWorker  bool
 }
 
 // nowFunc makes [time.Now] mockable
@@ -296,11 +298,19 @@ func (w *NotificationWorker) schedule(ctx context.Context, workerID int, retry b
 			instances, err := w.queryInstances(ctx, retry)
 			w.log(workerID, retry).OnError(err).Error("unable to query instances")
 
-			w.triggerInstances(call.WithTimestamp(ctx), instances, workerID, retry)
+			moreEvents := w.triggerInstances(call.WithTimestamp(ctx), instances, workerID, retry)
+
+			// if there are more events, we requeue the worker immediately
+			if moreEvents {
+				t.Reset(10 * time.Millisecond)
+				continue
+			}
+
 			if retry {
 				t.Reset(w.config.RetryRequeueEvery)
 				continue
 			}
+
 			t.Reset(w.config.RequeueEvery)
 		}
 	}
@@ -314,16 +324,23 @@ func (w *NotificationWorker) queryInstances(ctx context.Context, retry bool) ([]
 	return w.queries.ActiveInstances(), nil
 }
 
-func (w *NotificationWorker) triggerInstances(ctx context.Context, instances []string, workerID int, retry bool) {
+func (w *NotificationWorker) triggerInstances(ctx context.Context, instances []string, workerID int, retry bool) bool {
+	moreEvents := false
+
 	for _, instance := range instances {
 		instanceCtx := authz.WithInstanceID(ctx, instance)
 
-		err := w.trigger(instanceCtx, workerID, retry)
+		hasMore, err := w.trigger(instanceCtx, workerID, retry)
 		w.log(workerID, retry).WithField("instance", instance).OnError(err).Info("trigger failed")
+
+		if hasMore {
+			moreEvents = true
+		}
 	}
+	return moreEvents
 }
 
-func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bool) (err error) {
+func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bool) (moreEvents bool, err error) {
 	txCtx := ctx
 	if w.config.TransactionDuration > 0 {
 		var cancel, cancelTx func()
@@ -334,20 +351,31 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 	}
 	tx, err := w.client.BeginTx(txCtx, nil)
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer func() {
 		err = database.CloseTransaction(tx, err)
 	}()
 
-	events, err := w.searchEvents(txCtx, tx, retry)
+	// NB: Lock the instance to a single worker at a time to avoid multiple workers
+	// processing the same events concurrently. Once we fix the "for update skip locked"
+	// issue in the events query following, we should remove this.
+	// if lock, err := tryGetAdvisoryLockForInstance(ctx, tx); err != nil {
+	// 	return false, err
+	// } else if !lock {
+	// 	// we should assume the current worker will handle requeuing the trigger for the next run
+	// 	return false, nil
+	// }
+	// else, we acquired the lock and can continue
+
+	events, hasMore, err := w.searchEvents(txCtx, tx, retry)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	// If there aren't any events or no unlocked event terminate early and start a new run.
 	if len(events) == 0 {
-		return nil
+		return false, nil
 	}
 
 	w.log(workerID, retry).
@@ -378,10 +406,25 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 		}
 		// if the context is canceled, we stop the processing
 		if ctx.Err() != nil {
-			return nil
+			return false, nil
 		}
 	}
-	return nil
+	return hasMore, nil
+}
+
+func tryGetAdvisoryLockForInstance(ctx context.Context, tx *sql.Tx) (bool, error) {
+	instanceId := authz.GetInstance(ctx).InstanceID()
+
+	rows := tx.QueryRowContext(
+		ctx,
+		fmt.Sprintf("select pg_try_advisory_xact_lock(hashtext('%s'), hashtext('%s'))", "notification_worker", instanceId),
+	)
+
+	var lock bool
+	if err := rows.Scan(&lock); err != nil {
+		return false, err
+	}
+	return lock, nil
 }
 
 func (w *NotificationWorker) latestRetries(events []eventstore.Event) []eventstore.Event {
@@ -419,27 +462,43 @@ func (w *NotificationWorker) rollbackToSavepoint(ctx context.Context, tx *sql.Tx
 		Error("could not rollback to savepoint for notification event")
 }
 
-func (w *NotificationWorker) searchEvents(ctx context.Context, tx *sql.Tx, retry bool) ([]eventstore.Event, error) {
+func (w *NotificationWorker) searchEvents(ctx context.Context, tx *sql.Tx, retry bool) ([]eventstore.Event, bool, error) {
+	var events []eventstore.Event
+	var hasMore = false
+	var err error
+
 	if retry {
-		return w.searchRetryEvents(ctx, tx)
+		events, err = w.searchRetryEvents(ctx, tx)
+	} else {
+		// query events and lock them for update (with skip locked)
+		searchQuery := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			LockRowsDuringTx(tx, eventstore.LockOptionSkipLocked).
+			// Messages older than the MaxTTL, we can be ignored.
+			// The first attempt of a retry might still be older than the TTL and needs to be filtered out later on.
+			CreationDateAfter(w.now().Add(-1*w.config.MaxTtl)).
+			Limit(uint64(w.config.BulkLimit)+1). // NB: +1 to check if there are more events
+			AddQuery().
+			AggregateTypes(notification.AggregateType).
+			EventTypes(notification.RequestedType).
+			Builder().
+			ExcludeAggregateIDs().
+			EventTypes(notification.RetryRequestedType, notification.CanceledType, notification.SentType).
+			Builder()
+
+		//nolint:staticcheck
+		events, err = w.es.Filter(ctx, searchQuery)
 	}
-	// query events and lock them for update (with skip locked)
-	searchQuery := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		LockRowsDuringTx(tx, eventstore.LockOptionSkipLocked).
-		// Messages older than the MaxTTL, we can be ignored.
-		// The first attempt of a retry might still be older than the TTL and needs to be filtered out later on.
-		CreationDateAfter(w.now().Add(-1*w.config.MaxTtl)).
-		Limit(uint64(w.config.BulkLimit)).
-		AddQuery().
-		AggregateTypes(notification.AggregateType).
-		EventTypes(notification.RequestedType).
-		Builder().
-		ExcludeAggregateIDs().
-		EventTypes(notification.RetryRequestedType, notification.CanceledType, notification.SentType).
-		AggregateTypes(notification.AggregateType).
-		Builder()
-	//nolint:staticcheck
-	return w.es.Filter(ctx, searchQuery)
+
+	if err != nil {
+		return nil, false, err
+	}
+
+	if len(events) > int(w.config.BulkLimit) {
+		hasMore = true
+		events = events[:len(events)-1]
+	}
+
+	return events, hasMore, nil
 }
 
 func (w *NotificationWorker) searchRetryEvents(ctx context.Context, tx *sql.Tx) ([]eventstore.Event, error) {
@@ -455,7 +514,6 @@ func (w *NotificationWorker) searchRetryEvents(ctx context.Context, tx *sql.Tx) 
 		Builder().
 		ExcludeAggregateIDs().
 		EventTypes(notification.CanceledType, notification.SentType).
-		AggregateTypes(notification.AggregateType).
 		Builder()
 	//nolint:staticcheck
 	events, err := w.es.Filter(ctx, searchQuery)
