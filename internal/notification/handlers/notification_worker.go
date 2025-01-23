@@ -357,16 +357,18 @@ func (w *NotificationWorker) trigger(ctx context.Context, workerID int, retry bo
 		err = database.CloseTransaction(tx, err)
 	}()
 
-	// NB: Lock the instance to a single worker at a time to avoid multiple workers
-	// processing the same events concurrently. Once we fix the "for update skip locked"
-	// issue in the events query following, we should remove this.
-	if lock, err := tryGetAdvisoryLockForInstance(ctx, tx); err != nil {
-		return false, err
-	} else if !lock {
-		// we should assume the current worker will handle requeuing the trigger for the next run
-		return false, nil
+	if w.config.LockToSingleWorker {
+		// NB: Lock the instance to a single worker at a time to avoid multiple workers
+		// processing the same events concurrently. Once we fix the "for update skip locked"
+		// issue in the events query following, we should remove this.
+		if lock, err := tryGetAdvisoryLockForInstance(ctx, tx); err != nil {
+			return false, err
+		} else if !lock {
+			// we should assume the current worker will handle requeuing the trigger for the next run
+			return false, nil
+		}
+		// else, we acquired the lock and can continue
 	}
-	// else, we acquired the lock and can continue
 
 	events, hasMore, err := w.searchEvents(txCtx, tx, retry)
 	if err != nil {
