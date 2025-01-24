@@ -13,7 +13,7 @@ func logMessages(ctx context.Context, channel channels.NotificationChannel) chan
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 		logEntry := logging.WithFields(
 			"instance", authz.GetInstance(ctx).InstanceID(),
-			"triggering_event_type", message.GetTriggeringEvent().Type(),
+			"triggering_event_type", message.GetTriggeringEventType(),
 		)
 		logEntry.Debug("sending notification")
 		err := channel.HandleMessage(message)

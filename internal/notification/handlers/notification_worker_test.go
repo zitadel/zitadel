@@ -818,12 +818,23 @@ func newNotificationWorker(t *testing.T, ctrl *gomock.Controller, queries *mock.
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
 	if w.err == nil {
+		var eventType eventstore.EventType
+
+		switch event := a.event.(type) {
+		case *notification.RequestedEvent:
+			eventType = event.Request.EventType
+		case *notification.RetryRequestedEvent:
+			eventType = event.Request.EventType
+		default:
+			t.Fatalf("unknown event type %T", event)
+		}
+
 		if w.message != nil {
-			w.message.TriggeringEvent = a.event
+			w.message.TriggeringEventType = eventType
 			channel.EXPECT().HandleMessage(w.message).Return(w.sendError)
 		}
 		if w.messageSMS != nil {
-			w.messageSMS.TriggeringEvent = a.event
+			w.messageSMS.TriggeringEventType = eventType
 			channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
 				message.VerificationID = gu.Ptr(verificationID)
 				return w.sendError

@@ -13,11 +13,11 @@ func handleSecurityTokenEvent(
 	setConfig set.Config,
 	channels ChannelChains,
 	token any,
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
 ) error {
 	message := &messages.Form{
-		Serializable:    token,
-		TriggeringEvent: triggeringEvent,
+		Serializable:        token,
+		TriggeringEventType: triggeringEventType,
 	}
 	setChannels, err := channels.SecurityTokenEvent(ctx, setConfig)
 	if err != nil {

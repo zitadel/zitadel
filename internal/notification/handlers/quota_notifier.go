@@ -72,7 +72,7 @@ func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.
 		if alreadyHandled {
 			return nil
 		}
-		err = types.SendJSON(ctx, webhook.Config{CallURL: e.CallURL, Method: http.MethodPost}, u.channels, e, e).WithoutTemplate()
+		err = types.SendJSON(ctx, webhook.Config{CallURL: e.CallURL, Method: http.MethodPost}, u.channels, e, e.EventType).WithoutTemplate()
 		if err != nil {
 			return err
 		}

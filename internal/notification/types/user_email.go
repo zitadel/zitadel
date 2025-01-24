@@ -23,7 +23,7 @@ func generateEmail(
 	data templates.TemplateData,
 	args map[string]interface{},
 	lastEmail bool,
-	triggeringEvent eventstore.Event,
+	triggeringEventType eventstore.EventType,
 ) error {
 	emailChannels, config, err := channels.Email(ctx)
 	logging.OnError(err).Error("could not create email channel")
@@ -38,10 +38,10 @@ func generateEmail(
 	}
 	if config.SMTPConfig != nil {
 		message := &messages.Email{
-			Recipients:      []string{recipient},
-			Subject:         data.Subject,
-			Content:         html.UnescapeString(template),
-			TriggeringEvent: triggeringEvent,
+			Recipients:          []string{recipient},
+			Subject:             data.Subject,
+			Content:             html.UnescapeString(template),
+			TriggeringEventType: triggeringEventType,
 		}
 		return emailChannels.HandleMessage(message)
 	}
@@ -52,7 +52,7 @@ func generateEmail(
 		}
 		contextInfo := map[string]interface{}{
 			"recipientEmailAddress": recipient,
-			"eventType":             triggeringEvent.Type(),
+			"eventType":             triggeringEventType,
 			"provider":              config.ProviderConfig,
 		}
 
@@ -62,7 +62,7 @@ func generateEmail(
 				TemplateData: data,
 				Args:         caseArgs,
 			},
-			TriggeringEvent: triggeringEvent,
+			TriggeringEventType: triggeringEventType,
 		}
 		webhookChannels, err := channels.Webhook(ctx, *config.WebhookConfig)
 		if err != nil {

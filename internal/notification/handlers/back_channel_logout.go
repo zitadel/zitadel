@@ -191,7 +191,7 @@ func (u *backChannelLogoutNotifier) sendLogoutToken(ctx context.Context, oidcSes
 	if err != nil {
 		return err
 	}
-	err = types.SendSecurityTokenEvent(ctx, set.Config{CallURL: oidcSession.BackChannelLogoutURI}, u.channels, &LogoutTokenMessage{LogoutToken: token}, e).WithoutTemplate()
+	err = types.SendSecurityTokenEvent(ctx, set.Config{CallURL: oidcSession.BackChannelLogoutURI}, u.channels, &LogoutTokenMessage{LogoutToken: token}, e.Type()).WithoutTemplate()
 	if err != nil {
 		return err
 	}
@@ -247,7 +247,7 @@ func (b *backChannelLogoutSession) AppendEvents(events ...eventstore.Event) {
 				BackChannelLogoutURI: e.BackChannelLogoutURI,
 			})
 		case *sessionlogout.BackChannelLogoutSentEvent:
-			slices.DeleteFunc(b.sessions, func(session backChannelLogoutOIDCSessions) bool {
+			b.sessions = slices.DeleteFunc(b.sessions, func(session backChannelLogoutOIDCSessions) bool {
 				return session.OIDCSessionID == e.OIDCSessionID
 			})
 		}

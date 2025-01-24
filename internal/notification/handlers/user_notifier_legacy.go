@@ -169,7 +169,7 @@ func (u *userNotifierLegacy) reduceInitCodeAdded(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type()).
 			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID)
 		if err != nil {
 			return err
@@ -226,7 +226,7 @@ func (u *userNotifierLegacy) reduceEmailCodeAdded(event eventstore.Event) (*hand
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type()).
 			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
@@ -286,9 +286,9 @@ func (u *userNotifierLegacy) reducePasswordCodeAdded(event eventstore.Event) (*h
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type())
 		if e.NotificationType == domain.NotificationTypeSms {
-			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo)
+			notify = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), generatorInfo)
 		}
 		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
@@ -382,7 +382,7 @@ func (u *userNotifierLegacy) reduceOTPSMS(
 		return nil, err
 	}
 	generatorInfo := new(senders.CodeGeneratorInfo)
-	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event, generatorInfo)
+	notify := types.SendSMS(ctx, u.channels, translator, notifyUser, colors, event.Type(), generatorInfo)
 	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
 	if err != nil {
 		return nil, err
@@ -504,7 +504,7 @@ func (u *userNotifierLegacy) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event)
+	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event.Type())
 	err = notify.SendOTPEmailCode(ctx, url, plainCode, expiry)
 	if err != nil {
 		return nil, err
@@ -554,7 +554,7 @@ func (u *userNotifierLegacy) reduceDomainClaimed(event eventstore.Event) (*handl
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type()).
 			SendDomainClaimed(ctx, notifyUser, e.UserName)
 		if err != nil {
 			return err
@@ -608,7 +608,7 @@ func (u *userNotifierLegacy) reducePasswordlessCodeRequested(event eventstore.Ev
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type()).
 			SendPasswordlessRegistrationLink(ctx, notifyUser, code, e.ID, e.URLTemplate)
 		if err != nil {
 			return err
@@ -667,7 +667,7 @@ func (u *userNotifierLegacy) reducePasswordChanged(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
+		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type()).
 			SendPasswordChange(ctx, notifyUser)
 		if err != nil {
 			return err
@@ -722,7 +722,7 @@ func (u *userNotifierLegacy) reducePhoneCodeAdded(event eventstore.Event) (*hand
 			return err
 		}
 		generatorInfo := new(senders.CodeGeneratorInfo)
-		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e, generatorInfo).
+		if err = types.SendSMS(ctx, u.channels, translator, notifyUser, colors, e.Type(), generatorInfo).
 			SendPhoneVerificationCode(ctx, code); err != nil {
 			return err
 		}
@@ -776,7 +776,7 @@ func (u *userNotifierLegacy) reduceInviteCodeAdded(event eventstore.Event) (*han
 		if err != nil {
 			return err
 		}
-		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e.Type())
 		err = notify.SendInviteCode(ctx, notifyUser, code, e.ApplicationName, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err

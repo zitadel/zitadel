@@ -10,8 +10,8 @@ import (
 var _ channels.Message = (*JSON)(nil)
 
 type JSON struct {
-	Serializable    interface{}
-	TriggeringEvent eventstore.Event
+	Serializable        interface{}
+	TriggeringEventType eventstore.EventType
 }
 
 func (msg *JSON) GetContent() (string, error) {
@@ -19,6 +19,6 @@ func (msg *JSON) GetContent() (string, error) {
 	return string(bytes), err
 }
 
-func (msg *JSON) GetTriggeringEvent() eventstore.Event {
-	return msg.TriggeringEvent
+func (msg *JSON) GetTriggeringEventType() eventstore.EventType {
+	return msg.TriggeringEventType
 }
