@@ -161,6 +161,15 @@ func (c *Commands) removeUserPhone(ctx context.Context, userID string) (*domain.
 	return writeModelToObjectDetails(&cmd.model.WriteModel), nil
 }
 
+func (c *Commands) removeUserPhoneCommand(ctx context.Context, cmds []eventstore.Command, wm *UserV2WriteModel) ([]eventstore.Command, error) {
+	if wm.Phone == "" {
+		return cmds, nil
+	}
+
+	cmds = append(cmds, user.NewHumanPhoneRemovedEvent(ctx, &wm.Aggregate().Aggregate))
+	return cmds, nil
+}
+
 // UserPhoneEvents allows step-by-step additions of events,
 // operating on the Human Phone Model.
 type UserPhoneEvents struct {
