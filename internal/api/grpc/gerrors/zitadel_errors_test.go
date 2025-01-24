@@ -2,11 +2,16 @@ package gerrors
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/protoadapt"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
 
 func TestCaosToGRPCError(t *testing.T) {
@@ -45,13 +50,48 @@ func TestCaosToGRPCError(t *testing.T) {
 
 func Test_getErrorInfo(t *testing.T) {
 	tests := []struct {
-		name string
-		id   string
-		key  string
-		err  error
-	}{}
+		name   string
+		id     string
+		key    string
+		err    error
+		result protoadapt.MessageV1
+	}{
+		{
+			name:   "parent error nil, return message.ErrorDetail{}",
+			id:     "id",
+			key:    "key",
+			result: &message.ErrorDetail{Id: "id", Message: "key"},
+		},
+		{
+			name:   "parent error nil not commandErrors.WrongPasswordError{}, return message.ErrorDetail{}",
+			id:     "id",
+			key:    "key",
+			err:    fmt.Errorf("normal error not commandErrors.WrongPasswordError{}"),
+			result: &message.ErrorDetail{Id: "id", Message: "key"},
+		},
+		{
+			name:   "parent error not nil type commandErrors.WrongPasswordError{}, return message.CredentialsCheckError{}",
+			id:     "id",
+			key:    "key",
+			err:    &commandErrors.WrongPasswordError{FailedAttempts: 22},
+			result: &message.CredentialsCheckError{Id: "id", Message: "key", FailedAttempts: 22},
+		},
+		{
+			name: "parent error not nil wrapped commandErrors.WrongPasswordError{}, return message.CredentialsCheckError{}",
+			id:   "id",
+			key:  "key",
+			err: func() error {
+				err := fmt.Errorf("normal error")
+				wpa := &commandErrors.WrongPasswordError{FailedAttempts: 26}
+				return fmt.Errorf("%w: %w", err, wpa)
+			}(),
+			result: &message.CredentialsCheckError{Id: "id", Message: "key", FailedAttempts: 26},
+		},
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			errorInfo := getErrorInfo(tt.id, tt.key, tt.err)
+			assert.Equal(t, tt.result, errorInfo)
 		})
 	}
 }
