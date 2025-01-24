@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/passwap"
+
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
