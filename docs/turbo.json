@@ -1,0 +1,15 @@
+{
+    "extends": ["//"],
+    "tasks": {
+      "generate": {
+        "outputs": [".artifacts/**", "docs/apis/resources/**", ".docusaurus/**"],
+        "inputs": ["../proto/**"],
+        "cache": true
+      },
+      "build": {
+        "dependsOn": ["generate"],
+        "outputs": ["build/**"],
+        "cache": true
+      }
+    }
+  }
