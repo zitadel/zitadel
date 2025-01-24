@@ -29,6 +29,7 @@ import (
 
 const (
 	ClaimPrefix                     = "urn:zitadel:iam"
+	ScopeIAMGroup                   = "urn:zitadel:iam:org:group"
 	ScopeProjectRolePrefix          = "urn:zitadel:iam:org:project:role:"
 	ScopeProjectsRoles              = "urn:zitadel:iam:org:projects:roles"
 	ClaimProjectRoles               = "urn:zitadel:iam:org:project:roles"

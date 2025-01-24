@@ -292,6 +292,17 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	}
 }
 
+func setUserInfoGroupClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
+	if roles != nil && len(roles.projects) > 0 {
+		if roles, ok := roles.projects[roles.requestProjectID]; ok {
+			userInfo.AppendClaims(ClaimProjectRoles, roles)
+		}
+		for projectID, roles := range roles.projects {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
+		}
+	}
+}
+
 func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo, triggerType domain.TriggerType) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

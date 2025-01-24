@@ -1,0 +1,445 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.group.v1;
+
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/group";
+
+message Group {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    string name = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Group\""
+        }
+    ];
+    string description = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"Group Description\""
+        }
+    ];
+    GroupState state = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the group";
+        }
+    ];
+}
+
+message GroupGrant {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    repeated string role_keys = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"role.super.man\"]"
+        }
+    ];
+    GroupGrantState state = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the user";
+        }
+    ];
+    
+    string group_id = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+    string group_name = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi-giraffe\"";
+        }
+    ];
+    string project_id = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+    string project_name = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string project_grant_id = 9 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+    string granted_org_id = 10 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+    string granted_org_name = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string granted_org_domain = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\"";
+        }
+    ];
+    string org_id = 13 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\"";
+        }
+    ];
+    string org_domain = 14 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\"";
+        }
+    ];
+    string org_name = 15 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+}
+
+enum GroupState {
+    GROUP_STATE_UNSPECIFIED = 0;
+    GROUP_STATE_ACTIVE = 1;
+    GROUP_STATE_INACTIVE = 2;
+}
+
+enum GroupGrantState {
+    GROUP_GRANT_STATE_UNSPECIFIED = 0;
+    GROUP_GRANT_STATE_ACTIVE = 1;
+    GROUP_GRANT_STATE_INACTIVE = 2;
+}
+
+message GroupGrantQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        GroupGrantProjectIDQuery project_id_query = 1;
+        GroupGrantGroupIDQuery group_id_query = 2;
+        GroupGrantGroupNameQuery group_name_query = 3;
+        GroupGrantWithGrantedQuery with_granted_query = 4;
+        GroupGrantRoleKeyQuery role_key_query = 5;
+        GroupGrantProjectGrantIDQuery project_grant_id_query = 6;
+        GroupGrantProjectNameQuery project_name_query = 7;
+        GroupGrantOrgNameQuery org_name_query = 8;
+        GroupGrantOrgDomainQuery org_domain_query = 9;
+        GroupGrantOrgIdQuery org_id_query = 10;
+        GroupGrantGrantedOrgIdQuery granted_org_id_query = 11;
+        GroupGrantGrantedOrgNameQuery granted_org_name_query = 12;
+        GroupGrantGrantedOrgDomainQuery granted_org_domain_query = 13;
+    }
+}
+
+message GroupGrantGroupIDQuery {
+    string group_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message GroupGrantProjectIDQuery {
+    string project_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message GroupGrantOrgIdQuery {
+    string org_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message GroupGrantGrantedOrgIdQuery {
+    string granted_org_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message GroupGrantWithGrantedQuery {
+    bool with_granted = 1;
+}
+
+message GroupGrantRoleKeyQuery {
+    string role_key = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"role.super.man\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message GroupGrantProjectGrantIDQuery {
+    string project_grant_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message GroupGrantGroupNameQuery {
+    string Group_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"gigi-giraffe\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message GroupGrantOrgNameQuery {
+    string org_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"cao\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message GroupGrantOrgDomainQuery {
+    string org_domain = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"OS AG\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message GroupGrantProjectNameQuery {
+    string project_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ITADE\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "3"
+        }
+    ];
+}
+
+message GroupGrantOrgIDQuery {
+    string org_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message GroupGrantGrantedOrgIDQuery {
+    string granted_org_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+
+message GroupGrantGrantedOrgNameQuery {
+    string granted_org_name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"cao\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message GroupGrantGrantedOrgDomainQuery {
+    string granted_org_domain = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"OS AG\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message GroupQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        GroupNameQuery name_query = 1;
+        GroupResourceOwnerQuery group_resource_owner_query = 2;
+    }
+}
+
+message GroupNameQuery {
+    string name = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\""
+        }
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message GroupResourceOwnerQuery {
+    string resource_owner = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"78629023905388335\""
+        }
+    ];
+}
+
+message Membership {
+    string group_id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    repeated string roles = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"IAM_OWNER\"]"
+        }
+    ];
+    string group_name = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Name of the group"
+            example: "\"Gigi Giraffe\"";
+        }
+    ];
+    oneof type {
+        bool iam = 5 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one of type use iam, org id, project id or project grant id"
+            }
+        ];
+        string org_id = 6 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one of type use iam, org id, project id or project grant id"
+            }
+        ];
+        string project_id = 7 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one of type use iam, org id, project id or project grant id"
+            }
+        ];
+        string project_grant_id = 8 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "one of type use iam, org id, project id or project grant id"
+            }
+        ];
+    }
+}
+
+message MembershipQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        MembershipOrgQuery org_query = 1;
+        MembershipProjectQuery project_query = 2;
+        MembershipProjectGrantQuery project_grant_query = 3;
+        MembershipIAMQuery iam_query = 4;
+        MembershipGroupQuery group_query = 5;
+    }
+}
+
+// this query always equals
+message MembershipOrgQuery {
+    string org_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+// this query always equals
+message MembershipProjectQuery {
+    string project_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+// this query always equals
+message MembershipProjectGrantQuery {
+    string project_grant_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+// this query always equals
+message MembershipIAMQuery {
+    bool iam = 1;
+}
+
+// this query always equals
+message MembershipGroupQuery {
+    string group_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
