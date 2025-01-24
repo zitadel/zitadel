@@ -103,33 +103,8 @@ func New(
 	return api, nil
 }
 
-// RegisterServer registers a grpc service on the grpc server,
-// creates a new grpc gateway and registers it as a separate http handler
-//
-// used for v1 api (system, admin, mgmt, auth)
-func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayPrefix, tlsConfig *tls.Config) error {
-	grpcServer.RegisterServer(a.grpcServer)
-	handler, prefix, err := server.CreateGatewayWithPrefix(
-		ctx,
-		grpcServer,
-		a.port,
-		a.hostHeaders,
-		a.accessInterceptor,
-		tlsConfig,
-	)
-	if err != nil {
-		return err
-	}
-	a.RegisterHandlerOnPrefix(prefix, handler)
-	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
-	a.healthServer.SetServingStatus(grpcServer.MethodPrefix(), healthpb.HealthCheckResponse_SERVING)
-	return nil
-}
-
 // RegisterService registers a grpc service on the grpc server,
 // and its gateway on the gateway handler
-//
-// used for >= v2 api (e.g. user, session, ...)
 func (a *API) RegisterService(ctx context.Context, grpcServer server.Server) error {
 	grpcServer.RegisterServer(a.grpcServer)
 	err := server.RegisterGateway(ctx, a.grpcGateway, grpcServer)

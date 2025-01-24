@@ -91,7 +91,7 @@ Now you can access the console with the following default credentials:
 
 ## Import Keycloak users into ZITADEL
 
-As explained in this [ZITADEL user migration guide](/docs/guides/migrate/users), you can import users individually or in bulk. Since we are looking at importing a single user from Keycloak, migrating that individual user to ZITADEL can be done with the [ImportHumanUser](/docs/apis/resources/mgmt/management-service-import-human-user) endpoint. 
+As explained in this [ZITADEL user migration guide](/docs/guides/migrate/users), you can import users individually or in bulk. Since we are looking at importing a single user from Keycloak, migrating that individual user to ZITADEL can be done with the [ImportHumanUser](/docs/reference/deprecated#tag/management-service/POST/management/v1/users/human) endpoint. 
 
 > With this endpoint, an email will only be sent to the user if the email is marked as not verified or if there's no password set.
 
@@ -167,7 +167,7 @@ if your Keycloak Realm has a single user, your `my-realm-users-0.json` file, int
 }
 ```
 
-Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](/docs/apis/resources/mgmt/management-service-import-human-user) to import a user. The minimal format would be as shown below: 
+Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](/docs/reference/deprecated#tag/management-service/POST/management/v1/users/human) to import a user. The minimal format would be as shown below: 
 
 ```js 
 {

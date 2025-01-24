@@ -588,7 +588,7 @@ Errors:
     Data:
       Invalid: Datos no válidos para el esquema de usuario
   TokenExchange:
-    FeatureDisabled: La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    FeatureDisabled: La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/reference#tag/features/PUT/v2/features/instance
     Token:
       Missing: Falta la ficha
       Invalid: El token no es válido

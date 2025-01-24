@@ -588,7 +588,7 @@ Errors:
     Data:
       Invalid: Érvénytelen adat a User Schema-hoz
   TokenExchange:
-    FeatureDisabled: A Token Exchange funkció le van tiltva az példányod esetében. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    FeatureDisabled: A Token Exchange funkció le van tiltva az példányod esetében. https://zitadel.com/docs/reference#tag/features/PUT/v2/features/instance
     Token:
       Missing: A token hiányzik
       Invalid: A token érvénytelen

@@ -103,7 +103,7 @@ By following these steps and adhering to security best practices, you can effect
 ## Notes
 
 * Read about the [different methods to authenticate service users](./authenticate-service-users)
-* [Service User API reference](/docs/apis/resources/mgmt/user-machine)
+* [Service User API reference](/docs/reference/deprecated#tag/users)
 * [OIDC client secret basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)

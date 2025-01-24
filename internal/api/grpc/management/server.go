@@ -64,11 +64,3 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return management.RegisterManagementServiceHandler
 }
-
-func (s *Server) GatewayPathPrefix() string {
-	return GatewayPathPrefix()
-}
-
-func GatewayPathPrefix() string {
-	return "/management/v1"
-}

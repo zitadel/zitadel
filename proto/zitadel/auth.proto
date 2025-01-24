@@ -11,6 +11,7 @@ import "zitadel/metadata.proto";
 import "validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
+import "google/api/visibility.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -19,125 +20,23 @@ package zitadel.auth.v1;
 
 option go_package ="github.com/zitadel/zitadel/pkg/grpc/auth";
 
-option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-    info: {
-        title: "Authentication API aka Auth";
-        version: "1.0";
-        description: "The authentication API is used for all operations on the currently authenticated user.";
-        contact:{
-            name: "ZITADEL"
-            url: "https://zitadel.com"
-            email: "hi@zitadel.com"
-        }
-        license: {
-            name: "Apache License 2.0",
-            url: "https://github.com/zitadel/zitadel/blob/main/LICENSE"
-        };
-    };
-    tags: [
-        {
-            name: "General"
-        },
-        {
-            name: "Policies",
-            description: "Policies are settings that are made on either an instance or organization level of ZITADEL. The policies will have an impact on what a user is allowed to do or what should be shown to the user."
-        },
-        {
-            name: "User"
-        },
-        {
-            name: "User Authentication Factor"
-        },
-        {
-            name: "User Authorizations/Grants"
-        },
-        {
-            name: "User Email"
-        },
-        {
-            name: "User Metadata"
-        },
-        {
-            name: "User Phone"
-        },
-        {
-            name: "User Profile"
-        },
-        {
-            name: "User Social Login"
-        },
-        {
-            name: "User Tokens"
-        }
-    ];
-    schemes: HTTPS;
-
-    consumes: "application/json";
-    consumes: "application/grpc";
-    consumes: "application/grpc-web+proto";
-
-    produces: "application/json";
-    produces: "application/grpc";
-    produces: "application/grpc-web+proto";
-
-    host: "$CUSTOM-DOMAIN";
-    base_path: "/auth/v1";
-
-    external_docs: {
-        description: "Detailed information about ZITADEL",
-        url: "https://zitadel.com/docs"
-    }
-
-    security_definitions: {
-        security: {
-            key: "BasicAuth";
-            value: {
-                type: TYPE_BASIC;
-            }
-        }
-        security: {
-            key: "OAuth2";
-            value: {
-                type: TYPE_OAUTH2;
-                flow: FLOW_ACCESS_CODE;
-                authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-                token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
-                scopes: {
-                    scope: {
-                        key: "openid";
-                        value: "openid";
-                    }
-                }
-            }
-        }
-    }
-    security: {
-        security_requirement: {
-            key: "OAuth2";
-            value: {
-                scope: "openid";
-            }
-        }
-    }
-};
-
-
 service AuthService {
+    option (google.api.api_visibility).restriction = "v1, deprecated";
     rpc Healthz(HealthzRequest) returns (HealthzResponse) {
         option (google.api.http) = {
-            get: "/healthz"
+            get: "/auth/v1/healthz"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Healthz";
             description: "The health endpoint allows an external system to probe if ZITADEL authentication API is alive"
-            tags: "General";
+            tags: ["Healthz", "Auth Service"];
         };
     }
 
     rpc GetSupportedLanguages(GetSupportedLanguagesRequest) returns (GetSupportedLanguagesResponse) {
         option (google.api.http) = {
-            get: "/languages";
+            get: "/auth/v1/languages";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -148,13 +47,13 @@ service AuthService {
             summary: "Supported Languages";
             description: "Use GetSupportedLanguages on the admin service instead."
             deprecated: true;
-            tags: "General";
+            tags: ["Languages", "Auth Service"];
         };
     }
 
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
         option (google.api.http) = {
-            get: "/users/me"
+            get: "/auth/v1/users/me"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -164,13 +63,13 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Get my user";
             description: "Returns the full user object of the authenticated user including the profile, email, phone, etc "
-            tags: "User";
+            tags: ["My User", "Auth Service"];
         };
     }
 
     rpc RemoveMyUser(RemoveMyUserRequest) returns (RemoveMyUserResponse) {
         option (google.api.http) = {
-            delete: "/users/me"
+            delete: "/auth/v1/users/me"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -180,13 +79,13 @@ service AuthService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete my user";
             description: "Deletes the currently authenticated user. All authentication tokens will be removed and the user will not be able to make any request."
-            tags: "User";
+            tags: ["My User", "Auth Service"];
         };
     }
 
     rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
         option (google.api.http) = {
-            post: "/users/me/changes/_search"
+            post: "/auth/v1/users/me/changes/_search"
             body: "*"
         };
 
@@ -195,7 +94,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User";
+            tags: ["My User", "Auth Service"];
             summary: "Get My User History";
             description: "Returns a list of changes/events that have happened on the authenticated user. It's the history of the user. Make sure to send a limit."
         };
@@ -203,7 +102,7 @@ service AuthService {
 
     rpc ListMyUserSessions(ListMyUserSessionsRequest) returns (ListMyUserSessionsResponse) {
         option (google.api.http) = {
-            post: "/users/me/sessions/_search"
+            post: "/auth/v1/users/me/sessions/_search"
             body: "*"
         };
 
@@ -212,7 +111,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User";
+            tags: ["My User", "Auth Service"];
             summary: "Get My User Sessions";
             description: "Returns a list of a user session for the user agent of the authenticated user. This can be used to switch accounts in the current application."
         };
@@ -220,7 +119,7 @@ service AuthService {
 
     rpc ListMyMetadata(ListMyMetadataRequest) returns (ListMyMetadataResponse) {
         option (google.api.http) = {
-            post: "/users/me/metadata/_search"
+            post: "/auth/v1/users/me/metadata/_search"
             body: "*"
         };
 
@@ -229,7 +128,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Metadata";
+            tags: ["My User", "Auth Service"];
             summary: "Get My User Metadata";
             description: "Returns a list of metadata of the authenticated user. Metadata is a key value list with additional information needed on the user."
         };
@@ -237,7 +136,7 @@ service AuthService {
 
     rpc GetMyMetadata(GetMyMetadataRequest) returns (GetMyMetadataResponse) {
         option (google.api.http) = {
-            get: "/users/me/metadata/{key}"
+            get: "/auth/v1/users/me/metadata/{key}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -245,7 +144,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Metadata";
+            tags: ["My User", "Auth Service"];
             summary: "Get My User Metadata By Key";
             description: "Returns a metadata value by a specific key of the authenticated user. Metadata is a key value list with additional information needed on the user."
         };
@@ -253,7 +152,7 @@ service AuthService {
 
     rpc ListMyRefreshTokens(ListMyRefreshTokensRequest) returns (ListMyRefreshTokensResponse) {
         option (google.api.http) = {
-            post: "/users/me/tokens/refresh/_search"
+            post: "/auth/v1/users/me/tokens/refresh/_search"
             body: "*"
         };
 
@@ -262,7 +161,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Tokens";
+            tags: ["My User", "Auth Service"];
             summary: "Get Refresh Tokens";
             description: "Returns the list of refresh tokens of the authenticated user."
         };
@@ -270,7 +169,7 @@ service AuthService {
 
     rpc RevokeMyRefreshToken(RevokeMyRefreshTokenRequest) returns (RevokeMyRefreshTokenResponse) {
         option (google.api.http) = {
-            delete: "/users/me/tokens/refresh/{id}"
+            delete: "/auth/v1/users/me/tokens/refresh/{id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -278,7 +177,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Tokens";
+            tags: ["My User", "Auth Service"];
             summary: "Revoke Refresh Tokens";
             description: "Revokes a single refresh token of the authorized user by its (token) id."
         };
@@ -286,7 +185,7 @@ service AuthService {
 
     rpc RevokeAllMyRefreshTokens(RevokeAllMyRefreshTokensRequest) returns (RevokeAllMyRefreshTokensResponse) {
         option (google.api.http) = {
-            post: "/users/me/tokens/refresh/_revoke_all"
+            post: "/auth/v1/users/me/tokens/refresh/_revoke_all"
             body: "*"
         };
 
@@ -295,7 +194,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Tokens";
+            tags: ["My User", "Auth Service"];
             summary: "Revoke All Refresh Tokens";
             description: "Revokes all refresh tokens of the authenticated user."
         };
@@ -303,7 +202,7 @@ service AuthService {
 
     rpc UpdateMyUserName(UpdateMyUserNameRequest) returns (UpdateMyUserNameResponse) {
         option (google.api.http) = {
-            put: "/users/me/username"
+            put: "/auth/v1/users/me/username"
             body: "*"
         };
 
@@ -312,7 +211,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Users";
+            tags: ["My User", "Auth Service"];
             summary: "Change My Username";
             description: "Changes the username of the authenticated user. The user has to log in with the newly created username afterward."
         };
@@ -320,7 +219,7 @@ service AuthService {
 
     rpc GetMyPasswordComplexityPolicy(GetMyPasswordComplexityPolicyRequest) returns (GetMyPasswordComplexityPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/passwords/complexity"
+            get: "/auth/v1/policies/passwords/complexity"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -328,8 +227,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Password";
-            tags: "Policies";
+            tags: ["My User", "Auth Service"];
             summary: "Get Passwordcomplexity Policy";
             description: "Returns the password complexity settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines how the password should look."
         };
@@ -337,7 +235,7 @@ service AuthService {
 
     rpc UpdateMyPassword(UpdateMyPasswordRequest) returns (UpdateMyPasswordResponse) {
         option (google.api.http) = {
-            put: "/users/me/password"
+            put: "/auth/v1/users/me/password"
             body: "*"
         };
 
@@ -346,7 +244,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Password";
+            tags: ["My User", "Auth Service"];
             summary: "Change Password";
             description: "Changes the password of the authenticated user. Make sure the password follows the password complexity policy."
         };
@@ -354,7 +252,7 @@ service AuthService {
 
     rpc GetMyProfile(GetMyProfileRequest) returns (GetMyProfileResponse) {
         option (google.api.http) = {
-            get: "/users/me/profile"
+            get: "/auth/v1/users/me/profile"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -362,7 +260,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Profile";
+            tags: ["My User", "Auth Service"];
             summary: "Get My Profile";
             description: "Returns the profile information of the authenticated user, this includes given name, family name, etc."
         };
@@ -370,7 +268,7 @@ service AuthService {
 
     rpc UpdateMyProfile(UpdateMyProfileRequest) returns (UpdateMyProfileResponse) {
         option (google.api.http) = {
-            put: "/users/me/profile"
+            put: "/auth/v1/users/me/profile"
             body: "*"
         };
 
@@ -379,7 +277,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Profile";
+            tags: ["My User", "Auth Service"];
             summary: "Update My Profile";
             description: "Change the profile information of the authenticated user. This includes information like given name, family name, language, etc."
         };
@@ -387,7 +285,7 @@ service AuthService {
 
     rpc GetMyEmail(GetMyEmailRequest) returns (GetMyEmailResponse) {
         option (google.api.http) = {
-            get: "/users/me/email"
+            get: "/auth/v1/users/me/email"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -395,7 +293,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Email";
+            tags: ["My User", "Auth Service"];
             summary: "Get My Email";
             description: "Returns the email address and the verified flag of the authenticated user."
         };
@@ -403,7 +301,7 @@ service AuthService {
 
     rpc SetMyEmail(SetMyEmailRequest) returns (SetMyEmailResponse) {
         option (google.api.http) = {
-            put: "/users/me/email"
+            put: "/auth/v1/users/me/email"
             body: "*"
         };
 
@@ -412,7 +310,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Email";
+            tags: ["My User", "Auth Service"];
             summary: "Update My Email";
             description: "Change the email address of the authenticated user. A verification email will be sent to the given email address."
         };
@@ -420,7 +318,7 @@ service AuthService {
 
     rpc VerifyMyEmail(VerifyMyEmailRequest) returns (VerifyMyEmailResponse) {
         option (google.api.http) = {
-            post: "/users/me/email/_verify"
+            post: "/auth/v1/users/me/email/_verify"
             body: "*"
         };
 
@@ -429,7 +327,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Email";
+            tags: ["My User", "Auth Service"];
             summary: "Verify My Email";
             description: "Verify the email address of the authenticated user with the code that has been sent. State of the email address is verified after."
         };
@@ -437,7 +335,7 @@ service AuthService {
 
     rpc ResendMyEmailVerification(ResendMyEmailVerificationRequest) returns (ResendMyEmailVerificationResponse) {
         option (google.api.http) = {
-            post: "/users/me/email/_resend_verification"
+            post: "/auth/v1/users/me/email/_resend_verification"
             body: "*"
         };
 
@@ -446,7 +344,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Email";
+            tags: ["My User", "Auth Service"];
             summary: "Resend Email Verification";
             description: "A new email will be sent to the last set email address of the authenticated user, the last set email address will be used."
         };
@@ -454,7 +352,7 @@ service AuthService {
 
     rpc GetMyPhone(GetMyPhoneRequest) returns (GetMyPhoneResponse) {
         option (google.api.http) = {
-            get: "/users/me/phone"
+            get: "/auth/v1/users/me/phone"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -462,7 +360,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Phone";
+            tags: ["My User", "Auth Service"];
             summary: "Get My Phone";
             description: "Returns the phone number of the authenticated user and if the state is verified or not."
         };
@@ -470,7 +368,7 @@ service AuthService {
 
     rpc SetMyPhone(SetMyPhoneRequest) returns (SetMyPhoneResponse) {
         option (google.api.http) = {
-            put: "/users/me/phone"
+            put: "/auth/v1/users/me/phone"
             body: "*"
         };
 
@@ -479,7 +377,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Phone";
+            tags: ["My User", "Auth Service"];
             summary: "Set My Phone";
             description: "Sets a new phone number to the authenticated user. If a notification provider is configured the user will receive an sms with a code to authenticate the number."
         };
@@ -487,7 +385,7 @@ service AuthService {
 
     rpc VerifyMyPhone(VerifyMyPhoneRequest) returns (VerifyMyPhoneResponse) {
         option (google.api.http) = {
-            post: "/users/me/phone/_verify"
+            post: "/auth/v1/users/me/phone/_verify"
             body: "*"
         };
 
@@ -496,7 +394,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Phone";
+            tags: ["My User", "Auth Service"];
             summary: "Verify Phone";
             description: "Verify the phone number of the authenticated user, with the code that has been sent to the number. State of the phone number is verified after."
         };
@@ -505,7 +403,7 @@ service AuthService {
     // Resends an sms to the last given phone number, to verify it
     rpc ResendMyPhoneVerification(ResendMyPhoneVerificationRequest) returns (ResendMyPhoneVerificationResponse) {
         option (google.api.http) = {
-            post: "/users/me/phone/_resend_verification"
+            post: "/auth/v1/users/me/phone/_resend_verification"
             body: "*"
         };
 
@@ -514,7 +412,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Phone";
+            tags: ["My User", "Auth Service"];
             summary: "Resend Phone verification";
             description: "Resends the verification notification to the last given phone number of the authenticated user. The notification provider has to be configured."
         };
@@ -522,7 +420,7 @@ service AuthService {
 
     rpc RemoveMyPhone(RemoveMyPhoneRequest) returns (RemoveMyPhoneResponse) {
         option (google.api.http) = {
-            delete: "/users/me/phone"
+            delete: "/auth/v1/users/me/phone"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -530,7 +428,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Phone";
+            tags: ["My User", "Auth Service"];
             summary: "Remove Phone Number";
             description: "The phone number of the authenticated user will be removed."
         };
@@ -538,7 +436,7 @@ service AuthService {
 
     rpc RemoveMyAvatar(RemoveMyAvatarRequest) returns (RemoveMyAvatarResponse) {
         option (google.api.http) = {
-            delete: "/users/me/avatar"
+            delete: "/auth/v1/users/me/avatar"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -546,7 +444,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User";
+            tags: ["My User", "Auth Service"];
             summary: "Remove My Avatar";
             description: "Remove the avatar of the authenticated user. If no avatar is set a shortcut of the name of the user will be presented."
         };
@@ -554,7 +452,7 @@ service AuthService {
 
     rpc ListMyLinkedIDPs(ListMyLinkedIDPsRequest) returns (ListMyLinkedIDPsResponse) {
         option (google.api.http) = {
-            post: "/users/me/idps/_search"
+            post: "/auth/v1/users/me/idps/_search"
             body: "*"
         };
 
@@ -563,7 +461,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Social Login"
+            tags: ["My User", "Auth Service"];
             summary: "List Social Logins";
             description: "Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.)"
         };
@@ -571,7 +469,7 @@ service AuthService {
 
     rpc RemoveMyLinkedIDP(RemoveMyLinkedIDPRequest) returns (RemoveMyLinkedIDPResponse) {
         option (google.api.http) = {
-            delete: "/users/me/idps/{idp_id}/{linked_user_id}"
+            delete: "/auth/v1/users/me/idps/{idp_id}/{linked_user_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -579,7 +477,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Social Login"
+            tags: ["My User", "Auth Service"];
             summary: "Remove Social Login";
             description: "Remove one of the linked social logins/identity providers of the authenticated user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate."
         };
@@ -587,7 +485,7 @@ service AuthService {
 
     rpc ListMyAuthFactors(ListMyAuthFactorsRequest) returns (ListMyAuthFactorsResponse) {
         option (google.api.http) = {
-            post: "/users/me/auth_factors/_search"
+            post: "/auth/v1/users/me/auth_factors/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -595,7 +493,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "List Authentication Factors";
             description: "Returns a list of possible authentication factors, multi-factor (MFA), second factor (2FA)"
         };
@@ -603,7 +501,7 @@ service AuthService {
 
     rpc AddMyAuthFactorOTP(AddMyAuthFactorOTPRequest) returns (AddMyAuthFactorOTPResponse) {
         option (google.api.http) = {
-            post: "/users/me/auth_factors/otp"
+            post: "/auth/v1/users/me/auth_factors/otp"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -611,7 +509,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Add One-Time Password (OTP)";
             description: "Add a new One-Time Password (OTP) factor to the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. Only one OTP per user is allowed. After adding a new OTP it has to be verified."
         };
@@ -619,7 +517,7 @@ service AuthService {
 
     rpc VerifyMyAuthFactorOTP(VerifyMyAuthFactorOTPRequest) returns (VerifyMyAuthFactorOTPResponse) {
         option (google.api.http) = {
-            post: "/users/me/auth_factors/otp/_verify"
+            post: "/auth/v1/users/me/auth_factors/otp/_verify"
             body: "*"
         };
 
@@ -628,7 +526,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Verify One-Time Password (OTP)";
             description: "Verify the last added One-Time Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. Only one OTP per user is allowed."
         };
@@ -636,7 +534,7 @@ service AuthService {
 
     rpc RemoveMyAuthFactorOTP(RemoveMyAuthFactorOTPRequest) returns (RemoveMyAuthFactorOTPResponse) {
         option (google.api.http) = {
-            delete: "/users/me/auth_factors/otp"
+            delete: "/auth/v1/users/me/auth_factors/otp"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -644,7 +542,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Remove One-Time Password (OTP)";
             description: "Remove the configured One-Time Password (OTP) factor of the authenticated user. OTP is an authenticator app like Google/Microsoft Authenticator, Authy, etc. As only one OTP per user is allowed, the user will not have OTP as a second factor afterward."
         };
@@ -652,7 +550,7 @@ service AuthService {
 
     rpc AddMyAuthFactorOTPSMS(AddMyAuthFactorOTPSMSRequest) returns (AddMyAuthFactorOTPSMSResponse) {
         option (google.api.http) = {
-            post: "/users/me/auth_factors/otp_sms"
+            post: "/auth/v1/users/me/auth_factors/otp_sms"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -660,7 +558,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Add One-Time Password (OTP) SMS";
             description: "Add a new One-Time Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor."
         };
@@ -668,7 +566,7 @@ service AuthService {
 
     rpc RemoveMyAuthFactorOTPSMS(RemoveMyAuthFactorOTPSMSRequest) returns (RemoveMyAuthFactorOTPSMSResponse) {
         option (google.api.http) = {
-            delete: "/users/me/auth_factors/otp_sms"
+            delete: "/auth/v1/users/me/auth_factors/otp_sms"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -676,7 +574,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Remove One-Time Password (OTP) SMS";
             description: "Remove the configured One-Time Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second factor afterward."
         };
@@ -684,7 +582,7 @@ service AuthService {
 
     rpc AddMyAuthFactorOTPEmail(AddMyAuthFactorOTPEmailRequest) returns (AddMyAuthFactorOTPEmailResponse) {
         option (google.api.http) = {
-            post: "/users/me/auth_factors/otp_email"
+            post: "/auth/v1/users/me/auth_factors/otp_email"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -692,7 +590,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Add One-Time Password (OTP) Email";
             description: "Add a new One-Time Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor."
         };
@@ -700,7 +598,7 @@ service AuthService {
 
     rpc RemoveMyAuthFactorOTPEmail(RemoveMyAuthFactorOTPEmailRequest) returns (RemoveMyAuthFactorOTPEmailResponse) {
         option (google.api.http) = {
-            delete: "/users/me/auth_factors/otp_email"
+            delete: "/auth/v1/users/me/auth_factors/otp_email"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -708,7 +606,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Remove One-Time Password (OTP) Email";
             description: "Remove the configured One-Time Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second factor afterward."
         };
@@ -716,7 +614,7 @@ service AuthService {
 
     rpc AddMyAuthFactorU2F(AddMyAuthFactorU2FRequest) returns (AddMyAuthFactorU2FResponse) {
         option (google.api.http) = {
-            post: "/users/me/auth_factors/u2f"
+            post: "/auth/v1/users/me/auth_factors/u2f"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -724,7 +622,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Add Universal Second Factor (U2F)";
             description: "Add a new Universal Second Factor (U2F) to the authenticated user. U2F is a device-dependent authentication like FingerScan, FaceID, WindowHello, etc. The factor has to be verified after adding. Multiple factors can be added."
         };
@@ -732,7 +630,7 @@ service AuthService {
 
     rpc VerifyMyAuthFactorU2F(VerifyMyAuthFactorU2FRequest) returns (VerifyMyAuthFactorU2FResponse) {
         option (google.api.http) = {
-            post: "/users/me/auth_factors/u2f/_verify"
+            post: "/auth/v1/users/me/auth_factors/u2f/_verify"
             body: "*"
         };
 
@@ -741,7 +639,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Add Universal Second Factor (U2F)";
             description: "Verify the last added new Universal Second Factor (U2F) to the authenticated user."
         };
@@ -749,7 +647,7 @@ service AuthService {
 
     rpc RemoveMyAuthFactorU2F(RemoveMyAuthFactorU2FRequest) returns (RemoveMyAuthFactorU2FResponse) {
         option (google.api.http) = {
-            delete: "/users/me/auth_factors/u2f/{token_id}"
+            delete: "/auth/v1/users/me/auth_factors/u2f/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -757,7 +655,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Remove Universal Second Factor (U2F)";
             description: "Remove a specific Universal Second Factor (U2F) from the authenticated user by sending the id."
         };
@@ -765,14 +663,14 @@ service AuthService {
 
     rpc ListMyPasswordless(ListMyPasswordlessRequest) returns (ListMyPasswordlessResponse) {
         option (google.api.http) = {
-            post: "/users/me/passwordless/_search"
+            post: "/auth/v1/users/me/passwordless/_search"
         };
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "List Passkey";
             description: "Get the list of configured passkey authentication methods. Like FingerPrint, FaceID, WindowsHello, HardwareToken, etc."
         };
@@ -780,7 +678,7 @@ service AuthService {
 
     rpc AddMyPasswordless(AddMyPasswordlessRequest) returns (AddMyPasswordlessResponse) {
         option (google.api.http) = {
-            post: "/users/me/passwordless"
+            post: "/auth/v1/users/me/passwordless"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -788,7 +686,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Add passkey";
             description: "Add a new passkey authentication method to the authenticated user. Like FingerPrint, FaceID, WindowsHello, HardwareToken, etc. Multiple passkeys can be configured."
         };
@@ -796,7 +694,7 @@ service AuthService {
 
     rpc AddMyPasswordlessLink(AddMyPasswordlessLinkRequest) returns (AddMyPasswordlessLinkResponse) {
         option (google.api.http) = {
-            post: "/users/me/passwordless/_link"
+            post: "/auth/v1/users/me/passwordless/_link"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -804,7 +702,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Add passkey link";
             description: "Adds a new passkey authenticator link to the authenticated user and returns it in the response. This link enables the user to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
         };
@@ -812,7 +710,7 @@ service AuthService {
 
     rpc SendMyPasswordlessLink(SendMyPasswordlessLinkRequest) returns (SendMyPasswordlessLinkResponse) {
         option (google.api.http) = {
-            post: "/users/me/passwordless/_send_link"
+            post: "/auth/v1/users/me/passwordless/_send_link"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -820,7 +718,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Send passkey link";
             description: "Adds a new passkey authenticator link to the authenticated user and sends it to the registered email address. This link enables the user to register a new device if current passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
         };
@@ -828,7 +726,7 @@ service AuthService {
 
     rpc VerifyMyPasswordless(VerifyMyPasswordlessRequest) returns (VerifyMyPasswordlessResponse) {
         option (google.api.http) = {
-            post: "/users/me/passwordless/_verify"
+            post: "/auth/v1/users/me/passwordless/_verify"
             body: "*"
         };
 
@@ -837,7 +735,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Verify passkey";
             description: "Verifies the last added passkey configuration of the authenticated user."
         };
@@ -845,7 +743,7 @@ service AuthService {
 
     rpc RemoveMyPasswordless(RemoveMyPasswordlessRequest) returns (RemoveMyPasswordlessResponse) {
         option (google.api.http) = {
-            delete: "/users/me/passwordless/{token_id}"
+            delete: "/auth/v1/users/me/passwordless/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -853,7 +751,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authentication Factor"
+            tags: ["My User", "Auth Service"];
             summary: "Remove passkey";
             description: "Remove a passkey configuration from the authenticated user. The user will not be able to log in with that configuration afterward. Make sure the user has other possibilities to log in."
         };
@@ -861,7 +759,7 @@ service AuthService {
 
     rpc ListMyUserGrants(ListMyUserGrantsRequest) returns (ListMyUserGrantsResponse) {
         option (google.api.http) = {
-            post: "/usergrants/me/_search"
+            post: "/auth/v1/usergrants/me/_search"
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
@@ -869,7 +767,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authorizations/Grants"
+            tags: ["My User", "Auth Service"];
             summary: "List My Authorizations/Grants";
             description: "Returns a list of the authorizations/user grants the authenticated user has. User grants consist of an organization, a project and 1-n roles."
         };
@@ -877,7 +775,7 @@ service AuthService {
 
     rpc ListMyProjectOrgs(ListMyProjectOrgsRequest) returns (ListMyProjectOrgsResponse) {
         option (google.api.http) = {
-            post: "/global/projectorgs/_search"
+            post: "/auth/v1/global/projectorgs/_search"
             body: "*"
         };
 
@@ -886,7 +784,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authorizations/Grants"
+            tags: ["My User", "Auth Service"];
             summary: "List My Organizations";
             description: "Returns a list of the organizations where the authenticated user has any authorizations/user grants. The request is made in the context of the requested project. This request can be used in multi-tenancy applications to show the user a tenant switcher."
         };
@@ -894,7 +792,7 @@ service AuthService {
 
     rpc ListMyZitadelPermissions(ListMyZitadelPermissionsRequest) returns (ListMyZitadelPermissionsResponse) {
         option (google.api.http) = {
-            post: "/permissions/zitadel/me/_search"
+            post: "/auth/v1/permissions/zitadel/me/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -902,7 +800,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authorizations/Grants"
+            tags: ["My User", "Auth Service"];
             summary: "List My ZITADEL Permissions";
             description: "Returns a list of permissions the authenticated user has in ZITADEL based on the manager roles the user has. (e.g: ORG_OWNER = org.read, org.write, ...)."
         };
@@ -910,7 +808,7 @@ service AuthService {
 
     rpc ListMyProjectPermissions(ListMyProjectPermissionsRequest) returns (ListMyProjectPermissionsResponse) {
         option (google.api.http) = {
-            post: "/permissions/me/_search"
+            post: "/auth/v1/permissions/me/_search"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -918,7 +816,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Authorizations/Grants"
+            tags: ["My User", "Auth Service"];
             summary: "List My Project Roles";
             description: "Returns a list of roles for the authenticated user and for the requesting project (based on the token)."
         };
@@ -926,7 +824,7 @@ service AuthService {
 
     rpc ListMyMemberships(ListMyMembershipsRequest) returns (ListMyMembershipsResponse) {
         option (google.api.http) = {
-            post: "/memberships/me/_search"
+            post: "/auth/v1/memberships/me/_search"
             body: "*"
         };
 
@@ -935,7 +833,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "User Memberships"
+            tags: ["My User", "Auth Service"];
             summary: "List My ZITADEL Manager Roles";
             description: "Show all the management roles my user has in ZITADEL (ZITADEL Manager)."
         };
@@ -943,7 +841,7 @@ service AuthService {
 
     rpc GetMyLabelPolicy(GetMyLabelPolicyRequest) returns (GetMyLabelPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/label"
+            get: "/auth/v1/policies/label"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -951,7 +849,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Policies";
+            tags: ["My User", "Auth Service"];
             summary: "Get Label Policy";
             description: "Returns the label settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines the branding, colors, fonts, images, etc."
         };
@@ -959,7 +857,7 @@ service AuthService {
 
     rpc GetMyPrivacyPolicy(GetMyPrivacyPolicyRequest) returns (GetMyPrivacyPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/privacy"
+            get: "/auth/v1/policies/privacy"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -967,7 +865,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Policies";
+            tags: ["My User", "Auth Service"];
             summary: "Get Privacy Policy";
             description: "Returns the privacy settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines the TOS and terms of service links."
         };
@@ -975,7 +873,7 @@ service AuthService {
 
     rpc GetMyLoginPolicy(GetMyLoginPolicyRequest) returns (GetMyLoginPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/login"
+            get: "/auth/v1/policies/login"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -983,7 +881,7 @@ service AuthService {
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: "Policies";
+            tags: ["My User", "Auth Service"];
             summary: "Get Login Policy";
             description: "Returns the login settings that should be used for the authenticated user. It is set either on an instance or organization level. This policy defines what possibilities the user has to authenticate and to use in the login, e.g social logins, MFA, passkey, etc."
         };

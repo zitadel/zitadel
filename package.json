@@ -1,0 +1,14 @@
+{
+  "name": "zitadel",
+  "private": true,
+  "scripts": {
+    "generate": "turbo run generate",
+    "build": "turbo run build",
+    "build:docs": "turbo run build --filter=./docs/**",
+    "clear": "turbo run clear"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3"
+  },
+  "packageManager": "pnpm@9.15.4"
+}
