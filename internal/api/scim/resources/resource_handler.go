@@ -22,6 +22,7 @@ type ResourceHandler[T ResourceHolder] interface {
 	Replace(ctx context.Context, id string, resource T) (T, error)
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (T, error)
+	List(ctx context.Context, request *ListRequest) (*ListResponse[T], error)
 }
 
 type Resource struct {

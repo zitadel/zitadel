@@ -146,4 +146,6 @@ Then create a personal access token (PAT), copy and set it as `ZITADEL_SERVICE_U
 Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
 Also ensure your login domain is registered on your instance by adding it as a [trusted domain](/docs/reference/deprecated#tag/admin-service/POST/admin/v1/trusted_domains).
 
+If you want to enforce users to have their email verified, you can set the optional `EMAIL_VERIFICATION` variable to `true` in your environment and your users will be enforced to verify their email address before they can log in.
+
 ![Deploy to Vercel](/img/deploy-to-vercel.png)
