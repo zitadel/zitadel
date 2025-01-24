@@ -207,7 +207,7 @@ func Test_Extract(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, gotC, gotMsg, gotID, gotOk := ExtractZITADELError(tt.args.err)
+			gotC, gotMsg, gotID, gotOk := ExtractZITADELError(tt.args.err)
 			if gotC != tt.wantC {
 				t.Errorf("extract() gotC = %v, want %v", gotC, tt.wantC)
 			}
