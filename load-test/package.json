@@ -27,7 +27,7 @@
     },
     "scripts": {
         "bundle": "webpack",
-        "lint": "prettier --check src",
+        "lint": "prettier --check src/**",
         "lint:fix": "prettier --write src"
     }
 }

@@ -1,7 +1,7 @@
 import { loginByUsernamePassword } from '../login_ui';
 import { createOrg, removeOrg } from '../org';
-import {createMachine, User, addMachineSecret} from '../user';
-import {clientCredentials, userinfo} from '../oidc';
+import { createMachine, User, addMachineSecret } from '../user';
+import { clientCredentials, userinfo } from '../oidc';
 import { Config, MaxVUs } from '../config';
 
 export async function setup() {
@@ -37,10 +37,9 @@ export async function setup() {
 }
 
 export default function (data: any) {
-  clientCredentials(data.machines[__VU - 1].loginName, data.machines[__VU - 1].password)
-    .then((token) => {
-      userinfo(token.accessToken!)
-    })
+  clientCredentials(data.machines[__VU - 1].loginName, data.machines[__VU - 1].password).then((token) => {
+    userinfo(token.accessToken!);
+  });
 }
 
 export function teardown(data: any) {
