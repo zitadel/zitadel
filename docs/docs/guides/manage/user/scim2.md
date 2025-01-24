@@ -35,7 +35,7 @@ The base URL for the SCIM endpoint in Zitadel is: `https://${ZITADEL_DOMAIN}/sci
 ## Authentication
 
 The SCIM interface adheres to Zitadel's standard API authentication methods.
-For detailed instructions on authenticating with the SCIM interface, refer to the [Authenticate Service Users Guide]((/guides/integrate/service-users/authenticate-service-users)).
+For detailed instructions on authenticating with the SCIM interface, refer to the [Authenticate Service Users Guide](/guides/integrate/service-users/authenticate-service-users).
 
 ## Query
 
