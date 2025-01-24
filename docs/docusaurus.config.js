@@ -5,8 +5,8 @@ module.exports = {
   url: "https://zitadel.com",
   baseUrl: "/docs",
   onBrokenLinks: "throw",
-  onBrokenAnchors: "warn",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenAnchors: "log", //Docusaurus does not support checking links that reside in Scalar.
+  onBrokenMarkdownLinks: "warn", 
   favicon: "img/favicon.ico",
   organizationName: "zitadel",
   projectName: "zitadel",
@@ -245,6 +245,7 @@ module.exports = {
       route: '/docs/reference',
       showNavLink: false,
       configuration: {
+        searchHotKey: 'g',
         tagsSorter: 'alpha',
         hideModels: true,
         isEditable: false,
@@ -265,6 +266,7 @@ module.exports = {
         route: '/docs/reference/deprecated',
         showNavLink: false,
         configuration: {
+          searchHotKey: 'g',
           tagsSorter: 'alpha',
           hideModels: true,
           isEditable: false,
@@ -291,9 +293,8 @@ module.exports = {
       };
     },
   ],
-  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  themes: [ "docusaurus-theme-github-codeblock"],
   future: {
-    // See https://docusaurus.io/blog/releases/3.6
     experimental_faster: true,
   },
 };
