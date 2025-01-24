@@ -14,6 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
+	"github.com/zitadel/zitadel/internal/integration"
 )
 
 var _ execution.Target = &mockExecutionTarget{}
@@ -567,7 +568,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			closeFuncs := make([]func(), len(tt.args.targets))
 			for i, target := range tt.args.targets {
-				url, closeF := testServerCall(
+				url, closeF, _ := integration.TestServerCall(
 					target.reqBody,
 					target.sleep,
 					target.statusCode,
@@ -765,7 +766,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			closeFuncs := make([]func(), len(tt.args.targets))
 			for i, target := range tt.args.targets {
-				url, closeF := testServerCall(
+				url, closeF, _ := integration.TestServerCall(
 					target.reqBody,
 					target.sleep,
 					target.statusCode,

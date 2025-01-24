@@ -33,25 +33,31 @@ const (
 	ExecutionTargetsDataCol   = "targets_data"
 )
 
-type executionsHandler struct {
-	es    *eventstore.Eventstore
-	query *query.Queries
+type eventExecutionsHandlerQueries interface {
+	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
 }
 
-func NewExecutionsHandler(
+type eventExecutionsHandler struct {
+	eventTypes                 []string
+	aggregateTypeFromEventType func(typ eventstore.EventType) eventstore.AggregateType
+	query                      eventExecutionsHandlerQueries
+}
+
+func NewEventExecutionsHandler(
 	ctx context.Context,
 	config handler.Config,
-	es *eventstore.Eventstore,
-	query *query.Queries,
+	eventTypes []string,
+	aggregateTypeFromEventType func(typ eventstore.EventType) eventstore.AggregateType,
+	query eventExecutionsHandlerQueries,
 ) *handler.Handler {
-	return handler.NewHandler(ctx, &config, &executionsHandler{es: es, query: query})
+	return handler.NewHandler(ctx, &config, &eventExecutionsHandler{eventTypes: eventTypes, aggregateTypeFromEventType: aggregateTypeFromEventType, query: query})
 }
 
-func (u *executionsHandler) Name() string {
+func (u *eventExecutionsHandler) Name() string {
 	return ExecutionHandlerTable
 }
 
-func (*executionsHandler) Init() *old_handler.Check {
+func (*eventExecutionsHandler) Init() *old_handler.Check {
 	return handler.NewTableCheck(
 		handler.NewTable([]*handler.InitColumn{
 			handler.NewColumn(ExecutionInstanceID, handler.ColumnTypeText),
@@ -71,12 +77,10 @@ func (*executionsHandler) Init() *old_handler.Check {
 	)
 }
 
-func (u *executionsHandler) Reducers() []handler.AggregateReducer {
-	eventTypes := u.es.EventTypes()
-
+func (u *eventExecutionsHandler) Reducers() []handler.AggregateReducer {
 	aggList := make(map[eventstore.AggregateType][]eventstore.EventType)
-	for _, eventType := range eventTypes {
-		aggType := eventstore.AggregateTypeFromEventType(eventstore.EventType(eventType))
+	for _, eventType := range u.eventTypes {
+		aggType := u.aggregateTypeFromEventType(eventstore.EventType(eventType))
 		aggEventTypes, ok := aggList[aggType]
 		if !ok {
 			aggList[aggType] = []eventstore.EventType{eventstore.EventType(eventType)}
@@ -130,7 +134,7 @@ func groupsFromEventType(s string) []string {
 		}
 	}
 	// sort to end up with the most specific group first
-	slices.SortFunc(parts, func(a, b string) int {
+	slices.SortFunc(groups, func(a, b string) int {
 		return strings.Compare(a, b) * -1
 	})
 	return groups
@@ -148,7 +152,7 @@ func idsForEventType(eventType string) []string {
 	)
 }
 
-func (u *executionsHandler) reduce(e eventstore.Event) (*handler.Statement, error) {
+func (u *eventExecutionsHandler) reduce(e eventstore.Event) (*handler.Statement, error) {
 	ctx := HandlerContext(e.Aggregate())
 
 	targets, err := u.query.TargetsByExecutionID(ctx, idsForEventType(string(e.Type())))
@@ -235,7 +239,7 @@ func (e *EventExecution) ContextInfo() *ContextInfoEvent {
 		Version:       string(e.Aggregate.Version),
 		Sequence:      e.Sequence,
 		EventType:     string(e.EventType),
-		CreatedAt:     e.CreatedAt.Format(time.RFC3339Nano),
+		CreatedAt:     e.CreatedAt.Format(time.RFC3339),
 		UserID:        e.UserID,
 		EventPayload:  e.EventData,
 	}

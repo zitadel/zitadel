@@ -19,11 +19,11 @@ var (
 func Create(
 	ctx context.Context,
 	executionsCustomConfig projection.CustomConfig,
-	queries *query.Queries,
+	queries eventExecutionsHandlerQueries,
 	es *eventstore.Eventstore,
 ) {
 	projections = []*handler.Handler{
-		NewExecutionsHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), es, queries),
+		NewEventExecutionsHandler(ctx, projection.ApplyCustomConfig(executionsCustomConfig), es.EventTypes(), eventstore.AggregateTypeFromEventType, queries),
 	}
 }
 

@@ -18,23 +18,26 @@ import (
 var searchEventExecutions string
 
 type Queries interface {
+	ActiveInstancesWithFeatureFlag(ctx context.Context, featureFlag bool) []string
+	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
+}
+
+type baseQueries interface {
+	ActiveInstances() []string
 	InstanceByID(ctx context.Context, id string) (instance authz.Instance, err error)
 	GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string) (*query.NotifyUser, error)
 	TargetsByExecutionID(ctx context.Context, ids []string) (execution []*query.ExecutionTarget, err error)
 	GetInstanceFeatures(ctx context.Context, cascade bool) (_ *query.InstanceFeatures, err error)
-
-	ActiveInstances() []string
-	ActiveInstancesWithFeatureFlag(ctx context.Context, featureFlag bool) []string
 }
 
 type ExecutionsQueries struct {
 	Queries
-	queries *query.Queries
+	queries baseQueries
 	client  *database.DB
 }
 
 func NewExecutionsQueries(
-	baseQueries *query.Queries,
+	baseQueries baseQueries,
 	client *database.DB,
 ) *ExecutionsQueries {
 	return &ExecutionsQueries{

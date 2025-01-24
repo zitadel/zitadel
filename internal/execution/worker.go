@@ -74,7 +74,7 @@ func (w *Worker) schedule(ctx context.Context, workerID int) {
 }
 
 func (w *Worker) log(workerID int) *logging.Entry {
-	return logging.WithFields("notification worker", workerID)
+	return logging.WithFields("execution worker", workerID)
 }
 
 func (w *Worker) queryInstances(ctx context.Context) ([]string, error) {
