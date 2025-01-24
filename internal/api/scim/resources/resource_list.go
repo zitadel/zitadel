@@ -118,7 +118,7 @@ func (r *ListRequest) toSearchRequest(defaultSortCol query.Column, fieldPathColu
 	if r.SortBy == "" {
 		// set a default sort to ensure consistent results
 		sr.SortingColumn = defaultSortCol
-	} else if sortCol, err := fieldPathColumnMapping.Resolve(r.SortBy); err != nil {
+	} else if sortCol, err := fieldPathColumnMapping.Resolve(r.SortBy); err != nil || sortCol.FieldType == filter.FieldTypeCustom {
 		return sr, serrors.ThrowInvalidValue(zerrors.ThrowInvalidArgument(err, "SCIM-SRT1", "SortBy field is unknown or not supported"))
 	} else {
 		sr.SortingColumn = sortCol.Column
