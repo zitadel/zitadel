@@ -293,7 +293,7 @@ module.exports = {
       };
     },
   ],
-  themes: [ "docusaurus-theme-github-codeblock"],
+  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
   future: {
     experimental_faster: true,
   },
