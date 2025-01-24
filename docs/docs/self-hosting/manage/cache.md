@@ -7,6 +7,8 @@ ZITADEL supports the use of a caches to speed up the lookup of frequently needed
 
 :::info
 Caches is currently an [experimental beta](/docs/support/software-release-cycles-support#beta) feature.
+
+Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1332343909900222506)!
 :::
 
 ## Configuration

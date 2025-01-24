@@ -22,6 +22,8 @@ endpoints are called with a JWT access token.
 
 :::info
 Web keys are an [experimental](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable the `web_key` [feature](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) before using it.
+
+Test the feature and add improvement or bug reports directly to the [github repository](https://github.com/zitadel/zitadel) or let us know your general feedback in the [discord thread](https://discord.com/channels/927474939156643850/1329100936127320175/threads/1332344892629717075)!
 :::
 
 ### JSON Web Key
