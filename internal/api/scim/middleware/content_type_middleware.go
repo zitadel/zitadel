@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	ContentTypeScim = "application/scim+json"
-	ContentTypeJson = "application/json"
+	ContentTypeScim                = "application/scim+json"
+	ContentTypeJson                = "application/json"
+	ContentTypeApplicationWildcard = "application/*"
+	ContentTypeWildcard            = "*/*"
 )
 
 func ContentTypeMiddleware(next middleware.HandlerFuncWithError) middleware.HandlerFuncWithError {
@@ -44,7 +46,11 @@ func validateContentType(contentType string) bool {
 		return false
 	}
 
-	if mediaType != "" && !strings.EqualFold(mediaType, ContentTypeJson) && !strings.EqualFold(mediaType, ContentTypeScim) {
+	if mediaType != "" &&
+		!strings.EqualFold(mediaType, ContentTypeWildcard) &&
+		!strings.EqualFold(mediaType, ContentTypeApplicationWildcard) &&
+		!strings.EqualFold(mediaType, ContentTypeJson) &&
+		!strings.EqualFold(mediaType, ContentTypeScim) {
 		return false
 	}
 
