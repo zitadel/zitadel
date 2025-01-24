@@ -7,6 +7,8 @@ The SCIM v2 interface of Zitadel is currently in a [preview stage](/support/soft
 It is not yet feature-complete, may contain bugs, and is not generally available.
 
 Do not use it for production yet.
+
+As long as the feature is in a preview state, it will be available for free, it will be put behind a commercial license once it is fully available.
 :::
 
 The Zitadel [SCIM v2](https://scim.cloud/) service provider interface enables seamless integration of identity and
