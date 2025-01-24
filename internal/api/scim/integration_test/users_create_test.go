@@ -33,6 +33,9 @@ var (
 	//go:embed testdata/users_create_test_minimal_inactive.json
 	minimalInactiveUserJson []byte
 
+	//go:embed testdata/users_create_test_no_primary_email_phone.json
+	minimalNoPrimaryEmailPhoneUserJson []byte
+
 	//go:embed testdata/users_create_test_full.json
 	fullUserJson []byte
 
@@ -195,6 +198,24 @@ func TestCreateUser(t *testing.T) {
 			name: "full user",
 			body: fullUserJson,
 			want: fullUser,
+		},
+		{
+			name: "no primary email and phone",
+			body: minimalNoPrimaryEmailPhoneUserJson,
+			want: &resources.ScimUser{
+				Emails: []*resources.ScimEmail{
+					{
+						Value:   "user1@example.com",
+						Primary: true,
+					},
+				},
+				PhoneNumbers: []*resources.ScimPhoneNumber{
+					{
+						Value:   "+41711234567",
+						Primary: true,
+					},
+				},
+			},
 		},
 		{
 			name:          "missing userName",
