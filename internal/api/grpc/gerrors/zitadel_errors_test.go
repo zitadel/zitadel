@@ -7,11 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/protoadapt"
-
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/protoadapt"
 )
 
 func TestCaosToGRPCError(t *testing.T) {
