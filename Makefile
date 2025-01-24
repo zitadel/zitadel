@@ -88,17 +88,17 @@ console_move:
 .PHONY: console_dependencies
 console_dependencies:
 	cd console && \
-	yarn install --immutable
+	pnpm install
 
 .PHONY: console_client
 console_client:
 	cd console && \
-	yarn generate
+	turbo run generate
 
 .PHONY: console_build
 console_build: console_dependencies console_client
 	cd console && \
-	yarn build
+	turbo run build
 
 .PHONY: clean
 clean:

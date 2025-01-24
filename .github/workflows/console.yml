@@ -29,6 +29,10 @@ jobs:
         - 
           uses: actions/checkout@v4
         - 
+          uses: pnpm/action-setup@v2
+          with:
+            version: 6.32.9
+        - 
           uses: actions/cache/restore@v4
           timeout-minutes: 1
           continue-on-error: true
@@ -49,8 +53,8 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: ${{ inputs.node_version }}
-            cache: 'yarn'
-            cache-dependency-path: console/yarn.lock
+            cache: 'pnpm'
+            cache-dependency-path: pnpm-lock.yaml
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           run: make console_build
