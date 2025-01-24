@@ -19,7 +19,7 @@ import (
 
 // RawResourceHandlerAdapter adapts the ResourceHandler[T] without any generics
 type RawResourceHandlerAdapter interface {
-	ResourceNamePlural() schemas.ScimResourceTypePlural
+	Schema() *schemas.ResourceSchema
 
 	Create(ctx context.Context, data io.ReadCloser) (ResourceHolder, error)
 	Replace(ctx context.Context, resourceID string, data io.ReadCloser) (ResourceHolder, error)
@@ -37,8 +37,8 @@ func NewResourceHandlerAdapter[T ResourceHolder](handler ResourceHandler[T]) *Re
 	}
 }
 
-func (adapter *ResourceHandlerAdapter[T]) ResourceNamePlural() schemas.ScimResourceTypePlural {
-	return adapter.handler.ResourceNamePlural()
+func (adapter *ResourceHandlerAdapter[T]) Schema() *schemas.ResourceSchema {
+	return adapter.handler.Schema()
 }
 
 func (adapter *ResourceHandlerAdapter[T]) CreateFromHttp(r *http.Request) (ResourceHolder, error) {
@@ -112,7 +112,7 @@ func (adapter *ResourceHandlerAdapter[T]) GetFromHttp(r *http.Request) (T, error
 
 func (adapter *ResourceHandlerAdapter[T]) readEntity(data io.ReadCloser) (T, error) {
 	entity := adapter.handler.NewResource()
-	return entity, readSchema(data, entity, adapter.handler.SchemaType())
+	return entity, readSchema(data, entity, adapter.handler.Schema().ID)
 }
 
 func readSchema(data io.ReadCloser, entity SchemasHolder, schema schemas.ScimSchemaType) error {
