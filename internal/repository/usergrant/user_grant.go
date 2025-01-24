@@ -85,6 +85,7 @@ func UserGrantAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 type UserGrantChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
+	UserID               string   `json:"userId"`
 	RoleKeys             []string `json:"roleKeys"`
 }
 
@@ -99,6 +100,7 @@ func (e *UserGrantChangedEvent) UniqueConstraints() []*eventstore.UniqueConstrai
 func NewUserGrantChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	userID string,
 	roleKeys []string) *UserGrantChangedEvent {
 	return &UserGrantChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -106,6 +108,7 @@ func NewUserGrantChangedEvent(
 			aggregate,
 			UserGrantChangedType,
 		),
+		UserID:   userID,
 		RoleKeys: roleKeys,
 	}
 }
@@ -165,17 +168,17 @@ func UserGrantCascadeChangedEventMapper(event eventstore.Event) (eventstore.Even
 
 type UserGrantRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	userID               string `json:"-"`
-	projectID            string `json:"-"`
-	projectGrantID       string `json:"-"`
+	UserID               string `json:"userId,omitempty"`
+	ProjectID            string `json:"projectId,omitempty"`
+	ProjectGrantID       string `json:"grantId,omitempty"`
 }
 
 func (e *UserGrantRemovedEvent) Payload() interface{} {
-	return nil
+	return e
 }
 
 func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
+	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
 }
 
 func NewUserGrantRemovedEvent(
@@ -191,9 +194,9 @@ func NewUserGrantRemovedEvent(
 			aggregate,
 			UserGrantRemovedType,
 		),
-		userID:         userID,
-		projectID:      projectID,
-		projectGrantID: projectGrantID,
+		UserID:         userID,
+		ProjectID:      projectID,
+		ProjectGrantID: projectGrantID,
 	}
 }
 
