@@ -284,6 +284,10 @@ func ChangeVersion(version domain.OIDCVersion) func(event *OIDCConfigChangedEven
 
 func ChangeRedirectURIs(uris []string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
+		if uris == nil {
+			// explicitly set them to empty so we can differentiate "not set" in the event in case of no changes
+			uris = make([]string, 0)
+		}
 		e.RedirectUris = &uris
 	}
 }
@@ -314,6 +318,10 @@ func ChangeAuthMethodType(authMethodType domain.OIDCAuthMethodType) func(event *
 
 func ChangePostLogoutRedirectURIs(logoutRedirects []string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
+		if logoutRedirects == nil {
+			// explicitly set them to empty so we can differentiate "not set" in the event in case of no changes
+			logoutRedirects = make([]string, 0)
+		}
 		e.PostLogoutRedirectUris = &logoutRedirects
 	}
 }
@@ -356,6 +364,10 @@ func ChangeClockSkew(clockSkew time.Duration) func(event *OIDCConfigChangedEvent
 
 func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigChangedEvent) {
 	return func(e *OIDCConfigChangedEvent) {
+		if additionalOrigins == nil {
+			// explicitly set them to empty so we can differentiate "not set" in the event in case of no changes
+			additionalOrigins = make([]string, 0)
+		}
 		e.AdditionalOrigins = &additionalOrigins
 	}
 }
