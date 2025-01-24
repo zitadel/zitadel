@@ -12,14 +12,14 @@ const (
 	externalIdProvisioningDomainPlaceholder = "{provisioningDomain}"
 
 	KeyPrefix                 = "urn:zitadel:scim:"
-	KeyProvisioningDomain Key = KeyPrefix + "provisioning_domain"
+	KeyProvisioningDomain Key = KeyPrefix + "provisioningDomain"
 
 	KeyExternalId               Key = KeyPrefix + "externalId"
 	keyScopedExternalIdTemplate     = KeyPrefix + externalIdProvisioningDomainPlaceholder + ":externalId"
 	KeyMiddleName               Key = KeyPrefix + "name.middleName"
 	KeyHonorificPrefix          Key = KeyPrefix + "name.honorificPrefix"
 	KeyHonorificSuffix          Key = KeyPrefix + "name.honorificSuffix"
-	KeyProfileUrl               Key = KeyPrefix + "profileURL"
+	KeyProfileUrl               Key = KeyPrefix + "profileUrl"
 	KeyTitle                    Key = KeyPrefix + "title"
 	KeyLocale                   Key = KeyPrefix + "locale"
 	KeyTimezone                 Key = KeyPrefix + "timezone"
