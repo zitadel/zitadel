@@ -195,6 +195,8 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
 			setUserInfoOrgClaims(user, out)
+		case ScopeIAMGroups:
+			setGroupInfo(user.User, out)
 		default:
 			if claim, ok := strings.CutPrefix(s, domain.OrgDomainPrimaryScope); ok {
 				out.AppendClaims(domain.OrgDomainPrimaryClaim, claim)
@@ -206,6 +208,7 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 		}
 	}
 	return out
+	//zerrors.ThrowInvalidArgumentf(nil, "GROUP-IDasq", "UserInfo %s", user.User.GroupIDs)
 }
 
 func assertRoles(projectID string, user *query.OIDCUserInfo, roleAudience, requestedRoles []string, assertion bool, info *oidc.UserInfo) {
@@ -282,17 +285,6 @@ func setUserInfoOrgClaims(user *query.OIDCUserInfo, out *oidc.UserInfo) {
 }
 
 func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
-	if roles != nil && len(roles.projects) > 0 {
-		if roles, ok := roles.projects[roles.requestProjectID]; ok {
-			userInfo.AppendClaims(ClaimProjectRoles, roles)
-		}
-		for projectID, roles := range roles.projects {
-			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
-		}
-	}
-}
-
-func setUserInfoGroupClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	if roles != nil && len(roles.projects) > 0 {
 		if roles, ok := roles.projects[roles.requestProjectID]; ok {
 			userInfo.AppendClaims(ClaimProjectRoles, roles)
@@ -422,4 +414,26 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 	}
 
 	return nil
+	// zerrors.ThrowInvalidArgumentf(nil, "GROUP-IDasq", "UserInfo %s", userInfo.Claims)
+}
+
+// Set GroupInfo to the UserInfo
+
+/* Will Implement later.
+func setUserInfoGroupClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
+	if roles != nil && len(roles.projects) > 0 {
+		if roles, ok := roles.projects[roles.requestProjectID]; ok {
+			userInfo.AppendClaims(ClaimProjectRoles, roles)
+		}
+		for projectID, roles := range roles.projects {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
+		}
+	}
+}
+*/
+
+func setGroupInfo(user *query.User, out *oidc.UserInfo) {
+	if len(user.GroupIDs) > 0 {
+		out.AppendClaims(ClaimGroups, user.GroupIDs)
+	}
 }
