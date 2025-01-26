@@ -1,5 +1,5 @@
 {
-  "name": "console",
+  "name": "@zitadel/console",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,7 +8,8 @@
     "prelint": "pnpm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
-    "generate": "buf generate ../proto --include-imports --include-wkt"
+    "generate": "buf generate ../proto --include-imports --include-wkt",
+    "clear": "rm -rf src/app/proto/generated && rm -rf .angular"
   },
   "private": true,
   "dependencies": {

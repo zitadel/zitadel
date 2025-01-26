@@ -49,6 +49,24 @@ service ManagementService {
         };
     }
 
+    rpc GetOIDCInformation(GetOIDCInformationRequest) returns (GetOIDCInformationResponse) {
+        option (google.api.http) = {
+            get: "/zitadel/docs"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "ZITADEL documentation";
+            description: "This endpoint returns some general needed (OIDC) information about ZITADEL like the issuer or discovery endpoint."
+            tags: ["Healthz", "Management Service"];
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+        };
+    }
+
     rpc GetIAM(GetIAMRequest) returns (GetIAMResponse) {
         option (google.api.http) = {
             get: "/management/v1/iam"

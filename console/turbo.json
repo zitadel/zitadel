@@ -8,12 +8,15 @@
       },
       "build": {
         "dependsOn": ["generate"],
-        "outputs": ["build/**"],
+        "outputs": ["dist/**"],
         "cache": true
       },
       "start": {
         "dependsOn": ["generate"],
         "cache": false
+      },
+      "clear": {
+        "cache": false
       }
-    }
   }
+}
