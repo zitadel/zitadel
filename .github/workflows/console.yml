@@ -46,11 +46,13 @@ jobs:
             version: ${{ inputs.buf_version }}
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+          uses: pnpm/action-setup@v4
+        - 
+          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           uses: actions/setup-node@v4
           with:
             node-version: ${{ inputs.node_version }}
             cache: 'pnpm'
-            cache-dependency-path: pnpm-lock.yaml
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
           run: make console_build

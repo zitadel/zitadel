@@ -62,12 +62,14 @@ jobs:
     -
       name: Checkout
       uses: actions/checkout@v4
+    - 
+      if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      uses: pnpm/action-setup@v4
     -
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
         cache: 'pnpm'
-        cache-dependency-path: pnpm-lock.yaml
     -
       run: cd console && pnpm install
     -

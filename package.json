@@ -4,6 +4,7 @@
   "scripts": {
     "generate": "turbo run generate",
     "build": "turbo run build",
+    "build:console": "turbo run build --filter=./console/**",
     "build:docs": "turbo run build --filter=./docs/**",
     "clear": "turbo run clear"
   },
