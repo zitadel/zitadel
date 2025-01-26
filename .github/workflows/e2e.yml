@@ -41,11 +41,14 @@ jobs:
           ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
       -
         run: corepack enable
+      - 
+        uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
       -
         uses: cypress-io/github-action@v6
         with:
           runTests: false
-
       - 
         name: Cypress run
         uses: cypress-io/github-action@v6
