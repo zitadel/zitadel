@@ -88,17 +88,17 @@ console_move:
 .PHONY: console_dependencies
 console_dependencies:
 	cd console && \
-	yarn install --immutable
+	pnpm install --immutable
 
 .PHONY: console_client
 console_client:
 	cd console && \
-	yarn generate
+	pnpm generate
 
 .PHONY: console_build
 console_build: console_dependencies console_client
 	cd console && \
-	yarn build
+	pnpm build
 
 .PHONY: clean
 clean:
@@ -157,7 +157,7 @@ core_integration_test: core_integration_server_start core_integration_test_packa
 .PHONY: console_lint
 console_lint:
 	cd console && \
-	yarn lint
+	pnpm lint
 
 .PHONY: core_lint
 core_lint:

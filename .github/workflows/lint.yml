@@ -66,10 +66,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
-        cache: 'yarn'
-        cache-dependency-path: console/yarn.lock
+        cache: 'pnpm'
+        cache-dependency-path: pnpm-lock.yaml
     -
-      run: cd console && yarn install
+      run: cd console && pnpm install
     -
       name: lint
       run: make console_lint
