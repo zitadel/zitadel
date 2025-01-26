@@ -41,6 +41,11 @@ jobs:
           ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
       -
         run: corepack enable
+      -
+        uses: cypress-io/github-action@v6
+        with:
+          runTests: false
+
       - 
         name: Cypress run
         uses: cypress-io/github-action@v6
@@ -50,9 +55,11 @@ jobs:
           CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@localhost:26257/zitadel'
           CYPRESS_BACKEND_URL: http://localhost:8080
         with:
+          install: false
           working-directory: e2e
           browser: ${{ matrix.browser }}
           config-file: cypress.config.ts
+          working-directory: e2e
       - 
         uses: actions/upload-artifact@v4
         if: always()
