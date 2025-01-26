@@ -1,0 +1,19 @@
+{
+    "extends": ["//"],
+    "tasks": {
+      "generate": {
+        "outputs": ["src/app/proto/generated/**"],
+        "inputs": ["../proto/**", "buf.gen.yaml"],
+        "cache": true
+      },
+      "build": {
+        "dependsOn": ["generate"],
+        "outputs": ["build/**"],
+        "cache": true
+      },
+      "start": {
+        "dependsOn": ["generate"],
+        "cache": false
+      }
+    }
+  }
