@@ -226,9 +226,7 @@ module.exports = {
           sidebarPath: require.resolve("./sidebars.js"),
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
-          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
-          
-          docItemComponent:  '@theme/ApiItem'
+          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/"
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -293,7 +291,7 @@ module.exports = {
       };
     },
   ],
-  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  themes: [ "docusaurus-theme-github-codeblock"],
   future: {
     experimental_faster: true,
   },
