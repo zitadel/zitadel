@@ -2,10 +2,12 @@
   "name": "zitadel",
   "private": true,
   "scripts": {
-    "generate": "turbo run generate",
     "build": "turbo run build",
     "build:console": "turbo run build --filter=./console/**",
     "build:docs": "turbo run build --filter=./docs/**",
+    "generate": "turbo run generate",
+    "generate:console": "turbo run generate --filter=./console/**",
+    "generate:docs": "turbo run generate --filter=./docs/**",
     "clear": "turbo run clear"
   },
   "devDependencies": {
