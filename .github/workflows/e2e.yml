@@ -59,7 +59,6 @@ jobs:
           working-directory: e2e
           browser: ${{ matrix.browser }}
           config-file: cypress.config.ts
-          working-directory: e2e
       - 
         uses: actions/upload-artifact@v4
         if: always()
