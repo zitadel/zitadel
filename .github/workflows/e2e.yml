@@ -39,6 +39,8 @@ jobs:
         run: |
           cd ./e2e
           ZITADEL_IMAGE=zitadel:local docker compose up --detach --wait
+      -
+        run: corepack enable
       - 
         name: Cypress run
         uses: cypress-io/github-action@v6

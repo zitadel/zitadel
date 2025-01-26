@@ -1,3 +1,4 @@
 packages:
   - "console/**"
   - "docs/**"
+  - "e2e/**"
