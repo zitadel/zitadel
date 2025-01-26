@@ -9,7 +9,7 @@
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear && rm -rf static/apis && rm -rf .artifacts",
     "serve": "docusaurus serve",
-    "generate": "pnpm run generate:proto && npm run generate:current && npm run generate:deprecated",
+    "generate": "pnpm run generate:proto && pnpm run generate:current && pnpm run generate:deprecated",
     "generate:proto": "buf generate ../proto",
     "generate:current": "swagger2openapi --outfile .artifacts/apis/current.json .artifacts/apis/current.swagger.json && redocly join --without-x-tag-groups ./openapi/current.yaml .artifacts/apis/current.json -o static/apis/current.json",
     "generate:deprecated": "swagger2openapi --outfile .artifacts/apis/deprecated.json .artifacts/apis/deprecated.swagger.json && redocly join --without-x-tag-groups ./openapi/deprecated.yaml .artifacts/apis/deprecated.json -o static/apis/deprecated.json"
