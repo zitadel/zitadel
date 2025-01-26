@@ -44,9 +44,6 @@ jobs:
           with:
             github_token: ${{ github.token }}
             version: ${{ inputs.buf_version }}
-        - 
-          if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          uses: pnpm/action-setup@v4
         -
           run: corepack enable
         - 
