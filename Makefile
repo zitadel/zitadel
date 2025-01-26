@@ -88,7 +88,7 @@ console_move:
 .PHONY: console_dependencies
 console_dependencies:
 	cd console && \
-	pnpm install --immutable
+	pnpm install
 
 .PHONY: console_client
 console_client:
