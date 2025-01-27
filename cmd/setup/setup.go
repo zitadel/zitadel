@@ -28,7 +28,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -171,6 +170,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: dbClient}
 	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
 	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: dbClient}
+	steps.s47FillMembershipFields = &FillMembershipFields{eventstore: eventstoreClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -190,12 +190,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		&DeleteStaleOrgFields{
 			eventstore: eventstoreClient,
 		},
-		&RepeatableFillFields{
+		&FillFieldsForInstanceDomains{
 			eventstore: eventstoreClient,
-			handlers: []*handler.FieldHandler{
-				projection.InstanceDomainFields,
-				projection.MembershipFields,
-			},
 		},
 		&SyncRolePermissions{
 			eventstore:             eventstoreClient,
@@ -235,6 +231,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s44ReplaceCurrentSequencesIndex,
 		steps.s45CorrectProjectOwners,
 		steps.s46InitPermissionFunctions,
+		steps.s47FillMembershipFields,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
