@@ -6,3 +6,4 @@ export { create, fromJson, toJson } from "@bufbuild/protobuf";
 export type { JsonObject } from "@bufbuild/protobuf";
 export { TimestampSchema, timestampDate, timestampFromDate, timestampFromMs, timestampMs } from "@bufbuild/protobuf/wkt";
 export type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
+export type { Code, ConnectError } from "@connectrpc/connect";

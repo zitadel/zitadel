@@ -113,7 +113,12 @@ export async function sendPassword(command: UpdateSessionCommand) {
           );
 
           return {
-            error: `Failed to authenticate: You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.`,
+            error:
+              `Failed to authenticate. You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.` +
+              (lockoutSettings?.maxPasswordAttempts &&
+              error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
+                ? "Contact your administrator to unlock your account"
+                : ""),
           };
         }
         return { error: "Could not create session for user" };
@@ -136,7 +141,12 @@ export async function sendPassword(command: UpdateSessionCommand) {
         const lockoutSettings = await getLockoutSettings(command.organization);
 
         return {
-          error: `Failed to authenticate: You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.`,
+          error:
+            `Failed to authenticate. You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.` +
+            (lockoutSettings?.maxPasswordAttempts &&
+            error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
+              ? " Contact your administrator to unlock your account"
+              : ""),
         };
       }
       throw error;

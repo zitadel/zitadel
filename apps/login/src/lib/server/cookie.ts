@@ -7,9 +7,10 @@ import {
   getSession,
   setSession,
 } from "@/lib/zitadel";
-import { Duration, timestampMs } from "@zitadel/client";
+import { ConnectError, Duration, timestampMs } from "@zitadel/client";
 import {
   CredentialsCheckError,
+  CredentialsCheckErrorSchema,
   ErrorDetail,
 } from "@zitadel/proto/zitadel/message_pb";
 import {
@@ -30,13 +31,29 @@ type CustomCookieData = {
   authRequestId?: string; // if its linked to an OIDC flow
 };
 
+const passwordAttemptsHandler = (error: ConnectError) => {
+  const details = error.findDetails(CredentialsCheckErrorSchema);
+
+  if (details[0] && "failedAttempts" in details[0]) {
+    const failedAttempts = details[0].failedAttempts;
+    throw {
+      error: `Failed to authenticate: You had ${failedAttempts} password attempts.`,
+      failedAttempts: failedAttempts,
+    };
+  }
+  throw error;
+};
+
 export async function createSessionAndUpdateCookie(
   checks: Checks,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
-  const createdSession = await createSessionFromChecks(checks, challenges);
+  const createdSession = await createSessionFromChecks(
+    checks,
+    challenges,
+  ).catch(passwordAttemptsHandler);
 
   if (createdSession) {
     return getSession({
@@ -215,14 +232,5 @@ export async function setSessionAndUpdateCookie(
         throw "Session not be set";
       }
     })
-    .catch((error: ErrorDetail | CredentialsCheckError) => {
-      console.error("Could not set session", error);
-      if ("failedAttempts" in error && error.failedAttempts) {
-        throw {
-          error: `Failed to authenticate: You had ${error.failedAttempts} password attempts.`,
-          failedAttempts: error.failedAttempts,
-        };
-      }
-      throw error;
-    });
+    .catch(passwordAttemptsHandler);
 }
