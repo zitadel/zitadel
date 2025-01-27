@@ -839,6 +839,14 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Provision Users",
+      collapsed: true,
+      items: [
+          'apis/scim2'
+      ],
+    },
+    {
+      type: "category",
       label: "Actions",
       collapsed: false,
       items: [
