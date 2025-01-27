@@ -265,6 +265,7 @@ func TestCreateUser(t *testing.T) {
 			createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, tt.body)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 
 			if err != nil {
