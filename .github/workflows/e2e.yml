@@ -63,6 +63,9 @@ jobs:
           working-directory: e2e
           browser: ${{ matrix.browser }}
           config-file: cypress.config.ts
+          build: pnpm run build
+          start: pnpm start
+          wait-on: 'http://localhost:5000'
       - 
         uses: actions/upload-artifact@v4
         if: always()
