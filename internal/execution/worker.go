@@ -107,7 +107,7 @@ func (w *Worker) trigger(ctx context.Context, workerID int) (err error) {
 		err = database.CloseTransaction(tx, err)
 	}()
 
-	eventExecutions, err := w.queries.searchEventExecutions(txCtx)
+	eventExecutions, err := w.queries.searchEventExecutions(txCtx, w.config.BulkLimit)
 	if err != nil {
 		return err
 	}
@@ -123,14 +123,12 @@ func (w *Worker) trigger(ctx context.Context, workerID int) (err error) {
 		Info("handling event executions")
 
 	for _, event := range eventExecutions.EventExecutions {
-		if err := w.removeEventExecution(ctx, tx, event, workerID); err != nil {
-			event.WithLogFields(w.log(workerID).OnError(err)).Error("could not handle removal of execution event entry")
-			return err
-		}
-
-		if err := w.reduceEventExecution(ctx, event); err != nil {
-			event.WithLogFields(w.log(workerID).OnError(err)).Error("could not handle event execution")
-			return err
+		w.createSavepoint(txCtx, tx, event, workerID)
+		if err := w.reduceEventExecution(ctx, txCtx, tx, event, workerID); err != nil {
+			// if we have an error, we rollback to the savepoint and continue with the next event
+			// we use the txCtx to make sure we can rollback the transaction in case the ctx is canceled
+			w.rollbackToSavepoint(txCtx, tx, event, workerID)
+			continue
 		}
 
 		// if the context is canceled, we stop the processing
@@ -148,21 +146,29 @@ func (w *Worker) trigger(ctx context.Context, workerID int) (err error) {
 	return nil
 }
 
-func (w *Worker) reduceEventExecution(ctx context.Context, event *EventExecution) (err error) {
-	ctx = ContextWithExecuter(ctx, event.Aggregate)
+func (w *Worker) createSavepoint(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) {
+	_, err := tx.ExecContext(ctx, "SAVEPOINT execution_removed")
+	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not create savepoint for notification event")
+}
 
-	// if the notification is too old, we can directly return as it will be removed anyway
-	if event.CreatedAt.Add(w.config.MaxTtl).Before(w.now()) {
-		return nil
-	}
+func (w *Worker) rollbackToSavepoint(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) {
+	_, err := tx.ExecContext(ctx, "ROLLBACK TO SAVEPOINT execution_removed")
+	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not rollback to savepoint for notification event")
+}
 
-	targets, err := event.Targets()
-	if err != nil {
+func (w *Worker) reduceEventExecution(ctx context.Context, txCtx context.Context, tx *sql.Tx, event *EventExecution, workerID int) (err error) {
+	// try to delete the execution, to lock the row from being processed by another worker
+	if err := w.removeEventExecution(txCtx, tx, event, workerID); err != nil {
+		// if the delete fails, return the error to rollback and continue on
 		return err
 	}
 
-	_, err = CallTargets(ctx, targets, event.ContextInfo())
-	return err
+	// handle the calling of the targets
+	if err := w.handleEventExecution(ctx, event); err != nil {
+		event.WithLogFields(w.log(workerID).OnError(err)).Error("could not handle event execution")
+	}
+	// besides the deletion of the row, no other error is relevant
+	return nil
 }
 
 func (w *Worker) removeEventExecution(ctx context.Context, tx *sql.Tx, event *EventExecution, workerID int) error {
@@ -176,6 +182,23 @@ func (w *Worker) removeEventExecution(ctx context.Context, tx *sql.Tx, event *Ev
 		event.EventType,
 	)
 	event.WithLogFields(w.log(workerID).OnError(err)).Error("could not remove event execution for event")
+	return err
+}
+
+func (w *Worker) handleEventExecution(ctx context.Context, event *EventExecution) (err error) {
+	ctx = ContextWithExecuter(ctx, event.Aggregate)
+
+	// if the event is too old, we can directly return as it will be removed anyway
+	if event.CreatedAt.Add(w.config.MaxTtl).Before(w.now()) {
+		return nil
+	}
+
+	targets, err := event.Targets()
+	if err != nil {
+		return err
+	}
+
+	_, err = CallTargets(ctx, targets, event.ContextInfo())
 	return err
 }
 

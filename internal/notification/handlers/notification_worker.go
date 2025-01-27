@@ -22,7 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/notification"
 )
 
@@ -463,38 +462,4 @@ func (w *NotificationWorker) searchRetryEvents(ctx context.Context, tx *sql.Tx) 
 		return nil, err
 	}
 	return w.latestRetries(events), nil
-}
-
-type existingInstances []string
-
-// AppendEvents implements eventstore.QueryReducer.
-func (ai *existingInstances) AppendEvents(events ...eventstore.Event) {
-	for _, event := range events {
-		switch event.Type() {
-		case instance.InstanceAddedEventType:
-			*ai = append(*ai, event.Aggregate().InstanceID)
-		case instance.InstanceRemovedEventType:
-			*ai = slices.DeleteFunc(*ai, func(s string) bool {
-				return s == event.Aggregate().InstanceID
-			})
-		}
-	}
-}
-
-// Query implements eventstore.QueryReducer.
-func (*existingInstances) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		AddQuery().
-		AggregateTypes(instance.AggregateType).
-		EventTypes(
-			instance.InstanceAddedEventType,
-			instance.InstanceRemovedEventType,
-		).
-		Builder()
-}
-
-// Reduce implements eventstore.QueryReducer.
-// reduce is not used as events are reduced during AppendEvents
-func (*existingInstances) Reduce() error {
-	return nil
 }

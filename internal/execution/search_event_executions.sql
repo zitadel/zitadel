@@ -12,3 +12,5 @@ SELECT instance_id,
        COUNT(*) OVER ()
 FROM projections.execution_handler
 WHERE instance_id = $1
+LIMIT $2
+FOR UPDATE SKIP LOCKED

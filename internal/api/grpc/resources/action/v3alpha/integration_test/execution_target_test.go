@@ -342,7 +342,7 @@ func TestServer_ExecutionTarget_Event(t *testing.T) {
 	}
 }
 
-func TestServer_ExecutionTarget_Event_10Sec(t *testing.T) {
+func TestServer_ExecutionTarget_Event_LongerThanTargetTimeout(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
@@ -398,7 +398,7 @@ func TestServer_ExecutionTarget_Event_10Sec(t *testing.T) {
 	}
 }
 
-func TestServer_ExecutionTarget_Event_1Sec(t *testing.T) {
+func TestServer_ExecutionTarget_Event_LongerThanTransactionTimeout(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)

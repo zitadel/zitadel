@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func Test_reduceEventExecution(t *testing.T) {
+func Test_handleEventExecution(t *testing.T) {
 	type fields struct {
 		config WorkerConfig
 	}
@@ -114,7 +114,7 @@ func Test_reduceEventExecution(t *testing.T) {
 			require.NoError(t, err)
 			tt.args.event.TargetsData = data
 
-			err = worker.reduceEventExecution(
+			err = worker.handleEventExecution(
 				tt.args.ctx,
 				tt.args.event,
 			)

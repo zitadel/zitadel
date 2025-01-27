@@ -67,7 +67,7 @@ type EventExecutions struct {
 	EventExecutions []*EventExecution
 }
 
-func (w *ExecutionsQueries) searchEventExecutions(ctx context.Context) (eventExecutions *EventExecutions, err error) {
+func (w *ExecutionsQueries) searchEventExecutions(ctx context.Context, limit uint16) (eventExecutions *EventExecutions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -78,6 +78,7 @@ func (w *ExecutionsQueries) searchEventExecutions(ctx context.Context) (eventExe
 		},
 		searchEventExecutions,
 		authz.GetInstance(ctx).InstanceID(),
+		limit,
 	)
 	return eventExecutions, err
 }
