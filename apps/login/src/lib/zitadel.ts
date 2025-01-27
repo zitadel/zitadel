@@ -81,6 +81,14 @@ export async function getLoginSettings(orgId?: string) {
   return useCache ? cacheWrapper(callback) : callback;
 }
 
+export async function getPasswordExpirySettings(orgId?: string) {
+  const callback = settingsService
+    .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
 export async function listIDPLinks(userId: string) {
   return userService.listIDPLinks(
     {

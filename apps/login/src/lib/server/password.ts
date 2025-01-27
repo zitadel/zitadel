@@ -6,6 +6,7 @@ import {
 } from "@/lib/server/cookie";
 import {
   getLoginSettings,
+  getPasswordExpirySettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
@@ -141,8 +142,13 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
+  const expirySettings = await getPasswordExpirySettings(
+    command.organization ?? session.factors?.user?.organizationId,
+  );
+
   // check if the user has to change password first
   const passwordChangedCheck = checkPasswordChangeRequired(
+    expirySettings,
     session,
     humanUser,
     command.organization,

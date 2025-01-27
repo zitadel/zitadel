@@ -1,15 +1,29 @@
+import { timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { PasswordExpirySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 import { HumanUser } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import moment from "moment";
 
 export function checkPasswordChangeRequired(
+  expirySettings: PasswordExpirySettings | undefined,
   session: Session,
   humanUser: HumanUser | undefined,
   organization?: string,
   authRequestId?: string,
 ) {
-  if (humanUser?.passwordChangeRequired) {
+  let isOutdated = false;
+  if (expirySettings?.maxAgeDays && humanUser?.passwordChanged) {
+    const maxAgeDays = Number(expirySettings.maxAgeDays); // Convert bigint to number
+    const passwordChangedDate = moment(
+      timestampDate(humanUser.passwordChanged),
+    );
+    const outdatedPassword = passwordChangedDate.add(maxAgeDays, "days");
+    isOutdated = moment().isAfter(outdatedPassword);
+  }
+
+  if (humanUser?.passwordChangeRequired || isOutdated) {
     const params = new URLSearchParams({
       loginName: session.factors?.user?.loginName as string,
     });
