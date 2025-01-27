@@ -55,7 +55,7 @@ type Human struct {
 	IsPhoneVerified        bool                `json:"is_phone_verified,omitempty"`
 	PasswordChangeRequired bool                `json:"password_change_required,omitempty"`
 	PasswordChanged        time.Time           `json:"password_changed,omitempty"`
-	HumanMFAInitSkipped    *time.Time          `json:"mfa_init_skipped,omitempty"`
+	MFAInitSkipped         time.Time           `json:"mfa_init_skipped,omitempty"`
 }
 
 type Profile struct {
@@ -877,6 +877,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	isPhoneVerified := sql.NullBool{}
 	passwordChangeRequired := sql.NullBool{}
 	passwordChanged := sql.NullTime{}
+	mfaInitSkipped := sql.NullTime{}
 
 	machineID := sql.NullString{}
 	name := sql.NullString{}
@@ -909,6 +910,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		&isPhoneVerified,
 		&passwordChangeRequired,
 		&passwordChanged,
+		&mfaInitSkipped,
 		&machineID,
 		&name,
 		&description,
@@ -941,6 +943,7 @@ func scanUser(row *sql.Row) (*User, error) {
 			IsPhoneVerified:        isPhoneVerified.Bool,
 			PasswordChangeRequired: passwordChangeRequired.Bool,
 			PasswordChanged:        passwordChanged.Time,
+			MFAInitSkipped:         mfaInitSkipped.Time,
 		}
 	} else if machineID.Valid {
 		u.Machine = &Machine{
