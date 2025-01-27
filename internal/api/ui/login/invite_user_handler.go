@@ -119,10 +119,6 @@ func (l *Login) resendUserInvite(w http.ResponseWriter, r *http.Request, authReq
 }
 
 func (l *Login) renderInviteUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, orgID, loginName string, code string, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	if authReq != nil {
 		userID = authReq.UserID
 		orgID = authReq.UserOrgID
@@ -130,7 +126,7 @@ func (l *Login) renderInviteUser(w http.ResponseWriter, r *http.Request, authReq
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := inviteUserData{
-		baseData:    l.getBaseData(r, authReq, translator, "InviteUser.Title", "InviteUser.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InviteUser.Title", "InviteUser.Description", err),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,

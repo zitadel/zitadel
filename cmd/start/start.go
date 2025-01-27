@@ -77,7 +77,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
@@ -151,20 +150,12 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
-	queryDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeQuery)
+	dbClient, err := database.Connect(config.Database, false)
 	if err != nil {
 		return fmt.Errorf("cannot start DB client for queries: %w", err)
 	}
-	esPusherDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeEventPusher)
-	if err != nil {
-		return fmt.Errorf("cannot start client for event store pusher: %w", err)
-	}
-	projectionDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeProjectionSpooler)
-	if err != nil {
-		return fmt.Errorf("cannot start client for projection spooler: %w", err)
-	}
 
-	keyStorage, err := cryptoDB.NewKeyStorage(queryDBClient, masterKey)
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
@@ -173,16 +164,16 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return err
 	}
 
-	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
-	config.Eventstore.Searcher = new_es.NewEventstore(queryDBClient)
-	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
+	config.Eventstore.Pusher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Searcher = new_es.NewEventstore(dbClient)
+	config.Eventstore.Querier = old_es.NewCRDB(dbClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
-	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(queryDBClient, &es_v4_pg.Config{
+	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(dbClient, &es_v4_pg.Config{
 		MaxRetries: config.Eventstore.MaxRetries,
 	}))
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
-	cacheConnectors, err := connector.StartConnectors(config.Caches, queryDBClient)
+	cacheConnectors, err := connector.StartConnectors(config.Caches, dbClient)
 	if err != nil {
 		return fmt.Errorf("unable to start caches: %w", err)
 	}
@@ -191,8 +182,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		ctx,
 		eventstoreClient,
 		eventstoreV4.Querier,
-		queryDBClient,
-		projectionDBClient,
+		dbClient,
+		dbClient,
 		cacheConnectors,
 		config.Projections,
 		config.SystemDefaults,
@@ -216,7 +207,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(queries, eventstoreClient, queryDBClient, keys.OIDC, config.ExternalSecure)
+	authZRepo, err := authz.Start(queries, eventstoreClient, dbClient, keys.OIDC, config.ExternalSecure)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
@@ -224,7 +215,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
-	storage, err := config.AssetStorage.NewStorage(queryDBClient.DB)
+	storage, err := config.AssetStorage.NewStorage(dbClient.DB)
 	if err != nil {
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
@@ -269,7 +260,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return err
 	}
+  
 	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.Quotas.Execution, emit_execution.NewDatabaseLogStorage(queryDBClient, commands, queries))
+  
 	if err != nil {
 		return err
 	}
@@ -298,7 +291,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMS,
 		keys.OIDC,
 		config.OIDC.DefaultBackChannelLogoutLifetime,
-		queryDBClient,
+		dbClient,
 	)
 	notification.Start(ctx)
 
@@ -324,7 +317,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		commands,
 		queries,
 		eventstoreClient,
-		queryDBClient,
+		dbClient,
 		config,
 		storage,
 		authZRepo,
@@ -344,7 +337,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if server != nil {
 		server <- &Server{
 			Config:     config,
-			DB:         queryDBClient,
+			DB:         dbClient,
 			KeyStorage: keyStorage,
 			Keys:       keys,
 			Eventstore: eventstoreClient,

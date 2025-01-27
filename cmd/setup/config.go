@@ -89,6 +89,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	id.Configure(config.Machine)
 
+	// Copy the global role permissions mappings to the instance until we allow instance-level configuration over the API.
+	config.DefaultInstance.RolePermissionMappings = config.InternalAuthZ.RolePermissionMappings
+
 	return config
 }
 
@@ -132,6 +135,9 @@ type Steps struct {
 	s42Apps7OIDCConfigsLoginVersion         *Apps7OIDCConfigsLoginVersion
 	s43CreateFieldsDomainIndex              *CreateFieldsDomainIndex
 	s44ReplaceCurrentSequencesIndex         *ReplaceCurrentSequencesIndex
+	s45CorrectProjectOwners                 *CorrectProjectOwners
+	s46InitPermissionFunctions              *InitPermissionFunctions
+	s47FillMembershipFields                 *FillMembershipFields
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

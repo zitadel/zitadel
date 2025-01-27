@@ -61,13 +61,9 @@ func (l *Login) handleOTPVerification(w http.ResponseWriter, r *http.Request, au
 }
 
 func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, providers []domain.MFAType, selectedProvider domain.MFAType, err error) {
-	var errID, errMessage string
-	if err != nil {
-		errID, errMessage = l.getErrorMessage(r, err)
-	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &mfaOTPData{
-		userData:         l.getUserData(r, authReq, translator, "VerifyMFAU2F.Title", "VerifyMFAU2F.Description", errID, errMessage),
+		userData:         l.getUserData(r, authReq, translator, "VerifyMFAU2F.Title", "VerifyMFAU2F.Description", err),
 		MFAProviders:     removeSelectedProviderFromList(providers, selectedProvider),
 		SelectedProvider: selectedProvider,
 	}

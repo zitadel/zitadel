@@ -10,6 +10,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.24.0
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
+	github.com/alecthomas/participle/v2 v2.1.1
 	github.com/alicebob/miniredis/v2 v2.33.0
 	github.com/benbjohnson/clock v1.3.5
 	github.com/boombuler/barcode v1.0.2
@@ -28,6 +29,8 @@ require (
 	github.com/go-jose/go-jose/v4 v4.0.4
 	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/go-webauthn/webauthn v0.10.2
+	github.com/goccy/go-json v0.10.3
+	github.com/golang/protobuf v1.5.4
 	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
@@ -106,11 +109,9 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/go-webauthn/x v0.1.9 // indirect
-	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/mock v1.6.0 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-tpm v0.9.0 // indirect
 	github.com/google/pprof v0.0.0-20240528025155-186aa0362fba // indirect
 	github.com/google/s2a-go v0.1.7 // indirect

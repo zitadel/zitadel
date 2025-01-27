@@ -63,6 +63,14 @@ message Member {
             description: "type of the user (human / machine)"
         }
     ];
+
+      // The organization the user belong to.  
+     string user_resource_owner = 11 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+
 }
 
 message SearchQuery {
