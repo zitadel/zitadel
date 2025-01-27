@@ -288,6 +288,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	// handle the comparisons which use (i)like and therefore need to escape potential wildcards in the value
 	switch compare {
 	case TextEqualsIgnoreCase,
+		TextNotEqualsIgnoreCase,
 		TextStartsWith,
 		TextStartsWithIgnoreCase,
 		TextEndsWith,
@@ -334,6 +335,8 @@ func (q *textQuery) comp() sq.Sqlizer {
 		return sq.NotEq{q.Column.identifier(): q.Text}
 	case TextEqualsIgnoreCase:
 		return sq.ILike{q.Column.identifier(): q.Text}
+	case TextNotEqualsIgnoreCase:
+		return sq.NotILike{q.Column.identifier(): q.Text}
 	case TextStartsWith:
 		return sq.Like{q.Column.identifier(): q.Text + "%"}
 	case TextStartsWithIgnoreCase:
@@ -368,6 +371,7 @@ const (
 	TextContainsIgnoreCase
 	TextListContains
 	TextNotEquals
+	TextNotEqualsIgnoreCase
 
 	textCompareMax
 )
