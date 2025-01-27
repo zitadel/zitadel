@@ -68,12 +68,15 @@ func TestServerCall(
 				http.Error(w, "error", http.StatusInternalServerError)
 				return
 			}
-			if _, err := io.WriteString(w, string(resp)); err != nil {
+			if _, err := io.Writer.Write(w, resp); err != nil {
 				http.Error(w, "error", http.StatusInternalServerError)
 				return
 			}
 		} else {
-			io.WriteString(w, "finished successfully")
+			if _, err := io.WriteString(w, "finished successfully"); err != nil {
+				http.Error(w, "error", http.StatusInternalServerError)
+				return
+			}
 		}
 	}
 

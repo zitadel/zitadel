@@ -47,8 +47,7 @@ func NewExecutionsQueries(
 }
 
 func (q *ExecutionsQueries) ActiveInstancesWithFeatureFlag(ctx context.Context) []string {
-	instanceIDs := q.queries.ActiveInstances()
-	slices.DeleteFunc(instanceIDs, func(s string) bool {
+	return slices.DeleteFunc(q.queries.ActiveInstances(), func(s string) bool {
 		features, err := q.queries.GetInstanceFeatures(ctx, true)
 		if err != nil {
 			return true
@@ -58,8 +57,6 @@ func (q *ExecutionsQueries) ActiveInstancesWithFeatureFlag(ctx context.Context) 
 		}
 		return false
 	})
-
-	return instanceIDs
 }
 
 type EventExecutions struct {

@@ -279,10 +279,7 @@ func TestActionProjection_reduces(t *testing.T) {
 			reduce: (newMockEventExecutionsHandler(newMockEventExecutionHandlerQuery(0, fmt.Errorf("failed query")))).reduce,
 			want: wantReduce{
 				err: func(err error) bool {
-					if err.Error() == "failed query" {
-						return true
-					}
-					return false
+					return err.Error() == "failed query"
 				},
 			},
 		},

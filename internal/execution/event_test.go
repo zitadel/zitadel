@@ -19,11 +19,6 @@ func testEvent(
 	return timedTestEvent(eventType, aggregateType, data, time.Now(), opts...)
 }
 
-func toSystemEvent(event *repository.Event) *repository.Event {
-	event.EditorUser = "SYSTEM"
-	return event
-}
-
 func timedTestEvent(
 	eventType eventstore.EventType,
 	aggregateType eventstore.AggregateType,
@@ -51,16 +46,6 @@ func timedTestEvent(
 }
 
 type eventOption func(e *repository.Event)
-
-func withVersion(v eventstore.Version) eventOption {
-	return func(e *repository.Event) {
-		e.Version = v
-	}
-}
-
-func baseEvent(*testing.T) eventstore.Event {
-	return &eventstore.BaseEvent{}
-}
 
 func getEvent(event *repository.Event, mapper func(eventstore.Event) (eventstore.Event, error)) func(t *testing.T) eventstore.Event {
 	return func(t *testing.T) eventstore.Event {
