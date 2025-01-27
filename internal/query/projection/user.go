@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	UserTable        = "projections.users13"
+	UserTable        = "projections.users14"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix

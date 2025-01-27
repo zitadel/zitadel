@@ -66,14 +66,14 @@ SELECT
   , m.secret
   , m.access_token_type
   , count(*) OVER ()
-FROM projections.users13 u
+FROM projections.users14 u
 LEFT JOIN
-  projections.users13_humans h
+  projections.users14_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users13_machines m
+  projections.users14_machines m
   ON
     u.id = m.user_id
     AND u.instance_id = m.instance_id
