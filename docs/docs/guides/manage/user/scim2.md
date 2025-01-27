@@ -22,15 +22,20 @@ deprovisioning.
 The Zitadel SCIM v2.0 service provider implementation supports the following endpoints.
 The base URL for the SCIM endpoint in Zitadel is: `https://${ZITADEL_DOMAIN}/scim/v2/{orgId}`.
 
-| Endpoint                                                                | Remarks                                            |
-|-------------------------------------------------------------------------|----------------------------------------------------|
-| `GET /scim/v2/{orgId}/Users/{id}`                                       | Retrieve a known user                              |
-| `GET /scim/v2/{orgId}/Users`<br />`POST /scim/v2/{orgId}/Users/.search` | Query users (including filtering, sorting, paging) |
-| `POST /scim/v2/{orgId}/Users`                                           | Create a user                                      |
-| `PUT /scim/v2/{orgId}/Users/{id}`                                       | Replace a user                                     |
-| `PATCH /scim/v2/{orgId}/Users/{id}`                                     | Modify a user                                      |
-| `DELETE /scim/v2/{orgId}/Users/{id}`                                    | Delete a user                                      |
-| `POST /scim/v2/{orgId}/Bulk`                                            | Apply multiple operations in a single request      |
+| Endpoint                                                                | Remarks                                                    |
+|-------------------------------------------------------------------------|------------------------------------------------------------|
+| `GET /scim/v2/{orgId}/ServiceProviderConfig`                            | Retrieve the configuration of the Zitadel service provider |
+| `GET /scim/v2/{orgId}/Schemas`                                          | Retrieve all supported schemas                             |
+| `GET /scim/v2/{orgId}/Schemas/{id}`                                     | Retrieve a known supported schema                          |
+| `GET /scim/v2/{orgId}/ResourceTypes`                                    | Retrieve all supported resource types                      |
+| `GET /scim/v2/{orgId}/ResourceTypes/{name}`                             | Retrieve a known supported resource type                   |
+| `GET /scim/v2/{orgId}/Users/{id}`                                       | Retrieve a known user                                      |
+| `GET /scim/v2/{orgId}/Users`<br />`POST /scim/v2/{orgId}/Users/.search` | Query users (including filtering, sorting, paging)         |
+| `POST /scim/v2/{orgId}/Users`                                           | Create a user                                              |
+| `PUT /scim/v2/{orgId}/Users/{id}`                                       | Replace a user                                             |
+| `PATCH /scim/v2/{orgId}/Users/{id}`                                     | Modify a user                                              |
+| `DELETE /scim/v2/{orgId}/Users/{id}`                                    | Delete a user                                              |
+| `POST /scim/v2/{orgId}/Bulk`                                            | Apply multiple operations in a single request              |
 
 ## Authentication
 
