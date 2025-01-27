@@ -193,7 +193,7 @@ func TestGetUser(t *testing.T) {
 				// set provisioning domain of service user
 				_, err = Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
 					Id:    Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-					Key:   "urn:zitadel:scim:provisioning_domain",
+					Key:   "urn:zitadel:scim:provisioningDomain",
 					Value: []byte("fooBar"),
 				})
 				require.NoError(t, err)
@@ -213,7 +213,7 @@ func TestGetUser(t *testing.T) {
 
 				_, err = Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
 					Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-					Key: "urn:zitadel:scim:provisioning_domain",
+					Key: "urn:zitadel:scim:provisioningDomain",
 				})
 				require.NoError(t, err)
 			},
