@@ -5,6 +5,7 @@ import {
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
 import {
+  getLockoutSettings,
   getLoginSettings,
   getPasswordExpirySettings,
   getSession,
@@ -98,24 +99,48 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
       loginSettings = await getLoginSettings(command.organization);
 
-      session = await createSessionAndUpdateCookie(
-        checks,
-        undefined,
-        command.authRequestId,
-        loginSettings?.passwordCheckLifetime,
-      );
+      try {
+        session = await createSessionAndUpdateCookie(
+          checks,
+          undefined,
+          command.authRequestId,
+          loginSettings?.passwordCheckLifetime,
+        );
+      } catch (error: any) {
+        if ("failedAttempts" in error && error.failedAttempts) {
+          const lockoutSettings = await getLockoutSettings(
+            command.organization,
+          );
+
+          return {
+            error: `Failed to authenticate: You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.`,
+          };
+        }
+        return { error: "Could not create session for user" };
+      }
     }
 
     // this is a fake error message to hide that the user does not even exist
     return { error: "Could not verify password" };
   } else {
-    session = await setSessionAndUpdateCookie(
-      sessionCookie,
-      command.checks,
-      undefined,
-      command.authRequestId,
-      loginSettings?.passwordCheckLifetime,
-    );
+    try {
+      session = await setSessionAndUpdateCookie(
+        sessionCookie,
+        command.checks,
+        undefined,
+        command.authRequestId,
+        loginSettings?.passwordCheckLifetime,
+      );
+    } catch (error: any) {
+      if ("failedAttempts" in error && error.failedAttempts) {
+        const lockoutSettings = await getLockoutSettings(command.organization);
+
+        return {
+          error: `Failed to authenticate: You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.`,
+        };
+      }
+      throw error;
+    }
 
     if (!session?.factors?.user?.id) {
       return { error: "Could not create session for user" };
