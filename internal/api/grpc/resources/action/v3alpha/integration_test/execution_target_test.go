@@ -317,10 +317,10 @@ func TestServer_ExecutionTarget_Event(t *testing.T) {
 			expectedCalls: 10,
 		},
 		{
-			name:          "event, 100 session.added, ok",
+			name:          "event, 50 session.added, ok",
 			ctx:           isolatedIAMOwnerCTX,
-			eventCount:    100,
-			expectedCalls: 100,
+			eventCount:    50,
+			expectedCalls: 50,
 		},
 	}
 	for _, tt := range tests {

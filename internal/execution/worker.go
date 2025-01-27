@@ -128,7 +128,6 @@ func (w *Worker) trigger(ctx context.Context, workerID int) (err error) {
 			// if we have an error, we rollback to the savepoint and continue with the next event
 			// we use the txCtx to make sure we can rollback the transaction in case the ctx is canceled
 			w.rollbackToSavepoint(txCtx, tx, event, workerID)
-			continue
 		}
 
 		// if the context is canceled, we stop the processing

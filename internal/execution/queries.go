@@ -85,7 +85,6 @@ func (w *ExecutionsQueries) searchEventExecutions(ctx context.Context, limit uin
 
 func scanEventExecution(rows *sql.Rows) (*EventExecutions, error) {
 	eventExecutions := make([]*EventExecution, 0)
-	var count uint64
 	for rows.Next() {
 		e := new(EventExecution)
 		e.Aggregate = new(eventstore.Aggregate)
@@ -101,7 +100,6 @@ func scanEventExecution(rows *sql.Rows) (*EventExecutions, error) {
 			&e.UserID,
 			&e.EventData,
 			&e.TargetsData,
-			&count,
 		)
 		if err != nil {
 			return nil, err
@@ -117,7 +115,7 @@ func scanEventExecution(rows *sql.Rows) (*EventExecutions, error) {
 	return &EventExecutions{
 		EventExecutions: eventExecutions,
 		SearchResponse: query.SearchResponse{
-			Count: count,
+			Count: uint64(len(eventExecutions)),
 		},
 	}, nil
 }

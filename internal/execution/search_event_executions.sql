@@ -8,8 +8,7 @@ SELECT instance_id,
        created_at,
        user_id,
        event_data,
-       targets_data,
-       COUNT(*) OVER ()
+       targets_data
 FROM projections.execution_handler
 WHERE instance_id = $1
 LIMIT $2

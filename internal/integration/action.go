@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"sync"
 	"time"
 )
 
 type server struct {
 	server *httptest.Server
+	mu     sync.Mutex
 	called int
 }
 
@@ -23,11 +25,22 @@ func (s *server) Close() {
 }
 
 func (s *server) Called() int {
-	return s.called
+	s.mu.Lock()
+	called := s.called
+	s.mu.Unlock()
+	return called
+}
+
+func (s *server) Increase() {
+	s.mu.Lock()
+	s.called++
+	s.mu.Unlock()
 }
 
 func (s *server) ResetCalled() {
+	s.mu.Lock()
 	s.called = 0
+	s.mu.Unlock()
 }
 
 func TestServerCall(
@@ -41,7 +54,7 @@ func TestServerCall(
 	}
 
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		server.called++
+		server.Increase()
 		if reqBody != nil {
 			data, err := json.Marshal(reqBody)
 			if err != nil {
