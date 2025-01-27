@@ -45,6 +45,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           cache: 'pnpm'
+      -
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: .
+          runTests: false
       - 
         name: Cypress run
         uses: cypress-io/github-action@v6
@@ -54,7 +59,7 @@ jobs:
           CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@localhost:26257/zitadel'
           CYPRESS_BACKEND_URL: http://localhost:8080
         with:
-          install: true
+          install: false
           working-directory: e2e
           browser: ${{ matrix.browser }}
           config-file: cypress.config.ts
