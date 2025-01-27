@@ -992,10 +992,11 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users14_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users14_humans SET (phone, is_phone_verified, mfa_init_skipped) = ($1, $2, $3) WHERE (user_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
+								sql.NullTime{},
 								"agg-id",
 								"instance-id",
 							},
@@ -1039,10 +1040,11 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users14_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users14_humans SET (phone, is_phone_verified, mfa_init_skipped) = ($1, $2, $3) WHERE (user_id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
+								sql.NullTime{},
 								"agg-id",
 								"instance-id",
 							},
@@ -1867,6 +1869,84 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.users14_machines SET secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								nil,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUnsetMFAInitSkipped",
+			args: args{
+				event: getEvent(
+					testEvent(
+						user.HumanMFAOTPVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanOTPVerifiedEventMapper),
+			},
+			reduce: (&userProjection{}).reduceUnsetMFAInitSkipped,
+			want: wantReduce{
+				aggregateType: user.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users14 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.users14_humans SET mfa_init_skipped = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								sql.NullTime{},
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceMFAInitSkipped",
+			args: args{
+				event: getEvent(
+					timedTestEvent(
+						user.HumanMFAInitSkippedType,
+						user.AggregateType,
+						[]byte(`{}`),
+						testNow,
+					), user.HumanMFAInitSkippedEventMapper),
+			},
+			reduce: (&userProjection{}).reduceMFAInitSkipped,
+			want: wantReduce{
+				aggregateType: user.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users14 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.users14_humans SET mfa_init_skipped = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								sql.NullTime{
+									Time:  testNow,
+									Valid: true,
+								},
 								"agg-id",
 								"instance-id",
 							},

@@ -55,6 +55,7 @@ type Human struct {
 	IsPhoneVerified        bool                `json:"is_phone_verified,omitempty"`
 	PasswordChangeRequired bool                `json:"password_change_required,omitempty"`
 	PasswordChanged        time.Time           `json:"password_changed,omitempty"`
+	HumanMFAInitSkipped    *time.Time          `json:"mfa_init_skipped,omitempty"`
 }
 
 type Profile struct {
@@ -269,6 +270,10 @@ var (
 	}
 	HumanPasswordChangedCol = Column{
 		name:  projection.HumanPasswordChanged,
+		table: humanTable,
+	}
+	HumanMFAInitSkippedCol = Column{
+		name:  projection.HumanMFAInitSkipped,
 		table: humanTable,
 	}
 )
