@@ -1202,7 +1202,9 @@ message AddHumanUserRequest{
   SetHumanPhone phone = 10;
   repeated SetMetadataEntry metadata = 6;
   oneof password_type {
+    // Send either the password or the hashed_password
     Password password = 7;
+    // Send either the password or the hashed_password
     HashedPassword hashed_password = 8;
   }
   repeated IDPLink idp_links = 9;

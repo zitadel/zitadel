@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Deprecated API from ZITADEL
   version: v1
-  description: This is the deprecated but still available API for ZITADEL. Please consider to switch to the current API
+  description: This is the deprecated but still available API for ZITADEL. Please consider to switch to the [current API](/docs/reference/current). <br />  <br /> We're currently updating our API to a new structure that offers several benefits, including easier integration and a more understandable design. As we transition, the documentation for migrated/new requests can be found in our [current](/docs/reference/current) reference. As we transition the documentation some requests might only be listed in our deprecated section. Requests that have already been migrated are crossed out.
   contact:
     name: ZITADEL
     url: https://zitadel.com

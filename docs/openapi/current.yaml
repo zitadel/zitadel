@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Current API from ZITADEL
   version: v2
-  description: This is the recommended API for ZITADEL if you start implementing a new project.
+  description: This is the recommended API for ZITADEL if you start implementing a new project. <br /> <br /> We're currently updating our to a new API structure that offers several benefits, including easier integration and a more understanable design. As we transition the documentation for migrated/new requests can be found below. If you can't find what you need, please refer to the [deprecated](/docs/reference/deprecated) section for the older version. We expect to complete the migration to the new API structure by end of June 2025.
   contact:
     name: ZITADEL
     url: https://zitadel.com

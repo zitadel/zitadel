@@ -558,6 +558,11 @@ module.exports = {
   apis: [
     "apis/introduction",
     {
+      type: "link",
+      href: "/docs/reference",
+      label: "Core Resource Reference",
+    },
+    {
       type: "category",
       label: "Sign In Users ",
       collapsed: false,
