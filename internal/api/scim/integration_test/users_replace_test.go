@@ -233,6 +233,7 @@ func TestReplaceUser(t *testing.T) {
 				if statusCode == 0 {
 					statusCode = http.StatusBadRequest
 				}
+
 				scimErr := scim.RequireScimError(t, statusCode, err)
 				assert.Equal(t, tt.scimErrorType, scimErr.Error.ScimType)
 				if tt.zitadelErrID != "" {
