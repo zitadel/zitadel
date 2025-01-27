@@ -452,55 +452,55 @@ Notifications:
   # The amount of workers processing the notification request events.
   # If set to 0, no notification request events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
-  Workers: 1 # ZITADEL_NOTIFIACATIONS_WORKERS
+  Workers: 1 # ZITADEL_NOTIFICATIONS_WORKERS
   # The amount of events a single worker will process in a run.
-  BulkLimit: 10 # ZITADEL_NOTIFIACATIONS_BULKLIMIT
+  BulkLimit: 10 # ZITADEL_NOTIFICATIONS_BULKLIMIT
   # Time interval between scheduled notifications for request events
-  RequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_REQUEUEEVERY
+  RequeueEvery: 5s # ZITADEL_NOTIFICATIONS_REQUEUEEVERY
   # The amount of workers processing the notification retry events.
   # If set to 0, no notification retry events will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
-  RetryWorkers: 1 # ZITADEL_NOTIFIACATIONS_RETRYWORKERS
+  RetryWorkers: 1 # ZITADEL_NOTIFICATIONS_RETRYWORKERS
   # Time interval between scheduled notifications for retry events
-  RetryRequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_RETRYREQUEUEEVERY
+  RetryRequeueEvery: 5s # ZITADEL_NOTIFICATIONS_RETRYREQUEUEEVERY
   # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
   # from HandleActiveInstances duration in the past until the projection's current time
   # If set to 0 (default), every instance is always considered active
-  HandleActiveInstances: 0s # ZITADEL_NOTIFIACATIONS_HANDLEACTIVEINSTANCES
+  HandleActiveInstances: 0s # ZITADEL_NOTIFICATIONS_HANDLEACTIVEINSTANCES
   # The maximum duration a transaction remains open
   # before it spots left folding additional events
   # and updates the table.
-  TransactionDuration: 10s # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
+  TransactionDuration: 10s # ZITADEL_NOTIFICATIONS_TRANSACTIONDURATION
   # Automatically cancel the notification after the amount of failed attempts
-  MaxAttempts: 3 # ZITADEL_NOTIFIACATIONS_MAXATTEMPTS
+  MaxAttempts: 3 # ZITADEL_NOTIFICATIONS_MAXATTEMPTS
   # Automatically cancel the notification if it cannot be handled within a specific time
-  MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
+  MaxTtl: 5m  # ZITADEL_NOTIFICATIONS_MAXTTL
   # Failed attempts are retried after a confogired delay (with exponential backoff).
   # Set a minimum and maximum delay and a factor for the backoff
-  MinRetryDelay: 5s  # ZITADEL_NOTIFIACATIONS_MINRETRYDELAY
-  MaxRetryDelay: 1m # ZITADEL_NOTIFIACATIONS_MAXRETRYDELAY
+  MinRetryDelay: 5s  # ZITADEL_NOTIFICATIONS_MINRETRYDELAY
+  MaxRetryDelay: 1m # ZITADEL_NOTIFICATIONS_MAXRETRYDELAY
   # Any factor below 1 will be set to 1
-  RetryDelayFactor: 1.5 # ZITADEL_NOTIFIACATIONS_RETRYDELAYFACTOR
+  RetryDelayFactor: 1.5 # ZITADEL_NOTIFICATIONS_RETRYDELAYFACTOR
 
 Executions:
-  # The amount of workers processing the notification request events.
-  # If set to 0, no notification request events will be handled. This can be useful when running in
+  # The amount of workers processing the events to call targets through execution conditions.
+  # If set to 0, no executions will be handled. This can be useful when running in
   # multi binary / pod setup and allowing only certain executables to process the events.
-  Workers: 1 # ZITADEL_NOTIFIACATIONS_WORKERS
+  Workers: 1 # ZITADEL_EXECUTIONS_WORKERS
   # The amount of events a single worker will process in a run.
-  BulkLimit: 10 # ZITADEL_NOTIFIACATIONS_BULKLIMIT
-  # Time interval between scheduled notifications for request events
-  RequeueEvery: 5s # ZITADEL_NOTIFIACATIONS_REQUEUEEVERY
+  BulkLimit: 10 # ZITADEL_EXECUTIONS_BULKLIMIT
+  # Time interval between scheduled executions
+  RequeueEvery: 5s # ZITADEL_EXECUTIONS_REQUEUEEVERY
   # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
   # from HandleActiveInstances duration in the past until the projection's current time
   # If set to 0 (default), every instance is always considered active
-  HandleActiveInstances: 0s # ZITADEL_NOTIFIACATIONS_HANDLEACTIVEINSTANCES
+  HandleActiveInstances: 0s # ZITADEL_EXECUTIONS_HANDLEACTIVEINSTANCES
   # The maximum duration a transaction remains open
   # before it spots left folding additional events
   # and updates the table.
-  TransactionDuration: 10s # ZITADEL_NOTIFIACATIONS_TRANSACTIONDURATION
-  # Automatically cancel the notification if it cannot be handled within a specific time
-  MaxTtl: 5m  # ZITADEL_NOTIFIACATIONS_MAXTTL
+  TransactionDuration: 10s # ZITADEL_EXECUTIONS_TRANSACTIONDURATION
+  # Automatically cancel the execution if it cannot be handled within a specific time
+  MaxTtl: 5m  # ZITADEL_EXECUTIONS_MAXTTL
 
 Auth:
   # See Projections.BulkLimit
