@@ -56,6 +56,7 @@ func userToPb(userQ *query.User, assetPrefix string) *user.User {
 		UserId: userQ.ID,
 		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
 			Sequence:      userQ.Sequence,
+			CreationDate:  userQ.CreationDate,
 			EventDate:     userQ.ChangeDate,
 			ResourceOwner: userQ.ResourceOwner,
 		}),

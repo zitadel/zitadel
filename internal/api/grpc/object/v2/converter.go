@@ -17,6 +17,9 @@ func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
 		Sequence:      objectDetail.Sequence,
 		ResourceOwner: objectDetail.ResourceOwner,
 	}
+	if !objectDetail.CreationDate.IsZero() {
+		details.CreationDate = timestamppb.New(objectDetail.CreationDate)
+	}
 	if !objectDetail.EventDate.IsZero() {
 		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
 	}
