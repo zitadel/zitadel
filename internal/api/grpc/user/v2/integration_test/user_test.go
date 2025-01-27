@@ -3179,3 +3179,75 @@ func TestServer_VerifyInviteCode(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_HumanMFAInitSkipped(t *testing.T) {
+	type args struct {
+		ctx     context.Context
+		req     *user.HumanMFAInitSkippedRequest
+		prepare func(request *user.HumanMFAInitSkippedRequest) error
+	}
+	tests := []struct {
+		name       string
+		args       args
+		want       *user.HumanMFAInitSkippedResponse
+		checkState func(t *testing.T, userID string, resp *user.HumanMFAInitSkippedResponse)
+		wantErr    bool
+	}{
+		{
+			name: "user not existing",
+			args: args{
+				CTX,
+				&user.HumanMFAInitSkippedRequest{
+					UserId: "notexisting",
+				},
+				func(request *user.HumanMFAInitSkippedRequest) error { return nil },
+			},
+			wantErr: true,
+		},
+		{
+			name: "ok",
+			args: args{
+				CTX,
+				&user.HumanMFAInitSkippedRequest{},
+				func(request *user.HumanMFAInitSkippedRequest) error {
+					resp := Instance.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			want: &user.HumanMFAInitSkippedResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.DefaultOrg.Id,
+				},
+			},
+			checkState: func(t *testing.T, userID string, resp *user.HumanMFAInitSkippedResponse) {
+				state, err := Client.GetUserByID(CTX, &user.GetUserByIDRequest{
+					UserId: userID,
+				})
+				require.NoError(t, err)
+				integration.EqualProto(t,
+					state.GetUser().GetHuman().GetMfaInitSkipped(),
+					resp.GetDetails().GetChangeDate(),
+				)
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.args.prepare(tt.args.req)
+			require.NoError(t, err)
+
+			got, err := Client.HumanMFAInitSkipped(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			integration.AssertDetails(t, tt.want, got)
+			if tt.checkState != nil {
+				tt.checkState(t, tt.args.req.GetUserId(), got)
+			}
+		})
+	}
+}
