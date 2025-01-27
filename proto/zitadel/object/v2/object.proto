@@ -77,13 +77,13 @@ message Details {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
     }
+  ];
   //creation_date is the timestamp where the first operation on the object was made
   //
   // on read: the timestamp of the first event of the object
   //
   // on create: the timestamp of the event(s) added by the manipulation
   google.protobuf.Timestamp creation_date = 4;
-  ];
 }
 
 message ListDetails {
