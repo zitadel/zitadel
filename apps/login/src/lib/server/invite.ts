@@ -23,14 +23,14 @@ export type RegisterUserResponse = {
 export async function inviteUser(command: InviteUserCommand) {
   const _headers = await headers();
   const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const host = _headers.get("host");
 
   if (!host) {
     return { error: "Could not get domain" };
   }
 
   const human = await addHumanUser({
-    host,
+    host: instanceUrl,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,

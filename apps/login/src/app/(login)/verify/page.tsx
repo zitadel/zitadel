@@ -27,13 +27,16 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const _headers = await headers();
   const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
   }
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({
+    host: instanceUrl,
+    organization,
+  });
 
   let sessionFactors;
   let user: User | undefined;
@@ -44,7 +47,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
-      host,
+      host: instanceUrl,
       sessionParams: {
         loginName,
         organization,
@@ -54,6 +57,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     if (doSend && sessionFactors?.factors?.user?.id) {
       await sendEmailCode({
         host,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          (authRequestId ? `&authRequestId=${authRequestId}` : ""),
         userId: sessionFactors?.factors?.user?.id,
         authRequestId,
       }).catch((error) => {

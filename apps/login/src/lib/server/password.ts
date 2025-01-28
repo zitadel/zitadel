@@ -53,7 +53,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
 
   const users = await listUsers({
-    host,
+    serviceUrl: instanceUrl,
     loginName: command.loginName,
     organizationId: command.organization,
   });
@@ -67,7 +67,13 @@ export async function resetPassword(command: ResetPasswordCommand) {
   }
   const userId = users.result[0].userId;
 
-  return passwordReset({ userId, host, authRequestId: command.authRequestId });
+  return passwordReset({
+    serviceUrl: instanceUrl,
+    userId,
+    urlTemplate:
+      `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+      (command.authRequestId ? `&authRequestId=${command.authRequestId}` : ""),
+  });
 }
 
 export type UpdateSessionCommand = {

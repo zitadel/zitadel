@@ -19,8 +19,7 @@ export type StartIDPFlowCommand = {
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const host = _headers.get("host");
 
   if (!host) {
     return { error: "Could not get host" };

@@ -251,24 +251,30 @@ type resendVerifyEmailCommand = {
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+
+  const host = _headers.get("host");
+
+  if (!serviceUrl) {
+    return { error: "No host found" };
+  }
 
   if (!host) {
     return { error: "No host found" };
   }
 
   return command.isInvite
-    ? resendInviteCode({ host, userId: command.userId })
+    ? resendInviteCode({ serviceUrl, host, userId: command.userId })
     : resendEmailCode({
         userId: command.userId,
+        serviceUrl,
         host,
         authRequestId: command.authRequestId,
       });
 }
 
 type sendEmailCommand = {
-  host: string;
+  serviceUrl: string;
   userId: string;
   authRequestId?: string;
 };
@@ -276,8 +282,11 @@ type sendEmailCommand = {
 export async function sendEmailCode(command: sendEmailCommand) {
   return zitadelSendEmailCode({
     userId: command.userId,
-    host: command.host,
+    serviceUrl: command.serviceUrl,
     authRequestId: command.authRequestId,
+    urlTemplate:
+      `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+      (authRequestId ? `&authRequestId=${authRequestId}` : ""),
   });
 }
 

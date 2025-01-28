@@ -24,11 +24,15 @@ export default async function Page(props: {
   const tError = await getTranslations({ locale, namespace: "error" });
 
   const _headers = await headers();
+  const host = _headers.get("host");
   const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
+  }
+
+  if (!instanceUrl) {
+    throw new Error("No instanceUrl found");
   }
 
   const {
@@ -44,9 +48,9 @@ export default async function Page(props: {
   const { method } = params;
 
   const session = sessionId
-    ? await loadSessionById(host, sessionId, organization)
+    ? await loadSessionById(instanceUrl, sessionId, organization)
     : await loadMostRecentSession({
-        host,
+        host: instanceUrl,
         sessionParams: { loginName, organization },
       });
 
@@ -69,12 +73,12 @@ export default async function Page(props: {
 
   // email links do not come with organization, thus we need to use the session's organization
   const branding = await getBrandingSettings({
-    host,
+    host: instanceUrl,
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
-    host,
+    host: instanceUrl,
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 

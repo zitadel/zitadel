@@ -53,7 +53,11 @@ export default async function Page(props: {
     return loginFailed(branding, "IDP context missing");
   }
 
-  const intent = await retrieveIDPIntent({ host, id, token });
+  const intent = await retrieveIDPIntent({
+    serviceUrl: instanceUrl,
+    id,
+    token,
+  });
 
   const { idpInformation, userId } = intent;
 
