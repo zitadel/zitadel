@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
 	"github.com/zitadel/zitadel/internal/notification/channels/sms"
@@ -37,10 +38,12 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -70,10 +73,12 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -109,10 +114,12 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/user/init?authRequestID=%s&code=%s&loginname=%s&orgID=%s&passwordset=%t&userID=%s", eventOrigin, "", testCode, preferredLoginName, orgID, false, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -143,10 +150,12 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/user/init?authRequestID=%s&code=%s&loginname=%s&orgID=%s&passwordset=%t&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, "", testCode, preferredLoginName, orgID, false, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -182,10 +191,12 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/user/init?authRequestID=%s&code=%s&loginname=%s&orgID=%s&passwordset=%t&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, authRequestID, testCode, preferredLoginName, orgID, false, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -196,6 +207,48 @@ func Test_userNotifierLegacy_reduceInitCodeAdded(t *testing.T) {
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanInitCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+				}, args{
+					event: &user.HumanInitialCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:          code,
+						Expiry:        time.Hour,
+						AuthRequestID: authRequestID,
+					},
+				}, w
+		},
+	}, {
+		name: "cancel error, no reduce error expected",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.URL}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/user/init?authRequestID=%s&code=%s&loginname=%s&orgID=%s&passwordset=%t&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, authRequestID, testCode, preferredLoginName, orgID, false, userID)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+				err: channels.NewCancelError(nil),
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -250,10 +303,12 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -285,10 +340,12 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -326,10 +383,12 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/mail/verification?authRequestID=%s&code=%s&orgID=%s&userID=%s", eventOrigin, "", testCode, orgID, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -363,10 +422,12 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?authRequestID=%s&code=%s&orgID=%s&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, "", testCode, orgID, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -404,10 +465,12 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?authRequestID=%s&code=%s&orgID=%s&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, authRequestID, testCode, orgID, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -447,14 +510,56 @@ func Test_userNotifierLegacy_reduceEmailCodeAdded(t *testing.T) {
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanEmailVerificationCodeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanEmailCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       urlTemplate,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "cancel error, no reduce error expected",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.URL}}"
+			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+				err: channels.NewCancelError(nil),
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -511,10 +616,12 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -546,10 +653,12 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -587,10 +696,12 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/password/init?authRequestID=%s&code=%s&orgID=%s&userID=%s", eventOrigin, "", testCode, orgID, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -624,10 +735,12 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/password/init?authRequestID=%s&code=%s&orgID=%s&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, "", testCode, orgID, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -665,10 +778,12 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/password/init?authRequestID=%s&code=%s&orgID=%s&userID=%s", externalProtocol, instancePrimaryDomain, externalPort, authRequestID, testCode, orgID, userID)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -708,10 +823,12 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -744,13 +861,53 @@ func Test_userNotifierLegacy_reducePasswordCodeAdded(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.URL}}"
 			expectContent := "We received a password reset request. Please use the button below to reset your password. (Code ) If you didn't ask for this mail, please ignore it."
-			w.messageSMS = &messages.SMS{
-				SenderPhoneNumber:    "senderNumber",
-				RecipientPhoneNumber: lastPhone,
-				Content:              expectContent,
+			w.messageSMS = &wantLegacySMS{
+				sms: &messages.SMS{
+					SenderPhoneNumber:    "senderNumber",
+					RecipientPhoneNumber: lastPhone,
+					Content:              expectContent,
+				},
 			}
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().PasswordCodeSent(gomock.Any(), orgID, userID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordCodeAddedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              nil,
+						Expiry:            0,
+						URLTemplate:       "",
+						CodeReturned:      false,
+						NotificationType:  domain.NotificationTypeSms,
+						GeneratorID:       smsProviderID,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "cancel error, no reduce error expected",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.URL}}"
+			expectContent := "We received a password reset request. Please use the button below to reset your password. (Code ) If you didn't ask for this mail, please ignore it."
+			w.messageSMS = &wantLegacySMS{
+				sms: &messages.SMS{
+					SenderPhoneNumber:    "senderNumber",
+					RecipientPhoneNumber: lastPhone,
+					Content:              expectContent,
+				},
+				err: channels.NewCancelError(nil),
+			}
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -809,10 +966,12 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
@@ -838,10 +997,12 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 				Domains: []*query.InstanceDomain{{
@@ -851,6 +1012,42 @@ func Test_userNotifierLegacy_reduceDomainClaimed(t *testing.T) {
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().UserDomainClaimedSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.DomainClaimedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+					},
+				}, w
+		},
+	}, {
+		name: "cancel error, no reduce error expected",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+				err: channels.NewCancelError(nil),
+			}
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -900,10 +1097,12 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -936,10 +1135,12 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -979,10 +1180,12 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			testCode := "testcode"
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectContent := fmt.Sprintf("%s/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code=%s", eventOrigin, userID, orgID, codeID, testCode)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
@@ -1017,10 +1220,12 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			testCode := "testcode"
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, codeID, testCode)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 				Domains: []*query.InstanceDomain{{
@@ -1059,14 +1264,57 @@ func Test_userNotifierLegacy_reducePasswordlessCodeRequested(t *testing.T) {
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().HumanPasswordlessInitCodeSent(gomock.Any(), userID, orgID, codeID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &user.HumanPasswordlessInitCodeRequestedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						ID:                codeID,
+						Code:              code,
+						Expiry:            time.Hour,
+						URLTemplate:       urlTemplate,
+						CodeReturned:      false,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "cancel error, no reduce error expected",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.URL}}"
+			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+				err: channels.NewCancelError(nil),
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1124,10 +1372,12 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(&query.NotificationPolicy{
 				PasswordChange: true,
@@ -1156,10 +1406,12 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{lastEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(&query.NotificationPolicy{
 				PasswordChange: true,
@@ -1172,6 +1424,45 @@ func Test_userNotifierLegacy_reducePasswordChanged(t *testing.T) {
 			}, nil)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			commands.EXPECT().PasswordChangeSent(gomock.Any(), orgID, userID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &user.HumanPasswordChangedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+					},
+				}, w
+		},
+	}, {
+		name: "cancel error, no reduce error expected",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.LogoURL}}"
+			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{lastEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+				err: channels.NewCancelError(nil),
+			}
+			queries.EXPECT().NotificationPolicyByOrg(gomock.Any(), gomock.Any(), orgID, gomock.Any()).Return(&query.NotificationPolicy{
+				PasswordChange: true,
+			}, nil)
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1221,10 +1512,12 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s%s/%s/%s", eventOrigin, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{verifiedEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -1257,10 +1550,12 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
 			givenTemplate := "{{.LogoURL}}"
 			expectContent := fmt.Sprintf("%s://%s:%d%s/%s/%s", externalProtocol, instancePrimaryDomain, externalPort, assetsPath, policyID, logoURL)
-			w.message = &messages.Email{
-				Recipients: []string{verifiedEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, "testcode")
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -1299,10 +1594,12 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/otp/verify?loginName=%s&code=%s", eventOrigin, preferredLoginName, testCode)
-			w.message = &messages.Email{
-				Recipients: []string{verifiedEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
@@ -1337,10 +1634,12 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			givenTemplate := "{{.URL}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/otp/verify?loginName=%s&code=%s", externalProtocol, instancePrimaryDomain, externalPort, preferredLoginName, testCode)
-			w.message = &messages.Email{
-				Recipients: []string{verifiedEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
@@ -1379,15 +1678,58 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			urlTemplate := "https://my.custom.url/user/{{.LoginName}}/verify"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/user/%s/verify", preferredLoginName)
-			w.message = &messages.Email{
-				Recipients: []string{verifiedEmail},
-				Subject:    expectMailSubject,
-				Content:    expectContent,
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			commands.EXPECT().OTPEmailSent(gomock.Any(), userID, orgID).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+					userDataCrypto: codeAlg,
+					SMSTokenCrypto: nil,
+				}, args{
+					event: &session.OTPEmailChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:              code,
+						Expiry:            time.Hour,
+						ReturnCode:        false,
+						URLTmpl:           urlTemplate,
+						TriggeredAtOrigin: eventOrigin,
+					},
+				}, w
+		},
+	}, {
+		name: "cancel error, no reduce error expected",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			givenTemplate := "{{.URL}}"
+			urlTemplate := "https://my.custom.url/user/{{.LoginName}}/verify"
+			testCode := "testcode"
+			expectContent := fmt.Sprintf("https://my.custom.url/user/%s/verify", preferredLoginName)
+			w.message = &wantLegacyEmail{
+				email: &messages.Email{
+					Recipients: []string{verifiedEmail},
+					Subject:    expectMailSubject,
+					Content:    expectContent,
+				},
+				err: channels.NewCancelError(nil),
+			}
+			codeAlg, code := cryptoValue(t, ctrl, testCode)
+			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1439,10 +1781,12 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 			expiry := 0 * time.Hour
 			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, eventOriginDomain, expiry)
-			w.messageSMS = &messages.SMS{
-				SenderPhoneNumber:    "senderNumber",
-				RecipientPhoneNumber: verifiedPhone,
-				Content:              expectContent,
+			w.messageSMS = &wantLegacySMS{
+				sms: &messages.SMS{
+					SenderPhoneNumber:    "senderNumber",
+					RecipientPhoneNumber: verifiedPhone,
+					Content:              expectContent,
+				},
 			}
 			expectTemplateWithNotifyUserQueriesSMS(queries)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
@@ -1475,10 +1819,12 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 			expiry := 0 * time.Hour
 			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
 @%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
-			w.messageSMS = &messages.SMS{
-				SenderPhoneNumber:    "senderNumber",
-				RecipientPhoneNumber: verifiedPhone,
-				Content:              expectContent,
+			w.messageSMS = &wantLegacySMS{
+				sms: &messages.SMS{
+					SenderPhoneNumber:    "senderNumber",
+					RecipientPhoneNumber: verifiedPhone,
+					Content:              expectContent,
+				},
 			}
 			expectTemplateWithNotifyUserQueriesSMS(queries)
 			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
@@ -1489,6 +1835,49 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 				}},
 			}, nil)
 			commands.EXPECT().OTPSMSSent(gomock.Any(), userID, orgID, &senders.CodeGeneratorInfo{ID: smsProviderID, VerificationID: verificationID}).Return(nil)
+			return fields{
+					queries:  queries,
+					commands: commands,
+					es: eventstore.NewEventstore(&eventstore.Config{
+						Querier: es_repo_mock.NewRepo(t).ExpectFilterEvents().MockQuerier,
+					}),
+				}, args{
+					event: &session.OTPSMSChallengedEvent{
+						BaseEvent: *eventstore.BaseEventFromRepo(&repository.Event{
+							AggregateID:   userID,
+							ResourceOwner: sql.NullString{String: orgID},
+							CreationDate:  time.Now().UTC(),
+						}),
+						Code:         nil,
+						Expiry:       expiry,
+						CodeReturned: false,
+						GeneratorID:  smsProviderID,
+					},
+				}, w
+		},
+	}, {
+		name: "cancel error, no reduce error expected",
+		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w wantLegacy) {
+			testCode := ""
+			expiry := 0 * time.Hour
+			expectContent := fmt.Sprintf(`%[1]s is your one-time password for %[2]s. Use it within the next %[3]s.
+@%[2]s #%[1]s`, testCode, instancePrimaryDomain, expiry)
+			w.messageSMS = &wantLegacySMS{
+				sms: &messages.SMS{
+					SenderPhoneNumber:    "senderNumber",
+					RecipientPhoneNumber: verifiedPhone,
+					Content:              expectContent,
+				},
+				err: channels.NewCancelError(nil),
+			}
+			expectTemplateWithNotifyUserQueriesSMS(queries)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
+			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
+				Domains: []*query.InstanceDomain{{
+					Domain:    instancePrimaryDomain,
+					IsPrimary: true,
+				}},
+			}, nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1528,9 +1917,19 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 }
 
 type wantLegacy struct {
-	message    *messages.Email
-	messageSMS *messages.SMS
+	message    *wantLegacyEmail
+	messageSMS *wantLegacySMS
 	err        assert.ErrorAssertionFunc
+}
+
+type wantLegacyEmail struct {
+	email *messages.Email
+	err   error
+}
+
+type wantLegacySMS struct {
+	sms *messages.SMS
+	err error
 }
 
 func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields, a args, w wantLegacy) *userNotifierLegacy {
@@ -1539,14 +1938,14 @@ func newUserNotifierLegacy(t *testing.T, ctrl *gomock.Controller, queries *mock.
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
 	if w.err == nil {
 		if w.message != nil {
-			w.message.TriggeringEvent = a.event
-			channel.EXPECT().HandleMessage(w.message).Return(nil)
+			w.message.email.TriggeringEvent = a.event
+			channel.EXPECT().HandleMessage(w.message.email).Return(w.message.err)
 		}
 		if w.messageSMS != nil {
-			w.messageSMS.TriggeringEvent = a.event
-			channel.EXPECT().HandleMessage(w.messageSMS).DoAndReturn(func(message *messages.SMS) error {
+			w.messageSMS.sms.TriggeringEvent = a.event
+			channel.EXPECT().HandleMessage(w.messageSMS.sms).DoAndReturn(func(message *messages.SMS) error {
 				message.VerificationID = gu.Ptr(verificationID)
-				return nil
+				return w.messageSMS.err
 			})
 		}
 	}
