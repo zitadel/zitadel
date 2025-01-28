@@ -28,9 +28,9 @@ import {
   SetPasswordRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
-import { getInstanceUrl } from "../api";
 import { getNextUrl } from "../client";
 import { getSessionCookieById, getSessionCookieByLoginName } from "../cookies";
+import { getApiUrlOfHeaders } from "../service";
 import {
   checkEmailVerification,
   checkMFAFactors,
@@ -281,16 +281,17 @@ export async function checkSessionAndSetPassword({
   sessionId,
   password,
 }: CheckSessionAndSetPasswordCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
 
-  if (!host || typeof host !== "string") {
+  if (!instanceUrl) {
     throw new Error("No host found");
   }
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const { session } = await getSession({
-    host,
+    host: instanceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -308,7 +309,7 @@ export async function checkSessionAndSetPassword({
 
   // check if the user has no password set in order to set a password
   const authmethods = await listAuthenticationMethodTypes({
-    host,
+    host: instanceUrl,
     userId: session.factors.user.id,
   });
 
@@ -328,7 +329,7 @@ export async function checkSessionAndSetPassword({
   );
 
   const loginSettings = await getLoginSettings({
-    host,
+    host: instanceUrl,
     organization: session.factors.user.organizationId,
   });
 
@@ -348,19 +349,8 @@ export async function checkSessionAndSetPassword({
     });
   } else {
     const transport = async (host: string, token: string) => {
-      let instanceUrl;
-      try {
-        instanceUrl = await getInstanceUrl(host);
-      } catch (error) {
-        console.error(
-          `Could not get instance url for ${host}, fallback to ZITADEL_API_URL`,
-          error,
-        );
-        instanceUrl = process.env.ZITADEL_API_URL;
-      }
-
       return createServerTransport(token, {
-        baseUrl: instanceUrl,
+        baseUrl: host,
       });
     };
 
@@ -369,7 +359,10 @@ export async function checkSessionAndSetPassword({
       return createUserServiceClient(transportPromise);
     };
 
-    const selfService = await myUserService(host, `${sessionCookie.token}`);
+    const selfService = await myUserService(
+      instanceUrl,
+      `${sessionCookie.token}`,
+    );
 
     return selfService
       .setPassword(

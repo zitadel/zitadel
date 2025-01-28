@@ -3,24 +3,13 @@
 import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { headers } from "next/headers";
-import { getInstanceUrl } from "./api";
 import { getSessionCookieById } from "./cookies";
+import { getApiUrlOfHeaders } from "./service";
 import { getSession } from "./zitadel";
 
 const transport = async (host: string, token: string) => {
-  let instanceUrl;
-  try {
-    instanceUrl = await getInstanceUrl(host);
-  } catch (error) {
-    console.error(
-      `Could not get instance url for ${host}, fallback to ZITADEL_API_URL`,
-      error,
-    );
-    instanceUrl = process.env.ZITADEL_API_URL;
-  }
-
   return createServerTransport(token, {
-    baseUrl: instanceUrl,
+    baseUrl: host,
   });
 };
 
@@ -36,16 +25,17 @@ export async function setMyPassword({
   sessionId: string;
   password: string;
 }) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
 
-  if (!host || typeof host !== "string") {
+  if (!instanceUrl) {
     throw new Error("No host found");
   }
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const { session } = await getSession({
-    host,
+    host: instanceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -54,7 +44,7 @@ export async function setMyPassword({
     return { error: "Could not load session" };
   }
 
-  const service = await myUserService(host, `${sessionCookie.token}`);
+  const service = await myUserService(instanceUrl, `${sessionCookie.token}`);
 
   if (!session?.factors?.user?.id) {
     return { error: "No user id found in session" };

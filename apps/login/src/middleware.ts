@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getInstanceUrl } from "./lib/api";
+import { getApiUrlOfHeaders } from "./lib/service";
 
 export const config = {
   matcher: [
@@ -21,22 +21,8 @@ export async function middleware(request: NextRequest) {
   //   return NextResponse.next();
   // }
   const _headers = await headers();
-  const _host = _headers.get("host");
 
-  console.log("host", _host);
-
-  const host = _host || request.nextUrl.host;
-
-  let instanceUrl;
-  try {
-    instanceUrl = await getInstanceUrl(host);
-  } catch (error) {
-    console.error(
-      `[Middleware]: Could not get instance url of ${host}, fallback to ZITADEL_API_URL ${process.env.ZITADEL_API_URL}`,
-      error,
-    );
-    instanceUrl = process.env.ZITADEL_API_URL;
-  }
+  const instanceUrl = getApiUrlOfHeaders(_headers);
 
   const instanceHost = `${instanceUrl}`.replace("https://", "");
 
