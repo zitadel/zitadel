@@ -53,5 +53,8 @@ export function getApiUrlOfHeaders(headers: ReadonlyHeaders): string {
     }
   }
 
+  console.log("x-zitadel-forward-host" + headers.get("x-zitadel-forward-host"));
+  console.log("host" + headers.get("host"));
+
   return instanceUrl;
 }
