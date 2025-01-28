@@ -44,7 +44,7 @@ BEGIN
 		WHERE om.role = ANY(matched_roles)
 		AND om.instance_id = instanceID
 		AND om.user_id = userId
-	) AS orgs;
+	);
     RETURN;
 END;
 $$;

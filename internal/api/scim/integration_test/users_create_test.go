@@ -265,6 +265,7 @@ func TestCreateUser(t *testing.T) {
 			createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, tt.body)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 
 			if err != nil {
@@ -353,7 +354,7 @@ func TestCreateUser_metadata(t *testing.T) {
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:externalId", "701984")
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:name.middleName", "Jane")
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:name.honorificSuffix", "III")
-		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:profileURL", "http://login.example.com/bjensen")
+		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:profileUrl", "http://login.example.com/bjensen")
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:title", "Tour Guide")
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:locale", "en-US")
 		test.AssertMapContains(tt, mdMap, "urn:zitadel:scim:ims", `[{"value":"someaimhandle","type":"aim"},{"value":"twitterhandle","type":"X"}]`)
@@ -364,7 +365,7 @@ func TestCreateUser_metadata(t *testing.T) {
 func TestCreateUser_scopedExternalID(t *testing.T) {
 	_, err := Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
 		Id:    Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-		Key:   "urn:zitadel:scim:provisioning_domain",
+		Key:   "urn:zitadel:scim:provisioningDomain",
 		Value: []byte("fooBar"),
 	})
 	require.NoError(t, err)
@@ -378,7 +379,7 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 
 		_, err = Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
 			Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-			Key: "urn:zitadel:scim:provisioning_domain",
+			Key: "urn:zitadel:scim:provisioningDomain",
 		})
 		require.NoError(t, err)
 	}()
