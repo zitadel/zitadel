@@ -293,6 +293,7 @@ export async function checkSessionAndSetPassword({
   if (!instanceUrl) {
     throw new Error("No host found");
   }
+  const host = instanceUrl;
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
@@ -315,7 +316,7 @@ export async function checkSessionAndSetPassword({
 
   // check if the user has no password set in order to set a password
   const authmethods = await listAuthenticationMethodTypes({
-    host: instanceUrl,
+    host,
     userId: session.factors.user.id,
   });
 
