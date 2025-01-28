@@ -63,14 +63,14 @@ Response Example:
 
 ```json
 {
-	"samlRequest": {
-		"id": "V2_224908753244265546",
-		"creationDate": "2023-07-28T13:47:43.471505Z",
-		"issuer": "https://myapp.example.com",
-		"assertionConsumerService": "https://myapp.example.com/acs",
-		"relayState": "CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I",
-		"binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
-	}
+  "samlRequest": {
+    "id": "V2_224908753244265546",
+    "creationDate": "2023-07-28T13:47:43.471505Z",
+    "issuer": "https://myapp.example.com",
+    "assertionConsumerService": "https://myapp.example.com/acs",
+    "relayState": "CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I",
+    "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+  }
 }
 ```
 
@@ -116,21 +116,22 @@ In the response you will get content which describe how to handle further steps 
 Example Response POST-binding:
 ```json
 {
-	"details": {
-		"sequence": "686",
-		"changeDate": "2023-07-31T08:09:19.314537Z",
-		"resourceOwner": "163840776801878273"
-	},
-	"url": "https://myapp.example.com/acs",
-	"binding": {
-		"post": {
-			"relayState": "CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I",
-			"samlResponse": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFJlc3Bv..."
-		}
-	}
+  "details": {
+    "sequence": "686",
+    "changeDate": "2023-07-31T08:09:19.314537Z",
+    "resourceOwner": "163840776801878273"
+  },
+  "url": "https://myapp.example.com/acs",
+  "binding": {
+    "post": {
+      "relayState": "CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I",
+      "samlResponse": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFJlc3Bv..."
+    }
+  }
 }
+```
 
-Which should result in a POST call to the url 'https://myapp.example.com/acs' with the payload with the following attributes:
+Which expects your client to do a POST call to the URL `https://myapp.example.com/acs` with the payload containing the following attributes:
 
 ```
 RelayState: "CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I",
@@ -142,22 +143,23 @@ SAMLResponse: "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFJlc3Bv..."
 Example Response Redirect-binding:
 ```json
 {
-	"details": {
-		"sequence": "686",
-		"changeDate": "2023-07-31T08:09:19.314537Z",
-		"resourceOwner": "163840776801878273"
-	},
-	"url": "https://myapp.example.com/acs?RelayState=CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I&SAMLResponse=PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFJlc3Bv...",
-	"binding": {
-		"redirect": {}
-	}
+  "details": {
+    "sequence": "686",
+    "changeDate": "2023-07-31T08:09:19.314537Z",
+    "resourceOwner": "163840776801878273"
+  },
+  "url": "https://myapp.example.com/acs?RelayState=CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I&SAMLResponse=PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFJlc3Bv...",
+  "binding": {
+    "redirect": {}
+  }
 }
+```
 
-Which should result in a redirect to the url 'https://myapp.example.com/acs?RelayState=...&SAMLResponse=...' with all information as URL parameters.
+Which expects your client to redirect to the url 'https://myapp.example.com/acs?RelayState=...&SAMLResponse=...' with all information as URL parameters.
 
 ### SAML Endpoints
 
-All SAML relevant endpoints are provided by ZITADEL. In you login UI you just have to proxy them through and send them directly to the backend.
+All SAML relevant endpoints are provided by ZITADEL. In your login UI you just have to proxy them through and send them directly to the backend.
 
 These are endpoints like:
 - Metadata
