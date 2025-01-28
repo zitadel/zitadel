@@ -6,7 +6,6 @@ import posthog from 'posthog-js';
   providedIn: 'root',
 })
 export class PosthogService {
-  private postHog: any;
   private posthogToken?: string;
   private posthogUrl?: string;
 
@@ -29,7 +28,6 @@ export class PosthogService {
         enable_heatmaps: true,
         persistence: 'memory',
       });
-      this.postHog = posthog;
     }
   }
 }
