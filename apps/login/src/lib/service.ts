@@ -39,6 +39,9 @@ export function getApiUrlOfHeaders(headers: ReadonlyHeaders): string {
 
   if (headers.get("x-zitadel-forward-host")) {
     instanceUrl = headers.get("x-zitadel-forward-host") as string;
+    instanceUrl = instanceUrl.startsWith("https://")
+      ? instanceUrl
+      : `https://${instanceUrl}`;
   } else {
     const host = headers.get("host");
 
