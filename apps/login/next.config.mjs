@@ -35,7 +35,7 @@ const secureHeaders = [
 ];
 
 const nextConfig = {
-  basePath: "/",
+  basePath: "/new-login",
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
   experimental: {
     dynamicIO: true,
