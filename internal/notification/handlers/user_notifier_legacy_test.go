@@ -1729,7 +1729,7 @@ func Test_userNotifierLegacy_reduceOTPEmailChallenged(t *testing.T) {
 			}
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectTemplateWithNotifyUserQueries(queries, givenTemplate)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
 			return fields{
 					queries:  queries,
 					commands: commands,
@@ -1871,7 +1871,7 @@ func Test_userNotifierLegacy_reduceOTPSMSChallenged(t *testing.T) {
 				err: channels.NewCancelError(nil),
 			}
 			expectTemplateWithNotifyUserQueriesSMS(queries)
-			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any(), nil).Return(&query.Session{}, nil)
+			queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), userID, gomock.Any()).Return(&query.Session{}, nil)
 			queries.EXPECT().SearchInstanceDomains(gomock.Any(), gomock.Any()).Return(&query.InstanceDomains{
 				Domains: []*query.InstanceDomain{{
 					Domain:    instancePrimaryDomain,
