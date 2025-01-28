@@ -10,6 +10,7 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
+import { getApiUrlOfHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 
 type RegisterUserCommand = {
@@ -27,7 +28,9 @@ export type RegisterUserResponse = {
   factors: Factors | undefined;
 };
 export async function registerUser(command: RegisterUserCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

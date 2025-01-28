@@ -15,6 +15,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
+import { getApiUrlOfHeaders } from "../service";
 
 type CustomCookieData = {
   id: string;
@@ -33,7 +34,9 @@ export async function createSessionAndUpdateCookie(
   authRequestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     throw new Error("Could not get domain");
@@ -98,7 +101,9 @@ export async function createSessionForIdpAndUpdateCookie(
   authRequestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     throw new Error("Could not get domain");
@@ -163,7 +168,9 @@ export async function setSessionAndUpdateCookie(
   authRequestId?: string,
   lifetime?: Duration,
 ) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     throw new Error("Could not get domain");

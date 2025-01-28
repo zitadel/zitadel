@@ -1,6 +1,7 @@
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import {
   createCallback,
   getActiveIdentityProviders,
@@ -191,7 +192,9 @@ export async function GET(request: NextRequest) {
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

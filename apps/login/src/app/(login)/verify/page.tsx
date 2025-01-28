@@ -4,6 +4,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { VerifyRedirectButton } from "@/components/verify-redirect-button";
 import { sendEmailCode } from "@/lib/server/verify";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -24,7 +25,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const { userId, loginName, code, organization, authRequestId, invite } =
     searchParams;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

@@ -22,6 +22,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
+import { getApiUrlOfHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
 
@@ -41,7 +42,9 @@ export async function registerPasskeyLink(
 ): Promise<RegisterPasskeyResponse> {
   const { sessionId } = command;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     throw new Error("Could not get domain");
@@ -86,7 +89,9 @@ export async function registerPasskeyLink(
 }
 
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     throw new Error("Could not get domain");
@@ -152,7 +157,9 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     };
   }
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     return { error: "Could not get host" };

@@ -5,6 +5,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getActiveIdentityProviders,
@@ -28,7 +29,9 @@ export default async function Page(props: {
 
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

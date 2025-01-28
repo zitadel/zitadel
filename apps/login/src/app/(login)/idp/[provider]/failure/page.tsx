@@ -1,4 +1,5 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import { getBrandingSettings } from "@/lib/zitadel";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -23,7 +24,9 @@ export default async function Page(props: {
 
   const { organization } = searchParams;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

@@ -3,6 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SelfServiceMenu } from "@/components/self-service-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import {
   createCallback,
   getBrandingSettings,
@@ -59,7 +60,9 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "signedin" });
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

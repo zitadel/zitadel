@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import { getActiveIdentityProviders, getBrandingSettings } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
@@ -14,7 +15,9 @@ export default async function Page(props: {
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

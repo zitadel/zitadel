@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { InviteForm } from "@/components/invite-form";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -19,7 +20,9 @@ export default async function Page(props: {
 
   let { firstname, lastname, email, organization } = searchParams;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

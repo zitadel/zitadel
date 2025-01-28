@@ -13,6 +13,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
+import { getApiUrlOfHeaders } from "../service";
 import { getLoginSettings } from "../zitadel";
 
 export type SetOTPCommand = {
@@ -25,7 +26,9 @@ export type SetOTPCommand = {
 };
 
 export async function setOTP(command: SetOTPCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     throw new Error("Could not get domain");

@@ -3,6 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginOTP } from "@/components/login-otp";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -22,7 +23,9 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "otp" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

@@ -19,6 +19,7 @@ import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
+import { getApiUrlOfHeaders } from "../service";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
@@ -28,7 +29,9 @@ export async function verifyTOTP(
   loginName?: string,
   organization?: string,
 ) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
@@ -63,7 +66,9 @@ type VerifyUserByEmailCommand = {
 };
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
@@ -245,7 +250,9 @@ type resendVerifyEmailCommand = {
 };
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     return { error: "No host found" };
@@ -267,7 +274,6 @@ type sendEmailCommand = {
 };
 
 export async function sendEmailCode(command: sendEmailCommand) {
-  const host = (await headers()).get("host");
   return zitadelSendEmailCode({
     userId: command.userId,
     host: command.host,
@@ -286,7 +292,9 @@ export type SendVerificationRedirectWithoutCheckCommand = {
 export async function sendVerificationRedirectWithoutCheck(
   command: SendVerificationRedirectWithoutCheckCommand,
 ) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

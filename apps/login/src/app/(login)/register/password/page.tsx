@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetRegisterPasswordForm } from "@/components/set-register-password-form";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -21,7 +22,9 @@ export default async function Page(props: {
   let { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

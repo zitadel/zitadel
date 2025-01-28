@@ -2,6 +2,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetPasswordForm } from "@/components/set-password-form";
 import { UserAvatar } from "@/components/user-avatar";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -25,7 +26,9 @@ export default async function Page(props: {
   const { userId, loginName, organization, authRequestId, code, initial } =
     searchParams;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

@@ -44,7 +44,9 @@ type ResetPasswordCommand = {
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
@@ -76,7 +78,9 @@ export type UpdateSessionCommand = {
 };
 
 export async function sendPassword(command: UpdateSessionCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
@@ -249,7 +253,9 @@ export async function changePassword(command: {
   userId: string;
   password: string;
 }) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

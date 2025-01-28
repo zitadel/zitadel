@@ -4,6 +4,7 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
 import { UserAvatar } from "@/components/user-avatar";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,
@@ -32,7 +33,9 @@ export default async function Page(props: {
     searchParams;
   const { method } = params;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

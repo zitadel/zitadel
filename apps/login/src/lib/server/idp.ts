@@ -7,6 +7,7 @@ import {
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
+import { getApiUrlOfHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 
@@ -17,7 +18,9 @@ export type StartIDPFlowCommand = {
 };
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     return { error: "Could not get host" };
@@ -56,7 +59,9 @@ type CreateNewSessionCommand = {
 export async function createNewSessionFromIdpIntent(
   command: CreateNewSessionCommand,
 ) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     return { error: "Could not get domain" };

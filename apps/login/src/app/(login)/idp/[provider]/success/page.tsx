@@ -5,6 +5,7 @@ import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
 import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import {
   addHuman,
   addIDPLink,
@@ -38,7 +39,9 @@ export default async function Page(props: {
   const { id, token, authRequestId, organization, link } = searchParams;
   const { provider } = params;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

@@ -18,12 +18,15 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
+import { getApiUrlOfHeaders } from "../service";
 
 export async function continueWithSession({
   authRequestId,
   ...session
 }: Session & { authRequestId?: string }) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
@@ -89,7 +92,9 @@ export async function updateSession(options: UpdateSessionCommand) {
     };
   }
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     return { error: "Could not get host" };
@@ -151,7 +156,9 @@ type ClearSessionOptions = {
 };
 
 export async function clearSession(options: ClearSessionOptions) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
@@ -177,7 +184,9 @@ type CleanupSessionCommand = {
 };
 
 export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

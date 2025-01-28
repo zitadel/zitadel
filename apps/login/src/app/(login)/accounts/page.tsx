@@ -1,6 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -37,7 +38,9 @@ export default async function Page(props: {
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");

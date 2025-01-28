@@ -3,6 +3,7 @@
 import { addHumanUser, createInviteCode } from "@/lib/zitadel";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
+import { getApiUrlOfHeaders } from "../service";
 
 type InviteUserCommand = {
   email: string;
@@ -20,7 +21,9 @@ export type RegisterUserResponse = {
 };
 
 export async function inviteUser(command: InviteUserCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     return { error: "Could not get domain" };

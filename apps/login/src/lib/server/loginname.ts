@@ -8,6 +8,7 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { getApiUrlOfHeaders } from "../service";
 import { checkInvite } from "../verify-helper";
 import {
   getActiveIdentityProviders,
@@ -32,7 +33,9 @@ export type SendLoginnameCommand = {
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host) {
     throw new Error("Could not get domain");
@@ -76,7 +79,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     });
 
     if (identityProviders.length === 1) {
-      const host = (await headers()).get("host");
+      const _headers = await headers();
+      const instanceUrl = getApiUrlOfHeaders(_headers);
+      const host = instanceUrl;
 
       if (!host) {
         return { error: "Could not get host" };
@@ -123,7 +128,9 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     );
 
     if (identityProviders.length === 1) {
-      const host = (await headers()).get("host");
+      const _headers = await headers();
+      const instanceUrl = getApiUrlOfHeaders(_headers);
+      const host = instanceUrl;
 
       if (!host) {
         return { error: "Could not get host" };

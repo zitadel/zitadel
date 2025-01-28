@@ -2,6 +2,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
+import { getApiUrlOfHeaders } from "@/lib/service";
 import { getBrandingSettings, getDefaultOrg, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -17,7 +18,9 @@ export default async function Page(props: {
 
   let { userId, organization } = searchParams;
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const host = instanceUrl;
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
