@@ -7,29 +7,13 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/zitadel/zitadel/internal/api/scim/schemas"
+	"github.com/zitadel/zitadel/internal/api/scim/resources/patch"
 	"github.com/zitadel/zitadel/internal/api/scim/serrors"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type ResourceHandlerAdapter[T ResourceHolder] struct {
 	handler ResourceHandler[T]
-}
-
-type ListRequest struct {
-	// Count An integer indicating the desired maximum number of query results per page. OPTIONAL.
-	Count uint64 `json:"count" schema:"count"`
-
-	// StartIndex An integer indicating the 1-based index of the first query result. Optional.
-	StartIndex uint64 `json:"startIndex" schema:"startIndex"`
-}
-
-type ListResponse[T any] struct {
-	Schemas      []schemas.ScimSchemaType `json:"schemas"`
-	ItemsPerPage uint64                   `json:"itemsPerPage"`
-	TotalResults uint64                   `json:"totalResults"`
-	StartIndex   uint64                   `json:"startIndex"`
-	Resources    []T                      `json:"Resources"` // according to the rfc this is the only field in PascalCase...
 }
 
 func NewResourceHandlerAdapter[T ResourceHolder](handler ResourceHandler[T]) *ResourceHandlerAdapter[T] {
@@ -57,9 +41,42 @@ func (adapter *ResourceHandlerAdapter[T]) Replace(r *http.Request) (T, error) {
 	return adapter.handler.Replace(r.Context(), id, entity)
 }
 
+func (adapter *ResourceHandlerAdapter[T]) Update(r *http.Request) error {
+	request := new(patch.OperationRequest)
+	err := json.NewDecoder(r.Body).Decode(request)
+	if err != nil {
+		if zerrors.IsZitadelError(err) {
+			return err
+		}
+
+		return serrors.ThrowInvalidSyntax(zerrors.ThrowInvalidArgumentf(nil, "SCIM-ucrjson2", "Could not deserialize json: %v", err.Error()))
+	}
+
+	err = request.Validate()
+	if err != nil {
+		return err
+	}
+
+	if len(request.Operations) == 0 {
+		return nil
+	}
+
+	id := mux.Vars(r)["id"]
+	return adapter.handler.Update(r.Context(), id, request.Operations)
+}
+
 func (adapter *ResourceHandlerAdapter[T]) Delete(r *http.Request) error {
 	id := mux.Vars(r)["id"]
 	return adapter.handler.Delete(r.Context(), id)
+}
+
+func (adapter *ResourceHandlerAdapter[T]) List(r *http.Request) (*ListResponse[T], error) {
+	request, err := readListRequest(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return adapter.handler.List(r.Context(), request)
 }
 
 func (adapter *ResourceHandlerAdapter[T]) Get(r *http.Request) (T, error) {
@@ -71,7 +88,7 @@ func (adapter *ResourceHandlerAdapter[T]) readEntityFromBody(r *http.Request) (T
 	entity := adapter.handler.NewResource()
 	err := json.NewDecoder(r.Body).Decode(entity)
 	if err != nil {
-		if zerrors.IsZitadelError(err) {
+		if serrors.IsScimOrZitadelError(err) {
 			return entity, err
 		}
 

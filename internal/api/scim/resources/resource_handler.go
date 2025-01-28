@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/scim/resources/patch"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -20,8 +21,10 @@ type ResourceHandler[T ResourceHolder] interface {
 
 	Create(ctx context.Context, resource T) (T, error)
 	Replace(ctx context.Context, id string, resource T) (T, error)
+	Update(ctx context.Context, id string, operations patch.OperationCollection) error
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (T, error)
+	List(ctx context.Context, request *ListRequest) (*ListResponse[T], error)
 }
 
 type Resource struct {

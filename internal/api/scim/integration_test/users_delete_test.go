@@ -4,16 +4,18 @@ package integration_test
 
 import (
 	"context"
-	"github.com/brianvoe/gofakeit/v6"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/integration/scim"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
-	"google.golang.org/grpc/codes"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/scim"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestDeleteUser_errors(t *testing.T) {

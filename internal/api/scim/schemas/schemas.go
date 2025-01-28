@@ -10,6 +10,8 @@ const (
 	idPrefixZitadelMessages = "urn:ietf:params:scim:api:zitadel:messages:2.0:"
 
 	IdUser               ScimSchemaType = idPrefixCore + "User"
+	IdListResponse       ScimSchemaType = idPrefixMessages + "ListResponse"
+	IdPatchOperation     ScimSchemaType = idPrefixMessages + "PatchOp"
 	IdError              ScimSchemaType = idPrefixMessages + "Error"
 	IdZitadelErrorDetail ScimSchemaType = idPrefixZitadelMessages + "ErrorDetail"
 

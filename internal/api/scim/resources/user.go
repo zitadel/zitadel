@@ -7,17 +7,22 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	scim_config "github.com/zitadel/zitadel/internal/api/scim/config"
+	"github.com/zitadel/zitadel/internal/api/scim/resources/filter"
+	"github.com/zitadel/zitadel/internal/api/scim/resources/patch"
 	scim_schemas "github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type UsersHandler struct {
-	command     *command.Commands
-	query       *query.Queries
-	userCodeAlg crypto.EncryptionAlgorithm
-	config      *scim_config.Config
+	command         *command.Commands
+	query           *query.Queries
+	userCodeAlg     crypto.EncryptionAlgorithm
+	config          *scim_config.Config
+	filterEvaluator *filter.Evaluator
 }
 
 type ScimUser struct {
@@ -105,7 +110,7 @@ func NewUsersHandler(
 	query *query.Queries,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	config *scim_config.Config) ResourceHandler[*ScimUser] {
-	return &UsersHandler{command, query, userCodeAlg, config}
+	return &UsersHandler{command, query, userCodeAlg, config, filter.NewEvaluator(scim_schemas.IdUser)}
 }
 
 func (h *UsersHandler) ResourceNameSingular() scim_schemas.ScimResourceTypeSingular {
@@ -160,6 +165,21 @@ func (h *UsersHandler) Replace(ctx context.Context, id string, user *ScimUser) (
 	return user, nil
 }
 
+func (h *UsersHandler) Update(ctx context.Context, id string, operations patch.OperationCollection) error {
+	userWM, err := h.command.UserHumanWriteModel(ctx, id, true, true, true, true, false, false, true)
+	if err != nil {
+		return err
+	}
+
+	user := h.mapWriteModelToScimUser(ctx, userWM)
+	changeHuman, err := h.applyPatchesToChangeHuman(ctx, user, operations)
+	if err != nil {
+		return err
+	}
+
+	return h.command.ChangeUserHuman(ctx, changeHuman, h.userCodeAlg)
+}
+
 func (h *UsersHandler) Delete(ctx context.Context, id string) error {
 	memberships, grants, err := h.queryUserDependencies(ctx, id)
 	if err != nil {
@@ -176,11 +196,44 @@ func (h *UsersHandler) Get(ctx context.Context, id string) (*ScimUser, error) {
 		return nil, err
 	}
 
+	if user.Type != domain.UserTypeHuman {
+		return nil, zerrors.ThrowNotFound(nil, "SCIM-USRT1", "Errors.Users.NotFound")
+	}
+
 	metadata, err := h.queryMetadataForUser(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	return h.mapToScimUser(ctx, user, metadata), nil
+}
+
+func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListResponse[*ScimUser], error) {
+	q, err := h.buildListQuery(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.Count == 0 {
+		count, err := h.query.CountUsers(ctx, q)
+		if err != nil {
+			return nil, err
+		}
+
+		return newListResponse(count, q.SearchRequest, make([]*ScimUser, 0)), nil
+	}
+
+	users, err := h.query.SearchUsers(ctx, q, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata, err := h.queryMetadataForUsers(ctx, usersToIDs(users.Users))
+	if err != nil {
+		return nil, err
+	}
+
+	scimUsers := h.mapToScimUsers(ctx, users.Users, metadata)
+	return newListResponse(users.SearchResponse.Count, q.SearchRequest, scimUsers), nil
 }
 
 func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {

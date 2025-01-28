@@ -54,9 +54,25 @@ func mapResource[T sresources.ResourceHolder](router *mux.Router, mw zhttp_middl
 	resourceRouter := router.PathPrefix("/" + path.Join(zhttp.OrgIdInPathVariable, string(handler.ResourceNamePlural()))).Subrouter()
 
 	resourceRouter.Handle("", mw(handleResourceCreatedResponse(adapter.Create))).Methods(http.MethodPost)
+	resourceRouter.Handle("", mw(handleJsonResponse(adapter.List))).Methods(http.MethodGet)
+	resourceRouter.Handle("/.search", mw(handleJsonResponse(adapter.List))).Methods(http.MethodPost)
 	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.Get))).Methods(http.MethodGet)
 	resourceRouter.Handle("/{id}", mw(handleResourceResponse(adapter.Replace))).Methods(http.MethodPut)
+	resourceRouter.Handle("/{id}", mw(handleEmptyResponse(adapter.Update))).Methods(http.MethodPatch)
 	resourceRouter.Handle("/{id}", mw(handleEmptyResponse(adapter.Delete))).Methods(http.MethodDelete)
+}
+
+func handleJsonResponse[T any](next func(r *http.Request) (T, error)) zhttp_middlware.HandlerFuncWithError {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		entity, err := next(r)
+		if err != nil {
+			return err
+		}
+
+		err = json.NewEncoder(w).Encode(entity)
+		logging.OnError(err).Warn("scim json response encoding failed")
+		return nil
+	}
 }
 
 func handleResourceCreatedResponse[T sresources.ResourceHolder](next func(*http.Request) (T, error)) zhttp_middlware.HandlerFuncWithError {

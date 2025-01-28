@@ -4,21 +4,24 @@ package integration_test
 
 import (
 	"context"
-	"github.com/brianvoe/gofakeit/v6"
-	"github.com/muhlemmer/gu"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/api/scim/resources"
-	"github.com/zitadel/zitadel/internal/api/scim/schemas"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/internal/integration/scim"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
-	"golang.org/x/text/language"
 	"net/http"
 	"path"
 	"testing"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/api/scim/resources"
+	"github.com/zitadel/zitadel/internal/api/scim/schemas"
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/scim"
+	"github.com/zitadel/zitadel/internal/test"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func TestGetUser(t *testing.T) {
@@ -91,7 +94,7 @@ func TestGetUser(t *testing.T) {
 				},
 				DisplayName:       "Babs Jensen",
 				NickName:          "Babs",
-				ProfileUrl:        integration.Must(schemas.ParseHTTPURL("http://login.example.com/bjensen")),
+				ProfileUrl:        test.Must(schemas.ParseHTTPURL("http://login.example.com/bjensen")),
 				Title:             "Tour Guide",
 				PreferredLanguage: language.Make("en-US"),
 				Locale:            "en-US",
@@ -142,11 +145,11 @@ func TestGetUser(t *testing.T) {
 				},
 				Photos: []*resources.ScimPhoto{
 					{
-						Value: *integration.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/F")),
+						Value: *test.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/F")),
 						Type:  "photo",
 					},
 					{
-						Value: *integration.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/T")),
+						Value: *test.Must(schemas.ParseHTTPURL("https://photos.example.com/profilephoto/72930000000Ccne/T")),
 						Type:  "thumbnail",
 					},
 				},
@@ -190,7 +193,7 @@ func TestGetUser(t *testing.T) {
 				// set provisioning domain of service user
 				_, err = Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
 					Id:    Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-					Key:   "urn:zitadel:scim:provisioning_domain",
+					Key:   "urn:zitadel:scim:provisioningDomain",
 					Value: []byte("fooBar"),
 				})
 				require.NoError(t, err)
@@ -210,7 +213,7 @@ func TestGetUser(t *testing.T) {
 
 				_, err = Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
 					Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-					Key: "urn:zitadel:scim:provisioning_domain",
+					Key: "urn:zitadel:scim:provisioningDomain",
 				})
 				require.NoError(t, err)
 			},
@@ -254,7 +257,7 @@ func TestGetUser(t *testing.T) {
 				assert.Equal(ttt, schemas.ScimResourceTypeSingular("User"), fetchedUser.Resource.Meta.ResourceType)
 				assert.Equal(ttt, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, Instance.DefaultOrg.Id, "Users", fetchedUser.ID), fetchedUser.Resource.Meta.Location)
 				assert.Nil(ttt, fetchedUser.Password)
-				if !integration.PartiallyDeepEqual(tt.want, fetchedUser) {
+				if !test.PartiallyDeepEqual(tt.want, fetchedUser) {
 					ttt.Errorf("GetUser() got = %#v, want %#v", fetchedUser, tt.want)
 				}
 			}, retryDuration, tick)
