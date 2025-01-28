@@ -75,6 +75,7 @@ SELECT
   , h.is_phone_verified
   , h.password_change_required
   , h.password_changed
+  , h.mfa_init_skipped
   , m.user_id
   , m.name
   , m.description

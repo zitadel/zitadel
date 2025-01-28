@@ -307,15 +307,19 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceUnsetMFAInitSkipped,
 				},
 				{
-					Event:  user.HumanOTPSMSRemovedType,
+					Event:  user.HumanOTPSMSAddedType,
 					Reduce: p.reduceUnsetMFAInitSkipped,
 				},
 				{
-					Event:  user.HumanOTPEmailRemovedType,
+					Event:  user.HumanOTPEmailAddedType,
 					Reduce: p.reduceUnsetMFAInitSkipped,
 				},
 				{
 					Event:  user.HumanU2FTokenVerifiedType,
+					Reduce: p.reduceUnsetMFAInitSkipped,
+				},
+				{
+					Event:  user.HumanPasswordlessTokenVerifiedType,
 					Reduce: p.reduceUnsetMFAInitSkipped,
 				},
 				{
