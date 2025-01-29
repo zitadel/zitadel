@@ -27,12 +27,7 @@ export type SetOTPCommand = {
 
 export async function setOTP(command: SetOTPCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const recentSession = command.sessionId
     ? await getSessionCookieById({ sessionId: command.sessionId }).catch(
@@ -68,7 +63,7 @@ export async function setOTP(command: SetOTPCommand) {
   }
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: command.organization,
   });
 

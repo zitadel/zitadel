@@ -21,7 +21,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 async function loadSession(
-  host: string,
+  serviceUrl: string,
   loginName: string,
   authRequestId?: string,
 ) {
@@ -29,7 +29,7 @@ async function loadSession(
 
   if (authRequestId) {
     return createCallback({
-      host,
+      serviceUrl,
       req: create(CreateCallbackRequestSchema, {
         authRequestId,
         callbackKind: {
@@ -45,7 +45,7 @@ async function loadSession(
     });
   }
   return getSession({
-    host,
+    serviceUrl,
     sessionId: recent.id,
     sessionToken: recent.token,
   }).then((response) => {
@@ -61,21 +61,20 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "signedin" });
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const { loginName, authRequestId, organization } = searchParams;
-  const sessionFactors = await loadSession(host, loginName, authRequestId);
+  const sessionFactors = await loadSession(
+    serviceUrl,
+    loginName,
+    authRequestId,
+  );
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   let loginSettings;
   if (!authRequestId) {
-    loginSettings = await getLoginSettings({ host, organization });
+    loginSettings = await getLoginSettings({ serviceUrl, organization });
   }
 
   return (

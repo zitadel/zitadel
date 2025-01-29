@@ -40,21 +40,16 @@ export default async function Page(props: {
   const { provider } = params;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
-
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   if (!provider || !id || !token) {
     return loginFailed(branding, "IDP context missing");
   }
 
   const intent = await retrieveIDPIntent({
-    serviceUrl: instanceUrl,
+    serviceUrl,
     id,
     token,
   });
@@ -77,7 +72,7 @@ export default async function Page(props: {
     return loginFailed(branding, "IDP information missing");
   }
 
-  const idp = await getIDPByID({ host, id: idpInformation.idpId });
+  const idp = await getIDPByID({ serviceUrl, id: idpInformation.idpId });
   const options = idp?.config?.options;
 
   if (!idp) {
@@ -95,7 +90,7 @@ export default async function Page(props: {
     let idpLink;
     try {
       idpLink = await addIDPLink({
-        host,
+        serviceUrl,
         idp: {
           id: idpInformation.idpId,
           userId: idpInformation.userId,
@@ -126,20 +121,20 @@ export default async function Page(props: {
     const email = PROVIDER_MAPPING[providerType](idpInformation).email?.email;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
-      foundUser = await listUsers({ host, email }).then((response) => {
+      foundUser = await listUsers({ serviceUrl, email }).then((response) => {
         return response.result ? response.result[0] : null;
       });
     } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
       foundUser = await listUsers(
         options.autoLinking === AutoLinkingOption.USERNAME
-          ? { host, userName: idpInformation.userName }
-          : { host, email },
+          ? { serviceUrl, userName: idpInformation.userName }
+          : { serviceUrl, email },
       ).then((response) => {
         return response.result ? response.result[0] : null;
       });
     } else {
       foundUser = await listUsers({
-        host,
+        serviceUrl,
         userName: idpInformation.userName,
         email,
       }).then((response) => {
@@ -151,7 +146,7 @@ export default async function Page(props: {
       let idpLink;
       try {
         idpLink = await addIDPLink({
-          host,
+          serviceUrl,
           idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
@@ -192,12 +187,12 @@ export default async function Page(props: {
       const suffix = matched?.[1] ?? "";
 
       // this just returns orgs where the suffix is set as primary domain
-      const orgs = await getOrgsByDomain({ host, domain: suffix });
+      const orgs = await getOrgsByDomain({ serviceUrl, domain: suffix });
       const orgToCheckForDiscovery =
         orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
       const orgLoginSettings = await getLoginSettings({
-        host,
+        serviceUrl,
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
@@ -216,7 +211,7 @@ export default async function Page(props: {
       });
     }
 
-    const newUser = await addHuman({ host, request: userData });
+    const newUser = await addHuman({ serviceUrl, request: userData });
 
     if (newUser) {
       return (

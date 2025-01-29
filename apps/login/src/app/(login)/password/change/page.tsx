@@ -16,12 +16,7 @@ export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const searchParams = await props.searchParams;
   const locale = getLocale();
@@ -32,22 +27,22 @@ export default async function Page(props: {
 
   // also allow no session to be found (ignoreUnkownUsername)
   const sessionFactors = await loadMostRecentSession({
-    host,
+    serviceUrl,
     sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   const passwordComplexity = await getPasswordComplexitySettings({
-    host,
+    serviceUrl,
     organization: sessionFactors?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: sessionFactors?.factors?.user?.organizationId,
   });
 

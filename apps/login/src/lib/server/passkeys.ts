@@ -43,8 +43,8 @@ export async function registerPasskeyLink(
   const { sessionId } = command;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host) {
     throw new Error("Could not get domain");
@@ -52,7 +52,7 @@ export async function registerPasskeyLink(
 
   const sessionCookie = await getSessionCookieById({ sessionId });
   const session = await getSession({
-    host,
+    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -72,7 +72,7 @@ export async function registerPasskeyLink(
 
   // use session token to add the passkey
   const registerLink = await createPasskeyRegistrationLink({
-    host,
+    serviceUrl,
     userId,
   });
 
@@ -81,7 +81,7 @@ export async function registerPasskeyLink(
   }
 
   return registerPasskey({
-    host,
+    serviceUrl,
     userId,
     code: registerLink.code,
     domain: hostname,
@@ -90,12 +90,7 @@ export async function registerPasskeyLink(
 
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
@@ -113,7 +108,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     sessionId: command.sessionId,
   });
   const session = await getSession({
-    host,
+    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -124,7 +119,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
   }
 
   return zitadelVerifyPasskeyRegistration({
-    host,
+    serviceUrl,
     request: create(VerifyPasskeyRegistrationRequestSchema, {
       passkeyId: command.passkeyId,
       publicKeyCredential: command.publicKeyCredential,
@@ -158,14 +153,9 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   }
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
-  if (!host) {
-    return { error: "Could not get host" };
-  }
-
-  const loginSettings = await getLoginSettings({ host, organization });
+  const loginSettings = await getLoginSettings({ serviceUrl, organization });
 
   const lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
@@ -186,7 +176,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   }
 
   const userResponse = await getUserByID({
-    host,
+    serviceUrl,
     userId: session?.factors?.user?.id,
   });
 

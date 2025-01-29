@@ -21,15 +21,10 @@ export default async function Page(props: {
   let { firstname, lastname, email, organization } = searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   if (!organization) {
-    const org = await getDefaultOrg({ host });
+    const org = await getDefaultOrg({ serviceUrl });
     if (!org) {
       throw new Error("No default organization found");
     }
@@ -37,14 +32,14 @@ export default async function Page(props: {
     organization = org.id;
   }
 
-  const loginSettings = await getLoginSettings({ host, organization });
+  const loginSettings = await getLoginSettings({ serviceUrl, organization });
 
   const passwordComplexitySettings = await getPasswordComplexitySettings({
-    host,
+    serviceUrl,
     organization,
   });
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   return (
     <DynamicTheme branding={branding}>

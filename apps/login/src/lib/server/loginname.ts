@@ -34,15 +34,15 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host) {
     throw new Error("Could not get domain");
   }
 
   const loginSettingsByContext = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: command.organization,
   });
 
@@ -51,7 +51,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   }
 
   let searchUsersRequest: SearchUsersCommand = {
-    host,
+    serviceUrl,
     searchValue: command.loginName,
     organizationId: command.organization,
     loginSettings: loginSettingsByContext,
@@ -72,7 +72,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders({
-      host,
+      serviceUrl,
       orgId: command.organization,
     }).then((resp) => {
       return resp.identityProviders;
@@ -80,8 +80,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const _headers = await headers();
-      const instanceUrl = getApiUrlOfHeaders(_headers);
-      const host = instanceUrl;
+      const serviceUrl = getApiUrlOfHeaders(_headers);
+      const host = _headers.get("host");
 
       if (!host) {
         return { error: "Could not get host" };
@@ -102,7 +102,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       const resp = await startIdentityProviderFlow({
-        host,
+        serviceUrl,
         idpId: identityProviders[0].id,
         urls: {
           successUrl:
@@ -121,7 +121,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   };
 
   const redirectUserToIDP = async (userId: string) => {
-    const identityProviders = await listIDPLinks({ host, userId }).then(
+    const identityProviders = await listIDPLinks({ serviceUrl, userId }).then(
       (resp) => {
         return resp.result;
       },
@@ -129,8 +129,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const _headers = await headers();
-      const instanceUrl = getApiUrlOfHeaders(_headers);
-      const host = instanceUrl;
+      const serviceUrl = getApiUrlOfHeaders(_headers);
+      const host = _headers.get("host");
 
       if (!host) {
         return { error: "Could not get host" };
@@ -138,7 +138,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const identityProviderId = identityProviders[0].idpId;
 
-      const idp = await getIDPByID({ host, id: identityProviderId });
+      const idp = await getIDPByID({ serviceUrl, id: identityProviderId });
 
       const idpType = idp?.type;
 
@@ -160,7 +160,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       const resp = await startIdentityProviderFlow({
-        host,
+        serviceUrl,
         idpId: idp.id,
         urls: {
           successUrl:
@@ -185,7 +185,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const userId = potentialUsers[0].userId;
 
     const userLoginSettings = await getLoginSettings({
-      host,
+      serviceUrl,
       organization: user.details?.resourceOwner,
     });
 
@@ -243,7 +243,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     }
 
     const methods = await listAuthenticationMethodTypes({
-      host,
+      serviceUrl,
       userId: session.factors?.user?.id,
     });
 
@@ -400,12 +400,12 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const suffix = matched?.[1] ?? "";
 
       // this just returns orgs where the suffix is set as primary domain
-      const orgs = await getOrgsByDomain({ host, domain: suffix });
+      const orgs = await getOrgsByDomain({ serviceUrl, domain: suffix });
       const orgToCheckForDiscovery =
         orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
       const orgLoginSettings = await getLoginSettings({
-        host,
+        serviceUrl,
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {

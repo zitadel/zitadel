@@ -19,16 +19,16 @@ type ServiceClass =
 
 export async function createServiceForHost<T extends ServiceClass>(
   service: T,
-  host: string,
+  serviceUrl: string,
 ) {
   const token = await systemAPIToken();
 
-  if (!host || !token) {
+  if (!serviceUrl || !token) {
     throw new Error("No instance url or token found");
   }
 
   const transport = createServerTransport(token, {
-    baseUrl: host,
+    baseUrl: serviceUrl,
   });
 
   return createClientFor<T>(service)(transport);

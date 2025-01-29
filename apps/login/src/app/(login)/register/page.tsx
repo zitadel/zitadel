@@ -23,29 +23,24 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ host });
+    const org: Organization | null = await getDefaultOrg({ serviceUrl });
     if (org) {
       organization = org.id;
     }
   }
 
-  const legal = await getLegalAndSupportSettings({ host, organization });
+  const legal = await getLegalAndSupportSettings({ serviceUrl, organization });
   const passwordComplexitySettings = await getPasswordComplexitySettings({
-    host,
+    serviceUrl,
     organization,
   });
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
-  const loginSettings = await getLoginSettings({ host, organization });
+  const loginSettings = await getLoginSettings({ serviceUrl, organization });
 
   if (!loginSettings?.allowRegister) {
     return (

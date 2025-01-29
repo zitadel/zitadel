@@ -25,28 +25,23 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const sessionFactors = sessionId
-    ? await loadSessionById(host, sessionId, organization)
+    ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
-        host,
+        serviceUrl,
         sessionParams: { loginName, organization },
       });
 
   async function loadSessionById(
-    host: string,
+    serviceUrl: string,
     sessionId: string,
     organization?: string,
   ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
-      host,
+      serviceUrl,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -56,9 +51,9 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
-  const loginSettings = await getLoginSettings({ host, organization });
+  const loginSettings = await getLoginSettings({ serviceUrl, organization });
 
   return (
     <DynamicTheme branding={branding}>

@@ -35,15 +35,10 @@ export async function createSessionAndUpdateCookie(
   lifetime?: Duration,
 ): Promise<Session> {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const createdSession = await createSessionFromChecks({
-    host,
+    serviceUrl,
     checks,
     challenges,
     lifetime,
@@ -51,7 +46,7 @@ export async function createSessionAndUpdateCookie(
 
   if (createdSession) {
     return getSession({
-      host,
+      serviceUrl,
       sessionId: createdSession.sessionId,
       sessionToken: createdSession.sessionToken,
     }).then((response) => {
@@ -102,15 +97,10 @@ export async function createSessionForIdpAndUpdateCookie(
   lifetime?: Duration,
 ): Promise<Session> {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const createdSession = await createSessionForUserIdAndIdpIntent({
-    host,
+    serviceUrl,
     userId,
     idpIntent,
     lifetime,
@@ -121,7 +111,7 @@ export async function createSessionForIdpAndUpdateCookie(
   }
 
   const { session } = await getSession({
-    host,
+    serviceUrl,
     sessionId: createdSession.sessionId,
     sessionToken: createdSession.sessionToken,
   });
@@ -169,15 +159,10 @@ export async function setSessionAndUpdateCookie(
   lifetime?: Duration,
 ) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host) {
-    throw new Error("Could not get domain");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   return setSession({
-    host,
+    serviceUrl,
     sessionId: recentCookie.id,
     sessionToken: recentCookie.token,
     challenges,
@@ -203,7 +188,7 @@ export async function setSessionAndUpdateCookie(
       }
 
       return getSession({
-        host,
+        serviceUrl,
         sessionId: sessionCookie.id,
         sessionToken: sessionCookie.token,
       }).then((response) => {

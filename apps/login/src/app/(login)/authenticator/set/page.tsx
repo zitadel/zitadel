@@ -30,16 +30,11 @@ export default async function Page(props: {
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const sessionWithData = sessionId
-    ? await loadSessionById(host, sessionId, organization)
-    : await loadSessionByLoginname(host, loginName, organization);
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   async function getAuthMethodsAndUser(host: string, session?: Session) {
     const userId = session?.factors?.user?.id;
@@ -48,20 +43,24 @@ export default async function Page(props: {
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({ host, userId }).then((methods) => {
-      return getUserByID({ host, userId }).then((user) => {
-        const humanUser =
-          user.user?.type.case === "human" ? user.user?.type.value : undefined;
+    return listAuthenticationMethodTypes({ serviceUrl, userId }).then(
+      (methods) => {
+        return getUserByID({ serviceUrl, userId }).then((user) => {
+          const humanUser =
+            user.user?.type.case === "human"
+              ? user.user?.type.value
+              : undefined;
 
-        return {
-          factors: session?.factors,
-          authMethods: methods.authMethodTypes ?? [],
-          phoneVerified: humanUser?.phone?.isVerified ?? false,
-          emailVerified: humanUser?.email?.isVerified ?? false,
-          expirationDate: session?.expirationDate,
-        };
-      });
-    });
+          return {
+            factors: session?.factors,
+            authMethods: methods.authMethodTypes ?? [],
+            phoneVerified: humanUser?.phone?.isVerified ?? false,
+            emailVerified: humanUser?.email?.isVerified ?? false,
+            expirationDate: session?.expirationDate,
+          };
+        });
+      },
+    );
   }
 
   async function loadSessionByLoginname(
@@ -70,13 +69,13 @@ export default async function Page(props: {
     organization?: string,
   ) {
     return loadMostRecentSession({
-      host,
+      serviceUrl,
       sessionParams: {
         loginName,
         organization,
       },
     }).then((session) => {
-      return getAuthMethodsAndUser(host, session);
+      return getAuthMethodsAndUser(serviceUrl, session);
     });
   }
 
@@ -87,11 +86,11 @@ export default async function Page(props: {
   ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
-      host,
+      serviceUrl,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(host, sessionResponse.session);
+      return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
     });
   }
 
@@ -100,17 +99,17 @@ export default async function Page(props: {
   }
 
   const branding = await getBrandingSettings({
-    host,
+    serviceUrl,
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const identityProviders = await getActiveIdentityProviders({
-    host,
+    serviceUrl,
     orgId: sessionWithData.factors?.user?.organizationId,
     linking_allowed: true,
   }).then((resp) => {

@@ -25,15 +25,10 @@ export async function continueWithSession({
   ...session
 }: Session & { authRequestId?: string }) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: session.factors?.user?.organizationId,
   });
 
@@ -93,8 +88,8 @@ export async function updateSession(options: UpdateSessionCommand) {
   }
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host) {
     return { error: "Could not get host" };
@@ -111,7 +106,7 @@ export async function updateSession(options: UpdateSessionCommand) {
     challenges.webAuthN.domain = hostname;
   }
 
-  const loginSettings = await getLoginSettings({ host, organization });
+  const loginSettings = await getLoginSettings({ serviceUrl, organization });
 
   const lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
@@ -135,7 +130,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   let authMethods;
   if (checks && checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
-      host,
+      serviceUrl,
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -157,19 +152,14 @@ type ClearSessionOptions = {
 
 export async function clearSession(options: ClearSessionOptions) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const { sessionId } = options;
 
   const session = await getSessionCookieById({ sessionId });
 
   const deletedSession = await deleteSession({
-    host,
+    serviceUrl,
     sessionId: session.id,
     sessionToken: session.token,
   });
@@ -185,17 +175,12 @@ type CleanupSessionCommand = {
 
 export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const deleteResponse = await deleteSession({
-    host,
+    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });

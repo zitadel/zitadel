@@ -29,15 +29,15 @@ export type RegisterUserResponse = {
 };
 export async function registerUser(command: RegisterUserCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
   }
 
   const addResponse = await addHumanUser({
-    host,
+    serviceUrl,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -50,7 +50,7 @@ export async function registerUser(command: RegisterUserCommand) {
   }
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: command.organization,
   });
 
@@ -91,7 +91,7 @@ export async function registerUser(command: RegisterUserCommand) {
     return { redirect: "/passkey/set?" + params };
   } else {
     const userResponse = await getUserByID({
-      host,
+      serviceUrl,
       userId: session?.factors?.user?.id,
     });
 

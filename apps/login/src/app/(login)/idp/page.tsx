@@ -16,21 +16,16 @@ export default async function Page(props: {
   const organization = searchParams?.organization;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const identityProviders = await getActiveIdentityProviders({
-    host,
+    serviceUrl,
     orgId: organization,
   }).then((resp) => {
     return resp.identityProviders;
   });
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   return (
     <DynamicTheme branding={branding}>

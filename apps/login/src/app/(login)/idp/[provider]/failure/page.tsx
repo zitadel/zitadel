@@ -25,14 +25,9 @@ export default async function Page(props: {
   const { organization } = searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
-
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   return (
     <DynamicTheme branding={branding}>

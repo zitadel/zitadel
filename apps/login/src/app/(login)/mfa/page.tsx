@@ -25,24 +25,19 @@ export default async function Page(props: {
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const sessionFactors = sessionId
-    ? await loadSessionById(host, sessionId, organization)
-    : await loadSessionByLoginname(host, loginName, organization);
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   async function loadSessionByLoginname(
-    host: string,
+    serviceUrl: string,
     loginName?: string,
     organization?: string,
   ) {
     return loadMostRecentSession({
-      host,
+      serviceUrl,
       sessionParams: {
         loginName,
         organization,
@@ -50,7 +45,7 @@ export default async function Page(props: {
     }).then((session) => {
       if (session && session.factors?.user?.id) {
         return listAuthenticationMethodTypes({
-          host,
+          serviceUrl,
           userId: session.factors.user.id,
         }).then((methods) => {
           return {
@@ -69,13 +64,13 @@ export default async function Page(props: {
   ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
-      host,
+      serviceUrl,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes({
-          host,
+          serviceUrl,
           userId: response.session.factors.user.id,
         }).then((methods) => {
           return {
@@ -87,7 +82,7 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   return (
     <DynamicTheme branding={branding}>

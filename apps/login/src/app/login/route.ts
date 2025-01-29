@@ -30,9 +30,15 @@ export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
 
-async function loadSessions(host: string, ids: string[]): Promise<Session[]> {
+async function loadSessions({
+  serviceUrl,
+  ids,
+}: {
+  serviceUrl: string;
+  ids: string[];
+}): Promise<Session[]> {
   const response = await listSessions({
-    host,
+    serviceUrl,
     ids: ids.filter((id: string | undefined) => !!id),
   });
 
@@ -48,7 +54,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
 async function isSessionValid(
-  host: string,
+  serviceUrl: string,
   session: Session,
 ): Promise<boolean> {
   // session can't be checked without user
@@ -60,7 +66,7 @@ async function isSessionValid(
   let mfaValid = true;
 
   const authMethodTypes = await listAuthenticationMethodTypes({
-    host,
+    serviceUrl,
     userId: session.factors.user.id,
   });
 
@@ -109,7 +115,7 @@ async function isSessionValid(
   } else {
     // only check settings if no auth methods are available, as this would require a setup
     const loginSettings = await getLoginSettings({
-      host,
+      serviceUrl,
       organization: session.factors?.user?.organizationId,
     });
     if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
@@ -152,7 +158,7 @@ async function isSessionValid(
 }
 
 async function findValidSession(
-  host: string,
+  serviceUrl: string,
   sessions: Session[],
   authRequest: AuthRequest,
 ): Promise<Session | undefined> {
@@ -179,7 +185,7 @@ async function findValidSession(
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
-    if (await isSessionValid(host, session)) {
+    if (await isSessionValid(serviceUrl, session)) {
       return session;
     }
   }
@@ -193,12 +199,7 @@ export async function GET(request: NextRequest) {
   const sessionId = searchParams.get("sessionId");
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
   const _rsc = searchParams.get("_rsc");
@@ -210,7 +211,7 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions(host, ids);
+    sessions = await loadSessions({ serviceUrl, ids });
   }
 
   if (authRequestId && sessionId) {
@@ -223,7 +224,7 @@ export async function GET(request: NextRequest) {
     if (selectedSession && selectedSession.id) {
       console.log(`Found session ${selectedSession.id}`);
 
-      const isValid = await isSessionValid(host, selectedSession);
+      const isValid = await isSessionValid(serviceUrl, selectedSession);
 
       console.log("Session is valid:", isValid);
 
@@ -257,7 +258,7 @@ export async function GET(request: NextRequest) {
         // works not with _rsc request
         try {
           const { callbackUrl } = await createCallback({
-            host,
+            serviceUrl,
             req: create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {
@@ -284,7 +285,7 @@ export async function GET(request: NextRequest) {
             error?.code === 9
           ) {
             const loginSettings = await getLoginSettings({
-              host,
+              serviceUrl,
               organization: selectedSession.factors?.user?.organizationId,
             });
 
@@ -316,7 +317,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (authRequestId) {
-    const { authRequest } = await getAuthRequest({ host, authRequestId });
+    const { authRequest } = await getAuthRequest({ serviceUrl, authRequestId });
 
     let organization = "";
     let suffix = "";
@@ -343,7 +344,10 @@ export async function GET(request: NextRequest) {
           const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
           const orgDomain = matched?.[1] ?? "";
           if (orgDomain) {
-            const orgs = await getOrgsByDomain({ host, domain: orgDomain });
+            const orgs = await getOrgsByDomain({
+              serviceUrl,
+              domain: orgDomain,
+            });
             if (orgs.result && orgs.result.length === 1) {
               organization = orgs.result[0].id ?? "";
               suffix = orgDomain;
@@ -357,7 +361,7 @@ export async function GET(request: NextRequest) {
         idpId = matched?.[1] ?? "";
 
         const identityProviders = await getActiveIdentityProviders({
-          host,
+          serviceUrl,
           orgId: organization ? organization : undefined,
         }).then((resp) => {
           return resp.identityProviders;
@@ -382,7 +386,7 @@ export async function GET(request: NextRequest) {
           }
 
           return startIdentityProviderFlow({
-            host,
+            serviceUrl,
             idpId,
             urls: {
               successUrl:
@@ -482,7 +486,7 @@ export async function GET(request: NextRequest) {
          * Instead, the server attempts to silently authenticate the user using an existing session or other authentication mechanisms that do not require user interaction
          **/
         const selectedSession = await findValidSession(
-          host,
+          serviceUrl,
           sessions,
           authRequest,
         );
@@ -511,7 +515,7 @@ export async function GET(request: NextRequest) {
         };
 
         const { callbackUrl } = await createCallback({
-          host,
+          serviceUrl,
           req: create(CreateCallbackRequestSchema, {
             authRequestId,
             callbackKind: {
@@ -524,7 +528,7 @@ export async function GET(request: NextRequest) {
       } else {
         // check for loginHint, userId hint and valid sessions
         let selectedSession = await findValidSession(
-          host,
+          serviceUrl,
           sessions,
           authRequest,
         );
@@ -548,7 +552,7 @@ export async function GET(request: NextRequest) {
 
         try {
           const { callbackUrl } = await createCallback({
-            host,
+            serviceUrl,
             req: create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {

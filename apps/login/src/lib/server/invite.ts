@@ -22,7 +22,7 @@ export type RegisterUserResponse = {
 
 export async function inviteUser(command: InviteUserCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getApiUrlOfHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -30,7 +30,7 @@ export async function inviteUser(command: InviteUserCommand) {
   }
 
   const human = await addHumanUser({
-    host: instanceUrl,
+    serviceUrl,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -42,7 +42,11 @@ export async function inviteUser(command: InviteUserCommand) {
     return { error: "Could not create user" };
   }
 
-  const codeResponse = await createInviteCode({ userId: human.userId, host });
+  const codeResponse = await createInviteCode({
+    serviceUrl,
+    urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
+    userId: human.userId,
+  });
 
   if (!codeResponse || !human) {
     return { error: "Could not create invite code" };

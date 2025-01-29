@@ -22,9 +22,9 @@ export async function middleware(request: NextRequest) {
   // }
   const _headers = await headers();
 
-  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
-  const instanceHost = `${instanceUrl}`.replace("https://", "");
+  const instanceHost = `${serviceUrl}`.replace("https://", "");
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(
@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
-  request.nextUrl.href = `${instanceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
+  request.nextUrl.href = `${serviceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
   return NextResponse.rewrite(request.nextUrl, {
     request: {
       headers: requestHeaders,

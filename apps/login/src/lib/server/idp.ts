@@ -19,6 +19,7 @@ export type StartIDPFlowCommand = {
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
   const _headers = await headers();
+  const serviceUrl = getApiUrlOfHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -26,7 +27,7 @@ export async function startIDPFlow(command: StartIDPFlowCommand) {
   }
 
   return startIdentityProviderFlow({
-    host,
+    serviceUrl,
     idpId: command.idpId,
     urls: {
       successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.successUrl}`,
@@ -59,8 +60,8 @@ export async function createNewSessionFromIdpIntent(
   command: CreateNewSessionCommand,
 ) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host) {
     return { error: "Could not get domain" };
@@ -70,14 +71,17 @@ export async function createNewSessionFromIdpIntent(
     throw new Error("No userId or loginName provided");
   }
 
-  const userResponse = await getUserByID({ host, userId: command.userId });
+  const userResponse = await getUserByID({
+    serviceUrl,
+    userId: command.userId,
+  });
 
   if (!userResponse || !userResponse.user) {
     return { error: "User not found in the system" };
   }
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: userResponse.user.details?.resourceOwner,
   });
 

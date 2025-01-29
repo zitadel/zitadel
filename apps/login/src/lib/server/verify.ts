@@ -30,15 +30,10 @@ export async function verifyTOTP(
   organization?: string,
 ) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   return loadMostRecentSession({
-    host,
+    serviceUrl,
     sessionParams: {
       loginName,
       organization,
@@ -46,7 +41,7 @@ export async function verifyTOTP(
   }).then((session) => {
     if (session?.factors?.user?.id) {
       return verifyTOTPRegistration({
-        host,
+        serviceUrl,
         code,
         userId: session.factors.user.id,
       });
@@ -67,23 +62,18 @@ type VerifyUserByEmailCommand = {
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({
-        host,
+        serviceUrl,
         userId: command.userId,
         verificationCode: command.code,
       }).catch(() => {
         return { error: "Could not verify invite" };
       })
     : await verifyEmail({
-        host,
+        serviceUrl,
         userId: command.userId,
         verificationCode: command.code,
       }).catch(() => {
@@ -114,7 +104,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     session = await getSession({
-      host,
+      serviceUrl,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -128,7 +118,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     const userResponse = await getUserByID({
-      host,
+      serviceUrl,
       userId: session?.factors?.user?.id,
     });
 
@@ -138,7 +128,10 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     user = userResponse.user;
   } else {
-    const userResponse = await getUserByID({ host, userId: command.userId });
+    const userResponse = await getUserByID({
+      serviceUrl,
+      userId: command.userId,
+    });
 
     if (!userResponse || !userResponse.user) {
       return { error: "Could not load user" };
@@ -175,12 +168,12 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   }
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: user.details?.resourceOwner,
   });
 
   const authMethodResponse = await listAuthenticationMethodTypes({
-    host,
+    serviceUrl,
     userId: user.userId,
   });
 
@@ -252,41 +245,36 @@ type resendVerifyEmailCommand = {
 export async function resendVerification(command: resendVerifyEmailCommand) {
   const _headers = await headers();
   const serviceUrl = getApiUrlOfHeaders(_headers);
-
   const host = _headers.get("host");
-
-  if (!serviceUrl) {
-    return { error: "No host found" };
-  }
 
   if (!host) {
     return { error: "No host found" };
   }
 
   return command.isInvite
-    ? resendInviteCode({ serviceUrl, host, userId: command.userId })
+    ? resendInviteCode({ serviceUrl, userId: command.userId })
     : resendEmailCode({
         userId: command.userId,
         serviceUrl,
-        host,
-        authRequestId: command.authRequestId,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          (command.authRequestId
+            ? `&authRequestId=${command.authRequestId}`
+            : ""),
       });
 }
 
 type sendEmailCommand = {
   serviceUrl: string;
   userId: string;
-  authRequestId?: string;
+  urlTemplate: string;
 };
 
 export async function sendEmailCode(command: sendEmailCommand) {
   return zitadelSendEmailCode({
     userId: command.userId,
     serviceUrl: command.serviceUrl,
-    authRequestId: command.authRequestId,
-    urlTemplate:
-      `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
-      (authRequestId ? `&authRequestId=${authRequestId}` : ""),
+    urlTemplate: command.urlTemplate,
   });
 }
 
@@ -302,12 +290,7 @@ export async function sendVerificationRedirectWithoutCheck(
   command: SendVerificationRedirectWithoutCheckCommand,
 ) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   if (!("loginName" in command || "userId" in command)) {
     return { error: "No userId, nor loginname provided" };
@@ -329,7 +312,7 @@ export async function sendVerificationRedirectWithoutCheck(
     }
 
     session = await getSession({
-      host,
+      serviceUrl,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -343,7 +326,7 @@ export async function sendVerificationRedirectWithoutCheck(
     }
 
     const userResponse = await getUserByID({
-      host,
+      serviceUrl,
       userId: session?.factors?.user?.id,
     });
 
@@ -353,7 +336,10 @@ export async function sendVerificationRedirectWithoutCheck(
 
     user = userResponse.user;
   } else if ("userId" in command) {
-    const userResponse = await getUserByID({ host, userId: command.userId });
+    const userResponse = await getUserByID({
+      serviceUrl,
+      userId: command.userId,
+    });
 
     if (!userResponse?.user) {
       return { error: "Could not load user" };
@@ -390,7 +376,7 @@ export async function sendVerificationRedirectWithoutCheck(
   }
 
   const authMethodResponse = await listAuthenticationMethodTypes({
-    host,
+    serviceUrl,
     userId: user.userId,
   });
 
@@ -415,7 +401,7 @@ export async function sendVerificationRedirectWithoutCheck(
   }
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: user.details?.resourceOwner,
   });
 

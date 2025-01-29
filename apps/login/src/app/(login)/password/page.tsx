@@ -25,16 +25,11 @@ export default async function Page(props: {
   let { loginName, organization, authRequestId, alt } = searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ host });
+    const org: Organization | null = await getDefaultOrg({ serviceUrl });
 
     if (org) {
       defaultOrganization = org.id;
@@ -45,7 +40,7 @@ export default async function Page(props: {
   let sessionFactors;
   try {
     sessionFactors = await loadMostRecentSession({
-      host,
+      serviceUrl,
       sessionParams: {
         loginName,
         organization,
@@ -57,11 +52,11 @@ export default async function Page(props: {
   }
 
   const branding = await getBrandingSettings({
-    host,
+    serviceUrl,
     organization: organization ?? defaultOrganization,
   });
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: organization ?? defaultOrganization,
   });
 

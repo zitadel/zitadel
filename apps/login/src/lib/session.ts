@@ -4,7 +4,7 @@ import { getMostRecentCookieWithLoginname } from "./cookies";
 import { getSession } from "./zitadel";
 
 type LoadMostRecentSessionParams = {
-  host: string;
+  serviceUrl: string;
   sessionParams: {
     loginName?: string;
     organization?: string;
@@ -12,7 +12,7 @@ type LoadMostRecentSessionParams = {
 };
 
 export async function loadMostRecentSession({
-  host,
+  serviceUrl,
   sessionParams,
 }: LoadMostRecentSessionParams): Promise<Session | undefined> {
   const recent = await getMostRecentCookieWithLoginname({
@@ -21,7 +21,7 @@ export async function loadMostRecentSession({
   });
 
   return getSession({
-    host,
+    serviceUrl,
     sessionId: recent.id,
     sessionToken: recent.token,
   }).then((resp: GetSessionResponse) => resp.session);

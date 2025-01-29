@@ -19,22 +19,17 @@ export default async function Page(props: {
   const { loginName, organization, authRequestId, checkAfter } = searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const sessionFactors = await loadMostRecentSession({
-    host,
+    serviceUrl,
     sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   return (
     <DynamicTheme branding={branding}>

@@ -21,8 +21,8 @@ type VerifyU2FCommand = {
 
 export async function addU2F(command: RegisterU2FCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
@@ -37,7 +37,7 @@ export async function addU2F(command: RegisterU2FCommand) {
   }
 
   const session = await getSession({
-    host,
+    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -54,13 +54,13 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: "Could not get session" };
   }
 
-  return registerU2F({ host, userId, domain: hostname });
+  return registerU2F({ serviceUrl, userId, domain: hostname });
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
@@ -81,7 +81,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   });
 
   const session = await getSession({
-    host,
+    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -99,5 +99,5 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     userId,
   });
 
-  return verifyU2FRegistration({ host, request });
+  return verifyU2FRegistration({ serviceUrl, request });
 }

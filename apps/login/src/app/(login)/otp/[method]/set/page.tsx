@@ -34,18 +34,13 @@ export default async function Page(props: {
   const { method } = params;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
-
-  const branding = await getBrandingSettings({ host, organization });
-  const loginSettings = await getLoginSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const loginSettings = await getLoginSettings({ serviceUrl, organization });
 
   const session = await loadMostRecentSession({
-    host,
+    serviceUrl,
     sessionParams: {
       loginName,
       organization,
@@ -55,7 +50,7 @@ export default async function Page(props: {
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      await registerTOTP({ host, userId: session.factors.user.id })
+      await registerTOTP({ serviceUrl, userId: session.factors.user.id })
         .then((resp) => {
           if (resp) {
             totpResponse = resp;
@@ -66,14 +61,14 @@ export default async function Page(props: {
         });
     } else if (method === "sms") {
       // does not work
-      await addOTPSMS({ host, userId: session.factors.user.id }).catch(
+      await addOTPSMS({ serviceUrl, userId: session.factors.user.id }).catch(
         (error) => {
           error = new Error("Could not add OTP via SMS");
         },
       );
     } else if (method === "email") {
       // works
-      await addOTPEmail({ host, userId: session.factors.user.id }).catch(
+      await addOTPEmail({ serviceUrl, userId: session.factors.user.id }).catch(
         (error) => {
           error = new Error("Could not add OTP via Email");
         },

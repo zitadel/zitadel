@@ -19,15 +19,10 @@ export default async function Page(props: {
   let { userId, organization } = searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   if (!organization) {
-    const org = await getDefaultOrg({ host });
+    const org = await getDefaultOrg({ serviceUrl });
     if (!org) {
       throw new Error("No default organization found");
     }
@@ -35,12 +30,12 @@ export default async function Page(props: {
     organization = org.id;
   }
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   let user: User | undefined;
   let human: HumanUser | undefined;
   if (userId) {
-    const userResponse = await getUserByID({ host, userId });
+    const userResponse = await getUserByID({ serviceUrl, userId });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {

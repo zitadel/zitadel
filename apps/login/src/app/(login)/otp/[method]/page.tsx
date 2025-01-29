@@ -24,15 +24,11 @@ export default async function Page(props: {
   const tError = await getTranslations({ locale, namespace: "error" });
 
   const _headers = await headers();
+  const serviceUrl = getApiUrlOfHeaders(_headers);
   const host = _headers.get("host");
-  const instanceUrl = getApiUrlOfHeaders(_headers);
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
-  }
-
-  if (!instanceUrl) {
-    throw new Error("No instanceUrl found");
   }
 
   const {
@@ -48,9 +44,9 @@ export default async function Page(props: {
   const { method } = params;
 
   const session = sessionId
-    ? await loadSessionById(instanceUrl, sessionId, organization)
+    ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
-        host: instanceUrl,
+        serviceUrl,
         sessionParams: { loginName, organization },
       });
 
@@ -61,7 +57,7 @@ export default async function Page(props: {
   ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
-      host,
+      serviceUrl,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -73,12 +69,12 @@ export default async function Page(props: {
 
   // email links do not come with organization, thus we need to use the session's organization
   const branding = await getBrandingSettings({
-    host: instanceUrl,
+    serviceUrl,
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
-    host: instanceUrl,
+    serviceUrl,
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 

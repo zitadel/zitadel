@@ -20,19 +20,19 @@ export default async function Page(props: {
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
+  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
     throw new Error("No host found");
   }
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   const sessionFactors = sessionId
-    ? await loadSessionById(host, sessionId, organization)
+    ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
-        host,
+        serviceUrl,
         sessionParams: { loginName, organization },
       });
 
@@ -43,7 +43,7 @@ export default async function Page(props: {
   ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
-      host,
+      serviceUrl,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {

@@ -7,14 +7,14 @@ import { getSessionCookieById } from "./cookies";
 import { getApiUrlOfHeaders } from "./service";
 import { getSession } from "./zitadel";
 
-const transport = async (host: string, token: string) => {
+const transport = async (serviceUrl: string, token: string) => {
   return createServerTransport(token, {
-    baseUrl: host,
+    baseUrl: serviceUrl,
   });
 };
 
-const myUserService = async (host: string, sessionToken: string) => {
-  const transportPromise = await transport(host, sessionToken);
+const myUserService = async (serviceUrl: string, sessionToken: string) => {
+  const transportPromise = await transport(serviceUrl, sessionToken);
   return createUserServiceClient(transportPromise);
 };
 
@@ -26,16 +26,12 @@ export async function setMyPassword({
   password: string;
 }) {
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-
-  if (!instanceUrl) {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const { session } = await getSession({
-    host: instanceUrl,
+    serviceUrl,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -44,7 +40,7 @@ export async function setMyPassword({
     return { error: "Could not load session" };
   }
 
-  const service = await myUserService(instanceUrl, `${sessionCookie.token}`);
+  const service = await myUserService(serviceUrl, `${sessionCookie.token}`);
 
   if (!session?.factors?.user?.id) {
     return { error: "No user id found in session" };

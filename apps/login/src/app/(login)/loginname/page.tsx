@@ -26,37 +26,35 @@ export default async function Page(props: {
   const submit: boolean = searchParams?.submit === "true";
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ host });
+    const org: Organization | null = await getDefaultOrg({ serviceUrl });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
   const loginSettings = await getLoginSettings({
-    host,
+    serviceUrl,
     organization: organization ?? defaultOrganization,
   });
 
-  const contextLoginSettings = await getLoginSettings({ host, organization });
+  const contextLoginSettings = await getLoginSettings({
+    serviceUrl,
+    organization,
+  });
 
   const identityProviders = await getActiveIdentityProviders({
-    host,
+    serviceUrl,
     orgId: organization ?? defaultOrganization,
   }).then((resp) => {
     return resp.identityProviders;
   });
 
   const branding = await getBrandingSettings({
-    host,
+    serviceUrl,
     organization: organization ?? defaultOrganization,
   });
 

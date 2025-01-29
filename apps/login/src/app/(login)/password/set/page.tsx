@@ -27,18 +27,13 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
   if (loginName) {
     session = await loadMostRecentSession({
-      host,
+      serviceUrl,
       sessionParams: {
         loginName,
         organization,
@@ -46,19 +41,19 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings({ host, organization });
+  const branding = await getBrandingSettings({ serviceUrl, organization });
 
   const passwordComplexity = await getPasswordComplexitySettings({
-    host,
+    serviceUrl,
     organization: session?.factors?.user?.organizationId,
   });
 
-  const loginSettings = await getLoginSettings({ host, organization });
+  const loginSettings = await getLoginSettings({ serviceUrl, organization });
 
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
-    const userResponse = await getUserByID({ host, userId });
+    const userResponse = await getUserByID({ serviceUrl, userId });
     user = userResponse.user;
 
     if (user?.type.case === "human") {

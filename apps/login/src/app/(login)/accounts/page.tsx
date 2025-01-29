@@ -13,12 +13,12 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
-async function loadSessions(host: string) {
+async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
   const ids: (string | undefined)[] = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
     const response = await listSessions({
-      host,
+      serviceUrl,
       ids: ids.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
@@ -39,25 +39,20 @@ export default async function Page(props: {
   const organization = searchParams?.organization;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
-  const host = instanceUrl;
-
-  if (!host || typeof host !== "string") {
-    throw new Error("No host found");
-  }
+  const serviceUrl = getApiUrlOfHeaders(_headers);
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ host });
+    const org: Organization | null = await getDefaultOrg({ serviceUrl });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  let sessions = await loadSessions(host);
+  let sessions = await loadSessions({ serviceUrl });
 
   const branding = await getBrandingSettings({
-    host,
+    serviceUrl,
     organization: organization ?? defaultOrganization,
   });
 

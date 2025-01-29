@@ -26,7 +26,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     searchParams;
 
   const _headers = await headers();
-  const instanceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getApiUrlOfHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
@@ -34,7 +34,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   }
 
   const branding = await getBrandingSettings({
-    host: instanceUrl,
+    serviceUrl,
     organization,
   });
 
@@ -47,7 +47,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
-      host: instanceUrl,
+      serviceUrl,
       sessionParams: {
         loginName,
         organization,
@@ -56,12 +56,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
     if (doSend && sessionFactors?.factors?.user?.id) {
       await sendEmailCode({
-        host,
+        serviceUrl,
+        userId: sessionFactors?.factors?.user?.id,
         urlTemplate:
           `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
           (authRequestId ? `&authRequestId=${authRequestId}` : ""),
-        userId: sessionFactors?.factors?.user?.id,
-        authRequestId,
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Failed to send verification email");
@@ -70,9 +69,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   } else if ("userId" in searchParams && userId) {
     if (doSend) {
       await sendEmailCode({
-        host,
+        serviceUrl,
         userId,
-        authRequestId,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          (authRequestId ? `&authRequestId=${authRequestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Failed to send verification email");
