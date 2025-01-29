@@ -741,7 +741,6 @@ func (p *userProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handl
 			[]handler.Column{
 				handler.NewCol(HumanPhoneCol, nil),
 				handler.NewCol(HumanIsPhoneVerifiedCol, nil),
-				handler.NewCol(HumanMFAInitSkipped, sql.NullTime{}),
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
@@ -1154,9 +1153,10 @@ func (p *userProjection) reduceUnsetMFAInitSkipped(e eventstore.Event) (*handler
 	default:
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ojrf6", "reduce.wrong.event.type %s", e.Type())
 	case *user.HumanOTPVerifiedEvent,
-		*user.HumanOTPSMSRemovedEvent,
-		*user.HumanOTPEmailRemovedEvent,
-		*user.HumanU2FVerifiedEvent:
+		*user.HumanOTPSMSAddedEvent,
+		*user.HumanOTPEmailAddedEvent,
+		*user.HumanU2FVerifiedEvent,
+		*user.HumanPasswordlessVerifiedEvent:
 	}
 
 	return handler.NewMultiStatement(

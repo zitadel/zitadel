@@ -992,11 +992,10 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users14_humans SET (phone, is_phone_verified, mfa_init_skipped) = ($1, $2, $3) WHERE (user_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.users14_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
-								sql.NullTime{},
 								"agg-id",
 								"instance-id",
 							},
@@ -1040,11 +1039,10 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users14_humans SET (phone, is_phone_verified, mfa_init_skipped) = ($1, $2, $3) WHERE (user_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.users14_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
-								sql.NullTime{},
 								"agg-id",
 								"instance-id",
 							},
