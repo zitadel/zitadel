@@ -384,13 +384,14 @@ func (h *UsersHandler) mapAndValidateMetadata(ctx context.Context, user *ScimUse
 
 func (h *UsersHandler) buildResourceForQuery(ctx context.Context, user *query.User) *Resource {
 	return &Resource{
+		ID:      user.ID,
 		Schemas: []schemas.ScimSchemaType{schemas.IdUser},
 		Meta: &ResourceMeta{
 			ResourceType: schemas.UserResourceType,
 			Created:      user.CreationDate.UTC(),
 			LastModified: user.ChangeDate.UTC(),
 			Version:      strconv.FormatUint(user.Sequence, 10),
-			Location:     buildLocation(ctx, h, user.ID),
+			Location:     buildLocation(ctx, h.ResourceNamePlural(), user.ID),
 		},
 	}
 }
@@ -403,7 +404,7 @@ func (h *UsersHandler) buildResourceForWriteModel(ctx context.Context, user *com
 			Created:      user.CreationDate.UTC(),
 			LastModified: user.ChangeDate.UTC(),
 			Version:      strconv.FormatUint(user.ProcessedSequence, 10),
-			Location:     buildLocation(ctx, h, user.AggregateID),
+			Location:     buildLocation(ctx, h.ResourceNamePlural(), user.AggregateID),
 		},
 	}
 }

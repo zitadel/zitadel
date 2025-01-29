@@ -28,4 +28,7 @@ var AuthMapping = authz.MethodMapping{
 	"DELETE:/scim/v2/" + http.OrgIdInPathVariable + "/Users/{id}": {
 		Permission: domain.PermissionUserDelete,
 	},
+	"POST:/scim/v2/" + http.OrgIdInPathVariable + "/Bulk": {
+		Permission: "authenticated",
+	},
 }
