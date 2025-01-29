@@ -54,6 +54,14 @@ const (
 	// specified attribute and filter comparison combination is not supported.
 	ScimTypeInvalidFilter scimErrorType = "invalidFilter"
 
+	// ScimTypeInvalidPath The "path" attribute was invalid or malformed.
+	ScimTypeInvalidPath scimErrorType = "invalidPath"
+
+	// ScimTypeNoTarget The specified "path" did not
+	// yield an attribute or attribute value that could be operated on.
+	// This occurs when the specified "path" value contains a filter that yields no match.
+	ScimTypeNoTarget scimErrorType = "noTarget"
+
 	// ScimTypeUniqueness One or more of the attribute values are already in use or are reserved.
 	ScimTypeUniqueness scimErrorType = "uniqueness"
 )
@@ -96,6 +104,20 @@ func ThrowInvalidFilter(parent error) error {
 	return &wrappedScimError{
 		Parent:   parent,
 		ScimType: ScimTypeInvalidFilter,
+	}
+}
+
+func ThrowInvalidPath(parent error) error {
+	return &wrappedScimError{
+		Parent:   parent,
+		ScimType: ScimTypeInvalidPath,
+	}
+}
+
+func ThrowNoTarget(parent error) error {
+	return &wrappedScimError{
+		Parent:   parent,
+		ScimType: ScimTypeNoTarget,
 	}
 }
 

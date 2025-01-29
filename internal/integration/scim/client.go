@@ -101,6 +101,15 @@ func (c *ResourceClient[T]) Replace(ctx context.Context, orgID, id string, body 
 	return c.doWithBody(ctx, http.MethodPut, orgID, id, bytes.NewReader(body))
 }
 
+func (c *ResourceClient[T]) Update(ctx context.Context, orgID, id string, body []byte) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, c.buildURL(orgID, id), bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	return c.doReq(req, nil)
+}
+
 func (c *ResourceClient[T]) List(ctx context.Context, orgID string, req *ListRequest) (*ListResponse[*T], error) {
 	if req.SendAsPost {
 		listReq, err := json.Marshal(req)
@@ -181,14 +190,15 @@ func (c *ResourceClient[T]) doReq(req *http.Request, responseEntity interface{})
 	addTokenAsHeader(req)
 
 	resp, err := c.client.Do(req)
-	defer func() {
-		err := resp.Body.Close()
-		logging.OnError(err).Error("Failed to close response body")
-	}()
 
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		err := resp.Body.Close()
+		logging.OnError(err).Error("Failed to close response body")
+	}()
 
 	if (resp.StatusCode / 100) != 2 {
 		return readScimError(resp)
