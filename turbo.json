@@ -1,0 +1,17 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "tasks": {
+      "build": {
+        "cache": true
+      },
+      "generate": {
+        "cache": true
+      },
+      "clean": {
+        "cache": false
+      }
+    },
+    "remoteCache": {
+      "enabled": true
+    }
+  }

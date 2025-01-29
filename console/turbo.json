@@ -1,0 +1,15 @@
+{
+    "extends": ["//"],
+    "tasks": {
+      "generate": {
+        "outputs": ["src/app/proto/generated/**",".angular/**"],
+        "inputs": ["../proto/**"],
+        "cache": true
+      },
+      "build": {
+        "dependsOn": ["generate"],
+        "outputs": ["dist/**"],
+        "cache": true
+      }
+    }
+  }
