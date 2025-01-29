@@ -588,7 +588,7 @@ Errors:
     Data:
       Invalid: Nieprawidłowe dane dla schematu użytkownika
   TokenExchange:
-    FeatureDisabled: Funkcja wymiany tokenów jest wyłączona dla Twojej instancji. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    FeatureDisabled: Funkcja wymiany tokenów jest wyłączona dla Twojej instancji. https://zitadel.com/docs/reference#tag/features/PUT/v2/features/instance
     Token:
       Missing: Brak tokena
       Invalid: Token jest nieprawidłowy

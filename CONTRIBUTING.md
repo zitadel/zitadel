@@ -280,13 +280,13 @@ But you will have to install the relevant node dependencies.
 
 ```bash
 # Install dependencies
-(cd ./e2e && npm install)
+(cd ./e2e && pnpm install)
 
 # Run the tests interactively
-(cd ./e2e && npm run open:golangangular)
+(cd ./e2e && pnpm run open:golangangular)
 
 # Run the tests non-interactively
-(cd ./e2e && npm run e2e:golangangular)
+(cd ./e2e && pnpm run e2e:golangangular)
 ```
 
 When you are happy with your changes, you can cleanup your environment.
@@ -303,7 +303,7 @@ Using [Docker Compose](https://docs.docker.com/compose/), you run [CockroachDB](
 You use the ZITADEL container as backend for your console.
 The console is run in your [Node](https://nodejs.org/en/about/) environment using [a local development server for Angular](https://angular.io/cli/serve#ng-serve), so you have fast feedback about your changes.
 
-We use angular-eslint/Prettier for linting/formatting, so please run `yarn lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
+We use angular-eslint/Prettier for linting/formatting, so please run `pnpm lint:fix` before committing. (VSCode users, check out [this ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [this Prettier extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) to fix lint and formatting issues in development)
 
 Once you are happy with your changes, you run end-to-end tests and tear everything down.
 
@@ -350,17 +350,18 @@ To allow console access via http://localhost:4200, you have to configure the ZIT
 You can run the local console development server now.
 
 ```bash
-# Install npm dependencies
-yarn install
+# Install dependencies
+corepack enable
+pnpm install
 
 # Generate source files from Protos
-yarn generate
+pnpm generate
 
 # Start the server
-yarn start
+pnpm start
 
 # If you don't want to develop against http://localhost:8080, you can use another environment
-ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json yarn start
+ENVIRONMENT_JSON_URL=https://my-cloud-instance-abcdef.zitadel.cloud/ui/console/assets/environment.json pnpm start
 ```
 
 Navigate to http://localhost:4200/.
@@ -370,33 +371,33 @@ Open another shell.
 
 ```bash
 # Reformat your console code
-yarn lint:fix
+pnpm lint:fix
 
 # Change to the e2e directory
 cd .. && cd e2e/
 
 # If you made changes in the e2e directory, make sure you reformat the files here too
-npm run lint:fix
+pnpm run lint:fix
 
-# Install npm dependencies
-npm install
+# Install dependencies
+pnpm install
 
 # Run all e2e tests
-npm run e2e:angular -- --headed
+pnpm run e2e:angular -- --headed
 ```
 
 You can also open the test suite interactively for fast feedback on specific tests.
 
 ```bash
 # Run tests interactively
-npm run open:angular
+pnpm run open:angular
 ```
 
 If you also make [changes to the backend code](#backend--login), you can run the test against your locally built backend code and frontend server
 
 ```bash
-npm run open:golangangular
-npm run e2e:golangangular
+pnpm run open:golangangular
+pnpm run e2e:golangangular
 ```
 
 When you are happy with your changes, you can format your code and cleanup your environment

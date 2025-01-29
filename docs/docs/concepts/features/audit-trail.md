@@ -45,7 +45,7 @@ Go to your default settings and then click on the Tab **Events** to open the Eve
 Since everything that is available in Console can also be called with our APIs, you can access all events and audit data trough our APIs:
 
 - [Event API Guide](/docs/guides/integrate/zitadel-apis/event-api)
-- [API Documentation](/docs/apis/resources/admin/events)
+- [API Documentation](/docs/reference/deprecated#tag/events)
 
 Access to the API is possible with a [Service User](/docs/guides/integrate/service-users/authenticate-service-users) account, allowing you to integrate the events with your own business logic.
 

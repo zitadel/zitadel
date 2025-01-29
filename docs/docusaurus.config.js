@@ -4,9 +4,9 @@ module.exports = {
   trailingSlash: false,
   url: "https://zitadel.com",
   baseUrl: "/docs",
-  onBrokenLinks: "warn",
-  onBrokenAnchors: "warn",
-  onBrokenMarkdownLinks: "throw",
+  onBrokenLinks: "throw",
+  onBrokenAnchors: "log", //Docusaurus does not support checking links that reside in Scalar.
+  onBrokenMarkdownLinks: "warn", 
   favicon: "img/favicon.ico",
   organizationName: "zitadel",
   projectName: "zitadel",
@@ -83,6 +83,21 @@ module.exports = {
           label: "APIs",
           docId: "apis/introduction",
           position: "left",
+        },
+        {
+          type: 'dropdown',
+          label: 'Reference',
+          position: 'left',
+          items: [
+            {
+              label: 'Current',
+              to: 'reference',
+            },
+            {
+              label: 'Deprecated',
+              to: 'reference/deprecated',
+            }
+          ],
         },
         {
           type: "doc",
@@ -187,7 +202,7 @@ module.exports = {
       selector: "div#",
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python", "protobuf", "json", "bash"],
+      additionalLanguages: ["bash", "csharp", "java", "php", "ruby", "scala"],
     },
     colorMode: {
       defaultMode: "dark",
@@ -201,28 +216,6 @@ module.exports = {
       runmeLinkLabel: 'Checkout via Runme'
     },
   },
-  webpack: {
-    jsLoader: (isServer) => ({
-      loader: require.resolve('swc-loader'),
-      options: {
-        jsc: {
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          transform: {
-            react: {
-              runtime: 'automatic',
-            },
-          },
-          target: 'es2017',
-        },
-        module: {
-          type: isServer ? 'commonjs' : 'es6',
-        },
-      },
-    }),
-  },
   presets: [
     [
       "classic",
@@ -233,148 +226,58 @@ module.exports = {
           sidebarPath: require.resolve("./sidebars.js"),
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
-          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
-          remarkPlugins: [require("mdx-mermaid")],
-          
-          docItemComponent:  '@theme/ApiItem'
+          editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/"
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
       })
     ],
-
   ],
   plugins: [
     [
-      'docusaurus-plugin-openapi-docs',
+    '@scalar/docusaurus',
+    {
+      id: 'current',
+      label: 'API Reference',
+      route: '/docs/reference',
+      showNavLink: false,
+      configuration: {
+        searchHotKey: 'g',
+        tagsSorter: 'alpha',
+        hideModels: true,
+        isEditable: false,
+        hideDarkModeToggle: true,
+        hideClientButton: true,
+        defaultOpenAllTags: false,
+        spec: {
+          url: '/docs/apis/current.json',
+        },
+      },
+    },
+    ],
+    [
+      '@scalar/docusaurus',
       {
-        id: "apiDocs",
-        docsPluginId: "classic",
-        config: {
-          auth: {
-            specPath: ".artifacts/openapi/zitadel/auth.swagger.json",
-            outputDir: "docs/apis/resources/auth",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "tag",
-            },
-          },
-          mgmt: {
-            specPath: ".artifacts/openapi/zitadel/management.swagger.json",
-            outputDir: "docs/apis/resources/mgmt",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "tag",
-            },
-          },
-          admin: {
-            specPath: ".artifacts/openapi/zitadel/admin.swagger.json",
-            outputDir: "docs/apis/resources/admin",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "tag",
-            },
-          },
-          system: {
-            specPath: ".artifacts/openapi/zitadel/system.swagger.json",
-            outputDir: "docs/apis/resources/system",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "tag",
-            },
-          },
-          user_v2: {
-            specPath: ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
-            outputDir: "docs/apis/resources/user_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          session_v2: {
-            specPath: ".artifacts/openapi/zitadel/session/v2/session_service.swagger.json",
-            outputDir: "docs/apis/resources/session_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          oidc_v2: {
-            specPath: ".artifacts/openapi/zitadel/oidc/v2/oidc_service.swagger.json",
-            outputDir: "docs/apis/resources/oidc_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          settings_v2: {
-            specPath: ".artifacts/openapi/zitadel/settings/v2/settings_service.swagger.json",
-            outputDir: "docs/apis/resources/settings_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          user_schema_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/userschema/v3alpha/user_schema_service.swagger.json",
-            outputDir: "docs/apis/resources/user_schema_service_v3",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          user_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/user/v3alpha/user_service.swagger.json",
-            outputDir: "docs/apis/resources/user_service_v3",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          action_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/action/v3alpha/action_service.swagger.json",
-            outputDir: "docs/apis/resources/action_service_v3",
-            sidebarOptions: {
-                groupPathsBy: "tag",
-                categoryLinkSource: "auto",
-            },
-          },
-          webkey_v3: {
-            specPath: ".artifacts/openapi/zitadel/resources/webkey/v3alpha/webkey_service.swagger.json",
-            outputDir: "docs/apis/resources/webkey_service_v3",
-            sidebarOptions: {
-                groupPathsBy: "tag",
-                categoryLinkSource: "auto",
-            },
-          },
-          feature_v2: {
-            specPath: ".artifacts/openapi/zitadel/feature/v2/feature_service.swagger.json",
-            outputDir: "docs/apis/resources/feature_service_v2",
-            sidebarOptions: {
-                groupPathsBy: "tag",
-                categoryLinkSource: "auto",
-            },
-          },
-          org_v2: {
-            specPath: ".artifacts/openapi/zitadel/org/v2/org_service.swagger.json",
-            outputDir: "docs/apis/resources/org_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
-          idp_v2: {
-            specPath: ".artifacts/openapi/zitadel/idp/v2/idp_service.swagger.json",
-            outputDir: "docs/apis/resources/idp_service_v2",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
+        id: 'deprecated',
+        label: 'API Reference (Deprecated)',
+        route: '/docs/reference/deprecated',
+        showNavLink: false,
+        configuration: {
+          searchHotKey: 'g',
+          tagsSorter: 'alpha',
+          hideModels: true,
+          isEditable: false,
+          hideDarkModeToggle: true,
+          hideClientButton: true,
+          defaultOpenAllTags: false,
+          spec: {
+            url: '/docs/apis/deprecated.json',
           },
         },
       },
-    ],
+      ],
+      
     require.resolve("docusaurus-plugin-image-zoom"),
     async function myPlugin(context, options) {
       return {
@@ -388,5 +291,8 @@ module.exports = {
       };
     },
   ],
-  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  themes: [ "docusaurus-theme-github-codeblock"],
+  future: {
+    experimental_faster: true,
+  },
 };

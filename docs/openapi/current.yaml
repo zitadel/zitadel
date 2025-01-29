@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  title: Current API from ZITADEL
+  version: v2
+  description: This is the recommended API for ZITADEL if you start implementing a new project. <br /> <br /> We're currently updating our to a new API structure that offers several benefits, including easier integration and a more understanable design. As we transition the documentation for migrated/new requests can be found below. If you can't find what you need, please refer to the [deprecated](/docs/reference/deprecated) section for the older version. We expect to complete the migration to the new API structure by end of June 2025.
+  contact:
+    name: ZITADEL
+    url: https://zitadel.com
+    email: hi@zitadel.com
+  license:
+    name: Apache 2.0
+    url: https://github.com/zitadel/zitadel/blob/main/LICENSE
+servers:
+  - url: https://{instanceName}.{region}.zitadel.cloud/
+    variables:
+      instanceName:
+        default: demo
+        description: Instance name assigned by ZITADEL Cloud
+      region:
+        enum:
+          - 'us1'
+          - 'eu1'
+          - 'au1'
+          - 'ch1'
+        default: 'us1'
+  - url: https://{instanceHost}/
+    variables:
+      instanceHost:
+        default: demo.yourdomain.com
+        description: Instance name assigned by ZITADEL Cloud
+components:
+  securitySchemes:
+    oAuth2AuthCode:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/v2/authorize
+          tokenUrl: /oauth/v2/token
+          scopes:
+            openid: openid
+            urn:zitadel:iam:org:project:id:zitadel:aud: urn:zitadel:iam:org:project:id:zitadel:aud
+    bearerAuth:
+      type: http
+      scheme: bearer

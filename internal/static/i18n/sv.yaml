@@ -588,7 +588,7 @@ Errors:
     Data:
       Invalid: Data ogiltig för användarschema
   TokenExchange:
-    FeatureDisabled: Token Exchange-funktionen är inaktiverad för din instans. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    FeatureDisabled: Token Exchange-funktionen är inaktiverad för din instans. https://zitadel.com/docs/reference#tag/features/PUT/v2/features/instance
     Token:
       Missing: Token saknas
       Invalid: Token är ogiltig

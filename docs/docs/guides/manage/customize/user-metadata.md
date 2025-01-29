@@ -20,7 +20,7 @@ Typical use cases for user metadata include:
 ## Before you start
 
 Before you start you need to add some metadata to an existing user.
-You can do so by using [Console](../console/users) or [setting user metadata](/docs/apis/resources/mgmt/management-service-set-user-metadata) through the management API.
+You can do so by using [Console](../console/users) or [setting user metadata](/docs/reference/deprecated#tag/users/POST/management/v1/users/{id}/metadata/{key}) through the management API.
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
@@ -163,7 +163,7 @@ Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequ
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.
 :::
 
-You can request the user's metadata with the [List My Metadata](/docs/apis/resources/auth/auth-service-list-my-metadata) method:
+You can request the user's metadata with the [List My Metadata](/docs/reference/deprecated#tag/auth-service/POST/auth/v1/users/me/metadata/_search) method:
 
 ```bash
 curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
@@ -231,5 +231,5 @@ In case you want to get the metadata for another user, you need to use the manag
 The user that calls the management service must have [manager permissions](/docs/guides/manage/console/managers).
 A user can be either a human user or a service user.
 
-You can get [metadata of a user filtered by your query](/docs/apis/resources/mgmt/management-service-list-user-metadata) or [get a metadata object from a user by a specific key](/docs/apis/resources/mgmt/management-service-get-user-metadata).
-The management service allows you to set and delete metadata, see the [API documentation for users](/docs/apis/resources/mgmt/users).
+You can get [metadata of a user filtered by your query](/docs/reference/deprecated#tag/users/POST/management/v1/users/{id}/metadata/_search) or [get a metadata object from a user by a specific key](/docs/reference/deprecated#tag/management-service/GET/management/v1/users/{id}/metadata/{key}).
+The management service allows you to set and delete metadata, see the [API documentation for users](/docs/reference/deprecated#tag/users).

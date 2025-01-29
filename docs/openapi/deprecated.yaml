@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  title: Deprecated API from ZITADEL
+  version: v1
+  description: This is the deprecated but still available API for ZITADEL. Please consider to switch to the [current API](/docs/reference/current). <br />  <br /> We're currently updating our API to a new structure that offers several benefits, including easier integration and a more understandable design. As we transition, the documentation for migrated/new requests can be found in our [current](/docs/reference/current) reference. As we transition the documentation some requests might only be listed in our deprecated section. Requests that have already been migrated are crossed out.
+  contact:
+    name: ZITADEL
+    url: https://zitadel.com
+    email: hi@zitadel.com
+  license:
+    name: Apache 2.0
+    url: https://github.com/zitadel/zitadel/blob/main/LICENSE
+servers:
+  - url: https://{instanceName}.{region}.zitadel.cloud/
+    variables:
+      instanceName:
+        default: demo
+        description: Instance name assigned by ZITADEL Cloud
+      region:
+        enum:
+          - 'us1'
+          - 'eu1'
+          - 'au1'
+          - 'ch1'
+        default: 'us1'
+  - url: https://{instanceHost}/
+    variables:
+      instanceHost:
+        default: demo.yourdomain.com
+        description: Instance name assigned by ZITADEL Cloud
+components:
+  securitySchemes:
+    oAuth2AuthCode:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/v2/authorize
+          tokenUrl: /oauth/v2/token
+          scopes:
+            openid: openid
+            urn:zitadel:iam:org:project:id:zitadel:aud: urn:zitadel:iam:org:project:id:zitadel:aud
+    bearerAuth:
+      type: http
+      scheme: bearer

@@ -21,7 +21,7 @@ Please refer to our guides how to [authenticate users](/docs/guides/integrate/lo
 
 For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/docs/guides/integrate/login/oidc/device-authorization).
 
-Additionally, you can use the [session API](../apis/resources/session_service_v2/) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui/).
+Additionally, you can use the [session API](../reference#tag/sessions) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui/).
 
 ### Authenticate service users and machines
 
@@ -45,18 +45,18 @@ The [OIDC Playground](/docs/apis/openidoauth/authrequest) is for testing OpenID 
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2) or get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service).
+ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/reference#tag/sessions) or get OIDC authentication request details with the [OIDC service API](/docs/reference#tag/openid-connect-oidc).
 User authorizations can be [retrieved as roles from our APIs](/docs/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/docs/guides/integrate/login-ui)
 
 ## ZITADEL APIs (resource-based)
 
-ZITADEL provides APIs for each [core resource](/docs/apis/v2):
+ZITADEL provides APIs for each [core resource](/docs/reference#tag/healthz):
 
-- [User](/docs/apis/resources/user_service_v2)
-- [Session](/docs/apis/resources/session_service_v2)
-- [Settings](/docs/apis/resources/settings_service_v2)
+- [User](/docs/reference#tag/users)
+- [Session](/docs/reference#tag/sessions)
+- [Settings](/docs/reference#tag/settings)
 
 :::info
 We are migrating to a resource-based API approach.
@@ -98,7 +98,7 @@ Endpoint:
 $ZITADEL_DOMAIN/auth/v1/
 
 API Reference:
-[OpenAPI Docs](/apis/resources/auth)
+[OpenAPI Docs](/reference/deprecated#tag/auth)
 
 </div>
 </Column>
@@ -131,7 +131,7 @@ Endpoint:
 $ZITADEL_DOMAIN/management/v1/
 
 API Reference:
-[OpenAPI Docs](/apis/resources/mgmt)
+[OpenAPI Docs](/reference/deprecated#tag/management-service)
 
 </div>
 </Column>
@@ -162,7 +162,7 @@ Endpoint:
 $ZITADEL_DOMAIN/admin/v1/
 
 API Reference:
-[OpenAPI Docs](/apis/resources/admin)
+[OpenAPI Docs](/reference/deprecated#tag/admin-service)
 
 </div>
 </Column>
@@ -195,7 +195,7 @@ Endpoint:
 $ZITADEL_DOMAIN/system/v1/
 
 API Reference:
-[OpenAPI Docs](/apis/resources/system)
+[OpenAPI Docs](/reference/deprecated#tag/system)
 
 </div>
 </Column>

@@ -1,0 +1,22 @@
+{
+    "extends": ["//"],
+    "tasks": {
+      "generate": {
+        "outputs": ["static/apis/**"],
+        "inputs": ["../proto/**", "buf.gen.yaml", "openapi/**"],
+        "cache": true
+      },
+      "build": {
+        "dependsOn": ["generate"],
+        "outputs": ["build/**"],
+        "cache": true
+      },
+      "start": {
+        "dependsOn": ["generate"],
+        "cache": false
+      },
+      "clear": {
+        "cache": false
+      }
+    }
+  }
