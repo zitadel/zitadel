@@ -11,6 +11,7 @@ const (
 
 	IdUser               ScimSchemaType = idPrefixCore + "User"
 	IdListResponse       ScimSchemaType = idPrefixMessages + "ListResponse"
+	IdPatchOperation     ScimSchemaType = idPrefixMessages + "PatchOp"
 	IdError              ScimSchemaType = idPrefixMessages + "Error"
 	IdZitadelErrorDetail ScimSchemaType = idPrefixZitadelMessages + "ErrorDetail"
 
