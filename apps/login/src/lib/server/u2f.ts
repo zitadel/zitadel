@@ -38,6 +38,7 @@ export async function addU2F(command: RegisterU2FCommand) {
 
   const session = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -82,6 +83,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
 
   const session = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });

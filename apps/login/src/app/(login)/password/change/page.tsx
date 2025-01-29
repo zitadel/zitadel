@@ -28,21 +28,28 @@ export default async function Page(props: {
   // also allow no session to be found (ignoreUnkownUsername)
   const sessionFactors = await loadMostRecentSession({
     serviceUrl,
+    serviceRegion,
     sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const passwordComplexity = await getPasswordComplexitySettings({
     serviceUrl,
+    serviceRegion,
     organization: sessionFactors?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: sessionFactors?.factors?.user?.organizationId,
   });
 

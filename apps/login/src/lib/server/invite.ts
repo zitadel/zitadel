@@ -31,6 +31,7 @@ export async function inviteUser(command: InviteUserCommand) {
 
   const human = await addHumanUser({
     serviceUrl,
+    serviceRegion,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -44,6 +45,7 @@ export async function inviteUser(command: InviteUserCommand) {
 
   const codeResponse = await createInviteCode({
     serviceUrl,
+    serviceRegion,
     urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
     userId: human.userId,
   });

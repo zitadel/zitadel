@@ -1184,6 +1184,7 @@ export async function setUserPassword({
   if (!code) {
     const authmethods = await listAuthenticationMethodTypes({
       serviceUrl,
+      serviceRegion,
       userId,
     });
 

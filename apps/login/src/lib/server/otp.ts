@@ -64,6 +64,7 @@ export async function setOTP(command: SetOTPCommand) {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: command.organization,
   });
 

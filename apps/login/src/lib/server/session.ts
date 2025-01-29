@@ -29,6 +29,7 @@ export async function continueWithSession({
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: session.factors?.user?.organizationId,
   });
 
@@ -131,6 +132,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   if (checks && checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
       serviceUrl,
+      serviceRegion,
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -160,6 +162,7 @@ export async function clearSession(options: ClearSessionOptions) {
 
   const deletedSession = await deleteSession({
     serviceUrl,
+    serviceRegion,
     sessionId: session.id,
     sessionToken: session.token,
   });
@@ -181,6 +184,7 @@ export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
 
   const deleteResponse = await deleteSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });

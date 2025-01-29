@@ -36,11 +36,20 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
-  const loginSettings = await getLoginSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const session = await loadMostRecentSession({
     serviceUrl,
+    serviceRegion,
     sessionParams: {
       loginName,
       organization,
@@ -50,7 +59,11 @@ export default async function Page(props: {
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      await registerTOTP({ serviceUrl, userId: session.factors.user.id })
+      await registerTOTP({
+        serviceUrl,
+        serviceRegion,
+        userId: session.factors.user.id,
+      })
         .then((resp) => {
           if (resp) {
             totpResponse = resp;
@@ -61,18 +74,22 @@ export default async function Page(props: {
         });
     } else if (method === "sms") {
       // does not work
-      await addOTPSMS({ serviceUrl, userId: session.factors.user.id }).catch(
-        (error) => {
-          error = new Error("Could not add OTP via SMS");
-        },
-      );
+      await addOTPSMS({
+        serviceUrl,
+        serviceRegion,
+        userId: session.factors.user.id,
+      }).catch((error) => {
+        error = new Error("Could not add OTP via SMS");
+      });
     } else if (method === "email") {
       // works
-      await addOTPEmail({ serviceUrl, userId: session.factors.user.id }).catch(
-        (error) => {
-          error = new Error("Could not add OTP via Email");
-        },
-      );
+      await addOTPEmail({
+        serviceUrl,
+        serviceRegion,
+        userId: session.factors.user.id,
+      }).catch((error) => {
+        error = new Error("Could not add OTP via Email");
+      });
     } else {
       throw new Error("Invalid method");
     }

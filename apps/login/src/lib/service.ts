@@ -30,7 +30,7 @@ export async function createServiceForHost<T extends ServiceClass>(
     process.env.QA_SYSTEM_USER_ID &&
     process.env.QA_SYSTEM_USER_PRIVATE_KEY
   ) {
-    token = await systemAPIToken(serviceRegion);
+    token = await systemAPIToken({ serviceRegion });
   } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
     token = process.env.ZITADEL_SERVICE_USER_TOKEN;
   }

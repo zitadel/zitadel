@@ -28,6 +28,7 @@ export async function startIDPFlow(command: StartIDPFlowCommand) {
 
   return startIdentityProviderFlow({
     serviceUrl,
+    serviceRegion,
     idpId: command.idpId,
     urls: {
       successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.successUrl}`,
@@ -73,6 +74,7 @@ export async function createNewSessionFromIdpIntent(
 
   const userResponse = await getUserByID({
     serviceUrl,
+    serviceRegion,
     userId: command.userId,
   });
 
@@ -82,6 +84,7 @@ export async function createNewSessionFromIdpIntent(
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: userResponse.user.details?.resourceOwner,
   });
 

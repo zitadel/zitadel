@@ -24,7 +24,7 @@ export default async function Page(props: {
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   if (!organization) {
-    const org = await getDefaultOrg({ serviceUrl });
+    const org = await getDefaultOrg({ serviceUrl, serviceRegion });
     if (!org) {
       throw new Error("No default organization found");
     }
@@ -32,14 +32,23 @@ export default async function Page(props: {
     organization = org.id;
   }
 
-  const loginSettings = await getLoginSettings({ serviceUrl, organization });
-
-  const passwordComplexitySettings = await getPasswordComplexitySettings({
+  const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization,
   });
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const passwordComplexitySettings = await getPasswordComplexitySettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
+
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

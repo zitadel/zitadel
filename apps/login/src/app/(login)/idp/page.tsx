@@ -20,12 +20,17 @@ export default async function Page(props: {
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
+    serviceRegion,
     orgId: organization,
   }).then((resp) => {
     return resp.identityProviders;
   });
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

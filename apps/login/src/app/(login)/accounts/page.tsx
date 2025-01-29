@@ -13,12 +13,19 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
 
-async function loadSessions({ serviceUrl }: { serviceUrl: string }) {
+async function loadSessions({
+  serviceUrl,
+  serviceRegion,
+}: {
+  serviceUrl: string;
+  serviceRegion: string;
+}) {
   const ids: (string | undefined)[] = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
     const response = await listSessions({
       serviceUrl,
+      serviceRegion,
       ids: ids.filter((id) => !!id) as string[],
     });
     return response?.sessions ?? [];
@@ -43,16 +50,20 @@ export default async function Page(props: {
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceUrl });
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+      serviceRegion,
+    });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  let sessions = await loadSessions({ serviceUrl });
+  let sessions = await loadSessions({ serviceUrl, serviceRegion });
 
   const branding = await getBrandingSettings({
     serviceUrl,
+    serviceRegion,
     organization: organization ?? defaultOrganization,
   });
 

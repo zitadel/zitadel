@@ -39,6 +39,7 @@ export async function createSessionAndUpdateCookie(
 
   const createdSession = await createSessionFromChecks({
     serviceUrl,
+    serviceRegion,
     checks,
     challenges,
     lifetime,
@@ -47,6 +48,7 @@ export async function createSessionAndUpdateCookie(
   if (createdSession) {
     return getSession({
       serviceUrl,
+      serviceRegion,
       sessionId: createdSession.sessionId,
       sessionToken: createdSession.sessionToken,
     }).then((response) => {
@@ -101,6 +103,7 @@ export async function createSessionForIdpAndUpdateCookie(
 
   const createdSession = await createSessionForUserIdAndIdpIntent({
     serviceUrl,
+    serviceRegion,
     userId,
     idpIntent,
     lifetime,
@@ -112,6 +115,7 @@ export async function createSessionForIdpAndUpdateCookie(
 
   const { session } = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: createdSession.sessionId,
     sessionToken: createdSession.sessionToken,
   });
@@ -163,6 +167,7 @@ export async function setSessionAndUpdateCookie(
 
   return setSession({
     serviceUrl,
+    serviceRegion,
     sessionId: recentCookie.id,
     sessionToken: recentCookie.token,
     challenges,
@@ -189,6 +194,7 @@ export async function setSessionAndUpdateCookie(
 
       return getSession({
         serviceUrl,
+        serviceRegion,
         sessionId: sessionCookie.id,
         sessionToken: sessionCookie.token,
       }).then((response) => {

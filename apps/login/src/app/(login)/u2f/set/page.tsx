@@ -23,13 +23,18 @@ export default async function Page(props: {
 
   const sessionFactors = await loadMostRecentSession({
     serviceUrl,
+    serviceRegion,
     sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

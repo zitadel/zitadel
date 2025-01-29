@@ -53,6 +53,7 @@ export async function registerPasskeyLink(
   const sessionCookie = await getSessionCookieById({ sessionId });
   const session = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -73,6 +74,7 @@ export async function registerPasskeyLink(
   // use session token to add the passkey
   const registerLink = await createPasskeyRegistrationLink({
     serviceUrl,
+    serviceRegion,
     userId,
   });
 
@@ -82,6 +84,7 @@ export async function registerPasskeyLink(
 
   return registerPasskey({
     serviceUrl,
+    serviceRegion,
     userId,
     code: registerLink.code,
     domain: hostname,
@@ -109,6 +112,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
   });
   const session = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -120,6 +124,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
 
   return zitadelVerifyPasskeyRegistration({
     serviceUrl,
+    serviceRegion,
     request: create(VerifyPasskeyRegistrationRequestSchema, {
       passkeyId: command.passkeyId,
       publicKeyCredential: command.publicKeyCredential,
@@ -177,6 +182,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const userResponse = await getUserByID({
     serviceUrl,
+    serviceRegion,
     userId: session?.factors?.user?.id,
   });
 

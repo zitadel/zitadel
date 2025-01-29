@@ -36,31 +36,35 @@ export default async function Page(props: {
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
-  async function getAuthMethodsAndUser(host: string, session?: Session) {
+  async function getAuthMethodsAndUser(
+    serviceUrl: string,
+    serviceRegion: string,
+    session?: Session,
+  ) {
     const userId = session?.factors?.user?.id;
 
     if (!userId) {
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({ serviceUrl, userId }).then(
-      (methods) => {
-        return getUserByID({ serviceUrl, userId }).then((user) => {
-          const humanUser =
-            user.user?.type.case === "human"
-              ? user.user?.type.value
-              : undefined;
+    return listAuthenticationMethodTypes({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    }).then((methods) => {
+      return getUserByID({ serviceUrl, serviceRegion, userId }).then((user) => {
+        const humanUser =
+          user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
-          return {
-            factors: session?.factors,
-            authMethods: methods.authMethodTypes ?? [],
-            phoneVerified: humanUser?.phone?.isVerified ?? false,
-            emailVerified: humanUser?.email?.isVerified ?? false,
-            expirationDate: session?.expirationDate,
-          };
-        });
-      },
-    );
+        return {
+          factors: session?.factors,
+          authMethods: methods.authMethodTypes ?? [],
+          phoneVerified: humanUser?.phone?.isVerified ?? false,
+          emailVerified: humanUser?.email?.isVerified ?? false,
+          expirationDate: session?.expirationDate,
+        };
+      });
+    });
   }
 
   async function loadSessionByLoginname(
@@ -70,12 +74,13 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
+      serviceRegion,
       sessionParams: {
         loginName,
         organization,
       },
     }).then((session) => {
-      return getAuthMethodsAndUser(serviceUrl, session);
+      return getAuthMethodsAndUser(serviceUrl, serviceRegion, session);
     });
   }
 
@@ -87,10 +92,15 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
+      serviceRegion,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
+      return getAuthMethodsAndUser(
+        serviceUrl,
+        serviceRegion,
+        sessionResponse.session,
+      );
     });
   }
 
@@ -100,16 +110,19 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
+    serviceRegion,
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
+    serviceRegion,
     orgId: sessionWithData.factors?.user?.organizationId,
     linking_allowed: true,
   }).then((resp) => {

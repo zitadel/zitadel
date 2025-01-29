@@ -35,6 +35,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   const branding = await getBrandingSettings({
     serviceUrl,
+    serviceRegion,
     organization,
   });
 
@@ -48,6 +49,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
       serviceUrl,
+      serviceRegion,
       sessionParams: {
         loginName,
         organization,
@@ -57,6 +59,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     if (doSend && sessionFactors?.factors?.user?.id) {
       await sendEmailCode({
         serviceUrl,
+        serviceRegion,
         userId: sessionFactors?.factors?.user?.id,
         urlTemplate:
           `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
@@ -70,6 +73,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     if (doSend) {
       await sendEmailCode({
         serviceUrl,
+        serviceRegion,
         userId,
         urlTemplate:
           `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
@@ -80,7 +84,11 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       });
     }
 
-    const userResponse = await getUserByID({ serviceUrl, userId });
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {

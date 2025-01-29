@@ -30,7 +30,10 @@ export default async function Page(props: {
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceUrl });
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+      serviceRegion,
+    });
     if (org) {
       defaultOrganization = org.id;
     }
@@ -38,16 +41,19 @@ export default async function Page(props: {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: organization ?? defaultOrganization,
   });
 
   const contextLoginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization,
   });
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
+    serviceRegion,
     orgId: organization ?? defaultOrganization,
   }).then((resp) => {
     return resp.identityProviders;
@@ -55,6 +61,7 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
+    serviceRegion,
     organization: organization ?? defaultOrganization,
   });
 

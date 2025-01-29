@@ -43,6 +43,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   const loginSettingsByContext = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: command.organization,
   });
 
@@ -52,6 +53,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
   let searchUsersRequest: SearchUsersCommand = {
     serviceUrl,
+    serviceRegion,
     searchValue: command.loginName,
     organizationId: command.organization,
     loginSettings: loginSettingsByContext,
@@ -73,6 +75,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const redirectUserToSingleIDPIfAvailable = async () => {
     const identityProviders = await getActiveIdentityProviders({
       serviceUrl,
+      serviceRegion,
       orgId: command.organization,
     }).then((resp) => {
       return resp.identityProviders;
@@ -103,6 +106,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const resp = await startIdentityProviderFlow({
         serviceUrl,
+        serviceRegion,
         idpId: identityProviders[0].id,
         urls: {
           successUrl:
@@ -161,6 +165,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const resp = await startIdentityProviderFlow({
         serviceUrl,
+        serviceRegion,
         idpId: idp.id,
         urls: {
           successUrl:
@@ -186,6 +191,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const userLoginSettings = await getLoginSettings({
       serviceUrl,
+      serviceRegion,
       organization: user.details?.resourceOwner,
     });
 
@@ -244,6 +250,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     const methods = await listAuthenticationMethodTypes({
       serviceUrl,
+      serviceRegion,
       userId: session.factors?.user?.id,
     });
 
@@ -406,6 +413,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
+        serviceRegion,
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {

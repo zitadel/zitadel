@@ -65,24 +65,24 @@ export default async function Page(props: {
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes({ serviceUrl, userId }).then(
-      (methods) => {
-        return getUserByID({ serviceUrl, userId }).then((user) => {
-          const humanUser =
-            user.user?.type.case === "human"
-              ? user.user?.type.value
-              : undefined;
+    return listAuthenticationMethodTypes({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    }).then((methods) => {
+      return getUserByID({ serviceUrl, serviceRegion, userId }).then((user) => {
+        const humanUser =
+          user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
-          return {
-            factors: session?.factors,
-            authMethods: methods.authMethodTypes ?? [],
-            phoneVerified: humanUser?.phone?.isVerified ?? false,
-            emailVerified: humanUser?.email?.isVerified ?? false,
-            expirationDate: session?.expirationDate,
-          };
-        });
-      },
-    );
+        return {
+          factors: session?.factors,
+          authMethods: methods.authMethodTypes ?? [],
+          phoneVerified: humanUser?.phone?.isVerified ?? false,
+          emailVerified: humanUser?.email?.isVerified ?? false,
+          expirationDate: session?.expirationDate,
+        };
+      });
+    });
   }
 
   async function loadSessionByLoginname(
@@ -92,6 +92,7 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
+      serviceRegion,
       sessionParams: {
         loginName,
         organization,
@@ -109,6 +110,7 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
+      serviceRegion,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
@@ -116,9 +118,14 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
   const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: sessionWithData.factors?.user?.organizationId,
   });
 

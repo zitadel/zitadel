@@ -27,12 +27,17 @@ export default async function Page(props: {
     throw new Error("No host found");
   }
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
+        serviceRegion,
         sessionParams: { loginName, organization },
       });
 
@@ -44,6 +49,7 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
+      serviceRegion,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {

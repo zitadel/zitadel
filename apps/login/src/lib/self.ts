@@ -32,6 +32,7 @@ export async function setMyPassword({
 
   const { session } = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
