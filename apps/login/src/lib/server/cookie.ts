@@ -35,7 +35,7 @@ export async function createSessionAndUpdateCookie(
   lifetime?: Duration,
 ): Promise<Session> {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const createdSession = await createSessionFromChecks({
     serviceUrl,
@@ -97,7 +97,7 @@ export async function createSessionForIdpAndUpdateCookie(
   lifetime?: Duration,
 ): Promise<Session> {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const createdSession = await createSessionForUserIdAndIdpIntent({
     serviceUrl,
@@ -159,7 +159,7 @@ export async function setSessionAndUpdateCookie(
   lifetime?: Duration,
 ) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   return setSession({
     serviceUrl,

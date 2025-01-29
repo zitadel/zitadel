@@ -27,7 +27,7 @@ export type SetOTPCommand = {
 
 export async function setOTP(command: SetOTPCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const recentSession = command.sessionId
     ? await getSessionCookieById({ sessionId: command.sessionId }).catch(

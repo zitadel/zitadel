@@ -26,7 +26,7 @@ export default async function Page(props: {
   const submit: boolean = searchParams?.submit === "true";
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   let defaultOrganization;
   if (!organization) {

@@ -25,7 +25,7 @@ export default async function Page(props: {
   const { organization } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const branding = await getBrandingSettings({ serviceUrl, organization });
 

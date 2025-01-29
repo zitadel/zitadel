@@ -25,7 +25,7 @@ export default async function Page(props: {
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)

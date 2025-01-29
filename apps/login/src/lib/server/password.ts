@@ -45,7 +45,7 @@ type ResetPasswordCommand = {
 
 export async function resetPassword(command: ResetPasswordCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
@@ -85,7 +85,7 @@ export type UpdateSessionCommand = {
 
 export async function sendPassword(command: UpdateSessionCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
@@ -255,7 +255,7 @@ export async function changePassword(command: {
   password: string;
 }) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   // check for init state
   const { user } = await getUserByID({ serviceUrl, userId: command.userId });
@@ -284,7 +284,7 @@ export async function checkSessionAndSetPassword({
   password,
 }: CheckSessionAndSetPasswordCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 

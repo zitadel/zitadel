@@ -25,7 +25,7 @@ export default async function Page(props: {
   let { loginName, organization, authRequestId, alt } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   let defaultOrganization;
   if (!organization) {

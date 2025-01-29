@@ -43,7 +43,7 @@ export async function registerPasskeyLink(
   const { sessionId } = command;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -90,7 +90,7 @@ export async function registerPasskeyLink(
 
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
@@ -153,7 +153,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   }
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const loginSettings = await getLoginSettings({ serviceUrl, organization });
 

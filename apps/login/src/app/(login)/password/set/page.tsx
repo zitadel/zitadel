@@ -27,7 +27,7 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;

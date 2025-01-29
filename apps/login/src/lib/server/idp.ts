@@ -19,7 +19,7 @@ export type StartIDPFlowCommand = {
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -60,7 +60,7 @@ export async function createNewSessionFromIdpIntent(
   command: CreateNewSessionCommand,
 ) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {

@@ -199,7 +199,7 @@ export async function GET(request: NextRequest) {
   const sessionId = searchParams.get("sessionId");
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
   const _rsc = searchParams.get("_rsc");

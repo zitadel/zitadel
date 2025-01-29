@@ -30,7 +30,7 @@ export async function verifyTOTP(
   organization?: string,
 ) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   return loadMostRecentSession({
     serviceUrl,
@@ -62,7 +62,7 @@ type VerifyUserByEmailCommand = {
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({
@@ -244,7 +244,7 @@ type resendVerifyEmailCommand = {
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -290,7 +290,7 @@ export async function sendVerificationRedirectWithoutCheck(
   command: SendVerificationRedirectWithoutCheckCommand,
 ) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   if (!("loginName" in command || "userId" in command)) {
     return { error: "No userId, nor loginname provided" };

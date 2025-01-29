@@ -61,7 +61,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "signedin" });
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const { loginName, authRequestId, organization } = searchParams;
   const sessionFactors = await loadSession(

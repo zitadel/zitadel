@@ -19,7 +19,7 @@ export default async function Page(props: {
   const { loginName, organization, authRequestId, checkAfter } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const sessionFactors = await loadMostRecentSession({
     serviceUrl,

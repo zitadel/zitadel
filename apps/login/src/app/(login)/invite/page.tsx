@@ -21,7 +21,7 @@ export default async function Page(props: {
   let { firstname, lastname, email, organization } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   if (!organization) {
     const org = await getDefaultOrg({ serviceUrl });

@@ -34,7 +34,7 @@ export default async function Page(props: {
   const { method } = params;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const branding = await getBrandingSettings({ serviceUrl, organization });
   const loginSettings = await getLoginSettings({ serviceUrl, organization });

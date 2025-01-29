@@ -3,17 +3,32 @@ declare namespace NodeJS {
     /**
      * Multitenancy: The system api url
      */
-    AUDIENCE: string;
+    QA_AUDIENCE: string;
 
     /**
      * Multitenancy: The service user id
      */
-    SYSTEM_USER_ID: string;
+    QA_SYSTEM_USER_ID: string;
 
     /**
      * Multitenancy: The service user private key
      */
-    SYSTEM_USER_PRIVATE_KEY: string;
+    QA_SYSTEM_USER_PRIVATE_KEY: string;
+
+    /**
+     * Multitenancy: The system api url for prod environment
+     */
+    PROD_AUDIENCE: string;
+
+    /**
+     * Multitenancy: The service user id for prod environment
+     */
+    PROD_SYSTEM_USER_ID: string;
+
+    /**
+     * Multitenancy: The service user private key for prod environment
+     */
+    PROD_SYSTEM_USER_PRIVATE_KEY: string;
 
     /**
      * Self hosting: The instance url

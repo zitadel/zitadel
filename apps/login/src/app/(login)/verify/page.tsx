@@ -26,7 +26,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
     searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {

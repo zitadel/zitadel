@@ -20,7 +20,7 @@ export default async function Page(props: {
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {

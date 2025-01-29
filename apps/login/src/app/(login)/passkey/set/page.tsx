@@ -20,7 +20,7 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const session = await loadMostRecentSession({
     serviceUrl,

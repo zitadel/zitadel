@@ -34,7 +34,7 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -80,7 +80,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const _headers = await headers();
-      const serviceUrl = getServiceUrlFromHeaders(_headers);
+      const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
       const host = _headers.get("host");
 
       if (!host) {
@@ -129,7 +129,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const _headers = await headers();
-      const serviceUrl = getServiceUrlFromHeaders(_headers);
+      const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
       const host = _headers.get("host");
 
       if (!host) {

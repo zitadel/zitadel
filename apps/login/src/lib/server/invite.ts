@@ -22,7 +22,7 @@ export type RegisterUserResponse = {
 
 export async function inviteUser(command: InviteUserCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
