@@ -6,14 +6,30 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Phone struct {
 	Number   domain.PhoneNumber
+	Remove   bool
 	Verified bool
 
 	// ReturnCode is used if the Verified field is false
 	ReturnCode bool
+}
+
+func (p *Phone) Validate() (err error) {
+	if p.Remove && p.Number != "" {
+		return zerrors.ThrowInvalidArgumentf(nil, "USRP2-12881", "Cannot update and remove the phone number at the same time")
+	}
+
+	if p.Number != "" {
+		if p.Number, err = p.Number.Normalize(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // newPhoneCode generates a new code to be sent out to via SMS or
