@@ -60,6 +60,7 @@ type AuthRequest struct {
 	DefaultTranslations      []*CustomText
 	OrgTranslations          []*CustomText
 	SAMLRequestID            string
+	RequestLocalAuth         bool
 	// orgID the policies were last loaded with
 	policyOrgID string
 	// SessionID is set to the computed sessionID of the login session table

@@ -980,7 +980,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			name: "url with event trigger",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testCode")
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any()).Return(&query.Session{
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
 					ID:            sessionID,
 					ResourceOwner: instanceID,
 					UserFactor: query.SessionUserFactor{
@@ -1044,7 +1044,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any()).Return(&query.Session{
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
 					ID:            sessionID,
 					ResourceOwner: instanceID,
 					UserFactor: query.SessionUserFactor{
@@ -1129,7 +1129,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 			name: "url template",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				_, code := cryptoValue(t, ctrl, "testCode")
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any()).Return(&query.Session{
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
 					ID:            sessionID,
 					ResourceOwner: instanceID,
 					UserFactor: query.SessionUserFactor{
@@ -1220,7 +1220,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
 				testCode := "testcode"
 				_, code := cryptoValue(t, ctrl, testCode)
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any()).Return(&query.Session{
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
 					ID:            sessionID,
 					ResourceOwner: instanceID,
 					UserFactor: query.SessionUserFactor{
@@ -1284,7 +1284,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 						IsPrimary: true,
 					}},
 				}, nil)
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any()).Return(&query.Session{
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
 					ID:            sessionID,
 					ResourceOwner: instanceID,
 					UserFactor: query.SessionUserFactor{
@@ -1339,7 +1339,7 @@ func Test_userNotifier_reduceOTPSMSChallenged(t *testing.T) {
 		{
 			name: "external code",
 			test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any()).Return(&query.Session{
+				queries.EXPECT().SessionByID(gomock.Any(), gomock.Any(), sessionID, gomock.Any(), nil).Return(&query.Session{
 					ID:            sessionID,
 					ResourceOwner: instanceID,
 					UserFactor: query.SessionUserFactor{

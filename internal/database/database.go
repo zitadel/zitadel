@@ -65,10 +65,8 @@ func CloseTransaction(tx Tx, err error) error {
 }
 
 type Config struct {
-	Dialects                   map[string]interface{} `mapstructure:",remain"`
-	EventPushConnRatio         float64
-	ProjectionSpoolerConnRatio float64
-	connector                  dialect.Connector
+	Dialects  map[string]interface{} `mapstructure:",remain"`
+	connector dialect.Connector
 }
 
 func (c *Config) SetConnector(connector dialect.Connector) {
@@ -134,8 +132,8 @@ func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...a
 	return obj, nil
 }
 
-func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, error) {
-	client, pool, err := config.connector.Connect(useAdmin, config.EventPushConnRatio, config.ProjectionSpoolerConnRatio, purpose)
+func Connect(config Config, useAdmin bool) (*DB, error) {
+	client, pool, err := config.connector.Connect(useAdmin)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net"
 	"net/http"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -78,6 +79,39 @@ type SessionOTPFactor struct {
 type SessionsSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
+}
+
+func sessionsCheckPermission(ctx context.Context, sessions *Sessions, permissionCheck domain.PermissionCheck) {
+	sessions.Sessions = slices.DeleteFunc(sessions.Sessions,
+		func(session *Session) bool {
+			return sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserAgent, session.UserFactor, permissionCheck) != nil
+		},
+	)
+}
+
+func sessionCheckPermission(ctx context.Context, resourceOwner string, creator string, useragent domain.UserAgent, userFactor SessionUserFactor, permissionCheck domain.PermissionCheck) error {
+	data := authz.GetCtxData(ctx)
+	// no permission check necessary if user is creator
+	if data.UserID == creator {
+		return nil
+	}
+	// no permission check necessary if session belongs to the user
+	if userFactor.UserID != "" && data.UserID == userFactor.UserID {
+		return nil
+	}
+	// no permission check necessary if session belongs to the same useragent as used
+	if data.AgentID != "" && useragent.FingerprintID != nil && *useragent.FingerprintID != "" && data.AgentID == *useragent.FingerprintID {
+		return nil
+	}
+	// if session belongs to a user, check for permission on the user resource
+	if userFactor.ResourceOwner != "" {
+		if err := permissionCheck(ctx, domain.PermissionSessionRead, userFactor.ResourceOwner, userFactor.UserID); err != nil {
+			return err
+		}
+		return nil
+	}
+	// default, check for permission on instance
+	return permissionCheck(ctx, domain.PermissionSessionRead, resourceOwner, "")
 }
 
 func (q *SessionsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -195,7 +229,24 @@ var (
 	}
 )
 
-func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (session *Session, err error) {
+func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string, permissionCheck domain.PermissionCheck) (session *Session, err error) {
+	session, tokenID, err := q.sessionByID(ctx, shouldTriggerBulk, id)
+	if err != nil {
+		return nil, err
+	}
+	if sessionToken == "" {
+		if err := sessionCheckPermission(ctx, session.ResourceOwner, session.Creator, session.UserAgent, session.UserFactor, permissionCheck); err != nil {
+			return nil, err
+		}
+		return session, nil
+	}
+	if err := q.sessionTokenVerifier(ctx, sessionToken, session.ID, tokenID); err != nil {
+		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-dsfr3", "Errors.PermissionDenied")
+	}
+	return session, nil
+}
+
+func (q *Queries) sessionByID(ctx context.Context, shouldTriggerBulk bool, id string) (session *Session, tokenID string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -214,27 +265,31 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		},
 	).ToSql()
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
+		return nil, "", zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	var tokenID string
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		session, tokenID, err = scan(row)
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
-	if sessionToken == "" {
-		return session, nil
-	}
-	if err := q.sessionTokenVerifier(ctx, sessionToken, session.ID, tokenID); err != nil {
-		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-dsfr3", "Errors.PermissionDenied")
-	}
-	return session, nil
+	return session, tokenID, nil
 }
 
-func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries) (sessions *Sessions, err error) {
+func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQueries, permissionCheck domain.PermissionCheck) (*Sessions, error) {
+	sessions, err := q.searchSessions(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil {
+		sessionsCheckPermission(ctx, sessions, permissionCheck)
+	}
+	return sessions, nil
+}
+
+func (q *Queries) searchSessions(ctx context.Context, queries *SessionsSearchQueries) (sessions *Sessions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -270,6 +325,10 @@ func NewSessionIDsSearchQuery(ids []string) (SearchQuery, error) {
 
 func NewSessionCreatorSearchQuery(creator string) (SearchQuery, error) {
 	return NewTextQuery(SessionColumnCreator, creator, TextEquals)
+}
+
+func NewSessionUserAgentFingerprintIDSearchQuery(fingerprintID string) (SearchQuery, error) {
+	return NewTextQuery(SessionColumnUserAgentFingerprintID, fingerprintID, TextEquals)
 }
 
 func NewUserIDSearchQuery(id string) (SearchQuery, error) {
@@ -415,6 +474,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnOTPSMSCheckedAt.identifier(),
 			SessionColumnOTPEmailCheckedAt.identifier(),
 			SessionColumnMetadata.identifier(),
+			SessionColumnUserAgentFingerprintID.identifier(),
+			SessionColumnUserAgentIP.identifier(),
+			SessionColumnUserAgentDescription.identifier(),
+			SessionColumnUserAgentHeader.identifier(),
 			SessionColumnExpiration.identifier(),
 			countColumn.identifier(),
 		).From(sessionsTable.identifier()).
@@ -441,6 +504,8 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					otpSMSCheckedAt     sql.NullTime
 					otpEmailCheckedAt   sql.NullTime
 					metadata            database.Map[[]byte]
+					userAgentIP         sql.NullString
+					userAgentHeader     database.Map[[]string]
 					expiration          sql.NullTime
 				)
 
@@ -465,6 +530,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&otpSMSCheckedAt,
 					&otpEmailCheckedAt,
 					&metadata,
+					&session.UserAgent.FingerprintID,
+					&userAgentIP,
+					&session.UserAgent.Description,
+					&userAgentHeader,
 					&expiration,
 					&sessions.Count,
 				)
@@ -485,6 +554,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				session.OTPSMSFactor.OTPCheckedAt = otpSMSCheckedAt.Time
 				session.OTPEmailFactor.OTPCheckedAt = otpEmailCheckedAt.Time
 				session.Metadata = metadata
+				session.UserAgent.Header = http.Header(userAgentHeader)
+				if userAgentIP.Valid {
+					session.UserAgent.IP = net.ParseIP(userAgentIP.String)
+				}
 				session.Expiration = expiration.Time
 
 				sessions.Sessions = append(sessions.Sessions, session)

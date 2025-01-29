@@ -15,6 +15,8 @@ import (
 type UserV2WriteModel struct {
 	eventstore.WriteModel
 
+	CreationDate time.Time
+
 	UserName string
 
 	MachineWriteModel bool
@@ -73,6 +75,9 @@ type UserV2WriteModel struct {
 
 	IDPLinkWriteModel bool
 	IDPLinks          []*domain.UserIDPLink
+
+	MetadataWriteModel bool
+	Metadata           map[string][]byte
 }
 
 func NewUserExistsWriteModel(userID, resourceOwner string) *UserV2WriteModel {
@@ -87,7 +92,7 @@ func NewUserRemoveWriteModel(userID, resourceOwner string) *UserV2WriteModel {
 	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine(), WithState(), WithIDPLinks())
 }
 
-func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinks bool) *UserV2WriteModel {
+func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinks, metadataListWM bool) *UserV2WriteModel {
 	opts := []UserV2WMOption{WithHuman(), WithState()}
 	if profileWM {
 		opts = append(opts, WithProfile())
@@ -106,6 +111,9 @@ func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, ph
 	}
 	if idpLinks {
 		opts = append(opts, WithIDPLinks())
+	}
+	if metadataListWM {
+		opts = append(opts, WithMetadata())
 	}
 	return newUserV2WriteModel(userID, resourceOwner, opts...)
 }
@@ -169,6 +177,12 @@ func WithAvatar() UserV2WMOption {
 func WithIDPLinks() UserV2WMOption {
 	return func(o *UserV2WriteModel) {
 		o.IDPLinkWriteModel = true
+	}
+}
+
+func WithMetadata() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.MetadataWriteModel = true
 	}
 }
 
@@ -281,6 +295,17 @@ func (wm *UserV2WriteModel) Reduce() error {
 			wm.RemoveIDPLink(e.IDPConfigID, e.ExternalUserID)
 		case *user.UserIDPLinkCascadeRemovedEvent:
 			wm.RemoveIDPLink(e.IDPConfigID, e.ExternalUserID)
+		case *user.MetadataSetEvent:
+			if wm.Metadata == nil {
+				wm.Metadata = make(map[string][]byte)
+			}
+
+			wm.Metadata[e.Key] = e.Value
+		case *user.MetadataRemovedEvent:
+			wm.Metadata[e.Key] = nil
+			delete(wm.Metadata, e.Key)
+		case *user.MetadataRemovedAllEvent:
+			wm.Metadata = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -457,6 +482,13 @@ func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {
 		)
 	}
 
+	if wm.MetadataWriteModel {
+		eventTypes = append(eventTypes,
+			user.MetadataSetType,
+			user.MetadataRemovedType,
+			user.MetadataRemovedAllType)
+	}
+
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
@@ -482,6 +514,7 @@ func (wm *UserV2WriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.UserState = domain.UserStateActive
 	wm.PasswordEncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 	wm.PasswordChangeRequired = e.ChangeRequired
+	wm.CreationDate = e.Creation
 }
 
 func (wm *UserV2WriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEvent) {

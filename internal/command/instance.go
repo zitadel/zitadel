@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -116,14 +116,15 @@ type InstanceSetup struct {
 		MaxOTPAttempts           uint64
 		ShouldShowLockoutFailure bool
 	}
-	EmailTemplate     []byte
-	MessageTexts      []*domain.CustomMessageText
-	SMTPConfiguration *SMTPConfiguration
-	OIDCSettings      *OIDCSettings
-	Quotas            *SetQuotas
-	Features          *InstanceFeatures
-	Limits            *SetLimits
-	Restrictions      *SetRestrictions
+	EmailTemplate          []byte
+	MessageTexts           []*domain.CustomMessageText
+	SMTPConfiguration      *SMTPConfiguration
+	OIDCSettings           *OIDCSettings
+	Quotas                 *SetQuotas
+	Features               *InstanceFeatures
+	Limits                 *SetLimits
+	Restrictions           *SetRestrictions
+	RolePermissionMappings []authz.RoleMapping
 }
 
 type SMTPConfiguration struct {
@@ -379,6 +380,7 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LabelPolicy.ThemeMode,
 		),
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
+		prepareAddRolePermissions(instanceAgg, setup.RolePermissionMappings),
 	}
 }
 

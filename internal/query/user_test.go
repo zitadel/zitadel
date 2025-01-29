@@ -6,6 +6,7 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"reflect"
 	"regexp"
 	"testing"
 
@@ -530,6 +531,8 @@ var (
 		"access_token_type",
 		"count",
 	}
+	countUsersQuery = "SELECT COUNT(*) OVER () FROM projections.users13"
+	countUsersCols  = []string{"count"}
 )
 
 func Test_UserPrepares(t *testing.T) {
@@ -1508,10 +1511,67 @@ func Test_UserPrepares(t *testing.T) {
 			},
 			object: (*Users)(nil),
 		},
+		{
+			name:    "prepareCountUsersQuery no result",
+			prepare: prepareCountUsersQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(countUsersQuery),
+					nil,
+					nil,
+				),
+			},
+			object: uint64(0),
+		},
+		{
+			name:    "prepareCountUsersQuery one result",
+			prepare: prepareCountUsersQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(countUsersQuery),
+					countUsersCols,
+					[][]driver.Value{{uint64(1)}},
+				),
+			},
+			object: uint64(1),
+		},
+		{
+			name:    "prepareCountUsersQuery multiple results",
+			prepare: prepareCountUsersQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(countUsersQuery),
+					countUsersCols,
+					[][]driver.Value{{uint64(2)}},
+				),
+			},
+			object: uint64(2),
+		},
+		{
+			name:    "prepareCountUsersQuery sql err",
+			prepare: prepareCountUsersQuery,
+			want: want{
+				sqlExpectations: mockQueryErr(
+					regexp.QuoteMeta(countUsersQuery),
+					sql.ErrConnDone,
+				),
+				err: func(err error) (error, bool) {
+					if !errors.Is(err, sql.ErrConnDone) {
+						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
+			params := defaultPrepareArgs
+			if reflect.TypeOf(tt.prepare).NumIn() == 0 {
+				params = []reflect.Value{}
+			}
+
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, params...)
 		})
 	}
 }
