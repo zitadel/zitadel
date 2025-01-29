@@ -34,8 +34,12 @@ export async function createServiceForHost<T extends ServiceClass>(
     token = process.env.ZITADEL_SERVICE_USER_TOKEN;
   }
 
-  if (!serviceUrl || !token) {
-    throw new Error("No instance url or token found");
+  if (!serviceUrl) {
+    throw new Error("No instance url found");
+  }
+
+  if (!token) {
+    throw new Error("No token found");
   }
 
   const transport = createServerTransport(token, {
@@ -48,9 +52,10 @@ export async function createServiceForHost<T extends ServiceClass>(
 export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): string {
   let instanceUrl: string = process.env.ZITADEL_API_URL;
 
+  const forwardedHost = headers.get("x-zitadel-forward-host");
   // use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
-  if (headers.get("x-zitadel-forward-host")) {
-    instanceUrl = headers.get("x-zitadel-forward-host") as string;
+  if (forwardedHost) {
+    instanceUrl = forwardedHost;
     instanceUrl = instanceUrl.startsWith("https://")
       ? instanceUrl
       : `https://${instanceUrl}`;

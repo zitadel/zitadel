@@ -80,7 +80,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
       });
     }
 
-    const userResponse = await getUserByID(userId);
+    const userResponse = await getUserByID({ serviceUrl, userId });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {
