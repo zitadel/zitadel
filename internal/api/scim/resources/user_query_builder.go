@@ -29,8 +29,9 @@ var fieldPathColumnMapping = filter.FieldPathMapping{
 		FieldType: filter.FieldTypeString,
 	},
 	"username": {
-		Column:    query.UserUsernameCol,
-		FieldType: filter.FieldTypeString,
+		Column:          query.UserUsernameCol,
+		FieldType:       filter.FieldTypeString,
+		CaseInsensitive: true,
 	},
 	"name.familyname": {
 		Column:    query.HumanLastNameCol,
