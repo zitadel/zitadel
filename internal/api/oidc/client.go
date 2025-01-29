@@ -42,6 +42,9 @@ const (
 	ClaimActionLogFormat            = "urn:zitadel:iam:action:%s:log"
 
 	oidcCtx = "oidc"
+
+	ScopeIAMGroups = "urn:zitadel:iam:org:groups"
+	ClaimGroups    = ScopeIAMGroups
 )
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
@@ -357,6 +360,8 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 			}
 		case ScopeProjectsRoles:
 			allRoles = true
+		case ScopeIAMGroups:
+			setGroupInfo(user, userInfo)
 		default:
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
@@ -618,6 +623,12 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 			for claim, value := range resourceOwnerClaims {
 				claims = appendClaim(claims, claim, value)
 			}
+		case ScopeIAMGroups:
+			userGroups, err := o.assertUserGroup(ctx, userID)
+			if err != nil {
+				return nil, err
+			}
+			claims = appendClaim(claims, ClaimGroups, userGroups)
 		case ScopeProjectsRoles:
 			allRoles = true
 		}
@@ -1066,4 +1077,12 @@ func (s *Server) checkOrgScopes(ctx context.Context, resourceOwner string, scope
 		}
 		return false
 	}), nil
+}
+
+func (o *OPStorage) assertUserGroup(ctx context.Context, userID string) ([]string, error) {
+	user, err := o.query.GetUserByID(ctx, true, userID)
+	if err != nil {
+		return nil, err
+	}
+	return user.GroupIDs, nil
 }
