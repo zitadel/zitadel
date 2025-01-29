@@ -25,11 +25,7 @@ func ScimContextMiddleware(q *query.Queries) func(next zhttp.HandlerFuncWithErro
 }
 
 func initScimContext(ctx context.Context, q *query.Queries) (context.Context, error) {
-	data := smetadata.ScimContextData{
-		ProvisioningDomain:          "",
-		ExternalIDScopedMetadataKey: smetadata.ScopedKey(smetadata.KeyExternalId),
-	}
-
+	data := smetadata.NewScimContextData()
 	ctx = smetadata.SetScimContextData(ctx, data)
 
 	userID := authz.GetCtxData(ctx).UserID

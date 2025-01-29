@@ -583,6 +583,9 @@ SCIM:
   # default values whether an email/phone is considered verified when a users email/phone is created or updated
   EmailVerified: true # ZITADEL_SCIM_EMAILVERIFIED
   PhoneVerified: true # ZITADEL_SCIM_PHONEVERIFIED
+  MaxRequestBodySize: 1_000_000 # ZITADEL_SCIM_MAXREQUESTBODYSIZE
+  Bulk:
+    MaxOperationsCount: 100 # ZITADEL_SCIM_BULK_MAXOPERATIONSCOUNT
 
 Login:
   LanguageCookieName: zitadel.login.lang # ZITADEL_LOGIN_LANGUAGECOOKIENAME

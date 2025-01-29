@@ -5,7 +5,7 @@ import (
 	"embed"
 	_ "embed"
 	"net/http"
-	"path/filepath"
+	"path"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -279,7 +279,7 @@ func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Even
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
 func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
-	stmt, err := fs.ReadFile(filepath.Join(folder, typ, filename))
+	stmt, err := fs.ReadFile(path.Join(folder, typ, filename))
 	return string(stmt), err
 }
 
@@ -293,7 +293,7 @@ type statement struct {
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
 func readStatements(fs embed.FS, folder, typ string) ([]statement, error) {
-	basePath := filepath.Join(folder, typ)
+	basePath := path.Join(folder, typ)
 	dir, err := fs.ReadDir(basePath)
 	if err != nil {
 		return nil, err

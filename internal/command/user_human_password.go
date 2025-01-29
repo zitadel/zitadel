@@ -3,11 +3,13 @@ package command
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/passwap"
 
+	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -364,7 +366,10 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	if wm.UserState == domain.UserStateLocked {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-JLK35", "Errors.User.Locked")
+		wrongPasswordError := &commandErrors.WrongPasswordError{
+			FailedAttempts: int32(wm.PasswordCheckFailedCount),
+		}
+		return nil, zerrors.ThrowPreconditionFailed(wrongPasswordError, "COMMAND-JLK35", "Errors.User.Locked")
 	}
 	if wm.EncodedHash == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3nJ4t", "Errors.User.Password.NotSet")
@@ -374,7 +379,7 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
 	updated, err := hasher.Verify(wm.EncodedHash, password)
 	spanPasswordComparison.EndWithError(err)
-	err = convertPasswapErr(err)
+	err = convertLoginPasswapErr(wm.PasswordCheckFailedCount+1, err)
 	commands := make([]eventstore.Command, 0, 2)
 
 	// recheck for additional events (failed password checks or locks)
@@ -383,7 +388,10 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 		return nil, recheckErr
 	}
 	if wm.UserState == domain.UserStateLocked {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFA3t", "Errors.User.Locked")
+		wrongPasswordError := &commandErrors.WrongPasswordError{
+			FailedAttempts: int32(wm.PasswordCheckFailedCount),
+		}
+		return nil, zerrors.ThrowPreconditionFailed(wrongPasswordError, "COMMAND-SFA3t", "Errors.User.Locked")
 	}
 
 	if err == nil {
@@ -414,6 +422,20 @@ func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	return writeModel, nil
+}
+
+func convertLoginPasswapErr(passwordCheckFailedCount uint64, err error) error {
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, passwap.ErrPasswordMismatch) {
+		wrongPasswordError := &commandErrors.WrongPasswordError{
+			FailedAttempts: int32(passwordCheckFailedCount),
+		}
+		err = fmt.Errorf("%w: %w", err, wrongPasswordError)
+		return ErrPasswordInvalid(err)
+	}
+	return zerrors.ThrowInternal(err, "COMMAND-CahN2", "Errors.Internal")
 }
 
 func convertPasswapErr(err error) error {

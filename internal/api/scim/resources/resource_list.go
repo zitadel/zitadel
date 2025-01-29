@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"encoding/json"
 	"net/http"
 
 	zhttp "github.com/zitadel/zitadel/internal/api/http"
@@ -13,6 +12,8 @@ import (
 )
 
 type ListRequest struct {
+	Schemas []schemas.ScimSchemaType `json:"schemas"`
+
 	// Count An integer indicating the desired maximum number of query results per page.
 	Count int64 `json:"count" schema:"count"`
 
@@ -47,6 +48,10 @@ const (
 
 var parser = zhttp.NewParser()
 
+func (r *ListRequest) GetSchemas() []schemas.ScimSchemaType {
+	return r.Schemas
+}
+
 func (o ListRequestSortOrder) isDefined() bool {
 	switch o {
 	case ListRequestSortOrderAsc, ListRequestSortOrderDsc:
@@ -70,7 +75,7 @@ func newListResponse[T ResourceHolder](totalResultCount uint64, q query.SearchRe
 	}
 }
 
-func readListRequest(r *http.Request) (*ListRequest, error) {
+func (adapter *ResourceHandlerAdapter[T]) readListRequest(r *http.Request) (*ListRequest, error) {
 	request := &ListRequest{
 		Count:      defaultListCount,
 		StartIndex: 1,
@@ -89,12 +94,8 @@ func readListRequest(r *http.Request) (*ListRequest, error) {
 			return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-ullform", "Could not decode form: "+err.Error())
 		}
 	case http.MethodPost:
-		if err := json.NewDecoder(r.Body).Decode(request); err != nil {
-			if serrors.IsScimOrZitadelError(err) {
-				return nil, err
-			}
-
-			return nil, zerrors.ThrowInvalidArgument(nil, "SCIM-ulljson", "Could not decode json: "+err.Error())
+		if err := readSchema(r.Body, request, schemas.IdSearchRequest); err != nil {
+			return nil, err
 		}
 
 		// json deserialization initializes this field if an empty string is provided
