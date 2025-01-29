@@ -21,7 +21,18 @@ export async function createServiceForHost<T extends ServiceClass>(
   service: T,
   serviceUrl: string,
 ) {
-  const token = await systemAPIToken();
+  let token;
+
+  // if we are running in a multitenancy context, use the system user token
+  if (
+    process.env.AUDIENCE &&
+    process.env.SYSTEM_USER_ID &&
+    process.env.SYSTEM_USER_PRIVATE_KEY
+  ) {
+    token = await systemAPIToken();
+  } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
+    token = process.env.ZITADEL_SERVICE_USER_TOKEN;
+  }
 
   if (!serviceUrl || !token) {
     throw new Error("No instance url or token found");
