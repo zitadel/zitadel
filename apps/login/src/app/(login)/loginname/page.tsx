@@ -1,7 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UsernameForm } from "@/components/username-form";
-import { getApiUrlOfHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
@@ -26,7 +26,7 @@ export default async function Page(props: {
   const submit: boolean = searchParams?.submit === "true";
 
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   let defaultOrganization;
   if (!organization) {

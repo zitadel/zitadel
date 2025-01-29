@@ -13,7 +13,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 import { getLoginSettings } from "../zitadel";
 
 export type SetOTPCommand = {
@@ -27,7 +27,7 @@ export type SetOTPCommand = {
 
 export async function setOTP(command: SetOTPCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const recentSession = command.sessionId
     ? await getSessionCookieById({ sessionId: command.sessionId }).catch(

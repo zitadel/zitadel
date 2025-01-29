@@ -2,7 +2,7 @@ import { Alert } from "@/components/alert";
 import { ChangePasswordForm } from "@/components/change-password-form";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
-import { getApiUrlOfHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -16,7 +16,7 @@ export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const searchParams = await props.searchParams;
   const locale = getLocale();

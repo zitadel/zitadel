@@ -3,7 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginPasskey } from "@/components/login-passkey";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
-import { getApiUrlOfHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -20,7 +20,7 @@ export default async function Page(props: {
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {

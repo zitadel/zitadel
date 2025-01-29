@@ -19,7 +19,7 @@ import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
@@ -30,7 +30,7 @@ export async function verifyTOTP(
   organization?: string,
 ) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   return loadMostRecentSession({
     serviceUrl,
@@ -62,7 +62,7 @@ type VerifyUserByEmailCommand = {
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({
@@ -244,7 +244,7 @@ type resendVerifyEmailCommand = {
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -290,7 +290,7 @@ export async function sendVerificationRedirectWithoutCheck(
   command: SendVerificationRedirectWithoutCheckCommand,
 ) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   if (!("loginName" in command || "userId" in command)) {
     return { error: "No userId, nor loginname provided" };

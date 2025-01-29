@@ -3,7 +3,7 @@
 import { addHumanUser, createInviteCode } from "@/lib/zitadel";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 
 type InviteUserCommand = {
   email: string;
@@ -22,7 +22,7 @@ export type RegisterUserResponse = {
 
 export async function inviteUser(command: InviteUserCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {

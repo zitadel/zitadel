@@ -10,7 +10,7 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 
 type RegisterUserCommand = {
@@ -29,7 +29,7 @@ export type RegisterUserResponse = {
 };
 export async function registerUser(command: RegisterUserCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {

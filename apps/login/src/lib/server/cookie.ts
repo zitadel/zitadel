@@ -15,7 +15,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { headers } from "next/headers";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 
 type CustomCookieData = {
   id: string;
@@ -35,7 +35,7 @@ export async function createSessionAndUpdateCookie(
   lifetime?: Duration,
 ): Promise<Session> {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const createdSession = await createSessionFromChecks({
     serviceUrl,
@@ -97,7 +97,7 @@ export async function createSessionForIdpAndUpdateCookie(
   lifetime?: Duration,
 ): Promise<Session> {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const createdSession = await createSessionForUserIdAndIdpIntent({
     serviceUrl,
@@ -159,7 +159,7 @@ export async function setSessionAndUpdateCookie(
   lifetime?: Duration,
 ) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   return setSession({
     serviceUrl,

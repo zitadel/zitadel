@@ -1,6 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterForm } from "@/components/register-form";
-import { getApiUrlOfHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -23,7 +23,7 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   if (!organization) {
     const org: Organization | null = await getDefaultOrg({ serviceUrl });

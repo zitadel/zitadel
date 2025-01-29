@@ -1,7 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { InviteForm } from "@/components/invite-form";
-import { getApiUrlOfHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -21,7 +21,7 @@ export default async function Page(props: {
   let { firstname, lastname, email, organization } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   if (!organization) {
     const org = await getDefaultOrg({ serviceUrl });

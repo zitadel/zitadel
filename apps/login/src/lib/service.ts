@@ -34,9 +34,10 @@ export async function createServiceForHost<T extends ServiceClass>(
   return createClientFor<T>(service)(transport);
 }
 
-export function getApiUrlOfHeaders(headers: ReadonlyHeaders): string {
+export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): string {
   let instanceUrl: string = process.env.ZITADEL_API_URL;
 
+  // use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
   if (headers.get("x-zitadel-forward-host")) {
     instanceUrl = headers.get("x-zitadel-forward-host") as string;
     instanceUrl = instanceUrl.startsWith("https://")

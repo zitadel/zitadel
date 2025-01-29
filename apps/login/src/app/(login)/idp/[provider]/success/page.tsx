@@ -5,7 +5,7 @@ import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
 import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
-import { getApiUrlOfHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   addHuman,
   addIDPLink,
@@ -40,7 +40,7 @@ export default async function Page(props: {
   const { provider } = params;
 
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const branding = await getBrandingSettings({ serviceUrl, organization });
 

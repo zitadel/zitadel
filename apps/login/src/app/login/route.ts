@@ -1,7 +1,7 @@
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
-import { getApiUrlOfHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   createCallback,
   getActiveIdentityProviders,
@@ -199,7 +199,7 @@ export async function GET(request: NextRequest) {
   const sessionId = searchParams.get("sessionId");
 
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
   const _rsc = searchParams.get("_rsc");

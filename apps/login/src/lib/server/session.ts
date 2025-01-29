@@ -18,14 +18,14 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 
 export async function continueWithSession({
   authRequestId,
   ...session
 }: Session & { authRequestId?: string }) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
@@ -88,7 +88,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   }
 
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -152,7 +152,7 @@ type ClearSessionOptions = {
 
 export async function clearSession(options: ClearSessionOptions) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const { sessionId } = options;
 
@@ -175,7 +175,7 @@ type CleanupSessionCommand = {
 
 export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 

@@ -7,7 +7,7 @@ import {
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 
@@ -19,7 +19,7 @@ export type StartIDPFlowCommand = {
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -60,7 +60,7 @@ export async function createNewSessionFromIdpIntent(
   command: CreateNewSessionCommand,
 ) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {

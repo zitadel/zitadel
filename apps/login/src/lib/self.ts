@@ -4,7 +4,7 @@ import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
 import { headers } from "next/headers";
 import { getSessionCookieById } from "./cookies";
-import { getApiUrlOfHeaders } from "./service";
+import { getServiceUrlFromHeaders } from "./service";
 import { getSession } from "./zitadel";
 
 const transport = async (serviceUrl: string, token: string) => {
@@ -26,7 +26,7 @@ export async function setMyPassword({
   password: string;
 }) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 

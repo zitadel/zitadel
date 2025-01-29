@@ -8,7 +8,7 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 import { checkInvite } from "../verify-helper";
 import {
   getActiveIdentityProviders,
@@ -34,7 +34,7 @@ const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -80,7 +80,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const _headers = await headers();
-      const serviceUrl = getApiUrlOfHeaders(_headers);
+      const serviceUrl = getServiceUrlFromHeaders(_headers);
       const host = _headers.get("host");
 
       if (!host) {
@@ -129,7 +129,7 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
     if (identityProviders.length === 1) {
       const _headers = await headers();
-      const serviceUrl = getApiUrlOfHeaders(_headers);
+      const serviceUrl = getServiceUrlFromHeaders(_headers);
       const host = _headers.get("host");
 
       if (!host) {

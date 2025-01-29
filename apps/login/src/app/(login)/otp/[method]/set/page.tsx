@@ -4,7 +4,7 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
 import { UserAvatar } from "@/components/user-avatar";
-import { getApiUrlOfHeaders } from "@/lib/service";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,
@@ -34,7 +34,7 @@ export default async function Page(props: {
   const { method } = params;
 
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const branding = await getBrandingSettings({ serviceUrl, organization });
   const loginSettings = await getLoginSettings({ serviceUrl, organization });

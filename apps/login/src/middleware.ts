@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { getApiUrlOfHeaders } from "./lib/service";
+import { getServiceUrlFromHeaders } from "./lib/service";
 
 export const config = {
   matcher: [
@@ -13,16 +13,17 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
   // escape proxy if the environment is setup for multitenancy
-  // if (
-  //   !process.env.ZITADEL_API_URL ||
-  //   !process.env.ZITADEL_USER_ID ||
-  //   !process.env.ZITADEL_USER_TOKEN
-  // ) {
-  //   return NextResponse.next();
-  // }
+  if (
+    !process.env.ZITADEL_API_URL ||
+    !process.env.ZITADEL_USER_ID ||
+    !process.env.ZITADEL_USER_TOKEN
+  ) {
+    return NextResponse.next();
+  }
+
   const _headers = await headers();
 
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
 
   const instanceHost = `${serviceUrl}`.replace("https://", "");
 

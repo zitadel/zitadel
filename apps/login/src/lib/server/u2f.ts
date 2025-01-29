@@ -6,7 +6,7 @@ import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getSessionCookieById } from "../cookies";
-import { getApiUrlOfHeaders } from "../service";
+import { getServiceUrlFromHeaders } from "../service";
 
 type RegisterU2FCommand = {
   sessionId: string;
@@ -21,7 +21,7 @@ type VerifyU2FCommand = {
 
 export async function addU2F(command: RegisterU2FCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
@@ -59,7 +59,7 @@ export async function addU2F(command: RegisterU2FCommand) {
 
 export async function verifyU2F(command: VerifyU2FCommand) {
   const _headers = await headers();
-  const serviceUrl = getApiUrlOfHeaders(_headers);
+  const serviceUrl = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
