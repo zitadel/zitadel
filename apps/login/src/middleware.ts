@@ -15,8 +15,8 @@ export async function middleware(request: NextRequest) {
   // escape proxy if the environment is setup for multitenancy
   if (
     !process.env.ZITADEL_API_URL ||
-    !process.env.ZITADEL_USER_ID ||
-    !process.env.ZITADEL_USER_TOKEN
+    !process.env.ZITADEL_SERVICE_USER_ID ||
+    !process.env.ZITADEL_SERVICE_USER_TOKEN
   ) {
     return NextResponse.next();
   }
