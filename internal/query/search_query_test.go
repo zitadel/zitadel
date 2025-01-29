@@ -906,6 +906,19 @@ func TestNewTextQuery(t *testing.T) {
 			},
 		},
 		{
+			name: "not equal ignore case",
+			args: args{
+				column:  testCol,
+				value:   "h_urst%",
+				compare: TextNotEqualsIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "h\\_urst\\%",
+				Compare: TextNotEqualsIgnoreCase,
+			},
+		},
+		{
 			name: "starts with",
 			args: args{
 				column:  testCol,
@@ -1192,6 +1205,28 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.ILike{"test_table.test_col": "Hurst"},
+			},
+		},
+		{
+			name: "not equals",
+			fields: fields{
+				Column:  testCol,
+				Text:    "Hurst",
+				Compare: TextNotEquals,
+			},
+			want: want{
+				query: sq.NotEq{"test_table.test_col": "Hurst"},
+			},
+		},
+		{
+			name: "not equals ignore case",
+			fields: fields{
+				Column:  testCol,
+				Text:    "Hurst",
+				Compare: TextNotEqualsIgnoreCase,
+			},
+			want: want{
+				query: sq.NotILike{"test_table.test_col": "Hurst"},
 			},
 		},
 		{
