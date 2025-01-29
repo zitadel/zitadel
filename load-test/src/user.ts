@@ -19,7 +19,7 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest(
       'POST',
-      url('/v2beta/users/human'),
+      url('/v2/users/human'),
       JSON.stringify({
         username: username,
         organization: {
@@ -67,6 +67,23 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
         reject(reason);
       });
   });
+}
+
+const setEmailOTPOnHumanTrend = new Trend('set_human_email_otp_duration', true);
+export async function setEmailOTPOnHuman(user: User, org: Org, accessToken: string): Promise<void> {
+  const response = await http.asyncRequest('POST', url(`/v2/users/${user.userId}/otp_email`), null, {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'x-zitadel-orgid': org.organizationId,
+    },
+  });
+  check(response, {
+    'set email otp status ok': (r) => r.status === 200,
+  });
+  setEmailOTPOnHumanTrend.add(response.timings.duration);
+
+  return;
 }
 
 const updateHumanTrend = new Trend('update_human_duration', true);
@@ -172,8 +189,8 @@ export function addMachinePat(userId: string, org: Org, accessToken: string): Pr
 }
 
 export type MachineSecret = {
-    clientId: string;
-    clientSecret: string;
+  clientId: string;
+  clientSecret: string;
 };
 
 const addMachineSecretTrend = new Trend('user_add_machine_secret_duration', true);
@@ -204,20 +221,23 @@ export type MachineKey = {
 const addMachineKeyTrend = new Trend('user_add_machine_key_duration', true);
 export function addMachineKey(userId: string, org: Org, accessToken: string, publicKey?: string): Promise<MachineKey> {
   return new Promise((resolve, reject) => {
-    let response = http.asyncRequest('POST', url(`/management/v1/users/${userId}/keys`), 
-    JSON.stringify({
-      type: 'KEY_TYPE_JSON',
-      userId: userId,
-      // base64 encoded public key
-      publicKey: publicKey
-    }), 
-    {
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-        'x-zitadel-orgid': org.organizationId,
+    let response = http.asyncRequest(
+      'POST',
+      url(`/management/v1/users/${userId}/keys`),
+      JSON.stringify({
+        type: 'KEY_TYPE_JSON',
+        userId: userId,
+        // base64 encoded public key
+        publicKey: publicKey,
+      }),
+      {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'x-zitadel-orgid': org.organizationId,
+        },
       },
-    });
+    );
     response.then((res) => {
       check(res, {
         'generate machine key status ok': (r) => r.status === 200,
