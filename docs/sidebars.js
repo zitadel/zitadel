@@ -326,6 +326,7 @@ module.exports = {
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard",
+            "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/typescript-repo",
           ],
         },

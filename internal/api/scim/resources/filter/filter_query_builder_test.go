@@ -20,10 +20,11 @@ var fieldPathColumnMapping = FieldPathMapping{
 		Column:    query.UserChangeDateCol,
 		FieldType: FieldTypeTimestamp,
 	},
-	// a string field
+	// a case-insensitive string field
 	"username": {
-		Column:    query.UserUsernameCol,
-		FieldType: FieldTypeString,
+		Column:          query.UserUsernameCol,
+		FieldType:       FieldTypeString,
+		CaseInsensitive: true,
 	},
 	// a nested string field
 	"name.familyname": {
@@ -76,7 +77,7 @@ func TestFilter_BuildQuery(t *testing.T) {
 		{
 			name:   "simple binary operator",
 			filter: `userName eq "bjensen"`,
-			want:   test.Must(query.NewTextQuery(query.UserUsernameCol, "bjensen", query.TextEquals)),
+			want:   test.Must(query.NewTextQuery(query.UserUsernameCol, "bjensen", query.TextEqualsIgnoreCase)),
 		},
 		{
 			name:   "binary operator equals null",
@@ -176,7 +177,7 @@ func TestFilter_BuildQuery(t *testing.T) {
 		{
 			name:   "urn prefixed binary operator",
 			filter: `urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"`,
-			want:   test.Must(query.NewTextQuery(query.UserUsernameCol, "J", query.TextStartsWith)),
+			want:   test.Must(query.NewTextQuery(query.UserUsernameCol, "J", query.TextStartsWithIgnoreCase)),
 		},
 		{
 			name:   "urn prefixed nested binary operator",
@@ -196,7 +197,7 @@ func TestFilter_BuildQuery(t *testing.T) {
 		{
 			name:   "and logical expression",
 			filter: `name.familyName pr and userName eq "bjensen"`,
-			want:   test.Must(query.NewAndQuery(test.Must(query.NewNotNullQuery(query.HumanLastNameCol)), test.Must(query.NewTextQuery(query.UserUsernameCol, "bjensen", query.TextEquals)))),
+			want:   test.Must(query.NewAndQuery(test.Must(query.NewNotNullQuery(query.HumanLastNameCol)), test.Must(query.NewTextQuery(query.UserUsernameCol, "bjensen", query.TextEqualsIgnoreCase)))),
 		},
 		{
 			name:   "timestamp condition equal",
@@ -243,7 +244,7 @@ func TestFilter_BuildQuery(t *testing.T) {
 			filter: `userName eq "rudolpho" and emails co "example.com" or emails.value co "example2.org"`,
 			want: test.Must(query.NewOrQuery(
 				test.Must(query.NewAndQuery(
-					test.Must(query.NewTextQuery(query.UserUsernameCol, "rudolpho", query.TextEquals)),
+					test.Must(query.NewTextQuery(query.UserUsernameCol, "rudolpho", query.TextEqualsIgnoreCase)),
 					test.Must(query.NewTextQuery(query.HumanEmailCol, "example.com", query.TextContains))),
 				),
 				test.Must(query.NewTextQuery(query.HumanEmailCol, "example2.org", query.TextContains)))),
@@ -252,7 +253,7 @@ func TestFilter_BuildQuery(t *testing.T) {
 			name:   "nested and / or with grouping",
 			filter: `userName ne "rudolpho" and (emails co "example.com" or emails.value co "example.org")`,
 			want: test.Must(query.NewAndQuery(
-				test.Must(query.NewTextQuery(query.UserUsernameCol, "rudolpho", query.TextNotEquals)),
+				test.Must(query.NewTextQuery(query.UserUsernameCol, "rudolpho", query.TextNotEqualsIgnoreCase)),
 				test.Must(query.NewOrQuery(
 					test.Must(query.NewTextQuery(query.HumanEmailCol, "example.com", query.TextContains)),
 					test.Must(query.NewTextQuery(query.HumanEmailCol, "example.org", query.TextContains)),
@@ -263,7 +264,7 @@ func TestFilter_BuildQuery(t *testing.T) {
 			name:   "nested value path path",
 			filter: `userName eq "Hans" and emails[value ew "@example.org" or value ew "@example.com"]`,
 			want: test.Must(query.NewAndQuery(
-				test.Must(query.NewTextQuery(query.UserUsernameCol, "Hans", query.TextEquals)),
+				test.Must(query.NewTextQuery(query.UserUsernameCol, "Hans", query.TextEqualsIgnoreCase)),
 				test.Must(query.NewOrQuery(
 					test.Must(query.NewTextQuery(query.HumanEmailCol, "@example.org", query.TextEndsWith)),
 					test.Must(query.NewTextQuery(query.HumanEmailCol, "@example.com", query.TextEndsWith)),
@@ -288,13 +289,13 @@ func TestFilter_BuildQuery(t *testing.T) {
 			want: test.Must(query.NewAndQuery(
 				test.Must(query.NewTextQuery(query.HumanEmailCol, "@example.com", query.TextEndsWith)),
 				test.Must(query.NewTextQuery(query.HumanLastNameCol, "hans", query.TextContains)),
-				test.Must(query.NewTextQuery(query.UserUsernameCol, "peter", query.TextContains)),
+				test.Must(query.NewTextQuery(query.UserUsernameCol, "peter", query.TextContainsIgnoreCase)),
 			)),
 		},
 		{
 			name:   "negation",
 			filter: `not(username eq "foo")`,
-			want:   test.Must(query.NewNotQuery(test.Must(query.NewTextQuery(query.UserUsernameCol, "foo", query.TextEquals)))),
+			want:   test.Must(query.NewNotQuery(test.Must(query.NewTextQuery(query.UserUsernameCol, "foo", query.TextEqualsIgnoreCase)))),
 		},
 		{
 			name:   "negation with complex filter",
