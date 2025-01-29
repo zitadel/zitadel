@@ -1892,15 +1892,6 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users14 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								"agg-id",
-								"instance-id",
-							},
-						},
-						{
 							expectedStmt: "UPDATE projections.users14_humans SET mfa_init_skipped = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								sql.NullTime{},
@@ -1929,15 +1920,6 @@ func TestUserProjection_reduces(t *testing.T) {
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.users14 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								"agg-id",
-								"instance-id",
-							},
-						},
 						{
 							expectedStmt: "UPDATE projections.users14_humans SET mfa_init_skipped = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{

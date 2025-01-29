@@ -1159,28 +1159,16 @@ func (p *userProjection) reduceUnsetMFAInitSkipped(e eventstore.Event) (*handler
 		*user.HumanPasswordlessVerifiedEvent:
 	}
 
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		e,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(UserChangeDateCol, e.CreatedAt()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
-			},
-			[]handler.Condition{
-				handler.NewCond(UserIDCol, e.Aggregate().ID),
-				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(HumanMFAInitSkipped, sql.NullTime{}),
-			},
-			[]handler.Condition{
-				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-			handler.WithTableSuffix(UserHumanSuffix),
-		),
+		[]handler.Column{
+			handler.NewCol(HumanMFAInitSkipped, sql.NullTime{}),
+		},
+		[]handler.Condition{
+			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+		},
+		handler.WithTableSuffix(UserHumanSuffix),
 	), nil
 }
 
@@ -1189,31 +1177,19 @@ func (p *userProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
 	}
-	return handler.NewMultiStatement(
+	return handler.NewUpdateStatement(
 		e,
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(UserChangeDateCol, e.CreatedAt()),
-				handler.NewCol(UserSequenceCol, e.Sequence()),
-			},
-			[]handler.Condition{
-				handler.NewCond(UserIDCol, e.Aggregate().ID),
-				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(HumanMFAInitSkipped, sql.NullTime{
-					Time:  e.CreatedAt(),
-					Valid: true,
-				}),
-			},
-			[]handler.Condition{
-				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
-				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
-			},
-			handler.WithTableSuffix(UserHumanSuffix),
-		),
+		[]handler.Column{
+			handler.NewCol(HumanMFAInitSkipped, sql.NullTime{
+				Time:  e.CreatedAt(),
+				Valid: true,
+			}),
+		},
+		[]handler.Condition{
+			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+		},
+		handler.WithTableSuffix(UserHumanSuffix),
 	), nil
 }
 
