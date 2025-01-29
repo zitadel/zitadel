@@ -711,3 +711,13 @@ func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*comma
 		return &command.CreateUserInvite{UserID: req.GetUserId()}, nil
 	}
 }
+
+func (s *Server) HumanMFAInitSkipped(ctx context.Context, req *user.HumanMFAInitSkippedRequest) (_ *user.HumanMFAInitSkippedResponse, err error) {
+	details, err := s.command.HumanMFAInitSkippedV2(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.HumanMFAInitSkippedResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}

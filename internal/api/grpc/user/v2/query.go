@@ -82,9 +82,12 @@ func userTypeToPb(userQ *query.User, assetPrefix string) user.UserType {
 }
 
 func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
-	var passwordChanged *timestamppb.Timestamp
+	var passwordChanged, mfaInitSkipped *timestamppb.Timestamp
 	if !userQ.PasswordChanged.IsZero() {
 		passwordChanged = timestamppb.New(userQ.PasswordChanged)
+	}
+	if !userQ.MFAInitSkipped.IsZero() {
+		mfaInitSkipped = timestamppb.New(userQ.MFAInitSkipped)
 	}
 	return &user.HumanUser{
 		Profile: &user.HumanProfile{
@@ -106,6 +109,7 @@ func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 		},
 		PasswordChangeRequired: userQ.PasswordChangeRequired,
 		PasswordChanged:        passwordChanged,
+		MfaInitSkipped:         mfaInitSkipped,
 	}
 }
 
