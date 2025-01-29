@@ -190,6 +190,7 @@ func TestListUser(t *testing.T) {
 		{
 			name: "list paged sorted users with filter as post",
 			req: &scim.ListRequest{
+				Schemas:    []schemas.ScimSchemaType{schemas.IdSearchRequest},
 				Count:      gu.Ptr(5),
 				StartIndex: gu.Ptr(1),
 				SortOrder:  gu.Ptr(scim.ListRequestSortOrderAsc),
