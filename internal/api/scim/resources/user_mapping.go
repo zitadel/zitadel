@@ -154,6 +154,15 @@ func (h *UsersHandler) mapPrimaryEmail(scimUser *ScimUser) (command.Email, error
 		}, nil
 	}
 
+	// if no primary email was found, the first email will be used
+	for _, email := range scimUser.Emails {
+		email.Primary = true
+		return command.Email{
+			Address:  domain.EmailAddress(email.Value),
+			Verified: h.config.EmailVerified,
+		}, nil
+	}
+
 	return command.Email{}, zerrors.ThrowInvalidArgument(nil, "SCIM-EM19", "Errors.User.Email.Empty")
 }
 
@@ -163,6 +172,15 @@ func (h *UsersHandler) mapPrimaryPhone(scimUser *ScimUser) *command.Phone {
 			continue
 		}
 
+		return &command.Phone{
+			Number:   domain.PhoneNumber(phone.Value),
+			Verified: h.config.PhoneVerified,
+		}
+	}
+
+	// if no primary phone was found, the first phone will be used
+	for _, phone := range scimUser.PhoneNumbers {
+		phone.Primary = true
 		return &command.Phone{
 			Number:   domain.PhoneNumber(phone.Value),
 			Verified: h.config.PhoneVerified,
