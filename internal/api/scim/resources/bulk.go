@@ -60,7 +60,7 @@ func NewBulkHandler(
 ) *BulkHandler {
 	handlersByPluralResourceName := make(map[schemas.ScimResourceTypePlural]RawResourceHandlerAdapter, len(handlers))
 	for _, handler := range handlers {
-		handlersByPluralResourceName[handler.ResourceNamePlural()] = handler
+		handlersByPluralResourceName[handler.Schema().PluralName] = handler
 	}
 
 	return &BulkHandler{
@@ -135,7 +135,7 @@ func (h *BulkHandler) processOperation(ctx context.Context, op *BulkRequestOpera
 		}
 
 		if resourceNamePlural != "" && resourceID != "" {
-			opResp.Location = buildLocation(ctx, resourceNamePlural, resourceID)
+			opResp.Location = schemas.BuildLocationForResource(ctx, resourceNamePlural, resourceID)
 		}
 
 		opResp.Status = strconv.Itoa(statusCode)

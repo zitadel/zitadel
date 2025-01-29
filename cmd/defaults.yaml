@@ -580,6 +580,13 @@ SAML:
     #  EmailAddress: hi@zitadel.com # ZITADEL_SAML_PROVIDERCONFIG_CONTACTPERSON_EMAILADDRESS
 
 SCIM:
+  DocumentationUrl: https://zitadel.com/docs/guides/manage/user/scim2
+  AuthenticationSchemes:
+    - Name: Zitadel authentication token
+      Description: Authentication scheme using the OAuth Bearer Token Standard
+      SpecUri: https://www.rfc-editor.org/info/rfc6750
+      DocumentationUri: https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users
+      Type: oauthbearertoken
   # default values whether an email/phone is considered verified when a users email/phone is created or updated
   EmailVerified: true # ZITADEL_SCIM_EMAILVERIFIED
   PhoneVerified: true # ZITADEL_SCIM_PHONEVERIFIED

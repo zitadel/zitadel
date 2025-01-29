@@ -50,6 +50,13 @@ func buildHandler(
 	bulkHandler := sresources.NewBulkHandler(cfg.Bulk, usersHandler)
 	router.Handle("/"+zhttp.OrgIdInPathVariable+"/Bulk", middleware(handleJsonResponse(bulkHandler.BulkFromHttp))).Methods(http.MethodPost)
 
+	serviceProviderHandler := newServiceProviderHandler(cfg, usersHandler)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ServiceProviderConfig", middleware(handleJsonResponse(serviceProviderHandler.GetConfig))).Methods(http.MethodGet)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ResourceTypes", middleware(handleJsonResponse(serviceProviderHandler.ListResourceTypes))).Methods(http.MethodGet)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/ResourceTypes/{name}", middleware(handleResourceResponse(serviceProviderHandler.GetResourceType))).Methods(http.MethodGet)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/Schemas", middleware(handleJsonResponse(serviceProviderHandler.ListSchemas))).Methods(http.MethodGet)
+	router.Handle("/"+zhttp.OrgIdInPathVariable+"/Schemas/{id}", middleware(handleResourceResponse(serviceProviderHandler.GetSchema))).Methods(http.MethodGet)
+
 	return router
 }
 
@@ -64,7 +71,7 @@ func buildMiddleware(cfg *sconfig.Config, query *query.Queries, middlewares []zh
 }
 
 func mapResource[T sresources.ResourceHolder](router *mux.Router, mw zhttp_middlware.ErrorHandlerFunc, adapter *sresources.ResourceHandlerAdapter[T]) {
-	resourceRouter := router.PathPrefix("/" + path.Join(zhttp.OrgIdInPathVariable, string(adapter.ResourceNamePlural()))).Subrouter()
+	resourceRouter := router.PathPrefix("/" + path.Join(zhttp.OrgIdInPathVariable, string(adapter.Schema().PluralName))).Subrouter()
 
 	resourceRouter.Handle("", mw(handleResourceCreatedResponse(adapter.CreateFromHttp))).Methods(http.MethodPost)
 	resourceRouter.Handle("", mw(handleJsonResponse(adapter.ListFromHttp))).Methods(http.MethodGet)

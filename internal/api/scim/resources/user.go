@@ -23,30 +23,31 @@ type UsersHandler struct {
 	userCodeAlg     crypto.EncryptionAlgorithm
 	config          *scim_config.Config
 	filterEvaluator *filter.Evaluator
+	schema          *scim_schemas.ResourceSchema
 }
 
 type ScimUser struct {
-	*Resource
-	ID                string                        `json:"id"`
-	ExternalID        string                        `json:"externalId,omitempty"`
-	UserName          string                        `json:"userName,omitempty"`
-	Name              *ScimUserName                 `json:"name,omitempty"`
-	DisplayName       string                        `json:"displayName,omitempty"`
-	NickName          string                        `json:"nickName,omitempty"`
-	ProfileUrl        *scim_schemas.HttpURL         `json:"profileUrl,omitempty"`
-	Title             string                        `json:"title,omitempty"`
-	PreferredLanguage language.Tag                  `json:"preferredLanguage,omitempty"`
-	Locale            string                        `json:"locale,omitempty"`
-	Timezone          string                        `json:"timezone,omitempty"`
-	Active            *bool                         `json:"active,omitempty"`
-	Emails            []*ScimEmail                  `json:"emails,omitempty"`
-	PhoneNumbers      []*ScimPhoneNumber            `json:"phoneNumbers,omitempty"`
-	Password          *scim_schemas.WriteOnlyString `json:"password,omitempty"`
-	Ims               []*ScimIms                    `json:"ims,omitempty"`
-	Addresses         []*ScimAddress                `json:"addresses,omitempty"`
-	Photos            []*ScimPhoto                  `json:"photos,omitempty"`
-	Entitlements      []*ScimEntitlement            `json:"entitlements,omitempty"`
-	Roles             []*ScimRole                   `json:"roles,omitempty"`
+	*scim_schemas.Resource `scim:"ignoreInSchema"`
+	ID                     string                        `json:"id" scim:"ignoreInSchema"`
+	ExternalID             string                        `json:"externalId,omitempty"`
+	UserName               string                        `json:"userName,omitempty" scim:"required,unique,caseInsensitive"`
+	Name                   *ScimUserName                 `json:"name,omitempty" scim:"required"`
+	DisplayName            string                        `json:"displayName,omitempty"`
+	NickName               string                        `json:"nickName,omitempty"`
+	ProfileUrl             *scim_schemas.HttpURL         `json:"profileUrl,omitempty"`
+	Title                  string                        `json:"title,omitempty"`
+	PreferredLanguage      language.Tag                  `json:"preferredLanguage,omitempty"`
+	Locale                 string                        `json:"locale,omitempty"`
+	Timezone               string                        `json:"timezone,omitempty"`
+	Active                 *bool                         `json:"active,omitempty"`
+	Emails                 []*ScimEmail                  `json:"emails,omitempty" scim:"required"`
+	PhoneNumbers           []*ScimPhoneNumber            `json:"phoneNumbers,omitempty"`
+	Password               *scim_schemas.WriteOnlyString `json:"password,omitempty"`
+	Ims                    []*ScimIms                    `json:"ims,omitempty"`
+	Addresses              []*ScimAddress                `json:"addresses,omitempty"`
+	Photos                 []*ScimPhoto                  `json:"photos,omitempty"`
+	Entitlements           []*ScimEntitlement            `json:"entitlements,omitempty"`
+	Roles                  []*ScimRole                   `json:"roles,omitempty"`
 }
 
 type ScimEntitlement struct {
@@ -87,7 +88,7 @@ type ScimIms struct {
 }
 
 type ScimEmail struct {
-	Value   string `json:"value"`
+	Value   string `json:"value" scim:"required"`
 	Primary bool   `json:"primary"`
 }
 
@@ -98,8 +99,8 @@ type ScimPhoneNumber struct {
 
 type ScimUserName struct {
 	Formatted       string `json:"formatted,omitempty"`
-	FamilyName      string `json:"familyName,omitempty"`
-	GivenName       string `json:"givenName,omitempty"`
+	FamilyName      string `json:"familyName,omitempty" scim:"required"`
+	GivenName       string `json:"givenName,omitempty" scim:"required"`
 	MiddleName      string `json:"middleName,omitempty"`
 	HonorificPrefix string `json:"honorificPrefix,omitempty"`
 	HonorificSuffix string `json:"honorificSuffix,omitempty"`
@@ -110,20 +111,26 @@ func NewUsersHandler(
 	query *query.Queries,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	config *scim_config.Config) ResourceHandler[*ScimUser] {
-	return &UsersHandler{command, query, userCodeAlg, config, filter.NewEvaluator(scim_schemas.IdUser)}
+	return &UsersHandler{
+		command,
+		query,
+		userCodeAlg,
+		config,
+		filter.NewEvaluator(scim_schemas.IdUser),
+		scim_schemas.BuildSchema(scim_schemas.SchemaBuilderArgs{
+			ID:           scim_schemas.IdUser,
+			Name:         scim_schemas.UserResourceType,
+			EndpointName: scim_schemas.UsersResourceType,
+			Description:  "User Account",
+			Resource:     new(ScimUser),
+		}),
+	}
 }
 
-func (h *UsersHandler) ResourceNameSingular() scim_schemas.ScimResourceTypeSingular {
-	return scim_schemas.UserResourceType
-}
-
-func (h *UsersHandler) ResourceNamePlural() scim_schemas.ScimResourceTypePlural {
-	return scim_schemas.UsersResourceType
-}
-
-func (u *ScimUser) GetResource() *Resource {
+func (u *ScimUser) GetResource() *scim_schemas.Resource {
 	return u.Resource
 }
+
 func (u *ScimUser) GetSchemas() []scim_schemas.ScimSchemaType {
 	if u.Resource == nil {
 		return nil
@@ -132,12 +139,12 @@ func (u *ScimUser) GetSchemas() []scim_schemas.ScimSchemaType {
 	return u.Resource.Schemas
 }
 
-func (h *UsersHandler) NewResource() *ScimUser {
-	return new(ScimUser)
+func (h *UsersHandler) Schema() *scim_schemas.ResourceSchema {
+	return h.schema
 }
 
-func (h *UsersHandler) SchemaType() scim_schemas.ScimSchemaType {
-	return scim_schemas.IdUser
+func (h *UsersHandler) NewResource() *ScimUser {
+	return new(ScimUser)
 }
 
 func (h *UsersHandler) Create(ctx context.Context, user *ScimUser) (*ScimUser, error) {
@@ -226,7 +233,7 @@ func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListRes
 			return nil, err
 		}
 
-		return newListResponse(count, q.SearchRequest, make([]*ScimUser, 0)), nil
+		return NewListResponse(count, q.SearchRequest, make([]*ScimUser, 0)), nil
 	}
 
 	users, err := h.query.SearchUsers(ctx, q, nil)
@@ -240,7 +247,7 @@ func (h *UsersHandler) List(ctx context.Context, request *ListRequest) (*ListRes
 	}
 
 	scimUsers := h.mapToScimUsers(ctx, users.Users, metadata)
-	return newListResponse(users.SearchResponse.Count, q.SearchRequest, scimUsers), nil
+	return NewListResponse(users.SearchResponse.Count, q.SearchRequest, scimUsers), nil
 }
 
 func (h *UsersHandler) queryUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
