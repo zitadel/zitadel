@@ -79,7 +79,6 @@ export default async function Page(props: {
             authRequestId={authRequestId}
             altPassword={altPassword === "true"}
             organization={organization}
-            loginSettings={loginSettings}
           />
         )}
       </div>
