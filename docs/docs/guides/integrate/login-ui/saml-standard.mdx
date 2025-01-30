@@ -1,0 +1,168 @@
+---
+title: Support for the SAML Standard in a Custom Login UI
+sidebar_label: SAML Standard
+---
+
+To build your own login ui for your own application it is not necessary to have the SAML standard included or any additional work that has to be done.
+However, it might make sense, if you want to connect your login to different applications especially if they are not in your control and they rely on the standard.
+
+The following flow shows you the different components you need to enable SAML for your login.
+![SAML Flow](/img/guides/login-ui/saml-flow.png)
+
+1. Your application makes an SAML request to your login UI
+2. The login UI proxies the request to the ZITADEL API. In the request to the ZITADEL API, a header to identify your client is needed.
+3. The ZITADEL API parses the request and does what it needs to interpret certain parameters (e.g., binding, nameID policy, etc.)
+4. Redirect to a predefined, relative URL of the login UI that includes the samlrequest ID ("/login?authRequest=")
+5. Request to ZITADEL API to get all the information from the SAML request. This is optional and only needed if you like to get all the parsed information from the samlrequest-
+6. Authenticate the user in your login UI by creating and updating a session with all the checks you need.
+7. Finalize the SAML request by sending the session to the request, you will get the URL to redirect to or the body in the response
+8. Redirect to your application with the URL or call the application with HTTP Post with the content you got in the previous request
+9. All SAML-specific endpoints have to be accepted in the Login UI and should be proxied and sent to the ZITADEL API
+
+
+## Example
+
+Let's assume you host your login UI on the following URL:
+```
+https://login.example.com
+```
+
+## SAML Request
+
+A user opens your application and is unauthenticated, the user will then be redirected to your login with the following SAML Request:
+```
+https://login.example.com/saml/v2/SSO?SAMLRequest=nJLRa9swEMb%2FFXHvjmVTY0fUhqxhLNCtoc72sLerdFkEspTpzt3634%2BkGXQw8tBX6X76vk%2F33TJO4WhWsxziI%2F2ciUX9nkJkc7roYc7RJGTPJuJEbMSacfX53tQLbZCZsvgU4Q1yvM4cc5JkUwC1WffgXdHW1c2%2BclVtK6yc68hVnWvssqVm79p23za01E%2BuA%2FWNMvsUe6gXGtSGeaZNZMEoPdS6bgpdFbrd6aW50abuFk3Tfge1JhYfUc7kQeRoyjIki%2BGQWEynO12ebJfPdTmOD6BWf0PdpcjzRHmk%2FOwtfX28%2Fy%2BvLzxaBrW9pPvgo%2FPxx%2FWveHodYvNpt9sW24dxB8N5HeacLauPKU8o1x85nXhX7M%2BjhqJ4eYHhis%2BJBB0K3pZvpIZLDb7gRJv1NgVvX94hLxkje4oCahVC%2BnWXCYV6kDwTlMOr5L9lG%2F4EAAD%2F%2Fw%3D%3D&RelayState=CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I
+```
+
+The SAML request includes all the relevant information for the SAML standard, which includes the RelayState, the used binding and other information.
+
+You now have to proxy the SAML request from your own UI to the SSO Endpoint of ZITADEL.
+Make sure to add the user id of your login UI service/machine user as a header to the request: ```x-zitadel-login-client: <userid>```
+
+:::note
+The user id sent in the 'x-zitadel-login-client' has to match to the PAT you are sending in the request.
+:::
+
+Read more about the [SSO Endpoint Documentation](/docs/apis/saml/endpoints#sso_endpoint)
+
+The endpoint will redirect you to the domain of your UI on the path /login and add the SAML Request ID as parameter.
+```https://login.example.com/login?authRequest=V2_224908753244265546```
+
+### Get SAML Request by ID
+
+With the ID from the redirect before you will now be able to get the information of the SAML request.
+[Get SAML Request By ID Documentation](/docs/apis/resources/saml_service_v2/saml-service-get-saml-request)
+
+```bash
+curl --request GET \
+  --url https://$ZITADEL_DOMAIN/v2/saml/saml_requests/V2_224908753244265546 \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+```
+
+Response Example:
+
+```json
+{
+  "samlRequest": {
+    "id": "V2_224908753244265546",
+    "creationDate": "2023-07-28T13:47:43.471505Z",
+    "issuer": "https://myapp.example.com",
+    "assertionConsumerService": "https://myapp.example.com/acs",
+    "relayState": "CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I",
+    "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+  }
+}
+```
+
+### Perform Login
+
+After you have initialized the SAML flow you can implement the login.
+Implement all the steps you like the user to go trough by [creating](/docs/apis/resources/session_service_v2/session-service-create-session) and [updating](/docs/apis/resources/session_service/session-service-set-session) the user-session.
+
+Read the following resources for more information about the different checks:
+- [Username and Password](./username-password)
+- [External Identity Provider](./external-login)
+- [Passkeys](./passkey)
+- [Multi-Factor](./mfa)
+
+### Finalize SAML Request
+
+To finalize the SAML request and connect an existing user session with it you have to update the SAML request with the session token.
+On the create and update user session request you will always get a session token in the response.
+
+The latest session token has to be sent to the following request:
+
+Read more about the [Finalize SAML Request Documentation](/docs/apis/resources/saml_service_v2/saml-service-create-response)
+
+Make sure that the authorization header is from the same account that you originally sent in the client id header ```x-zitadel-login-client: <userid>``` on the SSO endpoint.
+```bash
+curl --request POST \
+  --url $ZITADEL_DOMAIN/v2/saml/saml_requests/V2_224908753244265546 \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json' \
+  --data '{
+  "session": {
+    "sessionId": "225307381909694508",
+    "sessionToken": "7N5kQCvC4jIf2OuBjwfyWSX2FUKbQqg4iG3uWT-TBngMhlS9miGUwpyUaN0HJ8OcbSzk4QHZy_Bvvv"
+  }
+}'
+```
+
+In the response you will get content which describe how to handle further steps from your login UI.
+
+#### POST-Binding
+
+Example Response POST-binding:
+```json
+{
+  "details": {
+    "sequence": "686",
+    "changeDate": "2023-07-31T08:09:19.314537Z",
+    "resourceOwner": "163840776801878273"
+  },
+  "url": "https://myapp.example.com/acs",
+  "binding": {
+    "post": {
+      "relayState": "CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I",
+      "samlResponse": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFJlc3Bv..."
+    }
+  }
+}
+```
+
+Which expects your client to do a POST call to the URL `https://myapp.example.com/acs` with the payload containing the following attributes:
+
+```
+RelayState: "CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I",
+SAMLResponse: "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFJlc3Bv..."
+```
+
+#### Redirect-Binding
+
+Example Response Redirect-binding:
+```json
+{
+  "details": {
+    "sequence": "686",
+    "changeDate": "2023-07-31T08:09:19.314537Z",
+    "resourceOwner": "163840776801878273"
+  },
+  "url": "https://myapp.example.com/acs?RelayState=CncN92gdF6is7bak63thXOsn0MmJn7CLQeGKWaXZo2L8nJN0sPEHbb4I&SAMLResponse=PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPFJlc3Bv...",
+  "binding": {
+    "redirect": {}
+  }
+}
+```
+
+Which expects your client to redirect to the url 'https://myapp.example.com/acs?RelayState=...&SAMLResponse=...' with all information as URL parameters.
+
+### SAML Endpoints
+
+All SAML relevant endpoints are provided by ZITADEL. In your login UI you just have to proxy them through and send them directly to the backend.
+
+These are endpoints like:
+- Metadata
+- Certificate
+- ACS
+- etc

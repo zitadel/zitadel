@@ -75,6 +75,7 @@ SELECT
   , h.is_phone_verified
   , h.password_change_required
   , h.password_changed
+  , h.mfa_init_skipped
   , m.user_id
   , m.name
   , m.description
@@ -83,17 +84,17 @@ SELECT
   , count(*) OVER ()
 FROM found_users fu
 JOIN
-  projections.users13 u
+  projections.users14 u
   ON
     fu.id = u.id
     AND fu.instance_id = u.instance_id
 LEFT JOIN
-  projections.users13_humans h
+  projections.users14_humans h
   ON
     fu.id = h.user_id
     AND fu.instance_id = h.instance_id
 LEFT JOIN
-  projections.users13_machines m
+  projections.users14_machines m
   ON
     fu.id = m.user_id
     AND fu.instance_id = m.instance_id

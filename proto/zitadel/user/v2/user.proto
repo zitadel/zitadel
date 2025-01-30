@@ -175,6 +175,8 @@ message HumanUser {
   bool password_change_required = 9;
   // The time the user last changed their password.
   google.protobuf.Timestamp password_changed = 10;
+  // The time the user last skipped MFA initialization.
+  google.protobuf.Timestamp mfa_init_skipped = 11;
 }
 
 message User {

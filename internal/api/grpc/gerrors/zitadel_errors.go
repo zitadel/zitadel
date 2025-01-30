@@ -7,7 +7,9 @@ import (
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/protoadapt"
 
+	commandErrors "github.com/zitadel/zitadel/internal/command/errors"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
@@ -23,7 +25,9 @@ func ZITADELToGRPCError(err error) error {
 	msg := key
 	msg += " (" + id + ")"
 
-	s, err := status.New(code, msg).WithDetails(&message.ErrorDetail{Id: id, Message: key})
+	errorInfo := getErrorInfo(id, key, err)
+
+	s, err := status.New(code, msg).WithDetails(errorInfo)
 	if err != nil {
 		logging.WithError(err).WithField("logID", "GRPC-gIeRw").Debug("unable to add detail")
 		return status.New(code, msg).Err()
@@ -70,4 +74,17 @@ func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {
 	default:
 		return codes.Unknown, err.Error(), "", false
 	}
+}
+
+func getErrorInfo(id, key string, err error) protoadapt.MessageV1 {
+	var errorInfo protoadapt.MessageV1
+
+	var wpe *commandErrors.WrongPasswordError
+	if err != nil && errors.As(err, &wpe) {
+		errorInfo = &message.CredentialsCheckError{Id: id, Message: key, FailedAttempts: wpe.FailedAttempts}
+	} else {
+		errorInfo = &message.ErrorDetail{Id: id, Message: key}
+	}
+
+	return errorInfo
 }
