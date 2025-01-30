@@ -1556,6 +1556,7 @@ func (c *Commands) prepareAddInstanceLDAPProvider(a *instance.Aggregate, writeMo
 					provider.UserObjectClasses,
 					provider.UserFilters,
 					provider.Timeout,
+					provider.RootCA,
 					provider.LDAPAttributes,
 					provider.IDPOptions,
 				),
@@ -1616,8 +1617,8 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 				provider.UserObjectClasses,
 				provider.UserFilters,
 				provider.Timeout,
-				c.idpConfigEncryption,
-				provider.LDAPAttributes,
+				provider.RootCA,
+				c.idpConfigEncryption, provider.LDAPAttributes,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
