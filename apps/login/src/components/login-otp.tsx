@@ -18,6 +18,7 @@ import { Spinner } from "./spinner";
 
 // either loginName or sessionId must be provided
 type Props = {
+  host: string | null;
   loginName?: string;
   sessionId?: string;
   authRequestId?: string;
@@ -25,7 +26,6 @@ type Props = {
   method: string;
   code?: string;
   loginSettings?: LoginSettings;
-  host: string | null;
 };
 
 type Inputs = {
@@ -33,6 +33,7 @@ type Inputs = {
 };
 
 export function LoginOTP({
+  host,
   loginName,
   sessionId,
   authRequestId,
@@ -40,7 +41,6 @@ export function LoginOTP({
   method,
   code,
   loginSettings,
-  host,
 }: Props) {
   const t = useTranslations("otp");
 

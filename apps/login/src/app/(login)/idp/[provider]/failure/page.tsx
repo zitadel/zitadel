@@ -2,6 +2,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { ChooseAuthenticatorToLogin } from "@/components/choose-authenticator-to-login";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getLoginSettings,
@@ -11,6 +12,7 @@ import {
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -22,9 +24,20 @@ export default async function Page(props: {
 
   const { organization, userId } = searchParams;
 
-  const branding = await getBrandingSettings(organization);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  const loginSettings = await getLoginSettings(organization);
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
+
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   let authMethods: AuthenticationMethodType[] = [];
   let user: User | undefined = undefined;
@@ -39,7 +52,11 @@ export default async function Page(props: {
   }
 
   if (userId) {
-    const userResponse = await getUserByID(userId);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {
@@ -51,7 +68,11 @@ export default async function Page(props: {
       }
     }
 
-    const authMethodsResponse = await listAuthenticationMethodTypes(userId);
+    const authMethodsResponse = await listAuthenticationMethodTypes({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    });
     if (authMethodsResponse.authMethodTypes) {
       authMethods = authMethodsResponse.authMethodTypes;
     }

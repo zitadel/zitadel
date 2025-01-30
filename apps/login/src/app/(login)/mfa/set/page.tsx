@@ -4,6 +4,7 @@ import { ChooseSecondFactorToSetup } from "@/components/choose-second-factor-to-
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -15,6 +16,7 @@ import {
 import { Timestamp, timestampDate } from "@zitadel/client";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 function isSessionValid(session: Partial<Session>): {
   valid: boolean;
@@ -49,19 +51,26 @@ export default async function Page(props: {
     sessionId,
   } = searchParams;
 
-  const sessionWithData = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  async function getAuthMethodsAndUser(session?: Session) {
+  const sessionWithData = sessionId
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
+
+  async function getAuthMethodsAndUser(host: string, session?: Session) {
     const userId = session?.factors?.user?.id;
 
     if (!userId) {
       throw Error("Could not get user id from session");
     }
 
-    return listAuthenticationMethodTypes(userId).then((methods) => {
-      return getUserByID(userId).then((user) => {
+    return listAuthenticationMethodTypes({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    }).then((methods) => {
+      return getUserByID({ serviceUrl, serviceRegion, userId }).then((user) => {
         const humanUser =
           user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
@@ -77,31 +86,48 @@ export default async function Page(props: {
   }
 
   async function loadSessionByLoginname(
+    host: string,
     loginName?: string,
     organization?: string,
   ) {
     return loadMostRecentSession({
-      loginName,
-      organization,
+      serviceUrl,
+      serviceRegion,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     }).then((session) => {
-      return getAuthMethodsAndUser(session);
+      return getAuthMethodsAndUser(serviceUrl, session);
     });
   }
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      serviceUrl,
+      serviceRegion,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
-      return getAuthMethodsAndUser(sessionResponse.session);
+      return getAuthMethodsAndUser(serviceUrl, sessionResponse.session);
     });
   }
 
-  const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(
-    sessionWithData.factors?.user?.organizationId,
-  );
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: sessionWithData.factors?.user?.organizationId,
+  });
 
   const { valid } = isSessionValid(sessionWithData);
 

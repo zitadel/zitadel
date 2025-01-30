@@ -22,6 +22,7 @@ import {
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
+import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { setSessionAndUpdateCookie } from "./cookie";
 
@@ -41,17 +42,21 @@ export async function registerPasskeyLink(
 ): Promise<RegisterPasskeyResponse> {
   const { sessionId } = command;
 
-  const sessionCookie = await getSessionCookieById({ sessionId });
-  const session = await getSession({
-    sessionId: sessionCookie.id,
-    sessionToken: sessionCookie.token,
-  });
-
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host) {
     throw new Error("Could not get domain");
   }
+
+  const sessionCookie = await getSessionCookieById({ sessionId });
+  const session = await getSession({
+    serviceUrl,
+    serviceRegion,
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
 
   const [hostname, port] = host.split(":");
 
@@ -67,19 +72,29 @@ export async function registerPasskeyLink(
   // TODO: add org context
 
   // use session token to add the passkey
-  const registerLink = await createPasskeyRegistrationLink(
+  const registerLink = await createPasskeyRegistrationLink({
+    serviceUrl,
+    serviceRegion,
     userId,
-    // sessionCookie.token,
-  );
+  });
 
   if (!registerLink.code) {
     throw new Error("Missing code in response");
   }
 
-  return registerPasskey(userId, registerLink.code, hostname);
+  return registerPasskey({
+    serviceUrl,
+    serviceRegion,
+    userId,
+    code: registerLink.code,
+    domain: hostname,
+  });
 }
 
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
   if (!!!passkeyName) {
@@ -96,6 +111,8 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     sessionId: command.sessionId,
   });
   const session = await getSession({
+    serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -105,14 +122,16 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
     throw new Error("Could not get session");
   }
 
-  return zitadelVerifyPasskeyRegistration(
-    create(VerifyPasskeyRegistrationRequestSchema, {
+  return zitadelVerifyPasskeyRegistration({
+    serviceUrl,
+    serviceRegion,
+    request: create(VerifyPasskeyRegistrationRequestSchema, {
       passkeyId: command.passkeyId,
       publicKeyCredential: command.publicKeyCredential,
       passkeyName,
       userId,
     }),
-  );
+  });
 }
 
 type SendPasskeyCommand = {
@@ -138,13 +157,14 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     };
   }
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  if (!host) {
-    return { error: "Could not get host" };
-  }
-
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
@@ -164,7 +184,11 @@ export async function sendPasskey(command: SendPasskeyCommand) {
     return { error: "Could not update session" };
   }
 
-  const userResponse = await getUserByID(session?.factors?.user?.id);
+  const userResponse = await getUserByID({
+    serviceUrl,
+    serviceRegion,
+    userId: session?.factors?.user?.id,
+  });
 
   if (!userResponse.user) {
     return { error: "User not found in the system" };

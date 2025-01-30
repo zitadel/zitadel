@@ -4,6 +4,7 @@ import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { TotpRegister } from "@/components/totp-register";
 import { UserAvatar } from "@/components/user-avatar";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/zitadel";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -31,18 +33,37 @@ export default async function Page(props: {
     searchParams;
   const { method } = params;
 
-  const branding = await getBrandingSettings(organization);
-  const loginSettings = await getLoginSettings(organization);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const session = await loadMostRecentSession({
-    loginName,
-    organization,
+    serviceUrl,
+    serviceRegion,
+    sessionParams: {
+      loginName,
+      organization,
+    },
   });
 
   let totpResponse: RegisterTOTPResponse | undefined, error: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      await registerTOTP(session.factors.user.id)
+      await registerTOTP({
+        serviceUrl,
+        serviceRegion,
+        userId: session.factors.user.id,
+      })
         .then((resp) => {
           if (resp) {
             totpResponse = resp;
@@ -53,12 +74,20 @@ export default async function Page(props: {
         });
     } else if (method === "sms") {
       // does not work
-      await addOTPSMS(session.factors.user.id).catch((error) => {
+      await addOTPSMS({
+        serviceUrl,
+        serviceRegion,
+        userId: session.factors.user.id,
+      }).catch((error) => {
         error = new Error("Could not add OTP via SMS");
       });
     } else if (method === "email") {
       // works
-      await addOTPEmail(session.factors.user.id).catch((error) => {
+      await addOTPEmail({
+        serviceUrl,
+        serviceRegion,
+        userId: session.factors.user.id,
+      }).catch((error) => {
         error = new Error("Could not add OTP via Email");
       });
     } else {

@@ -2,6 +2,7 @@ import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SetPasswordForm } from "@/components/set-password-form";
 import { UserAvatar } from "@/components/user-avatar";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -12,6 +13,7 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -24,27 +26,48 @@ export default async function Page(props: {
   const { userId, loginName, organization, authRequestId, code, initial } =
     searchParams;
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
   if (loginName) {
     session = await loadMostRecentSession({
-      loginName,
-      organization,
+      serviceUrl,
+      serviceRegion,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     });
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
-  const passwordComplexity = await getPasswordComplexitySettings(
-    session?.factors?.user?.organizationId,
-  );
+  const passwordComplexity = await getPasswordComplexitySettings({
+    serviceUrl,
+    serviceRegion,
+    organization: session?.factors?.user?.organizationId,
+  });
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
-    const userResponse = await getUserByID(userId);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    });
     user = userResponse.user;
 
     if (user?.type.case === "human") {

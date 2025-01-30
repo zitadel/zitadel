@@ -3,13 +3,11 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginPasskey } from "@/components/login-passkey";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getSession,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -22,13 +20,26 @@ export default async function Page(props: {
   const { loginName, altPassword, authRequestId, organization, sessionId } =
     searchParams;
 
-  const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({ loginName, organization });
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  const sessionFactors = sessionId
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadMostRecentSession({
+        serviceUrl,
+        serviceRegion,
+        sessionParams: { loginName, organization },
+      });
+
+  async function loadSessionById(
+    serviceUrl: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      serviceUrl,
+      serviceRegion,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -38,9 +49,11 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings(organization);
-
-  const loginSettings = await getLoginSettings(organization);
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>
@@ -66,7 +79,6 @@ export default async function Page(props: {
             authRequestId={authRequestId}
             altPassword={altPassword === "true"}
             organization={organization}
-            loginSettings={loginSettings}
           />
         )}
       </div>

@@ -8,6 +8,7 @@ import { idpTypeToIdentityProviderType, idpTypeToSlug } from "../idp";
 
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { UserState } from "@zitadel/proto/zitadel/user/v2/user_pb";
+import { getServiceUrlFromHeaders } from "../service";
 import { checkInvite } from "../verify-helper";
 import {
   getActiveIdentityProviders,
@@ -32,13 +33,27 @@ export type SendLoginnameCommand = {
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function sendLoginname(command: SendLoginnameCommand) {
-  const loginSettingsByContext = await getLoginSettings(command.organization);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host) {
+    throw new Error("Could not get domain");
+  }
+
+  const loginSettingsByContext = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: command.organization,
+  });
 
   if (!loginSettingsByContext) {
     return { error: "Could not get login settings" };
   }
 
   let searchUsersRequest: SearchUsersCommand = {
+    serviceUrl,
+    serviceRegion,
     searchValue: command.loginName,
     organizationId: command.organization,
     loginSettings: loginSettingsByContext,
@@ -58,14 +73,18 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   const { result: potentialUsers } = searchResult;
 
   const redirectUserToSingleIDPIfAvailable = async () => {
-    const identityProviders = await getActiveIdentityProviders(
-      command.organization,
-    ).then((resp) => {
+    const identityProviders = await getActiveIdentityProviders({
+      serviceUrl,
+      serviceRegion,
+      orgId: command.organization,
+    }).then((resp) => {
       return resp.identityProviders;
     });
 
     if (identityProviders.length === 1) {
-      const host = (await headers()).get("host");
+      const _headers = await headers();
+      const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+      const host = _headers.get("host");
 
       if (!host) {
         return { error: "Could not get host" };
@@ -86,6 +105,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       const resp = await startIdentityProviderFlow({
+        serviceUrl,
+        serviceRegion,
         idpId: identityProviders[0].id,
         urls: {
           successUrl:
@@ -104,12 +125,18 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   };
 
   const redirectUserToIDP = async (userId: string) => {
-    const identityProviders = await listIDPLinks(userId).then((resp) => {
+    const identityProviders = await listIDPLinks({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    }).then((resp) => {
       return resp.result;
     });
 
     if (identityProviders.length === 1) {
-      const host = (await headers()).get("host");
+      const _headers = await headers();
+      const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+      const host = _headers.get("host");
 
       if (!host) {
         return { error: "Could not get host" };
@@ -117,7 +144,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const identityProviderId = identityProviders[0].idpId;
 
-      const idp = await getIDPByID(identityProviderId);
+      const idp = await getIDPByID({
+        serviceUrl,
+        serviceRegion,
+        id: identityProviderId,
+      });
 
       const idpType = idp?.type;
 
@@ -139,6 +170,8 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       }
 
       const resp = await startIdentityProviderFlow({
+        serviceUrl,
+        serviceRegion,
         idpId: idp.id,
         urls: {
           successUrl:
@@ -162,9 +195,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
     const user = potentialUsers[0];
     const userId = potentialUsers[0].userId;
 
-    const userLoginSettings = await getLoginSettings(
-      user.details?.resourceOwner,
-    );
+    const userLoginSettings = await getLoginSettings({
+      serviceUrl,
+      serviceRegion,
+      organization: user.details?.resourceOwner,
+    });
 
     // compare with the concatenated suffix when set
     const concatLoginname = command.suffix
@@ -219,9 +254,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       return { error: "Initial User not supported" };
     }
 
-    const methods = await listAuthenticationMethodTypes(
-      session.factors?.user?.id,
-    );
+    const methods = await listAuthenticationMethodTypes({
+      serviceUrl,
+      serviceRegion,
+      userId: session.factors?.user?.id,
+    });
 
     // this can be expected to be an invite as users created in console have a password set.
     if (!methods.authMethodTypes || !methods.authMethodTypes.length) {
@@ -376,11 +413,19 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const suffix = matched?.[1] ?? "";
 
       // this just returns orgs where the suffix is set as primary domain
-      const orgs = await getOrgsByDomain(suffix);
+      const orgs = await getOrgsByDomain({
+        serviceUrl,
+        serviceRegion,
+        domain: suffix,
+      });
       const orgToCheckForDiscovery =
         orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
-      const orgLoginSettings = await getLoginSettings(orgToCheckForDiscovery);
+      const orgLoginSettings = await getLoginSettings({
+        serviceUrl,
+        serviceRegion,
+        organization: orgToCheckForDiscovery,
+      });
       if (orgLoginSettings?.allowDomainDiscovery) {
         orgToRegisterOn = orgToCheckForDiscovery;
       }

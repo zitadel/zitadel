@@ -3,9 +3,11 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { LoginPasskey } from "@/components/login-passkey";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -17,15 +19,37 @@ export default async function Page(props: {
 
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
-  const branding = await getBrandingSettings(organization);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadMostRecentSession({ loginName, organization });
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadMostRecentSession({
+        serviceUrl,
+        serviceRegion,
+        sessionParams: { loginName, organization },
+      });
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      serviceUrl,
+      serviceRegion,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {

@@ -4,6 +4,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { VerifyForm } from "@/components/verify-form";
 import { VerifyRedirectButton } from "@/components/verify-redirect-button";
 import { sendEmailCode } from "@/lib/server/verify";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -13,6 +14,7 @@ import {
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const searchParams = await props.searchParams;
@@ -23,7 +25,19 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const { userId, loginName, code, organization, authRequestId, invite } =
     searchParams;
 
-  const branding = await getBrandingSettings(organization);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   let sessionFactors;
   let user: User | undefined;
@@ -34,14 +48,22 @@ export default async function Page(props: { searchParams: Promise<any> }) {
 
   if ("loginName" in searchParams) {
     sessionFactors = await loadMostRecentSession({
-      loginName,
-      organization,
+      serviceUrl,
+      serviceRegion,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     });
 
     if (doSend && sessionFactors?.factors?.user?.id) {
       await sendEmailCode({
+        serviceUrl,
+        serviceRegion,
         userId: sessionFactors?.factors?.user?.id,
-        authRequestId,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          (authRequestId ? `&authRequestId=${authRequestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Failed to send verification email");
@@ -50,15 +72,23 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   } else if ("userId" in searchParams && userId) {
     if (doSend) {
       await sendEmailCode({
+        serviceUrl,
+        serviceRegion,
         userId,
-        authRequestId,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true` +
+          (authRequestId ? `&authRequestId=${authRequestId}` : ""),
       }).catch((error) => {
         console.error("Could not resend verification email", error);
         throw Error("Failed to send verification email");
       });
     }
 
-    const userResponse = await getUserByID(userId);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {
