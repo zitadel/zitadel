@@ -1,16 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { EnvironmentService } from './environment.service';
+import { Subscription } from 'rxjs';
 import posthog from 'posthog-js';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PosthogService {
+export class PosthogService implements OnDestroy {
   private posthogToken?: string;
   private posthogUrl?: string;
+  private envSubscription: Subscription;
 
   constructor(private envService: EnvironmentService) {
-    this.envService.env.subscribe((env) => {
+    this.envSubscription = this.envService.env.subscribe((env) => {
       this.posthogToken = env.posthog_token;
       this.posthogUrl = env.posthog_url;
       this.init();
@@ -29,5 +31,13 @@ export class PosthogService {
         persistence: 'memory',
       });
     }
+  }
+
+  ngOnDestroy() {
+    if (this.envSubscription) {
+      this.envSubscription.unsubscribe();
+    }
+
+    posthog.reset();
   }
 }
