@@ -28,7 +28,7 @@ type ListRequest struct {
 	SortOrder ListRequestSortOrder `json:"sortOrder" schema:"sortOrder"`
 }
 
-type ListResponse[T ResourceHolder] struct {
+type ListResponse[T any] struct {
 	Schemas      []schemas.ScimSchemaType `json:"schemas"`
 	ItemsPerPage uint64                   `json:"itemsPerPage"`
 	TotalResults uint64                   `json:"totalResults"`
@@ -43,7 +43,7 @@ const (
 	ListRequestSortOrderDsc ListRequestSortOrder = "descending"
 
 	defaultListCount = 100
-	maxListCount     = 100
+	MaxListCount     = 100
 )
 
 var parser = zhttp.NewParser()
@@ -65,7 +65,7 @@ func (o ListRequestSortOrder) IsAscending() bool {
 	return o == ListRequestSortOrderAsc
 }
 
-func newListResponse[T ResourceHolder](totalResultCount uint64, q query.SearchRequest, resources []T) *ListResponse[T] {
+func NewListResponse[T any](totalResultCount uint64, q query.SearchRequest, resources []T) *ListResponse[T] {
 	return &ListResponse[T]{
 		Schemas:      []schemas.ScimSchemaType{schemas.IdListResponse},
 		ItemsPerPage: q.Limit,
@@ -137,8 +137,8 @@ func (r *ListRequest) validate() error {
 	// according to the spec values < 0 are treated as 0
 	if r.Count < 0 {
 		r.Count = 0
-	} else if r.Count > maxListCount {
-		return zerrors.ThrowInvalidArgumentf(nil, "SCIM-ucr", "Limit count exceeded, set a count <= %v", maxListCount)
+	} else if r.Count > MaxListCount {
+		return zerrors.ThrowInvalidArgumentf(nil, "SCIM-ucr", "Limit count exceeded, set a count <= %v", MaxListCount)
 	}
 
 	if !r.SortOrder.isDefined() {

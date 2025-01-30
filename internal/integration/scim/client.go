@@ -125,6 +125,26 @@ func NewScimClient(target string) *Client {
 	}
 }
 
+func (c *Client) GetServiceProviderConfig(ctx context.Context, orgID string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/ServiceProviderConfig")
+}
+
+func (c *Client) GetSchemas(ctx context.Context, orgID string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/Schemas")
+}
+
+func (c *Client) GetSchema(ctx context.Context, orgID, schemaID string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/Schemas/"+schemaID)
+}
+
+func (c *Client) GetResourceTypes(ctx context.Context, orgID string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/ResourceTypes")
+}
+
+func (c *Client) GetResourceType(ctx context.Context, orgID, name string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/ResourceTypes/"+name)
+}
+
 func (c *Client) Bulk(ctx context.Context, orgID string, body []byte) (*BulkResponse, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/"+orgID+"/Bulk", bytes.NewReader(body))
 	if err != nil {
@@ -231,6 +251,29 @@ func (c *ResourceClient[T]) doWithBody(ctx context.Context, method, orgID, url s
 	req.Header.Set(zhttp.ContentType, middleware.ContentTypeScim)
 	responseEntity := new(T)
 	return responseEntity, doReq(c.client, req, responseEntity)
+}
+
+func (c *Client) getWithRawResponse(ctx context.Context, orgID, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/"+orgID+url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		err := resp.Body.Close()
+		logging.OnError(err).Error("Failed to close response body")
+	}()
+
+	if (resp.StatusCode / 100) != 2 {
+		return nil, readScimError(resp)
+	}
+
+	return io.ReadAll(resp.Body)
 }
 
 func doReq(client *http.Client, req *http.Request, responseEntity interface{}) error {

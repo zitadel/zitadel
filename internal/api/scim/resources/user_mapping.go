@@ -382,29 +382,29 @@ func (h *UsersHandler) mapAndValidateMetadata(ctx context.Context, user *ScimUse
 	}
 }
 
-func (h *UsersHandler) buildResourceForQuery(ctx context.Context, user *query.User) *Resource {
-	return &Resource{
+func (h *UsersHandler) buildResourceForQuery(ctx context.Context, user *query.User) *schemas.Resource {
+	return &schemas.Resource{
 		ID:      user.ID,
 		Schemas: []schemas.ScimSchemaType{schemas.IdUser},
-		Meta: &ResourceMeta{
+		Meta: &schemas.ResourceMeta{
 			ResourceType: schemas.UserResourceType,
-			Created:      user.CreationDate.UTC(),
-			LastModified: user.ChangeDate.UTC(),
+			Created:      gu.Ptr(user.CreationDate.UTC()),
+			LastModified: gu.Ptr(user.ChangeDate.UTC()),
 			Version:      strconv.FormatUint(user.Sequence, 10),
-			Location:     buildLocation(ctx, h.ResourceNamePlural(), user.ID),
+			Location:     schemas.BuildLocationForResource(ctx, h.schema.PluralName, user.ID),
 		},
 	}
 }
 
-func (h *UsersHandler) buildResourceForWriteModel(ctx context.Context, user *command.UserV2WriteModel) *Resource {
-	return &Resource{
+func (h *UsersHandler) buildResourceForWriteModel(ctx context.Context, user *command.UserV2WriteModel) *schemas.Resource {
+	return &schemas.Resource{
 		Schemas: []schemas.ScimSchemaType{schemas.IdUser},
-		Meta: &ResourceMeta{
+		Meta: &schemas.ResourceMeta{
 			ResourceType: schemas.UserResourceType,
-			Created:      user.CreationDate.UTC(),
-			LastModified: user.ChangeDate.UTC(),
+			Created:      gu.Ptr(user.CreationDate.UTC()),
+			LastModified: gu.Ptr(user.ChangeDate.UTC()),
 			Version:      strconv.FormatUint(user.ProcessedSequence, 10),
-			Location:     buildLocation(ctx, h.ResourceNamePlural(), user.AggregateID),
+			Location:     schemas.BuildLocationForResource(ctx, h.schema.PluralName, user.AggregateID),
 		},
 	}
 }
