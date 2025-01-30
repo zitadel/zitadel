@@ -1,5 +1,11 @@
 # @zitadel/client
 
+## 1.0.4
+
+### Patch Changes
+
+- 28dc956: dynamic properties for system token utility
+
 ## 1.0.3
 
 ### Patch Changes
