@@ -5,6 +5,7 @@ import { linkingSuccess } from "@/components/idps/pages/linking-success";
 import { loginFailed } from "@/components/idps/pages/login-failed";
 import { loginSuccess } from "@/components/idps/pages/login-success";
 import { idpTypeToIdentityProviderType, PROVIDER_MAPPING } from "@/lib/idp";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   addHuman,
   addIDPLink,
@@ -23,6 +24,7 @@ import {
   AddHumanUserRequestSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
@@ -37,13 +39,25 @@ export default async function Page(props: {
   const { id, token, authRequestId, organization, link } = searchParams;
   const { provider } = params;
 
-  const branding = await getBrandingSettings(organization);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   if (!provider || !id || !token) {
     return loginFailed(branding, "IDP context missing");
   }
 
-  const intent = await retrieveIDPIntent(id, token);
+  const intent = await retrieveIDPIntent({
+    serviceUrl,
+    serviceRegion,
+    id,
+    token,
+  });
 
   const { idpInformation, userId } = intent;
 
@@ -63,7 +77,11 @@ export default async function Page(props: {
     return loginFailed(branding, "IDP information missing");
   }
 
-  const idp = await getIDPByID(idpInformation.idpId);
+  const idp = await getIDPByID({
+    serviceUrl,
+    serviceRegion,
+    id: idpInformation.idpId,
+  });
   const options = idp?.config?.options;
 
   if (!idp) {
@@ -80,14 +98,16 @@ export default async function Page(props: {
 
     let idpLink;
     try {
-      idpLink = await addIDPLink(
-        {
+      idpLink = await addIDPLink({
+        serviceUrl,
+        serviceRegion,
+        idp: {
           id: idpInformation.idpId,
           userId: idpInformation.userId,
           userName: idpInformation.userName,
         },
         userId,
-      );
+      });
     } catch (error) {
       console.error(error);
       return linkingFailed(branding);
@@ -111,19 +131,23 @@ export default async function Page(props: {
     const email = PROVIDER_MAPPING[providerType](idpInformation).email?.email;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
-      foundUser = await listUsers({ email }).then((response) => {
-        return response.result ? response.result[0] : null;
-      });
+      foundUser = await listUsers({ serviceUrl, serviceRegion, email }).then(
+        (response) => {
+          return response.result ? response.result[0] : null;
+        },
+      );
     } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
       foundUser = await listUsers(
         options.autoLinking === AutoLinkingOption.USERNAME
-          ? { userName: idpInformation.userName }
-          : { email },
+          ? { serviceUrl, serviceRegion, userName: idpInformation.userName }
+          : { serviceUrl, serviceRegion, email },
       ).then((response) => {
         return response.result ? response.result[0] : null;
       });
     } else {
       foundUser = await listUsers({
+        serviceUrl,
+        serviceRegion,
         userName: idpInformation.userName,
         email,
       }).then((response) => {
@@ -134,14 +158,16 @@ export default async function Page(props: {
     if (foundUser) {
       let idpLink;
       try {
-        idpLink = await addIDPLink(
-          {
+        idpLink = await addIDPLink({
+          serviceUrl,
+          serviceRegion,
+          idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
             userName: idpInformation.userName,
           },
-          foundUser.userId,
-        );
+          userId: foundUser.userId,
+        });
       } catch (error) {
         console.error(error);
         return linkingFailed(branding);
@@ -175,11 +201,19 @@ export default async function Page(props: {
       const suffix = matched?.[1] ?? "";
 
       // this just returns orgs where the suffix is set as primary domain
-      const orgs = await getOrgsByDomain(suffix);
+      const orgs = await getOrgsByDomain({
+        serviceUrl,
+        serviceRegion,
+        domain: suffix,
+      });
       const orgToCheckForDiscovery =
         orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
-      const orgLoginSettings = await getLoginSettings(orgToCheckForDiscovery);
+      const orgLoginSettings = await getLoginSettings({
+        serviceUrl,
+        serviceRegion,
+        organization: orgToCheckForDiscovery,
+      });
       if (orgLoginSettings?.allowDomainDiscovery) {
         orgToRegisterOn = orgToCheckForDiscovery;
       }
@@ -196,7 +230,11 @@ export default async function Page(props: {
       });
     }
 
-    const newUser = await addHuman(userData);
+    const newUser = await addHuman({
+      serviceUrl,
+      serviceRegion,
+      request: userData,
+    });
 
     if (newUser) {
       return (

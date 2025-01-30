@@ -14,6 +14,8 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { headers } from "next/headers";
+import { getServiceUrlFromHeaders } from "../service";
 
 type CustomCookieData = {
   id: string;
@@ -32,10 +34,21 @@ export async function createSessionAndUpdateCookie(
   authRequestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
-  const createdSession = await createSessionFromChecks(checks, challenges);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  const createdSession = await createSessionFromChecks({
+    serviceUrl,
+    serviceRegion,
+    checks,
+    challenges,
+    lifetime,
+  });
 
   if (createdSession) {
     return getSession({
+      serviceUrl,
+      serviceRegion,
       sessionId: createdSession.sessionId,
       sessionToken: createdSession.sessionToken,
     }).then((response) => {
@@ -85,17 +98,24 @@ export async function createSessionForIdpAndUpdateCookie(
   authRequestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
-  const createdSession = await createSessionForUserIdAndIdpIntent(
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  const createdSession = await createSessionForUserIdAndIdpIntent({
+    serviceUrl,
+    serviceRegion,
     userId,
     idpIntent,
     lifetime,
-  );
+  });
 
   if (!createdSession) {
     throw "Could not create session";
   }
 
   const { session } = await getSession({
+    serviceUrl,
+    serviceRegion,
     sessionId: createdSession.sessionId,
     sessionToken: createdSession.sessionToken,
   });
@@ -142,13 +162,18 @@ export async function setSessionAndUpdateCookie(
   authRequestId?: string,
   lifetime?: Duration,
 ) {
-  return setSession(
-    recentCookie.id,
-    recentCookie.token,
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  return setSession({
+    serviceUrl,
+    serviceRegion,
+    sessionId: recentCookie.id,
+    sessionToken: recentCookie.token,
     challenges,
     checks,
     lifetime,
-  ).then((updatedSession) => {
+  }).then((updatedSession) => {
     if (updatedSession) {
       const sessionCookie: CustomCookieData = {
         id: recentCookie.id,
@@ -168,6 +193,8 @@ export async function setSessionAndUpdateCookie(
       }
 
       return getSession({
+        serviceUrl,
+        serviceRegion,
         sessionId: sessionCookie.id,
         sessionToken: sessionCookie.token,
       }).then((response) => {

@@ -2,16 +2,20 @@
 
 import { createServerTransport } from "@zitadel/client/node";
 import { createUserServiceClient } from "@zitadel/client/v2";
+import { headers } from "next/headers";
 import { getSessionCookieById } from "./cookies";
+import { getServiceUrlFromHeaders } from "./service";
 import { getSession } from "./zitadel";
 
-const transport = (token: string) =>
-  createServerTransport(token, {
-    baseUrl: process.env.ZITADEL_API_URL!,
+const transport = async (serviceUrl: string, token: string) => {
+  return createServerTransport(token, {
+    baseUrl: serviceUrl,
   });
+};
 
-const myUserService = (sessionToken: string) => {
-  return createUserServiceClient(transport(sessionToken));
+const myUserService = async (serviceUrl: string, sessionToken: string) => {
+  const transportPromise = await transport(serviceUrl, sessionToken);
+  return createUserServiceClient(transportPromise);
 };
 
 export async function setMyPassword({
@@ -21,9 +25,14 @@ export async function setMyPassword({
   sessionId: string;
   password: string;
 }) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const { session } = await getSession({
+    serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -32,7 +41,7 @@ export async function setMyPassword({
     return { error: "Could not load session" };
   }
 
-  const service = await myUserService(`${sessionCookie.token}`);
+  const service = await myUserService(serviceUrl, `${sessionCookie.token}`);
 
   if (!session?.factors?.user?.id) {
     return { error: "No user id found in session" };

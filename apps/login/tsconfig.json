@@ -2,6 +2,7 @@
   "extends": "@zitadel/tsconfig/nextjs.json",
   "compilerOptions": {
     "jsx": "preserve",
+    "target": "es2022",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

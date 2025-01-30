@@ -1,6 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SignInWithIdp } from "@/components/sign-in-with-idp";
 import { UsernameForm } from "@/components/username-form";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getActiveIdentityProviders,
   getBrandingSettings,
@@ -9,6 +10,7 @@ import {
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -23,29 +25,45 @@ export default async function Page(props: {
   const suffix = searchParams?.suffix;
   const submit: boolean = searchParams?.submit === "true";
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+      serviceRegion,
+    });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  const loginSettings = await getLoginSettings(
-    organization ?? defaultOrganization,
-  );
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: organization ?? defaultOrganization,
+  });
 
-  const contextLoginSettings = await getLoginSettings(organization);
+  const contextLoginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
-  const identityProviders = await getActiveIdentityProviders(
-    organization ?? defaultOrganization,
-  ).then((resp) => {
+  const identityProviders = await getActiveIdentityProviders({
+    serviceUrl,
+    serviceRegion,
+    orgId: organization ?? defaultOrganization,
+  }).then((resp) => {
     return resp.identityProviders;
   });
 
-  const branding = await getBrandingSettings(
-    organization ?? defaultOrganization,
-  );
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: organization ?? defaultOrganization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

@@ -18,14 +18,20 @@ import {
   getSessionCookieByLoginName,
   removeSessionFromCookie,
 } from "../cookies";
+import { getServiceUrlFromHeaders } from "../service";
 
 export async function continueWithSession({
   authRequestId,
   ...session
 }: Session & { authRequestId?: string }) {
-  const loginSettings = await getLoginSettings(
-    session.factors?.user?.organizationId,
-  );
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: session.factors?.user?.organizationId,
+  });
 
   const url =
     authRequestId && session.id && session.factors?.user
@@ -82,7 +88,9 @@ export async function updateSession(options: UpdateSessionCommand) {
     };
   }
 
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host) {
     return { error: "Could not get host" };
@@ -99,7 +107,11 @@ export async function updateSession(options: UpdateSessionCommand) {
     challenges.webAuthN.domain = hostname;
   }
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
@@ -122,9 +134,11 @@ export async function updateSession(options: UpdateSessionCommand) {
   // if password, check if user has MFA methods
   let authMethods;
   if (checks && checks.password && session.factors?.user?.id) {
-    const response = await listAuthenticationMethodTypes(
-      session.factors.user.id,
-    );
+    const response = await listAuthenticationMethodTypes({
+      serviceUrl,
+      serviceRegion,
+      userId: session.factors.user.id,
+    });
     if (response.authMethodTypes && response.authMethodTypes.length) {
       authMethods = response.authMethodTypes;
     }
@@ -143,11 +157,19 @@ type ClearSessionOptions = {
 };
 
 export async function clearSession(options: ClearSessionOptions) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   const { sessionId } = options;
 
   const session = await getSessionCookieById({ sessionId });
 
-  const deletedSession = await deleteSession(session.id, session.token);
+  const deletedSession = await deleteSession({
+    serviceUrl,
+    serviceRegion,
+    sessionId: session.id,
+    sessionToken: session.token,
+  });
 
   if (deletedSession) {
     return removeSessionFromCookie(session);
@@ -159,12 +181,17 @@ type CleanupSessionCommand = {
 };
 
 export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   const sessionCookie = await getSessionCookieById({ sessionId });
 
-  const deleteResponse = await deleteSession(
-    sessionCookie.id,
-    sessionCookie.token,
-  );
+  const deleteResponse = await deleteSession({
+    serviceUrl,
+    serviceRegion,
+    sessionId: sessionCookie.id,
+    sessionToken: sessionCookie.token,
+  });
 
   if (!deleteResponse) {
     throw new Error("Could not delete session");

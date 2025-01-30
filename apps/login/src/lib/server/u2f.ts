@@ -6,6 +6,7 @@ import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 import { getSessionCookieById } from "../cookies";
+import { getServiceUrlFromHeaders } from "../service";
 
 type RegisterU2FCommand = {
   sessionId: string;
@@ -19,6 +20,14 @@ type VerifyU2FCommand = {
 };
 
 export async function addU2F(command: RegisterU2FCommand) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const sessionCookie = await getSessionCookieById({
     sessionId: command.sessionId,
   });
@@ -28,15 +37,11 @@ export async function addU2F(command: RegisterU2FCommand) {
   }
 
   const session = await getSession({
+    serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
-
-  const host = (await headers()).get("host");
-
-  if (!host) {
-    return { error: "Could not get domain" };
-  }
 
   const [hostname, port] = host.split(":");
 
@@ -50,10 +55,18 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: "Could not get session" };
   }
 
-  return registerU2F(userId, hostname);
+  return registerU2F({ serviceUrl, serviceRegion, userId, domain: hostname });
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   let passkeyName = command.passkeyName;
   if (!!!passkeyName) {
     const headersList = await headers();
@@ -69,6 +82,8 @@ export async function verifyU2F(command: VerifyU2FCommand) {
   });
 
   const session = await getSession({
+    serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -79,12 +94,12 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     return { error: "Could not get session" };
   }
 
-  const req = create(VerifyU2FRegistrationRequestSchema, {
+  const request = create(VerifyU2FRegistrationRequestSchema, {
     u2fId: command.u2fId,
     publicKeyCredential: command.publicKeyCredential,
     tokenName: passkeyName,
     userId,
   });
 
-  return verifyU2FRegistration(req);
+  return verifyU2FRegistration({ serviceUrl, serviceRegion, request });
 }

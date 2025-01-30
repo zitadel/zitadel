@@ -3,6 +3,7 @@
 import { addHumanUser, createInviteCode } from "@/lib/zitadel";
 import { Factors } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
+import { getServiceUrlFromHeaders } from "../service";
 
 type InviteUserCommand = {
   email: string;
@@ -20,9 +21,17 @@ export type RegisterUserResponse = {
 };
 
 export async function inviteUser(command: InviteUserCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host) {
+    return { error: "Could not get domain" };
+  }
 
   const human = await addHumanUser({
+    serviceUrl,
+    serviceRegion,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -34,7 +43,12 @@ export async function inviteUser(command: InviteUserCommand) {
     return { error: "Could not create user" };
   }
 
-  const codeResponse = await createInviteCode(human.userId, host);
+  const codeResponse = await createInviteCode({
+    serviceUrl,
+    serviceRegion,
+    urlTemplate: `${host.includes("localhost") ? "http://" : "https://"}${host}/verify?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}&invite=true`,
+    userId: human.userId,
+  });
 
   if (!codeResponse || !human) {
     return { error: "Could not create invite code" };

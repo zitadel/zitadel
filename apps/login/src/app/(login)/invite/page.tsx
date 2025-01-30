@@ -1,6 +1,7 @@
 import { Alert, AlertType } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { InviteForm } from "@/components/invite-form";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -8,6 +9,7 @@ import {
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -18,8 +20,11 @@ export default async function Page(props: {
 
   let { firstname, lastname, email, organization } = searchParams;
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   if (!organization) {
-    const org = await getDefaultOrg();
+    const org = await getDefaultOrg({ serviceUrl, serviceRegion });
     if (!org) {
       throw new Error("No default organization found");
     }
@@ -27,12 +32,23 @@ export default async function Page(props: {
     organization = org.id;
   }
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
-  const passwordComplexitySettings =
-    await getPasswordComplexitySettings(organization);
+  const passwordComplexitySettings = await getPasswordComplexitySettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

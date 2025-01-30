@@ -7,11 +7,13 @@ import {
   ChecksSchema,
   CheckTOTPSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { headers } from "next/headers";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
 } from "../cookies";
+import { getServiceUrlFromHeaders } from "../service";
 import { getLoginSettings } from "../zitadel";
 
 export type SetOTPCommand = {
@@ -24,6 +26,9 @@ export type SetOTPCommand = {
 };
 
 export async function setOTP(command: SetOTPCommand) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   const recentSession = command.sessionId
     ? await getSessionCookieById({ sessionId: command.sessionId }).catch(
         (error) => {
@@ -57,7 +62,11 @@ export async function setOTP(command: SetOTPCommand) {
     });
   }
 
-  const loginSettings = await getLoginSettings(command.organization);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: command.organization,
+  });
 
   return setSessionAndUpdateCookie(
     recentSession,

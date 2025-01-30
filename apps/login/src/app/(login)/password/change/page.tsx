@@ -2,6 +2,7 @@ import { Alert } from "@/components/alert";
 import { ChangePasswordForm } from "@/components/change-password-form";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -9,10 +10,14 @@ import {
   getPasswordComplexitySettings,
 } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
 }) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   const searchParams = await props.searchParams;
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "password" });
@@ -22,19 +27,31 @@ export default async function Page(props: {
 
   // also allow no session to be found (ignoreUnkownUsername)
   const sessionFactors = await loadMostRecentSession({
-    loginName,
+    serviceUrl,
+    serviceRegion,
+    sessionParams: {
+      loginName,
+      organization,
+    },
+  });
+
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
     organization,
   });
 
-  const branding = await getBrandingSettings(organization);
+  const passwordComplexity = await getPasswordComplexitySettings({
+    serviceUrl,
+    serviceRegion,
+    organization: sessionFactors?.factors?.user?.organizationId,
+  });
 
-  const passwordComplexity = await getPasswordComplexitySettings(
-    sessionFactors?.factors?.user?.organizationId,
-  );
-
-  const loginSettings = await getLoginSettings(
-    sessionFactors?.factors?.user?.organizationId,
-  );
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: sessionFactors?.factors?.user?.organizationId,
+  });
 
   return (
     <DynamicTheme branding={branding}>

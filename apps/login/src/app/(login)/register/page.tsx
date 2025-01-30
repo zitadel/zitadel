@@ -1,5 +1,6 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { RegisterForm } from "@/components/register-form";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -9,6 +10,7 @@ import {
 } from "@/lib/zitadel";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -20,20 +22,41 @@ export default async function Page(props: {
   let { firstname, lastname, email, organization, authRequestId } =
     searchParams;
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+      serviceRegion,
+    });
     if (org) {
       organization = org.id;
     }
   }
 
-  const legal = await getLegalAndSupportSettings(organization);
-  const passwordComplexitySettings =
-    await getPasswordComplexitySettings(organization);
+  const legal = await getLegalAndSupportSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
+  const passwordComplexitySettings = await getPasswordComplexitySettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
-  const loginSettings = await getLoginSettings(organization);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   if (!loginSettings?.allowRegister) {
     return (
