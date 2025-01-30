@@ -26,9 +26,9 @@ export async function createServiceForHost<T extends ServiceClass>(
 
   // if we are running in a multitenancy context, use the system user token
   if (
-    process.env.QA_AUDIENCE &&
-    process.env.QA_SYSTEM_USER_ID &&
-    process.env.QA_SYSTEM_USER_PRIVATE_KEY
+    process.env[serviceRegion + "_AUDIENCE"] &&
+    process.env[serviceRegion + "_SYSTEM_USER_ID"] &&
+    process.env[serviceRegion + "_SYSTEM_USER_PRIVATE_KEY"]
   ) {
     token = await systemAPIToken({ serviceRegion });
   } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {

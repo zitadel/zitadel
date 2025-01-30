@@ -5,48 +5,31 @@ export async function systemAPIToken({
 }: {
   serviceRegion: string;
 }) {
-  const QA = {
-    audience: process.env.QA_AUDIENCE,
-    userID: process.env.QA_SYSTEM_USER_ID,
-    token: Buffer.from(
-      process.env.QA_SYSTEM_USER_PRIVATE_KEY,
-      "base64",
-    ).toString("utf-8"),
-  };
+  const REGIONS = ["eu1", "us1"].map((region) => {
+    return {
+      id: region,
+      audience: process.env[region + "_AUDIENCE"],
+      userID: process.env[region + "_SYSTEM_USER_ID"],
+      token: Buffer.from(
+        process.env[
+          region.toUpperCase() + "_SYSTEM_USER_PRIVATE_KEY"
+        ] as string,
+        "base64",
+      ).toString("utf-8"),
+    };
+  });
 
-  const PROD = {
-    audience: process.env.QA_AUDIENCE,
-    userID: process.env.QA_SYSTEM_USER_ID,
-    token: Buffer.from(
-      process.env.PROD_SYSTEM_USER_PRIVATE_KEY,
-      "base64",
-    ).toString("utf-8"),
-  };
+  const region = REGIONS.find((region) => region.id === serviceRegion);
 
-  let token;
-
-  switch (serviceRegion) {
-    case "eu1":
-      token = newSystemToken({
-        audience: QA.audience,
-        subject: QA.userID,
-        key: QA.token,
-      });
-      break;
-    case "us1":
-      token = newSystemToken({
-        audience: PROD.audience,
-        subject: PROD.userID,
-        key: PROD.token,
-      });
-      break;
-    default:
-      token = newSystemToken({
-        audience: QA.audience,
-        subject: QA.userID,
-        key: QA.token,
-      });
+  if (!region || !region.audience || !region.userID || !region.token) {
+    throw new Error("Invalid region");
   }
+
+  const token = newSystemToken({
+    audience: region.audience,
+    subject: region.userID,
+    key: region.token,
+  });
 
   return token;
 }
