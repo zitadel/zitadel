@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/scim/metadata"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/command"
@@ -73,8 +74,9 @@ func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*
 
 func (h *UsersHandler) mapToChangeHuman(ctx context.Context, scimUser *ScimUser) (*command.ChangeHuman, error) {
 	human := &command.ChangeHuman{
-		ID:       scimUser.ID,
-		Username: &scimUser.UserName,
+		ID:            scimUser.ID,
+		ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		Username:      &scimUser.UserName,
 		Profile: &command.Profile{
 			NickName:    &scimUser.NickName,
 			DisplayName: &scimUser.DisplayName,

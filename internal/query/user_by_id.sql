@@ -20,8 +20,8 @@ WITH login_names AS (SELECT
     WHERE
       u.instance_id = p.instance_id
       AND (
-        (p.is_default IS TRUE AND p.instance_id = $2)
-        OR (p.instance_id = $2 AND p.resource_owner = u.resource_owner)
+        (p.is_default IS TRUE AND p.instance_id = $3)
+        OR (p.instance_id = $3 AND p.resource_owner = u.resource_owner)
       )
     ORDER BY is_default
     LIMIT 1
@@ -32,8 +32,9 @@ WITH login_names AS (SELECT
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
   WHERE
-    u.instance_id = $2
-    AND u.id = $1
+      u.id = $1
+    AND (u.resource_owner = $2 OR $2 = '')
+    AND u.instance_id = $3
 )
 SELECT 
   u.id
@@ -80,6 +81,7 @@ LEFT JOIN
     AND u.instance_id = m.instance_id
 WHERE 
   u.id = $1
-  AND u.instance_id = $2
+  AND (u.resource_owner = $2 OR $2 = '')
+  AND u.instance_id = $3
 LIMIT 1
 ;
