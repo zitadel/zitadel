@@ -7,7 +7,6 @@ import (
 	_ "embed"
 	"fmt"
 	"net/http"
-	"regexp"
 	"testing"
 	"time"
 
@@ -29,19 +28,11 @@ var (
 	//go:embed testdata/users_update_test_full.json
 	fullUserUpdateJson []byte
 
-	minimalUserUpdateJson []byte = simpleReplacePatchBody("nickname", "foo")
-
-	// remove comments in the json, as the default golang json unmarshaler cannot handle them
-	// the test file is much easier to maintain with comments
-	removeCommentsRegex = regexp.MustCompile("(?s)//.*?\n|/\\*.*?\\*/")
+	minimalUserUpdateJson = simpleReplacePatchBody("nickname", "foo")
 )
 
 func init() {
 	fullUserUpdateJson = removeComments(fullUserUpdateJson)
-}
-
-func removeComments(json []byte) []byte {
-	return removeCommentsRegex.ReplaceAll(json, nil)
 }
 
 func TestUpdateUser(t *testing.T) {
