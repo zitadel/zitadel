@@ -7,6 +7,7 @@ import {
 } from "@/lib/zitadel";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
+import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 import { createSessionForIdpAndUpdateCookie } from "./cookie";
 
@@ -17,13 +18,17 @@ export type StartIDPFlowCommand = {
 };
 
 export async function startIDPFlow(command: StartIDPFlowCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
 
   if (!host) {
     return { error: "Could not get host" };
   }
 
   return startIdentityProviderFlow({
+    serviceUrl,
+    serviceRegion,
     idpId: command.idpId,
     urls: {
       successUrl: `${host.includes("localhost") ? "http://" : "https://"}${host}${command.successUrl}`,
@@ -55,19 +60,33 @@ type CreateNewSessionCommand = {
 export async function createNewSessionFromIdpIntent(
   command: CreateNewSessionCommand,
 ) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host) {
+    return { error: "Could not get domain" };
+  }
+
   if (!command.userId || !command.idpIntent) {
     throw new Error("No userId or loginName provided");
   }
 
-  const userResponse = await getUserByID(command.userId);
+  const userResponse = await getUserByID({
+    serviceUrl,
+    serviceRegion,
+    userId: command.userId,
+  });
 
   if (!userResponse || !userResponse.user) {
     return { error: "User not found in the system" };
   }
 
-  const loginSettings = await getLoginSettings(
-    userResponse.user.details?.resourceOwner,
-  );
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: userResponse.user.details?.resourceOwner,
+  });
 
   const session = await createSessionForIdpAndUpdateCookie(
     command.userId,

@@ -27,13 +27,23 @@ export function createClientTransport(token: string, opts: GrpcTransportOptions)
   });
 }
 
-export async function newSystemToken() {
+export async function newSystemToken({
+  audience,
+  subject,
+  key,
+  expirationTime,
+}: {
+  audience: string;
+  subject: string;
+  key: string;
+  expirationTime?: number | string | Date;
+}) {
   return await new SignJWT({})
     .setProtectedHeader({ alg: "RS256" })
     .setIssuedAt()
-    .setExpirationTime("1h")
-    .setIssuer(process.env.ZITADEL_SYSTEM_API_USERID ?? "")
-    .setSubject(process.env.ZITADEL_SYSTEM_API_USERID ?? "")
-    .setAudience(process.env.ZITADEL_ISSUER ?? "")
-    .sign(await importPKCS8(process.env.ZITADEL_SYSTEM_API_KEY ?? "", "RS256"));
+    .setExpirationTime(expirationTime ?? "1h")
+    .setIssuer(subject)
+    .setSubject(subject)
+    .setAudience(audience)
+    .sign(await importPKCS8(key, "RS256"));
 }

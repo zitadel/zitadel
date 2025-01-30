@@ -4,6 +4,7 @@ import { ChooseSecondFactor } from "@/components/choose-second-factor";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -11,6 +12,7 @@ import {
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -22,41 +24,59 @@ export default async function Page(props: {
 
   const { loginName, authRequestId, organization, sessionId } = searchParams;
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   const sessionFactors = sessionId
-    ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
+    ? await loadSessionById(serviceUrl, sessionId, organization)
+    : await loadSessionByLoginname(serviceUrl, loginName, organization);
 
   async function loadSessionByLoginname(
+    serviceUrl: string,
     loginName?: string,
     organization?: string,
   ) {
     return loadMostRecentSession({
-      loginName,
-      organization,
+      serviceUrl,
+      serviceRegion,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     }).then((session) => {
       if (session && session.factors?.user?.id) {
-        return listAuthenticationMethodTypes(session.factors.user.id).then(
-          (methods) => {
-            return {
-              factors: session?.factors,
-              authMethods: methods.authMethodTypes ?? [],
-            };
-          },
-        );
+        return listAuthenticationMethodTypes({
+          serviceUrl,
+          serviceRegion,
+          userId: session.factors.user.id,
+        }).then((methods) => {
+          return {
+            factors: session?.factors,
+            authMethods: methods.authMethodTypes ?? [],
+          };
+        });
       }
     });
   }
 
-  async function loadSessionById(sessionId: string, organization?: string) {
+  async function loadSessionById(
+    host: string,
+    sessionId: string,
+    organization?: string,
+  ) {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
+      serviceUrl,
+      serviceRegion,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes(
-          response.session.factors.user.id,
-        ).then((methods) => {
+        return listAuthenticationMethodTypes({
+          serviceUrl,
+          serviceRegion,
+          userId: response.session.factors.user.id,
+        }).then((methods) => {
           return {
             factors: response.session?.factors,
             authMethods: methods.authMethodTypes ?? [],
@@ -66,7 +86,11 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

@@ -1,6 +1,7 @@
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { SessionsList } from "@/components/sessions-list";
 import { getAllSessionCookieIds } from "@/lib/cookies";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   getBrandingSettings,
   getDefaultOrg,
@@ -9,15 +10,24 @@ import {
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import Link from "next/link";
 
-async function loadSessions() {
-  const ids = await getAllSessionCookieIds();
+async function loadSessions({
+  serviceUrl,
+  serviceRegion,
+}: {
+  serviceUrl: string;
+  serviceRegion: string;
+}) {
+  const ids: (string | undefined)[] = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
-    const response = await listSessions(
-      ids.filter((id: string | undefined) => !!id),
-    );
+    const response = await listSessions({
+      serviceUrl,
+      serviceRegion,
+      ids: ids.filter((id) => !!id) as string[],
+    });
     return response?.sessions ?? [];
   } else {
     console.info("No session cookie found.");
@@ -35,19 +45,27 @@ export default async function Page(props: {
   const authRequestId = searchParams?.authRequestId;
   const organization = searchParams?.organization;
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+      serviceRegion,
+    });
     if (org) {
       defaultOrganization = org.id;
     }
   }
 
-  let sessions = await loadSessions();
+  let sessions = await loadSessions({ serviceUrl, serviceRegion });
 
-  const branding = await getBrandingSettings(
-    organization ?? defaultOrganization,
-  );
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: organization ?? defaultOrganization,
+  });
 
   const params = new URLSearchParams();
 
