@@ -10,6 +10,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.24.0
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
+	github.com/alecthomas/participle/v2 v2.1.1
 	github.com/alicebob/miniredis/v2 v2.33.0
 	github.com/benbjohnson/clock v1.3.5
 	github.com/boombuler/barcode v1.0.2

@@ -23,18 +23,19 @@ type scimErrorType string
 type wrappedScimError struct {
 	Parent   error
 	ScimType scimErrorType
+	Status   int
 }
 
-type scimError struct {
+type ScimError struct {
 	Schemas       []schemas.ScimSchemaType `json:"schemas"`
 	ScimType      scimErrorType            `json:"scimType,omitempty"`
 	Detail        string                   `json:"detail,omitempty"`
 	StatusCode    int                      `json:"-"`
 	Status        string                   `json:"status"`
-	ZitadelDetail *errorDetail             `json:"urn:ietf:params:scim:api:zitadel:messages:2.0:ErrorDetail,omitempty"`
+	ZitadelDetail *ErrorDetail             `json:"urn:ietf:params:scim:api:zitadel:messages:2.0:ErrorDetail,omitempty"`
 }
 
-type errorDetail struct {
+type ErrorDetail struct {
 	ID      string `json:"id"`
 	Message string `json:"message"`
 }
@@ -49,6 +50,21 @@ const (
 	// ScimTypeInvalidSyntax The request body message structure was invalid or did
 	// not conform to the request schema.
 	ScimTypeInvalidSyntax scimErrorType = "invalidSyntax"
+
+	// ScimTypeInvalidFilter The specified filter syntax as invalid, or the
+	// specified attribute and filter comparison combination is not supported.
+	ScimTypeInvalidFilter scimErrorType = "invalidFilter"
+
+	// ScimTypeInvalidPath The "path" attribute was invalid or malformed.
+	ScimTypeInvalidPath scimErrorType = "invalidPath"
+
+	// ScimTypeNoTarget The specified "path" did not
+	// yield an attribute or attribute value that could be operated on.
+	// This occurs when the specified "path" value contains a filter that yields no match.
+	ScimTypeNoTarget scimErrorType = "noTarget"
+
+	// ScimTypeUniqueness One or more of the attribute values are already in use or are reserved.
+	ScimTypeUniqueness scimErrorType = "uniqueness"
 )
 
 var translator *i18n.Translator
@@ -63,7 +79,7 @@ func ErrorHandler(next zhttp_middleware.HandlerFuncWithError) http.Handler {
 			return
 		}
 
-		scimErr := mapToScimJsonError(r.Context(), err)
+		scimErr := MapToScimError(r.Context(), err)
 		w.WriteHeader(scimErr.StatusCode)
 
 		jsonErr := json.NewEncoder(w).Encode(scimErr)
@@ -85,7 +101,44 @@ func ThrowInvalidSyntax(parent error) error {
 	}
 }
 
-func (err *scimError) Error() string {
+func ThrowInvalidFilter(parent error) error {
+	return &wrappedScimError{
+		Parent:   parent,
+		ScimType: ScimTypeInvalidFilter,
+	}
+}
+
+func ThrowInvalidPath(parent error) error {
+	return &wrappedScimError{
+		Parent:   parent,
+		ScimType: ScimTypeInvalidPath,
+	}
+}
+
+func ThrowNoTarget(parent error) error {
+	return &wrappedScimError{
+		Parent:   parent,
+		ScimType: ScimTypeNoTarget,
+	}
+}
+
+func ThrowPayloadTooLarge(parent error) error {
+	return &wrappedScimError{
+		Parent: parent,
+		Status: http.StatusRequestEntityTooLarge,
+	}
+}
+
+func IsScimOrZitadelError(err error) bool {
+	return IsScimError(err) || zerrors.IsZitadelError(err)
+}
+
+func IsScimError(err error) bool {
+	var scimErr *wrappedScimError
+	return errors.As(err, &scimErr)
+}
+
+func (err *ScimError) Error() string {
 	return fmt.Sprintf("SCIM Error: %s: %s", err.ScimType, err.Detail)
 }
 
@@ -93,17 +146,30 @@ func (err *wrappedScimError) Error() string {
 	return fmt.Sprintf("SCIM Error: %s: %s", err.ScimType, err.Parent.Error())
 }
 
-func mapToScimJsonError(ctx context.Context, err error) *scimError {
-	scimErr := new(wrappedScimError)
-	if ok := errors.As(err, &scimErr); ok {
-		mappedErr := mapToScimJsonError(ctx, scimErr.Parent)
-		mappedErr.ScimType = scimErr.ScimType
+func MapToScimError(ctx context.Context, err error) *ScimError {
+	scimError := new(ScimError)
+	if ok := errors.As(err, &scimError); ok {
+		return scimError
+	}
+
+	scimWrappedError := new(wrappedScimError)
+	if ok := errors.As(err, &scimWrappedError); ok {
+		mappedErr := MapToScimError(ctx, scimWrappedError.Parent)
+		if scimWrappedError.ScimType != "" {
+			mappedErr.ScimType = scimWrappedError.ScimType
+		}
+
+		if scimWrappedError.Status != 0 {
+			mappedErr.Status = strconv.Itoa(scimWrappedError.Status)
+			mappedErr.StatusCode = scimWrappedError.Status
+		}
+
 		return mappedErr
 	}
 
 	zitadelErr := new(zerrors.ZitadelError)
 	if ok := errors.As(err, &zitadelErr); !ok {
-		return &scimError{
+		return &ScimError{
 			Schemas:    []schemas.ScimSchemaType{schemas.IdError},
 			Detail:     "Unknown internal server error",
 			Status:     strconv.Itoa(http.StatusInternalServerError),
@@ -117,13 +183,13 @@ func mapToScimJsonError(ctx context.Context, err error) *scimError {
 	}
 
 	localizedMsg := translator.LocalizeFromCtx(ctx, zitadelErr.GetMessage(), nil)
-	return &scimError{
+	return &ScimError{
 		Schemas:    []schemas.ScimSchemaType{schemas.IdError, schemas.IdZitadelErrorDetail},
 		ScimType:   mapErrorToScimErrorType(err),
 		Detail:     localizedMsg,
 		StatusCode: statusCode,
 		Status:     strconv.Itoa(statusCode),
-		ZitadelDetail: &errorDetail{
+		ZitadelDetail: &ErrorDetail{
 			ID:      zitadelErr.GetID(),
 			Message: zitadelErr.GetMessage(),
 		},
@@ -134,6 +200,8 @@ func mapErrorToScimErrorType(err error) scimErrorType {
 	switch {
 	case zerrors.IsErrorInvalidArgument(err):
 		return ScimTypeInvalidValue
+	case zerrors.IsErrorAlreadyExists(err):
+		return ScimTypeUniqueness
 	default:
 		return ""
 	}

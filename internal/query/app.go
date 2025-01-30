@@ -481,7 +481,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-h9TeF", "Errors.Internal")
 	}
 	apps.State, err = q.latestState(ctx, appsTable)
 	return apps, err

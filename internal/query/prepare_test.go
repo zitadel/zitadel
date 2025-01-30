@@ -110,7 +110,7 @@ func mockQueries(stmt string, cols []string, rows [][]driver.Value, args ...driv
 		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
-			if cols[len(cols)-1] == "count" {
+			if cols[len(cols)-1] == "count" && len(row) == len(cols)-1 {
 				row = append(row, count)
 			}
 			result.AddRow(row...)
