@@ -3,8 +3,12 @@ package ldap
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net"
 	"net/url"
 	"strconv"
@@ -125,22 +129,55 @@ func getConnection(
 	if timeout == 0 {
 		timeout = ldap.DefaultTimeout
 	}
+	fmt.Println("getConnection()")
+	// cert, err := tls.LoadX509KeyPair("/Users/work/ldap/server.pem", "/Users/work/ldap/server.pem")
 
-	conn, err := ldap.DialURL(server, ldap.DialWithDialer(&net.Dialer{Timeout: timeout}))
+	// fmt.Printf("err = %+v\n", err)
+	// fmt.Printf("cert = %+v\n", cert)
+	certs, err := ioutil.ReadFile("/Users/work/ldap/server.pem")
+	if err != nil {
+		log.Fatalf("Failed to append %q to RootCAs: %v", err)
+	}
+	rootCAs, _ := x509.SystemCertPool()
+	if rootCAs == nil {
+		rootCAs = x509.NewCertPool()
+	}
+	if ok := rootCAs.AppendCertsFromPEM(certs); !ok {
+		log.Println("No certs appended, using system certs only")
+	}
+	fmt.Println(">>>>>>>> No certs appended, using system certs only")
+
+	// conn, err := ldap.DialURL(server, ldap.DialWithDialer(
+	// 	&net.Dialer{
+	// 		Timeout: timeout}))
+	conn, err := ldap.DialURL(server, ldap.DialWithTLSDialer(
+		&tls.Config{
+			// Certificates: []tls.Certificate{cert},
+			RootCAs: rootCAs,
+		},
+		&net.Dialer{
+			Timeout: timeout},
+	))
+
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("connected")
 
 	u, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
-	if u.Scheme == "ldaps" && startTLS {
-		err = conn.StartTLS(&tls.Config{ServerName: u.Host})
-		if err != nil {
-			return nil, err
-		}
+
+	// if u.Scheme == "ldaps" && startTLS {
+	err = conn.StartTLS(
+		&tls.Config{
+			ServerName: u.Host,
+		})
+	if err != nil {
+		return nil, err
 	}
+	// }
 	return conn, nil
 }
 
