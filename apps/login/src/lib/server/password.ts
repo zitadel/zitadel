@@ -133,9 +133,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
         );
       } catch (error: any) {
         if ("failedAttempts" in error && error.failedAttempts) {
-          const lockoutSettings = await getLockoutSettings(
-            command.organization,
-          );
+          const lockoutSettings = await getLockoutSettings({
+            serviceUrl,
+            serviceRegion,
+            orgId: command.organization,
+          });
 
           return {
             error:
@@ -163,7 +165,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
       );
     } catch (error: any) {
       if ("failedAttempts" in error && error.failedAttempts) {
-        const lockoutSettings = await getLockoutSettings(command.organization);
+        const lockoutSettings = await getLockoutSettings({
+          serviceUrl,
+          serviceRegion,
+          orgId: command.organization,
+        });
 
         return {
           error:
