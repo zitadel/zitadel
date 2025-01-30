@@ -55,7 +55,7 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: "Could not get session" };
   }
 
-  return registerU2F({ serviceUrl, userId, domain: hostname });
+  return registerU2F({ serviceUrl, serviceRegion, userId, domain: hostname });
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
@@ -101,5 +101,5 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     userId,
   });
 
-  return verifyU2FRegistration({ serviceUrl, request });
+  return verifyU2FRegistration({ serviceUrl, serviceRegion, request });
 }

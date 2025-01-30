@@ -107,7 +107,11 @@ export async function updateSession(options: UpdateSessionCommand) {
     challenges.webAuthN.domain = hostname;
   }
 
-  const loginSettings = await getLoginSettings({ serviceUrl, organization });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey

@@ -265,7 +265,11 @@ export async function changePassword(command: {
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   // check for init state
-  const { user } = await getUserByID({ serviceUrl, userId: command.userId });
+  const { user } = await getUserByID({
+    serviceUrl,
+    serviceRegion,
+    userId: command.userId,
+  });
 
   if (!user || user.userId !== command.userId) {
     return { error: "Could not send Password Reset Link" };
@@ -348,29 +352,30 @@ export async function checkSessionAndSetPassword({
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
   if (forceMfa && hasNoMFAMethods) {
-    return setPassword({ serviceUrl, payload }).catch((error) => {
-      // throw error if failed precondition (ex. User is not yet initialized)
-      if (error.code === 9 && error.message) {
-        return { error: "Failed precondition" };
-      } else {
-        throw error;
-      }
-    });
+    return setPassword({ serviceUrl, serviceRegion, payload }).catch(
+      (error) => {
+        // throw error if failed precondition (ex. User is not yet initialized)
+        if (error.code === 9 && error.message) {
+          return { error: "Failed precondition" };
+        } else {
+          throw error;
+        }
+      },
+    );
   } else {
-    const transport = async (host: string, token: string) => {
+    const transport = async (serviceUrl: string, token: string) => {
       return createServerTransport(token, {
         baseUrl: serviceUrl,
       });
     };
 
-    const myUserService = async (host: string, sessionToken: string) => {
+    const myUserService = async (serviceUrl: string, sessionToken: string) => {
       const transportPromise = await transport(serviceUrl, sessionToken);
       return createUserServiceClient(transportPromise);
     };
 
     const selfService = await myUserService(
       serviceUrl,
-      serviceRegion,
       `${sessionCookie.token}`,
     );
 

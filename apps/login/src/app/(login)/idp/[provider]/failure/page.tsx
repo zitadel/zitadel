@@ -27,7 +27,11 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

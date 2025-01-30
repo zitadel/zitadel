@@ -160,7 +160,11 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  const loginSettings = await getLoginSettings({ serviceUrl, organization });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey

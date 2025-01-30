@@ -125,11 +125,13 @@ export async function sendLoginname(command: SendLoginnameCommand) {
   };
 
   const redirectUserToIDP = async (userId: string) => {
-    const identityProviders = await listIDPLinks({ serviceUrl, userId }).then(
-      (resp) => {
-        return resp.result;
-      },
-    );
+    const identityProviders = await listIDPLinks({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    }).then((resp) => {
+      return resp.result;
+    });
 
     if (identityProviders.length === 1) {
       const _headers = await headers();
@@ -142,7 +144,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
 
       const identityProviderId = identityProviders[0].idpId;
 
-      const idp = await getIDPByID({ serviceUrl, id: identityProviderId });
+      const idp = await getIDPByID({
+        serviceUrl,
+        serviceRegion,
+        id: identityProviderId,
+      });
 
       const idpType = idp?.type;
 
@@ -407,7 +413,11 @@ export async function sendLoginname(command: SendLoginnameCommand) {
       const suffix = matched?.[1] ?? "";
 
       // this just returns orgs where the suffix is set as primary domain
-      const orgs = await getOrgsByDomain({ serviceUrl, domain: suffix });
+      const orgs = await getOrgsByDomain({
+        serviceUrl,
+        serviceRegion,
+        domain: suffix,
+      });
       const orgToCheckForDiscovery =
         orgs.result && orgs.result.length === 1 ? orgs.result[0].id : undefined;
 
