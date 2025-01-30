@@ -20,16 +20,17 @@ type ServiceClass =
 export async function createServiceForHost<T extends ServiceClass>(
   service: T,
   serviceUrl: string,
+  serviceRegion: string,
 ) {
   let token;
 
   // if we are running in a multitenancy context, use the system user token
   if (
-    process.env.AUDIENCE &&
-    process.env.SYSTEM_USER_ID &&
-    process.env.SYSTEM_USER_PRIVATE_KEY
+    process.env[serviceRegion + "_AUDIENCE"] &&
+    process.env[serviceRegion + "_SYSTEM_USER_ID"] &&
+    process.env[serviceRegion + "_SYSTEM_USER_PRIVATE_KEY"]
   ) {
-    token = await systemAPIToken();
+    token = await systemAPIToken({ serviceRegion });
   } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
     token = process.env.ZITADEL_SERVICE_USER_TOKEN;
   }
@@ -49,7 +50,10 @@ export async function createServiceForHost<T extends ServiceClass>(
   return createClientFor<T>(service)(transport);
 }
 
-export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): string {
+export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
+  serviceUrl: string;
+  serviceRegion: string;
+} {
   let instanceUrl: string = process.env.ZITADEL_API_URL;
 
   const forwardedHost = headers.get("x-zitadel-forward-host");
@@ -70,5 +74,8 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): string {
     }
   }
 
-  return instanceUrl;
+  return {
+    serviceUrl: instanceUrl,
+    serviceRegion: headers.get("x-zitadel-region") || "",
+  };
 }

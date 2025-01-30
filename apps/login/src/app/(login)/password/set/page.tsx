@@ -27,13 +27,14 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   // also allow no session to be found (ignoreUnkownUsername)
   let session: Session | undefined;
   if (loginName) {
     session = await loadMostRecentSession({
       serviceUrl,
+      serviceRegion,
       sessionParams: {
         loginName,
         organization,
@@ -41,19 +42,32 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const passwordComplexity = await getPasswordComplexitySettings({
     serviceUrl,
+    serviceRegion,
     organization: session?.factors?.user?.organizationId,
   });
 
-  const loginSettings = await getLoginSettings({ serviceUrl, organization });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   let user: User | undefined;
   let displayName: string | undefined;
   if (userId) {
-    const userResponse = await getUserByID({ serviceUrl, userId });
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    });
     user = userResponse.user;
 
     if (user?.type.case === "human") {

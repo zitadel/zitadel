@@ -23,10 +23,13 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceUrl });
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+      serviceRegion,
+    });
     if (org) {
       organization = org.id;
     }
@@ -34,15 +37,28 @@ export default async function Page(props: {
 
   const missingData = !firstname || !lastname || !email;
 
-  const legal = await getLegalAndSupportSettings({ serviceUrl, organization });
+  const legal = await getLegalAndSupportSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
+    serviceRegion,
     organization,
   });
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
-  const loginSettings = await getLoginSettings({ serviceUrl, organization });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return missingData ? (
     <DynamicTheme branding={branding}>

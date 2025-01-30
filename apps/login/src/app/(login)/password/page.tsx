@@ -25,11 +25,14 @@ export default async function Page(props: {
   let { loginName, organization, authRequestId, alt } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg({ serviceUrl });
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+      serviceRegion,
+    });
 
     if (org) {
       defaultOrganization = org.id;
@@ -41,6 +44,7 @@ export default async function Page(props: {
   try {
     sessionFactors = await loadMostRecentSession({
       serviceUrl,
+      serviceRegion,
       sessionParams: {
         loginName,
         organization,
@@ -53,10 +57,12 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
+    serviceRegion,
     organization: organization ?? defaultOrganization,
   });
   const loginSettings = await getLoginSettings({
     serviceUrl,
+    serviceRegion,
     organization: organization ?? defaultOrganization,
   });
 

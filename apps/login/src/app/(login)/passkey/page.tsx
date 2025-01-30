@@ -5,11 +5,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { getSessionCookieById } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getSession,
-} from "@/lib/zitadel";
+import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
@@ -25,12 +21,13 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
+        serviceRegion,
         sessionParams: { loginName, organization },
       });
 
@@ -42,6 +39,7 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
+      serviceRegion,
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -51,9 +49,11 @@ export default async function Page(props: {
     });
   }
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
-
-  const loginSettings = await getLoginSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

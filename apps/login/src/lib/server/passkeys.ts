@@ -43,7 +43,7 @@ export async function registerPasskeyLink(
   const { sessionId } = command;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -53,6 +53,7 @@ export async function registerPasskeyLink(
   const sessionCookie = await getSessionCookieById({ sessionId });
   const session = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -73,6 +74,7 @@ export async function registerPasskeyLink(
   // use session token to add the passkey
   const registerLink = await createPasskeyRegistrationLink({
     serviceUrl,
+    serviceRegion,
     userId,
   });
 
@@ -82,6 +84,7 @@ export async function registerPasskeyLink(
 
   return registerPasskey({
     serviceUrl,
+    serviceRegion,
     userId,
     code: registerLink.code,
     domain: hostname,
@@ -90,7 +93,7 @@ export async function registerPasskeyLink(
 
 export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   // if no name is provided, try to generate one from the user agent
   let passkeyName = command.passkeyName;
@@ -109,6 +112,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
   });
   const session = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -120,6 +124,7 @@ export async function verifyPasskeyRegistration(command: VerifyPasskeyCommand) {
 
   return zitadelVerifyPasskeyRegistration({
     serviceUrl,
+    serviceRegion,
     request: create(VerifyPasskeyRegistrationRequestSchema, {
       passkeyId: command.passkeyId,
       publicKeyCredential: command.publicKeyCredential,
@@ -153,9 +158,13 @@ export async function sendPasskey(command: SendPasskeyCommand) {
   }
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  const loginSettings = await getLoginSettings({ serviceUrl, organization });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   const lifetime = checks?.webAuthN
     ? loginSettings?.multiFactorCheckLifetime // TODO different lifetime for webauthn u2f/passkey
@@ -177,6 +186,7 @@ export async function sendPasskey(command: SendPasskeyCommand) {
 
   const userResponse = await getUserByID({
     serviceUrl,
+    serviceRegion,
     userId: session?.factors?.user?.id,
   });
 

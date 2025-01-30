@@ -22,6 +22,7 @@ import { redirect } from "next/navigation";
 
 async function loadSession(
   serviceUrl: string,
+  serviceRegion: string,
   loginName: string,
   authRequestId?: string,
 ) {
@@ -30,6 +31,7 @@ async function loadSession(
   if (authRequestId) {
     return createCallback({
       serviceUrl,
+      serviceRegion,
       req: create(CreateCallbackRequestSchema, {
         authRequestId,
         callbackKind: {
@@ -46,6 +48,7 @@ async function loadSession(
   }
   return getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: recent.id,
     sessionToken: recent.token,
   }).then((response) => {
@@ -61,20 +64,29 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const t = await getTranslations({ locale, namespace: "signedin" });
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const { loginName, authRequestId, organization } = searchParams;
   const sessionFactors = await loadSession(
     serviceUrl,
+    serviceRegion,
     loginName,
     authRequestId,
   );
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   let loginSettings;
   if (!authRequestId) {
-    loginSettings = await getLoginSettings({ serviceUrl, organization });
+    loginSettings = await getLoginSettings({
+      serviceUrl,
+      serviceRegion,
+      organization,
+    });
   }
 
   return (

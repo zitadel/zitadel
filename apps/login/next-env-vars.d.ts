@@ -1,19 +1,13 @@
 declare namespace NodeJS {
   interface ProcessEnv {
-    /**
-     * Multitenancy: The system api url
-     */
-    AUDIENCE: string;
+    // Allow any environment variable that matches the pattern
+    [key: `${string}_AUDIENCE`]: string; // The system api url
+    [key: `${string}_SYSTEM_USER_ID`]: string; // The service user id
+    [key: `${string}_SYSTEM_USER_PRIVATE_KEY`]: string; // The service user private key
 
-    /**
-     * Multitenancy: The service user id
-     */
-    SYSTEM_USER_ID: string;
-
-    /**
-     * Multitenancy: The service user private key
-     */
-    SYSTEM_USER_PRIVATE_KEY: string;
+    AUDIENCE: string; // The fallback system api url
+    SYSTEM_USER_ID: string; // The fallback service user id
+    SYSTEM_USER_PRIVATE_KEY: string; // The fallback service user private key
 
     /**
      * Self hosting: The instance url

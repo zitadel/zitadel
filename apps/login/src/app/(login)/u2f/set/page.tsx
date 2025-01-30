@@ -19,17 +19,22 @@ export default async function Page(props: {
   const { loginName, organization, authRequestId, checkAfter } = searchParams;
 
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const sessionFactors = await loadMostRecentSession({
     serviceUrl,
+    serviceRegion,
     sessionParams: {
       loginName,
       organization,
     },
   });
 
-  const branding = await getBrandingSettings({ serviceUrl, organization });
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

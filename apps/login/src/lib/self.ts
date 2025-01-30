@@ -26,12 +26,13 @@ export async function setMyPassword({
   password: string;
 }) {
   const _headers = await headers();
-  const serviceUrl = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const { session } = await getSession({
     serviceUrl,
+    serviceRegion,
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
