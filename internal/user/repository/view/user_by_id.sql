@@ -74,18 +74,18 @@ SELECT
     , u.instance_id
     , (SELECT EXISTS (SELECT true FROM verified_auth_methods WHERE method_type = 6)) AS otp_sms_added
     , (SELECT EXISTS (SELECT true FROM verified_auth_methods WHERE method_type = 7)) AS otp_email_added
-FROM projections.users13 u
-    LEFT JOIN projections.users13_humans h
+FROM projections.users14 u
+    LEFT JOIN projections.users14_humans h
         ON u.instance_id = h.instance_id
         AND u.id = h.user_id
-    LEFT JOIN projections.users13_notifications n
+    LEFT JOIN projections.users14_notifications n
         ON u.instance_id = n.instance_id
         AND u.id = n.user_id
     LEFT JOIN projections.login_names3 l
         ON u.instance_id = l.instance_id
         AND u.id = l.user_id
         AND l.is_primary = true
-    LEFT JOIN projections.users13_machines m
+    LEFT JOIN projections.users14_machines m
         ON u.instance_id = m.instance_id
         AND u.id = m.user_id
     LEFT JOIN auth.users3 au

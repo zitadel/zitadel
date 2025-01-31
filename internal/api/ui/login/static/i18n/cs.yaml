@@ -505,6 +505,10 @@ Errors:
       CreationNotAllowed: Vytvoření nového uživatele není na tomto poskytovateli povoleno
       LinkingNotAllowed: Propojení uživatele není na tomto poskytovateli povoleno
       NoOptionAllowed:   Ani vytvoření, ani propojení není povoleno pro tohoto poskytovatele. Obraťte se na svého správce.
+      LoginFailedSwitchLocal: |
+        Přihlášení u externího poskytovatele identit selhalo. Vracíme se k místnímu přihlášení.
+
+        Podrobnosti o chybě: {{.Details}}
     GrantRequired: Přihlášení není možné. Uživatel musí mít alespoň jeden oprávnění na aplikaci. Prosím, kontaktujte svého správce.
     ProjectRequired: Přihlášení není možné. Organizace uživatele musí být přidělena k projektu. Prosím, kontaktujte svého správce.
   IdentityProvider:

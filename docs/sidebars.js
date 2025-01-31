@@ -159,6 +159,7 @@ module.exports = {
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
             "guides/manage/customize/user-schema",
+            "guides/manage/user/scim2",
           ],
         },
         "guides/manage/terraform-provider",
@@ -206,6 +207,31 @@ module.exports = {
           },
           items: [
             "guides/integrate/login/login-users",
+            {
+              type: "link",
+              href: "/docs/guides/integrate/login/login-users#zitadels-session-api",
+              label: "Session API"
+            },
+            {
+              type: "category",
+              label: "Hosted Login",
+              link: {
+                type: "doc",
+                id: "guides/integrate/login/hosted-login"
+              },
+              items: [
+                {
+                  type: "link",
+                  href: "/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta",
+                  label: "Login V2 [Beta]"
+                },
+              ]
+            },
+            {
+              type: "link",
+              href: "/docs/guides/integrate/login/login-users#build-a-custom-login-ui-to-authenticate-users",
+              label: "Custom Login UI",
+            },
             {
               type: "category",
               label: "OpenID Connect",
@@ -301,6 +327,7 @@ module.exports = {
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard",
+            "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/typescript-repo",
           ],
         },
@@ -809,6 +836,14 @@ module.exports = {
           collapsed: true,
           items: ["apis/saml/endpoints"],
         },
+      ],
+    },
+    {
+      type: "category",
+      label: "Provision Users",
+      collapsed: true,
+      items: [
+          'apis/scim2'
       ],
     },
     {

@@ -22,13 +22,11 @@ const (
 )
 
 func (l *Login) renderDeviceAuthUserCode(w http.ResponseWriter, r *http.Request, err error) {
-	var errID, errMessage string
 	if err != nil {
 		logging.WithError(err).Error()
-		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), nil)
-	data := l.getBaseData(r, nil, translator, "DeviceAuth.Title", "DeviceAuth.UserCode.Description", errID, errMessage)
+	data := l.getBaseData(r, nil, translator, "DeviceAuth.Title", "DeviceAuth.UserCode.Description", err)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplDeviceAuthUserCode], data, nil)
 }
 
@@ -41,7 +39,7 @@ func (l *Login) renderDeviceAuthAction(w http.ResponseWriter, r *http.Request, a
 		ClientID      string
 		Scopes        []string
 	}{
-		baseData:      l.getBaseData(r, authReq, translator, "DeviceAuth.Title", "DeviceAuth.Action.Description", "", ""),
+		baseData:      l.getBaseData(r, authReq, translator, "DeviceAuth.Title", "DeviceAuth.Action.Description", nil),
 		AuthRequestID: authReq.ID,
 		Username:      authReq.UserName,
 		ClientID:      authReq.ApplicationID,
@@ -63,7 +61,7 @@ func (l *Login) renderDeviceAuthDone(w http.ResponseWriter, r *http.Request, aut
 		baseData
 		Message string
 	}{
-		baseData: l.getBaseData(r, authReq, translator, "DeviceAuth.Title", "DeviceAuth.Done.Description", "", ""),
+		baseData: l.getBaseData(r, authReq, translator, "DeviceAuth.Title", "DeviceAuth.Done.Description", nil),
 	}
 	switch action {
 	case deviceAuthAllowed:
