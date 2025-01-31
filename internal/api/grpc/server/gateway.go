@@ -57,6 +57,7 @@ var (
 		},
 	)
 
+	// we need the errorHandler to set the request URI pattern in case of an error
 	errorHandler = runtime.ErrorHandlerFunc(
 		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
 			setRequestURIPattern(ctx)

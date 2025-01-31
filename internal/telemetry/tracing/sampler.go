@@ -13,6 +13,9 @@ type spanKindSampler struct {
 	kinds   []trace.SpanKind
 }
 
+// ShouldSample implements the [sdk_trace.Sampler] interface.
+// It will not sample any spans which do not match the configured span kinds.
+// For spans which do match, the decorated sampler is used to make the sampling decision.
 func (sk spanKindSampler) ShouldSample(p sdk_trace.SamplingParameters) sdk_trace.SamplingResult {
 	psc := trace.SpanContextFromContext(p.ParentContext)
 	if !slices.Contains(sk.kinds, p.Kind) {
