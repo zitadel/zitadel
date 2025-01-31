@@ -60,6 +60,9 @@ func (req *OperationRequest) Validate() error {
 }
 
 func (op *Operation) validate() error {
+	// ignore the casing, as some scim clients send these capitalized
+	op.Operation = OperationType(strings.ToLower(string(op.Operation)))
+
 	if !op.Operation.isValid() {
 		return serrors.ThrowInvalidValue(zerrors.ThrowInvalidArgumentf(nil, "SCIM-opty1", "Patch op %s not supported", op.Operation))
 	}
