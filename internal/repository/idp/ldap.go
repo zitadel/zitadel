@@ -41,6 +41,7 @@ type LDAPAttributes struct {
 	PreferredLanguageAttribute string `json:"preferredLanguageAttribute,omitempty"`
 	AvatarURLAttribute         string `json:"avatarURLAttribute,omitempty"`
 	ProfileAttribute           string `json:"profileAttribute,omitempty"`
+	RootCA                     []byte `json:"rootCA,omitempty"`
 }
 
 func (o *LDAPAttributes) Changes(attributes LDAPAttributes) LDAPAttributeChanges {
@@ -198,6 +199,7 @@ type LDAPIDPChangedEvent struct {
 	UserObjectClasses []string            `json:"userObjectClasses,omitempty"`
 	UserFilters       []string            `json:"userFilters,omitempty"`
 	Timeout           *time.Duration      `json:"timeout,omitempty"`
+	RootCA            []byte              `json:"rootCA,omitempty"`
 
 	LDAPAttributeChanges
 	OptionChanges
@@ -312,6 +314,12 @@ func ChangeLDAPUserFilters(userFilters []string) func(*LDAPIDPChangedEvent) {
 func ChangeLDAPTimeout(timeout time.Duration) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {
 		e.Timeout = &timeout
+	}
+}
+
+func ChangeLDAPRootCA(rootCA []byte) func(*LDAPIDPChangedEvent) {
+	return func(e *LDAPIDPChangedEvent) {
+		e.RootCA = rootCA
 	}
 }
 

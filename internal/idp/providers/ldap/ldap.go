@@ -23,6 +23,7 @@ type Provider struct {
 	userObjectClasses []string
 	userFilters       []string
 	timeout           time.Duration
+	rootCA            []byte
 
 	loginUrl string
 
@@ -186,6 +187,7 @@ func New(
 	userFilters []string,
 	timeout time.Duration,
 	loginUrl string,
+	rootCA []byte,
 	options ...ProviderOpts,
 ) *Provider {
 	provider := &Provider{
@@ -200,6 +202,7 @@ func New(
 		userFilters:       userFilters,
 		timeout:           timeout,
 		loginUrl:          loginUrl,
+		rootCA:            rootCA,
 	}
 	for _, option := range options {
 		option(provider)

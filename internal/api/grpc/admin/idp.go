@@ -2,6 +2,9 @@ package admin
 
 import (
 	"context"
+	"crypto/x509"
+	"fmt"
+	"log"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
@@ -385,6 +388,7 @@ func (s *Server) UpdateGoogleProvider(ctx context.Context, req *admin_pb.UpdateG
 }
 
 func (s *Server) AddLDAPProvider(ctx context.Context, req *admin_pb.AddLDAPProviderRequest) (*admin_pb.AddLDAPProviderResponse, error) {
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>> ")
 	id, details, err := s.command.AddInstanceLDAPProvider(ctx, addLDAPProviderToCommand(req))
 	if err != nil {
 		return nil, err
@@ -396,6 +400,13 @@ func (s *Server) AddLDAPProvider(ctx context.Context, req *admin_pb.AddLDAPProvi
 }
 
 func (s *Server) UpdateLDAPProvider(ctx context.Context, req *admin_pb.UpdateLDAPProviderRequest) (*admin_pb.UpdateLDAPProviderResponse, error) {
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>> admin update")
+	fmt.Printf("req = %+v\n", req)
+	rootCAs := x509.NewCertPool()
+	if ok := rootCAs.AppendCertsFromPEM(req.RootCA); !ok {
+		log.Println("No certs appended, using system certs only")
+	}
+	fmt.Printf("rootCAs = %+v\n", rootCAs)
 	details, err := s.command.UpdateInstanceLDAPProvider(ctx, req.Id, updateLDAPProviderToCommand(req))
 	if err != nil {
 		return nil, err

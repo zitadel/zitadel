@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"net/http"
 	"reflect"
 	"slices"
@@ -1366,6 +1367,7 @@ type LDAPIDPWriteModel struct {
 	UserObjectClasses []string
 	UserFilters       []string
 	Timeout           time.Duration
+	RootCA            []byte
 	idp.LDAPAttributes
 	idp.Options
 
@@ -1460,6 +1462,7 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 	userObjectClasses []string,
 	userFilters []string,
 	timeout time.Duration,
+	rootCA []byte,
 	secretCrypto crypto.EncryptionAlgorithm,
 	attributes idp.LDAPAttributes,
 	options idp.Options,
@@ -1500,6 +1503,9 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 	}
 	if wm.Timeout != timeout {
 		changes = append(changes, idp.ChangeLDAPTimeout(timeout))
+	}
+	if bytes.Equal(wm.RootCA, rootCA) {
+		changes = append(changes, idp.ChangeLDAPRootCA(rootCA))
 	}
 	attrs := wm.LDAPAttributes.Changes(attributes)
 	if !attrs.IsZero() {
@@ -1583,6 +1589,7 @@ func (wm *LDAPIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 		wm.UserFilters,
 		wm.Timeout,
 		callbackURL,
+		wm.RootCA,
 		opts...,
 	), nil
 }

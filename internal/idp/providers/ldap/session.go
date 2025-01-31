@@ -6,8 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/url"
@@ -53,7 +51,9 @@ func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 			s.Provider.userObjectClasses,
 			s.Provider.userFilters,
 			s.User,
-			s.Password, s.Provider.timeout)
+			s.Password,
+			s.Provider.timeout,
+			s.Provider.rootCA)
 		// If there were invalid credentials or multiple users with the credentials cancel process
 		if err != nil && (errors.Is(err, ErrFailedLogin) || errors.Is(err, ErrNoSingleUser)) {
 			return nil, err
@@ -98,8 +98,9 @@ func tryBind(
 	username string,
 	password string,
 	timeout time.Duration,
+	rootCA []byte,
 ) (*ldap.Entry, error) {
-	conn, err := getConnection(server, startTLS, timeout)
+	conn, err := getConnection(server, startTLS, timeout, rootCA)
 	if err != nil {
 		return nil, err
 	}
@@ -121,63 +122,110 @@ func tryBind(
 	)
 }
 
+// func getConnection(
+// 	server string,
+// 	startTLS bool,
+// 	timeout time.Duration,
+// ) (*ldap.Conn, error) {
+// 	if timeout == 0 {
+// 		timeout = ldap.DefaultTimeout
+// 	}
+// 	fmt.Println("getConnection()")
+// 	// cert, err := tls.LoadX509KeyPair("/Users/work/ldap/server.pem", "/Users/work/ldap/server.pem")
+
+// 	// fmt.Printf("err = %+v\n", err)
+// 	// fmt.Printf("cert = %+v\n", cert)
+// 	certs, err := ioutil.ReadFile("/Users/work/ldap/server.pem")
+// 	if err != nil {
+// 		log.Fatalf("Failed to append %q to RootCAs: %v", err)
+// 	}
+// 	rootCAs, _ := x509.SystemCertPool()
+// 	if rootCAs == nil {
+// 		rootCAs = x509.NewCertPool()
+// 	}
+// 	if ok := rootCAs.AppendCertsFromPEM(certs); !ok {
+// 		log.Println("No certs appended, using system certs only")
+// 	}
+// 	fmt.Println(">>>>>>>> No certs appended, using system certs only")
+
+// 	// conn, err := ldap.DialURL(server, ldap.DialWithDialer(
+// 	// 	&net.Dialer{
+// 	// 		Timeout: timeout}))
+// 	conn, err := ldap.DialURL(server, ldap.DialWithTLSDialer(
+// 		&tls.Config{
+// 			// Certificates: []tls.Certificate{cert},
+// 			RootCAs: rootCAs,
+// 		},
+// 		&net.Dialer{
+// 			Timeout: timeout},
+// 	))
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	fmt.Println("connected")
+
+// 	u, err := url.Parse(server)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+//		// if u.Scheme == "ldaps" && startTLS {
+//		err = conn.StartTLS(
+//			&tls.Config{
+//				ServerName: u.Host,
+//			})
+//		if err != nil {
+//			return nil, err
+//	}/	/ }
+//
+//		return conn, nil
+//	}
 func getConnection(
 	server string,
 	startTLS bool,
 	timeout time.Duration,
+	rootCA []byte,
 ) (*ldap.Conn, error) {
 	if timeout == 0 {
 		timeout = ldap.DefaultTimeout
 	}
-	fmt.Println("getConnection()")
-	// cert, err := tls.LoadX509KeyPair("/Users/work/ldap/server.pem", "/Users/work/ldap/server.pem")
 
-	// fmt.Printf("err = %+v\n", err)
-	// fmt.Printf("cert = %+v\n", cert)
-	certs, err := ioutil.ReadFile("/Users/work/ldap/server.pem")
-	if err != nil {
-		log.Fatalf("Failed to append %q to RootCAs: %v", err)
-	}
-	rootCAs, _ := x509.SystemCertPool()
-	if rootCAs == nil {
-		rootCAs = x509.NewCertPool()
-	}
-	if ok := rootCAs.AppendCertsFromPEM(certs); !ok {
-		log.Println("No certs appended, using system certs only")
-	}
-	fmt.Println(">>>>>>>> No certs appended, using system certs only")
-
-	// conn, err := ldap.DialURL(server, ldap.DialWithDialer(
-	// 	&net.Dialer{
-	// 		Timeout: timeout}))
-	conn, err := ldap.DialURL(server, ldap.DialWithTLSDialer(
-		&tls.Config{
-			// Certificates: []tls.Certificate{cert},
-			RootCAs: rootCAs,
-		},
-		&net.Dialer{
-			Timeout: timeout},
-	))
-
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("connected")
+	dialer := make([]ldap.DialOpt, 1, 2)
+	dialer[0] = ldap.DialWithDialer(&net.Dialer{Timeout: timeout})
 
 	u, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	// if u.Scheme == "ldaps" && startTLS {
-	err = conn.StartTLS(
-		&tls.Config{
-			ServerName: u.Host,
-		})
+	if u.Scheme == "ldaps" && rootCA != nil {
+		// cert, err := tls.X509KeyPair(rootCA, rootCA)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		rootCAs := x509.NewCertPool()
+		if ok := rootCAs.AppendCertsFromPEM(rootCA); !ok {
+			log.Println("No certs appended, using system certs only")
+		}
+
+		dialer = append(dialer, ldap.DialWithTLSConfig(&tls.Config{
+			RootCAs: rootCAs,
+		}))
+		// dialer = append(dialer, ldap.DialWithTLSConfig(&tls.Config{}))
+	}
+
+	conn, err := ldap.DialURL(server, dialer...)
 	if err != nil {
 		return nil, err
 	}
-	// }
+
+	if u.Scheme == "ldap" && startTLS {
+		err = conn.StartTLS(&tls.Config{ServerName: u.Host})
+		if err != nil {
+			return nil, err
+		}
+	}
 	return conn, nil
 }
 

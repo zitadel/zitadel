@@ -109,6 +109,7 @@ type LDAPProvider struct {
 	Timeout           time.Duration
 	LDAPAttributes    idp.LDAPAttributes
 	IDPOptions        idp.Options
+	RootCA            []byte
 }
 
 type SAMLProvider struct {

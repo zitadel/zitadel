@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"slices"
@@ -127,6 +128,8 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 		l.defaultRedirect(w, r)
 		return
 	}
+	fmt.Printf("authReq = %+v\n", authReq)
+	fmt.Printf("data = %+v\n", data)
 	l.handleIDP(w, r, authReq, data.IDPConfigID)
 }
 
@@ -966,6 +969,9 @@ func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTem
 	if identityProvider.LDAPIDPTemplate.LDAPAttributes.ProfileAttribute != "" {
 		opts = append(opts, ldap.WithProfileAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.ProfileAttribute))
 	}
+	if identityProvider.LDAPIDPTemplate.LDAPAttributes.RootCA != nil {
+		opts = append(opts, ldap.WithProfileAttribute(string(identityProvider.LDAPIDPTemplate.LDAPAttributes.RootCA)))
+	}
 	return ldap.New(
 		identityProvider.Name,
 		identityProvider.Servers,
@@ -977,6 +983,7 @@ func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTem
 		identityProvider.UserFilters,
 		identityProvider.Timeout,
 		l.baseURL(ctx)+EndpointLDAPLogin+"?"+QueryAuthRequestID+"=",
+		identityProvider.Certificate,
 		opts...,
 	), nil
 }
