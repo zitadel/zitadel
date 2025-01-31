@@ -21,12 +21,14 @@ import (
 )
 
 type Client struct {
-	Users *ResourceClient[resources.ScimUser]
+	client  *http.Client
+	baseURL string
+	Users   *ResourceClient[resources.ScimUser]
 }
 
 type ResourceClient[T any] struct {
 	client       *http.Client
-	baseUrl      string
+	baseURL      string
 	resourceName string
 }
 
@@ -44,6 +46,8 @@ type ZitadelErrorDetail struct {
 }
 
 type ListRequest struct {
+	Schemas []schemas.ScimSchemaType `json:"schemas"`
+
 	Count *int `json:"count,omitempty"`
 
 	// StartIndex An integer indicating the 1-based index of the first query result.
@@ -73,6 +77,32 @@ type ListResponse[T any] struct {
 	Resources    []T                      `json:"Resources"`
 }
 
+type BulkRequest struct {
+	Schemas      []schemas.ScimSchemaType `json:"schemas"`
+	FailOnErrors *int                     `json:"failOnErrors"`
+	Operations   []*BulkRequestOperation  `json:"Operations"`
+}
+
+type BulkRequestOperation struct {
+	Method string          `json:"method"`
+	BulkID string          `json:"bulkId"`
+	Path   string          `json:"path"`
+	Data   json.RawMessage `json:"data"`
+}
+
+type BulkResponse struct {
+	Schemas    []schemas.ScimSchemaType `json:"schemas"`
+	Operations []*BulkResponseOperation `json:"Operations"`
+}
+
+type BulkResponseOperation struct {
+	Method   string     `json:"method"`
+	BulkID   string     `json:"bulkId,omitempty"`
+	Location string     `json:"location,omitempty"`
+	Response *ScimError `json:"response,omitempty"`
+	Status   string     `json:"status"`
+}
+
 const (
 	listQueryParamSortBy     = "sortBy"
 	listQueryParamSortOrder  = "sortOrder"
@@ -85,12 +115,45 @@ func NewScimClient(target string) *Client {
 	target = "http://" + target + schemas.HandlerPrefix
 	client := &http.Client{}
 	return &Client{
+		client:  client,
+		baseURL: target,
 		Users: &ResourceClient[resources.ScimUser]{
 			client:       client,
-			baseUrl:      target,
+			baseURL:      target,
 			resourceName: "Users",
 		},
 	}
+}
+
+func (c *Client) GetServiceProviderConfig(ctx context.Context, orgID string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/ServiceProviderConfig")
+}
+
+func (c *Client) GetSchemas(ctx context.Context, orgID string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/Schemas")
+}
+
+func (c *Client) GetSchema(ctx context.Context, orgID, schemaID string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/Schemas/"+schemaID)
+}
+
+func (c *Client) GetResourceTypes(ctx context.Context, orgID string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/ResourceTypes")
+}
+
+func (c *Client) GetResourceType(ctx context.Context, orgID, name string) ([]byte, error) {
+	return c.getWithRawResponse(ctx, orgID, "/ResourceTypes/"+name)
+}
+
+func (c *Client) Bulk(ctx context.Context, orgID string, body []byte) (*BulkResponse, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/"+orgID+"/Bulk", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set(zhttp.ContentType, middleware.ContentTypeScim)
+	resp := new(BulkResponse)
+	return resp, doReq(c.client, req, resp)
 }
 
 func (c *ResourceClient[T]) Create(ctx context.Context, orgID string, body []byte) (*T, error) {
@@ -102,21 +165,25 @@ func (c *ResourceClient[T]) Replace(ctx context.Context, orgID, id string, body 
 }
 
 func (c *ResourceClient[T]) Update(ctx context.Context, orgID, id string, body []byte) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, c.buildURL(orgID, id), bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPatch, c.buildResourceURL(orgID, id), bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
 
-	return c.doReq(req, nil)
+	return doReq(c.client, req, nil)
 }
 
 func (c *ResourceClient[T]) List(ctx context.Context, orgID string, req *ListRequest) (*ListResponse[*T], error) {
+	listResponse := new(ListResponse[*T])
+
 	if req.SendAsPost {
 		listReq, err := json.Marshal(req)
 		if err != nil {
 			return nil, err
 		}
-		return c.doWithListResponse(ctx, http.MethodPost, orgID, ".search", bytes.NewReader(listReq))
+
+		err = c.doWithResponse(ctx, http.MethodPost, orgID, ".search", bytes.NewReader(listReq), listResponse)
+		return listResponse, err
 	}
 
 	query, err := url.ParseQuery("")
@@ -144,7 +211,8 @@ func (c *ResourceClient[T]) List(ctx context.Context, orgID string, req *ListReq
 		query.Set(listQueryParamFilter, *req.Filter)
 	}
 
-	return c.doWithListResponse(ctx, http.MethodGet, orgID, "?"+query.Encode(), nil)
+	err = c.doWithResponse(ctx, http.MethodGet, orgID, "?"+query.Encode(), nil, listResponse)
+	return listResponse, err
 }
 
 func (c *ResourceClient[T]) Get(ctx context.Context, orgID, resourceID string) (*T, error) {
@@ -156,40 +224,62 @@ func (c *ResourceClient[T]) Delete(ctx context.Context, orgID, id string) error 
 }
 
 func (c *ResourceClient[T]) do(ctx context.Context, method, orgID, url string) error {
-	req, err := http.NewRequestWithContext(ctx, method, c.buildURL(orgID, url), nil)
+	req, err := http.NewRequestWithContext(ctx, method, c.buildResourceURL(orgID, url), nil)
 	if err != nil {
 		return err
 	}
 
-	return c.doReq(req, nil)
+	return doReq(c.client, req, nil)
 }
 
-func (c *ResourceClient[T]) doWithListResponse(ctx context.Context, method, orgID, url string, body io.Reader) (*ListResponse[*T], error) {
-	req, err := http.NewRequestWithContext(ctx, method, c.buildURL(orgID, url), body)
+func (c *ResourceClient[T]) doWithResponse(ctx context.Context, method, orgID, url string, body io.Reader, response interface{}) error {
+	req, err := http.NewRequestWithContext(ctx, method, c.buildResourceURL(orgID, url), body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	req.Header.Set(zhttp.ContentType, middleware.ContentTypeScim)
-	response := new(ListResponse[*T])
-	return response, c.doReq(req, response)
+	return doReq(c.client, req, response)
 }
 
 func (c *ResourceClient[T]) doWithBody(ctx context.Context, method, orgID, url string, body io.Reader) (*T, error) {
-	req, err := http.NewRequestWithContext(ctx, method, c.buildURL(orgID, url), body)
+	req, err := http.NewRequestWithContext(ctx, method, c.buildResourceURL(orgID, url), body)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set(zhttp.ContentType, middleware.ContentTypeScim)
 	responseEntity := new(T)
-	return responseEntity, c.doReq(req, responseEntity)
+	return responseEntity, doReq(c.client, req, responseEntity)
 }
 
-func (c *ResourceClient[T]) doReq(req *http.Request, responseEntity interface{}) error {
-	addTokenAsHeader(req)
+func (c *Client) getWithRawResponse(ctx context.Context, orgID, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/"+orgID+url, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	resp, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		err := resp.Body.Close()
+		logging.OnError(err).Error("Failed to close response body")
+	}()
+
+	if (resp.StatusCode / 100) != 2 {
+		return nil, readScimError(resp)
+	}
+
+	return io.ReadAll(resp.Body)
+}
+
+func doReq(client *http.Client, req *http.Request, responseEntity interface{}) error {
+	addTokenAsHeader(req)
+
+	resp, err := client.Do(req)
 
 	if err != nil {
 		return err
@@ -239,12 +329,12 @@ func readScimError(resp *http.Response) error {
 	return scimErr
 }
 
-func (c *ResourceClient[T]) buildURL(orgID, segment string) string {
+func (c *ResourceClient[T]) buildResourceURL(orgID, segment string) string {
 	if segment == "" || strings.HasPrefix(segment, "?") {
-		return c.baseUrl + "/" + path.Join(orgID, c.resourceName) + segment
+		return c.baseURL + "/" + path.Join(orgID, c.resourceName) + segment
 	}
 
-	return c.baseUrl + "/" + path.Join(orgID, c.resourceName, segment)
+	return c.baseURL + "/" + path.Join(orgID, c.resourceName, segment)
 }
 
 func (err *ScimError) Error() string {

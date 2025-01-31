@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,6 +26,7 @@ import (
 func TestGetUser(t *testing.T) {
 	tests := []struct {
 		name        string
+		orgID       string
 		buildUserID func() string
 		cleanup     func(userID string)
 		ctx         context.Context
@@ -42,6 +42,19 @@ func TestGetUser(t *testing.T) {
 		},
 		{
 			name:        "no permissions",
+			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
+			errorStatus: http.StatusNotFound,
+			wantErr:     true,
+		},
+		{
+			name:        "another org",
+			orgID:       SecondaryOrganization.OrganizationId,
+			errorStatus: http.StatusNotFound,
+			wantErr:     true,
+		},
+		{
+			name:        "another org with permissions",
+			orgID:       SecondaryOrganization.OrganizationId,
 			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeNoPermission),
 			errorStatus: http.StatusNotFound,
 			wantErr:     true,
@@ -237,11 +250,16 @@ func TestGetUser(t *testing.T) {
 				userID = createUserResp.UserId
 			}
 
+			orgID := tt.orgID
+			if orgID == "" {
+				orgID = Instance.DefaultOrg.Id
+			}
+
 			retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
 			var fetchedUser *resources.ScimUser
 			var err error
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				fetchedUser, err = Instance.Client.SCIM.Users.Get(ctx, Instance.DefaultOrg.Id, userID)
+				fetchedUser, err = Instance.Client.SCIM.Users.Get(ctx, orgID, userID)
 				if tt.wantErr {
 					statusCode := tt.errorStatus
 					if statusCode == 0 {
@@ -255,7 +273,7 @@ func TestGetUser(t *testing.T) {
 				assert.Equal(ttt, userID, fetchedUser.ID)
 				assert.EqualValues(ttt, []schemas.ScimSchemaType{"urn:ietf:params:scim:schemas:core:2.0:User"}, fetchedUser.Schemas)
 				assert.Equal(ttt, schemas.ScimResourceTypeSingular("User"), fetchedUser.Resource.Meta.ResourceType)
-				assert.Equal(ttt, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, Instance.DefaultOrg.Id, "Users", fetchedUser.ID), fetchedUser.Resource.Meta.Location)
+				assert.Equal(ttt, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, orgID, "Users", fetchedUser.ID), fetchedUser.Resource.Meta.Location)
 				assert.Nil(ttt, fetchedUser.Password)
 				if !test.PartiallyDeepEqual(tt.want, fetchedUser) {
 					ttt.Errorf("GetUser() got = %#v, want %#v", fetchedUser, tt.want)
@@ -267,11 +285,4 @@ func TestGetUser(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestGetUser_anotherOrg(t *testing.T) {
-	createUserResp := Instance.CreateHumanUser(CTX)
-	org := Instance.CreateOrganization(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), gofakeit.Name(), gofakeit.Email())
-	_, err := Instance.Client.SCIM.Users.Get(CTX, org.OrganizationId, createUserResp.UserId)
-	scim.RequireScimError(t, http.StatusNotFound, err)
 }

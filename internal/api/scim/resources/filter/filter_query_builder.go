@@ -33,6 +33,7 @@ type MappedQueryBuilderFunc func(ctx context.Context, compareValue *CompValue, o
 type QueryFieldInfo struct {
 	Column           query.Column
 	FieldType        FieldType
+	CaseInsensitive  bool
 	BuildMappedQuery MappedQueryBuilderFunc
 }
 
@@ -290,19 +291,36 @@ func (b *queryBuilder) buildTextQuery(field *QueryFieldInfo, right CompValue, op
 	}
 
 	var comp query.TextComparison
-	switch {
-	case op.Equal:
-		comp = query.TextEquals
-	case op.NotEqual:
-		comp = query.TextNotEquals
-	case op.Contains:
-		comp = query.TextContains
-	case op.StartsWith:
-		comp = query.TextStartsWith
-	case op.EndsWith:
-		comp = query.TextEndsWith
-	default:
-		return nil, serrors.ThrowInvalidFilter(zerrors.ThrowInvalidArgument(nil, "SCIM-FF425", "Invalid filter expression: unsupported comparison operator for text fields"))
+	if field.CaseInsensitive {
+		switch {
+		case op.Equal:
+			comp = query.TextEqualsIgnoreCase
+		case op.NotEqual:
+			comp = query.TextNotEqualsIgnoreCase
+		case op.Contains:
+			comp = query.TextContainsIgnoreCase
+		case op.StartsWith:
+			comp = query.TextStartsWithIgnoreCase
+		case op.EndsWith:
+			comp = query.TextEndsWithIgnoreCase
+		default:
+			return nil, serrors.ThrowInvalidFilter(zerrors.ThrowInvalidArgument(nil, "SCIM-FF529", "Invalid filter expression: unsupported comparison operator for text fields"))
+		}
+	} else {
+		switch {
+		case op.Equal:
+			comp = query.TextEquals
+		case op.NotEqual:
+			comp = query.TextNotEquals
+		case op.Contains:
+			comp = query.TextContains
+		case op.StartsWith:
+			comp = query.TextStartsWith
+		case op.EndsWith:
+			comp = query.TextEndsWith
+		default:
+			return nil, serrors.ThrowInvalidFilter(zerrors.ThrowInvalidArgument(nil, "SCIM-FF425", "Invalid filter expression: unsupported comparison operator for text fields"))
+		}
 	}
 
 	return query.NewTextQuery(field.Column, *right.StringValue, comp)

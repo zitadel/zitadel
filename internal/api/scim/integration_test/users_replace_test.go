@@ -37,14 +37,16 @@ var (
 
 func TestReplaceUser(t *testing.T) {
 	tests := []struct {
-		name          string
-		body          []byte
-		ctx           context.Context
-		want          *resources.ScimUser
-		wantErr       bool
-		scimErrorType string
-		errorStatus   int
-		zitadelErrID  string
+		name             string
+		body             []byte
+		ctx              context.Context
+		createUserOrgID  string
+		replaceUserOrgID string
+		want             *resources.ScimUser
+		wantErr          bool
+		scimErrorType    string
+		errorStatus      int
+		zitadelErrID     string
 	}{
 		{
 			name: "minimal user",
@@ -207,10 +209,26 @@ func TestReplaceUser(t *testing.T) {
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
 		},
+		{
+			name:             "another org",
+			body:             minimalUserJson,
+			replaceUserOrgID: SecondaryOrganization.OrganizationId,
+			wantErr:          true,
+			errorStatus:      http.StatusNotFound,
+		},
+		{
+			name:             "another org with permissions",
+			body:             minimalUserJson,
+			replaceUserOrgID: SecondaryOrganization.OrganizationId,
+			ctx:              Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
+			wantErr:          true,
+			errorStatus:      http.StatusNotFound,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
+			// use iam owner => we don't want to test permissions of the create endpoint.
+			createdUser, err := Instance.Client.SCIM.Users.Create(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), Instance.DefaultOrg.Id, fullUserJson)
 			require.NoError(t, err)
 
 			defer func() {
@@ -223,7 +241,12 @@ func TestReplaceUser(t *testing.T) {
 				ctx = CTX
 			}
 
-			replacedUser, err := Instance.Client.SCIM.Users.Replace(ctx, Instance.DefaultOrg.Id, createdUser.ID, tt.body)
+			replaceUserOrgID := tt.replaceUserOrgID
+			if replaceUserOrgID == "" {
+				replaceUserOrgID = Instance.DefaultOrg.Id
+			}
+
+			replacedUser, err := Instance.Client.SCIM.Users.Replace(ctx, replaceUserOrgID, createdUser.ID, tt.body)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ReplaceUser() error = %v, wantErr %v", err, tt.wantErr)
 			}

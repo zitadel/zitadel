@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/scim/metadata"
 	"github.com/zitadel/zitadel/internal/api/scim/schemas"
 	"github.com/zitadel/zitadel/internal/command"
@@ -73,8 +74,9 @@ func (h *UsersHandler) mapToAddHuman(ctx context.Context, scimUser *ScimUser) (*
 
 func (h *UsersHandler) mapToChangeHuman(ctx context.Context, scimUser *ScimUser) (*command.ChangeHuman, error) {
 	human := &command.ChangeHuman{
-		ID:       scimUser.ID,
-		Username: &scimUser.UserName,
+		ID:            scimUser.ID,
+		ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		Username:      &scimUser.UserName,
 		Profile: &command.Profile{
 			NickName:    &scimUser.NickName,
 			DisplayName: &scimUser.DisplayName,
@@ -154,6 +156,15 @@ func (h *UsersHandler) mapPrimaryEmail(scimUser *ScimUser) (command.Email, error
 		}, nil
 	}
 
+	// if no primary email was found, the first email will be used
+	for _, email := range scimUser.Emails {
+		email.Primary = true
+		return command.Email{
+			Address:  domain.EmailAddress(email.Value),
+			Verified: h.config.EmailVerified,
+		}, nil
+	}
+
 	return command.Email{}, zerrors.ThrowInvalidArgument(nil, "SCIM-EM19", "Errors.User.Email.Empty")
 }
 
@@ -163,6 +174,15 @@ func (h *UsersHandler) mapPrimaryPhone(scimUser *ScimUser) *command.Phone {
 			continue
 		}
 
+		return &command.Phone{
+			Number:   domain.PhoneNumber(phone.Value),
+			Verified: h.config.PhoneVerified,
+		}
+	}
+
+	// if no primary phone was found, the first phone will be used
+	for _, phone := range scimUser.PhoneNumbers {
+		phone.Primary = true
 		return &command.Phone{
 			Number:   domain.PhoneNumber(phone.Value),
 			Verified: h.config.PhoneVerified,
@@ -364,28 +384,29 @@ func (h *UsersHandler) mapAndValidateMetadata(ctx context.Context, user *ScimUse
 	}
 }
 
-func (h *UsersHandler) buildResourceForQuery(ctx context.Context, user *query.User) *Resource {
-	return &Resource{
+func (h *UsersHandler) buildResourceForQuery(ctx context.Context, user *query.User) *schemas.Resource {
+	return &schemas.Resource{
+		ID:      user.ID,
 		Schemas: []schemas.ScimSchemaType{schemas.IdUser},
-		Meta: &ResourceMeta{
+		Meta: &schemas.ResourceMeta{
 			ResourceType: schemas.UserResourceType,
-			Created:      user.CreationDate.UTC(),
-			LastModified: user.ChangeDate.UTC(),
+			Created:      gu.Ptr(user.CreationDate.UTC()),
+			LastModified: gu.Ptr(user.ChangeDate.UTC()),
 			Version:      strconv.FormatUint(user.Sequence, 10),
-			Location:     buildLocation(ctx, h, user.ID),
+			Location:     schemas.BuildLocationForResource(ctx, h.schema.PluralName, user.ID),
 		},
 	}
 }
 
-func (h *UsersHandler) buildResourceForWriteModel(ctx context.Context, user *command.UserV2WriteModel) *Resource {
-	return &Resource{
+func (h *UsersHandler) buildResourceForWriteModel(ctx context.Context, user *command.UserV2WriteModel) *schemas.Resource {
+	return &schemas.Resource{
 		Schemas: []schemas.ScimSchemaType{schemas.IdUser},
-		Meta: &ResourceMeta{
+		Meta: &schemas.ResourceMeta{
 			ResourceType: schemas.UserResourceType,
-			Created:      user.CreationDate.UTC(),
-			LastModified: user.ChangeDate.UTC(),
+			Created:      gu.Ptr(user.CreationDate.UTC()),
+			LastModified: gu.Ptr(user.ChangeDate.UTC()),
 			Version:      strconv.FormatUint(user.ProcessedSequence, 10),
-			Location:     buildLocation(ctx, h, user.AggregateID),
+			Location:     schemas.BuildLocationForResource(ctx, h.schema.PluralName, user.AggregateID),
 		},
 	}
 }

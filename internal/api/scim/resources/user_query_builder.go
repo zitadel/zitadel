@@ -29,8 +29,9 @@ var fieldPathColumnMapping = filter.FieldPathMapping{
 		FieldType: filter.FieldTypeString,
 	},
 	"username": {
-		Column:    query.UserUsernameCol,
-		FieldType: filter.FieldTypeString,
+		Column:          query.UserUsernameCol,
+		FieldType:       filter.FieldTypeString,
+		CaseInsensitive: true,
 	},
 	"name.familyname": {
 		Column:    query.HumanLastNameCol,
@@ -87,7 +88,7 @@ func (h *UsersHandler) buildListQuery(ctx context.Context, request *ListRequest)
 		return q, nil
 	}
 
-	filterQuery, err := request.Filter.BuildQuery(ctx, h.SchemaType(), fieldPathColumnMapping)
+	filterQuery, err := request.Filter.BuildQuery(ctx, h.schema.ID, fieldPathColumnMapping)
 	if err != nil {
 		return nil, err
 	}

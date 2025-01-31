@@ -14,12 +14,13 @@ import (
 )
 
 type ChangeHuman struct {
-	ID       string
-	State    *domain.UserState
-	Username *string
-	Profile  *Profile
-	Email    *Email
-	Phone    *Phone
+	ID            string
+	ResourceOwner string
+	State         *domain.UserState
+	Username      *string
+	Profile       *Profile
+	Email         *Email
+	Phone         *Phone
 
 	Metadata             []*domain.Metadata
 	MetadataKeysToRemove []string
@@ -267,6 +268,7 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 	existingHuman, err := c.UserHumanWriteModel(
 		ctx,
 		human.ID,
+		human.ResourceOwner,
 		human.Profile != nil,
 		human.Email != nil,
 		human.Phone != nil,
@@ -491,6 +493,28 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	return cmds, err
 }
 
+func (c *Commands) HumanMFAInitSkippedV2(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	if userID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Wei5kooz1i", "Errors.User.UserIDMissing")
+	}
+
+	existingHuman, err := c.userStateWriteModel(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(existingHuman.UserState) {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-auj6jeBei4", "Errors.User.NotFound")
+	}
+	if err := c.checkPermissionUpdateUser(ctx, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+		return nil, err
+	}
+
+	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewHumanMFAInitSkippedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
+}
+
 func (c *Commands) userExistsWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -503,11 +527,11 @@ func (c *Commands) userExistsWriteModel(ctx context.Context, userID string) (wri
 	return writeModel, nil
 }
 
-func (c *Commands) UserHumanWriteModel(ctx context.Context, userID string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM, metadataWM bool) (writeModel *UserV2WriteModel, err error) {
+func (c *Commands) UserHumanWriteModel(ctx context.Context, userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM, metadataWM bool) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserHumanWriteModel(userID, "", profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM, metadataWM)
+	writeModel = NewUserHumanWriteModel(userID, resourceOwner, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM, metadataWM)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

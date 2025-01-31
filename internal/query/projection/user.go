@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	UserTable        = "projections.users13"
+	UserTable        = "projections.users14"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -37,6 +37,7 @@ const (
 	HumanUserInstanceIDCol      = "instance_id"
 	HumanPasswordChangeRequired = "password_change_required"
 	HumanPasswordChanged        = "password_changed"
+	HumanMFAInitSkipped         = "mfa_init_skipped"
 
 	// profile
 	HumanFirstNameCol         = "first_name"
@@ -123,6 +124,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(HumanIsPhoneVerifiedCol, handler.ColumnTypeBool, handler.Nullable()),
 			handler.NewColumn(HumanPasswordChangeRequired, handler.ColumnTypeBool),
 			handler.NewColumn(HumanPasswordChanged, handler.ColumnTypeTimestamp, handler.Nullable()),
+			handler.NewColumn(HumanMFAInitSkipped, handler.ColumnTypeTimestamp, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(HumanUserInstanceIDCol, HumanUserIDCol),
 			UserHumanSuffix,
@@ -301,14 +303,38 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.MachineSecretRemovedType,
 					Reduce: p.reduceMachineSecretRemoved,
 				},
-				// {
-				// 	Event:  user.UserGroupAddedType,
-				// 	Reduce: p.reduceGroupMemberAdded,
-				// },
-				// {
-				// 	Event:  user.UserGroupRemovedType,
-				// 	Reduce: p.reduceGroupMemberRemoved,
-				// },
+				{
+					Event:  user.UserV1MFAOTPVerifiedType,
+					Reduce: p.reduceUnsetMFAInitSkipped,
+				},
+				{
+					Event:  user.HumanMFAOTPVerifiedType,
+					Reduce: p.reduceUnsetMFAInitSkipped,
+				},
+				{
+					Event:  user.HumanOTPSMSAddedType,
+					Reduce: p.reduceUnsetMFAInitSkipped,
+				},
+				{
+					Event:  user.HumanOTPEmailAddedType,
+					Reduce: p.reduceUnsetMFAInitSkipped,
+				},
+				{
+					Event:  user.HumanU2FTokenVerifiedType,
+					Reduce: p.reduceUnsetMFAInitSkipped,
+				},
+				{
+					Event:  user.HumanPasswordlessTokenVerifiedType,
+					Reduce: p.reduceUnsetMFAInitSkipped,
+				},
+				{
+					Event:  user.UserV1MFAInitSkippedType,
+					Reduce: p.reduceMFAInitSkipped,
+				},
+				{
+					Event:  user.HumanMFAInitSkippedType,
+					Reduce: p.reduceMFAInitSkipped,
+				},
 			},
 		},
 		{
@@ -1138,6 +1164,51 @@ func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 		),
 	), nil
 
+}
+
+func (p *userProjection) reduceUnsetMFAInitSkipped(e eventstore.Event) (*handler.Statement, error) {
+	switch e.(type) {
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ojrf6", "reduce.wrong.event.type %s", e.Type())
+	case *user.HumanOTPVerifiedEvent,
+		*user.HumanOTPSMSAddedEvent,
+		*user.HumanOTPEmailAddedEvent,
+		*user.HumanU2FVerifiedEvent,
+		*user.HumanPasswordlessVerifiedEvent:
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(HumanMFAInitSkipped, sql.NullTime{}),
+		},
+		[]handler.Condition{
+			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+		},
+		handler.WithTableSuffix(UserHumanSuffix),
+	), nil
+}
+
+func (p *userProjection) reduceMFAInitSkipped(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanMFAInitSkippedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
+	}
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(HumanMFAInitSkipped, sql.NullTime{
+				Time:  e.CreatedAt(),
+				Valid: true,
+			}),
+		},
+		[]handler.Condition{
+			handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+			handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+		},
+		handler.WithTableSuffix(UserHumanSuffix),
+	), nil
 }
 
 func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
