@@ -160,7 +160,7 @@ func csp(posthogURL string) *middleware.CSP {
 		csp.ImgSrc = csp.ImgSrc.AddHost(posthogCSPHost)
 		csp.StyleSrc = csp.StyleSrc.AddHost(posthogCSPHost)
 		csp.FontSrc = csp.FontSrc.AddHost(posthogCSPHost)
-		csp.MediaSrc = csp.MediaSrc.AddHost(posthogCSPHost)
+		csp.MediaSrc = middleware.CSPSourceOpts().AddHost(posthogCSPHost)
 	}
 
 	return &csp
