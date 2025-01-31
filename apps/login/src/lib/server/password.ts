@@ -215,9 +215,11 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
-  const expirySettings = await getPasswordExpirySettings(
-    command.organization ?? session.factors?.user?.organizationId,
-  );
+  const expirySettings = await getPasswordExpirySettings({
+    serviceUrl,
+    serviceRegion,
+    orgId: command.organization ?? session.factors?.user?.organizationId,
+  });
 
   // check if the user has to change password first
   const passwordChangedCheck = checkPasswordChangeRequired(
