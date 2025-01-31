@@ -28,12 +28,14 @@ var (
 		table: groupsTable,
 	}
 	GroupColumnName = Column{
-		name:  projection.GroupColumnName,
-		table: groupsTable,
+		name:           projection.GroupColumnName,
+		table:          groupsTable,
+		isOrderByLower: true,
 	}
 	GroupColumnDescription = Column{
-		name:  projection.GroupColumnDescription,
-		table: groupsTable,
+		name:           projection.GroupColumnDescription,
+		table:          groupsTable,
+		isOrderByLower: true,
 	}
 	GroupColumnCreationDate = Column{
 		name:  projection.GroupColumnCreationDate,

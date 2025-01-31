@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -432,7 +431,7 @@ func getGroupResourceOwners(ctx context.Context, es handler.EventStore, instance
 		AwaitOpenTransactions().
 		InstanceID(instanceID).
 		AddQuery().
-		AggregateTypes(user.AggregateType).
+		AggregateTypes(group.AggregateType).
 		AggregateIDs(groupID).
 		EventTypes(group.GroupAddedType)
 

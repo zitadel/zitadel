@@ -10966,13 +10966,19 @@ message GetGroupByIDResponse {
 message ListGroupsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
+
+    // the field the result is sorted
+    zitadel.group.v1.GroupFieldName sorting_column = 2;
+
     //criteria the client is looking for
-    repeated zitadel.group.v1.GroupQuery queries = 2;
+    repeated zitadel.group.v1.GroupQuery queries = 3;
 }
 
 message ListGroupsResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.group.v1.Group result = 2;
+    // the field the result is sorted
+    zitadel.group.v1.GroupFieldName sorting_column = 2;
+    repeated zitadel.group.v1.Group result = 3;
 }
 
 message AddGroupRequest {
@@ -11017,7 +11023,7 @@ message UpdateGroupRequest {
         }
     ];
     string description = 3  [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        // (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             min_length: 1;
             max_length: 200;

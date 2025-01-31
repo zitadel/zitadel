@@ -32,7 +32,7 @@ func NewRemoveUserGroupUniqueConstraint(aggregateID, groupID string) *eventstore
 
 type UserGroupAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-	GroupID              string
+	GroupID              string `json:"groupID"`
 }
 
 func (e *UserGroupAddedEvent) Payload() interface{} {
@@ -59,7 +59,7 @@ func NewUserGroupAddedEvent(
 }
 
 func UserGroupAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &UserGroupRemovedEvent{
+	e := &UserGroupAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -74,7 +74,7 @@ func UserGroupAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 type UserGroupRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	GroupID string
+	GroupID string `json:"groupID"`
 }
 
 func (e *UserGroupRemovedEvent) Payload() interface{} {
@@ -101,13 +101,54 @@ func NewUserGroupRemovedEvent(
 }
 
 func UserGroupRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &UserGroupAddedEvent{
+	e := &UserGroupRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
 	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "GROUP-mL0vs", "unable to unmarshal user group member")
+	}
+
+	return e, nil
+}
+
+type UserGroupCascadeRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	GroupID              string `json:"groupID"`
+}
+
+func (e *UserGroupCascadeRemovedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *UserGroupCascadeRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveUserGroupUniqueConstraint(e.Aggregate().ID, e.GroupID)}
+}
+
+func NewUserGroupCascadeRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	groupID string,
+) *UserGroupCascadeRemovedEvent {
+	return &UserGroupCascadeRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserGroupCascadeRemovedType,
+		),
+		GroupID: groupID,
+	}
+}
+
+func UserGroupCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e := &UserGroupCascadeRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := event.Unmarshal(e)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "GROUP-nQ1ps", "unable to unmarshal user group member")
 	}
 
 	return e, nil

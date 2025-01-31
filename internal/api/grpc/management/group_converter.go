@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/pkg/grpc/group"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -54,9 +55,10 @@ func listGroupRequestToModel(req *mgmt_pb.ListGroupsRequest) (*query.GroupSearch
 	}
 	return &query.GroupSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Offset: offset,
-			Limit:  limit,
-			Asc:    asc,
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: GroupFieldNameToSortingColumn(req.SortingColumn),
 		},
 		Queries: queries,
 	}, nil
@@ -162,3 +164,16 @@ func ListGroupMembershipsRequestToModel(ctx context.Context, req *mgmt_pb.ListGr
 	}, nil
 }
 */
+
+func GroupFieldNameToSortingColumn(field group.GroupFieldName) query.Column {
+	switch field {
+	case group.GroupFieldName_GROUP_FIELD_NAME_NAME:
+		return query.GroupColumnName
+	case group.GroupFieldName_GROUP_FIELD_NAME_DESCRIPTION:
+		return query.GroupColumnDescription
+	case group.GroupFieldName_GROUP_FIELD_NAME_CREATION_DATE:
+		return query.GroupColumnCreationDate
+	default:
+		return query.GroupColumnID
+	}
+}

@@ -1,6 +1,7 @@
 package groupmember
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -45,15 +46,20 @@ func (e *GroupMemberAddedEvent) UniqueConstraints() []*eventstore.UniqueConstrai
 }
 
 func NewGroupMemberAddedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	// base *eventstore.BaseEvent,
 	groupID string,
 	roles ...string,
 ) *GroupMemberAddedEvent {
-
 	return &GroupMemberAddedEvent{
-		BaseEvent: *base,
-		GroupID:   groupID,
-		Roles:     roles,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GroupAddedEventType,
+		),
+		GroupID: groupID,
+		Roles:   roles,
 	}
 }
 
@@ -86,14 +92,19 @@ func (e *GroupMemberChangedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 }
 
 func NewGroupMemberChangedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	groupID string,
 	roles ...string,
 ) *GroupMemberChangedEvent {
 	return &GroupMemberChangedEvent{
-		BaseEvent: *base,
-		GroupID:   groupID,
-		Roles:     roles,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GroupChangedEventType,
+		),
+		GroupID: groupID,
+		Roles:   roles,
 	}
 }
 
@@ -125,13 +136,18 @@ func (e *GroupMemberRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 }
 
 func NewGroupRemovedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	groupID string,
 ) *GroupMemberRemovedEvent {
 
 	return &GroupMemberRemovedEvent{
-		BaseEvent: *base,
-		GroupID:   groupID,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GroupRemovedEventType,
+		),
+		GroupID: groupID,
 	}
 }
 
@@ -163,13 +179,18 @@ func (e *GroupMemberCascadeRemovedEvent) UniqueConstraints() []*eventstore.Uniqu
 }
 
 func NewGroupCascadeRemovedEvent(
-	base *eventstore.BaseEvent,
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
 	groupID string,
 ) *GroupMemberCascadeRemovedEvent {
 
 	return &GroupMemberCascadeRemovedEvent{
-		BaseEvent: *base,
-		GroupID:   groupID,
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			GroupCascadeRemovedEventType,
+		),
+		GroupID: groupID,
 	}
 }
 

@@ -8,6 +8,13 @@ package zitadel.group.v1;
 
 option go_package ="github.com/zitadel/zitadel/pkg/grpc/group";
 
+enum GroupFieldName {
+    GROUP_FIELD_NAME_UNSPECIFIED = 0;
+    GROUP_FIELD_NAME_NAME = 1;
+    GROUP_FIELD_NAME_DESCRIPTION = 2;
+    GROUP_FIELD_NAME_CREATION_DATE = 3;
+}
+
 message Group {
     string id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

@@ -26,11 +26,8 @@ func NewProjectGroupMemberAddedEvent(
 ) *GroupMemberAddedEvent {
 	return &GroupMemberAddedEvent{
 		GroupMemberAddedEvent: *groupmember.NewGroupMemberAddedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				GroupMemberAddedType,
-			),
+			ctx,
+			aggregate,
 			groupID,
 			roles...,
 		),
@@ -59,11 +56,8 @@ func GroupNewProjectGroupMemberChangedEvent(
 
 	return &GroupMemberChangedEvent{
 		GroupMemberChangedEvent: *groupmember.NewGroupMemberChangedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				GroupMemberChangedType,
-			),
+			ctx,
+			aggregate,
 			groupID,
 			roles...,
 		),
@@ -91,11 +85,8 @@ func NewProjectGroupMemberRemovedEvent(
 
 	return &GroupMemberRemovedEvent{
 		GroupMemberRemovedEvent: *groupmember.NewGroupRemovedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				GroupMemberRemovedType,
-			),
+			ctx,
+			aggregate,
 			groupID,
 		),
 	}
@@ -122,11 +113,8 @@ func NewProjectGroupMemberCascadeRemovedEvent(
 
 	return &GroupMemberCascadeRemovedEvent{
 		GroupMemberCascadeRemovedEvent: *groupmember.NewGroupCascadeRemovedEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				GroupMemberCascadeRemovedType,
-			),
+			ctx,
+			aggregate,
 			groupID,
 		),
 	}

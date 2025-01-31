@@ -1200,11 +1200,9 @@ func (p *userProjection) reduceGroupMemberAdded(event eventstore.Event) (*handle
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "GROUP-vhy1O", "reduce.wrong.event.type %s", user.UserGroupAddedType)
 	}
-	// groupID := e.Aggregate().ID
 
 	return reduceUserGroupAdded(
 		*e,
-		// withGroupMemberCond(GroupIDsCol, groupID),
 	)
 }
 
@@ -1214,10 +1212,8 @@ func (p *userProjection) reduceGroupMemberRemoved(event eventstore.Event) (*hand
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "GROUP-aqz1O", "reduce.wrong.event.type %s", user.UserGroupRemovedType)
 	}
-	groupID := e.Aggregate().ID
 
 	return reduceUserGroupRemoved(
 		*e,
-		withGroupMemberCond(GroupIDsCol, groupID),
 	)
 }

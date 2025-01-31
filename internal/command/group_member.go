@@ -99,6 +99,7 @@ func (c *Commands) addUserGroupMember(ctx context.Context, userGroupAgg *eventst
 	return user.NewUserGroupAddedEvent(ctx, userGroupAgg, group), nil
 }
 
+// Need to update these to remove user from the users13 table and group_members table
 // ChangeGroupMember updates an existing member
 func (c *Commands) ChangeGroupMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
 	if !member.IsValid() {
@@ -129,28 +130,37 @@ func (c *Commands) RemoveGroupMember(ctx context.Context, groupID, userID, resou
 		return nil, zerrors.ThrowInvalidArgument(nil, "GROUP-77nHd", "Errors.Group.Member.Invalid")
 	}
 	m, err := c.groupMemberWriteModelByID(ctx, groupID, userID, resourceOwner)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return nil, err
-	}
 	if zerrors.IsNotFound(err) {
 		// empty response because we have no data that match the request
-		return &domain.ObjectDetails{}, nil
+		return &domain.ObjectDetails{}, err
+	}
+
+	um, err := c.userGroupMemberWriteModelByID(ctx, groupID, userID, resourceOwner)
+	if zerrors.IsNotFound(err) {
+		return &domain.ObjectDetails{}, err
 	}
 
 	groupAgg := GroupAggregateFromWriteModel(&m.WriteModel)
+	userGroupAgg := GroupAggregateFromWriteModel(&um.WriteModel)
 	removeEvent := c.removeGroupMember(ctx, groupAgg, userID, false)
+
+	userEvents := c.removeUserGroupMember(ctx, userGroupAgg, groupID, false)
+
 	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
-	/*
-		// Remove group_id entry from users table
-		err = c.removeGroupIDFromUser(ctx, userID, groupID)
-		if err != nil {
-			return nil, err
-		}
-	*/
 	err = AppendAndReduce(m, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	userPushedEvents, err := c.eventstore.Push(ctx, userEvents)
+	if err != nil {
+		return nil, err
+	}
+
+	err = AppendAndReduce(um, userPushedEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +179,17 @@ func (c *Commands) removeGroupMember(ctx context.Context, groupAgg *eventstore.A
 	}
 }
 
+func (c *Commands) removeUserGroupMember(ctx context.Context, userGroupAgg *eventstore.Aggregate, groupID string, cascade bool) eventstore.Command {
+	if cascade {
+		return user.NewUserGroupCascadeRemovedEvent(
+			ctx,
+			userGroupAgg,
+			groupID)
+	} else {
+		return user.NewUserGroupRemovedEvent(ctx, userGroupAgg, groupID)
+	}
+}
+
 func (c *Commands) groupMemberWriteModelByID(ctx context.Context, groupID, userID, resourceOwner string) (member *GroupMemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -179,63 +200,26 @@ func (c *Commands) groupMemberWriteModelByID(ctx context.Context, groupID, userI
 		return nil, err
 	}
 
-	if writeModel.State == domain.MemberStateUnspecified || writeModel.State == domain.MemberStateRemoved {
-		return nil, zerrors.ThrowNotFound(nil, "GROUP-E9KyS", "Errors.NotFound")
-	}
+	// if writeModel.State == domain.MemberStateUnspecified || writeModel.State == domain.MemberStateRemoved {
+	// 	return nil, zerrors.ThrowNotFound(nil, "GROUP-E9KyS", "Errors.NotFound")
+	// }
 
 	return writeModel, nil
 }
 
-/*
-func (c *Commands) addGroupIDToUser(ctx context.Context, userID, groupID string) error {
+func (c *Commands) userGroupMemberWriteModelByID(ctx context.Context, groupID, userID, resourceOwner string) (userGroup *UserGroupMemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer span.End()
+	defer func() { span.EndWithError(err) }()
 
-	// Fetch the existing user
-	user, err := c.query.GetUserByID(ctx, false, userID)
+	writeModel := NewUserGroupMemberWriteModel(groupID, userID, resourceOwner)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// Add the groupID to the user's group_ids
-	user.GroupIDs = append(user.GroupIDs, groupID)
+	// if writeModel.State == domain.GroupStateUnspecified || writeModel.State == domain.GroupStateRemoved {
+	// 	return nil, zerrors.ThrowNotFound(nil, "GROUP-F1KyS", "Errors.NotFound")
+	// }
 
-	// Update the user in the database
-	userAgg := eventstore.NewAggregate(ctx, user.ID, eventstore.AggregateType(es_user.UserGroupAddedType), "v1")
-	evt := es_user.NewUserGroupAddedEvent(ctx, userAgg, user.GroupIDs...)
-	_, err = c.eventstore.Push(ctx, evt)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return writeModel, nil
 }
-
-func (c *Commands) removeGroupIDFromUser(ctx context.Context, userID, groupID string) error {
-	ctx, span := tracing.NewSpan(ctx)
-	defer span.End()
-
-	// Fetch the existing user
-	user, err := c.query.GetUserByID(ctx, false, userID)
-	if err != nil {
-		return err
-	}
-
-	// Remove the groupID from the user's group_ids
-	for i, id := range user.GroupIDs {
-		if id == groupID {
-			user.GroupIDs = append(user.GroupIDs[:i], user.GroupIDs[i+1:]...)
-			break
-		}
-	}
-
-	// Update the user in the database
-	userAgg := eventstore.NewAggregate(ctx, user.ID, eventstore.AggregateType(es_user.UserGroupRemovedType), "v1")
-	_, err = c.eventstore.Push(ctx, es_user.NewUserGroupRemovedEvent(ctx, userAgg, user.GroupIDs...))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-*/

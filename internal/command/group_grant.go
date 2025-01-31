@@ -298,7 +298,7 @@ func (c *Commands) checkGroupGrantPreCondition(ctx context.Context, groupgrant *
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if err := c.checkGroupExists(ctx, groupgrant.GroupID, ""); err != nil {
+	if err := c.checkGroupExists(ctx, groupgrant.GroupID, resourceOwner); err != nil {
 		return err
 	}
 	existingRoleKeys, err := c.searchGroupGrantPreConditionState(ctx, groupgrant, resourceOwner)

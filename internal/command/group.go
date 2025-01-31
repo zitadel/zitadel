@@ -47,6 +47,14 @@ func (c *Commands) AddGroup(ctx context.Context, group *domain.Group, resourceOw
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-emq7bpQY2s", "Errors.ResourceOwnerMissing")
 	}
+	// Check if the org exists
+	orgWriteModel, err := c.getOrgWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !isOrgStateExists(orgWriteModel.State) {
+		return nil, zerrors.ThrowNotFound(nil, "ORG-1MRds", "Errors.Org.NotFound")
+	}
 	if ownerUserID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-yf75Gl3Drp", "Errors.OwnerIDMissing")
 	}
@@ -209,7 +217,9 @@ func (c *Commands) checkGroupExists(ctx context.Context, groupID, resourceOwner 
 
 	_, state, err := c.groupAggregateByID(ctx, groupID, resourceOwner)
 	if err != nil || !state.Valid() {
-		return zerrors.ThrowPreconditionFailed(err, "COMMA-UDnxD", "Errors.Group.NotFound")
+		// return zerrors.ThrowPreconditionFailed(err, "COMMA-UDnxD", "Errors.Group.NotFound")
+		return zerrors.ThrowInvalidArgumentf(nil, "GROUP-UDnxD", "Errors.Group.NotFound %s,ResourceOwner: %s, GroupID: %s, Revision: %s", state, resourceOwner, groupID, group.GroupObjectRevision)
+
 	}
 	return nil
 }

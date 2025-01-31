@@ -142,5 +142,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanInviteCheckSucceededType, eventstore.GenericEventMapper[HumanInviteCheckSucceededEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, HumanInviteCheckFailedType, eventstore.GenericEventMapper[HumanInviteCheckFailedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, UserGroupAddedType, UserGroupAddedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, UserGroupAddedType, UserGroupRemovedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, UserGroupRemovedType, UserGroupRemovedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, UserGroupCascadeRemovedType, UserGroupCascadeRemovedEventMapper)
 }
