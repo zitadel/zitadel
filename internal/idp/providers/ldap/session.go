@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"net/url"
@@ -199,11 +200,8 @@ func getConnection(
 		return nil, err
 	}
 
+	fmt.Printf("rootCA = %+v\n", rootCA)
 	if u.Scheme == "ldaps" && rootCA != nil {
-		// cert, err := tls.X509KeyPair(rootCA, rootCA)
-		// if err != nil {
-		// 	return nil, err
-		// }
 		rootCAs := x509.NewCertPool()
 		if ok := rootCAs.AppendCertsFromPEM(rootCA); !ok {
 			log.Println("No certs appended, using system certs only")

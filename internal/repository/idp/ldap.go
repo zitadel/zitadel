@@ -22,6 +22,7 @@ type LDAPIDPAddedEvent struct {
 	UserObjectClasses []string            `json:"userObjectClasses"`
 	UserFilters       []string            `json:"userFilters"`
 	Timeout           time.Duration       `json:"timeout"`
+	RootCA            []byte              `json:"rootCA"`
 
 	LDAPAttributes
 	Options
@@ -317,11 +318,11 @@ func ChangeLDAPTimeout(timeout time.Duration) func(*LDAPIDPChangedEvent) {
 	}
 }
 
-func ChangeLDAPRootCA(rootCA []byte) func(*LDAPIDPChangedEvent) {
-	return func(e *LDAPIDPChangedEvent) {
-		e.RootCA = rootCA
-	}
-}
+// func ChangeLDAPRootCA(rootCA []byte) func(*LDAPIDPChangedEvent) {
+// 	return func(e *LDAPIDPChangedEvent) {
+// 		e.RootCA = rootCA
+// 	}
+// }
 
 func ChangeLDAPAttributes(attributes LDAPAttributeChanges) func(*LDAPIDPChangedEvent) {
 	return func(e *LDAPIDPChangedEvent) {

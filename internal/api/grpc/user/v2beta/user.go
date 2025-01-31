@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"golang.org/x/text/language"
@@ -454,6 +455,7 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 		return nil, "", nil, zerrors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	}
 	session := ldapProvider.GetSession(username, password)
+	fmt.Println("2")
 	externalUser, err := session.FetchUser(ctx)
 	if errors.Is(err, ldap.ErrFailedLogin) || errors.Is(err, ldap.ErrNoSingleUser) {
 		return nil, "", nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-nzun2i", "Errors.User.ExternalIDP.LoginFailed")

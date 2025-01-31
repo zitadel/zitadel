@@ -1,7 +1,6 @@
 package command
 
 import (
-	"bytes"
 	"net/http"
 	"reflect"
 	"slices"
@@ -1504,9 +1503,9 @@ func (wm *LDAPIDPWriteModel) NewChanges(
 	if wm.Timeout != timeout {
 		changes = append(changes, idp.ChangeLDAPTimeout(timeout))
 	}
-	if bytes.Equal(wm.RootCA, rootCA) {
-		changes = append(changes, idp.ChangeLDAPRootCA(rootCA))
-	}
+	// if !bytes.Equal(wm.RootCA, rootCA) {
+	// 	changes = append(changes, idp.ChangeLDAPRootCA(rootCA))
+	// }
 	attrs := wm.LDAPAttributes.Changes(attributes)
 	if !attrs.IsZero() {
 		changes = append(changes, idp.ChangeLDAPAttributes(attrs))

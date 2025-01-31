@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"slices"
 
@@ -28,8 +27,6 @@ func WithOrigin(fallBackToHttps bool, http1Header, http2Header string, instanceH
 
 func composeDomainContext(r *http.Request, fallBackToHttps bool, instanceDomainHeaders, publicDomainHeaders []string) *http_util.DomainCtx {
 	instanceHost, instanceProto := hostFromRequest(r, instanceDomainHeaders)
-	fmt.Printf("r = %+v\n", r)
-	fmt.Printf("publicDomainHeaders = %+v\n", publicDomainHeaders)
 	publicHost, publicProto := hostFromRequest(r, publicDomainHeaders)
 	if publicProto == "" {
 		publicProto = instanceProto

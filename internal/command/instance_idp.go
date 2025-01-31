@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/zitadel/saml/pkg/provider/xml"
@@ -1617,13 +1618,13 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 				provider.UserFilters,
 				provider.Timeout,
 				provider.RootCA,
-				c.idpConfigEncryption,
-				provider.LDAPAttributes,
+				c.idpConfigEncryption, provider.LDAPAttributes,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
 				return nil, err
 			}
+			fmt.Printf("event = %+v\n", event)
 			return []eventstore.Command{event}, nil
 		}, nil
 	}
