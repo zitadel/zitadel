@@ -128,6 +128,8 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 		l.defaultRedirect(w, r)
 		return
 	}
+	fmt.Printf("authReq = %+v\n", authReq)
+	fmt.Printf("data = %+v\n", data)
 	l.handleIDP(w, r, authReq, data.IDPConfigID)
 }
 
@@ -358,7 +360,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	fmt.Println("1")
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
 		logging.WithFields(
@@ -968,9 +969,6 @@ func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTem
 	if identityProvider.LDAPIDPTemplate.LDAPAttributes.ProfileAttribute != "" {
 		opts = append(opts, ldap.WithProfileAttribute(identityProvider.LDAPIDPTemplate.LDAPAttributes.ProfileAttribute))
 	}
-	// if identityProvider.LDAPIDPTemplate.LDAPAttributes.RootCA != nil {
-	// 	opts = append(opts, ldap.WithProfileAttribute(string(identityProvider.LDAPIDPTemplate.LDAPAttributes.RootCA)))
-	// }
 	return ldap.New(
 		identityProvider.Name,
 		identityProvider.Servers,
@@ -981,8 +979,8 @@ func (l *Login) ldapProvider(ctx context.Context, identityProvider *query.IDPTem
 		identityProvider.UserObjectClasses,
 		identityProvider.UserFilters,
 		identityProvider.Timeout,
-		l.baseURL(ctx)+EndpointLDAPLogin+"?"+QueryAuthRequestID+"=",
 		identityProvider.RootCA,
+		l.baseURL(ctx)+EndpointLDAPLogin+"?"+QueryAuthRequestID+"=",
 		opts...,
 	), nil
 }

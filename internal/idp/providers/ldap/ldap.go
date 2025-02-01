@@ -186,8 +186,8 @@ func New(
 	userObjectClasses []string,
 	userFilters []string,
 	timeout time.Duration,
-	loginUrl string,
 	rootCA []byte,
+	loginUrl string,
 	options ...ProviderOpts,
 ) *Provider {
 	provider := &Provider{
@@ -201,8 +201,8 @@ func New(
 		userObjectClasses: userObjectClasses,
 		userFilters:       userFilters,
 		timeout:           timeout,
-		loginUrl:          loginUrl,
 		rootCA:            rootCA,
+		loginUrl:          loginUrl,
 	}
 	for _, option := range options {
 		option(provider)

@@ -1540,6 +1540,7 @@ func (c *Commands) prepareAddOrgLDAPProvider(a *org.Aggregate, writeModel *OrgLD
 					provider.UserObjectClasses,
 					provider.UserFilters,
 					provider.Timeout,
+					provider.RootCA,
 					provider.LDAPAttributes,
 					provider.IDPOptions,
 				),

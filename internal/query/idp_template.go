@@ -581,10 +581,10 @@ var (
 		name:  projection.LDAPTimeoutCol,
 		table: ldapIdpTemplateTable,
 	}
-	// LDAPRootCACol = Column{
-	// 	name:  projection.LDAPRootCA,
-	// 	table: ldapIdpTemplateTable,
-	// }
+	LDAPRootCACol = Column{
+		name:  projection.LDAPRootCACol,
+		table: ldapIdpTemplateTable,
+	}
 	LDAPIDAttributeCol = Column{
 		name:  projection.LDAPIDAttributeCol,
 		table: ldapIdpTemplateTable,
@@ -948,7 +948,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			LDAPUserObjectClassesCol.identifier(),
 			LDAPUserFiltersCol.identifier(),
 			LDAPTimeoutCol.identifier(),
-			// LDAPRootCACol.identifier(),
+			LDAPRootCACol.identifier(),
 			LDAPIDAttributeCol.identifier(),
 			LDAPFirstNameAttributeCol.identifier(),
 			LDAPLastNameAttributeCol.identifier(),
@@ -1065,7 +1065,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			ldapUserObjectClasses := database.TextArray[string]{}
 			ldapUserFilters := database.TextArray[string]{}
 			ldapTimeout := sql.NullInt64{}
-			// var ldapRootCA []byte
+			var ldapRootCA []byte
 			ldapIDAttribute := sql.NullString{}
 			ldapFirstNameAttribute := sql.NullString{}
 			ldapLastNameAttribute := sql.NullString{}
@@ -1180,7 +1180,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&ldapUserObjectClasses,
 				&ldapUserFilters,
 				&ldapTimeout,
-				// &ldapRootCA,
+				&ldapRootCA,
 				&ldapIDAttribute,
 				&ldapFirstNameAttribute,
 				&ldapLastNameAttribute,
@@ -1320,7 +1320,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					UserObjectClasses: ldapUserObjectClasses,
 					UserFilters:       ldapUserFilters,
 					Timeout:           time.Duration(ldapTimeout.Int64),
-					// RootCA:            ldapRootCA,
+					RootCA:            ldapRootCA,
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                ldapIDAttribute.String,
 						FirstNameAttribute:         ldapFirstNameAttribute.String,
@@ -1447,7 +1447,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			LDAPUserObjectClassesCol.identifier(),
 			LDAPUserFiltersCol.identifier(),
 			LDAPTimeoutCol.identifier(),
-			// LDAPRootCACol.identifier(),
+			LDAPRootCACol.identifier(),
 			LDAPIDAttributeCol.identifier(),
 			LDAPFirstNameAttributeCol.identifier(),
 			LDAPLastNameAttributeCol.identifier(),
@@ -1569,7 +1569,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				ldapUserObjectClasses := database.TextArray[string]{}
 				ldapUserFilters := database.TextArray[string]{}
 				ldapTimeout := sql.NullInt64{}
-				// var ldapRootCA []byte
+				var ldapRootCA []byte
 				ldapIDAttribute := sql.NullString{}
 				ldapFirstNameAttribute := sql.NullString{}
 				ldapLastNameAttribute := sql.NullString{}
@@ -1684,7 +1684,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&ldapUserObjectClasses,
 					&ldapUserFilters,
 					&ldapTimeout,
-					// &ldapRootCA,
+					&ldapRootCA,
 					&ldapIDAttribute,
 					&ldapFirstNameAttribute,
 					&ldapLastNameAttribute,
@@ -1823,7 +1823,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						UserObjectClasses: ldapUserObjectClasses,
 						UserFilters:       ldapUserFilters,
 						Timeout:           time.Duration(ldapTimeout.Int64),
-						// RootCA:            ldapRootCA,
+						RootCA:            ldapRootCA,
 						LDAPAttributes: idp.LDAPAttributes{
 							IDAttribute:                ldapIDAttribute.String,
 							FirstNameAttribute:         ldapFirstNameAttribute.String,
