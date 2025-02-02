@@ -567,7 +567,7 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, true, false, false, false, false, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, "", true, false, false, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -912,7 +912,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, true, false, false, false, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, "", false, true, false, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1344,7 +1344,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, true, false, false, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, "", false, false, true, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1605,7 +1605,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, true, false, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, "", false, false, false, true, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -2132,7 +2132,7 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, false, true, false, false)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, "", false, false, false, false, true, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -2441,7 +2441,7 @@ func TestCommandSide_userHumanWriteModel_idpLinks(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userRemoveWriteModel(tt.args.ctx, tt.args.userID)
+			wm, err := r.userRemoveWriteModel(tt.args.ctx, tt.args.userID, "")
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -2744,7 +2744,7 @@ func TestCommandSide_userHumanWriteModel_metadata(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, false, false, false, true)
+			wm, err := r.UserHumanWriteModel(tt.args.ctx, tt.args.userID, "", false, false, false, false, false, false, true)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
