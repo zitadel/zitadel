@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"io/fs"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -112,7 +113,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 
 	handler.Use(callDurationInterceptor, instanceHandler, security, limitingAccessInterceptor.WithoutLimiting().Handle)
 	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		url := http_util.BuildOrigin(r.Host, externalSecure)
+		originURL := http_util.BuildOrigin(r.Host, externalSecure)
 		ctx := r.Context()
 		instance := authz.GetInstance(ctx)
 		instanceMgmtURL, err := templateInstanceManagementURL(config.InstanceManagementURL, instance)
@@ -121,7 +122,15 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 			return
 		}
 		limited := limitingAccessInterceptor.Limit(w, r)
-		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, config.PostHog.URL, config.PostHog.Token, limited)
+		issUrl, err := url.Parse(issuer(r))
+		if err != nil {
+			http.Error(w, fmt.Sprintf("unable to parse issuer url for console: %v", err), http.StatusInternalServerError)
+			return
+		}
+		if externalSecure && issUrl.Scheme == "http" {
+			issUrl.Scheme = "https"
+		}
+		environmentJSON, err := createEnvironmentJSON(originURL, issUrl.String(), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, config.PostHog.URL, config.PostHog.Token, limited)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
 			return
