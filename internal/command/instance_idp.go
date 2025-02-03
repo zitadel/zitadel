@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/zitadel/saml/pkg/provider/xml"
@@ -1625,7 +1624,6 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 			if err != nil || event == nil {
 				return nil, err
 			}
-			fmt.Printf("event = %+v\n", event)
 			return []eventstore.Command{event}, nil
 		}, nil
 	}

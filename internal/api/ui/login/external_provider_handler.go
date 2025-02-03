@@ -3,7 +3,6 @@ package login
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"slices"
@@ -128,8 +127,6 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 		l.defaultRedirect(w, r)
 		return
 	}
-	fmt.Printf("authReq = %+v\n", authReq)
-	fmt.Printf("data = %+v\n", data)
 	l.handleIDP(w, r, authReq, data.IDPConfigID)
 }
 

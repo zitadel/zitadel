@@ -2,7 +2,6 @@ package management
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
@@ -378,7 +377,6 @@ func (s *Server) UpdateGoogleProvider(ctx context.Context, req *mgmt_pb.UpdateGo
 }
 
 func (s *Server) AddLDAPProvider(ctx context.Context, req *mgmt_pb.AddLDAPProviderRequest) (*mgmt_pb.AddLDAPProviderResponse, error) {
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>> ")
 	id, details, err := s.command.AddOrgLDAPProvider(ctx, authz.GetCtxData(ctx).OrgID, addLDAPProviderToCommand(req))
 	if err != nil {
 		return nil, err
@@ -390,7 +388,6 @@ func (s *Server) AddLDAPProvider(ctx context.Context, req *mgmt_pb.AddLDAPProvid
 }
 
 func (s *Server) UpdateLDAPProvider(ctx context.Context, req *mgmt_pb.UpdateLDAPProviderRequest) (*mgmt_pb.UpdateLDAPProviderResponse, error) {
-	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>> man update ")
 	details, err := s.command.UpdateOrgLDAPProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateLDAPProviderToCommand(req))
 	if err != nil {
 		return nil, err

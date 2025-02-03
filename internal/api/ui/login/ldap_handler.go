@@ -1,7 +1,6 @@
 package login
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/zitadel/logging"
@@ -57,7 +56,6 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	identityProvider, err := l.getIDPByID(r, authReq.SelectedIDPConfigID)
-	fmt.Printf("identityProvider.LDAPIDPTemplate = %+v\n", identityProvider.LDAPIDPTemplate)
 	if err != nil {
 		l.renderLDAPLogin(w, r, authReq, err)
 		return
@@ -70,7 +68,6 @@ func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	session := &ldap.Session{Provider: provider, User: data.Username, Password: data.Password}
 
-	fmt.Println("3")
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
 		if _, _, actionErr := l.runPostExternalAuthenticationActions(new(domain.ExternalUser), nil, authReq, r, nil, err); actionErr != nil {
