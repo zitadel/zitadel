@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"net/url"
@@ -150,7 +151,6 @@ func getConnection(
 		dialer = append(dialer, ldap.DialWithTLSConfig(&tls.Config{
 			RootCAs: rootCAs,
 		}))
-		// dialer = append(dialer, ldap.DialWithTLSConfig(&tls.Config{}))
 	}
 
 	conn, err := ldap.DialURL(server, dialer...)
@@ -164,6 +164,7 @@ func getConnection(
 			return nil, err
 		}
 	}
+	fmt.Println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> comm")
 	return conn, nil
 }
 

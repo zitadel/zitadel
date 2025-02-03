@@ -13245,6 +13245,7 @@ message AddLDAPProviderRequest {
     google.protobuf.Duration timeout = 10;
     zitadel.idp.v1.LDAPAttributes attributes = 11;
     zitadel.idp.v1.Options provider_options = 12;
+    bytes root_ca = 13;
 }
 
 message AddLDAPProviderResponse {

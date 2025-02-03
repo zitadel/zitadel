@@ -423,6 +423,7 @@ func addLDAPProviderToCommand(req *admin_pb.AddLDAPProviderRequest) command.LDAP
 		UserObjectClasses: req.UserObjectClasses,
 		UserFilters:       req.UserFilters,
 		Timeout:           req.Timeout.AsDuration(),
+		RootCA:            req.RootCa,
 		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}

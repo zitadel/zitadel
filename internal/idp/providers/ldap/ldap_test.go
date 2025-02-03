@@ -18,6 +18,7 @@ func TestProvider_Options(t *testing.T) {
 		userObjectClasses []string
 		userFilters       []string
 		timeout           time.Duration
+		rootCA            []byte
 		loginUrl          string
 		opts              []ProviderOpts
 	}
@@ -172,6 +173,7 @@ func TestProvider_Options(t *testing.T) {
 				tt.fields.userObjectClasses,
 				tt.fields.userFilters,
 				tt.fields.timeout,
+				tt.fields.rootCA,
 				tt.fields.loginUrl,
 				tt.fields.opts...,
 			)
