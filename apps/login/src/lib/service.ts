@@ -69,7 +69,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
     if (host) {
       const [hostname, port] = host.split(":");
       if (hostname !== "localhost") {
-        instanceUrl = host;
+        instanceUrl = host.startsWith("https://") ? host : `https://${host}`;
       }
     }
   }
