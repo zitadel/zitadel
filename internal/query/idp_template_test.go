@@ -350,6 +350,7 @@ var (
 		` projections.idp_templates6_ldap3.user_object_classes,` +
 		` projections.idp_templates6_ldap3.user_filters,` +
 		` projections.idp_templates6_ldap3.timeout,` +
+		` projections.idp_templates6_ldap3.rootCA,` +
 		` projections.idp_templates6_ldap3.id_attribute,` +
 		` projections.idp_templates6_ldap3.first_name_attribute,` +
 		` projections.idp_templates6_ldap3.last_name_attribute,` +
@@ -478,6 +479,7 @@ var (
 		"user_object_classes",
 		"user_filters",
 		"timeout",
+		"rootCA",
 		"id_attribute",
 		"first_name_attribute",
 		"last_name_attribute",
@@ -1819,7 +1821,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						database.TextArray[string]{"object"},
 						database.TextArray[string]{"filter"},
 						time.Duration(30000000000),
-						[]byte("certificatge"),
+						[]byte("certificate"),
 						"id",
 						"first",
 						"last",
@@ -1868,7 +1870,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Duration(30000000000),
-					RootCA:            []byte("certificatge"),
+					RootCA:            []byte("certificate"),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "first",
@@ -2313,6 +2315,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							database.TextArray[string]{"object"},
 							database.TextArray[string]{"filter"},
 							time.Duration(30000000000),
+							[]byte("certificate"),
 							"id",
 							"first",
 							"last",
@@ -2327,7 +2330,6 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							"avatar",
 							"profile",
 							// apple
-							nil,
 							nil,
 							nil,
 							nil,
@@ -2368,6 +2370,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							UserObjectClasses: []string{"object"},
 							UserFilters:       []string{"filter"},
 							Timeout:           time.Duration(30000000000),
+							RootCA:            []byte("certificate"),
 							LDAPAttributes: idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "first",
@@ -2639,7 +2642,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							database.TextArray[string]{"object"},
 							database.TextArray[string]{"filter"},
 							time.Duration(30000000000),
-							nil,
+							[]byte("certificate"),
 							"id",
 							"first",
 							"last",
@@ -2744,6 +2747,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							domain.SAMLNameIDFormatTransient,
 							"customAttribute",
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2881,6 +2885,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// apple
 							nil,
 							nil,
@@ -2972,6 +2977,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// ldap config
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3109,6 +3115,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// apple
 							nil,
 							nil,
@@ -3223,6 +3230,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// apple
 							nil,
 							nil,
@@ -3264,6 +3272,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							UserObjectClasses: []string{"object"},
 							UserFilters:       []string{"filter"},
 							Timeout:           time.Duration(30000000000),
+							RootCA:            []byte("certificate"),
 							LDAPAttributes: idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "first",
