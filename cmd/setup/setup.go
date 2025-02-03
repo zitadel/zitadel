@@ -173,6 +173,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
 	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: dbClient}
 	steps.s47FillMembershipFields = &FillMembershipFields{eventstore: eventstoreClient}
+	steps.s48FixInTxOrderType = &FixInTxOrderType{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -203,6 +204,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
+		steps.s48FixInTxOrderType,
 		steps.s40InitPushFunc,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,

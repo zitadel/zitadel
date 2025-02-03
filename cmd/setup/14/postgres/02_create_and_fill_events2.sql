@@ -27,5 +27,5 @@ CREATE TABLE eventstore.events2 (
     resource_owner,
 
     EXTRACT(EPOCH FROM creation_date),
-    event_sequence
+    event_sequence::INTEGER
 FROM eventstore.events_old;
