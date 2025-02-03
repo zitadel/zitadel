@@ -5,7 +5,9 @@ import {
   setSessionAndUpdateCookie,
 } from "@/lib/server/cookie";
 import {
+  getLockoutSettings,
   getLoginSettings,
+  getPasswordExpirySettings,
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
@@ -122,24 +124,64 @@ export async function sendPassword(command: UpdateSessionCommand) {
         organization: command.organization,
       });
 
-      session = await createSessionAndUpdateCookie(
-        checks,
-        undefined,
-        command.authRequestId,
-        loginSettings?.passwordCheckLifetime,
-      );
+      try {
+        session = await createSessionAndUpdateCookie(
+          checks,
+          undefined,
+          command.authRequestId,
+          loginSettings?.passwordCheckLifetime,
+        );
+      } catch (error: any) {
+        if ("failedAttempts" in error && error.failedAttempts) {
+          const lockoutSettings = await getLockoutSettings({
+            serviceUrl,
+            serviceRegion,
+            orgId: command.organization,
+          });
+
+          return {
+            error:
+              `Failed to authenticate. You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.` +
+              (lockoutSettings?.maxPasswordAttempts &&
+              error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
+                ? "Contact your administrator to unlock your account"
+                : ""),
+          };
+        }
+        return { error: "Could not create session for user" };
+      }
     }
 
     // this is a fake error message to hide that the user does not even exist
     return { error: "Could not verify password" };
   } else {
-    session = await setSessionAndUpdateCookie(
-      sessionCookie,
-      command.checks,
-      undefined,
-      command.authRequestId,
-      loginSettings?.passwordCheckLifetime,
-    );
+    try {
+      session = await setSessionAndUpdateCookie(
+        sessionCookie,
+        command.checks,
+        undefined,
+        command.authRequestId,
+        loginSettings?.passwordCheckLifetime,
+      );
+    } catch (error: any) {
+      if ("failedAttempts" in error && error.failedAttempts) {
+        const lockoutSettings = await getLockoutSettings({
+          serviceUrl,
+          serviceRegion,
+          orgId: command.organization,
+        });
+
+        return {
+          error:
+            `Failed to authenticate. You had ${error.failedAttempts} of ${lockoutSettings?.maxPasswordAttempts} password attempts.` +
+            (lockoutSettings?.maxPasswordAttempts &&
+            error.failedAttempts >= lockoutSettings?.maxPasswordAttempts
+              ? " Contact your administrator to unlock your account"
+              : ""),
+        };
+      }
+      throw error;
+    }
 
     if (!session?.factors?.user?.id) {
       return { error: "Could not create session for user" };
@@ -173,8 +215,15 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   const humanUser = user.type.case === "human" ? user.type.value : undefined;
 
+  const expirySettings = await getPasswordExpirySettings({
+    serviceUrl,
+    serviceRegion,
+    orgId: command.organization ?? session.factors?.user?.organizationId,
+  });
+
   // check if the user has to change password first
   const passwordChangedCheck = checkPasswordChangeRequired(
+    expirySettings,
     session,
     humanUser,
     command.organization,

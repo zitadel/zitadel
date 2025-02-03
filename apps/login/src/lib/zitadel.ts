@@ -91,6 +91,44 @@ export async function getLoginSettings({
   return useCache ? cacheWrapper(callback) : callback;
 }
 
+export async function getLockoutSettings({
+  serviceUrl,
+  serviceRegion,
+  orgId,
+}: {
+  serviceUrl: string;
+  serviceRegion: string;
+  orgId?: string;
+}) {
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, serviceUrl, serviceRegion);
+
+  const callback = settingsService
+    .getLockoutSettings({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
+export async function getPasswordExpirySettings({
+  serviceUrl,
+  serviceRegion,
+  orgId,
+}: {
+  serviceUrl: string;
+  serviceRegion: string;
+  orgId?: string;
+}) {
+  const settingsService: Client<typeof SettingsService> =
+    await createServiceForHost(SettingsService, serviceUrl, serviceRegion);
+
+  const callback = settingsService
+    .getPasswordExpirySettings({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp) => (resp.settings ? resp.settings : undefined));
+
+  return useCache ? cacheWrapper(callback) : callback;
+}
+
 export async function listIDPLinks({
   serviceUrl,
   serviceRegion,
