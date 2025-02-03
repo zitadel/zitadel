@@ -8776,9 +8776,9 @@ message ListIAMMemberRolesResponse {
 message ListIAMMembersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    zitadel.member.v1.MemberFieldColumnName sorting_column=2;
     //criteria the client is looking for
-    repeated zitadel.member.v1.SearchQuery queries = 3;
+    repeated zitadel.member.v1.SearchQuery queries = 2;
+    zitadel.member.v1.MemberFieldColumnName sorting_column=3;
 }
 
 message ListIAMMembersResponse {
