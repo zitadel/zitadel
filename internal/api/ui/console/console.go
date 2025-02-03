@@ -45,6 +45,8 @@ var (
 
 const (
 	envRequestPath = "/assets/environment.json"
+	// https://posthog.com/docs/advanced/content-security-policy
+	posthogCSPHost = "https://*.i.posthog.com"
 )
 
 var (
@@ -106,7 +108,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 		config.LongCache.MaxAge,
 		config.LongCache.SharedMaxAge,
 	)
-	security := middleware.SecurityHeaders(csp(), nil)
+	security := middleware.SecurityHeaders(csp(config.PostHog.URL), nil)
 
 	handler := mux.NewRouter()
 
@@ -145,12 +147,22 @@ func templateInstanceManagementURL(templateableCookieValue string, instance auth
 	return cookieValue.String(), nil
 }
 
-func csp() *middleware.CSP {
+func csp(posthogURL string) *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.StyleSrc = csp.StyleSrc.AddInline()
 	csp.ScriptSrc = csp.ScriptSrc.AddEval()
 	csp.ConnectSrc = csp.ConnectSrc.AddOwnHost()
 	csp.ImgSrc = csp.ImgSrc.AddOwnHost().AddScheme("blob")
+	if posthogURL != "" {
+		// https://posthog.com/docs/advanced/content-security-policy#enabling-the-toolbar
+		csp.ScriptSrc = csp.ScriptSrc.AddHost(posthogCSPHost)
+		csp.ConnectSrc = csp.ConnectSrc.AddHost(posthogCSPHost)
+		csp.ImgSrc = csp.ImgSrc.AddHost(posthogCSPHost)
+		csp.StyleSrc = csp.StyleSrc.AddHost(posthogCSPHost)
+		csp.FontSrc = csp.FontSrc.AddHost(posthogCSPHost)
+		csp.MediaSrc = middleware.CSPSourceOpts().AddHost(posthogCSPHost)
+	}
+
 	return &csp
 }
 
