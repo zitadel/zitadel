@@ -130,16 +130,7 @@ func TestServer_CreateCallback(t *testing.T) {
 	require.NoError(t, err)
 	clientV2, err := Instance.CreateOIDCClientLoginVersion(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2)
 	require.NoError(t, err)
-	sessionResp, err := Instance.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
-		Checks: &session.Checks{
-			User: &session.CheckUser{
-				Search: &session.CheckUser_UserId{
-					UserId: Instance.Users[integration.UserTypeOrgOwner].ID,
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
+	sessionResp := createSession(t, Instance.Users[integration.UserTypeOrgOwner].ID)
 
 	tests := []struct {
 		name      string
@@ -389,4 +380,104 @@ func TestServer_CreateCallback(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestServer_CreateCallback_Permission(t *testing.T) {
+
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		dep     func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest
+		want    *oidc_pb.CreateCallbackResponse
+		wantURL *url.URL
+		wantErr bool
+	}{
+		{
+			name: "no usergrant and same resourceowner",
+			ctx:  CTX,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
+				user := Instance.CreateHumanUser(ctx)
+				project, err := Instance.CreateProjectWithPermissionCheck(ctx, true, true)
+				require.NoError(t, err)
+				clientV2, err := Instance.CreateOIDCClientLoginVersion(ctx, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2)
+				require.NoError(t, err)
+
+				authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, clientV2.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+				require.NoError(t, err)
+				sessionResp := createSession(t, user.GetUserId())
+				return &oidc_pb.CreateCallbackRequest{
+					AuthRequestId: authRequestID,
+					CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+						Session: &oidc_pb.Session{
+							SessionId:    sessionResp.GetSessionId(),
+							SessionToken: sessionResp.GetSessionToken(),
+						},
+					},
+				}
+			},
+			wantErr: true,
+		},
+		{
+			name: "Usergrant and same resourceowner",
+			ctx:  CTX,
+			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
+				user := Instance.CreateHumanUser(ctx)
+				project, err := Instance.CreateProjectWithPermissionCheck(ctx, true, true)
+				require.NoError(t, err)
+				clientV2, err := Instance.CreateOIDCClientLoginVersion(ctx, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, false, loginV2)
+				require.NoError(t, err)
+				Instance.CreateProjectUserGrant(t, ctx, project.GetId(), user.GetUserId())
+
+				authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, clientV2.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+				require.NoError(t, err)
+				sessionResp := createSession(t, user.GetUserId())
+				return &oidc_pb.CreateCallbackRequest{
+					AuthRequestId: authRequestID,
+					CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+						Session: &oidc_pb.Session{
+							SessionId:    sessionResp.GetSessionId(),
+							SessionToken: sessionResp.GetSessionToken(),
+						},
+					},
+				}
+			},
+			want: &oidc_pb.CreateCallbackResponse{
+				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Instance.ID(),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := tt.dep(CTX, t)
+
+			got, err := Client.CreateCallback(tt.ctx, req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			integration.AssertDetails(t, tt.want, got)
+			if tt.want != nil {
+				assert.Regexp(t, regexp.MustCompile(tt.want.CallbackUrl), got.GetCallbackUrl())
+			}
+		})
+	}
+}
+
+func createSession(t *testing.T, userID string) *session.CreateSessionResponse {
+	sessionResp, err := Instance.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: userID,
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+	return sessionResp
 }

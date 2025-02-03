@@ -194,6 +194,14 @@ func (i *Instance) CreateProject(ctx context.Context) (*management.AddProjectRes
 	})
 }
 
+func (i *Instance) CreateProjectWithPermissionCheck(ctx context.Context, projectRoleCheck, hasProjectCheck bool) (*management.AddProjectResponse, error) {
+	return i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+		Name:             fmt.Sprintf("project-%d", time.Now().UnixNano()),
+		HasProjectCheck:  hasProjectCheck,
+		ProjectRoleCheck: projectRoleCheck,
+	})
+}
+
 func (i *Instance) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
 	return i.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
 		ProjectId:      projectID,

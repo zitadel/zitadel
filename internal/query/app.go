@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
 	"time"
 
@@ -366,6 +367,71 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project 
 		return err
 	}, query, args...)
 	return project, err
+}
+
+//go:embed app_project_permission.sql
+var appProjectPermissionQuery string
+
+func (q *Queries) CheckProjectPermissionByClientID(ctx context.Context, clientID, userID string) (_ bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	var p *projectPermission
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		p, err = scanProjectPermissionByClientID(row)
+		return err
+	}, appProjectPermissionQuery,
+		authz.GetInstance(ctx).InstanceID(),
+		clientID,
+		domain.AppStateActive,
+		domain.ProjectStateActive,
+		userID,
+		domain.UserStateActive,
+		domain.ProjectGrantStateActive,
+		domain.UserGrantStateActive,
+	)
+	return p.permission(), err
+}
+
+type projectPermission struct {
+	InstanceID         sql.NullString
+	ResourceOwner      sql.NullString
+	ProjectID          sql.NullString
+	AppID              sql.NullString
+	UserResourceOwner  sql.NullString
+	GrantedOrgID       sql.NullString
+	UserGrantProjectID sql.NullString
+	HasProjectChecked  sql.NullBool
+	ProjectRoleChecked sql.NullBool
+}
+
+func (p *projectPermission) permission() bool {
+	return p.HasProjectChecked.Bool && p.ProjectRoleChecked.Bool
+}
+
+func scanProjectPermissionByClientID(row *sql.Row) (*projectPermission, error) {
+	p := new(projectPermission)
+	var count int
+	err := row.Scan(
+		&p.InstanceID,
+		&p.ResourceOwner,
+		&p.ProjectID,
+		&p.AppID,
+		&p.UserResourceOwner,
+		&p.GrantedOrgID,
+		&p.UserGrantProjectID,
+		&p.HasProjectChecked,
+		&p.ProjectRoleChecked,
+		&count,
+	)
+
+	if err != nil || count != 1 {
+		if errors.Is(err, sql.ErrNoRows) || count != 1 {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-4tq8wCTCgf", "Errors.User.NotFound")
+		}
+		return nil, zerrors.ThrowInternal(err, "QUERY-NwH4lAqlZC", "Errors.Internal")
+	}
+	return p, nil
 }
 
 func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id string, err error) {
