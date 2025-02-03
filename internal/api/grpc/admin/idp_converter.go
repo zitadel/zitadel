@@ -443,7 +443,7 @@ func updateLDAPProviderToCommand(req *admin_pb.UpdateLDAPProviderRequest) comman
 		Timeout:           req.Timeout.AsDuration(),
 		LDAPAttributes:    idp_grpc.LDAPAttributesToCommand(req.Attributes),
 		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
-		RootCA:            req.RootCA,
+		RootCA:            req.RootCa,
 	}
 }
 
