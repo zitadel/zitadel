@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates7"
+	IDPTemplateTable                 = "projections.idp_templates6"
 	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
@@ -331,7 +331,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(LDAPUserObjectClassesCol, handler.ColumnTypeTextArray),
 			handler.NewColumn(LDAPUserFiltersCol, handler.ColumnTypeTextArray),
 			handler.NewColumn(LDAPTimeoutCol, handler.ColumnTypeInt64),
-			handler.NewColumn(LDAPRootCACol, handler.ColumnTypeBytes),
+			handler.NewColumn(LDAPRootCACol, handler.ColumnTypeBytes, handler.Nullable()),
 			handler.NewColumn(LDAPIDAttributeCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LDAPFirstNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(LDAPLastNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
@@ -1898,7 +1898,7 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(LDAPUserObjectClassesCol, database.TextArray[string](idpEvent.UserObjectClasses)),
 				handler.NewCol(LDAPUserFiltersCol, database.TextArray[string](idpEvent.UserFilters)),
 				handler.NewCol(LDAPTimeoutCol, idpEvent.Timeout),
-				handler.NewCol(LDAPRootCACol, idpEvent.Timeout),
+				handler.NewCol(LDAPRootCACol, idpEvent.RootCA),
 				handler.NewCol(LDAPIDAttributeCol, idpEvent.IDAttribute),
 				handler.NewCol(LDAPFirstNameAttributeCol, idpEvent.FirstNameAttribute),
 				handler.NewCol(LDAPLastNameAttributeCol, idpEvent.LastNameAttribute),
