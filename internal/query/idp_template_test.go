@@ -795,6 +795,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// apple
 						nil,
 						nil,
@@ -920,6 +921,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1090,6 +1092,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// apple
 						nil,
 						nil,
@@ -1236,6 +1239,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// apple
 						nil,
 						nil,
@@ -1359,6 +1363,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1529,6 +1534,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
 						// apple
 						nil,
 						nil,
@@ -1652,6 +1658,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						domain.SAMLNameIDFormatTransient,
 						"customAttribute",
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1812,6 +1819,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						database.TextArray[string]{"object"},
 						database.TextArray[string]{"filter"},
 						time.Duration(30000000000),
+						[]byte("certificatge"),
 						"id",
 						"first",
 						"last",
@@ -1860,6 +1868,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Duration(30000000000),
+					RootCA:            []byte("certificatge"),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "first",
@@ -1968,6 +1977,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2116,6 +2126,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// ldap config
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2322,6 +2333,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 						},
 					},
 				),
@@ -2490,6 +2502,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
 							// apple
 							nil,
 							nil,
@@ -2626,6 +2639,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							database.TextArray[string]{"object"},
 							database.TextArray[string]{"filter"},
 							time.Duration(30000000000),
+							nil,
 							"id",
 							"first",
 							"last",
