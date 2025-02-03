@@ -273,7 +273,7 @@ func (h *UsersHandler) mapToScimUser(ctx context.Context, user *query.User, md m
 			FamilyName: user.Human.LastName,
 			GivenName:  user.Human.FirstName,
 		},
-		Active: gu.Ptr(user.State.IsEnabled()),
+		Active: schemas.NewRelaxedBool(user.State.IsEnabled()),
 	}
 
 	if string(user.Human.Email) != "" {
@@ -311,7 +311,7 @@ func (h *UsersHandler) mapWriteModelToScimUser(ctx context.Context, user *comman
 			FamilyName: user.LastName,
 			GivenName:  user.FirstName,
 		},
-		Active: gu.Ptr(user.UserState.IsEnabled()),
+		Active: schemas.NewRelaxedBool(user.UserState.IsEnabled()),
 	}
 
 	if string(user.Email) != "" {

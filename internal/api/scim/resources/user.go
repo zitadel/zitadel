@@ -39,7 +39,7 @@ type ScimUser struct {
 	PreferredLanguage      language.Tag                  `json:"preferredLanguage,omitempty"`
 	Locale                 string                        `json:"locale,omitempty"`
 	Timezone               string                        `json:"timezone,omitempty"`
-	Active                 *bool                         `json:"active,omitempty"`
+	Active                 *scim_schemas.RelaxedBool     `json:"active,omitempty"`
 	Emails                 []*ScimEmail                  `json:"emails,omitempty" scim:"required"`
 	PhoneNumbers           []*ScimPhoneNumber            `json:"phoneNumbers,omitempty"`
 	Password               *scim_schemas.WriteOnlyString `json:"password,omitempty"`
