@@ -7,13 +7,20 @@ import {
   getSession,
   setSession,
 } from "@/lib/zitadel";
-import { Duration, timestampMs } from "@zitadel/client";
+import { ConnectError, Duration, timestampMs } from "@zitadel/client";
+import {
+  CredentialsCheckError,
+  CredentialsCheckErrorSchema,
+  ErrorDetail,
+} from "@zitadel/proto/zitadel/message_pb";
 import {
   Challenges,
   RequestChallenges,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { headers } from "next/headers";
+import { getServiceUrlFromHeaders } from "../service";
 
 type CustomCookieData = {
   id: string;
@@ -26,16 +33,40 @@ type CustomCookieData = {
   authRequestId?: string; // if its linked to an OIDC flow
 };
 
+const passwordAttemptsHandler = (error: ConnectError) => {
+  const details = error.findDetails(CredentialsCheckErrorSchema);
+
+  if (details[0] && "failedAttempts" in details[0]) {
+    const failedAttempts = details[0].failedAttempts;
+    throw {
+      error: `Failed to authenticate: You had ${failedAttempts} password attempts.`,
+      failedAttempts: failedAttempts,
+    };
+  }
+  throw error;
+};
+
 export async function createSessionAndUpdateCookie(
   checks: Checks,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
-  const createdSession = await createSessionFromChecks(checks, challenges);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  const createdSession = await createSessionFromChecks({
+    serviceUrl,
+    serviceRegion,
+    checks,
+    challenges,
+    lifetime,
+  });
 
   if (createdSession) {
     return getSession({
+      serviceUrl,
+      serviceRegion,
       sessionId: createdSession.sessionId,
       sessionToken: createdSession.sessionToken,
     }).then((response) => {
@@ -85,17 +116,33 @@ export async function createSessionForIdpAndUpdateCookie(
   authRequestId: string | undefined,
   lifetime?: Duration,
 ): Promise<Session> {
-  const createdSession = await createSessionForUserIdAndIdpIntent(
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  const createdSession = await createSessionForUserIdAndIdpIntent({
+    serviceUrl,
+    serviceRegion,
     userId,
     idpIntent,
     lifetime,
-  );
+  }).catch((error: ErrorDetail | CredentialsCheckError) => {
+    console.error("Could not set session", error);
+    if ("failedAttempts" in error && error.failedAttempts) {
+      throw {
+        error: `Failed to authenticate: You had ${error.failedAttempts} password attempts.`,
+        failedAttempts: error.failedAttempts,
+      };
+    }
+    throw error;
+  });
 
   if (!createdSession) {
     throw "Could not create session";
   }
 
   const { session } = await getSession({
+    serviceUrl,
+    serviceRegion,
     sessionId: createdSession.sessionId,
     sessionToken: createdSession.sessionToken,
   });
@@ -142,63 +189,72 @@ export async function setSessionAndUpdateCookie(
   authRequestId?: string,
   lifetime?: Duration,
 ) {
-  return setSession(
-    recentCookie.id,
-    recentCookie.token,
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  return setSession({
+    serviceUrl,
+    serviceRegion,
+    sessionId: recentCookie.id,
+    sessionToken: recentCookie.token,
     challenges,
     checks,
     lifetime,
-  ).then((updatedSession) => {
-    if (updatedSession) {
-      const sessionCookie: CustomCookieData = {
-        id: recentCookie.id,
-        token: updatedSession.sessionToken,
-        creationTs: recentCookie.creationTs,
-        expirationTs: recentCookie.expirationTs,
-        // just overwrite the changeDate with the new one
-        changeTs: updatedSession.details?.changeDate
-          ? `${timestampMs(updatedSession.details.changeDate)}`
-          : "",
-        loginName: recentCookie.loginName,
-        organization: recentCookie.organization,
-      };
+  })
+    .then((updatedSession) => {
+      if (updatedSession) {
+        const sessionCookie: CustomCookieData = {
+          id: recentCookie.id,
+          token: updatedSession.sessionToken,
+          creationTs: recentCookie.creationTs,
+          expirationTs: recentCookie.expirationTs,
+          // just overwrite the changeDate with the new one
+          changeTs: updatedSession.details?.changeDate
+            ? `${timestampMs(updatedSession.details.changeDate)}`
+            : "",
+          loginName: recentCookie.loginName,
+          organization: recentCookie.organization,
+        };
 
-      if (authRequestId) {
-        sessionCookie.authRequestId = authRequestId;
-      }
-
-      return getSession({
-        sessionId: sessionCookie.id,
-        sessionToken: sessionCookie.token,
-      }).then((response) => {
-        if (response?.session && response.session.factors?.user?.loginName) {
-          const { session } = response;
-          const newCookie: CustomCookieData = {
-            id: sessionCookie.id,
-            token: updatedSession.sessionToken,
-            creationTs: sessionCookie.creationTs,
-            expirationTs: sessionCookie.expirationTs,
-            // just overwrite the changeDate with the new one
-            changeTs: updatedSession.details?.changeDate
-              ? `${timestampMs(updatedSession.details.changeDate)}`
-              : "",
-            loginName: session.factors?.user?.loginName ?? "",
-            organization: session.factors?.user?.organizationId ?? "",
-          };
-
-          if (sessionCookie.authRequestId) {
-            newCookie.authRequestId = sessionCookie.authRequestId;
-          }
-
-          return updateSessionCookie(sessionCookie.id, newCookie).then(() => {
-            return { challenges: updatedSession.challenges, ...session };
-          });
-        } else {
-          throw "could not get session or session does not have loginName";
+        if (authRequestId) {
+          sessionCookie.authRequestId = authRequestId;
         }
-      });
-    } else {
-      throw "Session not be set";
-    }
-  });
+
+        return getSession({
+          serviceUrl,
+          serviceRegion,
+          sessionId: sessionCookie.id,
+          sessionToken: sessionCookie.token,
+        }).then((response) => {
+          if (response?.session && response.session.factors?.user?.loginName) {
+            const { session } = response;
+            const newCookie: CustomCookieData = {
+              id: sessionCookie.id,
+              token: updatedSession.sessionToken,
+              creationTs: sessionCookie.creationTs,
+              expirationTs: sessionCookie.expirationTs,
+              // just overwrite the changeDate with the new one
+              changeTs: updatedSession.details?.changeDate
+                ? `${timestampMs(updatedSession.details.changeDate)}`
+                : "",
+              loginName: session.factors?.user?.loginName ?? "",
+              organization: session.factors?.user?.organizationId ?? "",
+            };
+
+            if (sessionCookie.authRequestId) {
+              newCookie.authRequestId = sessionCookie.authRequestId;
+            }
+
+            return updateSessionCookie(sessionCookie.id, newCookie).then(() => {
+              return { challenges: updatedSession.challenges, ...session };
+            });
+          } else {
+            throw "could not get session or session does not have loginName";
+          }
+        });
+      } else {
+        throw "Session not be set";
+      }
+    })
+    .catch(passwordAttemptsHandler);
 }

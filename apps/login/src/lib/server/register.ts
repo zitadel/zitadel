@@ -8,7 +8,9 @@ import {
   ChecksJson,
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { headers } from "next/headers";
 import { getNextUrl } from "../client";
+import { getServiceUrlFromHeaders } from "../service";
 import { checkEmailVerification } from "../verify-helper";
 
 type RegisterUserCommand = {
@@ -26,7 +28,17 @@ export type RegisterUserResponse = {
   factors: Factors | undefined;
 };
 export async function registerUser(command: RegisterUserCommand) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host || typeof host !== "string") {
+    throw new Error("No host found");
+  }
+
   const addResponse = await addHumanUser({
+    serviceUrl,
+    serviceRegion,
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -38,7 +50,11 @@ export async function registerUser(command: RegisterUserCommand) {
     return { error: "Could not create user" };
   }
 
-  const loginSettings = await getLoginSettings(command.organization);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: command.organization,
+  });
 
   let checkPayload: any = {
     user: { search: { case: "userId", value: addResponse.userId } },
@@ -76,7 +92,11 @@ export async function registerUser(command: RegisterUserCommand) {
 
     return { redirect: "/passkey/set?" + params };
   } else {
-    const userResponse = await getUserByID(session?.factors?.user?.id);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId: session?.factors?.user?.id,
+    });
 
     if (!userResponse.user) {
       return { error: "User not found in the system" };

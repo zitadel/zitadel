@@ -3,6 +3,7 @@ import { DynamicTheme } from "@/components/dynamic-theme";
 import { SelfServiceMenu } from "@/components/self-service-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   createCallback,
   getBrandingSettings,
@@ -15,15 +16,23 @@ import {
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-async function loadSession(loginName: string, authRequestId?: string) {
+async function loadSession(
+  serviceUrl: string,
+  serviceRegion: string,
+  loginName: string,
+  authRequestId?: string,
+) {
   const recent = await getMostRecentCookieWithLoginname({ loginName });
 
   if (authRequestId) {
-    return createCallback(
-      create(CreateCallbackRequestSchema, {
+    return createCallback({
+      serviceUrl,
+      serviceRegion,
+      req: create(CreateCallbackRequestSchema, {
         authRequestId,
         callbackKind: {
           case: "session",
@@ -33,17 +42,20 @@ async function loadSession(loginName: string, authRequestId?: string) {
           }),
         },
       }),
-    ).then(({ callbackUrl }) => {
+    }).then(({ callbackUrl }) => {
       return redirect(callbackUrl);
     });
   }
-  return getSession({ sessionId: recent.id, sessionToken: recent.token }).then(
-    (response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    },
-  );
+  return getSession({
+    serviceUrl,
+    serviceRegion,
+    sessionId: recent.id,
+    sessionToken: recent.token,
+  }).then((response) => {
+    if (response?.session) {
+      return response.session;
+    }
+  });
 }
 
 export default async function Page(props: { searchParams: Promise<any> }) {
@@ -51,14 +63,30 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const locale = getLocale();
   const t = await getTranslations({ locale, namespace: "signedin" });
 
-  const { loginName, authRequestId, organization } = searchParams;
-  const sessionFactors = await loadSession(loginName, authRequestId);
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  const branding = await getBrandingSettings(organization);
+  const { loginName, authRequestId, organization } = searchParams;
+  const sessionFactors = await loadSession(
+    serviceUrl,
+    serviceRegion,
+    loginName,
+    authRequestId,
+  );
+
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   let loginSettings;
   if (!authRequestId) {
-    loginSettings = await getLoginSettings(organization);
+    loginSettings = await getLoginSettings({
+      serviceUrl,
+      serviceRegion,
+      organization,
+    });
   }
 
   return (

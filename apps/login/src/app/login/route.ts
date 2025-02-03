@@ -1,6 +1,7 @@
 import { getAllSessions } from "@/lib/cookies";
 import { idpTypeToSlug } from "@/lib/idp";
 import { sendLoginname, SendLoginnameCommand } from "@/lib/server/loginname";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   createCallback,
   getActiveIdentityProviders,
@@ -22,16 +23,27 @@ import {
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
 
-async function loadSessions(ids: string[]): Promise<Session[]> {
-  const response = await listSessions(
-    ids.filter((id: string | undefined) => !!id),
-  );
+async function loadSessions({
+  serviceUrl,
+  serviceRegion,
+  ids,
+}: {
+  serviceUrl: string;
+  serviceRegion: string;
+  ids: string[];
+}): Promise<Session[]> {
+  const response = await listSessions({
+    serviceUrl,
+    serviceRegion,
+    ids: ids.filter((id: string | undefined) => !!id),
+  });
 
   return response?.sessions ?? [];
 }
@@ -44,7 +56,11 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
  * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
  * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
  **/
-async function isSessionValid(session: Session): Promise<boolean> {
+async function isSessionValid(
+  serviceUrl: string,
+  serviceRegion: string,
+  session: Session,
+): Promise<boolean> {
   // session can't be checked without user
   if (!session.factors?.user) {
     console.warn("Session has no user");
@@ -53,9 +69,11 @@ async function isSessionValid(session: Session): Promise<boolean> {
 
   let mfaValid = true;
 
-  const authMethodTypes = await listAuthenticationMethodTypes(
-    session.factors.user.id,
-  );
+  const authMethodTypes = await listAuthenticationMethodTypes({
+    serviceUrl,
+    serviceRegion,
+    userId: session.factors.user.id,
+  });
 
   const authMethods = authMethodTypes.authMethodTypes;
   if (authMethods && authMethods.includes(AuthenticationMethodType.TOTP)) {
@@ -101,9 +119,11 @@ async function isSessionValid(session: Session): Promise<boolean> {
     }
   } else {
     // only check settings if no auth methods are available, as this would require a setup
-    const loginSettings = await getLoginSettings(
-      session.factors?.user?.organizationId,
-    );
+    const loginSettings = await getLoginSettings({
+      serviceUrl,
+      serviceRegion,
+      organization: session.factors?.user?.organizationId,
+    });
     if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
       const otpEmail = session.factors.otpEmail?.verifiedAt;
       const otpSms = session.factors.otpSms?.verifiedAt;
@@ -144,6 +164,8 @@ async function isSessionValid(session: Session): Promise<boolean> {
 }
 
 async function findValidSession(
+  serviceUrl: string,
+  serviceRegion: string,
   sessions: Session[],
   authRequest: AuthRequest,
 ): Promise<Session | undefined> {
@@ -170,7 +192,7 @@ async function findValidSession(
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
-    if (await isSessionValid(session)) {
+    if (await isSessionValid(serviceUrl, serviceRegion, session)) {
       return session;
     }
   }
@@ -183,6 +205,9 @@ export async function GET(request: NextRequest) {
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
   const _rsc = searchParams.get("_rsc");
   if (_rsc) {
@@ -193,7 +218,7 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions(ids);
+    sessions = await loadSessions({ serviceUrl, serviceRegion, ids });
   }
 
   if (authRequestId && sessionId) {
@@ -206,7 +231,11 @@ export async function GET(request: NextRequest) {
     if (selectedSession && selectedSession.id) {
       console.log(`Found session ${selectedSession.id}`);
 
-      const isValid = await isSessionValid(selectedSession);
+      const isValid = await isSessionValid(
+        serviceUrl,
+        serviceRegion,
+        selectedSession,
+      );
 
       console.log("Session is valid:", isValid);
 
@@ -239,15 +268,17 @@ export async function GET(request: NextRequest) {
 
         // works not with _rsc request
         try {
-          const { callbackUrl } = await createCallback(
-            create(CreateCallbackRequestSchema, {
+          const { callbackUrl } = await createCallback({
+            serviceUrl,
+            serviceRegion,
+            req: create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {
                 case: "session",
                 value: create(SessionSchema, session),
               },
             }),
-          );
+          });
           if (callbackUrl) {
             return NextResponse.redirect(callbackUrl);
           } else {
@@ -265,9 +296,11 @@ export async function GET(request: NextRequest) {
             "code" in error &&
             error?.code === 9
           ) {
-            const loginSettings = await getLoginSettings(
-              selectedSession.factors?.user?.organizationId,
-            );
+            const loginSettings = await getLoginSettings({
+              serviceUrl,
+              serviceRegion,
+              organization: selectedSession.factors?.user?.organizationId,
+            });
 
             if (loginSettings?.defaultRedirectUri) {
               return NextResponse.redirect(loginSettings.defaultRedirectUri);
@@ -297,7 +330,11 @@ export async function GET(request: NextRequest) {
   }
 
   if (authRequestId) {
-    const { authRequest } = await getAuthRequest({ authRequestId });
+    const { authRequest } = await getAuthRequest({
+      serviceUrl,
+      serviceRegion,
+      authRequestId,
+    });
 
     let organization = "";
     let suffix = "";
@@ -324,7 +361,11 @@ export async function GET(request: NextRequest) {
           const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
           const orgDomain = matched?.[1] ?? "";
           if (orgDomain) {
-            const orgs = await getOrgsByDomain(orgDomain);
+            const orgs = await getOrgsByDomain({
+              serviceUrl,
+              serviceRegion,
+              domain: orgDomain,
+            });
             if (orgs.result && orgs.result.length === 1) {
               organization = orgs.result[0].id ?? "";
               suffix = orgDomain;
@@ -337,9 +378,11 @@ export async function GET(request: NextRequest) {
         const matched = IDP_SCOPE_REGEX.exec(idpScope);
         idpId = matched?.[1] ?? "";
 
-        const identityProviders = await getActiveIdentityProviders(
-          organization ? organization : undefined,
-        ).then((resp) => {
+        const identityProviders = await getActiveIdentityProviders({
+          serviceUrl,
+          serviceRegion,
+          orgId: organization ? organization : undefined,
+        }).then((resp) => {
           return resp.identityProviders;
         });
 
@@ -362,6 +405,8 @@ export async function GET(request: NextRequest) {
           }
 
           return startIdentityProviderFlow({
+            serviceUrl,
+            serviceRegion,
             idpId,
             urls: {
               successUrl:
@@ -460,7 +505,12 @@ export async function GET(request: NextRequest) {
          * This means that the user should not be prompted to enter their password again.
          * Instead, the server attempts to silently authenticate the user using an existing session or other authentication mechanisms that do not require user interaction
          **/
-        const selectedSession = await findValidSession(sessions, authRequest);
+        const selectedSession = await findValidSession(
+          serviceUrl,
+          serviceRegion,
+          sessions,
+          authRequest,
+        );
 
         if (!selectedSession || !selectedSession.id) {
           return NextResponse.json(
@@ -485,19 +535,26 @@ export async function GET(request: NextRequest) {
           sessionToken: cookie.token,
         };
 
-        const { callbackUrl } = await createCallback(
-          create(CreateCallbackRequestSchema, {
+        const { callbackUrl } = await createCallback({
+          serviceUrl,
+          serviceRegion,
+          req: create(CreateCallbackRequestSchema, {
             authRequestId,
             callbackKind: {
               case: "session",
               value: create(SessionSchema, session),
             },
           }),
-        );
+        });
         return NextResponse.redirect(callbackUrl);
       } else {
         // check for loginHint, userId hint and valid sessions
-        let selectedSession = await findValidSession(sessions, authRequest);
+        let selectedSession = await findValidSession(
+          serviceUrl,
+          serviceRegion,
+          sessions,
+          authRequest,
+        );
 
         if (!selectedSession || !selectedSession.id) {
           return gotoAccounts();
@@ -517,15 +574,17 @@ export async function GET(request: NextRequest) {
         };
 
         try {
-          const { callbackUrl } = await createCallback(
-            create(CreateCallbackRequestSchema, {
+          const { callbackUrl } = await createCallback({
+            serviceUrl,
+            serviceRegion,
+            req: create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {
                 case: "session",
                 value: create(SessionSchema, session),
               },
             }),
-          );
+          });
           if (callbackUrl) {
             return NextResponse.redirect(callbackUrl);
           } else {

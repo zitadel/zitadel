@@ -2,6 +2,7 @@ import { Alert } from "@/components/alert";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { PasswordForm } from "@/components/password-form";
 import { UserAvatar } from "@/components/user-avatar";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
@@ -11,6 +12,7 @@ import {
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { PasskeysType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function Page(props: {
   searchParams: Promise<Record<string | number | symbol, string | undefined>>;
@@ -22,9 +24,15 @@ export default async function Page(props: {
 
   let { loginName, organization, authRequestId, alt } = searchParams;
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   let defaultOrganization;
   if (!organization) {
-    const org: Organization | null = await getDefaultOrg();
+    const org: Organization | null = await getDefaultOrg({
+      serviceUrl,
+      serviceRegion,
+    });
 
     if (org) {
       defaultOrganization = org.id;
@@ -35,20 +43,28 @@ export default async function Page(props: {
   let sessionFactors;
   try {
     sessionFactors = await loadMostRecentSession({
-      loginName,
-      organization,
+      serviceUrl,
+      serviceRegion,
+      sessionParams: {
+        loginName,
+        organization,
+      },
     });
   } catch (error) {
     // ignore error to continue to show the password form
     console.warn(error);
   }
 
-  const branding = await getBrandingSettings(
-    organization ?? defaultOrganization,
-  );
-  const loginSettings = await getLoginSettings(
-    organization ?? defaultOrganization,
-  );
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: organization ?? defaultOrganization,
+  });
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: organization ?? defaultOrganization,
+  });
 
   return (
     <DynamicTheme branding={branding}>

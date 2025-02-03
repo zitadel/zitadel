@@ -1,6 +1,7 @@
 "use client";
+
 import { getNextUrl } from "@/lib/client";
-import { verifyTOTP } from "@/lib/server-actions";
+import { verifyTOTP } from "@/lib/server/verify";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import Link from "next/link";

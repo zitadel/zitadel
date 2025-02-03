@@ -2,9 +2,11 @@ import { Alert, AlertType } from "@/components/alert";
 import { Button, ButtonVariants } from "@/components/button";
 import { DynamicTheme } from "@/components/dynamic-theme";
 import { UserAvatar } from "@/components/user-avatar";
+import { getServiceUrlFromHeaders } from "@/lib/service";
 import { getBrandingSettings, getDefaultOrg, getUserByID } from "@/lib/zitadel";
 import { HumanUser, User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { getLocale, getTranslations } from "next-intl/server";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 export default async function Page(props: {
@@ -16,8 +18,11 @@ export default async function Page(props: {
 
   let { userId, organization } = searchParams;
 
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   if (!organization) {
-    const org = await getDefaultOrg();
+    const org = await getDefaultOrg({ serviceUrl, serviceRegion });
     if (!org) {
       throw new Error("No default organization found");
     }
@@ -25,12 +30,20 @@ export default async function Page(props: {
     organization = org.id;
   }
 
-  const branding = await getBrandingSettings(organization);
+  const branding = await getBrandingSettings({
+    serviceUrl,
+    serviceRegion,
+    organization,
+  });
 
   let user: User | undefined;
   let human: HumanUser | undefined;
   if (userId) {
-    const userResponse = await getUserByID(userId);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId,
+    });
     if (userResponse) {
       user = userResponse.user;
       if (user?.type.case === "human") {

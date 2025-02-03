@@ -9,6 +9,7 @@ import {
   resendInviteCode,
   verifyEmail,
   verifyInviteCode,
+  verifyTOTPRegistration,
   sendEmailCode as zitadelSendEmailCode,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
@@ -18,8 +19,39 @@ import { User } from "@zitadel/proto/zitadel/user/v2/user_pb";
 import { headers } from "next/headers";
 import { getNextUrl } from "../client";
 import { getSessionCookieByLoginName } from "../cookies";
+import { getServiceUrlFromHeaders } from "../service";
+import { loadMostRecentSession } from "../session";
 import { checkMFAFactors } from "../verify-helper";
 import { createSessionAndUpdateCookie } from "./cookie";
+
+export async function verifyTOTP(
+  code: string,
+  loginName?: string,
+  organization?: string,
+) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
+  return loadMostRecentSession({
+    serviceUrl,
+    serviceRegion,
+    sessionParams: {
+      loginName,
+      organization,
+    },
+  }).then((session) => {
+    if (session?.factors?.user?.id) {
+      return verifyTOTPRegistration({
+        serviceUrl,
+        serviceRegion,
+        code,
+        userId: session.factors.user.id,
+      });
+    } else {
+      throw Error("No user id found in session.");
+    }
+  });
+}
 
 type VerifyUserByEmailCommand = {
   userId: string;
@@ -31,11 +63,24 @@ type VerifyUserByEmailCommand = {
 };
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   const verifyResponse = command.isInvite
-    ? await verifyInviteCode(command.userId, command.code).catch(() => {
+    ? await verifyInviteCode({
+        serviceUrl,
+        serviceRegion,
+        userId: command.userId,
+        verificationCode: command.code,
+      }).catch(() => {
         return { error: "Could not verify invite" };
       })
-    : await verifyEmail(command.userId, command.code).catch(() => {
+    : await verifyEmail({
+        serviceUrl,
+        serviceRegion,
+        userId: command.userId,
+        verificationCode: command.code,
+      }).catch(() => {
         return { error: "Could not verify email" };
       });
 
@@ -63,6 +108,8 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     }
 
     session = await getSession({
+      serviceUrl,
+      serviceRegion,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -75,7 +122,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       return { error: "Could not create session for user" };
     }
 
-    const userResponse = await getUserByID(session?.factors?.user?.id);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId: session?.factors?.user?.id,
+    });
 
     if (!userResponse?.user) {
       return { error: "Could not load user" };
@@ -83,7 +134,11 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     user = userResponse.user;
   } else {
-    const userResponse = await getUserByID(command.userId);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId: command.userId,
+    });
 
     if (!userResponse || !userResponse.user) {
       return { error: "Could not load user" };
@@ -119,9 +174,17 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
     return { error: "Could not load user" };
   }
 
-  const loginSettings = await getLoginSettings(user.details?.resourceOwner);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: user.details?.resourceOwner,
+  });
 
-  const authMethodResponse = await listAuthenticationMethodTypes(user.userId);
+  const authMethodResponse = await listAuthenticationMethodTypes({
+    serviceUrl,
+    serviceRegion,
+    userId: user.userId,
+  });
 
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
     return { error: "Could not load possible authenticators" };
@@ -189,21 +252,42 @@ type resendVerifyEmailCommand = {
 };
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
-  const host = (await headers()).get("host");
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const host = _headers.get("host");
+
+  if (!host) {
+    return { error: "No host found" };
+  }
 
   return command.isInvite
-    ? resendInviteCode(command.userId)
-    : resendEmailCode(command.userId, host, command.authRequestId);
+    ? resendInviteCode({ serviceUrl, serviceRegion, userId: command.userId })
+    : resendEmailCode({
+        userId: command.userId,
+        serviceUrl,
+        serviceRegion,
+        urlTemplate:
+          `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
+          (command.authRequestId
+            ? `&authRequestId=${command.authRequestId}`
+            : ""),
+      });
 }
 
 type sendEmailCommand = {
+  serviceUrl: string;
+  serviceRegion: string;
   userId: string;
-  authRequestId?: string;
+  urlTemplate: string;
 };
 
 export async function sendEmailCode(command: sendEmailCommand) {
-  const host = (await headers()).get("host");
-  return zitadelSendEmailCode(command.userId, host, command.authRequestId);
+  return zitadelSendEmailCode({
+    serviceUrl: command.serviceUrl,
+    serviceRegion: command.serviceRegion,
+    userId: command.userId,
+    urlTemplate: command.urlTemplate,
+  });
 }
 
 export type SendVerificationRedirectWithoutCheckCommand = {
@@ -217,6 +301,9 @@ export type SendVerificationRedirectWithoutCheckCommand = {
 export async function sendVerificationRedirectWithoutCheck(
   command: SendVerificationRedirectWithoutCheckCommand,
 ) {
+  const _headers = await headers();
+  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+
   if (!("loginName" in command || "userId" in command)) {
     return { error: "No userId, nor loginname provided" };
   }
@@ -237,6 +324,8 @@ export async function sendVerificationRedirectWithoutCheck(
     }
 
     session = await getSession({
+      serviceUrl,
+      serviceRegion,
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -249,7 +338,11 @@ export async function sendVerificationRedirectWithoutCheck(
       return { error: "Could not create session for user" };
     }
 
-    const userResponse = await getUserByID(session?.factors?.user?.id);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId: session?.factors?.user?.id,
+    });
 
     if (!userResponse?.user) {
       return { error: "Could not load user" };
@@ -257,7 +350,11 @@ export async function sendVerificationRedirectWithoutCheck(
 
     user = userResponse.user;
   } else if ("userId" in command) {
-    const userResponse = await getUserByID(command.userId);
+    const userResponse = await getUserByID({
+      serviceUrl,
+      serviceRegion,
+      userId: command.userId,
+    });
 
     if (!userResponse?.user) {
       return { error: "Could not load user" };
@@ -293,7 +390,11 @@ export async function sendVerificationRedirectWithoutCheck(
     return { error: "Could not load user" };
   }
 
-  const authMethodResponse = await listAuthenticationMethodTypes(user.userId);
+  const authMethodResponse = await listAuthenticationMethodTypes({
+    serviceUrl,
+    serviceRegion,
+    userId: user.userId,
+  });
 
   if (!authMethodResponse || !authMethodResponse.authMethodTypes) {
     return { error: "Could not load possible authenticators" };
@@ -315,7 +416,11 @@ export async function sendVerificationRedirectWithoutCheck(
     return { redirect: `/authenticator/set?${params}` };
   }
 
-  const loginSettings = await getLoginSettings(user.details?.resourceOwner);
+  const loginSettings = await getLoginSettings({
+    serviceUrl,
+    serviceRegion,
+    organization: user.details?.resourceOwner,
+  });
 
   // redirect to mfa factor if user has one, or redirect to set one up
   const mfaFactorCheck = checkMFAFactors(

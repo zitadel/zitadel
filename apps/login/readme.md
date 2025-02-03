@@ -389,10 +389,6 @@ In future, self service options to jump to are shown below, like:
 
 ## Currently NOT Supported
 
-Timebased features like the multifactor init prompt or password expiry, are not supported due to a current limitation in the API. Lockout settings which keeps track of the password retries, will also be implemented in a later stage.
-
-- Lockout Settings
-- Password Expiry Settings
 - Login Settings: multifactor init prompt
 - forceMFA on login settings is not checked for IDPs
 

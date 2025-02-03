@@ -9,7 +9,6 @@ import {
   UserVerificationRequirement,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -26,7 +25,6 @@ type Props = {
   altPassword: boolean;
   login?: boolean;
   organization?: string;
-  loginSettings?: LoginSettings;
 };
 
 export function LoginPasskey({
@@ -36,7 +34,6 @@ export function LoginPasskey({
   altPassword,
   organization,
   login = true,
-  loginSettings,
 }: Props) {
   const t = useTranslations("passkey");
 
@@ -47,7 +44,6 @@ export function LoginPasskey({
 
   const initialized = useRef(false);
 
-  // TODO: move this to server side
   useEffect(() => {
     if (!initialized.current) {
       initialized.current = true;
