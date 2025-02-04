@@ -8,6 +8,10 @@ import {
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { Organization } from "@zitadel/proto/zitadel/org/v2/org_pb";
 import { OrganizationService } from "@zitadel/proto/zitadel/org/v2/org_service_pb";
+import {
+  CreateResponseRequest,
+  SAMLService,
+} from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import {
   Checks,
@@ -1028,6 +1032,24 @@ export async function createCallback({
   );
 
   return oidcService.createCallback(req);
+}
+
+export async function createResponse({
+  serviceUrl,
+  serviceRegion,
+  req,
+}: {
+  serviceUrl: string;
+  serviceRegion: string;
+  req: CreateResponseRequest;
+}) {
+  const samlService = await createServiceForHost(
+    SAMLService,
+    serviceUrl,
+    serviceRegion,
+  );
+
+  return samlService.createResponse(req);
 }
 
 export async function verifyEmail({
