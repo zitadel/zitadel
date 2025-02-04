@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   CodeQL-Build:
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:

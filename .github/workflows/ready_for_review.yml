@@ -4,7 +4,7 @@ on:
 
 jobs:
   comment:
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04
     steps:
       - uses: actions/github-script@v7
         with:

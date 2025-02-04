@@ -17,7 +17,7 @@ on:
 
 jobs:
   generate:
-    runs-on: ubuntu-22.04
+    runs-on: depot-ubuntu-22.04
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:

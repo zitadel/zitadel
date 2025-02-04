@@ -105,7 +105,7 @@ jobs:
 
   # TODO: produces the following output: ERROR: unknown command "cockroach start-single-node --insecure" for "cockroach"
   # cockroach:
-  #   runs-on: ubuntu-latest
+  #   runs-on: depot-ubuntu-22.04
   #   services:
   #     cockroach:
   #       image: cockroachdb/cockroach:latest

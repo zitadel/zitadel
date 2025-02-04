@@ -11,7 +11,7 @@ on:
 jobs:
   add-to-project:
     name: Add issue and community pr to project
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04
     steps:
       - name: add issue
         uses: actions/add-to-project@v1.0.1

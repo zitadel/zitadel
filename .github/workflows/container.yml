@@ -21,7 +21,7 @@ env:
 jobs:
   build:
     name: zitadel
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -124,7 +124,7 @@ jobs:
           retention-days: 1
   
   merge:
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-22.04
     needs:
       - build
     strategy:
