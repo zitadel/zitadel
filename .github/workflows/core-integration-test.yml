@@ -18,8 +18,7 @@ on:
 
 jobs:
   postgres:
-    runs-on:
-      group: zitadel-public
+    runs-on: depot-ubuntu-22.04
     services:
       postgres:
         image: postgres

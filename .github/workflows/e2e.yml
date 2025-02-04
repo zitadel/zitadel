@@ -10,8 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         browser: [firefox, chrome]
-    runs-on:
-      group: zitadel-public
+    runs-on: depot-ubuntu-22.04
     steps:
       - 
         name: Checkout Repository

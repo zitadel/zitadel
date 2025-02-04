@@ -21,8 +21,7 @@ on:
 
 jobs:
   test:
-    runs-on: 
-      group: zitadel-public
+    runs-on: depot-ubuntu-22.04
     steps:
       - 
         uses: actions/checkout@v3
