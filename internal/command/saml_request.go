@@ -63,7 +63,7 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 	return samlRequestWriteModelToCurrentSAMLRequest(writeModel), nil
 }
 
-func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
+func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, check projectPermissionCheck) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
 	writeModel, err := c.getSAMLRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -87,6 +87,12 @@ func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, 
 	}
 	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, nil, err
+	}
+
+	if check != nil {
+		if err := check(ctx, writeModel.Issuer, sessionWriteModel.UserID); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	if err := c.pushAppendAndReduce(ctx, writeModel, samlrequest.NewSessionLinkedEvent(

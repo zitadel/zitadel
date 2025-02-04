@@ -369,8 +369,8 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project 
 	return project, err
 }
 
-//go:embed app_project_permission.sql
-var appProjectPermissionQuery string
+//go:embed app_oidc_project_permission.sql
+var appOIDCProjectPermissionQuery string
 
 func (q *Queries) CheckProjectPermissionByClientID(ctx context.Context, clientID, userID string) (_ bool, err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -380,9 +380,33 @@ func (q *Queries) CheckProjectPermissionByClientID(ctx context.Context, clientID
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		p, err = scanProjectPermissionByClientID(row)
 		return err
-	}, appProjectPermissionQuery,
+	}, appOIDCProjectPermissionQuery,
 		authz.GetInstance(ctx).InstanceID(),
 		clientID,
+		domain.AppStateActive,
+		domain.ProjectStateActive,
+		userID,
+		domain.UserStateActive,
+		domain.ProjectGrantStateActive,
+		domain.UserGrantStateActive,
+	)
+	return p.permission(), err
+}
+
+//go:embed app_saml_project_permission.sql
+var appSAMLProjectPermissionQuery string
+
+func (q *Queries) CheckProjectPermissionByEntityID(ctx context.Context, entityID, userID string) (_ bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	var p *projectPermission
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		p, err = scanProjectPermissionByClientID(row)
+		return err
+	}, appSAMLProjectPermissionQuery,
+		authz.GetInstance(ctx).InstanceID(),
+		entityID,
 		domain.AppStateActive,
 		domain.ProjectStateActive,
 		userID,

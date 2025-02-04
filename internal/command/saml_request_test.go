@@ -531,7 +531,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				eventstore:           tt.fields.eventstore(t),
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
-			details, got, err := c.LinkSessionToSAMLRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
+			details, got, err := c.LinkSessionToSAMLRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient, nil)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assertObjectDetails(t, tt.res.details, details)
 			if err == nil {

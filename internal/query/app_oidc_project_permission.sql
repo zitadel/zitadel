@@ -39,7 +39,7 @@ with application as (
      WHERE pg.instance_id = $1
        AND pg.state = $7
 ), project_role_check as (
-/* all usergrants active and assoziated with the user, then filtered with the project */
+/* all usergrants active and associated with the user, then filtered with the project */
      SELECT ug.instance_id,
             ug.resource_owner,
             ug.project_id

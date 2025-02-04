@@ -51,9 +51,8 @@ func TestServer_GetAuthRequest(t *testing.T) {
 	require.NoError(t, err)
 	client, err := Instance.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
-	authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+	now, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
 	require.NoError(t, err)
-	now := time.Now()
 
 	tests := []struct {
 		name          string
@@ -131,7 +130,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "session not found",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -148,7 +147,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "session token invalid",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -165,7 +164,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "fail callback",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -190,7 +189,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "code callback",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
+					_, authRequestID, err := Instance.CreateOIDCAuthRequest(CTX, client.GetClientId(), Instance.Users.Get(integration.UserTypeOrgOwner).ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),

@@ -720,7 +720,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 				checkPermission:      tt.fields.checkPermission,
 			}
-			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
+			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient, nil)
 			require.ErrorIs(t, err, tt.res.wantErr)
 			assertObjectDetails(t, tt.res.details, details)
 			if err == nil {
