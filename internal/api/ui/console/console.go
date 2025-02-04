@@ -111,9 +111,11 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 	security := middleware.SecurityHeaders(csp(config.PostHog.URL), nil)
 
 	handler := mux.NewRouter()
+	handler.Use(security, limitingAccessInterceptor.WithoutLimiting().Handle)
 
-	handler.Use(callDurationInterceptor, instanceHandler, security, limitingAccessInterceptor.WithoutLimiting().Handle)
-	handler.Handle(envRequestPath, middleware.TelemetryHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	env := handler.NewRoute().Path(envRequestPath).Subrouter()
+	env.Use(callDurationInterceptor, middleware.TelemetryHandler(), instanceHandler)
+	env.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
 		url := http_util.BuildOrigin(r.Host, externalSecure)
 		ctx := r.Context()
 		instance := authz.GetInstance(ctx)
@@ -130,7 +132,7 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 		}
 		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
-	})))
+	})
 	handler.SkipClean(true).PathPrefix("").Handler(cache(http.FileServer(&spaHandler{http.FS(fSys)})))
 	return handler, nil
 }
