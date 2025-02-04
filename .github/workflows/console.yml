@@ -23,7 +23,7 @@ jobs:
     outputs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
       cache_path: ${{ env.cache_path }}
-    runs-on: depot-ubuntu-22.04
+    runs-on: depot-ubuntu-22.04-4
     steps:
         - 
           uses: actions/checkout@v4

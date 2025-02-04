@@ -31,7 +31,7 @@ env:
 
 jobs:
   build:
-    runs-on: depot-ubuntu-22.04
+    runs-on: depot-ubuntu-22.04-4
     outputs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
       cache_path: ${{ env.cache_path }}

@@ -21,7 +21,7 @@ on:
 
 jobs:
   test:
-    runs-on: depot-ubuntu-22.04
+    runs-on: depot-ubuntu-22.04-4
     steps:
       - 
         uses: actions/checkout@v3

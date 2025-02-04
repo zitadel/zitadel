@@ -18,7 +18,7 @@ on:
 
 jobs:
   postgres:
-    runs-on: depot-ubuntu-22.04
+    runs-on: depot-ubuntu-22.04-4
     services:
       postgres:
         image: postgres
@@ -104,7 +104,7 @@ jobs:
 
   # TODO: produces the following output: ERROR: unknown command "cockroach start-single-node --insecure" for "cockroach"
   # cockroach:
-  #   runs-on: depot-ubuntu-22.04
+  #   runs-on: depot-ubuntu-22.04-4
   #   services:
   #     cockroach:
   #       image: cockroachdb/cockroach:latest
