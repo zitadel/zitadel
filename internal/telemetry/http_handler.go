@@ -30,5 +30,5 @@ func TelemetryHandler(handler http.Handler, ignoredEndpoints ...string) http.Han
 }
 
 func spanNameFormatter(_ string, r *http.Request) string {
-	return r.Host + r.URL.EscapedPath()
+	return strings.Split(r.RequestURI, "?")[0]
 }
