@@ -1,0 +1,17 @@
+name: ffo test ci
+
+on:
+  push:
+    branches:
+      - test-depot
+
+jobs:
+  devcontainer:
+    name: prepare devcontainer
+    runs-on: depot-ubuntu-22.04-8
+    steps:
+        - uses: actions/checkout@v4
+        - name: run tests
+          uses: devcontainers/ci@v0.3
+          with:
+            runCmd: echo "hello world"
