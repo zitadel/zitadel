@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { QuickstartComponent } from './quickstart.component';
+import { OIDCConfigurationComponent } from './oidc-configuration.component';
 
 describe('QuickstartComponent', () => {
-  let component: QuickstartComponent;
-  let fixture: ComponentFixture<QuickstartComponent>;
+  let component: OIDCConfigurationComponent;
+  let fixture: ComponentFixture<OIDCConfigurationComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [QuickstartComponent],
+      declarations: [OIDCConfigurationComponent],
     });
-    fixture = TestBed.createComponent(QuickstartComponent);
+    fixture = TestBed.createComponent(OIDCConfigurationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { AddKeyDialogComponent } from './add-key-dialog.component';
+import { AddActionDialogComponent } from './add-action-dialog.component';
 
 describe('AddKeyDialogComponent', () => {
-  let component: AddKeyDialogComponent;
-  let fixture: ComponentFixture<AddKeyDialogComponent>;
+  let component: AddActionDialogComponent;
+  let fixture: ComponentFixture<AddActionDialogComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [AddKeyDialogComponent],
+      declarations: [AddActionDialogComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AddKeyDialogComponent);
+    fixture = TestBed.createComponent(AddActionDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -4,11 +4,12 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { SecondFactorType } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AuthFactor, AuthFactorState } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
-
 import { AuthFactorDialogComponent } from '../auth-factor-dialog/auth-factor-dialog.component';
+
 
 export interface WebAuthNOptions {
   challenge: string;
@@ -38,6 +39,10 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
 
   public error: string = '';
+  public otpAvailable$ = new BehaviorSubject<boolean>(false);
+  public u2fAvailable$ = new BehaviorSubject<boolean>(false);
+  public otpSmsAvailable$ = new BehaviorSubject<boolean>(false);
+  public otpEmailAvailable$ = new BehaviorSubject<boolean>(false);
   public otpDisabled$ = new BehaviorSubject<boolean>(true);
   public otpSmsDisabled$ = new BehaviorSubject<boolean>(true);
   public otpEmailDisabled$ = new BehaviorSubject<boolean>(true);
@@ -50,6 +55,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.getMFAs();
+    this.applyOrgPolicy();
   }
 
   public ngOnDestroy(): void {
@@ -59,6 +65,10 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public addAuthFactor(): void {
     const dialogRef = this.dialog.open(AuthFactorDialogComponent, {
       data: {
+        otp$: this.otpAvailable$,
+        u2f$: this.u2fAvailable$,
+        otpSms$: this.otpSmsAvailable$,
+        otpEmail$: this.otpEmailAvailable$,
         otpDisabled$: this.otpDisabled$,
         otpSmsDisabled$: this.otpSmsDisabled$,
         otpEmailDisabled$: this.otpEmailDisabled$,
@@ -86,6 +96,22 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
       .catch((error) => {
         this.error = error.message;
       });
+  }
+
+  public applyOrgPolicy(): void {
+    this.service.getMyLoginPolicy().then((resp) => {
+      if (resp && resp.policy) {
+        const secondFactors = resp.policy?.secondFactorsList;
+          this.displayAuthFactorBasedOnPolicy(
+            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP, this.otpAvailable$);
+          this.displayAuthFactorBasedOnPolicy(
+            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_U2F, this.u2fAvailable$);
+          this.displayAuthFactorBasedOnPolicy(
+            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL, this.otpEmailAvailable$);
+          this.displayAuthFactorBasedOnPolicy(
+            secondFactors, SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS, this.otpSmsAvailable$);
+      }
+    });
   }
 
   public deleteMFA(factor: AuthFactor.AsObject): void {
@@ -165,6 +191,14 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
     key: keyof AuthFactor.AsObject,
     subject: BehaviorSubject<boolean>
   ): void {
-    subject.next(mfas.some(mfa => !mfa[key]));
+    subject.next(mfas.some(mfa => !!mfa[key]));
+  }
+
+  private displayAuthFactorBasedOnPolicy(
+    factors: SecondFactorType[],
+    factor: SecondFactorType,
+    subject: BehaviorSubject<boolean>
+  ): void {
+    subject.next(factors.some(f => f === factor));
   }
 }

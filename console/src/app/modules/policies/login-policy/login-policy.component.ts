@@ -2,14 +2,12 @@ import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/co
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { firstValueFrom, forkJoin, from, Observable, of, Subject, take } from 'rxjs';
+import { forkJoin, from, of, Subject, take } from 'rxjs';
 import {
   GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
   UpdateLoginPolicyRequest,
-  UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import {
-  AddCustomLoginPolicyRequest,
   GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
   UpdateCustomLoginPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
@@ -24,8 +22,7 @@ import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
-import { catchError, map, takeUntil } from 'rxjs/operators';
-import { error } from 'console';
+import { map, takeUntil } from 'rxjs/operators';
 import { LoginPolicyService } from '../../../services/login-policy.service';
 
 const minValueValidator = (minValue: number) => (control: AbstractControl) => {
