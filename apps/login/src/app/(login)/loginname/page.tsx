@@ -28,8 +28,6 @@ export default async function Page(props: {
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  console.log("serviceUrl", serviceUrl, serviceRegion);
-
   let defaultOrganization;
   if (!organization) {
     const org: Organization | null = await getDefaultOrg({
