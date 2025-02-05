@@ -1,13 +1,13 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { combineLatestWith, defer, EMPTY, Observable, ReplaySubject, Subject, switchMap } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { ToastService } from 'src/app/services/toast.service';
-import { UserService } from '../../../../../services/user.service';
+import { UserService } from 'src/app/services/user.service';
 import { AuthFactor, AuthFactorState, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
-import { catchError, filter, map, pairwise, startWith } from 'rxjs/operators';
+import { catchError, filter, map, startWith } from 'rxjs/operators';
 import { pairwiseStartWith } from 'src/app/utils/pairwiseStartWith';
 
 export interface MFAItem {

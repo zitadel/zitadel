@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
 import {
@@ -8,7 +8,6 @@ import {
   distinctUntilKeyChanged,
   EMPTY,
   forkJoin,
-  from,
   mergeWith,
   NEVER,
   Observable,
@@ -17,19 +16,7 @@ import {
   Subject,
   TimeoutError,
 } from 'rxjs';
-import {
-  catchError,
-  combineLatest,
-  distinctUntilChanged,
-  filter,
-  finalize,
-  map,
-  startWith,
-  switchMap,
-  tap,
-  timeout,
-  withLatestFrom,
-} from 'rxjs/operators';
+import { catchError, distinctUntilChanged, filter, finalize, map, startWith, switchMap, tap, timeout } from 'rxjs/operators';
 
 import {
   AddMyAuthFactorOTPEmailRequest,

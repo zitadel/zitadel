@@ -8,9 +8,9 @@ import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginat
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { IDPUserLink } from 'src/app/proto/generated/zitadel/idp_pb';
 
-import { GrpcAuthService } from '../../../../services/grpc-auth.service';
-import { ManagementService } from '../../../../services/mgmt.service';
-import { ToastService } from '../../../../services/toast.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'cnsl-external-idps',
