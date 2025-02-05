@@ -25,7 +25,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 		ctx           context.Context
 		project       *domain.Project
 		resourceOwner string
-		ownerID       string
 	}
 	type res struct {
 		want *domain.Project
@@ -70,30 +69,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "",
-				ownerID:       "user1",
-			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "org with project owner, ownerID empty",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				project: &domain.Project{
-					Name:                   "project",
-					ProjectRoleAssertion:   true,
-					ProjectRoleCheck:       true,
-					HasProjectCheck:        true,
-					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-				},
-				resourceOwner: "org1",
-				ownerID:       "",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -111,12 +86,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 							"project", true, true, true,
 							domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 						),
-						project.NewProjectMemberAddedEvent(
-							context.Background(),
-							&project.NewAggregate("project1", "org1").Aggregate,
-							"user1",
-							[]string{domain.RoleProjectOwner}...,
-						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
@@ -131,7 +100,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
-				ownerID:       "user1",
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -149,12 +117,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 							"project", true, true, true,
 							domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 						),
-						project.NewProjectMemberAddedEvent(
-							context.Background(),
-							&project.NewAggregate("project1", "org1").Aggregate,
-							"user1",
-							[]string{domain.RoleProjectOwner}...,
-						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
@@ -169,7 +131,6 @@ func TestCommandSide_AddProject(t *testing.T) {
 					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 				},
 				resourceOwner: "org1",
-				ownerID:       "user1",
 			},
 			res: res{
 				want: &domain.Project{
@@ -193,7 +154,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				idGenerator: tt.fields.idGenerator,
 			}
 			c.setMilestonesCompletedForTest("instanceID")
-			got, err := c.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner, tt.args.ownerID)
+			got, err := c.AddProject(tt.args.ctx, tt.args.project, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1207,9 +1168,6 @@ func TestAddProject(t *testing.T) {
 						false,
 						domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 					),
-					project.NewProjectMemberAddedEvent(ctx, &agg.Aggregate,
-						"CAOS AG",
-						domain.RoleProjectOwner),
 				},
 			},
 		},

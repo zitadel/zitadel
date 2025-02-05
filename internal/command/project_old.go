@@ -20,7 +20,7 @@ func (c *Commands) checkProjectExistsOld(ctx context.Context, projectID, resourc
 	if err != nil {
 		return err
 	}
-	if projectWriteModel.State == domain.ProjectStateUnspecified || projectWriteModel.State == domain.ProjectStateRemoved {
+	if !isProjectStateExists(projectWriteModel.State) {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-EbFMN", "Errors.Project.NotFound")
 	}
 	return nil
@@ -35,7 +35,7 @@ func (c *Commands) changeProjectOld(ctx context.Context, projectChange *domain.P
 	if err != nil {
 		return nil, err
 	}
-	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
+	if !isProjectStateExists(existingProject.State) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
@@ -71,7 +71,7 @@ func (c *Commands) deactivateProjectOld(ctx context.Context, projectID string, r
 	if err != nil {
 		return nil, err
 	}
-	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
+	if !isProjectStateExists(existingProject.State) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-112M9", "Errors.Project.NotFound")
 	}
 	if existingProject.State != domain.ProjectStateActive {
@@ -96,7 +96,7 @@ func (c *Commands) reactivateProjectOld(ctx context.Context, projectID string, r
 	if err != nil {
 		return nil, err
 	}
-	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
+	if !isProjectStateExists(existingProject.State) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 	if existingProject.State != domain.ProjectStateInactive {
@@ -121,7 +121,7 @@ func (c *Commands) removeProjectOld(ctx context.Context, projectID, resourceOwne
 	if err != nil {
 		return nil, err
 	}
-	if existingProject.State == domain.ProjectStateUnspecified || existingProject.State == domain.ProjectStateRemoved {
+	if !isProjectStateExists(existingProject.State) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
