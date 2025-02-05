@@ -11,8 +11,8 @@ requestHttpRecord = {
   "user_id": "1234567890123",
 
   // all fields from requestBaseRecord
-  "request_is_system_user": false,
-  "request_is_authenticated": true,
+//  "request_is_system_user": false,
+//  "request_is_authenticated": true,
   "request_duration": "50ms",
 
   "request_http_protocol": "",
