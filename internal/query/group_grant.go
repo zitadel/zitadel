@@ -216,7 +216,7 @@ func NewGroupGrantRoleQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(GroupGrantRoles, value, TextListContains)
 }
 
-func NewGroupGrantStateQuery(value domain.UserGrantState) (SearchQuery, error) {
+func NewGroupGrantStateQuery(value domain.GroupGrantState) (SearchQuery, error) {
 	return NewNumberQuery(GroupGrantState, value, NumberEquals)
 }
 

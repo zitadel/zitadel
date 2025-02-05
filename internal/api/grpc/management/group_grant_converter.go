@@ -20,7 +20,7 @@ func ListGroupGrantsRequestToQuery(ctx context.Context, req *mgmt_pb.ListGroupGr
 	}
 
 	if shouldAppendGroupGrantOwnerQuery(req.Queries) {
-		ownerQuery, err := query.NewUserGrantResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+		ownerQuery, err := query.NewGroupGrantResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 		if err != nil {
 			return nil, err
 		}

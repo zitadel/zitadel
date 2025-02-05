@@ -119,5 +119,5 @@ func GroupGrantGroupIDQueryToModel(q *group_pb.GroupGrantGroupIDQuery) (query.Se
 }
 
 func GroupGrantWithGrantedQueryToModel(ctx context.Context, q *group_pb.GroupGrantWithGrantedQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantWithGrantedQuery(authz.GetCtxData(ctx).OrgID)
+	return query.NewGroupGrantWithGrantedQuery(authz.GetCtxData(ctx).OrgID)
 }

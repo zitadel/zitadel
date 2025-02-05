@@ -11,7 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/repository/group"
+	"github.com/zitadel/zitadel/internal/repository/groupgrant"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -68,11 +69,8 @@ func (s *Server) ListGroupGrantChanges(ctx context.Context, req *mgmt_pb.ListGro
 		AwaitOpenTransactions().
 		SequenceGreater(sequence).
 		AddQuery().
-		AggregateTypes(project.AggregateType).
-		AggregateIDs(req.GroupId).
-		EventData(map[string]interface{}{
-			"grantId": req.GrantId,
-		}).
+		AggregateTypes(groupgrant.AggregateType).
+		AggregateIDs(req.GrantId).
 		Builder()
 	if asc {
 		query.OrderAsc()
@@ -108,7 +106,7 @@ func (s *Server) ListGroupChanges(ctx context.Context, req *mgmt_pb.ListGroupCha
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
 		SequenceGreater(sequence).
 		AddQuery().
-		AggregateTypes(project.AggregateType).
+		AggregateTypes(group.AggregateType).
 		AggregateIDs(req.GroupId).
 		Builder()
 	if asc {
