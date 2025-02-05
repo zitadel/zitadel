@@ -18,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/internal/test"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
@@ -203,31 +202,17 @@ func TestGetUser(t *testing.T) {
 				require.NoError(t, err)
 
 				// set provisioning domain of service user
-				_, err = Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
-					Id:    Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-					Key:   "urn:zitadel:scim:provisioningDomain",
-					Value: []byte("fooBar"),
-				})
-				require.NoError(t, err)
+				setProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID, "fooBar")
 
 				// set externalID for provisioning domain
-				_, err = Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
-					Id:    createdUser.ID,
-					Key:   "urn:zitadel:scim:fooBar:externalId",
-					Value: []byte("100-scopedExternalId"),
-				})
-				require.NoError(t, err)
+				setAndEnsureMetadata(t, createdUser.ID, "urn:zitadel:scim:fooBar:externalId", "100-scopedExternalId")
 				return createdUser.ID
 			},
 			cleanup: func(userID string) {
 				_, err := Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: userID})
 				require.NoError(t, err)
 
-				_, err = Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
-					Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-					Key: "urn:zitadel:scim:provisioningDomain",
-				})
-				require.NoError(t, err)
+				removeProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID)
 			},
 			want: &resources.ScimUser{
 				ExternalID: "100-scopedExternalId",

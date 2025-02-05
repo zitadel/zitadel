@@ -316,12 +316,7 @@ func TestReplaceUser_scopedExternalID(t *testing.T) {
 	require.NoError(t, err)
 
 	// set provisioning domain of service user
-	_, err = Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
-		Id:    Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-		Key:   "urn:zitadel:scim:provisioningDomain",
-		Value: []byte("fooBazz"),
-	})
-	require.NoError(t, err)
+	setProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID, "fooBazz")
 
 	// replace the user with provisioning domain set
 	_, err = Instance.Client.SCIM.Users.Replace(CTX, Instance.DefaultOrg.Id, createdUser.ID, minimalUserWithExternalIDJson)
@@ -347,9 +342,5 @@ func TestReplaceUser_scopedExternalID(t *testing.T) {
 	_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
 	require.NoError(t, err)
 
-	_, err = Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
-		Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-		Key: "urn:zitadel:scim:provisioningDomain",
-	})
-	require.NoError(t, err)
+	removeProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID)
 }

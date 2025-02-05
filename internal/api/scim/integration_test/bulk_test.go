@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/internal/test"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 var (
@@ -694,4 +695,40 @@ func buildTooManyOperationsRequest() *scim.BulkRequest {
 	}
 
 	return req
+}
+
+func setProvisioningDomain(t require.TestingT, userID, provisioningDomain string) {
+	setAndEnsureMetadata(t, userID, "urn:zitadel:scim:provisioningDomain", provisioningDomain)
+}
+
+func setAndEnsureMetadata(t require.TestingT, userID, key, value string) {
+	_, err := Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
+		Id:    userID,
+		Key:   key,
+		Value: []byte(value),
+	})
+	require.NoError(t, err)
+
+	// ensure metadata is projected
+	ensureMetadataProjected(t, userID, key, value)
+}
+
+func ensureMetadataProjected(t require.TestingT, userID, key, value string) {
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		md, err := Instance.Client.Mgmt.GetUserMetadata(CTX, &management.GetUserMetadataRequest{
+			Id:  userID,
+			Key: key,
+		})
+		require.NoError(tt, err)
+		require.Equal(tt, value, string(md.Metadata.Value))
+	}, retryDuration, tick)
+}
+
+func removeProvisioningDomain(t require.TestingT, userID string) {
+	_, err := Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
+		Id:  userID,
+		Key: "urn:zitadel:scim:provisioningDomain",
+	})
+	require.NoError(t, err)
 }
