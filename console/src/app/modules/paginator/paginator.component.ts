@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
+import { Timestamp as ConnectTimestamp } from '@bufbuild/protobuf/wkt';
 
 export interface PageEvent {
   length: number;
@@ -14,7 +15,7 @@ export interface PageEvent {
   styleUrls: ['./paginator.component.scss'],
 })
 export class PaginatorComponent {
-  @Input() public timestamp: Timestamp.AsObject | undefined = undefined;
+  @Input() public timestamp: Timestamp.AsObject | ConnectTimestamp | undefined = undefined;
   @Input() public length: number = 0;
   @Input() public pageSize: number = 10;
   @Input() public pageIndex: number = 0;
