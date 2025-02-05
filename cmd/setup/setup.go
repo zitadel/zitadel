@@ -233,6 +233,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s45CorrectProjectOwners,
 		steps.s46InitPermissionFunctions,
 		steps.s47FillMembershipFields,
+		steps.s48InitPermiottedOrgsFunction,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
