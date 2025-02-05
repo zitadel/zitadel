@@ -80,9 +80,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	return authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
 
-type projectPermissionCheck func(ctx context.Context, clientID string, userID string) error
-
-func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, check projectPermissionCheck) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
+func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, checkApplicationPermission domain.ApplicationPermissionCheck) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
 	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -111,8 +109,8 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, err
 	}
 
-	if check != nil {
-		if err := check(ctx, writeModel.ClientID, sessionWriteModel.UserID); err != nil {
+	if checkApplicationPermission != nil {
+		if err := checkApplicationPermission(ctx, writeModel.ClientID, sessionWriteModel.UserID); err != nil {
 			return nil, nil, err
 		}
 	}

@@ -75,10 +75,7 @@ func promptToPb(p domain.Prompt) oidc_pb.Prompt {
 
 func (s *Server) checkPermission(ctx context.Context, clientID string, userID string) error {
 	permission, err := s.query.CheckProjectPermissionByClientID(ctx, clientID, userID)
-	if err != nil {
-		return err
-	}
-	if !permission {
+	if err != nil || !permission {
 		return zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.PermissionDenied")
 	}
 	return nil

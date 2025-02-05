@@ -4,8 +4,6 @@ package session_test
 
 import (
 	"context"
-	"slices"
-	"strings"
 	"testing"
 	"time"
 
@@ -256,14 +254,11 @@ func (u sessionAttrs) ids() []string {
 	return ids
 }
 
-func createSessions(ctx context.Context, t *testing.T, count int, userID string, userAgent string, lifetime *durationpb.Duration, metadata map[string][]byte, asc bool) sessionAttrs {
+func createSessions(ctx context.Context, t *testing.T, count int, userID string, userAgent string, lifetime *durationpb.Duration, metadata map[string][]byte) sessionAttrs {
 	infos := make([]*sessionAttr, count)
 	for i := 0; i < count; i++ {
 		infos[i] = createSession(ctx, t, userID, userAgent, lifetime, metadata)
 	}
-	slices.SortFunc(infos, func(a, b *sessionAttr) int {
-		return strings.Compare(a.ID, b.ID)
-	})
 	return infos
 }
 
@@ -421,7 +416,7 @@ func TestServer_ListSessions(t *testing.T) {
 				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
 					acsOrder := true
-					infos := createSessions(ctx, t, 3, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")}, acsOrder)
+					infos := createSessions(ctx, t, 3, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
 					request.Query = &object.ListQuery{
 						Asc: acsOrder,
 					}

@@ -58,10 +58,7 @@ func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *
 
 func (s *Server) checkPermission(ctx context.Context, issuer string, userID string) error {
 	permission, err := s.query.CheckProjectPermissionByEntityID(ctx, issuer, userID)
-	if err != nil {
-		return err
-	}
-	if !permission {
+	if err != nil || !permission {
 		return zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.PermissionDenied")
 	}
 	return nil

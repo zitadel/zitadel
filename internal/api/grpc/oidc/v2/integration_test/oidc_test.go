@@ -373,7 +373,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
@@ -388,7 +388,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -404,12 +404,12 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, true)
 
-				orgResp := Instance.CreateOrganization(ctx, "oidc-permissison-"+gofakeit.AppName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				projectGrantResp := Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, projectGrantResp.GetGrantId(), user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -428,7 +428,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
@@ -439,7 +439,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				_, clientID := createOIDCApplication(ctx, t, true, true)
 				user := Instance.CreateHumanUser(ctx)
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
@@ -453,7 +453,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
@@ -465,7 +465,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUser(ctx)
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -483,7 +483,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUser(ctx)
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -500,7 +500,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				_, clientID := createOIDCApplication(ctx, t, true, false)
 				user := Instance.CreateHumanUser(ctx)
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
@@ -513,7 +513,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectUserGrant(t, ctx, projectID, user.GetUserId())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -531,7 +531,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
@@ -541,11 +541,11 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 
-				orgResp := Instance.CreateOrganization(ctx, "oidc-permissison-"+gofakeit.AppName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				projectGrantResp := Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 				Instance.CreateProjectGrantUserGrant(ctx, orgResp.GetOrganizationId(), projectID, projectGrantResp.GetGrantId(), user.GetUserId())
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -561,10 +561,10 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, true, false)
 
-				orgResp := Instance.CreateOrganization(ctx, "oidc-permissison-"+gofakeit.AppName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
@@ -575,7 +575,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				user := Instance.CreateHumanUser(ctx)
 				_, clientID := createOIDCApplication(ctx, t, false, true)
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -593,7 +593,7 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			wantErr: true,
 		},
@@ -603,11 +603,11 @@ func TestServer_CreateCallback_Permission(t *testing.T) {
 			dep: func(ctx context.Context, t *testing.T) *oidc_pb.CreateCallbackRequest {
 				projectID, clientID := createOIDCApplication(ctx, t, false, true)
 
-				orgResp := Instance.CreateOrganization(ctx, "oidc-permissison-"+gofakeit.AppName(), gofakeit.Email())
+				orgResp := Instance.CreateOrganization(ctx, "oidc-permission-"+gofakeit.AppName(), gofakeit.Email())
 				Instance.CreateProjectGrant(ctx, projectID, orgResp.GetOrganizationId())
 				user := Instance.CreateHumanUserVerified(ctx, orgResp.GetOrganizationId(), gofakeit.Email(), gofakeit.Phone())
 
-				return createSessionAndAuthRequestForCallback(t, ctx, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
+				return createSessionAndAuthRequestForCallback(ctx, t, clientID, Instance.Users.Get(integration.UserTypeOrgOwner).ID, user.GetUserId())
 			},
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
@@ -650,7 +650,7 @@ func createSession(t *testing.T, ctx context.Context, userID string) *session.Cr
 	return sessionResp
 }
 
-func createSessionAndAuthRequestForCallback(t *testing.T, ctx context.Context, clientID, loginClient, userID string) *oidc_pb.CreateCallbackRequest {
+func createSessionAndAuthRequestForCallback(ctx context.Context, t *testing.T, clientID, loginClient, userID string) *oidc_pb.CreateCallbackRequest {
 	_, authRequestID, err := Instance.CreateOIDCAuthRequest(ctx, clientID, loginClient, redirectURI)
 	require.NoError(t, err)
 	sessionResp := createSession(t, ctx, userID)
