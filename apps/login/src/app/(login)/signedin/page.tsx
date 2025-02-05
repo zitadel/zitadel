@@ -6,6 +6,7 @@ import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
 import { getServiceUrlFromHeaders } from "@/lib/service";
 import {
   createCallback,
+  createResponse,
   getBrandingSettings,
   getLoginSettings,
   getSession,
@@ -15,6 +16,7 @@ import {
   CreateCallbackRequestSchema,
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { getLocale, getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import Link from "next/link";
@@ -24,16 +26,16 @@ async function loadSession(
   serviceUrl: string,
   serviceRegion: string,
   loginName: string,
-  authRequestId?: string,
+  requestId?: string,
 ) {
   const recent = await getMostRecentCookieWithLoginname({ loginName });
 
-  if (authRequestId) {
+  if (requestId && requestId.startsWith("oidc_")) {
     return createCallback({
       serviceUrl,
       serviceRegion,
       req: create(CreateCallbackRequestSchema, {
-        authRequestId,
+        authRequestId: requestId,
         callbackKind: {
           case: "session",
           value: create(SessionSchema, {
@@ -45,7 +47,25 @@ async function loadSession(
     }).then(({ callbackUrl }) => {
       return redirect(callbackUrl);
     });
+  } else if (requestId && requestId.startsWith("saml_")) {
+    return createResponse({
+      serviceUrl,
+      serviceRegion,
+      req: create(CreateResponseRequestSchema, {
+        samlRequestId: requestId.replace("saml_", ""),
+        responseKind: {
+          case: "session",
+          value: {
+            sessionId: recent.id,
+            sessionToken: recent.token,
+          },
+        },
+      }),
+    }).then(({ url }) => {
+      return redirect(url);
+    });
   }
+
   return getSession({
     serviceUrl,
     serviceRegion,
@@ -66,12 +86,12 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
 
-  const { loginName, authRequestId, organization } = searchParams;
+  const { loginName, requestId, organization } = searchParams;
   const sessionFactors = await loadSession(
     serviceUrl,
     serviceRegion,
     loginName,
-    authRequestId,
+    requestId,
   );
 
   const branding = await getBrandingSettings({
@@ -81,7 +101,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
   });
 
   let loginSettings;
-  if (!authRequestId) {
+  if (!requestId) {
     loginSettings = await getLoginSettings({
       serviceUrl,
       serviceRegion,

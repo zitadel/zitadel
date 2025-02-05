@@ -21,14 +21,14 @@ type Props = {
   organization?: string;
   code?: string;
   isInvite: boolean;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export function VerifyForm({
   userId,
   loginName,
   organization,
-  authRequestId,
+  requestId,
   code,
   isInvite,
 }: Props) {
@@ -78,7 +78,7 @@ export function VerifyForm({
         isInvite: isInvite,
         loginName: loginName,
         organization: organization,
-        authRequestId: authRequestId,
+        requestId: requestId,
       })
         .catch(() => {
           setError("Could not verify user");

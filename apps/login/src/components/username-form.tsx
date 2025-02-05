@@ -18,7 +18,7 @@ type Inputs = {
 
 type Props = {
   loginName: string | undefined;
-  authRequestId: string | undefined;
+  requestId: string | undefined;
   loginSettings: LoginSettings | undefined;
   organization?: string;
   suffix?: string;
@@ -29,7 +29,7 @@ type Props = {
 
 export function UsernameForm({
   loginName,
-  authRequestId,
+  requestId,
   organization,
   suffix,
   loginSettings,
@@ -56,7 +56,7 @@ export function UsernameForm({
     const res = await sendLoginname({
       loginName: values.loginName,
       organization,
-      authRequestId,
+      requestId,
       suffix,
     })
       .catch(() => {
@@ -117,8 +117,8 @@ export function UsernameForm({
               if (organization) {
                 registerParams.append("organization", organization);
               }
-              if (authRequestId) {
-                registerParams.append("authRequestId", authRequestId);
+              if (requestId) {
+                registerParams.append("requestId", requestId);
               }
 
               router.push("/register?" + registerParams);

@@ -22,7 +22,7 @@ type Props = {
   loginSettings: LoginSettings | undefined;
   loginName: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
   isAlternative?: boolean; // whether password was requested as alternative auth method
   promptPasswordless?: boolean;
 };
@@ -31,7 +31,7 @@ export function PasswordForm({
   loginSettings,
   loginName,
   organization,
-  authRequestId,
+  requestId,
   promptPasswordless,
   isAlternative,
 }: Props) {
@@ -58,7 +58,7 @@ export function PasswordForm({
       checks: create(ChecksSchema, {
         password: { password: values.password },
       }),
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not verify password");
@@ -86,7 +86,7 @@ export function PasswordForm({
     const response = await resetPassword({
       loginName,
       organization,
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not reset password");
@@ -111,8 +111,8 @@ export function PasswordForm({
       params.append("organization", organization);
     }
 
-    if (authRequestId) {
-      params.append("authRequestId", authRequestId);
+    if (requestId) {
+      params.append("requestId", requestId);
     }
 
     return router.push("/password/set?" + params);

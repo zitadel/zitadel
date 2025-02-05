@@ -126,11 +126,11 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    if (requestId) {
+    if (requestId && requestId.startsWith("oidc_")) {
       const { authRequest } = await getAuthRequest({
         serviceUrl,
         serviceRegion,
-        authRequestId: requestId,
+        authRequestId: requestId.replace("oidc_", ""),
       });
 
       let organization = "";
@@ -257,7 +257,7 @@ export async function GET(request: NextRequest) {
             try {
               let command: SendLoginnameCommand = {
                 loginName: authRequest.loginHint,
-                authRequestId: authRequest.id,
+                requestId: authRequest.id,
               };
 
               if (organization) {
@@ -426,6 +426,8 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.redirect(loginNameUrl);
       }
+    } else if (requestId && requestId.startsWith("saml_")) {
+      // handle saml request
     } else {
       return NextResponse.json(
         { error: "No authRequest nor samlRequest provided" },

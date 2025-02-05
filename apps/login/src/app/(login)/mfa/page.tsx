@@ -22,7 +22,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "mfa" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, authRequestId, organization, sessionId } = searchParams;
+  const { loginName, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
@@ -114,7 +114,7 @@ export default async function Page(props: {
           <ChooseSecondFactor
             loginName={loginName}
             sessionId={sessionId}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={organization}
             userMethods={sessionFactors.authMethods ?? []}
           ></ChooseSecondFactor>

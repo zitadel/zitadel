@@ -32,7 +32,7 @@ type Props = {
   firstname: string;
   lastname: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export function SetRegisterPasswordForm({
@@ -41,7 +41,7 @@ export function SetRegisterPasswordForm({
   firstname,
   lastname,
   organization,
-  authRequestId,
+  requestId,
 }: Props) {
   const t = useTranslations("register");
 
@@ -66,7 +66,7 @@ export function SetRegisterPasswordForm({
       firstName: firstname,
       lastName: lastname,
       organization: organization,
-      authRequestId: authRequestId,
+      requestId: requestId,
       password: values.password,
     })
       .catch(() => {

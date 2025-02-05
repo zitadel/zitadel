@@ -31,11 +31,11 @@ export function isSessionValid(session: Partial<Session>): {
 export function SessionItem({
   session,
   reload,
-  authRequestId,
+  requestId,
 }: {
   session: Session;
   reload: () => void;
-  authRequestId?: string;
+  requestId?: string;
 }) {
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -67,7 +67,7 @@ export function SessionItem({
         if (valid && session?.factors?.user) {
           const resp = await continueWithSession({
             ...session,
-            authRequestId: authRequestId,
+            requestId: requestId,
           });
 
           if (resp?.redirect) {
@@ -78,7 +78,7 @@ export function SessionItem({
           const res = await sendLoginname({
             loginName: session.factors?.user?.loginName,
             organization: session.factors.user.organizationId,
-            authRequestId: authRequestId,
+            requestId: requestId,
           })
             .catch(() => {
               setError("An internal error occurred");

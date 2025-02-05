@@ -35,7 +35,7 @@ type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
   sessionId: string;
   loginName: string;
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
 };
 
@@ -43,7 +43,7 @@ export function ChangePasswordForm({
   passwordComplexitySettings,
   sessionId,
   loginName,
-  authRequestId,
+  requestId,
   organization,
 }: Props) {
   const t = useTranslations("password");
@@ -97,7 +97,7 @@ export function ChangePasswordForm({
       checks: create(ChecksSchema, {
         password: { password: values.password },
       }),
-      authRequestId,
+      requestId,
     })
       .catch(() => {
         setError("Could not verify password");

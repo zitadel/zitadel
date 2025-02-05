@@ -20,7 +20,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "loginname" });
 
   const loginName = searchParams?.loginName;
-  const authRequestId = searchParams?.authRequestId;
+  const requestId = searchParams?.requestId;
   const organization = searchParams?.organization;
   const suffix = searchParams?.suffix;
   const submit: boolean = searchParams?.submit === "true";
@@ -73,7 +73,7 @@ export default async function Page(props: {
 
         <UsernameForm
           loginName={loginName}
-          authRequestId={authRequestId}
+          requestId={requestId}
           organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
           loginSettings={contextLoginSettings}
           suffix={suffix}
@@ -83,7 +83,7 @@ export default async function Page(props: {
           {identityProviders && (
             <SignInWithIdp
               identityProviders={identityProviders}
-              authRequestId={authRequestId}
+              requestId={requestId}
               organization={organization}
             ></SignInWithIdp>
           )}

@@ -25,8 +25,8 @@ export function UserAvatar({
     params.set("organization", searchParams.organization);
   }
 
-  if (searchParams?.authRequestId) {
-    params.set("authRequestId", searchParams.authRequestId);
+  if (searchParams?.requestId) {
+    params.set("requestId", searchParams.requestId);
   }
 
   if (searchParams?.loginName) {

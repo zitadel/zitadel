@@ -42,7 +42,7 @@ import {
 type ResetPasswordCommand = {
   loginName: string;
   organization?: string;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function resetPassword(command: ResetPasswordCommand) {
@@ -76,7 +76,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
     userId,
     urlTemplate:
       `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
-      (command.authRequestId ? `&authRequestId=${command.authRequestId}` : ""),
+      (command.requestId ? `&requestId=${command.requestId}` : ""),
   });
 }
 
@@ -84,7 +84,7 @@ export type UpdateSessionCommand = {
   loginName: string;
   organization?: string;
   checks: Checks;
-  authRequestId?: string;
+  requestId?: string;
 };
 
 export async function sendPassword(command: UpdateSessionCommand) {
@@ -128,7 +128,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
         session = await createSessionAndUpdateCookie(
           checks,
           undefined,
-          command.authRequestId,
+          command.requestId,
           loginSettings?.passwordCheckLifetime,
         );
       } catch (error: any) {
@@ -160,7 +160,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
         sessionCookie,
         command.checks,
         undefined,
-        command.authRequestId,
+        command.requestId,
         loginSettings?.passwordCheckLifetime,
       );
     } catch (error: any) {
@@ -227,7 +227,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     session,
     humanUser,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (passwordChangedCheck?.redirect) {
@@ -244,7 +244,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
     session,
     humanUser,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (emailVerificationCheck?.redirect) {
@@ -273,18 +273,18 @@ export async function sendPassword(command: UpdateSessionCommand) {
     loginSettings,
     authMethods,
     command.organization,
-    command.authRequestId,
+    command.requestId,
   );
 
   if (mfaFactorCheck?.redirect) {
     return mfaFactorCheck;
   }
 
-  if (command.authRequestId && session.id) {
+  if (command.requestId && session.id) {
     const nextUrl = await getNextUrl(
       {
         sessionId: session.id,
-        authRequestId: command.authRequestId,
+        requestId: command.requestId,
         organization:
           command.organization ?? session.factors?.user?.organizationId,
       },

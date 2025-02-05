@@ -51,7 +51,7 @@ export async function loginWithOIDCandSession({
       const command: SendLoginnameCommand = {
         loginName: selectedSession.factors.user?.loginName,
         organization: selectedSession.factors?.user?.organizationId,
-        authRequestId: authRequest,
+        requestId: `oidc_${authRequest}`,
       };
 
       const res = await sendLoginname(command);

@@ -20,14 +20,14 @@ import { SignInWithGoogle } from "./idps/sign-in-with-google";
 export interface SignInWithIDPProps {
   children?: ReactNode;
   identityProviders: IdentityProvider[];
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
   linkOnly?: boolean;
 }
 
 export function SignInWithIdp({
   identityProviders,
-  authRequestId,
+  requestId,
   organization,
   linkOnly,
 }: Readonly<SignInWithIDPProps>) {
@@ -40,7 +40,7 @@ export function SignInWithIdp({
       setLoading(true);
       const params = new URLSearchParams();
       if (linkOnly) params.set("link", "true");
-      if (authRequestId) params.set("authRequestId", authRequestId);
+      if (requestId) params.set("requestId", requestId);
       if (organization) params.set("organization", organization);
 
       try {
@@ -64,7 +64,7 @@ export function SignInWithIdp({
         setLoading(false);
       }
     },
-    [authRequestId, organization, linkOnly, router],
+    [requestId, organization, linkOnly, router],
   );
 
   const renderIDPButton = (idp: IdentityProvider) => {

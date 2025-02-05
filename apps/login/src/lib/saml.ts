@@ -49,7 +49,7 @@ export async function loginWithSAMLandSession({
       const command: SendLoginnameCommand = {
         loginName: selectedSession.factors.user?.loginName,
         organization: selectedSession.factors?.user?.organizationId,
-        authRequestId: samlRequest,
+        requestId: `saml_${samlRequest}`,
       };
 
       const res = await sendLoginname(command);

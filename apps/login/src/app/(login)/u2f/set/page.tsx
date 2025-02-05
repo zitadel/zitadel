@@ -16,7 +16,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "u2f" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, organization, authRequestId, checkAfter } = searchParams;
+  const { loginName, organization, requestId, checkAfter } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
@@ -62,7 +62,7 @@ export default async function Page(props: {
             loginName={loginName}
             sessionId={sessionFactors.id}
             organization={organization}
-            authRequestId={authRequestId}
+            requestId={requestId}
             checkAfter={checkAfter === "true"}
           />
         )}

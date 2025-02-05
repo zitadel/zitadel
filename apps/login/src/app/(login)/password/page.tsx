@@ -22,7 +22,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "password" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  let { loginName, organization, authRequestId, alt } = searchParams;
+  let { loginName, organization, requestId, alt } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
@@ -94,7 +94,7 @@ export default async function Page(props: {
         {loginName && (
           <PasswordForm
             loginName={loginName}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={organization} // stick to "organization" as we still want to do user discovery based on the searchParams not the default organization, later the organization is determined by the found user
             loginSettings={loginSettings}
             promptPasswordless={

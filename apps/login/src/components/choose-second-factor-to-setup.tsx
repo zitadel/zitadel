@@ -10,7 +10,7 @@ import { EMAIL, SMS, TOTP, U2F } from "./auth-methods";
 type Props = {
   loginName?: string;
   sessionId?: string;
-  authRequestId?: string;
+  requestId?: string;
   organization?: string;
   loginSettings: LoginSettings;
   userMethods: AuthenticationMethodType[];
@@ -22,7 +22,7 @@ type Props = {
 export function ChooseSecondFactorToSetup({
   loginName,
   sessionId,
-  authRequestId,
+  requestId,
   organization,
   loginSettings,
   userMethods,
@@ -38,8 +38,8 @@ export function ChooseSecondFactorToSetup({
   if (sessionId) {
     params.append("sessionId", sessionId);
   }
-  if (authRequestId) {
-    params.append("authRequestId", authRequestId);
+  if (requestId) {
+    params.append("requestId", requestId);
   }
   if (organization) {
     params.append("organization", organization);

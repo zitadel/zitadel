@@ -27,7 +27,7 @@ export default async function Page(props: {
   const t = await getTranslations({ locale, namespace: "authenticator" });
   const tError = await getTranslations({ locale, namespace: "error" });
 
-  const { loginName, authRequestId, organization, sessionId } = searchParams;
+  const { loginName, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
   const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
@@ -141,8 +141,8 @@ export default async function Page(props: {
     params.set("organization", sessionWithData.factors?.user?.organizationId);
   }
 
-  if (authRequestId) {
-    params.set("authRequestId", authRequestId);
+  if (requestId) {
+    params.set("requestId", requestId);
   }
 
   return (
@@ -174,7 +174,7 @@ export default async function Page(props: {
         {loginSettings?.allowExternalIdp && identityProviders && (
           <SignInWithIdp
             identityProviders={identityProviders}
-            authRequestId={authRequestId}
+            requestId={requestId}
             organization={sessionWithData.factors?.user?.organizationId}
             linkOnly={true} // tell the callback function to just link the IDP and not login, to get an error when user is already available
           ></SignInWithIdp>
