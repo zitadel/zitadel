@@ -1501,10 +1501,30 @@
     "@bufbuild/buf-win32-arm64" "1.43.0"
     "@bufbuild/buf-win32-x64" "1.43.0"
 
+"@bufbuild/protobuf@^2.2.2":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@bufbuild/protobuf/-/protobuf-2.2.3.tgz#9cd136f6b687e63e9b517b3a54211ece942897ee"
+  integrity sha512-tFQoXHJdkEOSwj5tRIZSPNUuXK3RaR7T1nUrPgbYX1pUbvqqaaZAsfo+NXBPsz5rZMSKVFrgK1WL8Q/MSLvprg==
+
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
+
+"@connectrpc/connect-node@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@connectrpc/connect-node/-/connect-node-2.0.0.tgz#1ea4eff7f2633fbe3d80378e1420bd213d9d83a4"
+  integrity sha512-DoI5T+SUvlS/8QBsxt2iDoUg15dSxqhckegrgZpWOtADtmGohBIVbx1UjtWmjLBrP4RdD0FeBw+XyRUSbpKnJQ==
+
+"@connectrpc/connect-web@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@connectrpc/connect-web/-/connect-web-2.0.0.tgz#14055c933bfe846e75856bce49ecd0250cbec3b2"
+  integrity sha512-oeCxqHXLXlWJdmcvp9L3scgAuK+FjNSn+twyhUxc8yvDbTumnt5Io+LnBzSYxAdUdYqTw5yHfTSCJ4hj0QID0g==
+
+"@connectrpc/connect@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@connectrpc/connect/-/connect-2.0.0.tgz#0a34d934bdce5fd3723f79b70aa843d4c1213df8"
+  integrity sha512-Usm8jgaaULANJU8vVnhWssSA6nrZ4DJEAbkNtXSoZay2YD5fDyMukCxu8NEhCvFzfHvrhxhcjttvgpyhOM7xAQ==
 
 "@ctrl/ngx-codemirror@^6.1.0":
   version "6.1.0"
@@ -3495,6 +3515,25 @@
   dependencies:
     js-yaml "^3.10.0"
     tslib "^2.4.0"
+
+"@zitadel/client@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@zitadel/client/-/client-1.0.4.tgz#9c539ac874a2ff95f4bcd16976f19dd53f6f0d59"
+  integrity sha512-FL9qFbksSf7ErbzRGLwWAlP9NaBK5mM+kH25s0t2OqWfLwm3lC5ZSvjBXLRL9OrnoGKAVv98Y1nSKh1HZKXr9g==
+  dependencies:
+    "@bufbuild/protobuf" "^2.2.2"
+    "@connectrpc/connect" "^2.0.0"
+    "@connectrpc/connect-node" "^2.0.0"
+    "@connectrpc/connect-web" "^2.0.0"
+    "@zitadel/proto" "1.0.2"
+    jose "^5.3.0"
+
+"@zitadel/proto@1.0.2", "@zitadel/proto@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@zitadel/proto/-/proto-1.0.2.tgz#11dfff1060771d344c575af483fa09afff8c3771"
+  integrity sha512-6kiKntWOaH8W54mJcaxjOA3uxktb7zA0UISyfMmlNgqfiWR5t/SCxA9+xbdVoGgaT6s8MPNvyPQ5GgY4cqgEVA==
+  dependencies:
+    "@bufbuild/protobuf" "^2.2.2"
 
 "@zkochan/js-yaml@0.0.6":
   version "0.0.6"
@@ -6537,6 +6576,11 @@ jiti@^1.18.2:
   version "1.21.6"
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.21.6.tgz#6c7f7398dd4b3142767f9a168af2f317a428d268"
   integrity sha512-2yTgeWTWzMWkHu6Jp9NKgePDaYHbntiwvYuuJLbbN9vl7DC9DvXKOB2BC3ZZ92D3cvV/aflH0osDfwpHepQ53w==
+
+jose@^5.3.0:
+  version "5.9.6"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.9.6.tgz#77f1f901d88ebdc405e57cce08d2a91f47521883"
+  integrity sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==
 
 js-tokens@^4.0.0:
   version "4.0.0"

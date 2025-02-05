@@ -79,6 +79,13 @@ message SetInstanceFeaturesRequest{
       description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
     }
   ];
+
+  optional bool console_use_v2_user_api = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -169,6 +176,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "If the flag is enabled, you'll be able to terminate a single session from the login UI by providing an id_token with a `sid` claim as id_token_hint on the end_session endpoint. Note that currently all sessions from the same user agent (browser) are terminated in the login UI. Sessions managed through the Session API already allow the termination of single sessions.";
+    }
+  ];
+
+  FeatureFlag console_use_v2_user_api = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
     }
   ];
 }
