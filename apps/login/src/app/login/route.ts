@@ -10,6 +10,7 @@ import {
   getActiveIdentityProviders,
   getAuthRequest,
   getOrgsByDomain,
+  getSAMLRequest,
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
@@ -432,6 +433,13 @@ export async function GET(request: NextRequest) {
       }
     } else if (requestId && requestId.startsWith("saml_")) {
       // handle saml request
+      const { samlRequest } = await getSAMLRequest({
+        serviceUrl,
+        serviceRegion,
+        samlRequestId: requestId.replace("saml_", ""),
+      });
+
+      samlRequest?.
     } else {
       return NextResponse.json(
         { error: "No authRequest nor samlRequest provided" },

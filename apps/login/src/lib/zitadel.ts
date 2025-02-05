@@ -1034,6 +1034,26 @@ export async function createCallback({
   return oidcService.createCallback(req);
 }
 
+export async function getSAMLRequest({
+  serviceUrl,
+  serviceRegion,
+  samlRequestId,
+}: {
+  serviceUrl: string;
+  serviceRegion: string;
+  samlRequestId: string;
+}) {
+  const samlService = await createServiceForHost(
+    SAMLService,
+    serviceUrl,
+    serviceRegion,
+  );
+
+  return samlService.getSAMLRequest({
+    samlRequestId,
+  });
+}
+
 export async function createResponse({
   serviceUrl,
   serviceRegion,
