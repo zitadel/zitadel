@@ -415,13 +415,8 @@ func TestServer_ListSessions(t *testing.T) {
 				CTX,
 				&session.ListSessionsRequest{},
 				func(ctx context.Context, t *testing.T, request *session.ListSessionsRequest) []*sessionAttr {
-					acsOrder := true
 					infos := createSessions(ctx, t, 3, User.GetUserId(), "agent", durationpb.New(time.Minute*5), map[string][]byte{"key": []byte("value")})
-					request.Query = &object.ListQuery{
-						Asc: acsOrder,
-					}
-					request.Queries = append(request.Queries,
-						&session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: infos.ids()}}})
+					request.Queries = append(request.Queries, &session.SearchQuery{Query: &session.SearchQuery_IdsQuery{IdsQuery: &session.IDsQuery{Ids: infos.ids()}}})
 					return infos
 				},
 			},
