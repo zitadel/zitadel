@@ -16,12 +16,12 @@ type InitPermittedOrgsFunction struct {
 }
 
 var (
-	//go:embed 47/*.sql
+	//go:embed 48/*.sql
 	permittedOrgsFunction embed.FS
 )
 
 func (mig *InitPermittedOrgsFunction) Execute(ctx context.Context, _ eventstore.Event) error {
-	statements, err := readStatements(permissionFunctions, "47", "")
+	statements, err := readStatements(permissionFunctions, "48", "")
 	if err != nil {
 		return err
 	}
@@ -35,5 +35,5 @@ func (mig *InitPermittedOrgsFunction) Execute(ctx context.Context, _ eventstore.
 }
 
 func (*InitPermittedOrgsFunction) String() string {
-	return "47_init_permission_functions"
+	return "48_init_permitted_orgs_function"
 }

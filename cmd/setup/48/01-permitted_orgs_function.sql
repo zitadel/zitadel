@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION eventstore.permitted_orgs(
     instanceId TEXT
     , userId TEXT
     , perm TEXT
-    , filter_orgs TEXT[]
+    , filter_orgs TEXT
 
     , org_ids OUT TEXT[]
 )
@@ -31,13 +31,13 @@ BEGIN
 			LIMIT 1;
 		
 		IF has_instance_permission THEN
-			-- Return all organizations
+			-- Return all organizations or only those in filter_orgs
 			SELECT array_agg(o.org_id) INTO org_ids
 				FROM eventstore.instance_orgs o
 				WHERE o.instance_id = instanceId
-        AND CASE WHEN filter_orgs IS NOT NULL 
-          THEN o.org_id IN (array_to_string(filter_orgs)) 
-          ELSE TRUE END;
+       AND CASE WHEN filter_orgs != ''
+           THEN o.org_id IN (filter_orgs) 
+           ELSE TRUE END;
 			RETURN;
 		END IF;
 	END;
