@@ -395,12 +395,7 @@ func TestCreateUser_metadata(t *testing.T) {
 }
 
 func TestCreateUser_scopedExternalID(t *testing.T) {
-	_, err := Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
-		Id:    Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-		Key:   "urn:zitadel:scim:provisioningDomain",
-		Value: []byte("fooBar"),
-	})
-	require.NoError(t, err)
+	setProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID, "fooBar")
 
 	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
 	require.NoError(t, err)
@@ -409,11 +404,7 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 		_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
 		require.NoError(t, err)
 
-		_, err = Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
-			Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-			Key: "urn:zitadel:scim:provisioningDomain",
-		})
-		require.NoError(t, err)
+		removeProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID)
 	}()
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
