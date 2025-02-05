@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -154,7 +153,7 @@ var (
 		PreferredLanguage: language.MustParse("en-US"),
 		Locale:            "en-US",
 		Timezone:          "America/Los_Angeles",
-		Active:            gu.Ptr(true),
+		Active:            schemas.NewRelaxedBool(true),
 	}
 )
 
@@ -191,7 +190,7 @@ func TestCreateUser(t *testing.T) {
 			name: "minimal inactive user",
 			body: minimalInactiveUserJson,
 			want: &resources.ScimUser{
-				Active: gu.Ptr(false),
+				Active: schemas.NewRelaxedBool(false),
 			},
 		},
 		{
