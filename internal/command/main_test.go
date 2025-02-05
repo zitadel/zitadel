@@ -232,6 +232,24 @@ func newMockPermissionCheckNotAllowed() domain.PermissionCheck {
 	}
 }
 
+func newMockApplicationPermissionCheckAllowed() domain.ApplicationPermissionCheck {
+	return func(ctx context.Context, clientID, userID string) (err error) {
+		return nil
+	}
+}
+
+func newMockApplicationPermissionCheckOIDCNotAllowed() domain.ApplicationPermissionCheck {
+	return func(ctx context.Context, clientID, userID string) (err error) {
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.PermissionDenied")
+	}
+}
+
+func newMockApplicationPermissionCheckSAMLNotAllowed() domain.ApplicationPermissionCheck {
+	return func(ctx context.Context, clientID, userID string) (err error) {
+		return zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.PermissionDenied")
+	}
+}
+
 func newMockTokenVerifierValid() func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 		return nil

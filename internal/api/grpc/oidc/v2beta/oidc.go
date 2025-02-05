@@ -101,7 +101,7 @@ func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *
 }
 
 func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID string, session *oidc_pb.Session) (*oidc_pb.CreateCallbackResponse, error) {
-	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true)
+	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true, nil)
 	if err != nil {
 		return nil, err
 	}

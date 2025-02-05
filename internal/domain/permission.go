@@ -39,3 +39,5 @@ const (
 	PermissionIDPRead             = "iam.idp.read"
 	PermissionOrgIDPRead          = "org.idp.read"
 )
+
+type ApplicationPermissionCheck func(ctx context.Context, clientID, userID string) (err error)
