@@ -154,7 +154,7 @@ func (h *UsersHandler) Create(ctx context.Context, user *ScimUser) (*ScimUser, e
 		return nil, err
 	}
 
-	err = h.command.AddUserHuman(ctx, orgID, addHuman, true, h.userCodeAlg)
+	err = h.command.AddUserHuman(ctx, orgID, addHuman, false, h.userCodeAlg)
 	if err != nil {
 		return nil, err
 	}
