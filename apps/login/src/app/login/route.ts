@@ -84,7 +84,11 @@ export async function GET(request: NextRequest) {
   const oidcRequestId = searchParams.get("authRequest"); // oidc initiated request
   const samlRequestId = searchParams.get("samlRequest"); // saml initiated request
 
-  const requestId = searchParams.get("requestId"); // internal request id which combines authRequest and samlRequest with the prefix oidc_ or saml_
+  // internal request id which combines authRequest and samlRequest with the prefix oidc_ or saml_
+  let requestId =
+    searchParams.get("requestId") ||
+    `oidc_${oidcRequestId}` ||
+    `saml_${samlRequestId}`;
 
   const sessionId = searchParams.get("sessionId");
 
@@ -194,7 +198,7 @@ export async function GET(request: NextRequest) {
             const params = new URLSearchParams();
 
             if (requestId) {
-              params.set("requestId", `oidc_${requestId}`);
+              params.set("requestId", requestId);
             }
 
             if (organization) {
@@ -332,7 +336,7 @@ export async function GET(request: NextRequest) {
             serviceUrl,
             serviceRegion,
             req: create(CreateCallbackRequestSchema, {
-              authRequestId: requestId,
+              authRequestId: requestId.replace("oidc_", ""),
               callbackKind: {
                 case: "session",
                 value: create(SessionSchema, session),
@@ -381,7 +385,7 @@ export async function GET(request: NextRequest) {
               serviceUrl,
               serviceRegion,
               req: create(CreateCallbackRequestSchema, {
-                authRequestId: requestId,
+                authRequestId: requestId.replace("oidc_", ""),
                 callbackKind: {
                   case: "session",
                   value: create(SessionSchema, session),
@@ -414,7 +418,7 @@ export async function GET(request: NextRequest) {
       } else {
         const loginNameUrl = new URL("/loginname", request.url);
 
-        loginNameUrl.searchParams.set("requestId", `oidc_${requestId}`);
+        loginNameUrl.searchParams.set("requestId", requestId);
         if (authRequest?.loginHint) {
           loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
           loginNameUrl.searchParams.set("submit", "true"); // autosubmit
