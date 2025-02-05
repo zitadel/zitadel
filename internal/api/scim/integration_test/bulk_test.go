@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -289,7 +288,7 @@ func TestBulk(t *testing.T) {
 					},
 					DisplayName:       "scim-bulk-created-user-0-given-name scim-bulk-created-user-0-family-name",
 					PreferredLanguage: test.Must(language.Parse("en")),
-					Active:            gu.Ptr(true),
+					Active:            schemas.NewRelaxedBool(true),
 					Emails: []*resources.ScimEmail{
 						{
 							Value:   "scim-bulk-created-user-0@example.com",
@@ -308,7 +307,7 @@ func TestBulk(t *testing.T) {
 					DisplayName:       "scim-bulk-created-user-1-given-name scim-bulk-created-user-1-family-name",
 					NickName:          "scim-bulk-created-user-1-nickname-patched",
 					PreferredLanguage: test.Must(language.Parse("en")),
-					Active:            gu.Ptr(true),
+					Active:            schemas.NewRelaxedBool(true),
 					Emails: []*resources.ScimEmail{
 						{
 							Value:   "scim-bulk-created-user-1@example.com",
@@ -333,7 +332,7 @@ func TestBulk(t *testing.T) {
 					DisplayName:       "scim-bulk-created-user-2-given-name scim-bulk-created-user-2-family-name",
 					NickName:          "scim-bulk-created-user-2-nickname-patched",
 					PreferredLanguage: test.Must(language.Parse("en")),
-					Active:            gu.Ptr(true),
+					Active:            schemas.NewRelaxedBool(true),
 					Emails: []*resources.ScimEmail{
 						{
 							Value:   "scim-bulk-created-user-2@example.com",

@@ -239,7 +239,7 @@ func TestListUser(t *testing.T) {
 				assert.Equal(t, 1, resp.StartIndex)
 				assert.Len(t, resp.Resources, 1)
 				assert.True(t, strings.HasPrefix(resp.Resources[0].UserName, "scim-username-0"))
-				assert.False(t, *resp.Resources[0].Active)
+				assert.False(t, resp.Resources[0].Active.Bool())
 			},
 		},
 		{

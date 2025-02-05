@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -112,7 +111,7 @@ func TestGetUser(t *testing.T) {
 				PreferredLanguage: language.Make("en-US"),
 				Locale:            "en-US",
 				Timezone:          "America/Los_Angeles",
-				Active:            gu.Ptr(true),
+				Active:            schemas.NewRelaxedBool(true),
 				Emails: []*resources.ScimEmail{
 					{
 						Value:   "bjensen@example.com",
