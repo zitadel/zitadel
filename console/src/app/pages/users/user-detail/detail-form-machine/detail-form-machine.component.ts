@@ -1,6 +1,6 @@
-import { Component, DestroyRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, UntypedFormGroup } from '@angular/forms';
-import { combineLatestWith, distinctUntilChanged, ReplaySubject, Subscription } from 'rxjs';
+import { Component, DestroyRef, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, FormControl } from '@angular/forms';
+import { combineLatestWith, distinctUntilChanged, ReplaySubject } from 'rxjs';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { AccessTokenType, MachineUser } from '@zitadel/proto/zitadel/user/v2/user_pb';
 import { startWith } from 'rxjs/operators';

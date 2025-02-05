@@ -6,7 +6,7 @@ import { BehaviorSubject, Observable, switchMap } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { ToastService } from 'src/app/services/toast.service';
 import { AuthFactorState, Passkey, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
-import { UserService } from '../../../../../services/user.service';
+import { UserService } from 'src/app/services/user.service';
 import { filter } from 'rxjs/operators';
 
 export interface WebAuthNOptions {

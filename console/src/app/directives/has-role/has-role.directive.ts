@@ -1,5 +1,4 @@
-import { DestroyRef, Directive, Input, OnDestroy, TemplateRef, ViewContainerRef } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { DestroyRef, Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
