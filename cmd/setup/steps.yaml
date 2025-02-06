@@ -31,7 +31,7 @@ FirstInstance:
         Number: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PHONE_NUMBER
         Verified: # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PHONE_VERIFIED
       Password: Password1! # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD
-      PasswordChangeRequired: true # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED
+      PasswordChangeRequired: false # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED
     # In the FirstInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
     # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role.
     Machine:

@@ -171,7 +171,7 @@ func accessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user.AccessTokenT
 
 func listUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueries, string, error) {
 	offset, limit, asc := object.ListQueryToQuery(req.Query)
-	queries, filterOrgIds, err := userQueriesToQuery(req.Queries, 0 /*start from level 0*/)
+	queries, filterOrgId, err := userQueriesToQuery(req.Queries, 0 /*start from level 0*/)
 	if err != nil {
 		return nil, "", err
 	}
@@ -183,7 +183,7 @@ func listUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueri
 			SortingColumn: userFieldNameToSortingColumn(req.SortingColumn),
 		},
 		Queries: queries,
-	}, filterOrgIds, nil
+	}, filterOrgId, nil
 }
 
 func userFieldNameToSortingColumn(field user.UserFieldName) query.Column {
