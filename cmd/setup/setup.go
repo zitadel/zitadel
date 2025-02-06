@@ -4,9 +4,11 @@ import (
 	"context"
 	"embed"
 	_ "embed"
+	"errors"
 	"net/http"
 	"path"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -171,6 +173,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
 	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: dbClient}
 	steps.s47FillMembershipFields = &FillMembershipFields{eventstore: eventstoreClient}
+	steps.s48FixInTxOrderType = &FixInTxOrderType{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -201,6 +204,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
+		steps.s48FixInTxOrderType,
 		steps.s40InitPushFunc,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
@@ -271,7 +275,23 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) {
 	err := migration.Migrate(ctx, eventstoreClient, step)
-	logging.WithFields("name", step.String()).OnError(err).Fatal(errorMsg)
+	if err == nil {
+		return
+	}
+	logFields := []any{
+		"name", step.String(),
+	}
+	pgErr := new(pgconn.PgError)
+	if errors.As(err, &pgErr) {
+		logFields = append(logFields,
+			"severity", pgErr.Severity,
+			"code", pgErr.Code,
+			"message", pgErr.Message,
+			"detail", pgErr.Detail,
+			"hint", pgErr.Hint,
+		)
+	}
+	logging.WithFields(logFields...).WithError(err).Fatal(errorMsg)
 }
 
 // readStmt reads a single file from the embedded FS,
