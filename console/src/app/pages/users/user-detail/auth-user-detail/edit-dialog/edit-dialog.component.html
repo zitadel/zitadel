@@ -47,7 +47,7 @@
         {{ data.isVerifiedTextKey | translate }}
       </mat-checkbox>
       <cnsl-info-section class="full-width desc">
-        <span>{{ data.isVerifiedTextDescKey | translate }}</span>
+        <span>{{ data.isVerifiedTextDescKey ?? '' | translate }}</span>
       </cnsl-info-section>
     </ng-container>
   </form>
