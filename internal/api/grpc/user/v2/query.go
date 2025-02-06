@@ -58,6 +58,7 @@ func userToPb(userQ *query.User, assetPrefix string) *user.User {
 			Sequence:      userQ.Sequence,
 			EventDate:     userQ.ChangeDate,
 			ResourceOwner: userQ.ResourceOwner,
+			CreationDate:  userQ.CreationDate,
 		}),
 		State:              userStateToPb(userQ.State),
 		Username:           userQ.Username,
