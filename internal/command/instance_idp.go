@@ -1618,7 +1618,8 @@ func (c *Commands) prepareUpdateInstanceLDAPProvider(a *instance.Aggregate, writ
 				provider.UserFilters,
 				provider.Timeout,
 				provider.RootCA,
-				c.idpConfigEncryption, provider.LDAPAttributes,
+				c.idpConfigEncryption,
+				provider.LDAPAttributes,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

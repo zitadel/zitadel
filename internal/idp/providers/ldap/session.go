@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"errors"
-	"log"
 	"net"
 	"net/url"
 	"strconv"
@@ -141,10 +140,10 @@ func getConnection(
 		return nil, err
 	}
 
-	if u.Scheme == "ldaps" && rootCA != nil {
+	if u.Scheme == "ldaps" && len(rootCA) > 0 {
 		rootCAs := x509.NewCertPool()
 		if ok := rootCAs.AppendCertsFromPEM(rootCA); !ok {
-			log.Println("No certs appended, using system certs only")
+			return nil, errors.New("unable to append rootCA")
 		}
 
 		dialer = append(dialer, ldap.DialWithTLSConfig(&tls.Config{

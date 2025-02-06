@@ -4328,7 +4328,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
-							[]byte("certificate"),
+							nil,
 							idp.LDAPAttributes{},
 							idp.Options{},
 						),
@@ -4351,7 +4351,6 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
-					RootCA:            []byte("certificate"),
 				},
 			},
 			res: res{
