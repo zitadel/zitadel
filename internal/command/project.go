@@ -66,6 +66,7 @@ func (c *Commands) addProjectWithID(ctx context.Context, projectAdd *domain.Proj
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(
 			ctx,
+			//nolint: contextcheck
 			ProjectAggregateFromWriteModel(&addedProject.WriteModel),
 			projectAdd.Name,
 			projectAdd.ProjectRoleAssertion,
