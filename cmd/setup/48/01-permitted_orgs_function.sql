@@ -36,8 +36,8 @@ BEGIN
 				FROM eventstore.instance_orgs o
 				WHERE o.instance_id = instanceId
 				AND CASE WHEN filter_orgs != ''
-						THEN o.org_id IN (filter_orgs) 
-						ELSE TRUE END;
+					THEN o.org_id IN (filter_orgs) 
+					ELSE TRUE END;
 			RETURN;
 		END IF;
 	END;
