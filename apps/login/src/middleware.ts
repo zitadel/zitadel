@@ -44,9 +44,7 @@ export async function middleware(request: NextRequest) {
   responseHeaders.set("Access-Control-Allow-Origin", "*");
   responseHeaders.set("Access-Control-Allow-Headers", "*");
 
-  const href = `${serviceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
-  console.log("changing request href", "old", request.nextUrl.href, "new", href)
-  request.nextUrl.href = href;
+  request.nextUrl.href = `${serviceUrl}${request.nextUrl.pathname}${request.nextUrl.search}`;
   return NextResponse.rewrite(request.nextUrl, {
     request: {
       headers: requestHeaders,
