@@ -35,9 +35,9 @@ BEGIN
 			SELECT array_agg(o.org_id) INTO org_ids
 				FROM eventstore.instance_orgs o
 				WHERE o.instance_id = instanceId
-       AND CASE WHEN filter_orgs != ''
-           THEN o.org_id IN (filter_orgs) 
-           ELSE TRUE END;
+        AND CASE WHEN filter_orgs != ''
+            THEN o.org_id IN (filter_orgs) 
+            ELSE TRUE END;
 			RETURN;
 		END IF;
 	END;
