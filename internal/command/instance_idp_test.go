@@ -4260,6 +4260,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
+							[]byte("certificate"),
 							idp.LDAPAttributes{},
 							idp.Options{},
 						),
@@ -4281,6 +4282,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
 				},
 			},
 			res: res{
@@ -4311,6 +4313,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 							[]string{"object"},
 							[]string{"filter"},
 							time.Second*30,
+							[]byte("certificate"),
 							idp.LDAPAttributes{
 								IDAttribute:                "id",
 								FirstNameAttribute:         "firstName",
@@ -4351,6 +4354,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "id",
 						FirstNameAttribute:         "firstName",
@@ -4626,6 +4630,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
+								[]byte("certificate"),
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4645,6 +4650,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"object"},
 					UserFilters:       []string{"filter"},
 					Timeout:           time.Second * 30,
+					RootCA:            []byte("certificate"),
 				},
 			},
 			res: res{
@@ -4674,6 +4680,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 								[]string{"object"},
 								[]string{"filter"},
 								time.Second*30,
+								[]byte("certificate"),
 								idp.LDAPAttributes{},
 								idp.Options{},
 							)),
@@ -4742,6 +4749,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 					UserObjectClasses: []string{"new object"},
 					UserFilters:       []string{"new filter"},
 					Timeout:           time.Second * 20,
+					RootCA:            []byte("certificate"),
 					LDAPAttributes: idp.LDAPAttributes{
 						IDAttribute:                "new id",
 						FirstNameAttribute:         "new firstName",
