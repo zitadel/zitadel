@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -208,7 +207,7 @@ func TestUpdateUser(t *testing.T) {
 				PreferredLanguage: language.MustParse("en-US"),
 				Locale:            "en-US",
 				Timezone:          "America/Los_Angeles",
-				Active:            gu.Ptr(true),
+				Active:            schemas.NewRelaxedBool(true),
 			},
 		},
 	}

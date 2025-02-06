@@ -47,7 +47,6 @@ func CreateServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				middleware.CallDurationHandler(),
-				middleware.DefaultTracingServer(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
 				middleware.InstanceInterceptor(queries, externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
@@ -63,6 +62,7 @@ func CreateServer(
 				middleware.ActivityInterceptor(),
 			),
 		),
+		grpc.StatsHandler(middleware.DefaultTracingServer()),
 	}
 	if tlsConfig != nil {
 		serverOptions = append(serverOptions, grpc.Creds(credentials.NewTLS(tlsConfig)))

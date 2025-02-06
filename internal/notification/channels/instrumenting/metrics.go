@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/logging"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
@@ -18,18 +17,14 @@ func countMessages(ctx context.Context, channel channels.NotificationChannel, su
 		if err != nil {
 			metricName = errorMetricName
 		}
-		addCount(ctx, metricName, message, err)
+		addCount(ctx, metricName, message)
 		return err
 	})
 }
 
-func addCount(ctx context.Context, metricName string, message channels.Message, err error) {
+func addCount(ctx context.Context, metricName string, message channels.Message) {
 	labels := map[string]attribute.Value{
-		"triggering_event_typey": attribute.StringValue(string(message.GetTriggeringEvent().Type())),
-		"instance":               attribute.StringValue(authz.GetInstance(ctx).InstanceID()),
-	}
-	if err != nil {
-		labels["error"] = attribute.StringValue(err.Error())
+		"triggering_event_type": attribute.StringValue(string(message.GetTriggeringEvent().Type())),
 	}
 	addCountErr := metrics.AddCount(ctx, metricName, 1, labels)
 	logging.WithFields("name", metricName, "labels", labels).OnError(addCountErr).Error("incrementing counter metric failed")
