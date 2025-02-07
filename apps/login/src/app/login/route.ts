@@ -487,7 +487,11 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const loginNameUrl = new URL("/loginname", request.url);
+        const loginNameUrl = new URL("/loginname");
+        console.log("loginNameUrl", loginNameUrl);
+        console.log("request.url", request.url);
+        console.log("nexturl", request.nextUrl);
+
         if (authRequest.id) {
           loginNameUrl.searchParams.set("authRequestId", authRequest.id);
         }
