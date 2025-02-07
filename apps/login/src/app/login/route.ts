@@ -202,7 +202,7 @@ async function findValidSession(
 
 function constructUrl(request: NextRequest, path: string) {
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-  return new URL(`${basePath}${path}`, request.nextUrl.origin);
+  return `${basePath}${path}`;
 }
 
 export async function GET(request: NextRequest) {
@@ -315,20 +315,29 @@ export async function GET(request: NextRequest) {
             }
 
             const signedinUrl = constructUrl(request, "/signedin");
+            const params = new URLSearchParams();
 
             if (selectedSession.factors?.user?.loginName) {
-              signedinUrl.searchParams.set(
+              params.append(
                 "loginName",
                 selectedSession.factors?.user?.loginName,
               );
+              // signedinUrl.searchParams.set(
+              //   "loginName",
+              //   selectedSession.factors?.user?.loginName,
+              // );
             }
             if (selectedSession.factors?.user?.organizationId) {
-              signedinUrl.searchParams.set(
+              params.append(
                 "organization",
                 selectedSession.factors?.user?.organizationId,
               );
+              // signedinUrl.searchParams.set(
+              //   "organization",
+              //   selectedSession.factors?.user?.organizationId,
+              // );
             }
-            return NextResponse.redirect(signedinUrl);
+            return NextResponse.redirect(signedinUrl + "?" + params);
           } else {
             return NextResponse.json({ error }, { status: 500 });
           }
@@ -438,27 +447,32 @@ export async function GET(request: NextRequest) {
 
     const gotoAccounts = (): NextResponse<unknown> => {
       const accountsUrl = constructUrl(request, "/accounts");
-
+      const params = new URLSearchParams();
       if (authRequest?.id) {
-        accountsUrl.searchParams.set("authRequestId", authRequest?.id);
+        params.append("authRequestId", authRequest.id);
+        // accountsUrl.searchParams.set("authRequestId", authRequest?.id);
       }
       if (organization) {
-        accountsUrl.searchParams.set("organization", organization);
+        params.append("organization", organization);
+        // accountsUrl.searchParams.set("organization", organization);
       }
 
-      return NextResponse.redirect(accountsUrl);
+      return NextResponse.redirect(accountsUrl + "?" + params);
     };
 
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
       const registerUrl = constructUrl(request, "/register");
+      const params = new URLSearchParams();
       if (authRequest.id) {
-        registerUrl.searchParams.set("authRequestId", authRequest.id);
+        params.append("authRequestId", authRequest.id);
+        // registerUrl.searchParams.set("authRequestId", authRequest.id);
       }
       if (organization) {
-        registerUrl.searchParams.set("organization", organization);
+        params.append("organization", organization);
+        // registerUrl.searchParams.set("organization", organization);
       }
 
-      return NextResponse.redirect(registerUrl);
+      return NextResponse.redirect(registerUrl + "?" + params);
     }
 
     // use existing session and hydrate it for oidc
@@ -495,23 +509,26 @@ export async function GET(request: NextRequest) {
         }
 
         const loginNameUrl = constructUrl(request, "/loginname");
-        console.log("loginNameUrl", loginNameUrl);
-        console.log("request.url", request.url);
-        console.log("nexturl", request.nextUrl);
+
+        const params = new URLSearchParams();
 
         if (authRequest.id) {
-          loginNameUrl.searchParams.set("authRequestId", authRequest.id);
+          params.append("authRequestId", authRequest.id);
+          // loginNameUrl.searchParams.set("authRequestId", authRequest.id);
         }
         if (authRequest.loginHint) {
-          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+          params.append("loginName", authRequest.loginHint);
+          // loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
         }
         if (organization) {
-          loginNameUrl.searchParams.set("organization", organization);
+          params.append("organization", organization);
+          // loginNameUrl.searchParams.set("organization", organization);
         }
         if (suffix) {
-          loginNameUrl.searchParams.set("suffix", suffix);
+          params.append("suffix", suffix);
+          // loginNameUrl.searchParams.set("suffix", suffix);
         }
-        return NextResponse.redirect(loginNameUrl);
+        return NextResponse.redirect(loginNameUrl + "?" + params);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         /**
          * With an OIDC none prompt, the authentication server must not display any authentication or consent user interface pages.
@@ -614,17 +631,22 @@ export async function GET(request: NextRequest) {
     } else {
       const loginNameUrl = constructUrl(request, "/loginname");
 
-      loginNameUrl.searchParams.set("authRequestId", authRequestId);
+      const params = new URLSearchParams();
+      params.set("authRequestId", authRequestId);
+      // loginNameUrl.searchParams.set("authRequestId", authRequestId);
       if (authRequest?.loginHint) {
-        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-        loginNameUrl.searchParams.set("submit", "true"); // autosubmit
+        params.set("loginName", authRequest.loginHint);
+        params.set("submit", "true"); // autosubmit
+        // loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+        // loginNameUrl.searchParams.set("submit", "true"); // autosubmit
       }
 
       if (organization) {
-        loginNameUrl.searchParams.set("organization", organization);
+        params.set("organization", organization);
+        // loginNameUrl.searchParams.set("organization", organization);
       }
 
-      return NextResponse.redirect(loginNameUrl);
+      return NextResponse.redirect(loginNameUrl + "?" + params);
     }
   } else {
     return NextResponse.json(
