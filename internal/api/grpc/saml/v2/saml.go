@@ -14,7 +14,7 @@ import (
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 )
 
-func (s *Server) GetAuthRequest(ctx context.Context, req *saml_pb.GetSAMLRequestRequest) (*saml_pb.GetSAMLRequestResponse, error) {
+func (s *Server) GetSAMLRequest(ctx context.Context, req *saml_pb.GetSAMLRequestRequest) (*saml_pb.GetSAMLRequestResponse, error) {
 	authRequest, err := s.query.SamlRequestByID(ctx, true, req.GetSamlRequestId(), true)
 	if err != nil {
 		logging.WithError(err).Error("query samlRequest by ID")

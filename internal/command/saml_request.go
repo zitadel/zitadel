@@ -75,7 +75,9 @@ func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ttPKNdAIFT", "Errors.SAMLRequest.AlreadyHandled")
 	}
 	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
-		return nil, nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-KCd48Rxt7x", "Errors.SAMLRequest.WrongLoginClient")
+		if err := c.checkPermission(ctx, domain.PermissionSessionLink, writeModel.ResourceOwner, ""); err != nil {
+			return nil, nil, err
+		}
 	}
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)

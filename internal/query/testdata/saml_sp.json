@@ -1,0 +1,11 @@
+{
+  "instance_id": "230690539048009730",
+  "app_id": "236647088211886082",
+  "state": 1,
+  "entity_id": "https://test.com/metadata",
+  "metadata": "bWV0YWRhdGE=",
+  "metadata_url": "https://test.com/metadata",
+  "project_id": "236645808328409090",
+  "project_role_assertion": true,
+  "project_role_keys": ["role1", "role2"]
+}

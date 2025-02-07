@@ -19,6 +19,7 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
+	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	saml_pb "github.com/zitadel/zitadel/pkg/grpc/saml/v2"
 	session_pb "github.com/zitadel/zitadel/pkg/grpc/session/v2"
@@ -101,7 +102,7 @@ func CreateSAMLSP(root string, idpMetadata *saml.EntityDescriptor, binding strin
 	return sp, nil
 }
 
-func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *samlsp.Middleware) (*management.AddSAMLAppResponse, error) {
+func (i *Instance) CreateSAMLClientLoginVersion(ctx context.Context, projectID string, m *samlsp.Middleware, loginVersion *app_pb.LoginVersion) (*management.AddSAMLAppResponse, error) {
 	spMetadata, err := xml.MarshalIndent(m.ServiceProvider.Metadata(), "", "  ")
 	if err != nil {
 		return nil, err
@@ -113,9 +114,10 @@ func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *sa
 	}
 
 	resp, err := i.Client.Mgmt.AddSAMLApp(ctx, &management.AddSAMLAppRequest{
-		ProjectId: projectID,
-		Name:      fmt.Sprintf("app-%s", gofakeit.AppName()),
-		Metadata:  &management.AddSAMLAppRequest_MetadataXml{MetadataXml: spMetadata},
+		ProjectId:    projectID,
+		Name:         fmt.Sprintf("app-%s", gofakeit.AppName()),
+		Metadata:     &management.AddSAMLAppRequest_MetadataXml{MetadataXml: spMetadata},
+		LoginVersion: loginVersion,
 	})
 	if err != nil {
 		return nil, err
@@ -135,7 +137,19 @@ func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *sa
 	})
 }
 
-func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState string, responseBinding string) (authRequestID string, err error) {
+func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *samlsp.Middleware) (*management.AddSAMLAppResponse, error) {
+	return i.CreateSAMLClientLoginVersion(ctx, projectID, m, nil)
+}
+
+func (i *Instance) CreateSAMLAuthRequestWithoutLoginClientHeader(m *samlsp.Middleware, loginBaseURI string, acs saml.Endpoint, relayState, responseBinding string) (authRequestID string, err error) {
+	return i.createSAMLAuthRequest(m, "", loginBaseURI, acs, relayState, responseBinding)
+}
+
+func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState, responseBinding string) (authRequestID string, err error) {
+	return i.createSAMLAuthRequest(m, loginClient, "", acs, relayState, responseBinding)
+}
+
+func (i *Instance) createSAMLAuthRequest(m *samlsp.Middleware, loginClient, loginBaseURI string, acs saml.Endpoint, relayState, responseBinding string) (authRequestID string, err error) {
 	authReq, err := m.ServiceProvider.MakeAuthenticationRequest(acs.Location, acs.Binding, responseBinding)
 	if err != nil {
 		return "", err
@@ -146,7 +160,11 @@ func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient strin
 		return "", err
 	}
 
-	req, err := GetRequest(redirectURL.String(), map[string]string{oidc_internal.LoginClientHeader: loginClient})
+	var headers map[string]string
+	if loginClient != "" {
+		headers = map[string]string{oidc_internal.LoginClientHeader: loginClient}
+	}
+	req, err := GetRequest(redirectURL.String(), headers)
 	if err != nil {
 		return "", fmt.Errorf("get request: %w", err)
 	}
@@ -156,11 +174,13 @@ func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient strin
 		return "", fmt.Errorf("check redirect: %w", err)
 	}
 
-	prefixWithHost := i.Issuer() + i.Config.LoginURLV2
-	if !strings.HasPrefix(loc.String(), prefixWithHost) {
-		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
+	if loginBaseURI == "" {
+		loginBaseURI = i.Issuer() + i.Config.LoginURLV2
 	}
-	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
+	if !strings.HasPrefix(loc.String(), loginBaseURI) {
+		return "", fmt.Errorf("login location has not prefix %s, but is %s", loginBaseURI, loc.String())
+	}
+	return strings.TrimPrefix(loc.String(), loginBaseURI), nil
 }
 
 func (i *Instance) FailSAMLAuthRequest(ctx context.Context, id string, reason saml_pb.ErrorReason) *saml_pb.CreateResponseResponse {

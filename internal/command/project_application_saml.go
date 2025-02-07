@@ -81,6 +81,8 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 			string(entity.EntityID),
 			samlApp.Metadata,
 			samlApp.MetadataURL,
+			samlApp.LoginVersion,
+			samlApp.LoginBaseURI,
 		),
 	}, nil
 }
@@ -121,7 +123,10 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 		samlApp.AppID,
 		string(entity.EntityID),
 		samlApp.Metadata,
-		samlApp.MetadataURL)
+		samlApp.MetadataURL,
+		samlApp.LoginVersion,
+		samlApp.LoginBaseURI,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -62,12 +62,14 @@ const (
 	AppOIDCConfigColumnLoginVersion             = "login_version"
 	AppOIDCConfigColumnLoginBaseURI             = "login_base_uri"
 
-	appSAMLTableSuffix             = "saml_configs"
-	AppSAMLConfigColumnAppID       = "app_id"
-	AppSAMLConfigColumnInstanceID  = "instance_id"
-	AppSAMLConfigColumnEntityID    = "entity_id"
-	AppSAMLConfigColumnMetadata    = "metadata"
-	AppSAMLConfigColumnMetadataURL = "metadata_url"
+	appSAMLTableSuffix              = "saml_configs"
+	AppSAMLConfigColumnAppID        = "app_id"
+	AppSAMLConfigColumnInstanceID   = "instance_id"
+	AppSAMLConfigColumnEntityID     = "entity_id"
+	AppSAMLConfigColumnMetadata     = "metadata"
+	AppSAMLConfigColumnMetadataURL  = "metadata_url"
+	AppSAMLConfigColumnLoginVersion = "login_version"
+	AppSAMLConfigColumnLoginBaseURI = "login_base_uri"
 )
 
 type appProjection struct{}
@@ -143,6 +145,8 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppSAMLConfigColumnEntityID, handler.ColumnTypeText),
 			handler.NewColumn(AppSAMLConfigColumnMetadata, handler.ColumnTypeBytes),
 			handler.NewColumn(AppSAMLConfigColumnMetadataURL, handler.ColumnTypeText),
+			handler.NewColumn(AppSAMLConfigColumnLoginVersion, handler.ColumnTypeEnum, handler.Nullable()),
+			handler.NewColumn(AppSAMLConfigColumnLoginBaseURI, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(AppSAMLConfigColumnInstanceID, AppSAMLConfigColumnAppID),
 			appSAMLTableSuffix,
@@ -703,6 +707,8 @@ func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppSAMLConfigColumnEntityID, e.EntityID),
 				handler.NewCol(AppSAMLConfigColumnMetadata, e.Metadata),
 				handler.NewCol(AppSAMLConfigColumnMetadataURL, e.MetadataURL),
+				handler.NewCol(AppSAMLConfigColumnLoginVersion, e.LoginVersion),
+				handler.NewCol(AppSAMLConfigColumnLoginBaseURI, e.LoginBaseURI),
 			},
 			handler.WithTableSuffix(appSAMLTableSuffix),
 		),
@@ -734,6 +740,12 @@ func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handle
 	}
 	if e.EntityID != "" {
 		cols = append(cols, handler.NewCol(AppSAMLConfigColumnEntityID, e.EntityID))
+	}
+	if e.LoginVersion != nil {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnLoginVersion, *e.LoginVersion))
+	}
+	if e.LoginBaseURI != nil {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnLoginBaseURI, *e.LoginBaseURI))
 	}
 
 	if len(cols) == 0 {

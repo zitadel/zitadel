@@ -43,7 +43,7 @@ func TestMain(m *testing.M) {
 	}())
 }
 
-func TestServer_GetAuthRequest(t *testing.T) {
+func TestServer_GetSAMLRequest(t *testing.T) {
 	rootURL := "https://sp.example.com"
 	idpMetadata, err := Instance.GetSAMLIDPMetadata()
 	require.NoError(t, err)
