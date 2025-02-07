@@ -200,6 +200,11 @@ async function findValidSession(
   return undefined;
 }
 
+function constructUrl(request: NextRequest, path: string) {
+  const basePath = request.nextUrl.basePath || "";
+  return new URL(`${basePath}${path}`, request.nextUrl.origin);
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const authRequestId = searchParams.get("authRequest");
@@ -309,7 +314,7 @@ export async function GET(request: NextRequest) {
               return NextResponse.redirect(loginSettings.defaultRedirectUri);
             }
 
-            const signedinUrl = new URL("/signedin", request.nextUrl);
+            const signedinUrl = constructUrl(request, "/signedin");
 
             if (selectedSession.factors?.user?.loginName) {
               signedinUrl.searchParams.set(
@@ -432,7 +437,8 @@ export async function GET(request: NextRequest) {
     }
 
     const gotoAccounts = (): NextResponse<unknown> => {
-      const accountsUrl = new URL("/accounts", request.nextUrl);
+      const accountsUrl = constructUrl(request, "/accounts");
+
       if (authRequest?.id) {
         accountsUrl.searchParams.set("authRequestId", authRequest?.id);
       }
@@ -444,7 +450,7 @@ export async function GET(request: NextRequest) {
     };
 
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
-      const registerUrl = new URL("/register", request.nextUrl);
+      const registerUrl = constructUrl(request, "/register");
       if (authRequest.id) {
         registerUrl.searchParams.set("authRequestId", authRequest.id);
       }
@@ -488,7 +494,7 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const loginNameUrl = new URL("/loginname", request.nextUrl);
+        const loginNameUrl = constructUrl(request, "/loginname");
         console.log("loginNameUrl", loginNameUrl);
         console.log("request.url", request.url);
         console.log("nexturl", request.nextUrl);
@@ -606,7 +612,7 @@ export async function GET(request: NextRequest) {
         }
       }
     } else {
-      const loginNameUrl = new URL("/loginname", request.nextUrl);
+      const loginNameUrl = constructUrl(request, "/loginname");
 
       loginNameUrl.searchParams.set("authRequestId", authRequestId);
       if (authRequest?.loginHint) {
