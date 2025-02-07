@@ -201,8 +201,14 @@ async function findValidSession(
 }
 
 function constructUrl(request: NextRequest, path: string) {
+  const forwardedHost = request.headers.get("x-zitadel-forward-host");
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-  return `${basePath}${path}`;
+  return new URL(
+    `${basePath}${path}`,
+    forwardedHost?.startsWith("https://")
+      ? forwardedHost
+      : `https://${forwardedHost}`,
+  );
 }
 
 export async function GET(request: NextRequest) {
