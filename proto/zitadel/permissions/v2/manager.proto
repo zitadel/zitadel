@@ -1,0 +1,214 @@
+syntax = "proto3";
+
+import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
+
+package zitadel.permissions.v2;
+
+/*
+message Manager2 {
+  // ID is the unique identifier of the manager role.
+  string id = 1;
+  // UserID is the ID of the user who was granted the manager role.
+  oneof user {
+    string user_id = 2;
+    User expanded = 3;
+  }
+  repeated string roles = 4;
+
+
+  oneof managerType {
+    // InstanceManager is the manager role for the instance.
+    InstanceManager instance_manager = 3;
+    // OrganizationManager is the manager role for the organization.
+    OrganizationManager organization_manager = 4;
+    // ProjectManager is the manager role for the project.
+    ProjectManager project_manager = 5;
+    // ProjectGrantManager is the manager role for the project grant.
+    ProjectGrantManager project_grant_manager = 6;
+  }
+}
+*/
+
+message Manager {
+
+  // ID is the unique identifier of the manager role.
+  string id = 1;
+  // User is the user who was granted the manager role.
+  User user = 2;
+//  string user_id = 3;
+//  string user_preferred_login_name = 4;
+//  string user_display_name = 5;
+//  string user_avatar_url = 6;
+//  string user_organization_id = 7;
+  // Resource is the type of the resource the manager roles were granted for.
+  oneof resource {
+    // Instance is returned if the manager roles were granted on the instance level.
+    bool instance = 3;
+    // Organization provides information about the organization the manager roles were granted for.
+    Organization organization = 4;
+    // Project provides information about the project the manager roles were granted for.
+    Project project = 5;
+    // ProjectGrant provides information about the project grant the manager roles were granted for.
+    ProjectGrant project_grant = 6;
+  }
+  // Roles are the roles that were granted to the user for the specified resource.
+  repeated string roles = 7;
+}
+
+message User {
+  // ID is the unique identifier of the user.
+  string id = 1;
+  // PreferredLoginName is the preferred login name of the user. This value is unique across the whole instance..
+  string preferred_login_name = 2;
+  // DisplayName is the public display name of the user.
+  // By default it's the user's given name and family name, their username or their email address.
+  string display_name = 3;
+  // AvatarURL is the URL to the user's public avatar image.
+  string avatar_url = 4;
+  // The organization the user belong to.
+  string organization_id = 5;
+
+  //  zitadel.user.v1.Type user_type = 10 TODO: peintner?
+}
+
+message Organization {
+  // ID is the unique identifier of the organization the user was granted the manager role for.
+  string id = 1;
+  // Name is the name of the organization the user was granted the manager role for.
+  string name = 2;
+}
+message Project {
+  // ID is the unique identifier of the project the user was granted the manager role for.
+  string id = 1;
+  // Name is the name of the project the user was granted the manager role for.
+  string name = 2;
+  // OrganizationID is the ID of the organization the project belongs to.
+  string organization_id = 3;
+}
+message ProjectGrant {
+  // ID is the unique identifier of the project grant the user was granted the manager role for.
+  string id = 1;
+  // ProjectID is the ID of the project the project grant belongs to.
+  string project_id = 2;
+  // ProjectName is the name of the project the project grant belongs to.
+  string project_name = 3;
+  // OrganizationID is the ID of the organization the project grant belongs to.
+  string organization_id = 4;
+}
+
+/*
+message SetInstanceManager {
+  // Roles are the roles that should be granted to the user.
+  repeated string roles = 1 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+        prefix: "IAM_" // TODO: do we want to limit here as well?
+      }
+    }
+  }];
+}
+
+message SetOrganizationManager {
+  // OrganizationID is the ID of the organization the user should be granted the manager role for.
+  string organization_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Roles are the roles that should be granted to the user within the specified organization.
+  repeated string roles = 2 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+        prefix: "ORG_" // TODO: do we want to limit here as well?
+      }
+    }
+  }];
+}
+
+message SetProjectManager {
+  // ProjectID is the ID of the project the user should be granted the manager role for.
+  string project_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Roles are the roles that should be granted to the user within the specified project.
+  repeated string roles = 2 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+        prefix: "PROJECT_" // TODO: do we want to limit here as well?
+      }
+    }
+  }];
+}
+
+message SetProjectGrantManager {
+  // ProjectGrantID is the ID of the project grant the user should be granted the manager role for.
+  string project_grant_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Roles are the roles that should be granted to the user within the specified project grant.
+  repeated string roles = 2 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+        prefix: "PROJECT_GRANT_" // TODO: do we want to limit here as well?
+      }
+    }
+  }];
+}
+*/
+
+message ManagerQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    // Search for managers roles granted to a specific user.
+    UserIDQuery user_id_query = 1;
+    // Search for managers roles granted for a specific resource.
+    ResourceQuery resource_query = 2;
+    // Search for managers roles granted with a specific role.
+    RoleQuery role_query = 3;
+  }
+}
+
+message UserIDQuery {
+  // Search for managers by user ID.
+  string user_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message ResourceQuery {
+  // Search for managers by the granted resource.
+  oneof resource {
+    // Search for managers granted on the instance level.
+    bool instance = 1;
+    // Search for managers granted on a specific organization.
+    string organization_id = 2;
+    // Search for managers granted on a specific project.
+    string project_id = 3;
+    // Search for managers granted on a specific project grant.
+    string project_grant_id = 4;
+  }
+}
+
+message RoleQuery {
+  // Search for managers by the granted role.
+  string role_key = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}

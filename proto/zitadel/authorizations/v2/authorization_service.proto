@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package zitadel.authorizations.v2;
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
+import "zitadel/authorizations/v2/authorization.proto";
+
+// AuthorizationService provides methods to manage authorizations for users within your projects and applications.
+//
+// For managing permissions and roles for ZITADEL internal resources, like organizations, projects,
+// users, etc., please use the PermissionsService.
+service AuthorizationsService {
+  // ListAuthorizations returns all authorizations matching the request and necessary permissions.
+  //
+  // Required permissions:
+  //   - "user.grant.read"
+  //   - no permissions required for listing own authorizations
+  rpc ListAuthorizations(ListAuthorizationsRequest) returns (ListAuthorizationsResponse) {}
+
+  // GetAuthorization returns the authorization by its ID.
+  //
+  // Required permissions:
+  //   - "user.grant.read"
+  //   - no permissions required for getting own authorization
+  rpc GetAuthorization(GetAuthorizationRequest) returns (GetAuthorizationResponse) {}
+
+  // CreateAuthorization creates a new authorization for a user in a project or project grant.
+  //
+  // Required permissions:
+  //   - "user.grant.write"
+  rpc CreateAuthorization(CreateAuthorizationRequest) returns (CreateAuthorizationResponse) {}
+
+  // UpdateAuthorization updates the authorization.
+  //
+  // Note that any role keys previously granted to the user and not present in the request will be revoked.
+  //
+  // Required permissions:
+  //   - "user.grant.write"
+  rpc UpdateAuthorization(UpdateAuthorizationRequest) returns (UpdateAuthorizationResponse) {}
+
+  // DeleteAuthorization deletes the authorization.
+  //
+  // In case the authorization is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the deletion date in the response to verify if the authorization was deleted during the request.
+  //
+  // Required permissions:
+  //   - "user.grant.delete"
+  rpc DeleteAuthorization(DeleteAuthorizationRequest) returns (DeleteAuthorizationResponse) {}
+}
+
+message ListAuthorizationsRequest {
+  // Paginate through the results using a limit.
+  zitadel.object.v2.ListQuery query = 1;
+  // Filter the authorizations to be returned.
+  repeated AuthorizationQuery queries = 2;
+}
+
+message ListAuthorizationsResponse {
+  // Details contains the pagination information.
+  zitadel.object.v2.ListDetails details = 1;
+  repeated Authorization authorizations = 2;
+}
+
+message GetAuthorizationRequest {
+  // ID is the unique identifier of the authorization.
+  string id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message GetAuthorizationResponse {
+  Authorization authorization = 1;
+}
+
+message CreateAuthorizationRequest {
+  // UserID is the ID of the user who should be granted the authorization.
+  string user_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Grant on either the project directly or on a project grant.
+  oneof grant {
+    option (validate.required) = true;
+
+    // Project is the ID of the project the user should be granted the authorization for.
+    string project_id = 2 [(validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    }];
+    // ProjectGrant is the ID of the project grant the user should be granted the authorization for.
+    string project_grant_id = 3 [(validate.rules).string = {
+      min_len: 1
+      max_len: 200
+    }];
+  }
+  // RoleKeys are the keys of the roles the user should be granted.
+  repeated string role_keys = 4 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+      }
+    }
+  }];
+}
+
+message CreateAuthorizationResponse {
+  // ID is the unique identifier of the newly created authorization.
+  string id = 1;
+  // CreationDate is the timestamp when the authorization was created.
+  google.protobuf.Timestamp creation_date = 2;
+}
+
+message UpdateAuthorizationRequest {
+  // ID is the unique identifier of the authorization.
+  string id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // RoleKeys are the keys of the roles the user should be granted.
+  // Note that any role keys previously granted to the user and not present in the list will be revoked.
+  repeated string role_keys = 2 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+      }
+    }
+  }];
+}
+
+message UpdateAuthorizationResponse {
+  // ChangeDate is the timestamp when the authorization was last updated.
+  google.protobuf.Timestamp change_date = 1;
+}
+
+message DeleteAuthorizationRequest {
+  // ID is the unique identifier of the authorization.
+  string id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message DeleteAuthorizationResponse {
+  // DeletionDate is the timestamp when the authorization was deleted.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might not be set.
+  google.protobuf.Timestamp deletion_date = 1;
+}

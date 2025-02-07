@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package zitadel.authorizations.v2;
+
+import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
+
+message AuthorizationQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    // Search for authorizations by their ID.
+    AuthorizationIDQuery authorization_id_query = 1;
+    // Search for authorizations by the ID of the user who was granted the authorization.
+    UserIDQuery user_id_query = 2;
+    // Search for authorizations by the ID of the organisation the user is part of.
+    UserOrganizationIDQuery user_organization_id_query = 3;
+    // Search for authorizations by the ID of the project the user was granted the authorization for.
+    ProjectIDQuery project_id_query = 4;
+    // Search for authorizations by the ID of the project grant the user was granted the authorization for.
+    ProjectGrantIDQuery project_grant_id_query = 5;
+    // Search for authorizations by the key of the role the user was granted.
+    RoleKeyQuery role_key_query = 6;
+
+    //    UserGrantProjectIDQuery project_id_query = 1;
+    //    UserGrantUserIDQuery user_id_query = 2;
+    //    UserGrantWithGrantedQuery with_granted_query = 3;
+    //    UserGrantRoleKeyQuery role_key_query = 4;
+    //    UserGrantProjectGrantIDQuery project_grant_id_query = 5;
+    //    UserGrantUserNameQuery user_name_query = 6;
+    //    UserGrantFirstNameQuery first_name_query = 7;
+    //    UserGrantLastNameQuery last_name_query = 8;
+    //    UserGrantEmailQuery email_query = 9;
+    //    UserGrantOrgNameQuery org_name_query = 10;
+    //    UserGrantOrgDomainQuery org_domain_query = 11;
+    //    UserGrantProjectNameQuery project_name_query = 12;
+    //    UserGrantDisplayNameQuery display_name_query = 13;
+    //    UserGrantUserTypeQuery user_type_query = 14;
+  }
+}
+
+message AuthorizationIDQuery {
+  string id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message UserIDQuery {
+  string user_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message UserOrganizationIDQuery {
+  string user_organization_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message ProjectIDQuery {
+  string project_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message ProjectGrantIDQuery {
+  string project_grant_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message RoleKeyQuery {
+  string role_key = 1 [(validate.rules).string = {max_len: 200}];
+  zitadel.object.v2.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message Authorization {
+  // ID is the unique identifier of the authorization.
+  string id = 1;
+  // UserID represents the ID of the user who was granted the authorization.
+  string user_id = 2;
+  // UserOrganisationID represents the ID of the organisation the user is part of.
+  string user_organization_id = 3;
+  // ProjectID represents the ID of the project the user was granted the authorization for.
+  string project_id = 4;
+  // ProjectGrantID represents the ID of the project grant the user was granted the authorization for.
+  // This field is only set if the authorization was granted for a project grant and not a project directly.
+  string project_grant_id = 5;
+
+  // Roles contains the roles the user was granted for the project or project grant.
+  repeated Role roles = 6;
+}
+
+message Role {
+  // Key is the unique identifier of the role.
+  string key = 1;
+  // DisplayName is the human readable name of the role.
+  string display_name = 2;
+}

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+
+package zitadel.metadata.v2;
+
+option go_package ="github.com/zitadel/zitadel/pkg/grpc/metadata/v2";
+
+message Metadata {
+    //zitadel.v1.ObjectDetails details = 1; TODO?
+    string key = 2;
+    bytes value = 3;
+}
+
+message MetadataQuery {
+    oneof query {
+        option (validate.required) = true;
+        MetadataKeyQuery key_query = 1;
+    }
+}
+
+message MetadataKeyQuery {
+    string key = 1 [
+        (validate.rules).string = {max_len: 200}
+    ];
+    zitadel.v1.TextQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true
+    ];
+}

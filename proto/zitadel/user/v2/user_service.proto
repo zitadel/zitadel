@@ -11,10 +11,12 @@ import "zitadel/user/v2/idp.proto";
 import "zitadel/user/v2/password.proto";
 import "zitadel/user/v2/user.proto";
 import "zitadel/user/v2/query.proto";
+import "zitadel/metadata/v2/metadata.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
@@ -1232,6 +1234,140 @@ service UserService {
     };
   }
 
+  // ListMetadata returns all matching metadata entries for a user.
+  // You can filter by key only. Filtering by value is not supported yet.
+  // If no filter is specified, all metadata entries are returned.
+  //
+  // Required permissions:
+  //   - 'user.read'
+  //   - no permissions required for listing own metadata
+  rpc ListMetadata (ListMetadataRequest) returns (ListMetadataResponse) {}
+
+  // GetMetadata returns a single metadata entry of the user identified by the key.
+  //
+  // Required permissions:
+  //   - 'user.read'
+  //   - no permissions required for getting own metadata
+  rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse) {}
+
+  // AddMetadata adds a new metadata entry to the user.
+  // If the key already exists, an error is returned.
+  //
+  // Required permissions:
+  //   - 'user.write'
+  rpc AddMetadata (AddMetadataRequest) returns (AddMetadataResponse) {}
+
+  // UpdateMetadata updates an existing metadata entry of the user.
+  // If the key does not exist, an error is returned.
+  //
+  // Required permissions:
+  //   - 'user.write'
+  rpc UpdateMetadata (UpdateMetadataRequest) returns (UpdateMetadataResponse) {}
+
+  // Set Metadata adds or updates a metadata entry of the user identified by the key.
+  // If the key does not exist, a new entry is created.
+  // If the key already exists, the value is updated.
+  // In case a key from an existing entry needs to be updated,
+  // the existing entry must be removed and a new one created.
+  //
+  // Required permissions:
+  //   - 'user.write'
+  rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse) {}
+
+  // Remove Metadata removes an existing metadata entry from the user.
+  // If the key does not exist, the request wil return a success as the
+  // desired state is already achieved.
+  // You can check the deletion date in the response to verify if the
+  // metadata entry was removed during the request.
+  //
+  // Required permissions:
+  //   - 'user.write'
+  rpc RemoveMetadata (RemoveMetadataRequest) returns (RemoveMetadataResponse) {}
+}
+
+message ListMetadataRequest{
+  // The user ID of the user you like to get the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Paginate through the results using a limit.
+  zitadel.object.v2.ListQuery query = 2;
+  // Filter the metadata to be returned.
+  repeated zitadel.metadata.v2.MetadataQuery queries = 3;
+}
+
+message ListMetadataResponse{
+  zitadel.object.v2.ListDetails details = 1;
+  repeated zitadel.metadata.v2.Metadata result = 2;
+}
+
+message GetMetadataRequest{
+  // The user ID of the user you like to get the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetMetadataResponse{
+  zitadel.metadata.v2.Metadata metadata = 1;
+}
+
+message AddMetadataRequest{
+  // The user ID of the user you like to add the metadata to.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  // If an entry with the same key already exists, an error is returned.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata value is the value of the metadata entry.
+  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message AddMetadataResponse{
+  // CreationDate is the timestamp the metadata entry was created.
+  google.protobuf.Timestamp creation_date = 1;
+}
+
+message UpdateMetadataRequest{
+  // The user ID of the user you like to update the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  // If an entry with the same key does not exist, an error is returned.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata value is the value of the metadata entry.
+  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message UpdateMetadataResponse{
+  // ChangeDate is the the timestamp the metadata entry was last updated.
+  google.protobuf.Timestamp change_date = 1;
+}
+
+message SetMetadataRequest{
+  // The user ID of the user you like to set the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  // An existing entry with the same key will be updated. The key cannot be changed.
+  // If you need to change the key, remove the existing entry and create a new one.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata value is the value of the metadata entry.
+  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetMetadataResponse{
+  // ChangeDate is the the timestamp the metadata entry was last set, either created or updated.
+  google.protobuf.Timestamp change_date = 2;
+}
+
+message RemoveMetadataRequest{
+  // The user ID of the user you like to remove the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMetadataResponse{
+  // DeletionDate is the timestamp the metadata entry was deleted.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might not be set.
+  google.protobuf.Timestamp deletion_date = 1;
 }
 
 message AddHumanUserRequest{

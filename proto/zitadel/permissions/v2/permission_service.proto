@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package zitadel.permissions.v2;
+
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
+import "zitadel/permissions/v2/manager.proto";
+
+// PermissionsService provides methods to manage permissions for resource
+// and their management in ZITADEL itself.
+//
+// If you want to manage permissions and roles within your project or application,
+// please use the AuthorizationsService.
+service PermissionsService {
+  // ListManagers returns all managers and its roles matching the request and necessary permissions.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.read" for instance managers
+  //   - "org.member.read" for organization managers
+  //   - "project.member.read" for project managers
+  //   - "project.grant.member.read" for project grant managers
+  //   - "user.membership.read" TODO: only this required?
+  //   - no permissions required for listing own manager roles
+  rpc ListManagers(ListManagersRequest) returns (ListManagersResponse) {}
+  // GetManager returns the manager role by its ID.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.read" for instance managers
+  //   - "org.member.read" for organization managers
+  //   - "project.member.read" for project managers
+  //   - "project.grant.member.read" for project grant managers
+  //   - "user.membership.read" TODO: only this required?
+  //   - no permissions required for getting own manager roles
+  rpc GetManager(GetManagerRequest) returns (GetManagerResponse) {}
+  // CreateManager grants a manager role to a user.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.write" for instance managers
+  //   - "org.member.write" for organization managers
+  //   - "project.member.write" for project managers
+  //   - "project.grant.member.write" for project grant managers
+  rpc CreateManager(CreateManagerRequest) returns (CreateManagerResponse) {}
+  // UpdateManager updates the manager role.
+  //
+  // Note that any role previously granted to the user and not present in the request will be revoked.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.write" for instance managers
+  //   - "org.member.write" for organization managers
+  //   - "project.member.write" for project managers
+  //   - "project.grant.member.write" for project grant managers
+  rpc UpdateManager(UpdateManagerRequest) returns (UpdateManagerResponse) {}
+  // DeleteManager revokes a manager role from a user.
+  //
+  // Note that the deletion is only guaranteed to be successful if the user has the required permissions.
+  //
+  // Required permissions depend on the resource type:
+  //   - "iam.member.delete" for instance managers
+  //   - "org.member.delete" for organization managers
+  //   - "project.member.delete" for project managers
+  //   - "project.grant.member.delete" for project grant managers
+  rpc DeleteManager(DeleteManagerRequest) returns (DeleteManagerResponse) {}
+}
+
+message ListManagersRequest {
+  // Paginate through the results using a limit.
+  zitadel.object.v2.ListQuery query = 1;
+  // Filter the manager roles to be returned.
+  repeated ManagerQuery queries = 2;
+  repeated Expand expand = 3; // TODO: ?
+}
+
+enum Expand {
+  EXPAND_UNSPECIFIED = 0;
+  EXPAND_USER = 1;
+  EXPAND_RESOURCE = 2;
+}
+
+message ListManagersResponse {
+  // Details contains the pagination information.
+  zitadel.object.v2.ListDetails details = 1;
+  repeated Manager managers = 2;
+}
+
+message GetManagerRequest {
+  // ID is the unique identifier of the manager.
+  string id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message GetManagerResponse {
+  Manager manager = 1;
+}
+
+/*
+message CreateManagerRequest {
+  // UserID is the ID of the user who should be granted the manager role.
+  string user_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  oneof managerType {
+    SetInstanceManager instance_manager = 2;
+    SetOrganizationManager organization_manager = 3;
+    SetProjectManager project_manager = 4;
+    SetProjectGrantManager project_grant_manager = 5;
+  }
+}
+*/
+
+message CreateManagerRequest {
+  // UserID is the ID of the user who should be granted the manager role.
+  string user_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Resource is the type of the resource the manager roles should be granted for.
+  oneof resource {
+    option (validate.required) = true;
+
+    // Instance is the resource type for granting manager privileges on the instance level.
+    bool instance = 2 [(validate.rules).bool = {const: true}];
+    // OrganizationID is required to grant manager privileges for a specific organization.
+    string organization_id = 3;
+    // ProjectID is required to grant manager privileges for a specific project.
+    string project_id = 4;
+    // ProjectGrantID is required to grant manager privileges for a specific project grant.
+    string project_grant_id = 5;
+  }
+  // Roles are the roles that should be granted to the user for the specified resource.
+  repeated string roles = 6 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+      }
+    }
+  }];
+}
+
+message CreateManagerResponse {
+  // ID is the unique identifier of the newly created manager role.
+  string id = 1;
+  // CreationDate is the timestamp when the manager role was created.
+  google.protobuf.Timestamp creation_date = 2;
+}
+
+message UpdateManagerRequest {
+  // ManagerID is the ID of the manager role that should be updated.
+  string manager_role_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Roles are the roles that the user should be granted.
+  // Note that any role previously granted to the user and not present in the list will be revoked.
+  repeated string roles = 2 [(validate.rules).repeated = {
+    unique: true
+    items: {
+      string: {
+        min_len: 1
+        max_len: 200
+      }
+    }
+  }];
+}
+
+message UpdateManagerResponse {
+  // ChangeDate is the timestamp when the manager role was last updated.
+  google.protobuf.Timestamp change_date = 1;
+}
+
+message DeleteManagerRequest {
+  // ManagerID is the ID of the manager role the user should be removed from.
+  string manager_role_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message DeleteManagerResponse {
+  // DeletionDate is the timestamp when the manager role was deleted.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might not be set.
+  google.protobuf.Timestamp deletion_date = 1;
+}
