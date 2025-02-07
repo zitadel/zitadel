@@ -205,8 +205,6 @@ export async function GET(request: NextRequest) {
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
-  const loginNameUrl = new URL("/loginname");
-  console.log("loginNameUrl", loginNameUrl);
   console.log("request.url", request.url);
   console.log("nexturl", request.nextUrl);
 
@@ -256,7 +254,7 @@ export async function GET(request: NextRequest) {
         const res = await sendLoginname(command);
 
         if (res && "redirect" in res && res?.redirect) {
-          const absoluteUrl = new URL(res.redirect, request.url);
+          const absoluteUrl = new URL(res.redirect, request.nextUrl);
           return NextResponse.redirect(absoluteUrl.toString());
         }
       }
@@ -311,7 +309,7 @@ export async function GET(request: NextRequest) {
               return NextResponse.redirect(loginSettings.defaultRedirectUri);
             }
 
-            const signedinUrl = new URL("/signedin", request.url);
+            const signedinUrl = new URL("/signedin", request.nextUrl);
 
             if (selectedSession.factors?.user?.loginName) {
               signedinUrl.searchParams.set(
@@ -434,7 +432,7 @@ export async function GET(request: NextRequest) {
     }
 
     const gotoAccounts = (): NextResponse<unknown> => {
-      const accountsUrl = new URL("/accounts", request.url);
+      const accountsUrl = new URL("/accounts", request.nextUrl);
       if (authRequest?.id) {
         accountsUrl.searchParams.set("authRequestId", authRequest?.id);
       }
@@ -446,7 +444,7 @@ export async function GET(request: NextRequest) {
     };
 
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
-      const registerUrl = new URL("/register", request.url);
+      const registerUrl = new URL("/register", request.nextUrl);
       if (authRequest.id) {
         registerUrl.searchParams.set("authRequestId", authRequest.id);
       }
@@ -482,7 +480,7 @@ export async function GET(request: NextRequest) {
             const res = await sendLoginname(command);
 
             if (res && "redirect" in res && res?.redirect) {
-              const absoluteUrl = new URL(res.redirect, request.url);
+              const absoluteUrl = new URL(res.redirect, request.nextUrl);
               return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
@@ -490,7 +488,7 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const loginNameUrl = new URL("/loginname");
+        const loginNameUrl = new URL("/loginname", request.nextUrl);
         console.log("loginNameUrl", loginNameUrl);
         console.log("request.url", request.url);
         console.log("nexturl", request.nextUrl);
@@ -608,7 +606,7 @@ export async function GET(request: NextRequest) {
         }
       }
     } else {
-      const loginNameUrl = new URL("/loginname", request.url);
+      const loginNameUrl = new URL("/loginname", request.nextUrl);
 
       loginNameUrl.searchParams.set("authRequestId", authRequestId);
       if (authRequest?.loginHint) {
