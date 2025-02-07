@@ -201,7 +201,7 @@ async function findValidSession(
 }
 
 function constructUrl(request: NextRequest, path: string) {
-  const basePath = request.nextUrl.basePath || "";
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   return new URL(`${basePath}${path}`, request.nextUrl.origin);
 }
 
