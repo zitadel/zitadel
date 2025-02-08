@@ -197,6 +197,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 			eventstore:             eventstoreClient,
 			rolePermissionMappings: config.InternalAuthZ.RolePermissionMappings,
 		},
+		&RiverMigrateRepeatable{
+			client: dbClient,
+		},
 	}
 
 	for _, step := range []migration.Migration{
