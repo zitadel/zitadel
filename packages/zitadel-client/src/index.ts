@@ -1,5 +1,5 @@
-export { createClientFor, toDate } from "./helpers";
-export { NewAuthorizationBearerInterceptor } from "./interceptors";
+export { createClientFor, toDate } from "./helpers.js";
+export { NewAuthorizationBearerInterceptor } from "./interceptors.js";
 
 // TODO: Move this to `./protobuf.ts` and export it from there
 export { create, fromJson, toJson } from "@bufbuild/protobuf";

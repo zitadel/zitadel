@@ -67,7 +67,7 @@ export ZITADEL_SERVICE_USER_TOKEN=<your service account personal access token he
 ### Setting up local environment
 
 ```sh
-# Install dependencies. Developing requires Node.js v16
+# Install dependencies. Developing requires Node.js v20
 pnpm install
 
 # Generate gRPC stubs
