@@ -44,7 +44,11 @@ const (
 	oidcCtx = "oidc"
 
 	ScopeIAMGroups = "urn:zitadel:iam:org:groups"
-	ClaimGroups    = ScopeIAMGroups
+	/* Clean This
+	ScopeIAMGroupsRoles = "urn:zitadel:iam:org:groups:roles"
+	ClaimIAMGroupsRoles = ScopeIAMGroupsRoles
+	*/
+	ClaimGroups = ScopeIAMGroups
 )
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
@@ -891,6 +895,14 @@ func checkGrantedRoles(roles *projectsRoles, grant query.UserGrant, requestedRol
 	}
 }
 
+func checkGrantedGroupRoles(roles *projectsRoles, grant query.GroupGrant, requestedRole string, isRequested bool) {
+	for _, grantedRole := range grant.Roles {
+		if requestedRole == grantedRole {
+			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested)
+		}
+	}
+}
+
 // projectsRoles contains all projects with all their roles for a user
 type projectsRoles struct {
 	// key is projectID
@@ -914,6 +926,66 @@ func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles 
 	for _, grant := range grants {
 		for _, role := range grant.Roles {
 			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+		}
+	}
+	return roles
+}
+
+/* GroupGrant V1 Implemantation, Will clean later.
+func newProjectGroupRoles(projectID string, group []query.OIDCGroupInfo, requestedRoles []string) *projectsRoles {
+	roles := new(projectsRoles)
+	// if specific roles where requested, check if they are granted and append them in the roles list
+	if len(requestedRoles) > 0 {
+		for _, requestedRole := range requestedRoles {
+			for _, group_grants := range group {
+				for _, grant := range group_grants.GroupGrants {
+					checkGrantedGroupRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+				}
+			}
+		}
+		return roles
+	}
+	// no specific roles were requested, so convert any grants into roles
+	for _, group_grants := range group {
+		for _, grant := range group_grants.GroupGrants {
+			for _, role := range grant.Roles {
+				roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+			}
+		}
+	}
+	return roles
+}
+*/
+
+// newProjectRolesV2 with group grant.
+func newProjectRolesV2(projectID string, grants []query.UserGrant, groups *query.OIDCGroupInfos, requestedRoles []string) *projectsRoles {
+	roles := new(projectsRoles)
+	// if specific roles where requested, check if they are granted and append them in the roles list
+	if len(requestedRoles) > 0 {
+		for _, requestedRole := range requestedRoles {
+			for _, grant := range grants {
+				checkGrantedRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+			}
+			// Add group grants to roles
+			for _, group_grants := range groups.Group {
+				for _, grant := range group_grants.GroupGrants {
+					checkGrantedGroupRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+				}
+			}
+		}
+		return roles
+	}
+	// no specific roles were requested, so convert any grants into roles
+	for _, grant := range grants {
+		for _, role := range grant.Roles {
+			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+		}
+	}
+	for _, group_grants := range groups.Group {
+		for _, grant := range group_grants.GroupGrants {
+			for _, role := range grant.Roles {
+				roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+			}
 		}
 	}
 	return roles

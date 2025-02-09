@@ -234,16 +234,15 @@ func (g *groupMemberProjection) Reducers() []handler.AggregateReducer {
 				},
 			},
 		},
-		// TODO: Need to implement this.
-		// {
-		// 	Aggregate: user.AggregateType,
-		// 	EventReducers: []handler.EventReducer{
-		// 		{
-		// 			Event:  user.UserRemovedType,
-		// 			Reduce: p.reduceUserRemoved,
-		// 		},
-		// 	},
-		// },
+		{
+			Aggregate: user.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: g.reduceUserRemoved,
+				},
+			},
+		},
 		{
 			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
@@ -316,7 +315,7 @@ func (g *groupMemberProjection) reduceRemoved(event eventstore.Event) (*handler.
 	)
 }
 
-func (p *groupMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (g *groupMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-aYA60", "reduce.wrong.event.type %s", user.UserRemovedType)

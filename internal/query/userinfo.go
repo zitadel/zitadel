@@ -42,9 +42,15 @@ var (
 	oidcUserInfoQueryTmpl           string
 	oidcUserInfoQuery               string
 	oidcUserInfoWithRoleOrgIDsQuery string
+
+	//go:embed userinfo_by_group_id.sql
+	oidcGroupInfoQueryTmpl           string
+	oidcGroupInfoQuery               string
+	oidcGroupInfoWithRoleOrgIDsQuery string
 )
 
 // build the two variants of the userInfo query
+// and the two variants of the groupInfo query
 func init() {
 	tmpl := template.Must(template.New("oidcUserInfoQuery").Parse(oidcUserInfoQueryTmpl))
 	var buf strings.Builder
@@ -58,6 +64,19 @@ func init() {
 		panic(err)
 	}
 	oidcUserInfoWithRoleOrgIDsQuery = buf.String()
+	buf.Reset()
+
+	grp_tmpl := template.Must(template.New("oidcGroupInfoQuery").Parse(oidcGroupInfoQueryTmpl))
+	if err := grp_tmpl.Execute(&buf, false); err != nil {
+		panic(err)
+	}
+	oidcGroupInfoQuery = buf.String()
+	buf.Reset()
+
+	if err := grp_tmpl.Execute(&buf, true); err != nil {
+		panic(err)
+	}
+	oidcGroupInfoWithRoleOrgIDsQuery = buf.String()
 	buf.Reset()
 }
 
@@ -92,6 +111,7 @@ type OIDCUserInfo struct {
 	Metadata   []UserMetadata `json:"metadata,omitempty"`
 	Org        *UserInfoOrg   `json:"org,omitempty"`
 	UserGrants []UserGrant    `json:"user_grants,omitempty"`
+	// GroupGrants []GroupGrant   `json:"group_grants,omitempty"`
 }
 
 type UserInfoOrg struct {
@@ -120,4 +140,57 @@ func (q *Queries) GetOIDCUserinfoClientByID(ctx context.Context, clientID string
 		return "", false, zerrors.ThrowInternal(err, "QUERY-Ais4r", "Errors.Internal")
 	}
 	return projectID, projectRoleAssertion, nil
+}
+
+type OIDCGroupInfo struct {
+	Group       *Group       `json:"group,omitempty"`
+	GroupGrants []GroupGrant `json:"group_grants,omitempty"`
+}
+
+func (q *Queries) getOIDCGroupInfo(ctx context.Context, groupID string, roleAudience []string, roleOrgIDs ...string) (groupInfo *OIDCGroupInfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if len(roleOrgIDs) > 0 {
+		groupInfo, err = database.QueryJSONObject[OIDCGroupInfo](ctx, q.client, oidcGroupInfoWithRoleOrgIDsQuery,
+			groupID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience), database.TextArray[string](roleOrgIDs),
+		)
+	} else {
+		groupInfo, err = database.QueryJSONObject[OIDCGroupInfo](ctx, q.client, oidcGroupInfoQuery,
+			groupID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
+		)
+	}
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, zerrors.ThrowNotFound(err, "QUERY-Eey2a", "Errors.Group.NotFound")
+	}
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Oath6", "Errors.Internal")
+	}
+	if groupInfo.Group == nil {
+		return nil, zerrors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.Group.NotFound")
+	}
+
+	return groupInfo, nil
+}
+
+type OIDCGroupInfos struct {
+	Group []OIDCGroupInfo `json:"group,omitempty"`
+}
+
+func (q *Queries) GetOIDCGroupInfos(ctx context.Context, groupIDs []string, roleAudience []string, roleOrgIDs ...string) (groupInfos *OIDCGroupInfos, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	groupInfos = &OIDCGroupInfos{
+		Group: make([]OIDCGroupInfo, 0, len(groupIDs)),
+	}
+	for _, groupID := range groupIDs {
+		groupInfo, err := q.getOIDCGroupInfo(ctx, groupID, roleAudience, roleOrgIDs...)
+		if err != nil {
+			return nil, err
+		}
+		groupInfos.Group = append(groupInfos.Group, *groupInfo)
+	}
+
+	return groupInfos, nil
 }
