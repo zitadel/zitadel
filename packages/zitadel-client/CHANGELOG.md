@@ -1,5 +1,13 @@
 # @zitadel/client
 
+## 1.0.6
+
+### Patch Changes
+
+- 90fbdd1: use node16/nodenext module resolution
+- Updated dependencies [90fbdd1]
+  - @zitadel/proto@1.0.3
+
 ## 1.0.5
 
 ### Patch Changes
