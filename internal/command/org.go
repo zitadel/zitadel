@@ -92,7 +92,7 @@ func (c *Commands) newOrgSetupCommands(ctx context.Context, orgID string, orgSet
 }
 
 func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail bool) error {
-	if admin.ID != "" && admin.Human == nil {
+	if admin.ID != "" {
 		c.validations = append(c.validations, c.commands.AddOrgMemberCommand(c.aggregate, admin.ID, orgAdminRoles(admin.Roles)...))
 		return nil
 	}
