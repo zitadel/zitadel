@@ -82,7 +82,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "admin with init",
+			name: "admin with init with userID passed for Human admin",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
 				Name: gofakeit.AppName(),

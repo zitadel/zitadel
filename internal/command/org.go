@@ -186,6 +186,9 @@ func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) 
 func (c *orgSetupCommands) createdAdmins() []*CreatedOrgAdmin {
 	users := make([]*CreatedOrgAdmin, 0, len(c.admins))
 	for _, admin := range c.admins {
+		if admin.ID != "" && admin.Human == nil {
+			continue
+		}
 		if admin.Human != nil {
 			users = append(users, c.createdHumanAdmin(admin))
 			continue
