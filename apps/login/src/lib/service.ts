@@ -71,7 +71,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 } {
   let instanceUrl;
 
-  const forwardedHost = headers.get("host");
+  const forwardedHost = headers.get("x-zitadel-forward-host");
   // use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
   if (forwardedHost) {
     instanceUrl = forwardedHost;
