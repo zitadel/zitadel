@@ -7,6 +7,8 @@ import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
 import "zitadel/permissions/v2/manager.proto";
 
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/permissions/v2;permissions";
+
 // PermissionsService provides methods to manage permissions for resource
 // and their management in ZITADEL itself.
 //
@@ -23,6 +25,7 @@ service PermissionsService {
   //   - "user.membership.read" TODO: only this required?
   //   - no permissions required for listing own manager roles
   rpc ListManagers(ListManagersRequest) returns (ListManagersResponse) {}
+
   // GetManager returns the manager role by its ID.
   //
   // Required permissions depend on the resource type:
@@ -33,7 +36,12 @@ service PermissionsService {
   //   - "user.membership.read" TODO: only this required?
   //   - no permissions required for getting own manager roles
   rpc GetManager(GetManagerRequest) returns (GetManagerResponse) {}
-  // CreateManager grants a manager role to a user.
+
+  // CreateManager grants a manager role to a user for a specific resource.
+  //
+  // Note that the roles are specific to the resource type.
+  // This means that if you want to grant a user the manager role for an organization and a project,
+  // you need to create two manager roles.
   //
   // Required permissions depend on the resource type:
   //   - "iam.member.write" for instance managers
@@ -41,7 +49,8 @@ service PermissionsService {
   //   - "project.member.write" for project managers
   //   - "project.grant.member.write" for project grant managers
   rpc CreateManager(CreateManagerRequest) returns (CreateManagerResponse) {}
-  // UpdateManager updates the manager role.
+
+  // UpdateManager updates the specific manager role.
   //
   // Note that any role previously granted to the user and not present in the request will be revoked.
   //
@@ -51,9 +60,12 @@ service PermissionsService {
   //   - "project.member.write" for project managers
   //   - "project.grant.member.write" for project grant managers
   rpc UpdateManager(UpdateManagerRequest) returns (UpdateManagerResponse) {}
+
   // DeleteManager revokes a manager role from a user.
   //
-  // Note that the deletion is only guaranteed to be successful if the user has the required permissions.
+  // In case the manager role is not found, the request will return a successful response as
+  // the desired state is already achieved.
+  // You can check the deletion date in the response to verify if the manager role was deleted during the request.
   //
   // Required permissions depend on the resource type:
   //   - "iam.member.delete" for instance managers
@@ -64,17 +76,10 @@ service PermissionsService {
 }
 
 message ListManagersRequest {
-  // Paginate through the results using a limit.
+  // Paginate through the results using a limit, offset and sorting.
   zitadel.object.v2.ListQuery query = 1;
   // Filter the manager roles to be returned.
   repeated ManagerQuery queries = 2;
-  repeated Expand expand = 3; // TODO: ?
-}
-
-enum Expand {
-  EXPAND_UNSPECIFIED = 0;
-  EXPAND_USER = 1;
-  EXPAND_RESOURCE = 2;
 }
 
 message ListManagersResponse {
@@ -94,22 +99,6 @@ message GetManagerRequest {
 message GetManagerResponse {
   Manager manager = 1;
 }
-
-/*
-message CreateManagerRequest {
-  // UserID is the ID of the user who should be granted the manager role.
-  string user_id = 1 [(validate.rules).string = {
-    min_len: 1
-    max_len: 200
-  }];
-  oneof managerType {
-    SetInstanceManager instance_manager = 2;
-    SetOrganizationManager organization_manager = 3;
-    SetProjectManager project_manager = 4;
-    SetProjectGrantManager project_grant_manager = 5;
-  }
-}
-*/
 
 message CreateManagerRequest {
   // UserID is the ID of the user who should be granted the manager role.
@@ -131,6 +120,9 @@ message CreateManagerRequest {
     string project_grant_id = 5;
   }
   // Roles are the roles that should be granted to the user for the specified resource.
+  // Note that roles are currently specific to the resource type.
+  // This means that if you want to grant a user the manager role for an organization and a project,
+  // you need to create two manager roles.
   repeated string roles = 6 [(validate.rules).repeated = {
     unique: true
     items: {

@@ -2,8 +2,60 @@ syntax = "proto3";
 
 package zitadel.authorizations.v2;
 
+import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2;authorizations";
+
+message Authorization {
+  // ID is the unique identifier of the authorization.
+  string id = 1;
+  // CreationDate is the timestamp when the authorization was created.
+  google.protobuf.Timestamp creation_date = 2;
+  // ChangeDate is the timestamp when the authorization was last updated.
+  // In case the authorization was not updated, this field is equal to the creation date.
+  google.protobuf.Timestamp change_date = 3;
+  // State is the current state of the authorization.
+  State state = 4;
+  // UserID represents the ID of the user who was granted the authorization.
+  string user_id = 5;
+  // UserOrganisationID represents the ID of the organisation the user is part of.
+  string user_organization_id = 6;
+  // UserPreferredLoginName represents the preferred login name of the granted user.
+  string user_preferred_login_name = 7;
+  // UserDisplayName represents the public display name of the granted user.
+  // By default it's the user's given name and family name, their username or their email address.
+  string user_display_name = 8;
+  // AvatarURL represents the URL to the public avatar of the granted user.
+  string avatar_url = 9;
+  // ProjectID represents the ID of the project the user was granted the authorization for.
+  string project_id = 10;
+  // ProjectName represents the name of the project the user was granted the authorization for.
+  string project_name = 11;
+  // ProjectGrantID represents the ID of the project grant the user was granted the authorization for.
+  // This field is only set if the authorization was granted for a project grant and not a project directly.
+  string project_grant_id = 12;
+  // OrganizationID represents the ID of the organization the authorization was granted for.
+  string organization_id = 13;
+  // OrganizationName represents the name of the organization the authorization was granted for.
+  string organization_name = 14;
+  // Roles contains the roles the user was granted for the project or project grant.
+  repeated Role roles = 15;
+}
+
+enum State {
+  STATE_UNSPECIFIED = 0;
+  STATE_ACTIVE = 1;
+  STATE_INACTIVE = 2;
+}
+
+message Role {
+  // Key is the unique identifier of the role.
+  string key = 1;
+  // DisplayName is the human readable name of the role.
+  string display_name = 2;
+}
 
 message AuthorizationQuery {
   oneof query {
@@ -11,30 +63,44 @@ message AuthorizationQuery {
 
     // Search for authorizations by their ID.
     AuthorizationIDQuery authorization_id_query = 1;
+    // Search for authorizations by their creation date.
+    CreationDateQuery creation_date_query = 2;
+    // Search for authorizations by their change date.
+    ChangeDateQuery change_date_query = 3;
+    // Search for authorizations by their state.
+    StateQuery state_query = 4;
     // Search for authorizations by the ID of the user who was granted the authorization.
-    UserIDQuery user_id_query = 2;
+    UserIDQuery user_id_query = 5;
     // Search for authorizations by the ID of the organisation the user is part of.
-    UserOrganizationIDQuery user_organization_id_query = 3;
+    UserOrganizationIDQuery user_organization_id_query = 6;
+    UserPreferredLoginNameQuery user_preferred_login_name_query = 7;
+    UserDisplayNameQuery user_display_name_query = 8;
     // Search for authorizations by the ID of the project the user was granted the authorization for.
-    ProjectIDQuery project_id_query = 4;
+    ProjectIDQuery project_id_query = 9;
+    ProjectNameQuery project_name_query = 10;
     // Search for authorizations by the ID of the project grant the user was granted the authorization for.
-    ProjectGrantIDQuery project_grant_id_query = 5;
+    ProjectGrantIDQuery project_grant_id_query = 11;
+    // Search for authorizations by the ID of the organization the authorization was granted for.
+    // This can either be the organization the project or the project grant is part of.
+    OrganizationIDQuery organization_id_query = 12;
+    OrganizationNameQuery organization_name_query = 13;
     // Search for authorizations by the key of the role the user was granted.
-    RoleKeyQuery role_key_query = 6;
+    RoleKeyQuery role_key_query = 14;
 
-    //    UserGrantProjectIDQuery project_id_query = 1;
-    //    UserGrantUserIDQuery user_id_query = 2;
-    //    UserGrantWithGrantedQuery with_granted_query = 3;
-    //    UserGrantRoleKeyQuery role_key_query = 4;
-    //    UserGrantProjectGrantIDQuery project_grant_id_query = 5;
-    //    UserGrantUserNameQuery user_name_query = 6;
+    // Combine multiple authorization queries with an AND operation.
+    AndQuery and_query = 15;
+    // Combine multiple authorization queries with an OR operation.
+    // For example, to search for authorizations of multiple OrganizationIDs.
+    OrQuery or_query = 16;
+    // Negate an authorization query.
+    NotQuery not_query = 17;
+
+    //    UserGrantWithGrantedQuery with_granted_query = 3; searched for the oauthz.OrganizationID as ro
+    //    UserGrantUserNameQuery user_name_query = 6; ??
     //    UserGrantFirstNameQuery first_name_query = 7;
     //    UserGrantLastNameQuery last_name_query = 8;
     //    UserGrantEmailQuery email_query = 9;
-    //    UserGrantOrgNameQuery org_name_query = 10;
     //    UserGrantOrgDomainQuery org_domain_query = 11;
-    //    UserGrantProjectNameQuery project_name_query = 12;
-    //    UserGrantDisplayNameQuery display_name_query = 13;
     //    UserGrantUserTypeQuery user_type_query = 14;
   }
 }
@@ -46,7 +112,31 @@ message AuthorizationIDQuery {
   }];
 }
 
+message CreationDateQuery {
+  // Specify the creation date of the authorization to search for.
+  google.protobuf.Timestamp creation_date = 1;
+  // Specify the method to search for the creation date. Default is EQUAL.
+  // For example, to search for all authorizations created after a specific date, use GREATER_THAN.
+  // To search for all authorizations created before a specific date, use LESS_THAN.
+  zitadel.object.v2.TimestampQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message ChangeDateQuery {
+  // Specify the change date of the authorization to search for.
+  google.protobuf.Timestamp change_date = 1;
+  // Specify the method to search for the change date. Default is EQUAL.
+  // For example, to search for all authorizations changed after a specific date, use GREATER_THAN.
+  // To search for all authorizations changed before a specific date, use LESS_THAN.
+  zitadel.object.v2.TimestampQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message StateQuery {
+  // Specify the state of the authorization to search for.
+  State state = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
+}
+
 message UserIDQuery {
+  // Specify the ID of the user who was granted the authorization to search for.
   string user_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
@@ -54,51 +144,101 @@ message UserIDQuery {
 }
 
 message UserOrganizationIDQuery {
+  // Specify the ID of the organization the user is part of to search for.
+  // Note that this might not be the organization the authorization was granted for.
   string user_organization_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
 }
 
+message UserPreferredLoginNameQuery {
+  // Specify the preferred login name of the granted user to search for.
+  string user_preferred_login_name = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Specify the method to search for the preferred login name. Default is EQUAL.
+  // For example, to search for all authorizations with a preferred login name containing a specific string,
+  // use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.object.v2.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
+message UserDisplayNameQuery {
+  // Specify the public display name of the granted user to search for.
+  string user_display_name = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+  // Specify the method to search for the display name. Default is EQUAL.
+  // For example, to search for all authorizations with a display name containing a specific string,
+  // use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.object.v2.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
 message ProjectIDQuery {
+  // Specify the ID of the project the user was granted the authorization for to search for.
+  // Note that this will also include authorizations granted for project grants of the same project.
   string project_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
 }
 
+message ProjectNameQuery {
+  // Specify the name of the project the user was granted the authorization for to search for.
+  // Note that this will also include authorizations granted for project grants of the same project.
+  string project_name = 1 [(validate.rules).string = {max_len: 200}];
+  // Specify the method to search for the project name. Default is EQUAL.
+  // For example, to search for all authorizations with a project name containing a specific string,
+  // use CONTAINS or CONTAINS_IGNORE_CASE.
+  zitadel.object.v2.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
+}
+
 message ProjectGrantIDQuery {
+  // Specify the ID of the project grant the user was granted the authorization for to search for.
   string project_grant_id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
 }
 
-message RoleKeyQuery {
-  string role_key = 1 [(validate.rules).string = {max_len: 200}];
+message OrganizationIDQuery {
+  // Specify the ID of the organization the authorization was granted for to search for.
+  // This can either be the organization the project or the project grant is part of.
+  string organization_id = 1 [(validate.rules).string = {
+    min_len: 1
+    max_len: 200
+  }];
+}
+
+message OrganizationNameQuery {
+  // Specify the name of the organization the authorization was granted for to search for.
+  // This can either be the organization the project or the project grant is part of.
+  string organization_name = 1 [(validate.rules).string = {max_len: 200}];
+  // Specify the method to search for the organization name. Default is EQUAL.
+  // For example, to search for all authorizations with an organization name containing a specific string,
+  // use CONTAINS or CONTAINS_IGNORE_CASE.
   zitadel.object.v2.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
-message Authorization {
-  // ID is the unique identifier of the authorization.
-  string id = 1;
-  // UserID represents the ID of the user who was granted the authorization.
-  string user_id = 2;
-  // UserOrganisationID represents the ID of the organisation the user is part of.
-  string user_organization_id = 3;
-  // ProjectID represents the ID of the project the user was granted the authorization for.
-  string project_id = 4;
-  // ProjectGrantID represents the ID of the project grant the user was granted the authorization for.
-  // This field is only set if the authorization was granted for a project grant and not a project directly.
-  string project_grant_id = 5;
-
-  // Roles contains the roles the user was granted for the project or project grant.
-  repeated Role roles = 6;
+message RoleKeyQuery {
+  // Specify the key of the role the user was granted to search for.
+  string role_key = 1 [(validate.rules).string = {max_len: 200}];
+  // Specify the method to search for the role key. Default is EQUAL.
+  // For example, to search for all authorizations starting with a specific role key,
+  // use STARTS_WITH or STARTS_WITH_IGNORE_CASE.
+  zitadel.object.v2.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }
 
-message Role {
-  // Key is the unique identifier of the role.
-  string key = 1;
-  // DisplayName is the human readable name of the role.
-  string display_name = 2;
+message AndQuery {
+  repeated AuthorizationQuery queries = 1;
+}
+
+message OrQuery {
+  repeated AuthorizationQuery queries = 1;
+}
+
+message NotQuery {
+  AuthorizationQuery query = 1;
 }

@@ -30,29 +30,25 @@ message RequestContext {
   }
 }
 
+// ListQuery is a general query object for lists to allow pagination and sorting.
 message ListQuery {
-  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
-    json_schema: {
-      title: "General List Query"
-      description: "Object unspecific list filters like offset, limit and asc/desc."
-    }
-  };
   uint64 offset = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"0\"";
     }
   ];
+  // limit is the maximum amount of objects returned. The default is set to 100
+  // with a maximum of 1000 in the runtime configuration.
+  // If the limit exceeds the maximum configured ZITADEL will throw an error.
+  // If no limit is present the default is taken.
   uint32 limit = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "100";
-      description: "Maximum amount of events returned. The default is set to 1000 in https://github.com/zitadel/zitadel/blob/new-eventstore/cmd/zitadel/startup.yaml. If the limit exceeds the maximum configured ZITADEL will throw an error. If no limit is present the default is taken.";
     }
   ];
-  bool asc = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "default is descending"
-    }
-  ];
+  // Asc is the sorting order. If true the list is sorted ascending, if false
+  // the list is sorted descending. The default is descending.
+  bool asc = 3;
 }
 
 message Details {

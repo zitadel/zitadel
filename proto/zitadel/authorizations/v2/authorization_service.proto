@@ -7,6 +7,8 @@ import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
 import "zitadel/authorizations/v2/authorization.proto";
 
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2;authorizations";
+
 // AuthorizationService provides methods to manage authorizations for users within your projects and applications.
 //
 // For managing permissions and roles for ZITADEL internal resources, like organizations, projects,
@@ -52,7 +54,7 @@ service AuthorizationsService {
 }
 
 message ListAuthorizationsRequest {
-  // Paginate through the results using a limit.
+  // Paginate through the results using a limit, offset and sorting.
   zitadel.object.v2.ListQuery query = 1;
   // Filter the authorizations to be returned.
   repeated AuthorizationQuery queries = 2;
@@ -82,7 +84,7 @@ message CreateAuthorizationRequest {
     min_len: 1
     max_len: 200
   }];
-  // Grant on either the project directly or on a project grant.
+  // Grant on either the project directly or on a project grant by their IDs.
   oneof grant {
     option (validate.required) = true;
 
@@ -141,7 +143,7 @@ message UpdateAuthorizationResponse {
 }
 
 message DeleteAuthorizationRequest {
-  // ID is the unique identifier of the authorization.
+  // ID is the unique identifier of the authorization that should be deleted.
   string id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200

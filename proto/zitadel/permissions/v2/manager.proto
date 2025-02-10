@@ -1,41 +1,23 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
 
 package zitadel.permissions.v2;
 
-/*
-message Manager2 {
-  // ID is the unique identifier of the manager role.
-  string id = 1;
-  // UserID is the ID of the user who was granted the manager role.
-  oneof user {
-    string user_id = 2;
-    User expanded = 3;
-  }
-  repeated string roles = 4;
-
-
-  oneof managerType {
-    // InstanceManager is the manager role for the instance.
-    InstanceManager instance_manager = 3;
-    // OrganizationManager is the manager role for the organization.
-    OrganizationManager organization_manager = 4;
-    // ProjectManager is the manager role for the project.
-    ProjectManager project_manager = 5;
-    // ProjectGrantManager is the manager role for the project grant.
-    ProjectGrantManager project_grant_manager = 6;
-  }
-}
-*/
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/permissions/v2;permissions";
 
 message Manager {
-
   // ID is the unique identifier of the manager role.
   string id = 1;
+  // CreationDate is the timestamp when the manager role was granted.
+  google.protobuf.Timestamp creation_date = 2;
+  // ChangeDate is the timestamp when the manager role was last updated.
+  // In case the manager role was not updated, this field is equal to the creation date.
+  google.protobuf.Timestamp change_date = 3;
   // User is the user who was granted the manager role.
-  User user = 2;
+  User user = 4;
 //  string user_id = 3;
 //  string user_preferred_login_name = 4;
 //  string user_display_name = 5;
@@ -44,22 +26,22 @@ message Manager {
   // Resource is the type of the resource the manager roles were granted for.
   oneof resource {
     // Instance is returned if the manager roles were granted on the instance level.
-    bool instance = 3;
+    bool instance = 5;
     // Organization provides information about the organization the manager roles were granted for.
-    Organization organization = 4;
+    Organization organization = 6;
     // Project provides information about the project the manager roles were granted for.
-    Project project = 5;
+    Project project = 7;
     // ProjectGrant provides information about the project grant the manager roles were granted for.
-    ProjectGrant project_grant = 6;
+    ProjectGrant project_grant = 8;
   }
   // Roles are the roles that were granted to the user for the specified resource.
-  repeated string roles = 7;
+  repeated string roles = 9;
 }
 
 message User {
   // ID is the unique identifier of the user.
   string id = 1;
-  // PreferredLoginName is the preferred login name of the user. This value is unique across the whole instance..
+  // PreferredLoginName is the preferred login name of the user. This value is unique across the whole instance.
   string preferred_login_name = 2;
   // DisplayName is the public display name of the user.
   // By default it's the user's given name and family name, their username or their email address.
@@ -96,79 +78,6 @@ message ProjectGrant {
   // OrganizationID is the ID of the organization the project grant belongs to.
   string organization_id = 4;
 }
-
-/*
-message SetInstanceManager {
-  // Roles are the roles that should be granted to the user.
-  repeated string roles = 1 [(validate.rules).repeated = {
-    unique: true
-    items: {
-      string: {
-        min_len: 1
-        max_len: 200
-        prefix: "IAM_" // TODO: do we want to limit here as well?
-      }
-    }
-  }];
-}
-
-message SetOrganizationManager {
-  // OrganizationID is the ID of the organization the user should be granted the manager role for.
-  string organization_id = 1 [(validate.rules).string = {
-    min_len: 1
-    max_len: 200
-  }];
-  // Roles are the roles that should be granted to the user within the specified organization.
-  repeated string roles = 2 [(validate.rules).repeated = {
-    unique: true
-    items: {
-      string: {
-        min_len: 1
-        max_len: 200
-        prefix: "ORG_" // TODO: do we want to limit here as well?
-      }
-    }
-  }];
-}
-
-message SetProjectManager {
-  // ProjectID is the ID of the project the user should be granted the manager role for.
-  string project_id = 1 [(validate.rules).string = {
-    min_len: 1
-    max_len: 200
-  }];
-  // Roles are the roles that should be granted to the user within the specified project.
-  repeated string roles = 2 [(validate.rules).repeated = {
-    unique: true
-    items: {
-      string: {
-        min_len: 1
-        max_len: 200
-        prefix: "PROJECT_" // TODO: do we want to limit here as well?
-      }
-    }
-  }];
-}
-
-message SetProjectGrantManager {
-  // ProjectGrantID is the ID of the project grant the user should be granted the manager role for.
-  string project_grant_id = 1 [(validate.rules).string = {
-    min_len: 1
-    max_len: 200
-  }];
-  // Roles are the roles that should be granted to the user within the specified project grant.
-  repeated string roles = 2 [(validate.rules).repeated = {
-    unique: true
-    items: {
-      string: {
-        min_len: 1
-        max_len: 200
-        prefix: "PROJECT_GRANT_" // TODO: do we want to limit here as well?
-      }
-    }
-  }];
-}
-*/
 
 message ManagerQuery {
   oneof query {
