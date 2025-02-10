@@ -20,17 +20,17 @@ type ServiceClass =
 export async function createServiceForHost<T extends ServiceClass>(
   service: T,
   serviceUrl: string,
-  serviceRegion: string,
+  serviceRegion?: string,
 ) {
   let token;
 
   // if we are running in a multitenancy context, use the system user token
   if (
-    process.env[serviceRegion + "_AUDIENCE"] &&
-    process.env[serviceRegion + "_SYSTEM_USER_ID"] &&
-    process.env[serviceRegion + "_SYSTEM_USER_PRIVATE_KEY"]
+    process.env.AUDIENCE &&
+    process.env.SYSTEM_USER_ID &&
+    process.env.SYSTEM_USER_PRIVATE_KEY
   ) {
-    token = await systemAPIToken({ serviceRegion });
+    token = await systemAPIToken();
   } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
     token = process.env.ZITADEL_SERVICE_USER_TOKEN;
   }
@@ -51,7 +51,7 @@ export async function createServiceForHost<T extends ServiceClass>(
 }
 
 /**
- * Extracts the service url and region from the headers if used in a multitenant context (x-zitadel-forward-host, x-zitade-region header)
+ * Extracts the service url and region from the headers if used in a multitenant context (host, x-zitade-region header)
  * or falls back to the ZITADEL_API_URL for a self hosting deployment
  * or falls back to the host header for a self hosting deployment using custom domains
  * @param headers
@@ -65,7 +65,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 } {
   let instanceUrl;
 
-  const forwardedHost = headers.get("x-zitadel-forward-host");
+  const forwardedHost = headers.get("host");
   // use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
   if (forwardedHost) {
     instanceUrl = forwardedHost;
