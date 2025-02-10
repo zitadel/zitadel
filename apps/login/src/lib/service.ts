@@ -75,7 +75,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   // use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
   if (forwardedHost) {
     instanceUrl = forwardedHost;
-    instanceUrl = instanceUrl.startsWith("https://")
+    instanceUrl = instanceUrl.startsWith("http://")
       ? instanceUrl
       : `https://${instanceUrl}`;
   } else if (process.env.ZITADEL_API_URL) {
