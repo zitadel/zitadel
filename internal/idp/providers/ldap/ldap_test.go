@@ -24,6 +24,7 @@ func TestProvider_Options(t *testing.T) {
 	}
 	type want struct {
 		name                       string
+		rootCA                     []byte
 		startTls                   bool
 		linkingAllowed             bool
 		creationAllowed            bool
@@ -115,6 +116,7 @@ func TestProvider_Options(t *testing.T) {
 				userObjectClasses: []string{"object"},
 				userFilters:       []string{"filter"},
 				timeout:           30 * time.Second,
+				rootCA:            []byte("certificate"),
 				loginUrl:          "url",
 				opts: []ProviderOpts{
 					WithoutStartTLS(),
@@ -139,6 +141,7 @@ func TestProvider_Options(t *testing.T) {
 			},
 			want: want{
 				name:                       "ldap",
+				rootCA:                     []byte("certificate"),
 				startTls:                   false,
 				linkingAllowed:             true,
 				creationAllowed:            true,
@@ -179,6 +182,7 @@ func TestProvider_Options(t *testing.T) {
 			)
 
 			a.Equal(tt.want.name, provider.Name())
+			a.Equal(tt.want.rootCA, provider.rootCA)
 			a.Equal(tt.want.startTls, provider.startTLS)
 			a.Equal(tt.want.linkingAllowed, provider.IsLinkingAllowed())
 			a.Equal(tt.want.creationAllowed, provider.IsCreationAllowed())
