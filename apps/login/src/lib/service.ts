@@ -40,6 +40,11 @@ export async function createServiceForHost<T extends ServiceClass>(
   }
 
   if (!token) {
+    console.log(
+      process.env.AUDIENCE,
+      process.env.SYSTEM_USER_ID,
+      process.env.SYSTEM_USER_PRIVATE_KEY,
+    );
     throw new Error("No token found");
   }
 
