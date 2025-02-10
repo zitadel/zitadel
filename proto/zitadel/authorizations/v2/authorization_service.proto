@@ -4,8 +4,8 @@ package zitadel.authorizations.v2;
 
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2/object.proto";
 import "zitadel/authorizations/v2/authorization.proto";
+import "zitadel/object/v2/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2;authorizations";
 

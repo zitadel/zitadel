@@ -1,30 +1,37 @@
 syntax = "proto3";
 
-import "zitadel/object.proto";
-import "validate/validate.proto";
-
 package zitadel.metadata.v2;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/metadata/v2";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+import "zitadel/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/metadata/v2;metadata";
 
 message Metadata {
-    //zitadel.v1.ObjectDetails details = 1; TODO?
-    string key = 2;
-    bytes value = 3;
+  // Timestamp of the creation of the metadata.
+  google.protobuf.Timestamp creation_date = 1;
+  // Timestamp of the last change of the metadata.
+  // In case the metadata was not changed, this field is equal to the creation date.
+  google.protobuf.Timestamp change_date = 2;
+  // Key of the metadata. This is the unique identifier of the metadata.
+  string key = 3;
+  // Value of the metadata.
+  bytes value = 4;
 }
 
 message MetadataQuery {
-    oneof query {
-        option (validate.required) = true;
-        MetadataKeyQuery key_query = 1;
-    }
+  oneof query {
+    option (validate.required) = true;
+    MetadataKeyQuery key_query = 1;
+  }
 }
 
 message MetadataKeyQuery {
-    string key = 1 [
-        (validate.rules).string = {max_len: 200}
-    ];
-    zitadel.v1.TextQueryMethod method = 2 [
-        (validate.rules).enum.defined_only = true
-    ];
+  // Specify the the key of the metadata to search for.
+  string key = 1 [(validate.rules).string = {max_len: 200}];
+  // Specify the method to use for the search. Default is EQUALS.
+  // For example, if you want to search for a key that starts with a specific string,
+  // use STARTS_WITH or STARTS_WITH_IGNORE_CASE.
+  zitadel.v1.TextQueryMethod method = 2 [(validate.rules).enum.defined_only = true];
 }

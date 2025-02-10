@@ -1285,91 +1285,6 @@ service UserService {
   rpc RemoveMetadata (RemoveMetadataRequest) returns (RemoveMetadataResponse) {}
 }
 
-message ListMetadataRequest{
-  // The user ID of the user you like to get the metadata from.
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Paginate through the results using a limit.
-  zitadel.object.v2.ListQuery query = 2;
-  // Filter the metadata to be returned.
-  repeated zitadel.metadata.v2.MetadataQuery queries = 3;
-}
-
-message ListMetadataResponse{
-  zitadel.object.v2.ListDetails details = 1;
-  repeated zitadel.metadata.v2.Metadata result = 2;
-}
-
-message GetMetadataRequest{
-  // The user ID of the user you like to get the metadata from.
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata key is the unique identifier of the metadata entry.
-  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message GetMetadataResponse{
-  zitadel.metadata.v2.Metadata metadata = 1;
-}
-
-message AddMetadataRequest{
-  // The user ID of the user you like to add the metadata to.
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata key is the unique identifier of the metadata entry.
-  // If an entry with the same key already exists, an error is returned.
-  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata value is the value of the metadata entry.
-  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
-}
-
-message AddMetadataResponse{
-  // CreationDate is the timestamp the metadata entry was created.
-  google.protobuf.Timestamp creation_date = 1;
-}
-
-message UpdateMetadataRequest{
-  // The user ID of the user you like to update the metadata from.
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata key is the unique identifier of the metadata entry.
-  // If an entry with the same key does not exist, an error is returned.
-  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata value is the value of the metadata entry.
-  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
-}
-
-message UpdateMetadataResponse{
-  // ChangeDate is the the timestamp the metadata entry was last updated.
-  google.protobuf.Timestamp change_date = 1;
-}
-
-message SetMetadataRequest{
-  // The user ID of the user you like to set the metadata from.
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata key is the unique identifier of the metadata entry.
-  // An existing entry with the same key will be updated. The key cannot be changed.
-  // If you need to change the key, remove the existing entry and create a new one.
-  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata value is the value of the metadata entry.
-  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
-}
-
-message SetMetadataResponse{
-  // ChangeDate is the the timestamp the metadata entry was last set, either created or updated.
-  google.protobuf.Timestamp change_date = 2;
-}
-
-message RemoveMetadataRequest{
-  // The user ID of the user you like to remove the metadata from.
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata key is the unique identifier of the metadata entry.
-  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message RemoveMetadataResponse{
-  // DeletionDate is the timestamp the metadata entry was deleted.
-  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
-  // In case the deletion occurred in a previous request, the deletion date might not be set.
-  google.protobuf.Timestamp deletion_date = 1;
-}
-
 message AddHumanUserRequest{
   reserved 3;
   reserved "organisation";
@@ -2513,4 +2428,89 @@ message HumanMFAInitSkippedRequest {
 
 message HumanMFAInitSkippedResponse {
   zitadel.object.v2.Details details = 1;
+}
+
+message ListMetadataRequest{
+  // The user ID of the user you like to get the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Paginate through the results using a limit.
+  zitadel.object.v2.ListQuery query = 2;
+  // Filter the metadata to be returned.
+  repeated zitadel.metadata.v2.MetadataQuery queries = 3;
+}
+
+message ListMetadataResponse{
+  zitadel.object.v2.ListDetails details = 1;
+  repeated zitadel.metadata.v2.Metadata result = 2;
+}
+
+message GetMetadataRequest{
+  // The user ID of the user you like to get the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetMetadataResponse{
+  zitadel.metadata.v2.Metadata metadata = 1;
+}
+
+message AddMetadataRequest{
+  // The user ID of the user you like to add the metadata to.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  // If an entry with the same key already exists, an error is returned.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata value is the value of the metadata entry.
+  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message AddMetadataResponse{
+  // CreationDate is the timestamp the metadata entry was created.
+  google.protobuf.Timestamp creation_date = 1;
+}
+
+message UpdateMetadataRequest{
+  // The user ID of the user you like to update the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  // If an entry with the same key does not exist, an error is returned.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata value is the value of the metadata entry.
+  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message UpdateMetadataResponse{
+  // ChangeDate is the the timestamp the metadata entry was last updated.
+  google.protobuf.Timestamp change_date = 1;
+}
+
+message SetMetadataRequest{
+  // The user ID of the user you like to set the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  // An existing entry with the same key will be updated. The key cannot be changed.
+  // If you need to change the key, remove the existing entry and create a new one.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata value is the value of the metadata entry.
+  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
+}
+
+message SetMetadataResponse{
+  // ChangeDate is the the timestamp the metadata entry was last set, either created or updated.
+  google.protobuf.Timestamp change_date = 2;
+}
+
+message RemoveMetadataRequest{
+  // The user ID of the user you like to remove the metadata from.
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  // Metadata key is the unique identifier of the metadata entry.
+  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMetadataResponse{
+  // DeletionDate is the timestamp the metadata entry was deleted.
+  // Note that the deletion date is only guaranteed to be set if the deletion was successful during the request.
+  // In case the deletion occurred in a previous request, the deletion date might not be set.
+  google.protobuf.Timestamp deletion_date = 1;
 }
