@@ -39,7 +39,7 @@
     "@faker-js/faker": "^9.2.0",
     "@changesets/cli": "^2.27.9",
     "@playwright/test": "^1.48.2",
-    "@types/node": "^22.9.0",
+    "@types/node": "^20.17.17",
     "@vitejs/plugin-react": "^4.3.3",
     "@zitadel/prettier-config": "workspace:*",
     "axios": "^1.7.7",
