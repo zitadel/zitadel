@@ -338,6 +338,7 @@ func prepareGroupGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			g := new(GroupGrant)
 
 			var (
+				groupName        sql.NullString
 				groupDescription sql.NullString
 
 				orgName   sql.NullString
@@ -360,7 +361,7 @@ func prepareGroupGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&g.State,
 
 				&g.GroupID,
-				&g.GroupName,
+				&groupName,
 				&groupDescription,
 				&g.GroupResourceOwner,
 
@@ -382,6 +383,7 @@ func prepareGroupGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				return nil, zerrors.ThrowInternal(err, "QUERY-oQPcP", "Errors.Internal")
 			}
 
+			g.GroupName = groupName.String
 			g.GroupDescription = groupDescription.String
 			g.OrgName = orgName.String
 			g.OrgPrimaryDomain = orgDomain.String
@@ -433,6 +435,7 @@ func prepareGroupGrantsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				g := new(GroupGrant)
 
 				var (
+					groupName        sql.NullString
 					groupDescription sql.NullString
 
 					orgName   sql.NullString
@@ -455,7 +458,7 @@ func prepareGroupGrantsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&g.State,
 
 					&g.GroupID,
-					&g.GroupName,
+					&groupName,
 					&groupDescription,
 					&g.GroupResourceOwner,
 
@@ -475,6 +478,7 @@ func prepareGroupGrantsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				if err != nil {
 					return nil, err
 				}
+				g.GroupName = groupName.String
 				g.GroupDescription = groupDescription.String
 				g.OrgName = orgName.String
 				g.OrgPrimaryDomain = orgDomain.String
