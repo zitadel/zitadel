@@ -34,6 +34,7 @@ func GroupGrantToPb(assetPrefix string, grant *query.GroupGrant) *group_pb.Group
 		GrantedOrgId:     grant.GrantedOrgID,
 		GrantedOrgName:   grant.GrantedOrgName,
 		GrantedOrgDomain: grant.GrantedOrgDomain,
+		GroupName:        grant.GroupName,
 		Details: object.ToViewDetailsPb(
 			grant.Sequence,
 			grant.CreationDate,
@@ -81,6 +82,8 @@ func GroupGrantQueryToQuery(ctx context.Context, query *group_pb.GroupGrantQuery
 		return GroupGrantProjectIDQueryToModel(q.ProjectIdQuery)
 	case *group_pb.GroupGrantQuery_ProjectNameQuery:
 		return GroupGrantProjectNameQueryToModel(q.ProjectNameQuery)
+	case *group_pb.GroupGrantQuery_GroupNameQuery:
+		return GroupGrantGroupNameQueryToModel(q.GroupNameQuery)
 	case *group_pb.GroupGrantQuery_GroupIdQuery:
 		return GroupGrantGroupIDQueryToModel(q.GroupIdQuery)
 	case *group_pb.GroupGrantQuery_WithGrantedQuery:
@@ -88,6 +91,10 @@ func GroupGrantQueryToQuery(ctx context.Context, query *group_pb.GroupGrantQuery
 	default:
 		return nil, errors.New("invalid query")
 	}
+}
+
+func GroupGrantGroupNameQueryToModel(q *group_pb.GroupGrantGroupNameQuery) (query.SearchQuery, error) {
+	return query.NewGroupGrantGroupNameQuery(q.GroupName, object.TextMethodToQuery(q.Method))
 }
 
 func GroupGrantOrgDomainQueryToModel(q *group_pb.GroupGrantOrgDomainQuery) (query.SearchQuery, error) {

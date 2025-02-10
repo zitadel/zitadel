@@ -148,6 +148,10 @@ func NewGroupGrantGroupIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(GroupGrantGroupID, id, TextEquals)
 }
 
+func NewGroupGrantGroupNameQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(GroupColumnName, value, method)
+}
+
 func NewGroupGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(GroupGrantProjectID, id, TextEquals)
 }
