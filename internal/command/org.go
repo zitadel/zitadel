@@ -98,8 +98,8 @@ func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail 
 	}
 
 	var userID string
-	if admin.Human != nil && admin.ID != "" {
-		userID = admin.ID
+	if admin.Human != nil && admin.Human.ID != "" {
+		userID = admin.Human.ID
 	} else {
 		var err error
 		userID, err = c.commands.idGenerator.Next()
@@ -107,6 +107,7 @@ func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail 
 			return err
 		}
 	}
+
 	if admin.Human != nil {
 		admin.Human.ID = userID
 		c.validations = append(c.validations, c.commands.AddHumanCommand(admin.Human, c.aggregate.ID, c.commands.userPasswordHasher, c.commands.userEncryption, allowInitialMail))
