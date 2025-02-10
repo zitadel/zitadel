@@ -1,6 +1,6 @@
 import { GrpcTransportOptions } from "@connectrpc/connect-node";
 import { createGrpcWebTransport } from "@connectrpc/connect-web";
-import { NewAuthorizationBearerInterceptor } from "./interceptors";
+import { NewAuthorizationBearerInterceptor } from "./interceptors.js";
 
 /**
  * Create a client transport using grpc web with the given token and configuration options.

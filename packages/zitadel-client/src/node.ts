@@ -1,6 +1,6 @@
 import { createGrpcTransport, GrpcTransportOptions } from "@connectrpc/connect-node";
 import { importPKCS8, SignJWT } from "jose";
-import { NewAuthorizationBearerInterceptor } from "./interceptors";
+import { NewAuthorizationBearerInterceptor } from "./interceptors.js";
 
 /**
  * Create a server transport using grpc with the given token and configuration options.

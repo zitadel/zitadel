@@ -30,11 +30,11 @@ importers:
         specifier: ^1.48.2
         version: 1.48.2
       '@types/node':
-        specifier: ^22.9.0
-        version: 22.9.0
+        specifier: ^20.17.17
+        version: 20.17.17
       '@vitejs/plugin-react':
         specifier: ^4.3.3
-        version: 4.3.3(vite@5.4.11(@types/node@22.9.0)(sass@1.80.7))
+        version: 4.3.3(vite@5.4.11(@types/node@20.17.17)(sass@1.80.7))
       '@zitadel/eslint-config':
         specifier: workspace:*
         version: link:packages/zitadel-eslint-config
@@ -67,10 +67,10 @@ importers:
         version: 5.6.3
       vite-tsconfig-paths:
         specifier: ^5.1.2
-        version: 5.1.2(typescript@5.6.3)(vite@5.4.11(@types/node@22.9.0)(sass@1.80.7))
+        version: 5.1.2(typescript@5.6.3)(vite@5.4.11(@types/node@20.17.17)(sass@1.80.7))
       vitest:
         specifier: ^2.1.4
-        version: 2.1.4(@types/node@22.9.0)(jsdom@25.0.1)(sass@1.80.7)
+        version: 2.1.4(@types/node@20.17.17)(jsdom@25.0.1)(sass@1.80.7)
 
   apps/login:
     dependencies:
@@ -151,8 +151,8 @@ importers:
         specifier: 0.7.34
         version: 0.7.34
       '@types/node':
-        specifier: 22.9.0
-        version: 22.9.0
+        specifier: ^20.17.17
+        version: 20.17.17
       '@types/react':
         specifier: 19.0.2
         version: 19.0.2
@@ -1554,8 +1554,8 @@ packages:
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
-  '@types/node@22.9.0':
-    resolution: {integrity: sha512-vuyHg81vvWA1Z1ELfvLko2c8f34gyA0zaic0+Rllc5lbCnbSyuvb2Oxpm6TAUAC/2xZN3QGqxBNggD1nNR2AfQ==}
+  '@types/node@20.17.17':
+    resolution: {integrity: sha512-/WndGO4kIfMicEQLTi/mDANUu/iVUhT7KboZPdEqqHQ4aTS+3qT3U5gIqWDFV+XouorjfgGqvKILJeHhuQgFYg==}
 
   '@types/react-dom@19.0.2':
     resolution: {integrity: sha512-c1s+7TKFaDRRxr1TxccIX2u7sfCnc3RxkVyBIUA2lCpyqCF+QoAwQ/CBg7bsMdVwP120HEH143VQezKtef5nCg==}
@@ -6011,7 +6011,7 @@ snapshots:
 
   '@types/node@12.20.55': {}
 
-  '@types/node@22.9.0':
+  '@types/node@20.17.17':
     dependencies:
       undici-types: 6.19.8
 
@@ -6033,7 +6033,7 @@ snapshots:
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 22.9.0
+      '@types/node': 20.17.17
     optional: true
 
   '@typescript-eslint/eslint-plugin@8.15.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3)':
@@ -6156,14 +6156,14 @@ snapshots:
 
   '@vercel/git-hooks@1.0.0': {}
 
-  '@vitejs/plugin-react@4.3.3(vite@5.4.11(@types/node@22.9.0)(sass@1.80.7))':
+  '@vitejs/plugin-react@4.3.3(vite@5.4.11(@types/node@20.17.17)(sass@1.80.7))':
     dependencies:
       '@babel/core': 7.26.0
       '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.0)
       '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.0)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.11(@types/node@22.9.0)(sass@1.80.7)
+      vite: 5.4.11(@types/node@20.17.17)(sass@1.80.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -6174,13 +6174,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.4(vite@5.4.11(@types/node@22.9.0)(sass@1.80.7))':
+  '@vitest/mocker@2.1.4(vite@5.4.11(@types/node@20.17.17)(sass@1.80.7))':
     dependencies:
       '@vitest/spy': 2.1.4
       estree-walker: 3.0.3
       magic-string: 0.30.12
     optionalDependencies:
-      vite: 5.4.11(@types/node@22.9.0)(sass@1.80.7)
+      vite: 5.4.11(@types/node@20.17.17)(sass@1.80.7)
 
   '@vitest/pretty-format@2.1.4':
     dependencies:
@@ -7107,7 +7107,7 @@ snapshots:
       debug: 4.3.7(supports-color@5.5.0)
       enhanced-resolve: 5.17.1
       eslint: 8.57.1
-      eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
+      eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.1))(eslint@8.57.1)
       fast-glob: 3.3.2
       get-tsconfig: 4.8.0
       is-bun-module: 1.1.0
@@ -7120,7 +7120,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-module-utils@2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1):
+  eslint-module-utils@2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
@@ -7141,7 +7141,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.1)
+      eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -8586,7 +8586,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.9.0
+      '@types/node': 20.17.17
       long: 5.2.3
 
   proxy-from-env@1.0.0: {}
@@ -9391,12 +9391,12 @@ snapshots:
       core-util-is: 1.0.2
       extsprintf: 1.3.0
 
-  vite-node@2.1.4(@types/node@22.9.0)(sass@1.80.7):
+  vite-node@2.1.4(@types/node@20.17.17)(sass@1.80.7):
     dependencies:
       cac: 6.7.14
       debug: 4.3.7(supports-color@5.5.0)
       pathe: 1.1.2
-      vite: 5.4.11(@types/node@22.9.0)(sass@1.80.7)
+      vite: 5.4.11(@types/node@20.17.17)(sass@1.80.7)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -9408,31 +9408,31 @@ snapshots:
       - supports-color
       - terser
 
-  vite-tsconfig-paths@5.1.2(typescript@5.6.3)(vite@5.4.11(@types/node@22.9.0)(sass@1.80.7)):
+  vite-tsconfig-paths@5.1.2(typescript@5.6.3)(vite@5.4.11(@types/node@20.17.17)(sass@1.80.7)):
     dependencies:
       debug: 4.3.7(supports-color@5.5.0)
       globrex: 0.1.2
       tsconfck: 3.1.4(typescript@5.6.3)
     optionalDependencies:
-      vite: 5.4.11(@types/node@22.9.0)(sass@1.80.7)
+      vite: 5.4.11(@types/node@20.17.17)(sass@1.80.7)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@5.4.11(@types/node@22.9.0)(sass@1.80.7):
+  vite@5.4.11(@types/node@20.17.17)(sass@1.80.7):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.49
       rollup: 4.25.0
     optionalDependencies:
-      '@types/node': 22.9.0
+      '@types/node': 20.17.17
       fsevents: 2.3.3
       sass: 1.80.7
 
-  vitest@2.1.4(@types/node@22.9.0)(jsdom@25.0.1)(sass@1.80.7):
+  vitest@2.1.4(@types/node@20.17.17)(jsdom@25.0.1)(sass@1.80.7):
     dependencies:
       '@vitest/expect': 2.1.4
-      '@vitest/mocker': 2.1.4(vite@5.4.11(@types/node@22.9.0)(sass@1.80.7))
+      '@vitest/mocker': 2.1.4(vite@5.4.11(@types/node@20.17.17)(sass@1.80.7))
       '@vitest/pretty-format': 2.1.4
       '@vitest/runner': 2.1.4
       '@vitest/snapshot': 2.1.4
@@ -9448,11 +9448,11 @@ snapshots:
       tinyexec: 0.3.1
       tinypool: 1.0.1
       tinyrainbow: 1.2.0
-      vite: 5.4.11(@types/node@22.9.0)(sass@1.80.7)
-      vite-node: 2.1.4(@types/node@22.9.0)(sass@1.80.7)
+      vite: 5.4.11(@types/node@20.17.17)(sass@1.80.7)
+      vite-node: 2.1.4(@types/node@20.17.17)(sass@1.80.7)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.9.0
+      '@types/node': 20.17.17
       jsdom: 25.0.1
     transitivePeerDependencies:
       - less
