@@ -372,7 +372,7 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project 
 //go:embed app_oidc_project_permission.sql
 var appOIDCProjectPermissionQuery string
 
-func (q *Queries) CheckProjectPermissionByClientID(ctx context.Context, clientID, userID string) (_ bool, err error) {
+func (q *Queries) CheckProjectPermissionByClientID(ctx context.Context, clientID, userID string) (_ *projectPermission, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -390,13 +390,13 @@ func (q *Queries) CheckProjectPermissionByClientID(ctx context.Context, clientID
 		domain.ProjectGrantStateActive,
 		domain.UserGrantStateActive,
 	)
-	return p.permission(), err
+	return p, err
 }
 
 //go:embed app_saml_project_permission.sql
 var appSAMLProjectPermissionQuery string
 
-func (q *Queries) CheckProjectPermissionByEntityID(ctx context.Context, entityID, userID string) (_ bool, err error) {
+func (q *Queries) CheckProjectPermissionByEntityID(ctx context.Context, entityID, userID string) (_ *projectPermission, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -414,48 +414,30 @@ func (q *Queries) CheckProjectPermissionByEntityID(ctx context.Context, entityID
 		domain.ProjectGrantStateActive,
 		domain.UserGrantStateActive,
 	)
-	return p.permission(), err
+	return p, err
 }
 
 type projectPermission struct {
-	InstanceID         sql.NullString
-	ResourceOwner      sql.NullString
-	ProjectID          sql.NullString
-	AppID              sql.NullString
-	UserResourceOwner  sql.NullString
-	GrantedOrgID       sql.NullString
-	UserGrantProjectID sql.NullString
-	HasProjectChecked  sql.NullBool
-	ProjectRoleChecked sql.NullBool
-}
-
-func (p *projectPermission) permission() bool {
-	return p.HasProjectChecked.Bool && p.ProjectRoleChecked.Bool
+	HasProjectChecked  bool
+	ProjectRoleChecked bool
 }
 
 func scanProjectPermissionByClientID(row *sql.Row) (*projectPermission, error) {
-	p := new(projectPermission)
-	var count int
+	var hasProjectChecked, projectRoleChecked sql.NullBool
 	err := row.Scan(
-		&p.InstanceID,
-		&p.ResourceOwner,
-		&p.ProjectID,
-		&p.AppID,
-		&p.UserResourceOwner,
-		&p.GrantedOrgID,
-		&p.UserGrantProjectID,
-		&p.HasProjectChecked,
-		&p.ProjectRoleChecked,
-		&count,
+		&hasProjectChecked,
+		&projectRoleChecked,
 	)
-
-	if err != nil || count != 1 {
-		if errors.Is(err, sql.ErrNoRows) || count != 1 {
+	if err != nil || !hasProjectChecked.Valid || !projectRoleChecked.Valid {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, zerrors.ThrowNotFound(err, "QUERY-4tq8wCTCgf", "Errors.User.NotFound")
 		}
 		return nil, zerrors.ThrowInternal(err, "QUERY-NwH4lAqlZC", "Errors.Internal")
 	}
-	return p, nil
+	return &projectPermission{
+		HasProjectChecked:  hasProjectChecked.Bool,
+		ProjectRoleChecked: projectRoleChecked.Bool,
+	}, nil
 }
 
 func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id string, err error) {

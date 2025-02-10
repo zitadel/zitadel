@@ -63,7 +63,7 @@ func (c *Commands) AddSAMLRequest(ctx context.Context, samlRequest *SAMLRequest)
 	return samlRequestWriteModelToCurrentSAMLRequest(writeModel), nil
 }
 
-func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, checkApplicationPermission domain.ApplicationPermissionCheck) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
+func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, projectPermissionCheck domain.ProjectPermissionCheck) (*domain.ObjectDetails, *CurrentSAMLRequest, error) {
 	writeModel, err := c.getSAMLRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -89,8 +89,8 @@ func (c *Commands) LinkSessionToSAMLRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, err
 	}
 
-	if checkApplicationPermission != nil {
-		if err := checkApplicationPermission(ctx, writeModel.Issuer, sessionWriteModel.UserID); err != nil {
+	if projectPermissionCheck != nil {
+		if err := projectPermissionCheck(ctx, writeModel.Issuer, sessionWriteModel.UserID); err != nil {
 			return nil, nil, err
 		}
 	}

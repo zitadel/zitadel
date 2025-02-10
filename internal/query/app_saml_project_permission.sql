@@ -45,13 +45,7 @@ with application as (
        AND ug.user_id = $5
        AND ug.state = $8
 )
-SELECT a.instance_id,
-       a.resource_owner,
-       a.project_id,
-       a.app_id,
-       uro.resource_owner as user_resource_owner,
-       hpgc.granted_org_id,
-       prc.project_id,
+SELECT
     /* project existence does not need to be checked, or resourceowner of user and project are equal, or resourceowner of user has project granted*/
        bool_and(COALESCE(
                (NOT a.has_project_check OR
@@ -64,8 +58,7 @@ SELECT a.instance_id,
                (NOT a.project_role_check OR
                 a.project_id = prc.project_id)
            , FALSE)
-       ) as role_checked,
-       count(*) OVER ()
+       ) as role_checked
 FROM application as a
          LEFT JOIN user_resourceowner as uro
                    ON uro.instance_id = a.instance_id

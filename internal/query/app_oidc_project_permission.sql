@@ -6,9 +6,6 @@ with application as (
            p.project_role_check,
            p.has_project_check
     FROM projections.apps7 as a
-         LEFT JOIN projections.apps7_api_configs as aac
-                   ON aac.app_id = a.id
-                   AND aac.instance_id = a.instance_id
          LEFT JOIN projections.apps7_oidc_configs as aoc
                    ON aoc.app_id = a.id
                    AND aoc.instance_id = a.instance_id
@@ -17,7 +14,7 @@ with application as (
                     AND p.resource_owner = a.resource_owner
                     AND p.id = a.project_id
     WHERE a.instance_id = $1
-      AND (aac.client_id = $2 OR aoc.client_id = $2)
+      AND aoc.client_id = $2
       AND a.state = $3
       AND p.state = $4
 ), user_resourceowner as (
@@ -48,13 +45,7 @@ with application as (
        AND ug.user_id = $5
        AND ug.state = $8
 )
-SELECT a.instance_id,
-       a.resource_owner,
-       a.project_id,
-       a.app_id,
-       uro.resource_owner as user_resource_owner,
-       hpgc.granted_org_id,
-       prc.project_id,
+SELECT
     /* project existence does not need to be checked, or resourceowner of user and project are equal, or resourceowner of user has project granted*/
        bool_and(COALESCE(
                (NOT a.has_project_check OR
@@ -67,8 +58,7 @@ SELECT a.instance_id,
                (NOT a.project_role_check OR
                 a.project_id = prc.project_id)
            , FALSE)
-       ) as role_checked,
-       count(*) OVER ()
+       ) as role_checked
 FROM application as a
          LEFT JOIN user_resourceowner as uro
                    ON uro.instance_id = a.instance_id
