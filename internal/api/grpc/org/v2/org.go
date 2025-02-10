@@ -57,7 +57,13 @@ func addOrganizationRequestAdminToCommand(admin *org.AddOrganizationRequest_Admi
 		if err != nil {
 			return nil, err
 		}
+		var custom_id string
+		if a.Human.UserId != nil {
+			custom_id = *a.Human.UserId
+		}
+
 		return &command.OrgSetupAdmin{
+			ID:    custom_id,
 			Human: human,
 			Roles: admin.GetRoles(),
 		}, nil
