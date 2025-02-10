@@ -40,5 +40,4 @@ const (
 	PermissionOrgIDPRead          = "org.idp.read"
 )
 
-type ProjectPermissionCheck func(ctx context.Context, clientID, userID string) (err error
 type ProjectPermissionCheck func(ctx context.Context, clientID, userID string) (err error)

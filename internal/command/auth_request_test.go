@@ -181,7 +181,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 		sessionID        string
 		sessionToken     string
 		checkLoginClient bool
-		permissionCheck  domain.ApplicationPermissionCheck
+		permissionCheck  domain.ProjectPermissionCheck
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -781,7 +781,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionID:        "sessionID",
 				sessionToken:     "token",
 				checkLoginClient: true,
-				permissionCheck:  newMockApplicationPermissionCheckAllowed(),
+				permissionCheck:  newMockProjectPermissionCheckAllowed(),
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
@@ -864,7 +864,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionID:        "sessionID",
 				sessionToken:     "token",
 				checkLoginClient: true,
-				permissionCheck:  newMockApplicationPermissionCheckOIDCNotAllowed(),
+				permissionCheck:  newMockProjectPermissionCheckOIDCNotAllowed(),
 			},
 			res{
 				wantErr: zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.PermissionDenied"),

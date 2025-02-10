@@ -141,7 +141,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 		sessionID        string
 		sessionToken     string
 		checkLoginClient bool
-		checkPermission  domain.ApplicationPermissionCheck
+		checkPermission  domain.ProjectPermissionCheck
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -584,7 +584,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				sessionID:        "sessionID",
 				sessionToken:     "token",
 				checkLoginClient: true,
-				checkPermission:  newMockApplicationPermissionCheckAllowed(),
+				checkPermission:  newMockProjectPermissionCheckAllowed(),
 			},
 			res{
 				details: &domain.ObjectDetails{ResourceOwner: "instanceID"},
@@ -657,7 +657,7 @@ func TestCommands_LinkSessionToSAMLRequest(t *testing.T) {
 				sessionID:        "sessionID",
 				sessionToken:     "token",
 				checkLoginClient: true,
-				checkPermission:  newMockApplicationPermissionCheckSAMLNotAllowed(),
+				checkPermission:  newMockProjectPermissionCheckSAMLNotAllowed(),
 			},
 			res{
 				wantErr: zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.PermissionDenied"),
