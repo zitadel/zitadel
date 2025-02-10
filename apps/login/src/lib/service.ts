@@ -81,12 +81,14 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   } else if (process.env.ZITADEL_API_URL) {
     instanceUrl = process.env.ZITADEL_API_URL;
   } else {
-    const host = headers.get("host");
+    // TODO: remove this fallback once the host header is always set
+    const host =
+      headers.get("x-zitadel-forward-host") ?? "http://localhost:8080";
 
     if (host) {
       const [hostname, port] = host.split(":");
       if (hostname !== "localhost") {
-        instanceUrl = host.startsWith("https://") ? host : `https://${host}`;
+        instanceUrl = host.startsWith("http") ? host : `https://${host}`;
       }
     }
   }

@@ -201,11 +201,13 @@ async function findValidSession(
 }
 
 function constructUrl(request: NextRequest, path: string) {
-  const forwardedHost = request.headers.get("host");
+  // TODO: remove localhost
+  const forwardedHost =
+    request.headers.get("x-zitadel-forward-host") ?? "http://localhost:8080";
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
   return new URL(
     `${basePath}${path}`,
-    forwardedHost?.startsWith("https://")
+    forwardedHost?.startsWith("http")
       ? forwardedHost
       : `https://${forwardedHost}`,
   );
