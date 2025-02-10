@@ -1,5 +1,11 @@
 # @zitadel/client
 
+## 1.0.5
+
+### Patch Changes
+
+- 4fa22c0: fix export for grpcweb transport
+
 ## 1.0.4
 
 ### Patch Changes
