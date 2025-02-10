@@ -97,6 +97,8 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
     throw new Error("Service URL could not be determined");
   }
 
+  console.log("Service URL", instanceUrl);
+
   return {
     serviceUrl: instanceUrl,
     serviceRegion: headers.get("x-zitadel-region") || "",
