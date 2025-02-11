@@ -430,7 +430,7 @@ func scanProjectPermissionByClientID(row *sql.Row) (*projectPermission, error) {
 	)
 	if err != nil || !hasProjectChecked.Valid || !projectRoleChecked.Valid {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, zerrors.ThrowNotFound(err, "QUERY-4tq8wCTCgf", "Errors.User.NotFound")
+			return nil, zerrors.ThrowNotFound(err, "QUERY-4tq8wCTCgf", "Errors.App.NotFound")
 		}
 		return nil, zerrors.ThrowInternal(err, "QUERY-NwH4lAqlZC", "Errors.Internal")
 	}
