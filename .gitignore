@@ -22,3 +22,5 @@ packages/zitadel-server/src/app/proto
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/out
+/docker

@@ -81,9 +81,8 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   } else if (process.env.ZITADEL_API_URL) {
     instanceUrl = process.env.ZITADEL_API_URL;
   } else {
-    // TODO: remove this fallback once the host header is always set
     const host =
-      headers.get("x-zitadel-forward-host") ?? "http://localhost:8080";
+      headers.get("x-zitadel-forward-host") ?? headers.get("host");
 
     if (host) {
       const [hostname, port] = host.split(":");
