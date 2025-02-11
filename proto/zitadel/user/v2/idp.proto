@@ -134,31 +134,40 @@ message IDPSAMLAccessInformation{
 }
 
 message IDPLink {
+  // ID of the identity provider
   string idp_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the identity provider"
       min_length: 1;
       max_length: 200;
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
+  // ID of the user of the identity provider
   string user_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "ID of the user of the identity provider"
       min_length: 1;
       max_length: 200;
       example: "\"6516849804890468048461403518\"";
     }
   ];
+  // Username of the user of the identity provider
   string user_name = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "username of the user of the identity provider"
       min_length: 1;
       max_length: 200;
       example: "\"user@external.com\"";
+    }
+  ];
+  // Name of the identity provider
+  // This field is read-only and will be set by the server.
+  string idp_name = 4 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      read_only: true;
+      example: "\"Google\"";
     }
   ];
 }
