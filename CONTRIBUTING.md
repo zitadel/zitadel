@@ -141,6 +141,13 @@ Replace "policeman" with "police officer," "manpower" with "workforce," and "bus
 Ableist language includes words or phrases such as crazy, insane, blind to or blind eye to, cripple, dumb, and others.
 Choose alternative words depending on the context.
 
+### API
+
+ZITADEL follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
+The API is designed to be used by different clients, such as web applications, mobile applications, and other services.
+Therefore, the API is designed to be easy to use, consistent, and reliable.
+Please check out the dedicated [API guidelines](./API_DESIGN.md) page when contributing to the API.
+
 ### Developing ZITADEL with Dev Containers
 
 Follow the instructions provided by your code editor/IDE to initiate the development container. This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers". The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)

@@ -1,21 +1,46 @@
 # API Design
 
 ## The Basics
-ZITADEL follows an API first approach. This means that the API is designed before the implementation. 
-The API is designed using the Protobuf specification. The Protobuf specification is then used to generate the API client and server code in different programming languages.
+ZITADEL follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
+The API is designed using the Protobuf specification. The Protobuf specification is then used to generate the API client
+and server code in different programming languages.
+The API is designed to be used by different clients, such as web applications, mobile applications, and other services.
+Therefore, the API is designed to be easy to use, consistent, and reliable.
 
 Starting with the V2 API, the API and its services use a resource-oriented design. 
-This means that the API is designed around resources, which are the key entities in the system. Each resource has a unique identifier and a set of properties that describe the resource.
-Resources can be created, read, updated, and deleted using the API.
+This means that the API is designed around resources, which are the key entities in the system.
+Each resource has a unique identifier and a set of properties that describe the resource.
+The entire lifecycle of a resource can be managed using the API.
+
+> [!IMPORTANT]
+> This style guide is a work in progress and will be updated over time.
+> Not all parts of the API might follow the guidelines yet.
+> However, all new endpoints and services must be designed according to this style guide.
 
 ### Protobuf, gRPC and connectRPC
 
+The API is designed using the Protobuf specification. The Protobuf specification is used to define the API services, messages, and methods.
+Starting with the V2 API, the API uses connectRPC as the main transport protocol. 
+[connectRPC](https://connectrpc.com/) is a protocol that is based on gRPC and HTTP/2.
+It allows clients to call the API using connectRPC, gRPC and also HTTP/1.1.
+
 ## Conventions
+
+The API follows the base conventions of Protobuf and connectRPC.
+
+Please check out their style guides and concepts for more information:
+- Protobuf: https://protobuf.dev/programming-guides/style/
+- gRPC: https://grpc.io/docs/what-is-grpc/core-concepts/
+- Buf: https://buf.build/docs/best-practices/style-guide/
+
+Additionally, there are some conventions that are specific to the ZITADEL API.
+These conventions are described in the following sections.
 
 ### Explicitness
 
 Make the handling of the API as explicit as possible. Do not make assumptions about the client's knowledge of the system or the API. 
 Provide clear and concise documentation for the API.
+
 Do not rely on implicit fallbacks or defaults if the client does not provide certain parameters.
 Only use defaults if they are explicitly documented, such as returning a result set for the whole instance if no filter is provided.
 
@@ -23,9 +48,12 @@ Only use defaults if they are explicitly documented, such as returning a result 
 
 Names of resources, fields and methods should be descriptive and consistent.
 Use domain-specific terminology and avoid abbreviations.
-For example, use `OrganizationID` instead of OrgID or resourceOwner for the creation of a mew user or when returning one.
+For example, use `OrganizationID` instead of **OrgID** or **resourceOwner** for the creation of a mew user or when returning one.
 
-//TODO: add link to naming conventions / naming guidelines (https://github.com/zitadel/zitadel/issues/5888)
+> [!TODO]
+> We'll update the resources in the [concepts section](https://zitadel.com/docs/concepts/structure/instance) to describe
+> common resources and their meaning.
+> Until then, please refer to the following issue: https://github.com/zitadel/zitadel/issues/5888
 
 #### Resources and Fields
 
@@ -34,13 +62,22 @@ For example, when creating a new user, the organization ID is required. The `org
 
 Only allow providing a context where it is required. Do not provide the possibility to provide a context where it is not required.
 For example, when retrieving or updating a user, the organization ID is not required, since the user can be determined by the user ID.
-However, it is possible to provide the organization ID as a filter to retrieve a list of users.
+However, it is possible to provide the organization ID as a filter to retrieve a list of users of a specific organization.
 
 Prevent the creation of global messages that are used in multiple resources unless they always follow the same pattern.
 Use dedicated fields as described above or create a separate message for the specific context, that is only used in the boundary of the same resource.
 For example, settings might be set as a default on the instance level, but might be overridden on the organization level.
 In this case, the settings could share the same `SettingsContext` message to determine the context of the settings.
 But do not create a global `Context` message that is used across the whole API if there are different scenarios and different fields required for the context.
+The same applies to messages that are returned by multiple resources.
+For example, information about the `User` might be different when managing the user resource itself than when it's returned
+as part of an authorization or a manager role. 
+
+Prevent reusing messages for the creation and the retrieval of a resource.
+Returning messages might contain additional information that is not required or even not available for the creation of the resource.
+What might sound obvious when designing the CreateUserRequest for example, where only an organization_id but not the `organization_name` is available,
+might not be so obvious when designing some sub-resource like a user's `IdentityProviderLink`, 
+which might contain an `identity_provider_name` when returned but not when created.
 
 #### Operations and Methods
 
