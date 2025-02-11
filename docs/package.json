@@ -37,7 +37,7 @@
     "docusaurus-theme-github-codeblock": "^2.0.2",
     "docusaurus-theme-openapi-docs": "3.0.1",
     "mdx-mermaid": "^2.0.0",
-    "mermaid": "^10.9.1",
+    "mermaid": "^10.9.3",
     "postcss": "^8.4.31",
     "prism-react-renderer": "^2.1.0",
     "raw-loader": "^4.0.2",
