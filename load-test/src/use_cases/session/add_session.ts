@@ -1,9 +1,9 @@
-import { loginByUsernamePassword } from '../login_ui';
-import { createOrg, removeOrg } from '../org';
-import { User, createHuman } from '../user';
+import { loginByUsernamePassword } from '../../login_ui';
+import { createOrg, removeOrg } from '../../org';
+import { User, createHuman } from '../../user';
 import { Trend } from 'k6/metrics';
-import { Config, MaxVUs } from '../config';
-import { createSession } from '../session';
+import { Config, MaxVUs } from '../../config';
+import { createSession } from '../../session';
 import { check } from 'k6';
 
 export async function setup() {
@@ -27,12 +27,16 @@ export async function setup() {
 const addSessionTrend = new Trend('add_session_duration', true);
 export default async function (data: any) {
   const start = new Date();
-  const session = await createSession(data.users[__VU - 1], data.org, data.tokens.accessToken);
+  const session = await createSession(data.org, data.tokens.accessToken, {
+    user: {
+      userId: data.users[__VU - 1].userId,
+    },
+  });
 
   check(session, {
-    'add session is status ok': (s) => s.id !== "",
+    'add session is status ok': (s) => s.id !== '',
   });
-  
+
   addSessionTrend.add(new Date().getTime() - start.getTime());
 }
 
