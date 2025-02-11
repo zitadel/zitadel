@@ -29,11 +29,11 @@ func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) 
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*user.ListUsersResponse, error) {
-	queries, filterOrgIds, err := listUsersRequestToModel(req)
+	queries, filterOrgId, err := listUsersRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries, filterOrgIds, s.checkPermission)
+	res, err := s.query.SearchUsers(ctx, queries, filterOrgId, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
