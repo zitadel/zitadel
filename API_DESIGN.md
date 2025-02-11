@@ -48,7 +48,7 @@ Only use defaults if they are explicitly documented, such as returning a result 
 
 Names of resources, fields and methods should be descriptive and consistent.
 Use domain-specific terminology and avoid abbreviations.
-For example, use `OrganizationID` instead of **OrgID** or **resourceOwner** for the creation of a mew user or when returning one.
+For example, use `OrganizationID` instead of **OrgID** or **resourceOwner** for the creation of a new user or when returning one.
 
 > [!NOTE]
 > We'll update the resources in the [concepts section](https://zitadel.com/docs/concepts/structure/instance) to describe
