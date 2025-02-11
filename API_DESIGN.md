@@ -50,7 +50,7 @@ Names of resources, fields and methods should be descriptive and consistent.
 Use domain-specific terminology and avoid abbreviations.
 For example, use `OrganizationID` instead of **OrgID** or **resourceOwner** for the creation of a mew user or when returning one.
 
-> [!TODO]
+> [!NOTE]
 > We'll update the resources in the [concepts section](https://zitadel.com/docs/concepts/structure/instance) to describe
 > common resources and their meaning.
 > Until then, please refer to the following issue: https://github.com/zitadel/zitadel/issues/5888
@@ -65,18 +65,18 @@ For example, when retrieving or updating a user, the organization ID is not requ
 However, it is possible to provide the organization ID as a filter to retrieve a list of users of a specific organization.
 
 Prevent the creation of global messages that are used in multiple resources unless they always follow the same pattern.
-Use dedicated fields as described above or create a separate message for the specific context, that is only used in the boundary of the same resource.
+Use dedicated fields as described above or create a separate message for the specific context, that is only used in the boundary of the same resource.  
 For example, settings might be set as a default on the instance level, but might be overridden on the organization level.
 In this case, the settings could share the same `SettingsContext` message to determine the context of the settings.
-But do not create a global `Context` message that is used across the whole API if there are different scenarios and different fields required for the context.
-The same applies to messages that are returned by multiple resources.
+But do not create a global `Context` message that is used across the whole API if there are different scenarios and different fields required for the context.  
+The same applies to messages that are returned by multiple resources.  
 For example, information about the `User` might be different when managing the user resource itself than when it's returned
-as part of an authorization or a manager role. 
+as part of an authorization or a manager role, where only limited information is needed.
 
 Prevent reusing messages for the creation and the retrieval of a resource.
-Returning messages might contain additional information that is not required or even not available for the creation of the resource.
-What might sound obvious when designing the CreateUserRequest for example, where only an organization_id but not the `organization_name` is available,
-might not be so obvious when designing some sub-resource like a user's `IdentityProviderLink`, 
+Returning messages might contain additional information that is not required or even not available for the creation of the resource.  
+What might sound obvious when designing the CreateUserRequest for example, where only an `organization_id` but not the 
+`organization_name` is available, might not be so obvious when designing some sub-resource like a user's `IdentityProviderLink`, 
 which might contain an `identity_provider_name` when returned but not when created.
 
 #### Operations and Methods
@@ -109,7 +109,9 @@ Check the possible status codes https://zitadel.com/docs/apis/statuscodes
 Additionally to the status code, the API returns unique error codes for each type of error.
 The error codes are used to identify a specific error and can be used to handle the error programmatically.
 
-TODO: Add error codes schema and examples
+> [!NOTE]
+> Currently, ZITADEL might already return some error codes. However, they do not follow a specific pattern yet
+> and are not documented. We will update the error codes and document them in the future.
 
 ### Error Message and Details
 
@@ -170,15 +172,17 @@ Grpc-Status: 3
 
 - Document the purpose of the API, the services, the endpoints, the request and response messages, the error codes and the status codes.
 - Describe the fields of the request and response messages, the purpose and if needed the constraints.  
-- Document and explain the possible error codes and the error messages that can be returned by the API.
 - Document if the endpoints requires specific permissions or roles.
+- Document and explain the possible error codes and the error messages that can be returned by the API.
 
 #### Examples
 
 ```proto
 // ListUsers will return all matching users. By default, we will return all users of your instance that you have permission to read. Make sure to include a limit and sorting for pagination.
 //
-// Required permission: user.read
+// Required permission:
+//   - user.read
+//   - no permission required to own user
 //
 // Error Codes:
 //   - invalid_request: Your request does not have a valid format. Check error details for the reason.
