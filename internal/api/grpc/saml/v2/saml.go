@@ -56,8 +56,22 @@ func (s *Server) failSAMLRequest(ctx context.Context, samlRequestID string, ae *
 	return createCallbackResponseFromBinding(details, url, body, authReq.RelayState), nil
 }
 
+func (s *Server) checkPermission(ctx context.Context, issuer string, userID string) error {
+	permission, err := s.query.CheckProjectPermissionByEntityID(ctx, issuer, userID)
+	if err != nil {
+		return err
+	}
+	if !permission.HasProjectChecked {
+		return zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.User.ProjectRequired")
+	}
+	if !permission.ProjectRoleChecked {
+		return zerrors.ThrowPermissionDenied(nil, "SAML-foSyH49RvL", "Errors.User.GrantRequired")
+	}
+	return nil
+}
+
 func (s *Server) linkSessionToSAMLRequest(ctx context.Context, samlRequestID string, session *saml_pb.Session) (*saml_pb.CreateResponseResponse, error) {
-	details, aar, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken(), true)
+	details, aar, err := s.command.LinkSessionToSAMLRequest(ctx, samlRequestID, session.GetSessionId(), session.GetSessionToken(), true, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

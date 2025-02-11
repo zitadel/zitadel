@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/crewjam/saml"
@@ -141,23 +142,23 @@ func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *sa
 	return i.CreateSAMLClientLoginVersion(ctx, projectID, m, nil)
 }
 
-func (i *Instance) CreateSAMLAuthRequestWithoutLoginClientHeader(m *samlsp.Middleware, loginBaseURI string, acs saml.Endpoint, relayState, responseBinding string) (authRequestID string, err error) {
+func (i *Instance) CreateSAMLAuthRequestWithoutLoginClientHeader(m *samlsp.Middleware, loginBaseURI string, acs saml.Endpoint, relayState, responseBinding string) (now time.Time, authRequestID string, err error) {
 	return i.createSAMLAuthRequest(m, "", loginBaseURI, acs, relayState, responseBinding)
 }
 
-func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState, responseBinding string) (authRequestID string, err error) {
+func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState, responseBinding string) (now time.Time, authRequestID string, err error) {
 	return i.createSAMLAuthRequest(m, loginClient, "", acs, relayState, responseBinding)
 }
 
-func (i *Instance) createSAMLAuthRequest(m *samlsp.Middleware, loginClient, loginBaseURI string, acs saml.Endpoint, relayState, responseBinding string) (authRequestID string, err error) {
+func (i *Instance) createSAMLAuthRequest(m *samlsp.Middleware, loginClient, loginBaseURI string, acs saml.Endpoint, relayState, responseBinding string) (now time.Time, authRequestID string, err error) {
 	authReq, err := m.ServiceProvider.MakeAuthenticationRequest(acs.Location, acs.Binding, responseBinding)
 	if err != nil {
-		return "", err
+		return now, "", err
 	}
 
 	redirectURL, err := authReq.Redirect(relayState, &m.ServiceProvider)
 	if err != nil {
-		return "", err
+		return now, "", err
 	}
 
 	var headers map[string]string
@@ -166,21 +167,22 @@ func (i *Instance) createSAMLAuthRequest(m *samlsp.Middleware, loginClient, logi
 	}
 	req, err := GetRequest(redirectURL.String(), headers)
 	if err != nil {
-		return "", fmt.Errorf("get request: %w", err)
+		return now, "", fmt.Errorf("get request: %w", err)
 	}
 
+	now = time.Now()
 	loc, err := CheckRedirect(req)
 	if err != nil {
-		return "", fmt.Errorf("check redirect: %w", err)
+		return now, "", fmt.Errorf("check redirect: %w", err)
 	}
 
 	if loginBaseURI == "" {
 		loginBaseURI = i.Issuer() + i.Config.LoginURLV2
 	}
 	if !strings.HasPrefix(loc.String(), loginBaseURI) {
-		return "", fmt.Errorf("login location has not prefix %s, but is %s", loginBaseURI, loc.String())
+		return now, "", fmt.Errorf("login location has not prefix %s, but is %s", loginBaseURI, loc.String())
 	}
-	return strings.TrimPrefix(loc.String(), loginBaseURI), nil
+	return now, strings.TrimPrefix(loc.String(), loginBaseURI), nil
 }
 
 func (i *Instance) FailSAMLAuthRequest(ctx context.Context, id string, reason saml_pb.ErrorReason) *saml_pb.CreateResponseResponse {
