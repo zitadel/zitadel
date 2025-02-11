@@ -53,7 +53,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
-			name: "org with project owner, resourceowner empty",
+			name: "project, resourceowner empty",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -75,10 +75,11 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
-			name: "org with project owner, error already exists",
+			name: "project, error already exists",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internl"),
 						project.NewProjectAddedEvent(
 							context.Background(),
@@ -106,10 +107,42 @@ func TestCommandSide_AddProject(t *testing.T) {
 			},
 		},
 		{
-			name: "org with project owner, ok",
+			name: "project, already exists",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy),
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instanceID"),
+				project: &domain.Project{
+					Name:                   "project",
+					ProjectRoleAssertion:   true,
+					ProjectRoleCheck:       true,
+					HasProjectCheck:        true,
+					PrivateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsErrorAlreadyExists,
+			},
+		},
+		{
+			name: "project, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
 					expectPush(
 						project.NewProjectAddedEvent(
 							context.Background(),
