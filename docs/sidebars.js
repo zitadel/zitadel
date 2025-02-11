@@ -159,6 +159,7 @@ module.exports = {
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
             "guides/manage/customize/user-schema",
+            "guides/manage/user/scim2",
           ],
         },
         "guides/manage/terraform-provider",
@@ -326,6 +327,7 @@ module.exports = {
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard",
+            "guides/integrate/login-ui/saml-standard",
             "guides/integrate/login-ui/typescript-repo",
           ],
         },
@@ -834,6 +836,14 @@ module.exports = {
           collapsed: true,
           items: ["apis/saml/endpoints"],
         },
+      ],
+    },
+    {
+      type: "category",
+      label: "Provision Users",
+      collapsed: true,
+      items: [
+          'apis/scim2'
       ],
     },
     {

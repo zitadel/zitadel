@@ -97,7 +97,7 @@ BEGIN
                 , ("c").payload
                 , ("c").creator
                 , COALESCE(current_owner, ("c").owner) -- AS owner
-                , EXTRACT(EPOCH FROM NOW()) -- AS position
+                , cluster_logical_timestamp() -- AS position
                 , ordinality::INT -- AS in_tx_order
             FROM
                 UNNEST(commands) WITH ORDINALITY AS c

@@ -55,6 +55,7 @@ type Human struct {
 	IsPhoneVerified        bool                `json:"is_phone_verified,omitempty"`
 	PasswordChangeRequired bool                `json:"password_change_required,omitempty"`
 	PasswordChanged        time.Time           `json:"password_changed,omitempty"`
+	MFAInitSkipped         time.Time           `json:"mfa_init_skipped,omitempty"`
 }
 
 type Profile struct {
@@ -271,6 +272,10 @@ var (
 		name:  projection.HumanPasswordChanged,
 		table: humanTable,
 	}
+	HumanMFAInitSkippedCol = Column{
+		name:  projection.HumanMFAInitSkipped,
+		table: humanTable,
+	}
 )
 
 var (
@@ -363,6 +368,10 @@ func (q *Queries) GetUserByIDWithPermission(ctx context.Context, shouldTriggerBu
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string) (user *User, err error) {
+	return q.GetUserByIDWithResourceOwner(ctx, shouldTriggerBulk, userID, "")
+}
+
+func (q *Queries) GetUserByIDWithResourceOwner(ctx context.Context, shouldTriggerBulk bool, userID, resourceOwner string) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -377,6 +386,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		},
 		userByIDQuery,
 		userID,
+		resourceOwner,
 		authz.GetInstance(ctx).InstanceID(),
 	)
 	return user, err
@@ -602,6 +612,27 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 		return err
 	}, stmt, args...)
 	return user, err
+}
+
+func (q *Queries) CountUsers(ctx context.Context, queries *UserSearchQueries) (count uint64, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	query, scan := prepareCountUsersQuery()
+	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
+	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
+	if err != nil {
+		return 0, zerrors.ThrowInternal(err, "QUERY-w3Dx", "Errors.Query.SQLStatment")
+	}
+
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		count, err = scan(rows)
+		return err
+	}, stmt, args...)
+	if err != nil {
+		return 0, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
+	}
+	return count, err
 }
 
 func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
@@ -851,6 +882,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	isPhoneVerified := sql.NullBool{}
 	passwordChangeRequired := sql.NullBool{}
 	passwordChanged := sql.NullTime{}
+	mfaInitSkipped := sql.NullTime{}
 
 	machineID := sql.NullString{}
 	name := sql.NullString{}
@@ -883,6 +915,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		&isPhoneVerified,
 		&passwordChangeRequired,
 		&passwordChanged,
+		&mfaInitSkipped,
 		&machineID,
 		&name,
 		&description,
@@ -915,6 +948,7 @@ func scanUser(row *sql.Row) (*User, error) {
 			IsPhoneVerified:        isPhoneVerified.Bool,
 			PasswordChangeRequired: passwordChangeRequired.Bool,
 			PasswordChanged:        passwordChanged.Time,
+			MFAInitSkipped:         mfaInitSkipped.Time,
 		}
 	} else if machineID.Valid {
 		u.Machine = &Machine{
@@ -961,6 +995,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			HumanIsPhoneVerifiedCol.identifier(),
 			HumanPasswordChangeRequiredCol.identifier(),
 			HumanPasswordChangedCol.identifier(),
+			HumanMFAInitSkippedCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
@@ -1276,6 +1311,24 @@ func scanNotifyUser(row *sql.Row) (*NotifyUser, error) {
 	u.PasswordSet = notifyPasswordSet.Bool
 
 	return u, nil
+}
+
+func prepareCountUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (uint64, error)) {
+	return sq.Select(countColumn.identifier()).
+			From(userTable.identifier()).
+			LeftJoin(join(HumanUserIDCol, UserIDCol)).
+			LeftJoin(join(MachineUserIDCol, UserIDCol)).
+			PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (count uint64, err error) {
+			// the count is implemented as a windowing function,
+			// if it is zero, no row is returned at all.
+			if !rows.Next() {
+				return
+			}
+
+			err = rows.Scan(&count)
+			return
+		}
 }
 
 func prepareUserUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (bool, error)) {

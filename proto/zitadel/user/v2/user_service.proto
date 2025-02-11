@@ -1206,6 +1206,32 @@ service UserService {
       };
     };
   }
+
+  // MFA Init Skipped
+  //
+  // Update the last time the user has skipped MFA initialization. The server timestamp is used.
+  rpc HumanMFAInitSkipped(HumanMFAInitSkippedRequest) returns (HumanMFAInitSkippedResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/mfa_init_skipped"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
 }
 
 message AddHumanUserRequest{
@@ -2334,5 +2360,21 @@ message VerifyInviteCodeRequest {
 }
 
 message VerifyInviteCodeResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message HumanMFAInitSkippedRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }
+  ];
+}
+
+message HumanMFAInitSkippedResponse {
   zitadel.object.v2.Details details = 1;
 }

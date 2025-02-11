@@ -5,7 +5,7 @@ import (
 	"embed"
 	_ "embed"
 	"net/http"
-	"path/filepath"
+	"path"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -170,6 +170,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s44ReplaceCurrentSequencesIndex = &ReplaceCurrentSequencesIndex{dbClient: dbClient}
 	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
 	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: dbClient}
+	steps.s47FillMembershipFields = &FillMembershipFields{eventstore: eventstoreClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -230,6 +231,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s44ReplaceCurrentSequencesIndex,
 		steps.s45CorrectProjectOwners,
 		steps.s46InitPermissionFunctions,
+		steps.s47FillMembershipFields,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -277,7 +279,7 @@ func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Even
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
 func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
-	stmt, err := fs.ReadFile(filepath.Join(folder, typ, filename))
+	stmt, err := fs.ReadFile(path.Join(folder, typ, filename))
 	return string(stmt), err
 }
 
@@ -291,7 +293,7 @@ type statement struct {
 // Typ describes the database dialect and may be omitted if no
 // dialect specific migration is specified.
 func readStatements(fs embed.FS, folder, typ string) ([]statement, error) {
-	basePath := filepath.Join(folder, typ)
+	basePath := path.Join(folder, typ)
 	dir, err := fs.ReadDir(basePath)
 	if err != nil {
 		return nil, err

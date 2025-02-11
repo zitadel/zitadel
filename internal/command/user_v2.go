@@ -159,12 +159,12 @@ func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writ
 	return writeModel, nil
 }
 
-func (c *Commands) RemoveUserV2(ctx context.Context, userID string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUserV2(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
 	}
 
-	existingUser, err := c.userRemoveWriteModel(ctx, userID)
+	existingUser, err := c.userRemoveWriteModel(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -210,11 +210,11 @@ func (c *Commands) RemoveUserV2(ctx context.Context, userID string, cascadingUse
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) userRemoveWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
+func (c *Commands) userRemoveWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserRemoveWriteModel(userID, "")
+	writeModel = NewUserRemoveWriteModel(userID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

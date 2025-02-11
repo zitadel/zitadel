@@ -26,7 +26,7 @@ type Tracer struct {
 }
 
 func (c *Config) NewTracer() error {
-	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
+	sampler := otel.NewSampler(sdk_trace.TraceIDRatioBased(c.Fraction))
 	exporter, err := stdout.New(stdout.WithPrettyPrint())
 	if err != nil {
 		return err
