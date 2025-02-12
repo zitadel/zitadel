@@ -124,6 +124,19 @@ func (wm *ProjectWriteModel) NewChangedEvent(
 	return changeEvent, true, nil
 }
 
+func isProjectStateExists(state domain.ProjectState) bool {
+	return !hasProjectState(state, domain.ProjectStateRemoved, domain.ProjectStateUnspecified)
+}
+
 func ProjectAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, project.AggregateType, project.AggregateVersion)
+}
+
+func hasProjectState(check domain.ProjectState, states ...domain.ProjectState) bool {
+	for _, state := range states {
+		if check == state {
+			return true
+		}
+	}
+	return false
 }
