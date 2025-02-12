@@ -72,7 +72,7 @@ BEGIN
             , c.creator
             , COALESCE(current_owner, c.owner) -- AS owner
             , EXTRACT(EPOCH FROM NOW()) -- AS position
-            , c.ordinality::INT -- AS in_tx_order
+            , c.ordinality::{{ .InTxOrderType }} -- AS in_tx_order
         FROM
             UNNEST(commands) WITH ORDINALITY AS c
         WHERE
