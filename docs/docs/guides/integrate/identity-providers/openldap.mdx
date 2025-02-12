@@ -34,7 +34,35 @@ Otherwise, your users passwords are sent in clear text through the wire.
 
 ### Basic configuration
 
-To run LDAP locally to test it with ZITADEL please refer to [OpenLDAP](https://www.openldap.org/) with [slapd](https://www.openldap.org/software/man.cgi?query=slapd).
+You can run OpenLdap via `docker-compose` using the following:
+```
+version: '2'
+
+networks:
+  my-network:
+    driver: bridge
+services:
+  openldap:
+    image: bitnami/openldap:latest
+    ports:
+      - '389:1389'
+    environment:
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=Password1!
+      - LDAP_USERS=test
+      - LDAP_PASSWORDS=Password1!
+      - LDAP_ROOT=dc=example,dc=com
+      - LDAP_ADMIN_DN=cn=admin,dc=example,dc=com
+    networks:
+      - my-network
+    volumes:
+      - 'openldap_data:/bitnami/openldap'
+volumes:
+  openldap_data:
+    driver: local
+````
+
+Alternatively, you can run LDAP locally. To run LDAP locally to test it with ZITADEL please refer to [OpenLDAP](https://www.openldap.org/) with [slapd](https://www.openldap.org/software/man.cgi?query=slapd).
 
 For a quickstart guide please refer to their [official documentation](https://www.openldap.org/doc/admin22/quickstart.html).
 
