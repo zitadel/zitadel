@@ -4,7 +4,6 @@ package org_test
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -177,7 +176,6 @@ func TestServer_AddOrganization(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.AddOrganization(tt.ctx, tt.req)
-			fmt.Printf("got = %+v\n", got)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
