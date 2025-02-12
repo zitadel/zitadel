@@ -105,11 +105,15 @@ func TestServer_AddOrganization(t *testing.T) {
 			},
 			want: &org.AddOrganizationResponse{
 				OrganizationId: integration.NotEmpty,
-				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
+				OrgAdmins: []*org.OrgAdmins{
 					{
-						UserId:    integration.NotEmpty,
-						EmailCode: gu.Ptr(integration.NotEmpty),
-						PhoneCode: nil,
+						OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId:    integration.NotEmpty,
+								EmailCode: gu.Ptr(integration.NotEmpty),
+								PhoneCode: nil,
+							},
+						},
 					},
 				},
 			},
@@ -149,10 +153,13 @@ func TestServer_AddOrganization(t *testing.T) {
 				},
 			},
 			want: &org.AddOrganizationResponse{
-				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
-					// a single admin is expected, because the first provided already exists
+				OrgAdmins: []*org.OrgAdmins{
 					{
-						UserId: integration.NotEmpty,
+						OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId: integration.NotEmpty,
+							},
+						},
 					},
 				},
 			},
