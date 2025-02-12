@@ -36,6 +36,15 @@ Please check out their style guides and concepts for more information:
 Additionally, there are some conventions that are specific to the ZITADEL API.
 These conventions are described in the following sections.
 
+### Versioning
+
+The services and messages are versioned using major version numbers. This means that any change within a major version number is backward compatible.
+Any breaking change requires a new major version number.
+Each service is versioned independently. This means that a service can have a different version number than another service.
+When creating a new service, start with version `2`, as version `1` is reserved for the old context based API and services.
+
+Please check out the structure Buf style guide for more information about the folder and package structure: https://buf.build/docs/best-practices/style-guide/
+
 ### Explicitness
 
 Make the handling of the API as explicit as possible. Do not make assumptions about the client's knowledge of the system or the API. 
@@ -60,6 +69,16 @@ For example, use `OrganizationID` instead of **OrgID** or **resourceOwner** for 
 When a context is required for creating a resource, the context is added as a field to the resource.
 For example, when creating a new user, the organization ID is required. The `organization_id` is added as a field to the `CreateUserRequest`.
 
+```protobuf
+message CreateUserRequest {
+  ...
+  string organization_id = 7 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+  ];
+  ...
+}
+```
+
 Only allow providing a context where it is required. Do not provide the possibility to provide a context where it is not required.
 For example, when retrieving or updating a user, the organization ID is not required, since the user can be determined by the user ID.
 However, it is possible to provide the organization ID as a filter to retrieve a list of users of a specific organization.
@@ -79,6 +98,31 @@ What might sound obvious when designing the CreateUserRequest for example, where
 `organization_name` is available, might not be so obvious when designing some sub-resource like a user's `IdentityProviderLink`, 
 which might contain an `identity_provider_name` when returned but not when created.
 
+```protobuf
+message CreateUserRequest {
+  ...
+  repreated AddIdentityProviderLink identity_provider_links = 8;
+  ...
+}
+
+message AddIdentityProviderLink {
+  string identity_provider_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+  ];
+  string user_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+  ];
+  string user_name = 3;
+}
+
+message IdentiyProviderLink {
+  string identity_provider_id = 1;
+  string identity_provider_name = 2;
+  string user_id = 3;
+  string user_name = 4;
+} 
+```
+
 #### Operations and Methods
 
 Methods on a resource should be named using the following convention:
@@ -93,6 +137,40 @@ Methods on a list of resources should be named using the following convention:
 - Add: `Add<resource>`
 - Remove: `Remove<resource>`
 - Set: `Set<resource>`
+
+## Authentication and Authorization
+
+The API uses OAuth 2 for authorization. There are corresponding middlewares that check the access token for validity and 
+automatically return an error if the token is invalid.
+
+Permissions grated to the user are organization specific and might only be checked based on the queried resource.
+Therefore, the API does not check the permissions itself but relies on the checks of the functions that are called by the API.
+Required permissions need to be documented in the [API documentation](#documentation).
+
+## Pagination
+
+The API uses pagination for listing resources. The client can specify a limit and an offset to retrieve a subset of the resources.
+Additionally, the client can specify sorting options to sort the resources by a specific field.
+
+Most listing methods should provide use the `ListQuery` message to allow the client to specify the limit, offset, and sorting options.
+```protobuf
+
+// ListQuery is a general query object for lists to allow pagination and sorting.
+message ListQuery {
+  uint64 offset = 1;
+  // limit is the maximum amount of objects returned. The default is set to 100
+  // with a maximum of 1000 in the runtime configuration.
+  // If the limit exceeds the maximum configured ZITADEL will throw an error.
+  // If no limit is present the default is taken.
+  uint32 limit = 2;
+  // Asc is the sorting order. If true the list is sorted ascending, if false
+  // the list is sorted descending. The default is descending.
+  bool asc = 3;
+}
+```
+On the corresponding responses the `ListDetails` can be used to return the total count of the resources
+and allow the user to handle their offset and limit accordingly.
+
 
 ## Error Handling
 
