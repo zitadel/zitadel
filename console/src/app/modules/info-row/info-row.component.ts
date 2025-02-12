@@ -104,4 +104,11 @@ export class InfoRowComponent {
     }
     return user.type.case === 'human' ? user.type.value : undefined;
   }
+
+  public isV2(user: User.AsObject | UserV2 | UserV1) {
+    if ('$typeName' in user) {
+      return user.$typeName === 'zitadel.user.v2.User';
+    }
+    return false;
+  }
 }

@@ -949,6 +949,14 @@
       "5": "Pozastavený",
       "6": "Počáteční"
     },
+    "STATEV2": {
+      "0": "Neznámý",
+      "1": "Aktivní",
+      "2": "Neaktivní",
+      "3": "Smazaný",
+      "4": "Uzamčený",
+      "5": "Počáteční"
+    },
     "SEARCH": {
       "ADDITIONAL": "Přihlašovací jméno (současná organizace)",
       "ADDITIONAL-EXTERNAL": "Přihlašovací jméno (externí organizace)"

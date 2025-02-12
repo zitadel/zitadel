@@ -156,7 +156,6 @@ export class UserDetailComponent implements OnInit {
         }
         return curr;
       }),
-      tap((res) => console.log('res', res)),
     );
   }
 

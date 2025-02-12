@@ -246,7 +246,6 @@ export class AuthUserDetailComponent implements OnInit {
 
   private getMetadataById(userId: string): Observable<MetadataQuery> {
     return defer(() => this.newMgmtService.listUserMetadata(userId)).pipe(
-      tap((val) => console.log('val val', val)),
       map((metadata) => ({ state: 'success', value: metadata.result }) as const),
       startWith({ state: 'loading', value: [] as Metadata[] } as const),
       catchError((err) => of({ state: 'error', value: err.message ?? '' } as const)),

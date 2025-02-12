@@ -878,6 +878,14 @@
       "5": "Tergantung",
       "6": "Awal"
     },
+    "STATEV2": {
+      "0": "Tidak dikenal",
+      "1": "Aktif",
+      "2": "Tidak aktif",
+      "3": "Dihapus",
+      "4": "Terkunci",
+      "5": "Awal"
+    },
     "SEARCH": {
       "ADDITIONAL": "Nama login (organisasi saat ini)",
       "ADDITIONAL-EXTERNAL": "Nama login (organisasi eksternal)"
