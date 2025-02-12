@@ -18,7 +18,7 @@ type Apps7SAMLConfigsLoginVersion struct {
 }
 
 func (mig *Apps7SAMLConfigsLoginVersion) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addOIDCAppLoginVersion)
+	_, err := mig.dbClient.ExecContext(ctx, addSAMLAppLoginVersion)
 	return err
 }
 

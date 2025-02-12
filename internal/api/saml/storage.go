@@ -102,6 +102,12 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	// for backwards compatibility we pass the login client if set
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	loginClient := headers.Get(LoginClientHeader)
+
+	// for backwards compatibility we'll use the new login if the header is set (no matter the other configs)
+	if loginClient != "" {
+		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
+	}
+
 	// if the instance requires the v2 login, use it no matter what the application configured
 	if authz.GetFeatures(ctx).LoginV2.Required {
 		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
@@ -118,10 +124,7 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	case domain.LoginVersionUnspecified:
 		fallthrough
 	default:
-		// if undefined, use the v2 login if the header is sent, to retain the current behavior
-		if loginClient != "" {
-			return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
-		}
+		// since we already checked for a login header, we can fall back to the v1 login
 		return p.createAuthRequest(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
 	}
 }
