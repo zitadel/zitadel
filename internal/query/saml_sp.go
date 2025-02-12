@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"net/url"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -23,7 +23,7 @@ type SAMLServiceProvider struct {
 	ProjectID            string              `json:"project_id,omitempty"`
 	ProjectRoleAssertion bool                `json:"project_role_assertion,omitempty"`
 	LoginVersion         domain.LoginVersion `json:"login_version,omitempty"`
-	LoginBaseURI         *URL                `json:"login_base_uri,omitempty"`
+	LoginBaseURI         *url.URL            `json:"login_base_uri,omitempty"`
 	ProjectRoleKeys      []string            `json:"project_role_keys,omitempty"`
 }
 
@@ -34,8 +34,10 @@ func (q *Queries) ActiveSAMLServiceProviderByID(ctx context.Context, entityID st
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	sp, err = database.QueryJSONObject[SAMLServiceProvider](ctx, q.client,
-		samlSPQuery,
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		sp, err = scanSAMLServiceProviderByID(row)
+		return err
+	}, samlSPQuery,
 		authz.GetInstance(ctx).InstanceID(),
 		entityID,
 	)
@@ -49,7 +51,57 @@ func (q *Queries) ActiveSAMLServiceProviderByID(ctx context.Context, entityID st
 	loginV2 := instance.Features().LoginV2
 	if loginV2.Required {
 		sp.LoginVersion = domain.LoginVersion2
-		sp.LoginBaseURI = (*URL)(loginV2.BaseURI)
+		sp.LoginBaseURI = loginV2.BaseURI
 	}
 	return sp, err
+}
+
+func scanSAMLServiceProviderByID(row *sql.Row) (*SAMLServiceProvider, error) {
+	var instanceID, appID, entityID, metadataURL, projectID sql.NullString
+	var projectRoleAssertion sql.NullBool
+	var metadata []byte
+	var state, loginVersion sql.NullInt16
+	var loginBaseURI sql.NullString
+	var projectRoleKeys []string
+
+	err := row.Scan(
+		&instanceID,
+		&appID,
+		&state,
+		&entityID,
+		&metadata,
+		&metadataURL,
+		&projectID,
+		&projectRoleAssertion,
+		&loginVersion,
+		&loginBaseURI,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-8cjj8ao6yY", "Errors.App.NotFound")
+		}
+		return nil, zerrors.ThrowInternal(err, "QUERY-1xzFD209Bp", "Errors.Internal")
+	}
+	sp := &SAMLServiceProvider{
+		InstanceID:           instanceID.String,
+		AppID:                appID.String,
+		State:                domain.AppState(state.Int16),
+		EntityID:             entityID.String,
+		Metadata:             metadata,
+		MetadataURL:          metadataURL.String,
+		ProjectID:            projectID.String,
+		ProjectRoleAssertion: projectRoleAssertion.Bool,
+		ProjectRoleKeys:      projectRoleKeys,
+	}
+	if loginVersion.Valid {
+		sp.LoginVersion = domain.LoginVersion(loginVersion.Int16)
+	}
+	if loginBaseURI.Valid {
+		url, err := url.Parse(loginBaseURI.String)
+		if err != nil {
+			return nil, err
+		}
+		sp.LoginBaseURI = url
+	}
+	return sp, nil
 }

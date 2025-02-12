@@ -41,11 +41,11 @@ func (s *ServiceProvider) LoginURL(id string) string {
 	}
 	// any v2 login without a specific base uri will be sent to the configured login v2 UI
 	// this way we're also backwards compatible
-	if s.SP.LoginBaseURI == nil || s.SP.LoginBaseURI.URL().String() == "" {
+	if s.SP.LoginBaseURI == nil || s.SP.LoginBaseURI.String() == "" {
 		return s.defaultLoginURLV2 + id
 	}
 	// for clients with a specific URI (internal or external) we only need to add the auth request id
-	uri := s.SP.LoginBaseURI.URL().JoinPath(LoginPath)
+	uri := s.SP.LoginBaseURI.JoinPath(LoginPath)
 	q := uri.Query()
 	q.Set(LoginSamlRequestParam, id)
 	uri.RawQuery = q.Encode()
