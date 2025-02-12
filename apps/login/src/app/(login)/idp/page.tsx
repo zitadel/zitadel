@@ -16,11 +16,11 @@ export default async function Page(props: {
   const organization = searchParams?.organization;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
-    serviceRegion,
+
     orgId: organization,
   }).then((resp) => {
     return resp.identityProviders;
@@ -28,7 +28,7 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 

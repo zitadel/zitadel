@@ -29,7 +29,7 @@ export type RegisterUserResponse = {
 };
 export async function registerUser(command: RegisterUserCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
@@ -38,7 +38,7 @@ export async function registerUser(command: RegisterUserCommand) {
 
   const addResponse = await addHumanUser({
     serviceUrl,
-    serviceRegion,
+
     email: command.email,
     firstName: command.firstName,
     lastName: command.lastName,
@@ -52,7 +52,7 @@ export async function registerUser(command: RegisterUserCommand) {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: command.organization,
   });
 
@@ -94,7 +94,7 @@ export async function registerUser(command: RegisterUserCommand) {
   } else {
     const userResponse = await getUserByID({
       serviceUrl,
-      serviceRegion,
+
       userId: session?.factors?.user?.id,
     });
 
