@@ -136,7 +136,7 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						EventDate:     now,
 						ResourceOwner: "orgID",
 					},
-					CreatedAdmins: []*command.CreatedOrgAdmin{
+					OrgAdmins: []*command.CreatedOrgAdmin{
 						{
 							ID:        "id",
 							EmailCode: gu.Ptr("emailCode"),
