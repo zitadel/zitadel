@@ -4,9 +4,11 @@ import (
 	"context"
 	"embed"
 	_ "embed"
+	"errors"
 	"net/http"
 	"path"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -271,7 +273,23 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) {
 	err := migration.Migrate(ctx, eventstoreClient, step)
-	logging.WithFields("name", step.String()).OnError(err).Fatal(errorMsg)
+	if err == nil {
+		return
+	}
+	logFields := []any{
+		"name", step.String(),
+	}
+	pgErr := new(pgconn.PgError)
+	if errors.As(err, &pgErr) {
+		logFields = append(logFields,
+			"severity", pgErr.Severity,
+			"code", pgErr.Code,
+			"message", pgErr.Message,
+			"detail", pgErr.Detail,
+			"hint", pgErr.Hint,
+		)
+	}
+	logging.WithFields(logFields...).WithError(err).Fatal(errorMsg)
 }
 
 // readStmt reads a single file from the embedded FS,
