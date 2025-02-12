@@ -17,16 +17,20 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var (
-	//go:embed testdata/saml_sp.json
-	testdataSamlSP string
-	//go:embed testdata/saml_sp_loginversion.json
-	testdataSamlSPLoginVersion string
-)
-
 func TestQueries_ActiveSAMLServiceProviderByID(t *testing.T) {
 	expQuery := regexp.QuoteMeta(samlSPQuery)
-	cols := []string{"serviceprovider"}
+	cols := []string{
+		"instance_id",
+		"app_id",
+		"state",
+		"entity_id",
+		"metadata",
+		"metadata_url",
+		"project_id",
+		"project_role_assertion",
+		"login_version",
+		"login_base_uri",
+	}
 
 	tests := []struct {
 		name    string
@@ -46,7 +50,18 @@ func TestQueries_ActiveSAMLServiceProviderByID(t *testing.T) {
 		},
 		{
 			name: "sp",
-			mock: mockQuery(expQuery, cols, []driver.Value{testdataSamlSP}, "instanceID", "entityID"),
+			mock: mockQuery(expQuery, cols, []driver.Value{
+				"230690539048009730",
+				"236647088211886082",
+				domain.AppStateActive,
+				"https://test.com/metadata",
+				"metadata",
+				"https://test.com/metadata",
+				"236645808328409090",
+				true,
+				domain.LoginVersionUnspecified,
+				"",
+			}, "instanceID", "entityID"),
 			want: &SAMLServiceProvider{
 				InstanceID:           "230690539048009730",
 				AppID:                "236647088211886082",
@@ -56,12 +71,22 @@ func TestQueries_ActiveSAMLServiceProviderByID(t *testing.T) {
 				MetadataURL:          "https://test.com/metadata",
 				ProjectID:            "236645808328409090",
 				ProjectRoleAssertion: true,
-				ProjectRoleKeys:      []string{"role1", "role2"},
 			},
 		},
 		{
 			name: "sp with loginversion",
-			mock: mockQuery(expQuery, cols, []driver.Value{testdataSamlSPLoginVersion}, "instanceID", "entityID"),
+			mock: mockQuery(expQuery, cols, []driver.Value{
+				"230690539048009730",
+				"236647088211886082",
+				domain.AppStateActive,
+				"https://test.com/metadata",
+				"metadata",
+				"https://test.com/metadata",
+				"236645808328409090",
+				true,
+				domain.LoginVersion2,
+				"https://test.com/login",
+			}, "instanceID", "entityID"),
 			want: &SAMLServiceProvider{
 				InstanceID:           "230690539048009730",
 				AppID:                "236647088211886082",
@@ -71,12 +96,10 @@ func TestQueries_ActiveSAMLServiceProviderByID(t *testing.T) {
 				MetadataURL:          "https://test.com/metadata",
 				ProjectID:            "236645808328409090",
 				ProjectRoleAssertion: true,
-				ProjectRoleKeys:      []string{"role1", "role2"},
-				LoginVersion:         domain.LoginVersion1,
-				LoginBaseURI: func() *URL {
+				LoginVersion:         domain.LoginVersion2,
+				LoginBaseURI: func() *url.URL {
 					ret, _ := url.Parse("https://test.com/login")
-					retURL := URL(*ret)
-					return &retURL
+					return ret
 				}(),
 			},
 		},

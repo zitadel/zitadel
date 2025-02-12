@@ -24,7 +24,6 @@ type SAMLServiceProvider struct {
 	ProjectRoleAssertion bool                `json:"project_role_assertion,omitempty"`
 	LoginVersion         domain.LoginVersion `json:"login_version,omitempty"`
 	LoginBaseURI         *url.URL            `json:"login_base_uri,omitempty"`
-	ProjectRoleKeys      []string            `json:"project_role_keys,omitempty"`
 }
 
 //go:embed saml_sp_by_id.sql
@@ -62,7 +61,6 @@ func scanSAMLServiceProviderByID(row *sql.Row) (*SAMLServiceProvider, error) {
 	var metadata []byte
 	var state, loginVersion sql.NullInt16
 	var loginBaseURI sql.NullString
-	var projectRoleKeys []string
 
 	err := row.Scan(
 		&instanceID,
@@ -91,12 +89,11 @@ func scanSAMLServiceProviderByID(row *sql.Row) (*SAMLServiceProvider, error) {
 		MetadataURL:          metadataURL.String,
 		ProjectID:            projectID.String,
 		ProjectRoleAssertion: projectRoleAssertion.Bool,
-		ProjectRoleKeys:      projectRoleKeys,
 	}
 	if loginVersion.Valid {
 		sp.LoginVersion = domain.LoginVersion(loginVersion.Int16)
 	}
-	if loginBaseURI.Valid {
+	if loginBaseURI.Valid && loginBaseURI.String != "" {
 		url, err := url.Parse(loginBaseURI.String)
 		if err != nil {
 			return nil, err
