@@ -67,7 +67,6 @@ export async function createServiceForHost<T extends ServiceClass>(
  */
 export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   serviceUrl: string;
-  serviceRegion: string;
 } {
   let instanceUrl;
 
@@ -81,8 +80,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   } else if (process.env.ZITADEL_API_URL) {
     instanceUrl = process.env.ZITADEL_API_URL;
   } else {
-    const host =
-      headers.get("x-zitadel-forward-host") ?? headers.get("host");
+    const host = headers.get("x-zitadel-forward-host") ?? headers.get("host");
 
     if (host) {
       const [hostname, port] = host.split(":");
@@ -100,6 +98,5 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 
   return {
     serviceUrl: instanceUrl,
-    serviceRegion: headers.get("x-zitadel-region") || "",
   };
 }

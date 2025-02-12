@@ -52,7 +52,7 @@ export default async function Page(props: {
   } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionWithData = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
@@ -67,10 +67,10 @@ export default async function Page(props: {
 
     return listAuthenticationMethodTypes({
       serviceUrl,
-      serviceRegion,
+
       userId,
     }).then((methods) => {
-      return getUserByID({ serviceUrl, serviceRegion, userId }).then((user) => {
+      return getUserByID({ serviceUrl, userId }).then((user) => {
         const humanUser =
           user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
@@ -92,7 +92,7 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
-      serviceRegion,
+
       sessionParams: {
         loginName,
         organization,
@@ -110,7 +110,7 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-      serviceRegion,
+
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
@@ -120,12 +120,12 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: sessionWithData.factors?.user?.organizationId,
   });
 

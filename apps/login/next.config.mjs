@@ -54,7 +54,7 @@ if (process.env.ZITADEL_API_URL) {
 
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
-  output: 'standalone',
+  output: "standalone",
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
   experimental: {
     dynamicIO: true,

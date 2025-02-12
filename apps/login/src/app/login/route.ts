@@ -32,16 +32,14 @@ export const fetchCache = "default-no-store";
 
 async function loadSessions({
   serviceUrl,
-  serviceRegion,
   ids,
 }: {
   serviceUrl: string;
-  serviceRegion: string;
+
   ids: string[];
 }): Promise<Session[]> {
   const response = await listSessions({
     serviceUrl,
-    serviceRegion,
     ids: ids.filter((id: string | undefined) => !!id),
   });
 
@@ -58,7 +56,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
  **/
 async function isSessionValid(
   serviceUrl: string,
-  serviceRegion: string,
+
   session: Session,
 ): Promise<boolean> {
   // session can't be checked without user
@@ -71,7 +69,7 @@ async function isSessionValid(
 
   const authMethodTypes = await listAuthenticationMethodTypes({
     serviceUrl,
-    serviceRegion,
+
     userId: session.factors.user.id,
   });
 
@@ -121,7 +119,7 @@ async function isSessionValid(
     // only check settings if no auth methods are available, as this would require a setup
     const loginSettings = await getLoginSettings({
       serviceUrl,
-      serviceRegion,
+
       organization: session.factors?.user?.organizationId,
     });
     if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
@@ -165,7 +163,7 @@ async function isSessionValid(
 
 async function findValidSession(
   serviceUrl: string,
-  serviceRegion: string,
+
   sessions: Session[],
   authRequest: AuthRequest,
 ): Promise<Session | undefined> {
@@ -192,7 +190,7 @@ async function findValidSession(
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
-    if (await isSessionValid(serviceUrl, serviceRegion, session)) {
+    if (await isSessionValid(serviceUrl, session)) {
       return session;
     }
   }
@@ -222,7 +220,7 @@ export async function GET(request: NextRequest) {
   console.log("nexturl", request.nextUrl);
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
   const _rsc = searchParams.get("_rsc");
@@ -234,7 +232,7 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceUrl, serviceRegion, ids });
+    sessions = await loadSessions({ serviceUrl, ids });
   }
 
   if (authRequestId && sessionId) {
@@ -249,7 +247,7 @@ export async function GET(request: NextRequest) {
 
       const isValid = await isSessionValid(
         serviceUrl,
-        serviceRegion,
+
         selectedSession,
       );
 
@@ -286,7 +284,7 @@ export async function GET(request: NextRequest) {
         try {
           const { callbackUrl } = await createCallback({
             serviceUrl,
-            serviceRegion,
+
             req: create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {
@@ -314,7 +312,7 @@ export async function GET(request: NextRequest) {
           ) {
             const loginSettings = await getLoginSettings({
               serviceUrl,
-              serviceRegion,
+
               organization: selectedSession.factors?.user?.organizationId,
             });
 
@@ -357,7 +355,7 @@ export async function GET(request: NextRequest) {
   if (authRequestId) {
     const { authRequest } = await getAuthRequest({
       serviceUrl,
-      serviceRegion,
+
       authRequestId,
     });
 
@@ -388,7 +386,7 @@ export async function GET(request: NextRequest) {
           if (orgDomain) {
             const orgs = await getOrgsByDomain({
               serviceUrl,
-              serviceRegion,
+
               domain: orgDomain,
             });
             if (orgs.result && orgs.result.length === 1) {
@@ -405,7 +403,7 @@ export async function GET(request: NextRequest) {
 
         const identityProviders = await getActiveIdentityProviders({
           serviceUrl,
-          serviceRegion,
+
           orgId: organization ? organization : undefined,
         }).then((resp) => {
           return resp.identityProviders;
@@ -431,7 +429,7 @@ export async function GET(request: NextRequest) {
 
           return startIdentityProviderFlow({
             serviceUrl,
-            serviceRegion,
+
             idpId,
             urls: {
               successUrl:
@@ -545,7 +543,7 @@ export async function GET(request: NextRequest) {
          **/
         const selectedSession = await findValidSession(
           serviceUrl,
-          serviceRegion,
+
           sessions,
           authRequest,
         );
@@ -575,7 +573,7 @@ export async function GET(request: NextRequest) {
 
         const { callbackUrl } = await createCallback({
           serviceUrl,
-          serviceRegion,
+
           req: create(CreateCallbackRequestSchema, {
             authRequestId,
             callbackKind: {
@@ -589,7 +587,7 @@ export async function GET(request: NextRequest) {
         // check for loginHint, userId hint and valid sessions
         let selectedSession = await findValidSession(
           serviceUrl,
-          serviceRegion,
+
           sessions,
           authRequest,
         );
@@ -614,7 +612,7 @@ export async function GET(request: NextRequest) {
         try {
           const { callbackUrl } = await createCallback({
             serviceUrl,
-            serviceRegion,
+
             req: create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {
