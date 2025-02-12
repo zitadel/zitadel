@@ -136,8 +136,8 @@ func Test_createdOrganizationToPb(t *testing.T) {
 						EventDate:     now,
 						ResourceOwner: "orgID",
 					},
-					OrgAdmins: []*command.CreatedOrgAdmin{
-						{
+					OrgAdmins: []command.OrgAdmin{
+						&command.CreatedOrgAdmin{
 							ID:        "id",
 							EmailCode: gu.Ptr("emailCode"),
 							PhoneCode: gu.Ptr("phoneCode"),
@@ -152,11 +152,15 @@ func Test_createdOrganizationToPb(t *testing.T) {
 					ResourceOwner: "orgID",
 				},
 				OrganizationId: "orgID",
-				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
+				OrgAdmins: []*org.OrgAdmins{
 					{
-						UserId:    "id",
-						EmailCode: gu.Ptr("emailCode"),
-						PhoneCode: gu.Ptr("phoneCode"),
+						OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId:    "id",
+								EmailCode: gu.Ptr("emailCode"),
+								PhoneCode: gu.Ptr("phoneCode"),
+							},
+						},
 					},
 				},
 			},

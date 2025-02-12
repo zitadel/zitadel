@@ -71,11 +71,11 @@ func (a *CreatedOrgAdmin) GetID() string {
 	return a.ID
 }
 
-type GratedOrgAdmin struct {
+type AssignedOrgAdmin struct {
 	ID string
 }
 
-func (a *GratedOrgAdmin) GetID() string {
+func (a *AssignedOrgAdmin) GetID() string {
 	return a.ID
 }
 

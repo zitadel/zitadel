@@ -72,15 +72,15 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganiza
 		switch admin := admin.(type) {
 		case *command.CreatedOrgAdmin:
 			admins[i] = &org.OrgAdmins{
-				OrgAdmin: &org.OrgAdmins_CreatedAdmins{
-					CreatedAdmins: &org.CreatedAdmin{
+				OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+					CreatedAdmin: &org.CreatedAdmin{
 						UserId:    admin.ID,
 						EmailCode: admin.EmailCode,
 						PhoneCode: admin.PhoneCode,
 					},
 				},
 			}
-		case *command.GratedOrgAdmin:
+		case *command.AssignedOrgAdmin:
 			admins[i] = &org.OrgAdmins{
 				OrgAdmin: &org.OrgAdmins_AssignedAdmin{
 					AssignedAdmin: &org.AssignedAdmin{

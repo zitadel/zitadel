@@ -185,7 +185,7 @@ message OrgAdmins {
   oneof OrgAdmin {
     option (validate.required) = true;
 
-    CreatedAdmin created_admins = 3;
+    CreatedAdmin created_admin = 3;
     AssignedAdmin assigned_admin = 4;
   }
 }

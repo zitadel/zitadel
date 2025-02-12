@@ -83,7 +83,7 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganiza
 					},
 				},
 			}
-		case *command.GratedOrgAdmin:
+		case *command.AssignedOrgAdmin:
 			admins[i] = &org.OrgAdmins{
 				OrgAdmin: &org.OrgAdmins_AssignedAdmin{
 					AssignedAdmin: &org.AssignedAdmin{
