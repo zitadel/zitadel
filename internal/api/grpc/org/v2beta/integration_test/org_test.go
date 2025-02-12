@@ -157,6 +157,13 @@ func TestServer_AddOrganization(t *testing.T) {
 				OrganizationId: integration.NotEmpty,
 				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
+						OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &org.AssignedAdmin{
+								UserId: User.GetUserId(),
+							},
+						},
+					},
+					{
 						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
 							CreatedAdmin: &org.CreatedAdmin{
 								UserId: integration.NotEmpty,
