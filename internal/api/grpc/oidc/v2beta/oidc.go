@@ -100,8 +100,22 @@ func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *
 	}, nil
 }
 
+func (s *Server) checkPermission(ctx context.Context, clientID string, userID string) error {
+	permission, err := s.query.CheckProjectPermissionByClientID(ctx, clientID, userID)
+	if err != nil {
+		return err
+	}
+	if !permission.HasProjectChecked {
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-BakSFPjbfN", "Errors.User.ProjectRequired")
+	}
+	if !permission.ProjectRoleChecked {
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-EP688AF2jA", "Errors.User.GrantRequired")
+	}
+	return nil
+}
+
 func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID string, session *oidc_pb.Session) (*oidc_pb.CreateCallbackResponse, error) {
-	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true)
+	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}

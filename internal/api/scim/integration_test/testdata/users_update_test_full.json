@@ -134,6 +134,14 @@
       "op": "replace",
       "path": "password",
       "value": "Password2!"
+    },
+    // replace active state
+    {
+      "op": "replace",
+      "path": "active",
+      // quoted uppercase bool
+      // (ensure compatibility with Microsoft Entra)
+      "value": "True"
     }
   ]
 }

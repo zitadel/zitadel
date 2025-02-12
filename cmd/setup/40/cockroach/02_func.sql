@@ -1,15 +1,3 @@
--- represents an event to be created.
-CREATE TYPE IF NOT EXISTS eventstore.command AS (
-    instance_id TEXT
-    , aggregate_type TEXT
-    , aggregate_id TEXT
-    , command_type TEXT
-    , revision INT2
-    , payload JSONB
-    , creator TEXT
-    , owner TEXT
-);
-
 CREATE OR REPLACE FUNCTION eventstore.latest_aggregate_state(
     instance_id TEXT
     , aggregate_type TEXT
@@ -98,7 +86,7 @@ BEGIN
                 , ("c").creator
                 , COALESCE(current_owner, ("c").owner) -- AS owner
                 , cluster_logical_timestamp() -- AS position
-                , ordinality::INT -- AS in_tx_order
+                , ordinality::{{ .InTxOrderType }} -- AS in_tx_order
             FROM
                 UNNEST(commands) WITH ORDINALITY AS c
             WHERE

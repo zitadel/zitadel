@@ -46,6 +46,11 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	loginClient := headers.Get(LoginClientHeader)
 
+	// for backwards compatibility we'll use the new login if the header is set (no matter the other configs)
+	if loginClient != "" {
+		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
+	}
+
 	// if the instance requires the v2 login, use it no matter what the application configured
 	if authz.GetFeatures(ctx).LoginV2.Required {
 		return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
@@ -64,10 +69,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	case domain.LoginVersionUnspecified:
 		fallthrough
 	default:
-		// if undefined, use the v2 login if the header is sent, to retain the current behavior
-		if loginClient != "" {
-			return o.createAuthRequestLoginClient(ctx, req, userID, loginClient)
-		}
+		// since we already checked for a login header, we can fall back to the v1 login
 		return o.createAuthRequest(ctx, req, userID)
 	}
 }

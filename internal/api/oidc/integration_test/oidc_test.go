@@ -441,13 +441,13 @@ func createImplicitClientNoLoginClientHeader(t testing.TB) string {
 }
 
 func createAuthRequest(t testing.TB, instance *integration.Instance, clientID, redirectURI string, scope ...string) string {
-	redURL, err := instance.CreateOIDCAuthRequest(CTX, clientID, instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, scope...)
+	_, redURL, err := instance.CreateOIDCAuthRequest(CTX, clientID, instance.Users.Get(integration.UserTypeLogin).ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }
 
 func createAuthRequestNoLoginClientHeader(t testing.TB, instance *integration.Instance, clientID, redirectURI string, scope ...string) string {
-	redURL, err := instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTX, clientID, redirectURI, "", scope...)
+	_, redURL, err := instance.CreateOIDCAuthRequestWithoutLoginClientHeader(CTX, clientID, redirectURI, "", scope...)
 	require.NoError(t, err)
 	return redURL
 }
