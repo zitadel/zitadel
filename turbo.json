@@ -25,6 +25,7 @@
       "cache": true
     },
     "build": {},
+    "build:standalone": {},
     "test": {},
     "start": {},
     "start:built": {},

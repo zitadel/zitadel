@@ -5,7 +5,7 @@
   "scripts": {
     "generate": "turbo run generate",
     "build": "turbo run build",
-    "build:docker": "rm -rf ./out ./docker && mkdir -p ./docker && turbo prune @zitadel/login --docker && cd ./docker && cp -r ../out/json/* . && pnpm install --frozen-lockfile && cp -r ../out/full/* . && turbo run build && cd ..",
+    "build:docker": "rm -rf ./out ./docker && mkdir -p ./docker && turbo prune @zitadel/login --docker && cd ./docker && cp -r ../out/json/* . && pnpm install --frozen-lockfile && cp -r ../out/full/* . && turbo run build:standalone && cd ..",
     "build:packages": "turbo run build --filter=./packages/*",
     "build:apps": "turbo run build --filter=./apps/*",
     "test": "turbo run test",
