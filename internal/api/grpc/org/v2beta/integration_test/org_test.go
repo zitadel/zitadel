@@ -193,16 +193,21 @@ func TestServer_AddOrganization(t *testing.T) {
 			assert.Equal(t, got.GetDetails().GetResourceOwner(), got.GetOrganizationId())
 
 			// check the admins
-			require.Len(t, got.GetCreatedAdmins(), len(tt.want.GetCreatedAdmins()))
-			for i, admin := range tt.want.GetCreatedAdmins() {
-				gotAdmin := got.GetCreatedAdmins()[i]
-				assertCreatedAdmin(t, admin, gotAdmin)
+			require.Len(t, got.GetOrganizationAdmins(), len(tt.want.GetOrganizationAdmins()))
+			for i, admin := range tt.want.GetOrganizationAdmins() {
+				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
+				switch admin := admin.OrganizationAdmin.(type) {
+				case *org.OrganizationAdmin_CreatedAdmin:
+					assertCreatedAdmin(t, admin.CreatedAdmin, gotAdmin.(*org.OrganizationAdmin_CreatedAdmin).CreatedAdmin)
+				case *org.OrganizationAdmin_AssignedAdmin:
+					assert.Equal(t, admin.AssignedAdmin.GetUserId(), gotAdmin.(*org.OrganizationAdmin_AssignedAdmin).AssignedAdmin.GetUserId())
+				}
 			}
 		})
 	}
 }
 
-func assertCreatedAdmin(t *testing.T, expected, got *org.AddOrganizationResponse_CreatedAdmin) {
+func assertCreatedAdmin(t *testing.T, expected, got *org.CreatedAdmin) {
 	if expected.GetUserId() != "" {
 		assert.NotEmpty(t, got.GetUserId())
 	} else {
