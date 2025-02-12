@@ -207,8 +207,9 @@ message AddOrganizationResponse{
   }
   zitadel.object.v2.Details details = 1;
   string organization_id = 2;
+  // CreatedAdmin is now deprecated, use OrganizationAdmin instead
   repeated CreatedAdmin created_admins = 3;
-  repeated OrgAdmins org_admins = 4;
+  repeated OrganizationAdmin organization_admins = 4;
 }
 
 message CreatedAdmin {
@@ -218,8 +219,8 @@ message CreatedAdmin {
 }
 message AssignedAdmin { string user_id = 1; }
 
-message OrgAdmins {
-  oneof OrgAdmin {
+message OrganizationAdmin {
+  oneof OrganizationAdmin {
     option (validate.required) = true;
 
     CreatedAdmin created_admin = 3;

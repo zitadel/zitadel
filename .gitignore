@@ -78,7 +78,6 @@ migrations/cockroach/migrate_cloud.go
 /zitadel
 node_modules/
 .kreya
-cmd/setup/steps.yaml
 
 go.work
 go.work.sum

@@ -67,12 +67,12 @@ func addOrganizationRequestAdminToCommand(admin *org.AddOrganizationRequest_Admi
 }
 
 func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganizationResponse, err error) {
-	admins := make([]*org.OrgAdmins, len(createdOrg.OrgAdmins))
+	admins := make([]*org.OrganizationAdmin, len(createdOrg.OrgAdmins))
 	for i, admin := range createdOrg.OrgAdmins {
 		switch admin := admin.(type) {
 		case *command.CreatedOrgAdmin:
-			admins[i] = &org.OrgAdmins{
-				OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+			admins[i] = &org.OrganizationAdmin{
+				OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
 					CreatedAdmin: &org.CreatedAdmin{
 						UserId:    admin.ID,
 						EmailCode: admin.EmailCode,
@@ -81,8 +81,8 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganiza
 				},
 			}
 		case *command.AssignedOrgAdmin:
-			admins[i] = &org.OrgAdmins{
-				OrgAdmin: &org.OrgAdmins_AssignedAdmin{
+			admins[i] = &org.OrganizationAdmin{
+				OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
 					AssignedAdmin: &org.AssignedAdmin{
 						UserId: admin.ID,
 					},
@@ -91,8 +91,8 @@ func createdOrganizationToPb(createdOrg *command.CreatedOrg) (_ *org.AddOrganiza
 		}
 	}
 	return &org.AddOrganizationResponse{
-		Details:        object.DomainToDetailsPb(createdOrg.ObjectDetails),
-		OrganizationId: createdOrg.ObjectDetails.ResourceOwner,
-		OrgAdmins:      admins,
+		Details:            object.DomainToDetailsPb(createdOrg.ObjectDetails),
+		OrganizationId:     createdOrg.ObjectDetails.ResourceOwner,
+		OrganizationAdmins: admins,
 	}, nil
 }

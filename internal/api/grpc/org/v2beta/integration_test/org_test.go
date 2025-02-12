@@ -4,6 +4,7 @@ package org_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -105,9 +106,9 @@ func TestServer_AddOrganization(t *testing.T) {
 			},
 			want: &org.AddOrganizationResponse{
 				OrganizationId: integration.NotEmpty,
-				OrgAdmins: []*org.OrgAdmins{
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
 							CreatedAdmin: &org.CreatedAdmin{
 								UserId:    integration.NotEmpty,
 								EmailCode: gu.Ptr(integration.NotEmpty),
@@ -153,9 +154,10 @@ func TestServer_AddOrganization(t *testing.T) {
 				},
 			},
 			want: &org.AddOrganizationResponse{
-				OrgAdmins: []*org.OrgAdmins{
+				OrganizationId: integration.NotEmpty,
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
 							CreatedAdmin: &org.CreatedAdmin{
 								UserId: integration.NotEmpty,
 							},
@@ -168,6 +170,7 @@ func TestServer_AddOrganization(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.AddOrganization(tt.ctx, tt.req)
+			fmt.Printf("got = %+v\n", got)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

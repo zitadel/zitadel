@@ -108,9 +108,9 @@ func TestServer_AddOrganization(t *testing.T) {
 			},
 			want: &org.AddOrganizationResponse{
 				OrganizationId: integration.NotEmpty,
-				OrgAdmins: []*org.OrgAdmins{
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
 							CreatedAdmin: &org.CreatedAdmin{
 								UserId:    userId,
 								EmailCode: gu.Ptr(integration.NotEmpty),
@@ -156,9 +156,9 @@ func TestServer_AddOrganization(t *testing.T) {
 				},
 			},
 			want: &org.AddOrganizationResponse{
-				OrgAdmins: []*org.OrgAdmins{
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						OrgAdmin: &org.OrgAdmins_CreatedAdmin{
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
 							CreatedAdmin: &org.CreatedAdmin{
 								UserId: integration.NotEmpty,
 							},
