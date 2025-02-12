@@ -60,7 +60,7 @@ func New(client *database.DB) *Queue {
 }
 
 func (q *Queue) ExecuteMigrations(ctx context.Context) error {
-	_, err := q.driver.GetExecutor().Exec(ctx, "CREATE SCHEMA IF NOT EXISTS " + schema)
+	_, err := q.driver.GetExecutor().Exec(ctx, "CREATE SCHEMA IF NOT EXISTS "+schema)
 	if err != nil {
 		return err
 	}
