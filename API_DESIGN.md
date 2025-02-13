@@ -82,7 +82,7 @@ message CreateUserRequest {
 }
 ```
 
-Only allow providing a context where it is required. Do not provide the possibility to provide a context where it is not required.
+Only allow providing a context where it is required. The context MUST not be provided if not required.
 For example, when retrieving or updating a user, the `organization_id` is not required, since the user can be determined by the user's id.
 However, it is possible to provide the `organization_id` as a filter to retrieve a list of users of a specific organization.
 
