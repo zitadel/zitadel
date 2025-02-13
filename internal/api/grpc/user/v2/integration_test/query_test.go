@@ -185,7 +185,7 @@ func TestServer_GetUserByID(t *testing.T) {
 func TestServer_GetUserByID_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
-	newUserID := newOrg.CreatedAdmins[0].GetUserId()
+	newUserID := newOrg.OrganizationAdmins[0].GetCreatedAdmin().GetUserId()
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest

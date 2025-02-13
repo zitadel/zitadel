@@ -1236,7 +1236,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := gofakeit.Email()
 	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman-%s", gofakeit.AppName()), newOrgOwnerEmail)
-	newUserID := newOrg.CreatedAdmins[0].GetUserId()
+	newUserID := newOrg.OrganizationAdmins[0].GetCreatedAdmin().GetUserId()
 	type args struct {
 		ctx context.Context
 		req *user.UpdateHumanUserRequest
