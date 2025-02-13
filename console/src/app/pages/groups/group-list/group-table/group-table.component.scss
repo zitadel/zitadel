@@ -1,0 +1,12 @@
+@mixin group-table-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+}
+
+.group-tr-actions {
+  width: 42px;
+}
+
+.margin-left {
+  margin-left: 0.5rem;
+}

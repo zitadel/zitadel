@@ -1,0 +1,55 @@
+<div class="user-autocomplete-found" *ngIf="groups.length > 0">
+  <div class="found-user-row" *ngFor="let user of groups; index as i">
+    <div class="user-name-column">
+      <span>{{ user.name }}</span>
+      <span class="smaller cnsl-secondary-text">{{ user.name }}</span>
+    </div>
+    <span class="fill-space"></span>
+    <button class="search-user-dl-btn" matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" mat-icon-button color="warn">
+      <i class="las la-minus-circle" (click)="groups.splice(i, 1)"></i>
+    </button>
+  </div>
+  <div class="add-user-row" *ngIf="!editState">
+    <button (click)="editState = true" mat-icon-button>
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</div>
+
+<form *ngIf="editState">
+  <ng-container>
+    <div class="line">
+      <cnsl-form-field class="user-create-form-field more-space">
+        <cnsl-label>{{ 'GROUP.SEARCH.ADDITIONAL' | translate }}</cnsl-label>
+
+        <input
+          cnslInput
+          #usernameInput
+          [formControl]="myControl"
+          placeholder="Search for the group loginname"
+          [matAutocomplete]="auto"
+          data-e2e="add-member-input"
+        />
+
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
+          <mat-option *ngIf="isLoading" class="is-loading">
+            <mat-spinner diameter="30"></mat-spinner>
+          </mat-option>
+          <mat-option *ngFor="let user of filteredGroups" [value]="user">
+            <div class="user-option" data-e2e="user-option">
+              <div class="user-option-column">
+                <span>{{user.name}}</span>
+                <span class="fill-space"></span>
+                <span class="smaller cnsl-secondary-text">{{ user.name }}</span>
+              </div>
+            </div>
+          </mat-option>
+        </mat-autocomplete>
+
+        <span class="user-autocomplete-target-desc">
+          {{ 'GROUP.TARGET.SELF' | translate }}
+        </span>
+      </cnsl-form-field>
+    </div>
+  </ng-container>
+</form>

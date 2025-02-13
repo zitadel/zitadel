@@ -61,9 +61,19 @@
         "METADATA": "Add custom attributes to your user like your department. You can use this information in your organizations actions."
       }
     },
+    "GROUPS": {
+      "TITLE": "Groups",
+      "DESCRIPTION": "A list of user groups."
+    },
     "AUTHORIZATIONS": {
       "TITLE": "Authorizations",
-      "DESCRIPTION": "Authorizations define the access rights of a user to a project. You can grant a user access to a project and define the users roles within that project."
+      "DESCRIPTION": "Authorizations define the access rights of a user to a project. You can grant a user access to a project and define the users roles within that project.",
+      "USER": {
+        "TITLE" : "User"
+      },
+      "GROUP": {
+        "TITLE":"Group"
+      }
     },
     "ACTIONS": {
       "TITLE": "Actions",
@@ -408,7 +418,8 @@
     "TOS": "Terms of Service",
     "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
     "SETTINGS": "Settings",
-    "CUSTOMERPORTAL": "Customer Portal"
+    "CUSTOMERPORTAL": "Customer Portal",
+    "GROUPS": "Groups"
   },
   "QUICKSTART": {
     "TITLE": "Integrate ZITADEL into your application",
@@ -553,6 +564,7 @@
     "ORGNAME": "Organization Name",
     "PRIMARYDOMAIN": "Primary Domain",
     "PROJECTNAME": "Project Name",
+    "GROUPNAME": "Group Name",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
       "5": "contains",
@@ -1032,6 +1044,37 @@
         "DESCRIPTION": "You are about to delete the personal access token. Are you sure?"
       },
       "DELETED": "Token deleted with success."
+    }
+  },
+  "GROUP": {
+    "CREATE": {
+      "TITLE": "Create a New Group",
+      "NAME": "Name",
+      "DESCRIPTION": "Description"
+    },
+    "TOAST": {
+      "CREATED": "Group created successfully.",
+      "DELETED": "Group deleted successfully!",
+      "SELECTEDREACTIVATED": "Selected groups reactivated.",
+      "SELECTEDDEACTIVATED": "Selected groups deactivated.",
+      "REACTIVATED": "Group reactivated.",
+      "DEACTIVATED": "Group deactivated."
+    },
+    "PAGES": {
+      "NOGROUP": "No associated group.",
+      "DELETE": "Delete Group"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Delete Group",
+      "DELETE_DESCRIPTION": "You are about to permanently delete a group. Are you sure?",
+      "TYPEUSERNAME": "Type '{{value}}', to confirm and delete the group.",
+      "GROUPNAME": "Groupname"
+    },
+    "TARGET": {
+      "SELF": "If you want to grant a group of an other organization"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Groupname (current organization)"
     }
   },
   "METADATA": {
@@ -1879,6 +1922,7 @@
         "SEL_PROJECT": "Search for a project",
         "SEL_ROLES": "Select the roles you want to be added to the grant",
         "SEL_USER": "Select users",
+        "SEL_GROUP": "Select groups",
         "SEL_ORG": "Search an organization",
         "SEL_ORG_DESC": "Search the organization to grant.",
         "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
@@ -1930,7 +1974,8 @@
         "DELETE_TITLE": "Delete project grant",
         "DELETE_DESCRIPTION": "You are about to delete a project grant. Are you sure?"
       },
-      "ROLES": "Project Roles"
+      "ROLES": "Project Roles",
+      "GROUP": "Group"
     },
     "APP": {
       "TITLE": "Applications",

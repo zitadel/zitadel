@@ -6,6 +6,7 @@ import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { GrantedProject, Project, ProjectGrantState, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { Group, GroupState } from 'src/app/proto/generated/zitadel/group_pb';
 
 @Component({
   selector: 'cnsl-info-row',
@@ -14,6 +15,7 @@ import { User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 })
 export class InfoRowComponent {
   @Input() public user!: User.AsObject;
+  @Input() public group!: Group.AsObject;
   @Input() public org!: Org.AsObject;
   @Input() public instance!: InstanceDetail.AsObject;
   @Input() public app!: App.AsObject;
@@ -23,6 +25,7 @@ export class InfoRowComponent {
   @Input() public loginPolicy?: LoginPolicy.AsObject;
 
   public UserState: any = UserState;
+  public GroupState: any = GroupState;
   public State: any = State;
   public OrgState: any = OrgState;
   public AppState: any = AppState;

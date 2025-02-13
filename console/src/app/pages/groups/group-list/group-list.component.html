@@ -1,0 +1,15 @@
+<div class="max-width-container">
+  <div class="enlarged-container">
+    <div class="groups-title-row">
+      <h1>{{ 'DESCRIPTIONS.GROUPS.TITLE' | translate }}</h1>
+    </div>
+    <p class="group-list-sub cnsl-secondary-text">{{ 'DESCRIPTIONS.GROUPS.DESCRIPTION' | translate }}</p>
+    <ng-container>
+      <cnsl-group-table
+        [canWrite$]="['user.write$'] | hasRole"
+        [canDelete$]="['user.delete$'] | hasRole"
+      >
+      </cnsl-group-table>
+    </ng-container>
+  </div>
+</div>

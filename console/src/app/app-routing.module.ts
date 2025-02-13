@@ -55,6 +55,11 @@ const routes: Routes = [
     loadChildren: () => import('src/app/pages/users/users.module'),
   },
   {
+    path: 'groups',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('src/app/pages/groups/groups.module'),
+  },
+  {
     path: 'instance',
     loadChildren: () => import('./pages/instance/instance.module'),
     canActivate: [AuthGuard, RoleGuard],
@@ -110,6 +115,14 @@ const routes: Routes = [
       {
         path: 'user/:userid',
         loadChildren: () => import('src/app/pages/user-grant-create/user-grant-create.module'),
+        canActivate: [RoleGuard],
+        data: {
+          roles: ['user.grant.write'],
+        },
+      },
+      {
+        path: 'groups',
+        loadChildren: () => import('src/app/pages/groups/group-grant-create/group-grant-create.module'),
         canActivate: [RoleGuard],
         data: {
           roles: ['user.grant.write'],

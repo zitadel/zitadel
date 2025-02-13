@@ -1,0 +1,44 @@
+.icon-button {
+  margin-right: 0.5rem;
+}
+
+td,
+th {
+  padding: 0.5rem;
+
+  &:first-child {
+    padding-left: 0;
+    padding-right: 1rem;
+  }
+
+  &:last-child {
+    padding-right: 0;
+  }
+}
+
+.action {
+  width: 40px;
+}
+
+.member-action-tr {
+  max-width: 100px;
+}
+
+.sa-icon {
+  display: block;
+  width: 32px;
+  margin: 0 0.5rem;
+
+  i {
+    margin: auto;
+  }
+}
+
+.pointer {
+  outline: none;
+  cursor: pointer;
+}
+
+.role-row {
+  min-width: 200px;
+}
