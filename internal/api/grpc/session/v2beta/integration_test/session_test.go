@@ -267,7 +267,7 @@ func TestServer_CreateSession_lock_user(t *testing.T) {
 		fmt.Sprintf("TestServer_CreateSession_lock_user_%s", gofakeit.AppName()),
 		gofakeit.Email(),
 	)
-	userID := org.CreatedAdmins[0].GetUserId()
+	userID := org.OrganizationAdmins[0].GetCreatedAdmin().GetUserId()
 	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
 
 	// enable password lockout

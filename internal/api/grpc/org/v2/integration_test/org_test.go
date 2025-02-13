@@ -43,6 +43,7 @@ func TestMain(m *testing.M) {
 
 func TestServer_AddOrganization(t *testing.T) {
 	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
+	userId := "userID"
 
 	tests := []struct {
 		name    string
@@ -81,7 +82,7 @@ func TestServer_AddOrganization(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "admin with init",
+			name: "admin with init with userID passed for Human admin",
 			ctx:  CTX,
 			req: &org.AddOrganizationRequest{
 				Name: gofakeit.AppName(),
@@ -89,6 +90,7 @@ func TestServer_AddOrganization(t *testing.T) {
 					{
 						UserType: &org.AddOrganizationRequest_Admin_Human{
 							Human: &user.AddHumanUserRequest{
+								UserId: &userId,
 								Profile: &user.SetHumanProfile{
 									GivenName:  "firstname",
 									FamilyName: "lastname",
@@ -106,11 +108,15 @@ func TestServer_AddOrganization(t *testing.T) {
 			},
 			want: &org.AddOrganizationResponse{
 				OrganizationId: integration.NotEmpty,
-				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						UserId:    integration.NotEmpty,
-						EmailCode: gu.Ptr(integration.NotEmpty),
-						PhoneCode: nil,
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId:    userId,
+								EmailCode: gu.Ptr(integration.NotEmpty),
+								PhoneCode: nil,
+							},
+						},
 					},
 				},
 			},
@@ -150,10 +156,20 @@ func TestServer_AddOrganization(t *testing.T) {
 				},
 			},
 			want: &org.AddOrganizationResponse{
-				CreatedAdmins: []*org.AddOrganizationResponse_CreatedAdmin{
-					// a single admin is expected, because the first provided already exists
+				OrganizationAdmins: []*org.OrganizationAdmin{
 					{
-						UserId: integration.NotEmpty,
+						OrganizationAdmin: &org.OrganizationAdmin_AssignedAdmin{
+							AssignedAdmin: &org.AssignedAdmin{
+								UserId: User.GetUserId(),
+							},
+						},
+					},
+					{
+						OrganizationAdmin: &org.OrganizationAdmin_CreatedAdmin{
+							CreatedAdmin: &org.CreatedAdmin{
+								UserId: integration.NotEmpty,
+							},
+						},
 					},
 				},
 			},
@@ -179,16 +195,21 @@ func TestServer_AddOrganization(t *testing.T) {
 			assert.Equal(t, got.GetDetails().GetResourceOwner(), got.GetOrganizationId())
 
 			// check the admins
-			require.Len(t, got.GetCreatedAdmins(), len(tt.want.GetCreatedAdmins()))
-			for i, admin := range tt.want.GetCreatedAdmins() {
-				gotAdmin := got.GetCreatedAdmins()[i]
-				assertCreatedAdmin(t, admin, gotAdmin)
+			require.Len(t, got.GetOrganizationAdmins(), len(tt.want.GetOrganizationAdmins()))
+			for i, admin := range tt.want.GetOrganizationAdmins() {
+				gotAdmin := got.GetOrganizationAdmins()[i].OrganizationAdmin
+				switch admin := admin.OrganizationAdmin.(type) {
+				case *org.OrganizationAdmin_CreatedAdmin:
+					assertCreatedAdmin(t, admin.CreatedAdmin, gotAdmin.(*org.OrganizationAdmin_CreatedAdmin).CreatedAdmin)
+				case *org.OrganizationAdmin_AssignedAdmin:
+					assert.Equal(t, admin.AssignedAdmin.GetUserId(), gotAdmin.(*org.OrganizationAdmin_AssignedAdmin).AssignedAdmin.GetUserId())
+				}
 			}
 		})
 	}
 }
 
-func assertCreatedAdmin(t *testing.T, expected, got *org.AddOrganizationResponse_CreatedAdmin) {
+func assertCreatedAdmin(t *testing.T, expected, got *org.CreatedAdmin) {
 	if expected.GetUserId() != "" {
 		assert.NotEmpty(t, got.GetUserId())
 	} else {
