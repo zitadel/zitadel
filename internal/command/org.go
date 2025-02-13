@@ -96,16 +96,24 @@ func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail 
 		c.validations = append(c.validations, c.commands.AddOrgMemberCommand(c.aggregate, admin.ID, orgAdminRoles(admin.Roles)...))
 		return nil
 	}
-	userID, err := c.commands.idGenerator.Next()
-	if err != nil {
-		return err
+
+	var userID string
+	if admin.Human != nil && admin.Human.ID != "" {
+		userID = admin.Human.ID
+	} else {
+		var err error
+		userID, err = c.commands.idGenerator.Next()
+		if err != nil {
+			return err
+		}
 	}
+
 	if admin.Human != nil {
 		admin.Human.ID = userID
 		c.validations = append(c.validations, c.commands.AddHumanCommand(admin.Human, c.aggregate.ID, c.commands.userPasswordHasher, c.commands.userEncryption, allowInitialMail))
 	} else if admin.Machine != nil {
 		admin.Machine.Machine.AggregateID = userID
-		if err = c.setupOrgAdminMachine(c.aggregate, admin.Machine); err != nil {
+		if err := c.setupOrgAdminMachine(c.aggregate, admin.Machine); err != nil {
 			return err
 		}
 	}
@@ -179,7 +187,7 @@ func (c *orgSetupCommands) push(ctx context.Context) (_ *CreatedOrg, err error) 
 func (c *orgSetupCommands) createdAdmins() []*CreatedOrgAdmin {
 	users := make([]*CreatedOrgAdmin, 0, len(c.admins))
 	for _, admin := range c.admins {
-		if admin.ID != "" {
+		if admin.ID != "" && admin.Human == nil {
 			continue
 		}
 		if admin.Human != nil {
