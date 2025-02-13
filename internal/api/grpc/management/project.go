@@ -177,8 +177,7 @@ func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjec
 }
 
 func (s *Server) AddProject(ctx context.Context, req *mgmt_pb.AddProjectRequest) (*mgmt_pb.AddProjectResponse, error) {
-	ctxData := authz.GetCtxData(ctx)
-	project, err := s.command.AddProject(ctx, ProjectCreateToDomain(req), ctxData.OrgID, ctxData.UserID)
+	project, err := s.command.AddProject(ctx, ProjectCreateToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

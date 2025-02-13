@@ -1264,10 +1264,10 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, ""),
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project1", "org1").Aggregate, "app1", "entity1", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 						eventFromEventPusher(
-							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, ""),
+							project.NewSAMLConfigAddedEvent(context.Background(), &project.NewAggregate("project2", "org1").Aggregate, "app2", "entity2", []byte{}, "", domain.LoginVersionUnspecified, ""),
 						),
 					),
 					expectPush(
