@@ -20,7 +20,7 @@ func NewAddGroupMemberUniqueConstraint(aggregateID, groupID string) *eventstore.
 	return eventstore.NewAddEventUniqueConstraint(
 		GroupUniqueMember,
 		fmt.Sprintf("%s:%s", aggregateID, groupID),
-		"Errors.GroupMember.AlreadyExists")
+		"Errors.Group.Member.AlreadyExists")
 }
 
 func NewRemoveGroupMemberUniqueConstraint(aggregateID, groupID string) *eventstore.UniqueConstraint {

@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -707,7 +706,7 @@ func TestOperationCollection_Apply(t *testing.T) {
 				PreferredLanguage: language.MustParse("en-US"),
 				Locale:            "en-US",
 				Timezone:          "America/New_York",
-				Active:            gu.Ptr(true),
+				Active:            schemas.NewRelaxedBool(true),
 				Emails: []*ScimEmail{
 					{
 						Value:   "jeanie.pendleton@example.com",

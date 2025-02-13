@@ -31,7 +31,7 @@ func (c *Commands) AddGroupWithID(ctx context.Context, group *domain.Group, reso
 		return nil, err
 	}
 	if existingGroup.State != domain.GroupStateUnspecified {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-opamwu", "Errors.Group.AlreadyExisting")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-opamwu", "Errors.Group.AlreadyExists")
 	}
 	group, err = c.addGroupWithID(ctx, group, resourceOwner, groupID)
 	if err != nil {
@@ -67,7 +67,7 @@ func (c *Commands) AddGroup(ctx context.Context, group *domain.Group, resourceOw
 	group, err = c.addGroupWithIDWithOwner(ctx, group, resourceOwner, ownerUserID, groupID)
 	if err != nil {
 		if zerrors.IsErrorAlreadyExists(err) {
-			return nil, zerrors.ThrowAlreadyExists(err, "COMMAND-9f8sJ", "Errors.Group.AlreadyExisting")
+			return nil, zerrors.ThrowAlreadyExists(err, "COMMAND-9f8sJ", "Errors.Group.AlreadyExists")
 		}
 		return nil, err
 	}
