@@ -6,9 +6,11 @@ import (
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/sdk/instrumentation"
 	sdk_metric "go.opentelemetry.io/otel/sdk/metric"
 
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
@@ -33,9 +35,19 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 	if err != nil {
 		return &Metrics{}, err
 	}
+	// create a view to filter out unwanted attributes
+	view := sdk_metric.NewView(
+		sdk_metric.Instrument{
+			Scope: instrumentation.Scope{Name: otelhttp.ScopeName},
+		},
+		sdk_metric.Stream{
+			AttributeFilter: attribute.NewAllowKeysFilter("http.method", "http.status_code", "http.target"),
+		},
+	)
 	meterProvider := sdk_metric.NewMeterProvider(
 		sdk_metric.WithReader(exporter),
 		sdk_metric.WithResource(resource),
+		sdk_metric.WithView(view),
 	)
 	return &Metrics{
 		Provider: meterProvider,
