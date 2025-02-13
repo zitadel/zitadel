@@ -37,6 +37,8 @@ import {
   ResendInviteCodeResponse,
   SetEmailRequestSchema,
   SetEmailResponse,
+  SetPasswordRequestSchema,
+  SetPasswordResponse,
   SetPhoneRequestSchema,
   SetPhoneResponse,
   UnlockUserRequestSchema,
@@ -190,6 +192,10 @@ export class UserService {
 
   public resendInviteCode(userId: string): Promise<ResendInviteCodeResponse> {
     return this.grpcService.userNew.resendInviteCode(create(ResendInviteCodeRequestSchema, { userId }));
+  }
+
+  public setPassword(req: MessageInitShape<typeof SetPasswordRequestSchema>): Promise<SetPasswordResponse> {
+    return this.grpcService.userNew.setPassword(create(SetPasswordRequestSchema, req));
   }
 }
 
