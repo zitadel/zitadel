@@ -376,7 +376,7 @@ message LDAPAttributes {
   string avatar_url_attribute = 12
       [ (validate.rules).string = {max_len : 200} ];
   string profile_attribute = 13 [ (validate.rules).string = {max_len : 200} ];
-  string root_ca= 14 [(validate.rules).bytes.max_len = 12000];
+  string root_ca= 14 [(validate.rules).bytes = {min_len: 1, max_len: 12000}];
 }
 
 enum AzureADTenantType {
