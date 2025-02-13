@@ -678,12 +678,31 @@ func (i *Instance) CreatePasswordSession(t *testing.T, ctx context.Context, user
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
 
+func (i *Instance) CreateProjectGrant(ctx context.Context, projectID, grantedOrgID string) *mgmt.AddProjectGrantResponse {
+	resp, err := i.Client.Mgmt.AddProjectGrant(ctx, &mgmt.AddProjectGrantRequest{
+		GrantedOrgId: grantedOrgID,
+		ProjectId:    projectID,
+	})
+	logging.OnError(err).Panic("create project grant")
+	return resp
+}
+
 func (i *Instance) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) string {
 	resp, err := i.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 	})
 	require.NoError(t, err)
+	return resp.GetUserGrantId()
+}
+
+func (i *Instance) CreateProjectGrantUserGrant(ctx context.Context, orgID, projectID, projectGrantID, userID string) string {
+	resp, err := i.Client.Mgmt.AddUserGrant(SetOrgID(ctx, orgID), &mgmt.AddUserGrantRequest{
+		UserId:         userID,
+		ProjectId:      projectID,
+		ProjectGrantId: projectGrantID,
+	})
+	logging.OnError(err).Panic("create project grant user grant")
 	return resp.GetUserGrantId()
 }
 

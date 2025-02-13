@@ -80,7 +80,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 	return authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
 
-func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
+func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, sessionToken string, checkLoginClient bool, projectPermissionCheck domain.ProjectPermissionCheck) (*domain.ObjectDetails, *CurrentAuthRequest, error) {
 	writeModel, err := c.getAuthRequestWriteModel(ctx, id)
 	if err != nil {
 		return nil, nil, err
@@ -96,6 +96,7 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 			return nil, nil, err
 		}
 	}
+
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
@@ -106,6 +107,12 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 	}
 	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, nil, err
+	}
+
+	if projectPermissionCheck != nil {
+		if err := projectPermissionCheck(ctx, writeModel.ClientID, sessionWriteModel.UserID); err != nil {
+			return nil, nil, err
+		}
 	}
 
 	if err := c.pushAppendAndReduce(ctx, writeModel, authrequest.NewSessionLinkedEvent(

@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/crewjam/saml"
@@ -135,32 +136,33 @@ func (i *Instance) CreateSAMLClient(ctx context.Context, projectID string, m *sa
 	})
 }
 
-func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState string, responseBinding string) (authRequestID string, err error) {
+func (i *Instance) CreateSAMLAuthRequest(m *samlsp.Middleware, loginClient string, acs saml.Endpoint, relayState string, responseBinding string) (now time.Time, authRequestID string, err error) {
 	authReq, err := m.ServiceProvider.MakeAuthenticationRequest(acs.Location, acs.Binding, responseBinding)
 	if err != nil {
-		return "", err
+		return now, "", err
 	}
 
 	redirectURL, err := authReq.Redirect(relayState, &m.ServiceProvider)
 	if err != nil {
-		return "", err
+		return now, "", err
 	}
 
 	req, err := GetRequest(redirectURL.String(), map[string]string{oidc_internal.LoginClientHeader: loginClient})
 	if err != nil {
-		return "", fmt.Errorf("get request: %w", err)
+		return now, "", fmt.Errorf("get request: %w", err)
 	}
 
+	now = time.Now()
 	loc, err := CheckRedirect(req)
 	if err != nil {
-		return "", fmt.Errorf("check redirect: %w", err)
+		return now, "", fmt.Errorf("check redirect: %w", err)
 	}
 
 	prefixWithHost := i.Issuer() + i.Config.LoginURLV2
 	if !strings.HasPrefix(loc.String(), prefixWithHost) {
-		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
+		return now, "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}
-	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
+	return now, strings.TrimPrefix(loc.String(), prefixWithHost), nil
 }
 
 func (i *Instance) FailSAMLAuthRequest(ctx context.Context, id string, reason saml_pb.ErrorReason) *saml_pb.CreateResponseResponse {
