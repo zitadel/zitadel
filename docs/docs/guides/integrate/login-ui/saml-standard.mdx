@@ -10,9 +10,9 @@ The following flow shows you the different components you need to enable SAML fo
 ![SAML Flow](/img/guides/login-ui/saml-flow.png)
 
 1. Your application makes an SAML request to your login UI
-2. The login UI proxies the request to the ZITADEL API. In the request to the ZITADEL API, a header to identify your client is needed.
+2. The login UI proxies the request to the ZITADEL API.
 3. The ZITADEL API parses the request and does what it needs to interpret certain parameters (e.g., binding, nameID policy, etc.)
-4. Redirect to a predefined, relative URL of the login UI that includes the samlrequest ID ("/login?authRequest=")
+4. Redirect to a predefined, relative URL of the login UI that includes the samlrequest ID ("/login?authRequest="), configurable per application.
 5. Request to ZITADEL API to get all the information from the SAML request. This is optional and only needed if you like to get all the parsed information from the samlrequest-
 6. Authenticate the user in your login UI by creating and updating a session with all the checks you need.
 7. Finalize the SAML request by sending the session to the request, you will get the URL to redirect to or the body in the response
@@ -37,10 +37,10 @@ https://login.example.com/saml/v2/SSO?SAMLRequest=nJLRa9swEMb%2FFXHvjmVTY0fUhqxh
 The SAML request includes all the relevant information for the SAML standard, which includes the RelayState, the used binding and other information.
 
 You now have to proxy the SAML request from your own UI to the SSO Endpoint of ZITADEL.
-Make sure to add the user id of your login UI service/machine user as a header to the request: ```x-zitadel-login-client: <userid>```
+For more information have a look under [OIDC Proxy](./typescript-repo#oidc-proxy) for the necessary headers.
 
 :::note
-The user id sent in the 'x-zitadel-login-client' has to match to the PAT you are sending in the request.
+The version and the maybe custom URI to the available login UI is configurable under the application.
 :::
 
 Read more about the [SSO Endpoint Documentation](/docs/apis/saml/endpoints#sso_endpoint)
