@@ -342,6 +342,27 @@ Errors:
       HasNotExistingRole: One role doesn't exist on project
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
+  Group:
+    GroupIDMissing: Group Id missing
+    AlreadyExists: Group already exists on organization
+    Invalid: Group is invalid
+    NotActive: Group is not active
+    NotInactive: Group is not deactivated
+    NotFound: Group not found
+    Member:
+      NotFound: Group member not found
+      Invalid: Group member is invalid
+      AlreadyExists: Group member already exists
+      NotExisting: Group member doesn't exist
+  GroupGrant:
+    AlreadyExists: User grant already exists
+    NotFound: User grant not found
+    Invalid: User grant is invalid
+    NotChanged: User grant has not been changed
+    IDMissing: Id missing
+    NotActive: User grant is not active
+    NotInactive: User grant is not deactivated
+    RoleKeyNotFound: Role not found
   IAM:
     NotFound: Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains
     Member:
@@ -632,6 +653,8 @@ AggregateTypes:
   web_key: Web Key
   saml_request: SAML Request
   saml_session: SAML Session
+  group: Group
+  groupgrant: Group Grant
 
 EventTypes:
   execution:
@@ -877,6 +900,11 @@ EventTypes:
     pat:
       added: Personal Access Token added
       removed: Personal Access Token removed
+    groups:
+      added: User added to group
+      removed: User removed from group
+      cascade:
+        removed: User removed from group
   org:
     added: Organization added
     changed: Organization changed
@@ -1031,6 +1059,12 @@ EventTypes:
       removed: Project member removed
       cascade:
         removed: Project member cascade removed
+      group:
+        added: Project group member added
+        removed: Project group member removed
+        changed: Project group member changed
+        cascade:
+          removed: Project group member cascade removed
     role:
       added: Project role added
       changed: Project role changed
@@ -1049,6 +1083,12 @@ EventTypes:
         removed: Management access member removed
         cascade:
           removed: Management access cascade removed
+        group:
+          added: Management access group added
+          removed: Management access group removed
+          changed: Management access group changed
+          cascade:
+            removed: Management access group cascade removed
     application:
       added: Application added
       changed: Application changed
@@ -1360,7 +1400,36 @@ EventTypes:
         code:
           added: Phone number verification code generated
           sent: Phone number verification code sent
-
+  group:
+    added: Group added
+    changed: Group changed
+    deactivated: Group deactivated
+    reactivated: Group reactivated
+    removed: Group removed
+    member:
+      added: Group member added
+      changed: Group member changed
+      removed: Group member removed
+      cascade:
+        removed: Group member cascade removed
+    role:
+      added: Project role added
+      changed: Project role changed
+      removed: Project role removed
+    grant:
+      added: Management access added
+      changed: Management access changed
+      removed: Management access removed
+      deactivated: Management access deactivated
+      reactivated: Management access reactivated
+      cascade:
+        changed: Management access changed
+      member:
+        added: Management access member added
+        changed: Management access member changed
+        removed: Management access member removed
+        cascade:
+          removed: Management access cascade removed
 
   web_key:
     added: Web Key added
