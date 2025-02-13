@@ -22,6 +22,7 @@ import (
 
 var ErrNoSingleUser = errors.New("user does not exist or too many entries returned")
 var ErrFailedLogin = errors.New("user failed to login")
+var ErrUnableToAppendRootCA = errors.New("unable to append rootCA")
 
 var _ idp.Session = (*Session)(nil)
 
@@ -143,7 +144,7 @@ func getConnection(
 	if u.Scheme == "ldaps" && len(rootCA) > 0 {
 		rootCAs := x509.NewCertPool()
 		if ok := rootCAs.AppendCertsFromPEM(rootCA); !ok {
-			return nil, errors.New("unable to append rootCA")
+			return nil, ErrUnableToAppendRootCA
 		}
 
 		dialer = append(dialer, ldap.DialWithTLSConfig(&tls.Config{
