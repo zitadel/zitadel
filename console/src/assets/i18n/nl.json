@@ -949,6 +949,14 @@
       "5": "Opgeschort",
       "6": "Initieel"
     },
+    "STATEV2": {
+      "0": "Onbekend",
+      "1": "Actief",
+      "2": "Inactief",
+      "3": "Verwijderd",
+      "4": "Vergrendeld",
+      "5": "Initieel"
+    },
     "SEARCH": {
       "ADDITIONAL": "Loginnaam (huidige organisatie)",
       "ADDITIONAL-EXTERNAL": "Loginnaam (externe organisatie)"

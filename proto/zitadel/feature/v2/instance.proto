@@ -106,6 +106,13 @@ message SetInstanceFeaturesRequest{
       description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.";
     }
   ];
+
+  optional bool console_use_v2_user_api = 15 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -223,6 +230,13 @@ message GetInstanceFeaturesResponse {
   FeatureFlag permission_check_v2 = 15 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "Enable a newer, more performant, permission check used for v2 and v3 resource based APIs.";
+    }
+  ];
+
+  FeatureFlag console_use_v2_user_api = 16 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If this is enabled the console web client will use the new User v2 API for certain calls";
     }
   ];
 }

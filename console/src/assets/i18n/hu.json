@@ -949,6 +949,14 @@
       "5": "Felfüggesztett",
       "6": "Kezdeti"
     },
+    "STATEV2": {
+      "0": "Ismeretlen",
+      "1": "Aktív",
+      "2": "Inaktív",
+      "3": "Törölt",
+      "4": "Zárolt",
+      "5": "Kezdeti"
+    },
     "SEARCH": {
       "ADDITIONAL": "Belépési név (jelenlegi szervezet)",
       "ADDITIONAL-EXTERNAL": "Belépési név (külső szervezet)"

@@ -949,6 +949,14 @@
       "5": "Suspenso",
       "6": "Inicial"
     },
+    "STATEV2": {
+      "0": "Desconhecido",
+      "1": "Ativo",
+      "2": "Inativo",
+      "3": "Excluído",
+      "4": "Bloqueado",
+      "5": "Inicial"
+    },
     "SEARCH": {
       "ADDITIONAL": "Nome de usuário (organização atual)",
       "ADDITIONAL-EXTERNAL": "Nome de usuário (organização externa)"

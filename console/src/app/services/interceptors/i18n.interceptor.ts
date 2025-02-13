@@ -10,7 +10,7 @@ const i18nHeader = 'Accept-Language';
 export class I18nInterceptor<TReq = unknown, TResp = unknown> implements UnaryInterceptor<TReq, TResp> {
   constructor(private translate: TranslateService) {}
 
-  public async intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
+  public intercept(request: Request<TReq, TResp>, invoker: any): Promise<UnaryResponse<TReq, TResp>> {
     const metadata = request.getMetadata();
 
     const navLang = this.translate.currentLang ?? navigator.language;
@@ -18,12 +18,6 @@ export class I18nInterceptor<TReq = unknown, TResp = unknown> implements UnaryIn
       metadata[i18nHeader] = navLang;
     }
 
-    return invoker(request)
-      .then((response: any) => {
-        return response;
-      })
-      .catch((error: any) => {
-        return Promise.reject(error);
-      });
+    return invoker(request);
   }
 }

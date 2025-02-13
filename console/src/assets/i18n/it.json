@@ -948,6 +948,14 @@
       "5": "Sospeso",
       "6": "Initializzato"
     },
+    "STATEV2": {
+      "0": "Sconosciuto",
+      "1": "Attivo",
+      "2": "Inattivo",
+      "3": "Rimosso",
+      "4": "Bloccato",
+      "5": "Initializzato"
+    },
     "SEARCH": {
       "ADDITIONAL": "Nome (organizzazione corrente)",
       "ADDITIONAL-EXTERNAL": "Loginname (organizzazione esterna)"

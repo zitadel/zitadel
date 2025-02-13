@@ -949,6 +949,14 @@
       "5": "Suspendu",
       "6": "Initial"
     },
+    "STATEV2": {
+      "0": "Inconnu",
+      "1": "Actif",
+      "2": "Inactif",
+      "3": "Supprimé",
+      "4": "Verrouillé",
+      "5": "Initial"
+    },
     "SEARCH": {
       "ADDITIONAL": "Nom de connexion (organisation actuelle)",
       "ADDITIONAL-EXTERNAL": "Nom de connexion (organisation externe)"
