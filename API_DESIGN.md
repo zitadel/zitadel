@@ -1,5 +1,8 @@
 # API Design
 
+This document describes the design principles and conventions for the ZITADEL API. It is scoped to the services and 
+endpoints of the proprietary ZITADEL API and does not cover any standardized APIs like OAuth 2, OpenID Connect or SCIM.  
+
 ## The Basics
 ZITADEL follows an API first approach. This means all features can not only be accessed via the UI but also via the API.
 The API is designed using the Protobuf specification. The Protobuf specification is then used to generate the API client
@@ -15,7 +18,7 @@ The entire lifecycle of a resource can be managed using the API.
 > [!IMPORTANT]
 > This style guide is a work in progress and will be updated over time.
 > Not all parts of the API might follow the guidelines yet.
-> However, all new endpoints and services must be designed according to this style guide.
+> However, all new endpoints and services MUST be designed according to this style guide.
 
 ### Protobuf, gRPC and connectRPC
 
@@ -55,9 +58,9 @@ Only use defaults if they are explicitly documented, such as returning a result 
 
 ### Naming Conventions
 
-Names of resources, fields and methods should be descriptive and consistent.
+Names of resources, fields and methods MUST be descriptive and consistent.
 Use domain-specific terminology and avoid abbreviations.
-For example, use `OrganizationID` instead of **OrgID** or **resourceOwner** for the creation of a new user or when returning one.
+For example, use `organization_id` instead of **org_id** or **resource_owner** for the creation of a new user or when returning one.
 
 > [!NOTE]
 > We'll update the resources in the [concepts section](https://zitadel.com/docs/concepts/structure/instance) to describe
@@ -67,7 +70,7 @@ For example, use `OrganizationID` instead of **OrgID** or **resourceOwner** for 
 #### Resources and Fields
 
 When a context is required for creating a resource, the context is added as a field to the resource.
-For example, when creating a new user, the organization ID is required. The `organization_id` is added as a field to the `CreateUserRequest`.
+For example, when creating a new user, the organization's id is required. The `organization_id` is added as a field to the `CreateUserRequest`.
 
 ```protobuf
 message CreateUserRequest {
@@ -80,8 +83,8 @@ message CreateUserRequest {
 ```
 
 Only allow providing a context where it is required. Do not provide the possibility to provide a context where it is not required.
-For example, when retrieving or updating a user, the organization ID is not required, since the user can be determined by the user ID.
-However, it is possible to provide the organization ID as a filter to retrieve a list of users of a specific organization.
+For example, when retrieving or updating a user, the `organization_id` is not required, since the user can be determined by the user's id.
+However, it is possible to provide the `organization_id` as a filter to retrieve a list of users of a specific organization.
 
 Prevent the creation of global messages that are used in multiple resources unless they always follow the same pattern.
 Use dedicated fields as described above or create a separate message for the specific context, that is only used in the boundary of the same resource.  
@@ -125,18 +128,30 @@ message IdentiyProviderLink {
 
 #### Operations and Methods
 
-Methods on a resource should be named using the following convention:
-- Create: `Create<resource>`
-- Update: `Update<resource>`
-- Delete: `Delete<resource>`
-- Get: `Get<resource>`
-- List: `List<resource>`
-- Search: `Search<resource>`
+Methods on a resource MUST be named using the following convention:
 
-Methods on a list of resources should be named using the following convention:
-- Add: `Add<resource>`
-- Remove: `Remove<resource>`
-- Set: `Set<resource>`
+| Operation | Method Name        | Description                                                                                                                                                                                                                                 |
+|-----------|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Create    | Create\<resource\> | Create a new resource. If the new resource conflicts with an existing resources uniqueness (id, loginname, ...) the creation MUST be prevented and an error returned.                                                                       |
+| Update    | Update\<resource\> | Update an existing resource. In most cases this SHOULD allow partial updates. If there are exception, they MUST be explicitly documented on the endpoint. The resource MUST already exists. An error is returned otherwise.                 |
+| Delete    | Delete\<resource\> | Delete an existing resource. If the resource does not exist, no error SHOULD be returned. In case of an exception to this rule, the behavior MUST clearly be documented.                                                                    |
+| Set       | Set\<resource\>    | Set a resource. This will replace the existing resource with the new resource. In case where the creation and update of a resource do not need to be differentiated, a single `Set` method SHOULD be used. It SHOULD allow partial changes. |
+| Get       | Get\<resource\>    | Retrieve a single resource by its unique identifier. If the resource does not exist, an error MUST be returned.                                                                                                                             |
+| List      | List\<resource\>   | Retrieve a list of resources. The endpoint SHOULD provide options to filter, sort and paginate.                                                                                                                                             |
+
+Methods on a list of resources MUST be named using the following convention:
+
+| Operation | Method Name        | Description                                                                                                                                                                                      |
+|-----------|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Add       | Add\<resource\>    | Add a new resource to a list. Any existing unique constraint (id, loginname, ...) will prevent the addition and return an error.                                                                 |
+| Remove    | Remove\<resource\> | Remove an existing resource from a list. If the resource does not exist in the list, no error SHOULD be returned. In case of an exception to this rule, the behavior MUST clearly be documented. |
+| Set       | Set\<resource\>    | Set a list of resources. This will replace the existing list with the new list.                                                                                                                  |
+
+Additionally, state changes, specific actions or operations that do not fit into the CRUD operations SHOULD be named according to the action that is performed:
+- `Activate` or `Deactivate` for enabling or disabling a resource.
+- `Verify` for verifying a resource.
+- `Send` for sending a resource.
+- etc.
 
 ## Authentication and Authorization
 
@@ -152,7 +167,7 @@ Required permissions need to be documented in the [API documentation](#documenta
 The API uses pagination for listing resources. The client can specify a limit and an offset to retrieve a subset of the resources.
 Additionally, the client can specify sorting options to sort the resources by a specific field.
 
-Most listing methods should provide use the `ListQuery` message to allow the client to specify the limit, offset, and sorting options.
+Most listing methods SHOULD provide use the `ListQuery` message to allow the client to specify the limit, offset, and sorting options.
 ```protobuf
 
 // ListQuery is a general query object for lists to allow pagination and sorting.
@@ -174,7 +189,8 @@ and allow the user to handle their offset and limit accordingly.
 
 ## Error Handling
 
-The API returns machine-readable errors in the response body. This includes a status code, an error code and possibly some details.
+The API returns machine-readable errors in the response body. This includes a status code, an error code and possibly 
+some details about the error. See the following sections for more information about the status codes, error codes and error messages.
 
 ### Status Codes
 
@@ -206,15 +222,19 @@ HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
 {
-  "code": "USER-001",
-  "message": "user requires a username",
+  "code": "user_missing_information",
+  "message": "missing required information for the creation of the user",
   "details": [
     {
       "@type": "type.googleapis.com/google.rpc.BadRequest",
       "fieldViolations": [
         {
-          "field": "username",
-          "description": "Username is required"
+          "field": "given_name",
+          "description": "given name is required"
+        },
+        {
+          "field": "family_name",
+          "description": "family name is required"
         }
       ]
     }
@@ -224,21 +244,25 @@ Content-Type: application/json
 
 gRPC / connectRPC example:
 ```
-HTTP/2.0 200 Bad Request
+HTTP/2.0 200 OK
 Content-Type: application/grpc
-Grpc-Message: user requires a username
+Grpc-Message: missing required information for the creation of the user
 Grpc-Status: 3
 
 {
-  "code": "USER-001",
-  "message": "user requires a username",
+  "code": "user_missing_information",
+  "message": "missing required information for the creation of the user",
   "details": [
     {
       "@type": "type.googleapis.com/google.rpc.BadRequest",
       "fieldViolations": [
         {
-          "field": "username",
-          "description": "Username is required"
+          "field": "given_name",
+          "description": "given name is required"
+        },
+        {
+          "field": "family_name",
+          "description": "family name is required"
         }
       ]
     }
@@ -255,7 +279,28 @@ Grpc-Status: 3
 
 #### Examples
 
-```proto
+```protobuf
+// CreateUser will create a new user (human or machine) in the specified organization.
+// The username must be unique.
+//
+// For human users:
+// The user will receive a verification email if the email address is not marked as verified.
+// You can pass a hashed_password. This allows migrating your users from your own system to ZITADEL, without any password
+// reset for the user. Please check the required format and supported algorithms: <Link to documentation>. 
+//
+// Required permission:
+//   - user.write
+//
+// Error Codes:
+//   - user_missing_information: The request is missing required information (either given_name, family_name and/or email) for the creation of the user. Check error details for the missing fields.
+//   - user_already_exists: The user already exists. The username must be unique.
+//   - invalid_request: Your request does not have a valid format. Check error details for the reason.
+//   - permission_denied: You do not have the required permissions to access the requested resource.
+//   - unauthenticated: You are not authenticated. Please provide a valid access token.
+rpc CreatUser(CreatUserRequest) returns (CreatUserResponse) {}
+```
+
+```protobuf
 // ListUsers will return all matching users. By default, we will return all users of your instance that you have permission to read. Make sure to include a limit and sorting for pagination.
 //
 // Required permission:
@@ -264,32 +309,36 @@ Grpc-Status: 3
 //
 // Error Codes:
 //   - invalid_request: Your request does not have a valid format. Check error details for the reason.
-//   - unauthenticated: You are not authenticated. Please provide a valid access token.
 //   - permission_denied: You do not have the required permissions to access the requested resource.
+//   - unauthenticated: You are not authenticated. Please provide a valid access token.
 rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {}
 ```
 
-```proto
+```protobuf
+// VerifyEmail will verify the provided verification code and mark the email as verified on success.
+// An error is returned if the verification code is invalid or expired or if the user does not exist.
+// Note that if multiple verification codes are generated, only the last one is valid.
+//
+// Required permission:
+//   - no permission required, the user must be authenticated
+//
+// Error Codes:
+//   - invalid_verification_code: The verification code is invalid or expired.
+//   - invalid_request: Your request does not have a valid format. Check error details for the reason.
+//   - unauthenticated: You are not authenticated. Please provide a valid access token.
+rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {}
+```
 
-message SetPhoneRequest{
-  // The user ID of the user to set the phone number for.
+```protobuf
+message VerifyEmailRequest{
+  // The id of the user to verify the email for.
   string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
+    (validate.rules).string = {min_len: 1, max_len: 200}
   ];
-  // The phone number to set for the user.
-  string phone = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED
+  // The verification code generated and sent to the user.
+  string verification_code = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 20}
   ];
-  // If no verification is specified, an SMS will be automatically sent to the user.
-  oneof verification {
-    // Let ZITADEL send a phone verification code via SMS to the user.
-    SendPhoneVerificationCode send_code = 3;
-    // Return the phone verification code for the user so you can handle the delivery yourself.
-    ReturnPhoneVerificationCode return_code = 4;
-    // State the phone number as already verified.
-    bool is_verified = 5 [(validate.rules).bool.const = true];
-  }
 }
+
 ```
