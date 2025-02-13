@@ -70,6 +70,7 @@ const (
 	OAuthUserEndpointCol          = "user_endpoint"
 	OAuthScopesCol                = "scopes"
 	OAuthIDAttributeCol           = "id_attribute"
+	OAuthUsePKCECol               = "use_pkce"
 
 	OIDCIDCol             = "idp_id"
 	OIDCInstanceIDCol     = "instance_id"
@@ -78,6 +79,7 @@ const (
 	OIDCClientSecretCol   = "client_secret"
 	OIDCScopesCol         = "scopes"
 	OIDCIDTokenMappingCol = "id_token_mapping"
+	OIDCUsePKCECol        = "use_pkce"
 
 	JWTIDCol           = "idp_id"
 	JWTInstanceIDCol   = "instance_id"
@@ -216,6 +218,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(OAuthUserEndpointCol, handler.ColumnTypeText),
 			handler.NewColumn(OAuthScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(OAuthIDAttributeCol, handler.ColumnTypeText),
+			handler.NewColumn(OAuthUsePKCECol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(OAuthInstanceIDCol, OAuthIDCol),
 			IDPTemplateOAuthSuffix,
@@ -229,6 +232,7 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(OIDCClientSecretCol, handler.ColumnTypeJSONB),
 			handler.NewColumn(OIDCScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(OIDCIDTokenMappingCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(OIDCUsePKCECol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(OIDCInstanceIDCol, OIDCIDCol),
 			IDPTemplateOIDCSuffix,
@@ -720,6 +724,7 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(OAuthUserEndpointCol, idpEvent.UserEndpoint),
 				handler.NewCol(OAuthScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OAuthIDAttributeCol, idpEvent.IDAttribute),
+				handler.NewCol(OAuthUsePKCECol, idpEvent.UsePKCE),
 			},
 			handler.WithTableSuffix(IDPTemplateOAuthSuffix),
 		),
@@ -811,6 +816,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, idpEvent.IsIDTokenMapping),
+				handler.NewCol(OIDCUsePKCECol, idpEvent.UsePKCE),
 			},
 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -1152,6 +1158,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, true),
+				handler.NewCol(OIDCUsePKCECol, false),
 			},
 			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
@@ -2250,6 +2257,9 @@ func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.C
 	if idpEvent.IDAttribute != nil {
 		oauthCols = append(oauthCols, handler.NewCol(OAuthIDAttributeCol, *idpEvent.IDAttribute))
 	}
+	if idpEvent.UsePKCE != nil {
+		oauthCols = append(oauthCols, handler.NewCol(OAuthUsePKCECol, *idpEvent.UsePKCE))
+	}
 	return oauthCols
 }
 
@@ -2269,6 +2279,9 @@ func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Col
 	}
 	if idpEvent.IsIDTokenMapping != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCIDTokenMappingCol, *idpEvent.IsIDTokenMapping))
+	}
+	if idpEvent.UsePKCE != nil {
+		oidcCols = append(oidcCols, handler.NewCol(OIDCUsePKCECol, *idpEvent.UsePKCE))
 	}
 	return oidcCols
 }

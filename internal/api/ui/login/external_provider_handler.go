@@ -15,6 +15,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
+	http_oidc "github.com/zitadel/oidc/v3/pkg/http"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -1004,11 +1006,24 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]openid.ProviderOpts, 1, 2)
+	opts := make([]openid.ProviderOpts, 1, 3)
 	opts[0] = openid.WithSelectAccount()
 	if identityProvider.OIDCIDPTemplate.IsIDTokenMapping {
 		opts = append(opts, openid.WithIDTokenMapping())
 	}
+
+	if identityProvider.OIDCIDPTemplate.UsePKCE {
+		var cookieHandler *http_oidc.CookieHandler
+
+		if !l.externalSecure {
+			cookieHandler = http_oidc.NewCookieHandler(l.oidcKey, l.oidcKey, http_oidc.WithUnsecure())
+		} else {
+			cookieHandler = http_oidc.NewCookieHandler(l.oidcKey, l.oidcKey)
+		}
+
+		opts = append(opts, openid.WithRelyingPartyOption(rp.WithPKCE(cookieHandler)))
+	}
+
 	return openid.New(identityProvider.Name,
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
@@ -1046,6 +1061,19 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
 		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
 	}
+
+	opts := make([]oauth.ProviderOpts, 0, 1)
+	if identityProvider.OAuthIDPTemplate.UsePKCE {
+		var cookieHandler *http_oidc.CookieHandler
+
+		if !l.externalSecure {
+			cookieHandler = http_oidc.NewCookieHandler(l.oidcKey, l.oidcKey, http_oidc.WithUnsecure())
+		} else {
+			cookieHandler = http_oidc.NewCookieHandler(l.oidcKey, l.oidcKey)
+		}
+
+		opts = append(opts, oauth.WithRelyingPartyOption(rp.WithPKCE(cookieHandler)))
+	}
 	return oauth.New(
 		config,
 		identityProvider.Name,
@@ -1053,6 +1081,7 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+		opts...,
 	)
 }
 

@@ -2188,7 +2188,9 @@
       "REMOVED": "Успешно отстрането."
     },
     "ISIDTOKENMAPPING": "Совпаѓање од ID токен",
-    "ISIDTOKENMAPPING_DESC": "Ако е избрано, информациите од провајдерот се мапираат од ID токенот, а не од userinfo крајната точка."
+    "ISIDTOKENMAPPING_DESC": "Ако е избрано, информациите од провајдерот се мапираат од ID токенот, а не од userinfo крајната точка.",
+    "USEPKCE": "Користете PKCE",
+    "USEPKCE_DESC": "Определува дали параметрите code_challenge и code_challenge_method се вклучени во барањето за авторизација"
   },
   "MFA": {
     "LIST": {

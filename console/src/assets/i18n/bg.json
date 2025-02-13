@@ -2187,7 +2187,9 @@
       "REMOVED": "Премахнато успешно."
     },
     "ISIDTOKENMAPPING": "Съответствие от ID токен",
-    "ISIDTOKENMAPPING_DESC": "Ако е избрано, информацията на доставчика се съответства от ID токена, а не от userinfo крайната точка."
+    "ISIDTOKENMAPPING_DESC": "Ако е избрано, информацията на доставчика се съответства от ID токена, а не от userinfo крайната точка.",
+    "USEPKCE": "Използвайте PKCE",
+    "USEPKCE_DESC": "Определя дали параметрите code_challenge и code_challenge_method са включени в заявката за удостоверяване"
   },
   "MFA": {
     "LIST": {

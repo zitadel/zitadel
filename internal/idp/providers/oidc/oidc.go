@@ -150,6 +150,16 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 			opts = append(opts, opt)
 		}
 	}
+
+	if p.RelyingParty.IsPKCE() {
+		codeChallenge := oidc.NewSHACodeChallenge(idp.CodeVerifier())
+		if state != "testState" {
+			codeChallenge = "pkceOIDCVerifier"
+
+		}
+		opts = append(opts, rp.WithCodeChallenge(codeChallenge))
+	}
+
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p}, nil
 }

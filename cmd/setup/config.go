@@ -136,6 +136,7 @@ type Steps struct {
 	s45CorrectProjectOwners                 *CorrectProjectOwners
 	s46InitPermissionFunctions              *InitPermissionFunctions
 	s47FillMembershipFields                 *FillMembershipFields
+	s49IDPTemplate6UsePKCE                  *IDPTemplate6UsePKCE
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
