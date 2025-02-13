@@ -1250,20 +1250,6 @@ service UserService {
   //   - no permissions required for getting own metadata
   rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse) {}
 
-  // AddMetadata adds a new metadata entry to the user.
-  // If the key already exists, an error is returned.
-  //
-  // Required permissions:
-  //   - 'user.write'
-  rpc AddMetadata (AddMetadataRequest) returns (AddMetadataResponse) {}
-
-  // UpdateMetadata updates an existing metadata entry of the user.
-  // If the key does not exist, an error is returned.
-  //
-  // Required permissions:
-  //   - 'user.write'
-  rpc UpdateMetadata (UpdateMetadataRequest) returns (UpdateMetadataResponse) {}
-
   // Set Metadata adds or updates a metadata entry of the user identified by the key.
   // If the key does not exist, a new entry is created.
   // If the key already exists, the value is updated.
@@ -2453,36 +2439,6 @@ message GetMetadataRequest{
 
 message GetMetadataResponse{
   zitadel.metadata.v2.Metadata metadata = 1;
-}
-
-message AddMetadataRequest{
-  // The user ID of the user you like to add the metadata to.
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata key is the unique identifier of the metadata entry.
-  // If an entry with the same key already exists, an error is returned.
-  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata value is the value of the metadata entry.
-  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
-}
-
-message AddMetadataResponse{
-  // CreationDate is the timestamp the metadata entry was created.
-  google.protobuf.Timestamp creation_date = 1;
-}
-
-message UpdateMetadataRequest{
-  // The user ID of the user you like to update the metadata from.
-  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata key is the unique identifier of the metadata entry.
-  // If an entry with the same key does not exist, an error is returned.
-  string metadata_key = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-  // Metadata value is the value of the metadata entry.
-  bytes metadata_value = 3 [(validate.rules).bytes = {min_len: 1, max_len: 500000}];
-}
-
-message UpdateMetadataResponse{
-  // ChangeDate is the the timestamp the metadata entry was last updated.
-  google.protobuf.Timestamp change_date = 1;
 }
 
 message SetMetadataRequest{
