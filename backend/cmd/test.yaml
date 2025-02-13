@@ -1,0 +1,5 @@
+database:
+  postgres: 'something'
+  cockroach:
+    host: localhost
+    port: 26257
