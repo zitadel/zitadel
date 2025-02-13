@@ -49,6 +49,7 @@ We provide you with a wide range of out-of-the-box features to accelerate your p
 :white_check_mark: LDAP  
 :white_check_mark: Passkeys / FIDO2  
 :white_check_mark: OTP  
+:white_check_mark: SCIM 2.0 Server
 and an unlimited audit trail is there for you, ready to use.
 
 With ZITADEL, you are assured of a robust and customizable turnkey solution for all your authentication and authorization needs.
@@ -128,6 +129,7 @@ Authentication
 - [Custom sessions](https://zitadel.com/docs/guides/integrate/login-ui/username-password) if you need to go beyond OIDC or SAML 
 - [Machine-to-machine](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 - [Token exchange and impersonation](https://zitadel.com/docs/guides/integrate/token-exchange)
+- [Beta: Hosted Login V2](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta) our new login version 2.0
 
 Multi-Tenancy
 
@@ -141,10 +143,11 @@ Integration
 - [GRPC and REST APIs](https://zitadel.com/docs/apis/introduction) for every functionality and resource
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to call any API, send webhooks, adjust workflows, or customize tokens
 - [Role Based Access Control (RBAC)](https://zitadel.com/docs/guides/integrate/retrieve-user-roles)
+- [SCIM 2.0 Server](https://zitadel.com/docs/apis/scim2)
 - [Examples and SDKs](https://zitadel.com/docs/sdk-examples/introduction)
 - [Audit Log and SOC/SIEM](https://zitadel.com/docs/guides/integrate/external-audit-log)
 - [User registration and onboarding](https://zitadel.com/docs/guides/integrate/onboarding)
-- [Hosted and custom login user interface](https://zitadel.com/docs/guides/integrate/login-ui)
+- [Hosted and custom login user interface](https://zitadel.com/docs/guides/integrate/login/login-users)
 
 Self-Service
 - [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification
@@ -190,6 +193,11 @@ Use our login widget to allow easy and secure access to your applications and en
 Use [Console](https://zitadel.com/docs/guides/manage/console/overview) or our [APIs](https://zitadel.com/docs/apis/introduction) to setup organizations, projects and applications.
 
 [![Console Showcase](https://user-images.githubusercontent.com/1366906/223663344-67038d5f-4415-4285-ab20-9a4d397e2138.gif)](http://www.youtube.com/watch?v=RPpHktAcCtk "Console Showcase")
+
+### Login V2
+
+Check out our new Login V2 version in our [typescript repository](https://github.com/zitadel/typescript) or in our [documentation](https://zitadel.com/docs/guides/integrate/login/hosted-login#hosted-login-version-2-beta)
+[![New Login Showcase](https://github.com/user-attachments/assets/cb5c5212-128b-4dc9-b11d-cabfd3f73e26)]
 
 ## Security
 
