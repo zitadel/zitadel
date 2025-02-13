@@ -98,6 +98,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: orgResp.OrganizationId,
 				},
 			},
@@ -143,6 +144,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: orgResp.OrganizationId,
 				},
 			},
@@ -230,6 +232,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
@@ -268,6 +271,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 				},
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
+					CreationDate:  timestamppb.Now(),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
