@@ -63,10 +63,6 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		WebKey:                              featureSourceToFlagPb(&f.WebKey),
 		DebugOidcParentError:                featureSourceToFlagPb(&f.DebugOIDCParentError),
 		OidcSingleV1SessionTermination:      featureSourceToFlagPb(&f.OIDCSingleV1SessionTermination),
-		ConsoleUseV2UserApi: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_INSTANCE,
-		},
 	}
 }
 

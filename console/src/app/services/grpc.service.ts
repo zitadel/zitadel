@@ -16,13 +16,13 @@ import { ExhaustedGrpcInterceptor } from './interceptors/exhausted.grpc.intercep
 import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
-import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
 import { UserServiceClient } from '../proto/generated/zitadel/user/v2/User_serviceServiceClientPb';
 //@ts-ignore
 import { createUserServiceClient } from '@zitadel/client/v2';
 //@ts-ignore
 import { createAuthServiceClient, createManagementServiceClient } from '@zitadel/client/v1';
 import { createGrpcWebTransport } from '@connectrpc/connect-web';
+import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2/Feature_serviceServiceClientPb';
 
 @Injectable({
   providedIn: 'root',

@@ -71,6 +71,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) (*com
 		EnableBackChannelLogout:         req.EnableBackChannelLogout,
 		LoginV2:                         loginV2,
 		PermissionCheckV2:               req.PermissionCheckV2,
+		ConsoleUseV2UserApi:             req.ConsoleUseV2UserApi,
 	}, nil
 }
 
@@ -91,10 +92,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		EnableBackChannelLogout:             featureSourceToFlagPb(&f.EnableBackChannelLogout),
 		LoginV2:                             loginV2ToLoginV2FlagPb(f.LoginV2),
 		PermissionCheckV2:                   featureSourceToFlagPb(&f.PermissionCheckV2),
-		ConsoleUseV2UserApi: &feature_pb.FeatureFlag{
-			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_INSTANCE,
-		},
+		ConsoleUseV2UserApi:                 featureSourceToFlagPb(&f.ConsoleUseV2UserApi),
 	}
 }
 
