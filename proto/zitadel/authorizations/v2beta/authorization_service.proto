@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package zitadel.authorizations.v2;
+package zitadel.authorizations.v2beta;
 
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
-import "zitadel/authorizations/v2/authorization.proto";
+import "zitadel/authorizations/v2beta/authorization.proto";
 import "zitadel/object/v2/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2;authorizations";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2beta;authorizations";
 
 // AuthorizationService provides methods to manage authorizations for users within your projects and applications.
 //

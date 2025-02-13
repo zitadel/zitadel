@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package zitadel.permissions.v2;
+package zitadel.permissions.v2beta;
 
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
-import "zitadel/permissions/v2/manager.proto";
+import "zitadel/permissions/v2beta/manager.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/permissions/v2;permissions";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/permissions/v2beta;permissions";
 
 // PermissionsService provides methods to manage permissions for resource
 // and their management in ZITADEL itself.

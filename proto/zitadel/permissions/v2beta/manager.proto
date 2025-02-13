@@ -4,9 +4,9 @@ import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
 
-package zitadel.permissions.v2;
+package zitadel.permissions.v2beta;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/permissions/v2;permissions";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/permissions/v2beta;permissions";
 
 message Manager {
   // ID is the unique identifier of the manager role.

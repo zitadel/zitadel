@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package zitadel.authorizations.v2;
+package zitadel.authorizations.v2beta;
 
 import "google/protobuf/timestamp.proto";
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2;authorizations";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/authorizations/v2beta;authorizations";
 
 message Authorization {
   // ID is the unique identifier of the authorization.
@@ -33,7 +33,11 @@ message Authorization {
 
 enum State {
   STATE_UNSPECIFIED = 0;
+  // An active authorization grants the user access with the roles specified on the project.
   STATE_ACTIVE = 1;
+  // An inactive authorization temporarily deactivates the granted access and roles.
+  // ZITADEL will not include the specific authorization in any authorization information like an access token.
+  // But the information can still be accessed using the API.
   STATE_INACTIVE = 2;
 }
 
@@ -43,7 +47,6 @@ message User {
   // PreferredLoginName represents the preferred login name of the granted user.
   string preferred_login_name = 2;
   // DisplayName represents the public display name of the granted user.
-  // By default it's the user's given name and family name, their username or their email address.
   string display_name = 3;
   // AvatarURL is the URL to the user's public avatar image.
   string avatar_url = 4;
@@ -163,7 +166,7 @@ message StateQuery {
 
 message UserIDQuery {
   // Specify the ID of the user who was granted the authorization to search for.
-  string user_id = 1 [(validate.rules).string = {
+  string id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
@@ -172,7 +175,7 @@ message UserIDQuery {
 message UserOrganizationIDQuery {
   // Specify the ID of the organization the user is part of to search for.
   // Note that this might not be the organization the authorization was granted for.
-  string user_organization_id = 1 [(validate.rules).string = {
+  string id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
@@ -180,7 +183,7 @@ message UserOrganizationIDQuery {
 
 message UserPreferredLoginNameQuery {
   // Specify the preferred login name of the granted user to search for.
-  string user_preferred_login_name = 1 [(validate.rules).string = {
+  string login_name = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
@@ -192,7 +195,7 @@ message UserPreferredLoginNameQuery {
 
 message UserDisplayNameQuery {
   // Specify the public display name of the granted user to search for.
-  string user_display_name = 1 [(validate.rules).string = {
+  string display_name = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
@@ -205,7 +208,7 @@ message UserDisplayNameQuery {
 message ProjectIDQuery {
   // Specify the ID of the project the user was granted the authorization for to search for.
   // Note that this will also include authorizations granted for project grants of the same project.
-  string project_id = 1 [(validate.rules).string = {
+  string id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
@@ -214,7 +217,7 @@ message ProjectIDQuery {
 message ProjectNameQuery {
   // Specify the name of the project the user was granted the authorization for to search for.
   // Note that this will also include authorizations granted for project grants of the same project.
-  string project_name = 1 [(validate.rules).string = {max_len: 200}];
+  string name = 1 [(validate.rules).string = {max_len: 200}];
   // Specify the method to search for the project name. Default is EQUAL.
   // For example, to search for all authorizations granted on a project with
   // a name containing a specific string, use CONTAINS or CONTAINS_IGNORE_CASE.
@@ -223,7 +226,7 @@ message ProjectNameQuery {
 
 message ProjectGrantIDQuery {
   // Specify the ID of the project grant the user was granted the authorization for to search for.
-  string project_grant_id = 1 [(validate.rules).string = {
+  string id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
@@ -232,7 +235,7 @@ message ProjectGrantIDQuery {
 message OrganizationIDQuery {
   // Specify the ID of the organization the authorization was granted for to search for.
   // This can either be the organization the project or the project grant is part of.
-  string organization_id = 1 [(validate.rules).string = {
+  string id = 1 [(validate.rules).string = {
     min_len: 1
     max_len: 200
   }];
@@ -241,7 +244,7 @@ message OrganizationIDQuery {
 message OrganizationNameQuery {
   // Specify the name of the organization the authorization was granted for to search for.
   // This can either be the organization the project or the project grant is part of.
-  string organization_name = 1 [(validate.rules).string = {max_len: 200}];
+  string name = 1 [(validate.rules).string = {max_len: 200}];
   // Specify the method to search for the organization name. Default is EQUAL.
   // For example, to search for all authorizations with an organization name containing a specific string,
   // use CONTAINS or CONTAINS_IGNORE_CASE.
@@ -250,7 +253,7 @@ message OrganizationNameQuery {
 
 message RoleKeyQuery {
   // Specify the key of the role the user was granted to search for.
-  string role_key = 1 [(validate.rules).string = {max_len: 200}];
+  string key = 1 [(validate.rules).string = {max_len: 200}];
   // Specify the method to search for the role key. Default is EQUAL.
   // For example, to search for all authorizations starting with a specific role key,
   // use STARTS_WITH or STARTS_WITH_IGNORE_CASE.
