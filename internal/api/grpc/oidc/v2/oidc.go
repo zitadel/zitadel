@@ -73,6 +73,20 @@ func promptToPb(p domain.Prompt) oidc_pb.Prompt {
 	}
 }
 
+func (s *Server) checkPermission(ctx context.Context, clientID string, userID string) error {
+	permission, err := s.query.CheckProjectPermissionByClientID(ctx, clientID, userID)
+	if err != nil {
+		return err
+	}
+	if !permission.HasProjectChecked {
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.User.ProjectRequired")
+	}
+	if !permission.ProjectRoleChecked {
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-foSyH49RvL", "Errors.User.GrantRequired")
+	}
+	return nil
+}
+
 func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallbackRequest) (*oidc_pb.CreateCallbackResponse, error) {
 	switch v := req.GetCallbackKind().(type) {
 	case *oidc_pb.CreateCallbackRequest_Error:
@@ -101,7 +115,7 @@ func (s *Server) failAuthRequest(ctx context.Context, authRequestID string, ae *
 }
 
 func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID string, session *oidc_pb.Session) (*oidc_pb.CreateCallbackResponse, error) {
-	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true)
+	details, aar, err := s.command.LinkSessionToAuthRequest(ctx, authRequestID, session.GetSessionId(), session.GetSessionToken(), true, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
