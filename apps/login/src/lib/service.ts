@@ -80,7 +80,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   } else if (process.env.ZITADEL_API_URL) {
     instanceUrl = process.env.ZITADEL_API_URL;
   } else {
-    const host = headers.get("x-zitadel-forward-host") ?? headers.get("host");
+    const host = headers.get("host");
 
     if (host) {
       const [hostname, port] = host.split(":");
@@ -93,8 +93,6 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   if (!instanceUrl) {
     throw new Error("Service URL could not be determined");
   }
-
-  console.log("Service URL", instanceUrl);
 
   return {
     serviceUrl: instanceUrl,
