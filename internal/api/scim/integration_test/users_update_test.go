@@ -10,8 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -28,7 +26,7 @@ var (
 	//go:embed testdata/users_update_test_full.json
 	fullUserUpdateJson []byte
 
-	minimalUserUpdateJson = simpleReplacePatchBody("nickname", "foo")
+	minimalUserUpdateJson = simpleReplacePatchBody("nickname", "\"foo\"")
 )
 
 func init() {
@@ -43,9 +41,6 @@ func TestUpdateUser(t *testing.T) {
 		_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: fullUserCreated.ID})
 		require.NoError(t, err)
 	}()
-
-	iamOwnerCtx := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	secondaryOrg := Instance.CreateOrganization(iamOwnerCtx, gofakeit.Name(), gofakeit.Email())
 
 	tests := []struct {
 		name          string
@@ -74,7 +69,15 @@ func TestUpdateUser(t *testing.T) {
 		},
 		{
 			name:        "other org",
-			orgID:       secondaryOrg.OrganizationId,
+			orgID:       SecondaryOrganization.OrganizationId,
+			body:        minimalUserUpdateJson,
+			wantErr:     true,
+			errorStatus: http.StatusNotFound,
+		},
+		{
+			name:        "other org with permissions",
+			ctx:         Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner),
+			orgID:       SecondaryOrganization.OrganizationId,
 			body:        minimalUserUpdateJson,
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
@@ -204,7 +207,7 @@ func TestUpdateUser(t *testing.T) {
 				PreferredLanguage: language.MustParse("en-US"),
 				Locale:            "en-US",
 				Timezone:          "America/Los_Angeles",
-				Active:            gu.Ptr(true),
+				Active:            schemas.NewRelaxedBool(true),
 			},
 		},
 	}

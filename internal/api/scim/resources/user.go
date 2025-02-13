@@ -39,7 +39,7 @@ type ScimUser struct {
 	PreferredLanguage      language.Tag                  `json:"preferredLanguage,omitempty"`
 	Locale                 string                        `json:"locale,omitempty"`
 	Timezone               string                        `json:"timezone,omitempty"`
-	Active                 *bool                         `json:"active,omitempty"`
+	Active                 *scim_schemas.RelaxedBool     `json:"active,omitempty"`
 	Emails                 []*ScimEmail                  `json:"emails,omitempty" scim:"required"`
 	PhoneNumbers           []*ScimPhoneNumber            `json:"phoneNumbers,omitempty"`
 	Password               *scim_schemas.WriteOnlyString `json:"password,omitempty"`
@@ -154,7 +154,7 @@ func (h *UsersHandler) Create(ctx context.Context, user *ScimUser) (*ScimUser, e
 		return nil, err
 	}
 
-	err = h.command.AddUserHuman(ctx, orgID, addHuman, true, h.userCodeAlg)
+	err = h.command.AddUserHuman(ctx, orgID, addHuman, false, h.userCodeAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +180,8 @@ func (h *UsersHandler) Replace(ctx context.Context, id string, user *ScimUser) (
 }
 
 func (h *UsersHandler) Update(ctx context.Context, id string, operations patch.OperationCollection) error {
-	userWM, err := h.command.UserHumanWriteModel(ctx, id, true, true, true, true, false, false, true)
+	orgID := authz.GetCtxData(ctx).OrgID
+	userWM, err := h.command.UserHumanWriteModel(ctx, id, orgID, true, true, true, true, false, false, true)
 	if err != nil {
 		return err
 	}
@@ -191,6 +192,9 @@ func (h *UsersHandler) Update(ctx context.Context, id string, operations patch.O
 		return err
 	}
 
+	// ensure the identity of the user is not modified
+	changeHuman.ID = id
+	changeHuman.ResourceOwner = orgID
 	return h.command.ChangeUserHuman(ctx, changeHuman, h.userCodeAlg)
 }
 
@@ -200,12 +204,12 @@ func (h *UsersHandler) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	_, err = h.command.RemoveUserV2(ctx, id, memberships, grants...)
+	_, err = h.command.RemoveUserV2(ctx, id, authz.GetCtxData(ctx).OrgID, memberships, grants...)
 	return err
 }
 
 func (h *UsersHandler) Get(ctx context.Context, id string) (*ScimUser, error) {
-	user, err := h.query.GetUserByID(ctx, false, id)
+	user, err := h.query.GetUserByIDWithResourceOwner(ctx, false, id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

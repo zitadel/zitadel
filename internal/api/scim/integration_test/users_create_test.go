@@ -10,8 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -155,7 +153,7 @@ var (
 		PreferredLanguage: language.MustParse("en-US"),
 		Locale:            "en-US",
 		Timezone:          "America/Los_Angeles",
-		Active:            gu.Ptr(true),
+		Active:            schemas.NewRelaxedBool(true),
 	}
 )
 
@@ -164,6 +162,7 @@ func TestCreateUser(t *testing.T) {
 		name          string
 		body          []byte
 		ctx           context.Context
+		orgID         string
 		want          *resources.ScimUser
 		wantErr       bool
 		scimErrorType string
@@ -191,7 +190,7 @@ func TestCreateUser(t *testing.T) {
 			name: "minimal inactive user",
 			body: minimalInactiveUserJson,
 			want: &resources.ScimUser{
-				Active: gu.Ptr(false),
+				Active: schemas.NewRelaxedBool(false),
 			},
 		},
 		{
@@ -275,6 +274,13 @@ func TestCreateUser(t *testing.T) {
 			wantErr:     true,
 			errorStatus: http.StatusNotFound,
 		},
+		{
+			name:        "another org",
+			body:        minimalUserJson,
+			orgID:       SecondaryOrganization.OrganizationId,
+			wantErr:     true,
+			errorStatus: http.StatusNotFound,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -283,7 +289,12 @@ func TestCreateUser(t *testing.T) {
 				ctx = CTX
 			}
 
-			createdUser, err := Instance.Client.SCIM.Users.Create(ctx, Instance.DefaultOrg.Id, tt.body)
+			orgID := tt.orgID
+			if orgID == "" {
+				orgID = Instance.DefaultOrg.Id
+			}
+
+			createdUser, err := Instance.Client.SCIM.Users.Create(ctx, orgID, tt.body)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateUser() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -311,7 +322,7 @@ func TestCreateUser(t *testing.T) {
 
 			assert.EqualValues(t, []schemas.ScimSchemaType{"urn:ietf:params:scim:schemas:core:2.0:User"}, createdUser.Resource.Schemas)
 			assert.Equal(t, schemas.ScimResourceTypeSingular("User"), createdUser.Resource.Meta.ResourceType)
-			assert.Equal(t, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, Instance.DefaultOrg.Id, "Users", createdUser.ID), createdUser.Resource.Meta.Location)
+			assert.Equal(t, "http://"+Instance.Host()+path.Join(schemas.HandlerPrefix, orgID, "Users", createdUser.ID), createdUser.Resource.Meta.Location)
 			assert.Nil(t, createdUser.Password)
 
 			if tt.want != nil {
@@ -384,12 +395,7 @@ func TestCreateUser_metadata(t *testing.T) {
 }
 
 func TestCreateUser_scopedExternalID(t *testing.T) {
-	_, err := Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
-		Id:    Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-		Key:   "urn:zitadel:scim:provisioningDomain",
-		Value: []byte("fooBar"),
-	})
-	require.NoError(t, err)
+	setProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID, "fooBar")
 
 	createdUser, err := Instance.Client.SCIM.Users.Create(CTX, Instance.DefaultOrg.Id, fullUserJson)
 	require.NoError(t, err)
@@ -398,11 +404,7 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 		_, err = Instance.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: createdUser.ID})
 		require.NoError(t, err)
 
-		_, err = Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
-			Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-			Key: "urn:zitadel:scim:provisioningDomain",
-		})
-		require.NoError(t, err)
+		removeProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID)
 	}()
 
 	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
@@ -422,10 +424,4 @@ func TestCreateUser_scopedExternalID(t *testing.T) {
 		require.NoError(tt, err)
 		assert.Equal(tt, "701984", string(md.Metadata.Value))
 	}, retryDuration, tick)
-}
-
-func TestCreateUser_anotherOrg(t *testing.T) {
-	org := Instance.CreateOrganization(Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner), gofakeit.Name(), gofakeit.Email())
-	_, err := Instance.Client.SCIM.Users.Create(CTX, org.OrganizationId, fullUserJson)
-	scim.RequireScimError(t, http.StatusNotFound, err)
 }

@@ -368,6 +368,10 @@ func (q *Queries) GetUserByIDWithPermission(ctx context.Context, shouldTriggerBu
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string) (user *User, err error) {
+	return q.GetUserByIDWithResourceOwner(ctx, shouldTriggerBulk, userID, "")
+}
+
+func (q *Queries) GetUserByIDWithResourceOwner(ctx context.Context, shouldTriggerBulk bool, userID, resourceOwner string) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -382,6 +386,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		},
 		userByIDQuery,
 		userID,
+		resourceOwner,
 		authz.GetInstance(ctx).InstanceID(),
 	)
 	return user, err

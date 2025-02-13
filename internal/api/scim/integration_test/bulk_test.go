@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
@@ -24,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/internal/test"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 var (
@@ -289,7 +289,7 @@ func TestBulk(t *testing.T) {
 					},
 					DisplayName:       "scim-bulk-created-user-0-given-name scim-bulk-created-user-0-family-name",
 					PreferredLanguage: test.Must(language.Parse("en")),
-					Active:            gu.Ptr(true),
+					Active:            schemas.NewRelaxedBool(true),
 					Emails: []*resources.ScimEmail{
 						{
 							Value:   "scim-bulk-created-user-0@example.com",
@@ -308,7 +308,7 @@ func TestBulk(t *testing.T) {
 					DisplayName:       "scim-bulk-created-user-1-given-name scim-bulk-created-user-1-family-name",
 					NickName:          "scim-bulk-created-user-1-nickname-patched",
 					PreferredLanguage: test.Must(language.Parse("en")),
-					Active:            gu.Ptr(true),
+					Active:            schemas.NewRelaxedBool(true),
 					Emails: []*resources.ScimEmail{
 						{
 							Value:   "scim-bulk-created-user-1@example.com",
@@ -333,7 +333,7 @@ func TestBulk(t *testing.T) {
 					DisplayName:       "scim-bulk-created-user-2-given-name scim-bulk-created-user-2-family-name",
 					NickName:          "scim-bulk-created-user-2-nickname-patched",
 					PreferredLanguage: test.Must(language.Parse("en")),
-					Active:            gu.Ptr(true),
+					Active:            schemas.NewRelaxedBool(true),
 					Emails: []*resources.ScimEmail{
 						{
 							Value:   "scim-bulk-created-user-2@example.com",
@@ -695,4 +695,40 @@ func buildTooManyOperationsRequest() *scim.BulkRequest {
 	}
 
 	return req
+}
+
+func setProvisioningDomain(t require.TestingT, userID, provisioningDomain string) {
+	setAndEnsureMetadata(t, userID, "urn:zitadel:scim:provisioningDomain", provisioningDomain)
+}
+
+func setAndEnsureMetadata(t require.TestingT, userID, key, value string) {
+	_, err := Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
+		Id:    userID,
+		Key:   key,
+		Value: []byte(value),
+	})
+	require.NoError(t, err)
+
+	// ensure metadata is projected
+	ensureMetadataProjected(t, userID, key, value)
+}
+
+func ensureMetadataProjected(t require.TestingT, userID, key, value string) {
+	retryDuration, tick := integration.WaitForAndTickWithMaxDuration(CTX, time.Minute)
+	require.EventuallyWithT(t, func(tt *assert.CollectT) {
+		md, err := Instance.Client.Mgmt.GetUserMetadata(CTX, &management.GetUserMetadataRequest{
+			Id:  userID,
+			Key: key,
+		})
+		require.NoError(tt, err)
+		require.Equal(tt, value, string(md.Metadata.Value))
+	}, retryDuration, tick)
+}
+
+func removeProvisioningDomain(t require.TestingT, userID string) {
+	_, err := Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
+		Id:  userID,
+		Key: "urn:zitadel:scim:provisioningDomain",
+	})
+	require.NoError(t, err)
 }
