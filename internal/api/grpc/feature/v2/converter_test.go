@@ -183,6 +183,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseUri:  gu.Ptr("https://login.com"),
 		},
+		ConsoleUseV2UserApi: gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -200,6 +201,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 			Required: true,
 			BaseURI:  &url.URL{Scheme: "https", Host: "login.com"},
 		},
+		ConsoleUseV2UserApi: gu.Ptr(true),
 	}
 	got, err := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -264,6 +266,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		ConsoleUseV2UserApi: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -325,6 +331,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:   feature_pb.Source_SOURCE_INSTANCE,
 		},
 		PermissionCheckV2: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		ConsoleUseV2UserApi: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},

@@ -1,12 +1,13 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { MatTableDataSource } from '@angular/material/table';
+import { BehaviorSubject, Observable, switchMap } from 'rxjs';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { AuthFactorState, User, WebAuthNToken } from 'src/app/proto/generated/zitadel/user_pb';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { AuthFactorState, Passkey, User } from '@zitadel/proto/zitadel/user/v2/user_pb';
+import { UserService } from 'src/app/services/user.service';
+import { filter } from 'rxjs/operators';
 
 export interface WebAuthNOptions {
   challenge: string;
@@ -24,23 +25,22 @@ export interface WebAuthNOptions {
   styleUrls: ['./passwordless.component.scss'],
 })
 export class PasswordlessComponent implements OnInit, OnDestroy {
-  @Input() public user!: User.AsObject;
+  @Input({ required: true }) public user!: User;
   @Input() public disabled: boolean = true;
   public displayedColumns: string[] = ['name', 'state', 'actions'];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-  @ViewChild(MatTable) public table!: MatTable<WebAuthNToken.AsObject>;
   @ViewChild(MatSort) public sort!: MatSort;
-  public dataSource: MatTableDataSource<WebAuthNToken.AsObject> = new MatTableDataSource<WebAuthNToken.AsObject>([]);
+  public dataSource: MatTableDataSource<Passkey> = new MatTableDataSource<Passkey>([]);
 
-  public AuthFactorState: any = AuthFactorState;
+  public AuthFactorState = AuthFactorState;
   public error: string = '';
 
   constructor(
-    private service: ManagementService,
     private toast: ToastService,
     private dialog: MatDialog,
+    private userService: UserService,
   ) {}
 
   public ngOnInit(): void {
@@ -52,10 +52,10 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
   }
 
   public getPasswordless(): void {
-    this.service
-      .listHumanPasswordless(this.user.id)
+    this.userService
+      .listPasskeys({ userId: this.user.userId })
       .then((passwordless) => {
-        this.dataSource = new MatTableDataSource(passwordless.resultList);
+        this.dataSource = new MatTableDataSource(passwordless.result);
         this.dataSource.sort = this.sort;
       })
       .catch((error) => {
@@ -63,7 +63,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
       });
   }
 
-  public deletePasswordless(id?: string): void {
+  public deletePasswordless(passkeyId: string): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',
@@ -74,24 +74,26 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp && id) {
-        this.service
-          .removeHumanPasswordless(id, this.user.id)
-          .then(() => {
-            this.toast.showInfo('USER.TOAST.PASSWORDLESSREMOVED', true);
-            this.getPasswordless();
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.userService.removePasskeys({ userId: this.user.userId, passkeyId })),
+      )
+      .subscribe({
+        next: () => {
+          this.toast.showInfo('USER.TOAST.PASSWORDLESSREMOVED', true);
+          this.getPasswordless();
+        },
+        error: (error) => {
+          this.toast.showError(error);
+        },
+      });
   }
 
   public sendPasswordlessRegistration(): void {
-    this.service
-      .sendPasswordlessRegistration(this.user.id)
+    this.userService
+      .createPasskeyRegistrationLink({ userId: this.user.userId, medium: { case: 'sendLink', value: {} } })
       .then(() => {
         this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT', true);
       })

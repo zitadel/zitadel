@@ -949,6 +949,14 @@
       "5": "Felfüggesztett",
       "6": "Kezdeti"
     },
+    "STATEV2": {
+      "0": "Ismeretlen",
+      "1": "Aktív",
+      "2": "Inaktív",
+      "3": "Törölt",
+      "4": "Zárolt",
+      "5": "Kezdeti"
+    },
     "SEARCH": {
       "ADDITIONAL": "Belépési név (jelenlegi szervezet)",
       "ADDITIONAL-EXTERNAL": "Belépési név (külső szervezet)"
@@ -1484,7 +1492,9 @@
         "ENABLED": "\"Engedélyezve\" öröklődik",
         "DISABLED": "\"Letiltva\" öröklődik"
       },
-      "RESET": "Mindent állíts öröklésre"
+      "RESET": "Mindent állíts öröklésre",
+      "CONSOLEUSEV2USERAPI": "Használja a V2 API-t a konzolban felhasználók létrehozásához",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ha ez a jelző engedélyezve van, a konzol a V2 User API-t használja új felhasználók létrehozásához. A V2 API-val az újonnan létrehozott felhasználók kezdeti állapot nélkül indulnak."
     },
     "DIALOG": {
       "RESET": {

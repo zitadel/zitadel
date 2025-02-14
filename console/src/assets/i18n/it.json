@@ -948,6 +948,14 @@
       "5": "Sospeso",
       "6": "Initializzato"
     },
+    "STATEV2": {
+      "0": "Sconosciuto",
+      "1": "Attivo",
+      "2": "Inattivo",
+      "3": "Rimosso",
+      "4": "Bloccato",
+      "5": "Initializzato"
+    },
     "SEARCH": {
       "ADDITIONAL": "Nome (organizzazione corrente)",
       "ADDITIONAL-EXTERNAL": "Loginname (organizzazione esterna)"
@@ -1486,7 +1494,9 @@
         "ENABLED": "\"Abilitato\" viene ereditato",
         "DISABLED": "\"Disabilitato\" viene ereditato"
       },
-      "RESET": "Imposta tutto su predefinito"
+      "RESET": "Imposta tutto su predefinito",
+      "CONSOLEUSEV2USERAPI": "Utilizza l'API V2 nella console per la creazione degli utenti",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando questa opzione è abilitata, la console utilizza l'API V2 User per creare nuovi utenti. Con l'API V2, i nuovi utenti creati iniziano senza uno stato iniziale."
     },
     "DIALOG": {
       "RESET": {

@@ -949,6 +949,14 @@
       "5": "Suspendu",
       "6": "Initial"
     },
+    "STATEV2": {
+      "0": "Inconnu",
+      "1": "Actif",
+      "2": "Inactif",
+      "3": "Supprimé",
+      "4": "Verrouillé",
+      "5": "Initial"
+    },
     "SEARCH": {
       "ADDITIONAL": "Nom de connexion (organisation actuelle)",
       "ADDITIONAL-EXTERNAL": "Nom de connexion (organisation externe)"
@@ -1486,7 +1494,9 @@
         "ENABLED": "\"Activé\" est hérité",
         "DISABLED": "\"Désactivé\" est hérité"
       },
-      "RESET": "Réinitialiser tout sur hérité"
+      "RESET": "Réinitialiser tout sur hérité",
+      "CONSOLEUSEV2USERAPI": "Utilisez l'API V2 dans la console pour la création d'utilisateurs",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial."
     },
     "DIALOG": {
       "RESET": {

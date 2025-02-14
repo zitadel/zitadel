@@ -1,7 +1,18 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, OnInit } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, Subscription, take, takeUntil } from 'rxjs';
+import {
+  take,
+  map,
+  switchMap,
+  firstValueFrom,
+  mergeWith,
+  Observable,
+  defer,
+  of,
+  shareReplay,
+  combineLatestWith,
+} from 'rxjs';
 import {
   containsLowerCaseValidator,
   containsNumberValidator,
@@ -14,161 +25,200 @@ import {
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
-import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { catchError, filter } from 'rxjs/operators';
+import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { UserService } from '../../../../services/user.service';
 
 @Component({
   selector: 'cnsl-password',
   templateUrl: './password.component.html',
   styleUrls: ['./password.component.scss'],
 })
-export class PasswordComponent implements OnDestroy {
-  userId: string = '';
-  public username: string = '';
-
-  public policy!: PasswordComplexityPolicy.AsObject;
-  public passwordForm!: UntypedFormGroup;
-
-  private formSub: Subscription = new Subscription();
-  private destroy$: Subject<void> = new Subject();
+export class PasswordComponent implements OnInit {
+  private readonly breadcrumb$: Observable<Breadcrumb[]>;
+  protected readonly username$: Observable<string>;
+  protected readonly id$: Observable<string | undefined>;
+  protected readonly form$: Observable<UntypedFormGroup>;
+  protected readonly passwordPolicy$: Observable<PasswordComplexityPolicy.AsObject | undefined>;
+  protected readonly user$: Observable<User.AsObject>;
 
   constructor(
     activatedRoute: ActivatedRoute,
-    private fb: UntypedFormBuilder,
-    private authService: GrpcAuthService,
-    private mgmtUserService: ManagementService,
-    private toast: ToastService,
-    private breadcrumbService: BreadcrumbService,
+    private readonly fb: UntypedFormBuilder,
+    private readonly authService: GrpcAuthService,
+    private readonly userService: UserService,
+    private readonly toast: ToastService,
+    private readonly breadcrumbService: BreadcrumbService,
+    private readonly destroyRef: DestroyRef,
   ) {
-    activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      const { username } = data;
-      this.username = username;
-    });
-    activatedRoute.params.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-      const { id } = data;
-      if (id) {
-        this.userId = id;
-        breadcrumbService.setBreadcrumb([
+    const usernameParam$ = activatedRoute.queryParamMap.pipe(
+      map((params) => params.get('username')),
+      filter(Boolean),
+    );
+    this.id$ = activatedRoute.paramMap.pipe(map((params) => params.get('id') ?? undefined));
+
+    this.user$ = this.authService.user.pipe(take(1), filter(Boolean));
+    this.username$ = usernameParam$.pipe(mergeWith(this.user$.pipe(map((user) => user.preferredLoginName))));
+
+    this.breadcrumb$ = this.getBreadcrumb$(this.id$, this.user$);
+    this.passwordPolicy$ = this.getPasswordPolicy$().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    const validators$ = this.getValidators$(this.passwordPolicy$);
+    this.form$ = this.getForm$(this.id$, validators$);
+  }
+
+  private getBreadcrumb$(id$: Observable<string | undefined>, user$: Observable<User.AsObject>): Observable<Breadcrumb[]> {
+    return id$.pipe(
+      switchMap(async (id) => {
+        if (id) {
+          return [
+            new Breadcrumb({
+              type: BreadcrumbType.ORG,
+              routerLink: ['/org'],
+            }),
+          ];
+        }
+        const user = await firstValueFrom(user$);
+        if (!user) {
+          return [];
+        }
+        return [
           new Breadcrumb({
-            type: BreadcrumbType.ORG,
-            routerLink: ['/org'],
+            type: BreadcrumbType.AUTHUSER,
+            name: user.human?.profile?.displayName,
+            routerLink: ['/users', 'me'],
           }),
-        ]);
-      } else {
-        this.authService.user.pipe(take(1)).subscribe((user) => {
-          if (user) {
-            this.username = user.preferredLoginName;
-            this.breadcrumbService.setBreadcrumb([
-              new Breadcrumb({
-                type: BreadcrumbType.AUTHUSER,
-                name: user.human?.profile?.displayName,
-                routerLink: ['/users', 'me'],
-              }),
-            ]);
-          }
-        });
-      }
+        ];
+      }),
+    );
+  }
 
-      const validators: Validators[] = [requiredValidator];
-      this.authService
-        .getMyPasswordComplexityPolicy()
-        .then((resp) => {
-          if (resp.policy) {
-            this.policy = resp.policy;
-          }
-          if (this.policy.minLength) {
-            validators.push(minLengthValidator(this.policy.minLength));
-          }
-          if (this.policy.hasLowercase) {
-            validators.push(containsLowerCaseValidator);
-          }
-          if (this.policy.hasUppercase) {
-            validators.push(containsUpperCaseValidator);
-          }
-          if (this.policy.hasNumber) {
-            validators.push(containsNumberValidator);
-          }
-          if (this.policy.hasSymbol) {
-            validators.push(containsSymbolValidator);
-          }
+  private getValidators$(
+    passwordPolicy$: Observable<PasswordComplexityPolicy.AsObject | undefined>,
+  ): Observable<Validators[]> {
+    return passwordPolicy$.pipe(
+      map((policy) => {
+        const validators: Validators[] = [requiredValidator];
+        if (!policy) {
+          return validators;
+        }
+        if (policy.minLength) {
+          validators.push(minLengthValidator(policy.minLength));
+        }
+        if (policy.hasLowercase) {
+          validators.push(containsLowerCaseValidator);
+        }
+        if (policy.hasUppercase) {
+          validators.push(containsUpperCaseValidator);
+        }
+        if (policy.hasNumber) {
+          validators.push(containsNumberValidator);
+        }
+        if (policy.hasSymbol) {
+          validators.push(containsSymbolValidator);
+        }
+        return validators;
+      }),
+    );
+  }
 
-          this.setupForm(validators);
-        })
-        .catch((error) => {
-          this.setupForm(validators);
-        });
+  private getForm$(
+    id$: Observable<string | undefined>,
+    validators$: Observable<Validators[]>,
+  ): Observable<UntypedFormGroup> {
+    return id$.pipe(
+      combineLatestWith(validators$),
+      map(([id, validators]) => {
+        if (id) {
+          return this.fb.group({
+            password: ['', validators],
+            confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
+          });
+        } else {
+          return this.fb.group({
+            currentPassword: ['', requiredValidator],
+            newPassword: ['', validators],
+            confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
+          });
+        }
+      }),
+    );
+  }
+
+  private getPasswordPolicy$(): Observable<PasswordComplexityPolicy.AsObject | undefined> {
+    return defer(() => this.authService.getMyPasswordComplexityPolicy()).pipe(
+      map((resp) => resp.policy),
+      catchError(() => of(undefined)),
+    );
+  }
+
+  ngOnInit() {
+    this.breadcrumb$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((breadcrumbs) => {
+      this.breadcrumbService.setBreadcrumb(breadcrumbs);
     });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    this.formSub.unsubscribe();
-  }
+  public async setInitialPassword(userId: string, form: UntypedFormGroup): Promise<void> {
+    const password = this.password(form)?.value;
 
-  setupForm(validators: Validators[]): void {
-    if (this.userId) {
-      this.passwordForm = this.fb.group({
-        password: ['', validators],
-        confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
+    if (form.invalid || !password) {
+      return;
+    }
+
+    try {
+      await this.userService.setPassword({
+        userId,
+        newPassword: {
+          password,
+          changeRequired: false,
+        },
       });
-    } else {
-      this.passwordForm = this.fb.group({
-        currentPassword: ['', requiredValidator],
-        newPassword: ['', validators],
-        confirmPassword: ['', [requiredValidator, passwordConfirmValidator()]],
+    } catch (error) {
+      this.toast.showError(error);
+      return;
+    }
+    this.toast.showInfo('USER.TOAST.INITIALPASSWORDSET', true);
+    window.history.back();
+  }
+
+  public async setPassword(form: UntypedFormGroup, user: User.AsObject): Promise<void> {
+    const currentPassword = this.currentPassword(form);
+    const newPassword = this.newPassword(form);
+
+    if (form.invalid || !currentPassword?.value || !newPassword?.value || newPassword?.invalid) {
+      return;
+    }
+
+    try {
+      await this.userService.setPassword({
+        userId: user.id,
+        newPassword: {
+          password: newPassword.value,
+          changeRequired: false,
+        },
+        verification: {
+          case: 'currentPassword',
+          value: currentPassword.value,
+        },
       });
+    } catch (error) {
+      this.toast.showError(error);
+      return;
     }
+    this.toast.showInfo('USER.TOAST.PASSWORDCHANGED', true);
+    window.history.back();
   }
 
-  public setInitialPassword(userId: string): void {
-    if (this.passwordForm.valid && this.password && this.password.value) {
-      this.mgmtUserService
-        .setHumanInitialPassword(userId, this.password.value)
-        .then((data: any) => {
-          this.toast.showInfo('USER.TOAST.INITIALPASSWORDSET', true);
-          window.history.back();
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
+  public password(form: UntypedFormGroup): AbstractControl | null {
+    return form.get('password');
   }
 
-  public setPassword(): void {
-    if (
-      this.passwordForm.valid &&
-      this.currentPassword &&
-      this.currentPassword.value &&
-      this.newPassword &&
-      this.newPassword.value &&
-      this.newPassword.valid
-    ) {
-      this.authService
-        .updateMyPassword(this.currentPassword.value, this.newPassword.value)
-        .then((data: any) => {
-          this.toast.showInfo('USER.TOAST.PASSWORDCHANGED', true);
-          window.history.back();
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
+  public newPassword(form: UntypedFormGroup): AbstractControl | null {
+    return form.get('newPassword');
   }
 
-  public get password(): AbstractControl | null {
-    return this.passwordForm.get('password');
-  }
-
-  public get newPassword(): AbstractControl | null {
-    return this.passwordForm.get('newPassword');
-  }
-
-  public get currentPassword(): AbstractControl | null {
-    return this.passwordForm.get('currentPassword');
-  }
-
-  public get confirmPassword(): AbstractControl | null {
-    return this.passwordForm.get('confirmPassword');
+  public currentPassword(form: UntypedFormGroup): AbstractControl | null {
+    return form.get('currentPassword');
   }
 }

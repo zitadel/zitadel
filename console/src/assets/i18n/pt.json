@@ -949,6 +949,14 @@
       "5": "Suspenso",
       "6": "Inicial"
     },
+    "STATEV2": {
+      "0": "Desconhecido",
+      "1": "Ativo",
+      "2": "Inativo",
+      "3": "Excluído",
+      "4": "Bloqueado",
+      "5": "Inicial"
+    },
     "SEARCH": {
       "ADDITIONAL": "Nome de usuário (organização atual)",
       "ADDITIONAL-EXTERNAL": "Nome de usuário (organização externa)"
@@ -1487,7 +1495,9 @@
         "ENABLED": "\"Habilitado\" é herdado",
         "DISABLED": "\"Desabilitado\" é herdado"
       },
-      "RESET": "Definir tudo para herdar"
+      "RESET": "Definir tudo para herdar",
+      "CONSOLEUSEV2USERAPI": "Use a API V2 no console para criação de usuários",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando esta opção está ativada, o console utiliza a API V2 de Usuários para criar novos usuários. Com a API V2, os novos usuários criados começam sem um estado inicial."
     },
     "DIALOG": {
       "RESET": {

@@ -949,6 +949,14 @@
       "5": "已暂停",
       "6": "初始化"
     },
+    "STATEV2": {
+      "0": "未知",
+      "1": "启用",
+      "2": "停用",
+      "3": "已删除",
+      "4": "已锁定",
+      "5": "初始化"
+    },
     "SEARCH": {
       "ADDITIONAL": "登录名 (当前组织)",
       "ADDITIONAL-EXTERNAL": "登录名 (外部组织)"
@@ -1486,7 +1494,9 @@
         "ENABLED": "“已启用” 是继承的",
         "DISABLED": "“已禁用” 是继承的"
       },
-      "RESET": "全部设置为继承"
+      "RESET": "全部设置为继承",
+      "CONSOLEUSEV2USERAPI": "在控制台中使用V2 API创建用户。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "启用此标志时，控制台使用V2用户API创建新用户。使用V2 API，新创建的用户将以无初始状态开始。"
     },
     "DIALOG": {
       "RESET": {
