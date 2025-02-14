@@ -48,8 +48,40 @@ type NotificationWorker struct {
 
 // Work implements [river.Worker].
 func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*command.NotificationRequest]) error {
-	panic("unimplemented")
-	river.JobCancel()
+	ctx = ContextWithNotifier(ctx, job.Args.Aggregate())
+
+	// if the notification is too old, we can directly cancel
+	if job.CreatedAt.Add(w.config.MaxTtl).Before(w.now()) {
+		return river.JobCancel(errors.New("notification is too old"))
+	}
+
+	// Get the notify user first, so if anything fails afterward we have the current state of the user
+	// and can pass that to the retry request.
+	// We do not trigger the projection to reduce load on the database. By the time the notification is processed,
+	// the user should be projected anyway. If not, it will just wait for the next run.
+	notifyUser, err := w.queries.GetNotifyUserByID(ctx, false, job.Args.UserID)
+	if err != nil {
+		return err
+	}
+
+	// The domain claimed event requires the domain as argument, but lacks the user when creating the request event.
+	// Since we set it into the request arguments, it will be passed into a potential retry event.
+	if job.Args.RequiresPreviousDomain && job.Args.Args != nil && job.Args.Args.Domain == "" {
+		index := strings.LastIndex(notifyUser.LastEmail, "@")
+		job.Args.Args.Domain = notifyUser.LastEmail[index+1:]
+	}
+
+	err = w.sendNotificationQueue(ctx, job.Args, notifyUser)
+	if err == nil {
+		return nil
+	}
+	// if retries are disabled or if the error explicitly specifies, we cancel the notification
+	// TODO: move max attempts to job config
+	if w.config.MaxAttempts <= 1 || errors.Is(err, &channels.CancelError{}) {
+		return river.JobCancel(errors.New("notification is too old"))
+	}
+	return err
+	// TODO: handle backoff
 }
 
 type WorkerConfig struct {
@@ -262,6 +294,53 @@ func (w *NotificationWorker) sendNotification(ctx, txCtx context.Context, tx *sq
 	logging.WithFields("instanceID", authz.GetInstance(ctx).InstanceID(), "notification", e.Aggregate().ID).
 		OnError(err).Error("could not set notification event on aggregate")
 	return nil
+}
+
+func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request notification.Request, notifyUser *query.NotifyUser) error {
+	ctx, err := enrichCtx(ctx, request.TriggeredAtOrigin)
+	if err != nil {
+		return channels.NewCancelError(err)
+	}
+
+	var code string
+	if request.Code != nil {
+		code, err = crypto.DecryptString(request.Code, w.queries.UserDataCrypto)
+		if err != nil {
+			return err
+		}
+	}
+
+	colors, err := w.queries.ActiveLabelPolicyByOrg(ctx, request.UserResourceOwner, false)
+	if err != nil {
+		return err
+	}
+
+	translator, err := w.queries.GetTranslatorWithOrgTexts(ctx, request.UserResourceOwner, request.MessageType)
+	if err != nil {
+		return err
+	}
+
+	generatorInfo := new(senders.CodeGeneratorInfo)
+	var notify types.Notify
+	switch request.NotificationType {
+	case domain.NotificationTypeEmail:
+		template, err := w.queries.MailTemplateByOrg(ctx, notifyUser.ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, e)
+	case domain.NotificationTypeSms:
+		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, e, generatorInfo)
+	}
+
+	args := request.Args.ToMap()
+	args[Code] = code
+	// existing notifications use `OTP` as argument for the code
+	if request.IsOTP {
+		args[OTP] = code
+	}
+
+	return notify(request.URLTemplate, args, request.MessageType, request.UnverifiedNotificationChannel)
 }
 
 func (w *NotificationWorker) exponentialBackOff(current time.Duration) time.Duration {
