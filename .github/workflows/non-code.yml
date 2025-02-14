@@ -1,0 +1,34 @@
+name: Non-Code Changes CI
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'adopters.yaml'
+      - 'marketing/**'
+      - '.github/**'
+      - '.gitignore'
+      - '*.md'
+      - 'LICENSE'
+      - 'assets/**'
+      - 'locales/**'
+
+jobs:
+  docs_checks:
+    runs-on: zitadel-runner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run Markdown Linter (for docs)
+        uses: DavidAnson/markdownlint-cli2-action@v14
+        with:
+          config: ".markdownlint.json"
+
+      - name: Validate YAML files
+        run: |
+          set -e
+          yamllint adopters.yaml
+
+      - name: Notify on non-code change
+        run: echo "Docs or marketing files changed. No code changes detected."

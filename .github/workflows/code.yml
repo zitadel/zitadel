@@ -9,10 +9,6 @@ on:
       - '**.html'
       - '**.scss'
       - '**.css'
-    paths-ignore:
-      - 'docs/**'
-      - 'adopters.yaml'
-      - 'marketing/**'
 
 jobs:
   check_files:
