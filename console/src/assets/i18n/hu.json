@@ -2210,7 +2210,9 @@
       "REMOVED": "Sikeresen eltávolítva."
     },
     "ISIDTOKENMAPPING": "Hozzárendelés az ID token alapján",
-    "ISIDTOKENMAPPING_DESC": "Ha ezt választod, a szolgáltatói információkat az ID token alapján rendeljük hozzá, nem a userinfo végpontból."
+    "ISIDTOKENMAPPING_DESC": "Ha ezt választod, a szolgáltatói információkat az ID token alapján rendeljük hozzá, nem a userinfo végpontból.",
+    "USEPKCE": "PKCE használata",
+    "USEPKCE_DESC": "Meghatározza, hogy a code_challenge és a code_challenge_method paraméterek szerepeljenek-e a hitelesítési kérelemben"
   },
   "MFA": {
     "LIST": {
