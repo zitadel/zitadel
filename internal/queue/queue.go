@@ -2,74 +2,58 @@ package queue
 
 import (
 	"context"
-	"sync"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/riverqueue/river"
 	"github.com/riverqueue/river/riverdriver"
 	"github.com/riverqueue/river/riverdriver/riverpgxv5"
-	"github.com/riverqueue/river/rivermigrate"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/dialect"
 )
-
-const (
-	schema          = "queue"
-	applicationName = "zitadel_queue"
-)
-
-var conns = &sync.Map{}
-
-type queueKey struct{}
-
-func WithQueue(parent context.Context) context.Context {
-	return context.WithValue(parent, queueKey{}, struct{}{})
-}
-
-func init() {
-	dialect.RegisterBeforeAcquire(func(ctx context.Context, c *pgx.Conn) error {
-		if _, ok := ctx.Value(queueKey{}).(struct{}); !ok {
-			return nil
-		}
-		_, err := c.Exec(ctx, "SET search_path TO "+schema+"; SET application_name TO "+applicationName)
-		if err != nil {
-			return err
-		}
-		conns.Store(c, struct{}{})
-		return nil
-	})
-	dialect.RegisterAfterRelease(func(c *pgx.Conn) error {
-		_, ok := conns.LoadAndDelete(c)
-		if !ok {
-			return nil
-		}
-		_, err := c.Exec(context.Background(), "SET search_path TO DEFAULT; SET application_name TO "+dialect.DefaultAppName)
-		return err
-	})
-}
 
 // Queue abstracts the underlying queuing library
 // For more information see github.com/riverqueue/river
-// TODO(adlerhurst): maybe it makes more sense to split the effective queue from the migrator.
 type Queue struct {
-	driver riverdriver.Driver[pgx.Tx]
+	driver  riverdriver.Driver[pgx.Tx]
+	client  *river.Client[pgx.Tx]
+	workers *river.Workers
 }
 
-func New(client *database.DB) *Queue {
-	return &Queue{driver: riverpgxv5.New(client.Pool)}
+type Config struct {
+	*river.Config
+	Client *database.DB
 }
 
-func (q *Queue) ExecuteMigrations(ctx context.Context) error {
-	_, err := q.driver.GetExecutor().Exec(ctx, "CREATE SCHEMA IF NOT EXISTS "+schema)
-	if err != nil {
-		return err
+func NewQueue(config *Config) (queue *Queue, err error) {
+	queue = &Queue{
+		driver:  riverpgxv5.New(config.Client.Pool),
+		workers: river.NewWorkers(),
 	}
 
-	migrator, err := rivermigrate.New(q.driver, nil)
+	queue.client, err = river.NewClient(queue.driver, config.Config)
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	return queue, nil
+}
+
+func (q *Queue) Start(ctx context.Context) error {
+	return q.client.Start(ctx)
+}
+
+func (q *Queue) AddWorkers(w ...Worker) {
+	for _, worker := range w {
+		worker.Register(q.workers)
+	}
+}
+
+func (q *Queue) Insert(ctx context.Context, args river.JobArgs) error {
 	ctx = WithQueue(ctx)
-	_, err = migrator.Migrate(ctx, rivermigrate.DirectionUp, nil)
+	_, err := q.client.Insert(ctx, args, nil)
 	return err
+}
+
+type Worker interface {
+	Register(workers *river.Workers)
 }

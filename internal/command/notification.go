@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/riverqueue/river"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -36,6 +37,8 @@ type NotificationRetryRequest struct {
 	NotifyUser *query.NotifyUser
 }
 
+var _ river.JobArgs = (*NotificationRequest)(nil)
+
 func NewNotificationRequest(
 	userID, resourceOwner, triggerOrigin string,
 	eventType eventstore.EventType,
@@ -50,6 +53,11 @@ func NewNotificationRequest(
 		NotificationType:  notificationType,
 		MessageType:       messageType,
 	}
+}
+
+// Kind implements [river.JobArgs].
+func (r *NotificationRequest) Kind() string {
+	return "notification_requested"
 }
 
 func (r *NotificationRequest) WithCode(code *crypto.CryptoValue, expiry time.Duration) *NotificationRequest {
