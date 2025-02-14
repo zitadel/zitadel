@@ -58,7 +58,7 @@ jobs:
         run: pnpm install
 
       - name: Build for Docker
-        run: NEXT_PUBLIC_BASE_PATH=/ui/new-login pnpm build:docker
+        run: NEXT_PUBLIC_BASE_PATH=/new-login pnpm build:docker
 
       - name: Build and Push Image
         id: build
