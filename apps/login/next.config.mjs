@@ -41,6 +41,12 @@ const imageRemotePatterns = [
     port: "8080",
     pathname: "/**",
   },
+  {
+    protocol: "https",
+    hostname: "*.zitadel.*",
+    port: "",
+    pathname: "/**",
+  },
 ];
 
 if (process.env.ZITADEL_API_URL) {
