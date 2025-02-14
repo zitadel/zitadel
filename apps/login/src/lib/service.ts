@@ -49,15 +49,8 @@ export async function createServiceForHost<T extends ServiceClass>(
     throw new Error("No token found");
   }
 
-  const instanceHost = new URL(serviceUrl).host
   const transport = createServerTransport(token, {
-    baseUrl: process.env.ZITADEL_API_URL ?? serviceUrl,
-    interceptors: process.env.ZITADEL_API_URL && process.env.ZITADEL_API_URL != serviceUrl || process.env.ZITADEL_INSTANCE_HOST_HEADER ? [(next) => {
-      return (req) => {
-        req.header.set(process.env.ZITADEL_INSTANCE_HOST_HEADER ?? "x-zitadel-instance-host", instanceHost)
-        return next(req)
-      }
-    }] : undefined
+    baseUrl: serviceUrl,
   });
 
   return createClientFor<T>(service)(transport);
