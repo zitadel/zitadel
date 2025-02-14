@@ -7,6 +7,7 @@ import { getServiceUrlFromHeaders } from "@/lib/service";
 import { findValidSession } from "@/lib/session";
 import {
   createCallback,
+  createResponse,
   getActiveIdentityProviders,
   getAuthRequest,
   getOrgsByDomain,
@@ -15,14 +16,12 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { create } from "@zitadel/client";
-import {
-  AuthRequest,
-  Prompt,
-} from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import { Prompt } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import {
   CreateCallbackRequestSchema,
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { CreateResponseRequestSchema } from "@zitadel/proto/zitadel/saml/v2/saml_service_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -33,19 +32,17 @@ export const fetchCache = "default-no-store";
 
 const gotoAccounts = ({
   request,
-  authRequest,
+  requestId,
   organization,
-  idPrefix,
 }: {
   request: NextRequest;
-  authRequest: AuthRequest;
-  organization: string;
-  idPrefix: string;
+  requestId: string;
+  organization?: string;
 }): NextResponse<unknown> => {
   const accountsUrl = new URL("/accounts", request.url);
 
-  if (authRequest?.id) {
-    accountsUrl.searchParams.set("requestId", `${idPrefix}${authRequest.id}`);
+  if (requestId) {
+    accountsUrl.searchParams.set("requestId", requestId);
   }
   if (organization) {
     accountsUrl.searchParams.set("organization", organization);
@@ -59,7 +56,6 @@ async function loadSessions({
   ids,
 }: {
   serviceUrl: string;
-
   ids: string[];
 }): Promise<Session[]> {
   const response = await listSessions({
@@ -177,7 +173,6 @@ export async function GET(request: NextRequest) {
 
           const identityProviders = await getActiveIdentityProviders({
             serviceUrl,
-
             orgId: organization ? organization : undefined,
           }).then((resp) => {
             return resp.identityProviders;
@@ -203,7 +198,6 @@ export async function GET(request: NextRequest) {
 
             return startIdentityProviderFlow({
               serviceUrl,
-
               idpId,
               urls: {
                 successUrl:
@@ -243,9 +237,8 @@ export async function GET(request: NextRequest) {
         if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
           return gotoAccounts({
             request,
-            authRequest,
+            requestId: `oidc_${authRequest.id}`,
             organization,
-            idPrefix: "oidc_",
           });
         } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
           /**
@@ -300,7 +293,6 @@ export async function GET(request: NextRequest) {
            **/
           const selectedSession = await findValidSession({
             serviceUrl,
-
             sessions,
             authRequest,
           });
@@ -330,7 +322,6 @@ export async function GET(request: NextRequest) {
 
           const { callbackUrl } = await createCallback({
             serviceUrl,
-
             req: create(CreateCallbackRequestSchema, {
               authRequestId: requestId.replace("oidc_", ""),
               callbackKind: {
@@ -351,9 +342,8 @@ export async function GET(request: NextRequest) {
           if (!selectedSession || !selectedSession.id) {
             return gotoAccounts({
               request,
-              authRequest,
+              requestId: `oidc_${authRequest.id}`,
               organization,
-              idPrefix: "oidc_",
             });
           }
 
@@ -364,9 +354,8 @@ export async function GET(request: NextRequest) {
           if (!cookie || !cookie.id || !cookie.token) {
             return gotoAccounts({
               request,
-              authRequest,
+              requestId: `oidc_${authRequest.id}`,
               organization,
-              idPrefix: "oidc_",
             });
           }
 
@@ -395,18 +384,16 @@ export async function GET(request: NextRequest) {
               );
               return gotoAccounts({
                 request,
-                authRequest,
                 organization,
-                idPrefix: "oidc_",
+                requestId: `oidc_${authRequest.id}`,
               });
             }
           } catch (error) {
             console.error(error);
             return gotoAccounts({
               request,
-              authRequest,
+              requestId: `oidc_${authRequest.id}`,
               organization,
-              idPrefix: "oidc_",
             });
           }
         }
@@ -432,6 +419,107 @@ export async function GET(request: NextRequest) {
         serviceUrl,
         samlRequestId: requestId.replace("saml_", ""),
       });
+
+      if (!samlRequest) {
+        return NextResponse.json(
+          { error: "No samlRequest found" },
+          { status: 400 },
+        );
+      }
+
+      let selectedSession = await findValidSession({
+        serviceUrl,
+        sessions,
+        samlRequest,
+      });
+
+      if (!selectedSession || !selectedSession.id) {
+        return gotoAccounts({
+          request,
+          requestId: `saml_${samlRequest.id}`,
+        });
+      }
+
+      const cookie = sessionCookies.find(
+        (cookie) => cookie.id === selectedSession.id,
+      );
+
+      if (!cookie || !cookie.id || !cookie.token) {
+        return gotoAccounts({
+          request,
+          requestId: `saml_${samlRequest.id}`,
+          // organization,
+        });
+      }
+
+      const session = {
+        sessionId: cookie.id,
+        sessionToken: cookie.token,
+      };
+
+      try {
+        const { url, binding } = await createResponse({
+          serviceUrl,
+          req: create(CreateResponseRequestSchema, {
+            samlRequestId: requestId.replace("saml_", ""),
+            responseKind: {
+              case: "session",
+              value: session,
+            },
+          }),
+        });
+        if (url && binding.case === "redirect") {
+          return NextResponse.redirect(url);
+        } else if (url && binding.case === "post") {
+          const formData = {
+            key1: "value1",
+            key2: "value2",
+          };
+
+          // Convert form data to URL-encoded string
+          const formBody = Object.entries(formData)
+            .map(
+              ([key, value]) =>
+                encodeURIComponent(key) + "=" + encodeURIComponent(value),
+            )
+            .join("&");
+
+          // Make a POST request to the external URL with the form data
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formBody,
+          });
+
+          // Handle the response from the external URL
+          if (response.ok) {
+            return NextResponse.json({
+              message: "SAML request completed successfully",
+            });
+          } else {
+            return NextResponse.json(
+              { error: "Failed to complete SAML request" },
+              { status: response.status },
+            );
+          }
+        } else {
+          console.log(
+            "could not create response, redirect user to choose other account",
+          );
+          return gotoAccounts({
+            request,
+            requestId: `saml_${samlRequest.id}`,
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        return gotoAccounts({
+          request,
+          requestId: `saml_${samlRequest.id}`,
+        });
+      }
     } else {
       return NextResponse.json(
         { error: "No authRequest nor samlRequest provided" },
