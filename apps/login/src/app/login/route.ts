@@ -216,7 +216,6 @@ export async function GET(request: NextRequest) {
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
-
   const _headers = await headers();
   const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
