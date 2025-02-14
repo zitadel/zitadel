@@ -21,7 +21,7 @@ type VerifyU2FCommand = {
 
 export async function addU2F(command: RegisterU2FCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
@@ -38,7 +38,7 @@ export async function addU2F(command: RegisterU2FCommand) {
 
   const session = await getSession({
     serviceUrl,
-    serviceRegion,
+
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -55,12 +55,12 @@ export async function addU2F(command: RegisterU2FCommand) {
     return { error: "Could not get session" };
   }
 
-  return registerU2F({ serviceUrl, serviceRegion, userId, domain: hostname });
+  return registerU2F({ serviceUrl, userId, domain: hostname });
 }
 
 export async function verifyU2F(command: VerifyU2FCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
@@ -83,7 +83,7 @@ export async function verifyU2F(command: VerifyU2FCommand) {
 
   const session = await getSession({
     serviceUrl,
-    serviceRegion,
+
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -101,5 +101,5 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     userId,
   });
 
-  return verifyU2FRegistration({ serviceUrl, serviceRegion, request });
+  return verifyU2FRegistration({ serviceUrl, request });
 }

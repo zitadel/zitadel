@@ -32,16 +32,14 @@ export const fetchCache = "default-no-store";
 
 async function loadSessions({
   serviceUrl,
-  serviceRegion,
   ids,
 }: {
   serviceUrl: string;
-  serviceRegion: string;
+
   ids: string[];
 }): Promise<Session[]> {
   const response = await listSessions({
     serviceUrl,
-    serviceRegion,
     ids: ids.filter((id: string | undefined) => !!id),
   });
 
@@ -58,7 +56,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
  **/
 async function isSessionValid(
   serviceUrl: string,
-  serviceRegion: string,
+
   session: Session,
 ): Promise<boolean> {
   // session can't be checked without user
@@ -71,7 +69,7 @@ async function isSessionValid(
 
   const authMethodTypes = await listAuthenticationMethodTypes({
     serviceUrl,
-    serviceRegion,
+
     userId: session.factors.user.id,
   });
 
@@ -121,7 +119,7 @@ async function isSessionValid(
     // only check settings if no auth methods are available, as this would require a setup
     const loginSettings = await getLoginSettings({
       serviceUrl,
-      serviceRegion,
+
       organization: session.factors?.user?.organizationId,
     });
     if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
@@ -165,7 +163,7 @@ async function isSessionValid(
 
 async function findValidSession(
   serviceUrl: string,
-  serviceRegion: string,
+
   sessions: Session[],
   authRequest: AuthRequest,
 ): Promise<Session | undefined> {
@@ -192,7 +190,7 @@ async function findValidSession(
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
-    if (await isSessionValid(serviceUrl, serviceRegion, session)) {
+    if (await isSessionValid(serviceUrl, session)) {
       return session;
     }
   }
@@ -200,15 +198,26 @@ async function findValidSession(
   return undefined;
 }
 
+function constructUrl(request: NextRequest, path: string) {
+  const forwardedHost =
+    request.headers.get("x-zitadel-forward-host") ??
+    request.headers.get("host");
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  return new URL(
+    `${basePath}${path}`,
+    forwardedHost?.startsWith("http")
+      ? forwardedHost
+      : `https://${forwardedHost}`,
+  );
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
-  console.log("requesturl", request.url);
-
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
   const _rsc = searchParams.get("_rsc");
@@ -220,7 +229,7 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceUrl, serviceRegion, ids });
+    sessions = await loadSessions({ serviceUrl, ids });
   }
 
   if (authRequestId && sessionId) {
@@ -235,7 +244,7 @@ export async function GET(request: NextRequest) {
 
       const isValid = await isSessionValid(
         serviceUrl,
-        serviceRegion,
+
         selectedSession,
       );
 
@@ -253,7 +262,7 @@ export async function GET(request: NextRequest) {
         const res = await sendLoginname(command);
 
         if (res && "redirect" in res && res?.redirect) {
-          const absoluteUrl = new URL(res.redirect, request.url);
+          const absoluteUrl = new URL(res.redirect, request.nextUrl);
           return NextResponse.redirect(absoluteUrl.toString());
         }
       }
@@ -272,7 +281,7 @@ export async function GET(request: NextRequest) {
         try {
           const { callbackUrl } = await createCallback({
             serviceUrl,
-            serviceRegion,
+
             req: create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {
@@ -300,7 +309,7 @@ export async function GET(request: NextRequest) {
           ) {
             const loginSettings = await getLoginSettings({
               serviceUrl,
-              serviceRegion,
+
               organization: selectedSession.factors?.user?.organizationId,
             });
 
@@ -308,21 +317,30 @@ export async function GET(request: NextRequest) {
               return NextResponse.redirect(loginSettings.defaultRedirectUri);
             }
 
-            const signedinUrl = new URL("/signedin", request.url);
+            const signedinUrl = constructUrl(request, "/signedin");
+            const params = new URLSearchParams();
 
             if (selectedSession.factors?.user?.loginName) {
-              signedinUrl.searchParams.set(
+              params.append(
                 "loginName",
                 selectedSession.factors?.user?.loginName,
               );
+              // signedinUrl.searchParams.set(
+              //   "loginName",
+              //   selectedSession.factors?.user?.loginName,
+              // );
             }
             if (selectedSession.factors?.user?.organizationId) {
-              signedinUrl.searchParams.set(
+              params.append(
                 "organization",
                 selectedSession.factors?.user?.organizationId,
               );
+              // signedinUrl.searchParams.set(
+              //   "organization",
+              //   selectedSession.factors?.user?.organizationId,
+              // );
             }
-            return NextResponse.redirect(signedinUrl);
+            return NextResponse.redirect(signedinUrl + "?" + params);
           } else {
             return NextResponse.json({ error }, { status: 500 });
           }
@@ -334,7 +352,7 @@ export async function GET(request: NextRequest) {
   if (authRequestId) {
     const { authRequest } = await getAuthRequest({
       serviceUrl,
-      serviceRegion,
+
       authRequestId,
     });
 
@@ -365,7 +383,7 @@ export async function GET(request: NextRequest) {
           if (orgDomain) {
             const orgs = await getOrgsByDomain({
               serviceUrl,
-              serviceRegion,
+
               domain: orgDomain,
             });
             if (orgs.result && orgs.result.length === 1) {
@@ -382,7 +400,7 @@ export async function GET(request: NextRequest) {
 
         const identityProviders = await getActiveIdentityProviders({
           serviceUrl,
-          serviceRegion,
+
           orgId: organization ? organization : undefined,
         }).then((resp) => {
           return resp.identityProviders;
@@ -408,7 +426,7 @@ export async function GET(request: NextRequest) {
 
           return startIdentityProviderFlow({
             serviceUrl,
-            serviceRegion,
+
             idpId,
             urls: {
               successUrl:
@@ -431,27 +449,33 @@ export async function GET(request: NextRequest) {
     }
 
     const gotoAccounts = (): NextResponse<unknown> => {
-      const accountsUrl = new URL("/accounts", request.url);
+      const accountsUrl = constructUrl(request, "/accounts");
+      const params = new URLSearchParams();
       if (authRequest?.id) {
-        accountsUrl.searchParams.set("authRequestId", authRequest?.id);
+        params.append("authRequestId", authRequest.id);
+        // accountsUrl.searchParams.set("authRequestId", authRequest?.id);
       }
       if (organization) {
-        accountsUrl.searchParams.set("organization", organization);
+        params.append("organization", organization);
+        // accountsUrl.searchParams.set("organization", organization);
       }
 
-      return NextResponse.redirect(accountsUrl);
+      return NextResponse.redirect(accountsUrl + "?" + params);
     };
 
     if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
-      const registerUrl = new URL("/register", request.url);
+      const registerUrl = constructUrl(request, "/register");
+      const params = new URLSearchParams();
       if (authRequest.id) {
-        registerUrl.searchParams.set("authRequestId", authRequest.id);
+        params.append("authRequestId", authRequest.id);
+        // registerUrl.searchParams.set("authRequestId", authRequest.id);
       }
       if (organization) {
-        registerUrl.searchParams.set("organization", organization);
+        params.append("organization", organization);
+        // registerUrl.searchParams.set("organization", organization);
       }
 
-      return NextResponse.redirect(registerUrl);
+      return NextResponse.redirect(registerUrl + "?" + params);
     }
 
     // use existing session and hydrate it for oidc
@@ -479,7 +503,7 @@ export async function GET(request: NextRequest) {
             const res = await sendLoginname(command);
 
             if (res && "redirect" in res && res?.redirect) {
-              const absoluteUrl = new URL(res.redirect, request.url);
+              const absoluteUrl = new URL(res.redirect, request.nextUrl);
               return NextResponse.redirect(absoluteUrl.toString());
             }
           } catch (error) {
@@ -487,20 +511,27 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const loginNameUrl = new URL("/loginname", request.url);
+        const loginNameUrl = constructUrl(request, "/loginname");
+
+        const params = new URLSearchParams();
+
         if (authRequest.id) {
-          loginNameUrl.searchParams.set("authRequestId", authRequest.id);
+          params.append("authRequestId", authRequest.id);
+          // loginNameUrl.searchParams.set("authRequestId", authRequest.id);
         }
         if (authRequest.loginHint) {
-          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+          params.append("loginName", authRequest.loginHint);
+          // loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
         }
         if (organization) {
-          loginNameUrl.searchParams.set("organization", organization);
+          params.append("organization", organization);
+          // loginNameUrl.searchParams.set("organization", organization);
         }
         if (suffix) {
-          loginNameUrl.searchParams.set("suffix", suffix);
+          params.append("suffix", suffix);
+          // loginNameUrl.searchParams.set("suffix", suffix);
         }
-        return NextResponse.redirect(loginNameUrl);
+        return NextResponse.redirect(loginNameUrl + "?" + params);
       } else if (authRequest.prompt.includes(Prompt.NONE)) {
         /**
          * With an OIDC none prompt, the authentication server must not display any authentication or consent user interface pages.
@@ -509,7 +540,7 @@ export async function GET(request: NextRequest) {
          **/
         const selectedSession = await findValidSession(
           serviceUrl,
-          serviceRegion,
+
           sessions,
           authRequest,
         );
@@ -539,7 +570,7 @@ export async function GET(request: NextRequest) {
 
         const { callbackUrl } = await createCallback({
           serviceUrl,
-          serviceRegion,
+
           req: create(CreateCallbackRequestSchema, {
             authRequestId,
             callbackKind: {
@@ -553,7 +584,7 @@ export async function GET(request: NextRequest) {
         // check for loginHint, userId hint and valid sessions
         let selectedSession = await findValidSession(
           serviceUrl,
-          serviceRegion,
+
           sessions,
           authRequest,
         );
@@ -578,7 +609,7 @@ export async function GET(request: NextRequest) {
         try {
           const { callbackUrl } = await createCallback({
             serviceUrl,
-            serviceRegion,
+
             req: create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {
@@ -601,19 +632,24 @@ export async function GET(request: NextRequest) {
         }
       }
     } else {
-      const loginNameUrl = new URL("/loginname", request.url);
+      const loginNameUrl = constructUrl(request, "/loginname");
 
-      loginNameUrl.searchParams.set("authRequestId", authRequestId);
+      const params = new URLSearchParams();
+      params.set("authRequestId", authRequestId);
+      // loginNameUrl.searchParams.set("authRequestId", authRequestId);
       if (authRequest?.loginHint) {
-        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-        loginNameUrl.searchParams.set("submit", "true"); // autosubmit
+        params.set("loginName", authRequest.loginHint);
+        params.set("submit", "true"); // autosubmit
+        // loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+        // loginNameUrl.searchParams.set("submit", "true"); // autosubmit
       }
 
       if (organization) {
-        loginNameUrl.searchParams.set("organization", organization);
+        params.set("organization", organization);
+        // loginNameUrl.searchParams.set("organization", organization);
       }
 
-      return NextResponse.redirect(loginNameUrl);
+      return NextResponse.redirect(loginNameUrl + "?" + params);
     }
   } else {
     return NextResponse.json(

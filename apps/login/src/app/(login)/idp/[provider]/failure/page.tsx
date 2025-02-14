@@ -25,17 +25,17 @@ export default async function Page(props: {
   const { organization, userId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 
@@ -54,7 +54,7 @@ export default async function Page(props: {
   if (userId) {
     const userResponse = await getUserByID({
       serviceUrl,
-      serviceRegion,
+
       userId,
     });
     if (userResponse) {
@@ -70,7 +70,7 @@ export default async function Page(props: {
 
     const authMethodsResponse = await listAuthenticationMethodTypes({
       serviceUrl,
-      serviceRegion,
+
       userId,
     });
     if (authMethodsResponse.authMethodTypes) {

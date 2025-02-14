@@ -23,12 +23,11 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   if (!organization) {
     const org: Organization | null = await getDefaultOrg({
       serviceUrl,
-      serviceRegion,
     });
     if (org) {
       organization = org.id;
@@ -39,24 +38,24 @@ export default async function Page(props: {
 
   const legal = await getLegalAndSupportSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 

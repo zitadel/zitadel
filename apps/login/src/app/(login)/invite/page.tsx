@@ -21,10 +21,10 @@ export default async function Page(props: {
   let { firstname, lastname, email, organization } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   if (!organization) {
-    const org = await getDefaultOrg({ serviceUrl, serviceRegion });
+    const org = await getDefaultOrg({ serviceUrl });
     if (!org) {
       throw new Error("No default organization found");
     }
@@ -34,19 +34,19 @@ export default async function Page(props: {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 
   const passwordComplexitySettings = await getPasswordComplexitySettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 

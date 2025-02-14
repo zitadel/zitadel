@@ -23,6 +23,7 @@
     "lint:fix": "prettier --write .",
     "lint-staged": "lint-staged",
     "build": "next build",
+    "build:standalone": "NEXT_OUTPUT_MODE=standalone pnpm build",
     "prestart": "pnpm build",
     "start": "next start",
     "start:built": "next start",

@@ -21,13 +21,13 @@ export default async function Page(props: {
     searchParams;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
-        serviceRegion,
+
         sessionParams: { loginName, organization },
       });
 
@@ -39,7 +39,7 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-      serviceRegion,
+
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -51,7 +51,7 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 

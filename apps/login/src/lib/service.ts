@@ -20,17 +20,16 @@ type ServiceClass =
 export async function createServiceForHost<T extends ServiceClass>(
   service: T,
   serviceUrl: string,
-  serviceRegion: string,
 ) {
   let token;
 
   // if we are running in a multitenancy context, use the system user token
   if (
-    process.env[serviceRegion + "_AUDIENCE"] &&
-    process.env[serviceRegion + "_SYSTEM_USER_ID"] &&
-    process.env[serviceRegion + "_SYSTEM_USER_PRIVATE_KEY"]
+    process.env.AUDIENCE &&
+    process.env.SYSTEM_USER_ID &&
+    process.env.SYSTEM_USER_PRIVATE_KEY
   ) {
-    token = await systemAPIToken({ serviceRegion });
+    token = await systemAPIToken();
   } else if (process.env.ZITADEL_SERVICE_USER_TOKEN) {
     token = process.env.ZITADEL_SERVICE_USER_TOKEN;
   }
@@ -43,15 +42,33 @@ export async function createServiceForHost<T extends ServiceClass>(
     throw new Error("No token found");
   }
 
+  const instanceHost = new URL(serviceUrl).host;
   const transport = createServerTransport(token, {
-    baseUrl: serviceUrl,
+    baseUrl: process.env.ZITADEL_API_URL ?? serviceUrl,
+    interceptors:
+      (process.env.ZITADEL_API_URL &&
+        process.env.ZITADEL_API_URL != serviceUrl) ||
+      process.env.ZITADEL_INSTANCE_HOST_HEADER
+        ? [
+            (next) => {
+              return (req) => {
+                req.header.set(
+                  process.env.ZITADEL_INSTANCE_HOST_HEADER ??
+                    "x-zitadel-instance-host",
+                  instanceHost,
+                );
+                return next(req);
+              };
+            },
+          ]
+        : undefined,
   });
 
   return createClientFor<T>(service)(transport);
 }
 
 /**
- * Extracts the service url and region from the headers if used in a multitenant context (x-zitadel-forward-host, x-zitade-region header)
+ * Extracts the service url and region from the headers if used in a multitenant context (host, x-zitadel-forward-host header)
  * or falls back to the ZITADEL_API_URL for a self hosting deployment
  * or falls back to the host header for a self hosting deployment using custom domains
  * @param headers
@@ -61,7 +78,6 @@ export async function createServiceForHost<T extends ServiceClass>(
  */
 export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   serviceUrl: string;
-  serviceRegion: string;
 } {
   let instanceUrl;
 
@@ -69,7 +85,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
   // use the forwarded host if available (multitenant), otherwise fall back to the host of the deployment itself
   if (forwardedHost) {
     instanceUrl = forwardedHost;
-    instanceUrl = instanceUrl.startsWith("https://")
+    instanceUrl = instanceUrl.startsWith("http://")
       ? instanceUrl
       : `https://${instanceUrl}`;
   } else if (process.env.ZITADEL_API_URL) {
@@ -80,7 +96,7 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
     if (host) {
       const [hostname, port] = host.split(":");
       if (hostname !== "localhost") {
-        instanceUrl = host.startsWith("https://") ? host : `https://${host}`;
+        instanceUrl = host.startsWith("http") ? host : `https://${host}`;
       }
     }
   }
@@ -91,6 +107,5 @@ export function getServiceUrlFromHeaders(headers: ReadonlyHeaders): {
 
   return {
     serviceUrl: instanceUrl,
-    serviceRegion: headers.get("x-zitadel-region") || "",
   };
 }
