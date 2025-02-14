@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/riverqueue/river"
-	"github.com/riverqueue/river/rivertype"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -35,6 +34,8 @@ const (
 )
 
 type NotificationWorker struct {
+	river.WorkerDefaults[*command.NotificationRequest]
+
 	commands Commands
 	queries  *NotificationQueries
 	es       *eventstore.Eventstore
@@ -45,24 +46,10 @@ type NotificationWorker struct {
 	backOff  func(current time.Duration) time.Duration
 }
 
-// Middleware implements river.Worker.
-func (w *NotificationWorker) Middleware(job *river.Job[*command.NotificationRequest]) []rivertype.WorkerMiddleware {
-	panic("unimplemented")
-}
-
-// NextRetry implements river.Worker.
-func (w *NotificationWorker) NextRetry(job *river.Job[*command.NotificationRequest]) time.Time {
-	panic("unimplemented")
-}
-
-// Timeout implements river.Worker.
-func (w *NotificationWorker) Timeout(job *river.Job[*command.NotificationRequest]) time.Duration {
-	panic("unimplemented")
-}
-
-// Work implements river.Worker.
+// Work implements [river.Worker].
 func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*command.NotificationRequest]) error {
 	panic("unimplemented")
+	river.JobCancel()
 }
 
 type WorkerConfig struct {
