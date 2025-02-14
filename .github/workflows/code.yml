@@ -1,0 +1,94 @@
+name: Run Tests on Code Changes Only
+
+on:
+  pull_request:
+    paths:
+      - '**.go'
+      - '**.ts'
+      - '**.js'
+      - '**.html'
+      - '**.scss'
+      - '**.css'
+    paths-ignore:
+      - 'docs/**'
+      - 'adopters.yaml'
+      - 'marketing/**'
+
+jobs:
+  check_files:
+    runs-on: zitadel-runner
+    outputs:
+      go_changed: ${{ steps.filter.outputs.go }}
+      js_changed: ${{ steps.filter.outputs.js }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get Changed Files
+        id: files
+        uses: tj-actions/changed-files@v35
+
+      - name: Check for Go file changes
+        id: filter
+        run: |
+          echo "go=$(echo '${{ steps.files.outputs.all_changed_files }}' | grep -qE '\.go$' && echo 'true' || echo 'false')" >> $GITHUB_ENV
+          echo "js=$(echo '${{ steps.files.outputs.all_changed_files }}' | grep -qE '\.(ts|js)$' && echo 'true' || echo 'false')" >> $GITHUB_ENV
+
+
+  go_tests:
+    needs: check_files
+    runs-on: zitadel-runner
+    if: needs.check_files.outputs.go_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.15'
+
+      - name: Build Go
+        run: go build -v ./...
+
+      - name: Install Go dependencies
+        run: go get .
+
+      - name: Run Go tests
+        run: go test ./...
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.52.2
+
+      - name: Run golangci-lint
+        run: golangci-lint run ./...
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run staticcheck
+        run: staticcheck ./...
+
+
+  js_tests:
+    needs: check_files
+    runs-on: zitadel-runner
+    if: needs.check_files.outputs.js_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install JS/TS dependencies
+        run: npm install
+
+      - name: Run JavaScript/TypeScript tests
+        run: npm test
+
+      - name: Run ESLint
+        run: npx eslint .
