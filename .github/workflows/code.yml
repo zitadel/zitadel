@@ -33,7 +33,7 @@ jobs:
 
   go_tests:
     needs: check_files
-    runs-on: zitadel-runner
+    runs-on: zitadel-public
     if: needs.check_files.outputs.go_changed == 'true'
     steps:
       - name: Checkout code
@@ -69,7 +69,7 @@ jobs:
 
   js_tests:
     needs: check_files
-    runs-on: zitadel-runner
+    runs-on: zitadel-public
     if: needs.check_files.outputs.js_changed == 'true'
     steps:
       - name: Checkout code
