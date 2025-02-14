@@ -62,7 +62,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 					WithRelyingPartyOption(rp.WithPKCE(nil)),
 				},
 			},
-			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&code_challenge=pkceOAuthVerifier&code_challenge_method=S256&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
+			want: &Session{AuthURL: "https://oauth2.com/authorize?client_id=clientID&code_challenge=2ZoH_a01aprzLkwVbjlPsBo4m8mJ_zOKkaDqYM7Oh5w&code_challenge_method=S256&prompt=select_account&redirect_uri=redirectURI&response_type=code&scope=user&state=testState"},
 		},
 	}
 	for _, tt := range tests {
@@ -72,6 +72,9 @@ func TestProvider_BeginAuth(t *testing.T) {
 
 			provider, err := New(tt.fields.config, tt.fields.name, tt.fields.userEndpoint, tt.fields.userMapper, tt.fields.options...)
 			r.NoError(err)
+			provider.generateVerifier = func() string {
+				return "pkceOAuthVerifier"
+			}
 
 			ctx := context.Background()
 			session, err := provider.BeginAuth(ctx, "testState")

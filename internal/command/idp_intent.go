@@ -25,7 +25,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string) preparation.Validation {
+func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, successURL, failureURL string, idpArguments map[string]any) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if idpID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing")
@@ -53,13 +53,14 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID, s
 					successURL,
 					failureURL,
 					idpID,
+					idpArguments,
 				),
 			}, nil
 		}, nil
 	}
 }
 
-func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
+func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string, idpArguments map[string]any) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
@@ -70,7 +71,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	}
 
 	//nolint: staticcheck
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, idpID, successURL, failureURL, idpArguments))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -132,18 +133,12 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 	return intent, nil
 }
 
-func (c *Commands) AuthFromProvider(ctx context.Context, idpID, state string, idpCallback, samlRootURL string) (string, bool, error) {
+func (c *Commands) AuthFromProvider(ctx context.Context, idpID, state, idpCallback, samlRootURL string) (idp.Session, error) {
 	provider, err := c.GetProvider(ctx, idpID, idpCallback, samlRootURL)
 	if err != nil {
-		return "", false, err
+		return nil, err
 	}
-	session, err := provider.BeginAuth(ctx, state)
-	if err != nil {
-		return "", false, err
-	}
-
-	content, redirect := session.GetAuth(ctx)
-	return content, redirect, nil
+	return provider.BeginAuth(ctx, state)
 }
 
 func getIDPIntentWriteModel(ctx context.Context, writeModel *IDPIntentWriteModel, filter preparation.FilterToQueryReducer) error {

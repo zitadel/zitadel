@@ -548,7 +548,6 @@ func startAPIs(
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
-		keys.OIDCKey,
 		cacheConnectors,
 	)
 	if err != nil {

@@ -39,11 +39,12 @@ func TestCommands_CreateIntent(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx        context.Context
-		idpID      string
-		successURL string
-		failureURL string
-		instanceID string
+		ctx          context.Context
+		idpID        string
+		successURL   string
+		failureURL   string
+		instanceID   string
+		idpArguments map[string]any
 	}
 	type res struct {
 		intentID string
@@ -196,6 +197,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								nil,
 							)
 						}(),
 					),
@@ -250,6 +252,9 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								map[string]interface{}{
+									"verifier": "pkceOAuthVerifier",
+								},
 							)
 						}(),
 					),
@@ -262,6 +267,9 @@ func TestCommands_CreateIntent(t *testing.T) {
 				idpID:      "idp",
 				successURL: "https://success.url",
 				failureURL: "https://failure.url",
+				idpArguments: map[string]interface{}{
+					"verifier": "pkceOAuthVerifier",
+				},
 			},
 			res{
 				intentID: "id",
@@ -304,6 +312,9 @@ func TestCommands_CreateIntent(t *testing.T) {
 								success,
 								failure,
 								"idp",
+								map[string]interface{}{
+									"verifier": "pkceOAuthVerifier",
+								},
 							)
 						}(),
 					),
@@ -316,6 +327,9 @@ func TestCommands_CreateIntent(t *testing.T) {
 				idpID:      "idp",
 				successURL: "https://success.url",
 				failureURL: "https://failure.url",
+				idpArguments: map[string]interface{}{
+					"verifier": "pkceOAuthVerifier",
+				},
 			},
 			res{
 				intentID: "id",
@@ -329,7 +343,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID)
+			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID, tt.args.idpArguments)
 			require.ErrorIs(t, err, tt.res.err)
 			if intentWriteModel != nil {
 				assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
@@ -588,8 +602,14 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			content, redirect, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
+			session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
 			require.ErrorIs(t, err, tt.res.err)
+
+			var content string
+			var redirect bool
+			if err == nil {
+				content, redirect = session.GetAuth(tt.args.ctx)
+			}
 			assert.Equal(t, tt.res.redirect, redirect)
 			assert.Equal(t, tt.res.content, content)
 		})
@@ -677,6 +697,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 									success,
 									failure,
 									"idp",
+									nil,
 								)
 							}(),
 						),
@@ -714,9 +735,10 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
-			content, _, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
+			session, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
 			require.ErrorIs(t, err, tt.res.err)
 
+			content, _ := session.GetAuth(tt.args.ctx)
 			authURL, err := url.Parse(content)
 			require.NoError(t, err)
 

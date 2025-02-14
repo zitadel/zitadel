@@ -24,6 +24,7 @@ type Provider struct {
 	useIDToken        bool
 	userInfoMapper    func(info *oidc.UserInfo) idp.User
 	authOptions       []func(bool) rp.AuthURLOpt
+	generateVerifier  func() string
 }
 
 type ProviderOpts func(provider *Provider)
@@ -102,8 +103,9 @@ var DefaultMapper UserInfoMapper = func(info *oidc.UserInfo) idp.User {
 // New creates a generic OIDC provider
 func New(name, issuer, clientID, clientSecret, redirectURI string, scopes []string, userInfoMapper UserInfoMapper, options ...ProviderOpts) (provider *Provider, err error) {
 	provider = &Provider{
-		name:           name,
-		userInfoMapper: userInfoMapper,
+		name:             name,
+		userInfoMapper:   userInfoMapper,
+		generateVerifier: oauth2.GenerateVerifier,
 	}
 	for _, option := range options {
 		option(provider)
@@ -151,17 +153,14 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 		}
 	}
 
+	var codeVerifier string
 	if p.RelyingParty.IsPKCE() {
-		codeChallenge := oidc.NewSHACodeChallenge(idp.CodeVerifier())
-		if state != "testState" {
-			codeChallenge = "pkceOIDCVerifier"
-
-		}
-		opts = append(opts, rp.WithCodeChallenge(codeChallenge))
+		codeVerifier = p.generateVerifier()
+		opts = append(opts, rp.WithCodeChallenge(oidc.NewSHACodeChallenge(codeVerifier)))
 	}
 
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
-	return &Session{AuthURL: url, Provider: p}, nil
+	return &Session{AuthURL: url, Provider: p, CodeVerifier: codeVerifier}, nil
 }
 
 func loginHint(hint string) rp.AuthURLOpt {
