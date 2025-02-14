@@ -239,7 +239,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s45CorrectProjectOwners,
 		steps.s46InitPermissionFunctions,
 		steps.s47FillMembershipFields,
-		steps.s49InitPermiottedOrgsFunction,
+		steps.s49InitPermittedOrgsFunction,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -259,7 +259,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s37Apps7OIDConfigsBackChannelLogoutURI,
 		steps.s42Apps7OIDCConfigsLoginVersion,
 		steps.s43CreateFieldsDomainIndex,
-		steps.s49Apps7SAMLConfigsLoginVersion,
+		steps.s48Apps7SAMLConfigsLoginVersion,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
