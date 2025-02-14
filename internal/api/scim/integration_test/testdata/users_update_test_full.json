@@ -3,7 +3,7 @@
   "Operations": [
     // add without path
     {
-      "op": "add",
+      "op": "Add", // with PascalCase operation type
       "value": {
         "emails":[
           {
@@ -17,7 +17,7 @@
     },
     // add complex attribute with path
     {
-      "op": "add",
+      "op": "add", // with camelCase operation type
       "path":  "name",
       "value": {
         "formatted": "added-formatted",
@@ -30,7 +30,7 @@
     },
     // add complex attribute value
     {
-      "op": "add",
+      "op": "ADD", // with UPPERCASE operation type
       "path": "name.middlename",
       "value": "added-middle-name-2"
     },
@@ -134,6 +134,14 @@
       "op": "replace",
       "path": "password",
       "value": "Password2!"
+    },
+    // replace active state
+    {
+      "op": "replace",
+      "path": "active",
+      // quoted uppercase bool
+      // (ensure compatibility with Microsoft Entra)
+      "value": "True"
     }
   ]
 }

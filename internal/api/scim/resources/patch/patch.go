@@ -3,7 +3,6 @@ package patch
 import (
 	"encoding/json"
 	"reflect"
-	"slices"
 	"strings"
 
 	"github.com/zitadel/logging"
@@ -46,11 +45,11 @@ type ResourcePatcher interface {
 	Removed(attributePath []string) error
 }
 
-func (req *OperationRequest) Validate() error {
-	if !slices.Contains(req.Schemas, schemas.IdPatchOperation) {
-		return serrors.ThrowInvalidSyntax(zerrors.ThrowInvalidArgumentf(nil, "SCIM-xy1schema", "Expected schema %v is not provided", schemas.IdPatchOperation))
-	}
+func (req *OperationRequest) GetSchemas() []schemas.ScimSchemaType {
+	return req.Schemas
+}
 
+func (req *OperationRequest) Validate() error {
 	for _, op := range req.Operations {
 		if err := op.validate(); err != nil {
 			return err
@@ -61,6 +60,9 @@ func (req *OperationRequest) Validate() error {
 }
 
 func (op *Operation) validate() error {
+	// ignore the casing, as some scim clients send these capitalized
+	op.Operation = OperationType(strings.ToLower(string(op.Operation)))
+
 	if !op.Operation.isValid() {
 		return serrors.ThrowInvalidValue(zerrors.ThrowInvalidArgumentf(nil, "SCIM-opty1", "Patch op %s not supported", op.Operation))
 	}

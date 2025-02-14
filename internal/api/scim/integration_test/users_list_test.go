@@ -20,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/internal/integration/scim"
 	"github.com/zitadel/zitadel/internal/test"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
@@ -190,6 +189,7 @@ func TestListUser(t *testing.T) {
 		{
 			name: "list paged sorted users with filter as post",
 			req: &scim.ListRequest{
+				Schemas:    []schemas.ScimSchemaType{schemas.IdSearchRequest},
 				Count:      gu.Ptr(5),
 				StartIndex: gu.Ptr(1),
 				SortOrder:  gu.Ptr(scim.ListRequestSortOrderAsc),
@@ -238,7 +238,7 @@ func TestListUser(t *testing.T) {
 				assert.Equal(t, 1, resp.StartIndex)
 				assert.Len(t, resp.Resources, 1)
 				assert.True(t, strings.HasPrefix(resp.Resources[0].UserName, "scim-username-0"))
-				assert.False(t, *resp.Resources[0].Active)
+				assert.False(t, resp.Resources[0].Active.Bool())
 			},
 		},
 		{
@@ -371,20 +371,10 @@ func TestListUser(t *testing.T) {
 				resp := createHumanUser(t, CTX, Instance.DefaultOrg.Id, 102)
 
 				// set provisioning domain of service user
-				_, err := Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
-					Id:    Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-					Key:   "urn:zitadel:scim:provisioningDomain",
-					Value: []byte("fooBar"),
-				})
-				require.NoError(t, err)
+				setProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID, "fooBar")
 
 				// set externalID for provisioning domain
-				_, err = Instance.Client.Mgmt.SetUserMetadata(CTX, &management.SetUserMetadataRequest{
-					Id:    resp.UserId,
-					Key:   "urn:zitadel:scim:fooBar:externalId",
-					Value: []byte("100-scopedExternalId"),
-				})
-				require.NoError(t, err)
+				setAndEnsureMetadata(t, resp.UserId, "urn:zitadel:scim:fooBar:externalId", "100-scopedExternalId")
 				return &scim.ListRequest{
 					Filter: gu.Ptr(fmt.Sprintf(`id eq "%s"`, resp.UserId)),
 				}
@@ -395,11 +385,7 @@ func TestListUser(t *testing.T) {
 			},
 			cleanup: func(t require.TestingT) {
 				// delete provisioning domain of service user
-				_, err := Instance.Client.Mgmt.RemoveUserMetadata(CTX, &management.RemoveUserMetadataRequest{
-					Id:  Instance.Users.Get(integration.UserTypeOrgOwner).ID,
-					Key: "urn:zitadel:scim:provisioningDomain",
-				})
-				require.NoError(t, err)
+				removeProvisioningDomain(t, Instance.Users.Get(integration.UserTypeOrgOwner).ID)
 			},
 		},
 	}

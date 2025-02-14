@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
 	"github.com/zitadel/zitadel/internal/activity"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/auth/repository"
@@ -62,22 +63,12 @@ type Storage struct {
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.ActiveAppBySAMLEntityID(ctx, entityID)
+	sp, err := p.query.ActiveSAMLServiceProviderByID(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
-	return serviceprovider.NewServiceProvider(
-		app.ID,
-		&serviceprovider.Config{
-			Metadata: app.SAMLConfig.Metadata,
-		},
-		func(id string) string {
-			if strings.HasPrefix(id, command.IDPrefixV2) {
-				return p.defaultLoginURLv2 + id
-			}
-			return p.defaultLoginURL + id
-		},
-	)
+
+	return ServiceProviderFromBusiness(sp, p.defaultLoginURL, p.defaultLoginURLv2)
 }
 
 func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
@@ -108,11 +99,34 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	// for backwards compatibility we pass the login client if set
 	headers, _ := http_utils.HeadersFromCtx(ctx)
-	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
+	loginClient := headers.Get(LoginClientHeader)
+
+	// for backwards compatibility we'll use the new login if the header is set (no matter the other configs)
+	if loginClient != "" {
 		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
 	}
-	return p.createAuthRequest(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
+
+	// if the instance requires the v2 login, use it no matter what the application configured
+	if authz.GetFeatures(ctx).LoginV2.Required {
+		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
+	}
+	version, err := p.query.SAMLAppLoginVersion(ctx, applicationID)
+	if err != nil {
+		return nil, err
+	}
+	switch version {
+	case domain.LoginVersion1:
+		return p.createAuthRequest(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
+	case domain.LoginVersion2:
+		return p.createAuthRequestLoginClient(ctx, req, acsUrl, protocolBinding, relayState, applicationID, loginClient)
+	case domain.LoginVersionUnspecified:
+		fallthrough
+	default:
+		// since we already checked for a login header, we can fall back to the v1 login
+		return p.createAuthRequest(ctx, req, acsUrl, protocolBinding, relayState, applicationID)
+	}
 }
 
 func (p *Storage) createAuthRequestLoginClient(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID, loginClient string) (_ models.AuthRequestInt, err error) {
