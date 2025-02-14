@@ -21,6 +21,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) 
 	return &user.GetUserByIDResponse{
 		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
 			Sequence:      resp.Sequence,
+			CreationDate:  resp.CreationDate,
 			EventDate:     resp.ChangeDate,
 			ResourceOwner: resp.ResourceOwner,
 		}),
