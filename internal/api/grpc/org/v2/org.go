@@ -2,7 +2,6 @@ package org
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"

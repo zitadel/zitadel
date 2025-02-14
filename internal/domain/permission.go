@@ -39,3 +39,7 @@ const (
 	PermissionIDPRead             = "iam.idp.read"
 	PermissionOrgIDPRead          = "org.idp.read"
 )
+
+// ProjectPermissionCheck is used as a check for preconditions dependent on application, project, user resourceowner and usergrants.
+// Configurable on the project the application belongs to through the flags related to authentication.
+type ProjectPermissionCheck func(ctx context.Context, clientID, userID string) (err error)

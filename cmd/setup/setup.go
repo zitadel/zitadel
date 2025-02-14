@@ -4,9 +4,11 @@ import (
 	"context"
 	"embed"
 	_ "embed"
+	"errors"
 	"net/http"
 	"path"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
@@ -171,6 +173,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s45CorrectProjectOwners = &CorrectProjectOwners{eventstore: eventstoreClient}
 	steps.s46InitPermissionFunctions = &InitPermissionFunctions{eventstoreClient: dbClient}
 	steps.s47FillMembershipFields = &FillMembershipFields{eventstore: eventstoreClient}
+	steps.s48Apps7SAMLConfigsLoginVersion = &Apps7SAMLConfigsLoginVersion{dbClient: dbClient}
 
 	err = projection.Create(ctx, dbClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -196,6 +199,9 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		&SyncRolePermissions{
 			eventstore:             eventstoreClient,
 			rolePermissionMappings: config.InternalAuthZ.RolePermissionMappings,
+		},
+		&RiverMigrateRepeatable{
+			client: dbClient,
 		},
 	}
 
@@ -251,6 +257,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s37Apps7OIDConfigsBackChannelLogoutURI,
 		steps.s42Apps7OIDCConfigsLoginVersion,
 		steps.s43CreateFieldsDomainIndex,
+		steps.s48Apps7SAMLConfigsLoginVersion,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -271,7 +278,23 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) {
 	err := migration.Migrate(ctx, eventstoreClient, step)
-	logging.WithFields("name", step.String()).OnError(err).Fatal(errorMsg)
+	if err == nil {
+		return
+	}
+	logFields := []any{
+		"name", step.String(),
+	}
+	pgErr := new(pgconn.PgError)
+	if errors.As(err, &pgErr) {
+		logFields = append(logFields,
+			"severity", pgErr.Severity,
+			"code", pgErr.Code,
+			"message", pgErr.Message,
+			"detail", pgErr.Detail,
+			"hint", pgErr.Hint,
+		)
+	}
+	logging.WithFields(logFields...).WithError(err).Fatal(errorMsg)
 }
 
 // readStmt reads a single file from the embedded FS,

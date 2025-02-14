@@ -146,7 +146,7 @@ func TestServer_AddOrganization(t *testing.T) {
 								IdpLinks: []*user.IDPLink{
 									{
 										IdpId:    idpResp.Id,
-										UserId:   "userID",
+										UserId:   userId,
 										UserName: "username",
 									},
 								},
