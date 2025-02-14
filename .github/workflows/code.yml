@@ -12,7 +12,7 @@ on:
 
 jobs:
   check_files:
-    runs-on: zitadel-runner
+    runs-on: zitadel-public
     outputs:
       go_changed: ${{ steps.filter.outputs.go }}
       js_changed: ${{ steps.filter.outputs.js }}

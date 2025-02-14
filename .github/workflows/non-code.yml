@@ -15,7 +15,7 @@ on:
 
 jobs:
   docs_checks:
-    runs-on: zitadel-runner
+    runs-on: zitadel-public
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
