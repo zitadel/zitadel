@@ -57,7 +57,7 @@ export async function createServiceForHost<T extends ServiceClass>(
 }
 
 /**
- * Extracts the service url and region from the headers if used in a multitenant context (host, x-zitade-region header)
+ * Extracts the service url and region from the headers if used in a multitenant context (host, x-zitadel-forward-host header)
  * or falls back to the ZITADEL_API_URL for a self hosting deployment
  * or falls back to the host header for a self hosting deployment using custom domains
  * @param headers
