@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
+	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -89,6 +90,8 @@ type userNotifier struct {
 	commands     Commands
 	queries      *NotificationQueries
 	otpEmailTmpl string
+
+	queue *queue.Queue
 }
 
 func NewUserNotifier(
@@ -99,6 +102,7 @@ func NewUserNotifier(
 	channels types.ChannelChains,
 	otpEmailTmpl string,
 	legacyMode bool,
+	queue *queue.Queue,
 ) *handler.Handler {
 	if legacyMode {
 		return NewUserNotifierLegacy(ctx, config, commands, queries, channels, otpEmailTmpl)
@@ -107,6 +111,7 @@ func NewUserNotifier(
 		commands:     commands,
 		queries:      queries,
 		otpEmailTmpl: otpEmailTmpl,
+		queue:        queue,
 	})
 }
 
@@ -215,23 +220,20 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		origin := http_util.DomainContext(ctx).Origin()
-		return u.commands.RequestNotification(
-			ctx,
+		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
-			command.NewNotificationRequest(
-				e.Aggregate().ID,
-				e.Aggregate().ResourceOwner,
-				origin,
-				e.EventType,
-				domain.NotificationTypeEmail,
-				domain.InitCodeMessageType,
-			).
-				WithURLTemplate(login.InitUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)).
-				WithCode(e.Code, e.Expiry).
-				WithArgs(&domain.NotificationArguments{
-					AuthRequestID: e.AuthRequestID,
-				}).
-				WithUnverifiedChannel(),
+			origin,
+			e.EventType,
+			domain.NotificationTypeEmail,
+			domain.InitCodeMessageType,
+		).
+			WithURLTemplate(login.InitUserLinkTemplate(origin, e.Aggregate().ID, e.Aggregate().ResourceOwner, e.AuthRequestID)).
+			WithCode(e.Code, e.Expiry).
+			WithArgs(&domain.NotificationArguments{
+				AuthRequestID: e.AuthRequestID,
+			}).
+			WithUnverifiedChannel(),
 		)
 	}), nil
 }

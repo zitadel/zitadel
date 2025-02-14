@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/riverqueue/river"
+	"github.com/riverqueue/river/rivertype"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -22,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/queue"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/notification"
 )
@@ -40,6 +43,26 @@ type NotificationWorker struct {
 	config   WorkerConfig
 	now      nowFunc
 	backOff  func(current time.Duration) time.Duration
+}
+
+// Middleware implements river.Worker.
+func (w *NotificationWorker) Middleware(job *river.Job[*command.NotificationRequest]) []rivertype.WorkerMiddleware {
+	panic("unimplemented")
+}
+
+// NextRetry implements river.Worker.
+func (w *NotificationWorker) NextRetry(job *river.Job[*command.NotificationRequest]) time.Time {
+	panic("unimplemented")
+}
+
+// Timeout implements river.Worker.
+func (w *NotificationWorker) Timeout(job *river.Job[*command.NotificationRequest]) time.Duration {
+	panic("unimplemented")
+}
+
+// Work implements river.Worker.
+func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*command.NotificationRequest]) error {
+	panic("unimplemented")
 }
 
 type WorkerConfig struct {
@@ -78,6 +101,7 @@ func NewNotificationWorker(
 	es *eventstore.Eventstore,
 	client *database.DB,
 	channels types.ChannelChains,
+	queue *queue.Queue,
 ) *NotificationWorker {
 	// make sure the delay does not get less
 	if config.RetryDelayFactor < 1 {
@@ -92,8 +116,15 @@ func NewNotificationWorker(
 		channels: channels,
 		now:      time.Now,
 	}
+	queue.AddWorkers(w)
 	w.backOff = w.exponentialBackOff
 	return w
+}
+
+var _ river.Worker[*command.NotificationRequest] = (*NotificationWorker)(nil)
+
+func (w *NotificationWorker) Register(workers *river.Workers) {
+	river.AddWorker(workers, w)
 }
 
 func (w *NotificationWorker) Start(ctx context.Context) {
