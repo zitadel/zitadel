@@ -1534,6 +1534,10 @@
       "MAXSIZEEXCEEDED": "最大サイズの524KBを超えました。",
       "NOSVGSUPPORTED": "SVGはサポートされていません！",
       "FONTINLOGINONLY": "フォントは現在、ログインインターフェイスにのみ表示されます。",
+      "BACKGROUNDCOLOR": "背景色",
+      "PRIMARYCOLOR": "プライマリカラー",
+      "WARNCOLOR": "警告色",
+      "FONTCOLOR": "フォントカラー",
       "VIEWS": {
         "PREVIEW": "プレビュー",
         "CURRENT": "現在の構成"
@@ -1669,7 +1673,8 @@
         "PR": "パスワードのリセット",
         "DC": "ドメインクレーム",
         "PL": "パスワードレス",
-        "PC": "パスワードの変更"
+        "PC": "パスワードの変更",
+        "IU": "ユーザーの招待"
       },
       "CHIPS": {
         "firstname": "名",
@@ -2051,6 +2056,14 @@
       "LDAP": {
         "TITLE": "LDAPプロバイダー",
         "DESCRIPTION": "LDAPプロバイダーのクレデンシャルを入力してください。"
+      },
+      "APPLE": {
+        "TITLE": "Appleプロバイダー",
+        "DESCRIPTION": "Appleプロバイダーのクレデンシャルを入力してください。"
+      },
+      "SAML": {
+        "TITLE": "SAMLプロバイダー",
+        "DESCRIPTION": "SAMLプロバイダーのクレデンシャルを入力してください。"
       }
     },
     "DETAIL": {
@@ -2170,6 +2183,23 @@
       "JWTENDPOINT": "JWTエンドポイント",
       "JWTKEYSENDPOINT": "JWTキーエンドポイント"
     },
+    "APPLE": {
+      "TEAMID": "チームID",
+      "KEYID": "キーID",
+      "PRIVATEKEY": "秘密鍵",
+      "UPDATEPRIVATEKEY": "秘密鍵の更新",
+      "UPLOADPRIVATEKEY": "秘密鍵のアップロード",
+      "KEYMAXSIZEEXCEEDED": "最大サイズの5kBを超えています"
+    },
+    "SAML": {
+      "METADATAXML": "Metadata XML",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "署名付きリクエスト",
+      "NAMEIDFORMAT": "NameIDフォーマット",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "カスタム属性名",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "NameIDフォーマットが`transient`の場合にユーザーをマッピングするためのカスタム属性名 (例: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`)"
+    },
     "TOAST": {
       "SAVED": "正常に保存されました。",
       "REACTIVATED": "IDPがアクティブになりました。",
@@ -2254,7 +2284,11 @@
         "DELETE_TITLE": "SMTP設定を削除する",
         "DELETE_DESCRIPTION": "構成を削除しようとしています。送信者名を入力してこのアクションを確認します",
         "DELETED": "SMTP設定が削除されました",
-        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。"
+        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。",
+        "TEST_TITLE": "SMTP設定をテストする",
+        "TEST_DESCRIPTION": "テスト用のメールアドレスを指定してください",
+        "TEST_EMAIL": "メールアドレス",
+        "TEST_RESULT": "テスト結果"
       }
     },
     "CREATE": {
