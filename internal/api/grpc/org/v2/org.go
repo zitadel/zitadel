@@ -43,7 +43,6 @@ func addOrganizationRequestAdminsToCommand(requestAdmins []*org.AddOrganizationR
 			return nil, err
 		}
 	}
-	fmt.Printf("admins = %+v\n", admins)
 	return admins, nil
 }
 
