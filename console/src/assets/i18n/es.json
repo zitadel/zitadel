@@ -1495,7 +1495,9 @@
         "ENABLED": "\"Habilitado\" se hereda",
         "DISABLED": "\"Deshabilitado\" se hereda"
       },
-      "RESET": "Establecer todo a heredado"
+      "RESET": "Establecer todo a heredado",
+      "CONSOLEUSEV2USERAPI": "Utilice la API V2 en la consola para la creación de usuarios",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Cuando esta opción está habilitada, la consola utiliza la API V2 de usuario para crear nuevos usuarios. Con la API V2, los usuarios recién creados comienzan sin un estado inicial."
     },
     "DIALOG": {
       "RESET": {

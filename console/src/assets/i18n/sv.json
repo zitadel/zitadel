@@ -1498,7 +1498,9 @@
         "ENABLED": "\"Aktiverad\" ärvs",
         "DISABLED": "\"Inaktiverad\" ärvs"
       },
-      "RESET": "Återställ allt till arv"
+      "RESET": "Återställ allt till arv",
+      "CONSOLEUSEV2USERAPI": "Använd V2 API i konsolen för att skapa användare",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "När denna flagga är aktiverad använder konsolen V2 User API för att skapa nya användare. Med V2 API startar nyligen skapade användare utan ett initialt tillstånd."
     },
     "DIALOG": {
       "RESET": {

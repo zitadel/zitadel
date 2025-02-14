@@ -1362,7 +1362,9 @@
         "ENABLED": "\"Diaktifkan\" diwariskan",
         "DISABLED": "\"Dinonaktifkan\" diwariskan"
       },
-      "RESET": "Tetapkan semua untuk diwarisi"
+      "RESET": "Tetapkan semua untuk diwarisi",
+      "CONSOLEUSEV2USERAPI": "Gunakan API V2 di konsol untuk pembuatan pengguna",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Ketika flag ini diaktifkan, konsol menggunakan API Pengguna V2 untuk membuat pengguna baru. Dengan API V2, pengguna yang baru dibuat dimulai tanpa keadaan awal."
     },
     "DIALOG": {
       "RESET": {

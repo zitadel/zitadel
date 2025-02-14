@@ -1494,7 +1494,9 @@
         "ENABLED": "„Aktiviert“ wird vererbt",
         "DISABLED": "„Deaktiviert“ wird vererbt"
       },
-      "RESET": "Alle auf Erben setzen"
+      "RESET": "Alle auf Erben setzen",
+      "CONSOLEUSEV2USERAPI": "Verwende die V2-API in der Konsole zur Erstellung von Benutzern",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Wenn diese Option aktiviert ist, verwendet die Konsole die V2 User API, um neue Benutzer zu erstellen. Mit der V2 API starten neu erstellte Benutzer nicht im Initial Zustand."
     },
     "DIALOG": {
       "RESET": {

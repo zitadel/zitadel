@@ -1494,7 +1494,9 @@
         "ENABLED": "有効は継承されます",
         "DISABLED": "無効は継承されます"
       },
-      "RESET": "すべて継承に設定"
+      "RESET": "すべて継承に設定",
+      "CONSOLEUSEV2USERAPI": "コンソールでユーザー作成のためにV2 APIを使用してください。",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "このフラグが有効化されると、コンソールはV2ユーザーAPIを使用して新しいユーザーを作成します。V2 APIでは、新しく作成されたユーザーは初期状態なしで開始します。"
     },
     "DIALOG": {
       "RESET": {

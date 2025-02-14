@@ -1494,7 +1494,9 @@
         "ENABLED": "\"Activé\" est hérité",
         "DISABLED": "\"Désactivé\" est hérité"
       },
-      "RESET": "Réinitialiser tout sur hérité"
+      "RESET": "Réinitialiser tout sur hérité",
+      "CONSOLEUSEV2USERAPI": "Utilisez l'API V2 dans la console pour la création d'utilisateurs",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial."
     },
     "DIALOG": {
       "RESET": {

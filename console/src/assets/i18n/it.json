@@ -1494,7 +1494,9 @@
         "ENABLED": "\"Abilitato\" viene ereditato",
         "DISABLED": "\"Disabilitato\" viene ereditato"
       },
-      "RESET": "Imposta tutto su predefinito"
+      "RESET": "Imposta tutto su predefinito",
+      "CONSOLEUSEV2USERAPI": "Utilizza l'API V2 nella console per la creazione degli utenti",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Quando questa opzione è abilitata, la console utilizza l'API V2 User per creare nuovi utenti. Con l'API V2, i nuovi utenti creati iniziano senza uno stato iniziale."
     },
     "DIALOG": {
       "RESET": {

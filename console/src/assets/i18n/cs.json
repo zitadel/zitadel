@@ -1494,7 +1494,9 @@
         "ENABLED": "„Povoleno“ je zděděno",
         "DISABLED": "„Zakázáno“ je zděděno"
       },
-      "RESET": "Nastavit vše na děděné"
+      "RESET": "Nastavit vše na děděné",
+      "CONSOLEUSEV2USERAPI": "Použijte V2 API v konzoli pro vytvoření uživatele",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Když je tato příznak povolen, konzole používá V2 User API k vytvoření nových uživatelů. S V2 API nově vytvoření uživatelé začínají bez počátečního stavu."
     },
     "DIALOG": {
       "RESET": {
