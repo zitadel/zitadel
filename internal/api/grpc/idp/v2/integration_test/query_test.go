@@ -76,6 +76,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -124,6 +125,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -145,6 +147,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
@@ -193,6 +196,7 @@ func TestServer_GetIDPByID(t *testing.T) {
 						name,
 						&object.Details{
 							Sequence:      resp.Details.Sequence,
+							CreationDate:  resp.Details.CreationDate,
 							ChangeDate:    resp.Details.ChangeDate,
 							ResourceOwner: resp.Details.ResourceOwner,
 						}}
