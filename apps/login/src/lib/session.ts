@@ -12,7 +12,7 @@ import {
 
 type LoadMostRecentSessionParams = {
   serviceUrl: string;
-  serviceRegion: string;
+
   sessionParams: {
     loginName?: string;
     organization?: string;
@@ -21,7 +21,7 @@ type LoadMostRecentSessionParams = {
 
 export async function loadMostRecentSession({
   serviceUrl,
-  serviceRegion,
+
   sessionParams,
 }: LoadMostRecentSessionParams): Promise<Session | undefined> {
   const recent = await getMostRecentCookieWithLoginname({
@@ -31,7 +31,7 @@ export async function loadMostRecentSession({
 
   return getSession({
     serviceUrl,
-    serviceRegion,
+
     sessionId: recent.id,
     sessionToken: recent.token,
   }).then((resp: GetSessionResponse) => resp.session);
@@ -43,11 +43,9 @@ export async function loadMostRecentSession({
  **/
 export async function isSessionValid({
   serviceUrl,
-  serviceRegion,
   session,
 }: {
   serviceUrl: string;
-  serviceRegion: string;
   session: Session;
 }): Promise<boolean> {
   // session can't be checked without user
@@ -60,7 +58,6 @@ export async function isSessionValid({
 
   const authMethodTypes = await listAuthenticationMethodTypes({
     serviceUrl,
-    serviceRegion,
     userId: session.factors.user.id,
   });
 
@@ -110,7 +107,6 @@ export async function isSessionValid({
     // only check settings if no auth methods are available, as this would require a setup
     const loginSettings = await getLoginSettings({
       serviceUrl,
-      serviceRegion,
       organization: session.factors?.user?.organizationId,
     });
     if (loginSettings?.forceMfa || loginSettings?.forceMfaLocalOnly) {
@@ -154,12 +150,11 @@ export async function isSessionValid({
 
 export async function findValidSession({
   serviceUrl,
-  serviceRegion,
+
   sessions,
   authRequest,
 }: {
   serviceUrl: string;
-  serviceRegion: string;
   sessions: Session[];
   authRequest: AuthRequest;
 }): Promise<Session | undefined> {
@@ -186,7 +181,7 @@ export async function findValidSession({
 
   // return the first valid session according to settings
   for (const session of sessionsWithHint) {
-    if (await isSessionValid({ serviceUrl, serviceRegion, session })) {
+    if (await isSessionValid({ serviceUrl, session })) {
       return session;
     }
   }

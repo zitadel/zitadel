@@ -1,5 +1,19 @@
 # @zitadel/client
 
+## 1.0.6
+
+### Patch Changes
+
+- 90fbdd1: use node16/nodenext module resolution
+- Updated dependencies [90fbdd1]
+  - @zitadel/proto@1.0.3
+
+## 1.0.5
+
+### Patch Changes
+
+- 4fa22c0: fix export for grpcweb transport
+
 ## 1.0.4
 
 ### Patch Changes

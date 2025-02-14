@@ -25,7 +25,7 @@ export default async function Page(props: {
   const { loginName, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionFactors = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
@@ -38,7 +38,7 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
-      serviceRegion,
+
       sessionParams: {
         loginName,
         organization,
@@ -47,7 +47,7 @@ export default async function Page(props: {
       if (session && session.factors?.user?.id) {
         return listAuthenticationMethodTypes({
           serviceUrl,
-          serviceRegion,
+
           userId: session.factors.user.id,
         }).then((methods) => {
           return {
@@ -67,14 +67,14 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-      serviceRegion,
+
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes({
           serviceUrl,
-          serviceRegion,
+
           userId: response.session.factors.user.id,
         }).then((methods) => {
           return {
@@ -88,7 +88,7 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 

@@ -5,6 +5,7 @@
   "scripts": {
     "generate": "turbo run generate",
     "build": "turbo run build",
+    "build:docker": "rm -rf ./out ./docker && mkdir -p ./docker && turbo prune @zitadel/login --docker && cd ./docker && cp -r ../out/json/* . && pnpm install --frozen-lockfile && cp -r ../out/full/* . && turbo run build:standalone && cd ..",
     "build:packages": "turbo run build --filter=./packages/*",
     "build:apps": "turbo run build --filter=./apps/*",
     "test": "turbo run test",
@@ -39,7 +40,7 @@
     "@faker-js/faker": "^9.2.0",
     "@changesets/cli": "^2.27.9",
     "@playwright/test": "^1.48.2",
-    "@types/node": "^22.9.0",
+    "@types/node": "^20.17.17",
     "@vitejs/plugin-react": "^4.3.3",
     "@zitadel/prettier-config": "workspace:*",
     "axios": "^1.7.7",

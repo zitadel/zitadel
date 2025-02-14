@@ -40,11 +40,11 @@ export default async function Page(props: {
   const { provider } = params;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 
@@ -54,7 +54,7 @@ export default async function Page(props: {
 
   const intent = await retrieveIDPIntent({
     serviceUrl,
-    serviceRegion,
+
     id,
     token,
   });
@@ -79,7 +79,7 @@ export default async function Page(props: {
 
   const idp = await getIDPByID({
     serviceUrl,
-    serviceRegion,
+
     id: idpInformation.idpId,
   });
   const options = idp?.config?.options;
@@ -100,7 +100,7 @@ export default async function Page(props: {
     try {
       idpLink = await addIDPLink({
         serviceUrl,
-        serviceRegion,
+
         idp: {
           id: idpInformation.idpId,
           userId: idpInformation.userId,
@@ -131,23 +131,21 @@ export default async function Page(props: {
     const email = PROVIDER_MAPPING[providerType](idpInformation).email?.email;
 
     if (options.autoLinking === AutoLinkingOption.EMAIL && email) {
-      foundUser = await listUsers({ serviceUrl, serviceRegion, email }).then(
-        (response) => {
-          return response.result ? response.result[0] : null;
-        },
-      );
+      foundUser = await listUsers({ serviceUrl, email }).then((response) => {
+        return response.result ? response.result[0] : null;
+      });
     } else if (options.autoLinking === AutoLinkingOption.USERNAME) {
       foundUser = await listUsers(
         options.autoLinking === AutoLinkingOption.USERNAME
-          ? { serviceUrl, serviceRegion, userName: idpInformation.userName }
-          : { serviceUrl, serviceRegion, email },
+          ? { serviceUrl, userName: idpInformation.userName }
+          : { serviceUrl, email },
       ).then((response) => {
         return response.result ? response.result[0] : null;
       });
     } else {
       foundUser = await listUsers({
         serviceUrl,
-        serviceRegion,
+
         userName: idpInformation.userName,
         email,
       }).then((response) => {
@@ -160,7 +158,7 @@ export default async function Page(props: {
       try {
         idpLink = await addIDPLink({
           serviceUrl,
-          serviceRegion,
+
           idp: {
             id: idpInformation.idpId,
             userId: idpInformation.userId,
@@ -203,7 +201,7 @@ export default async function Page(props: {
       // this just returns orgs where the suffix is set as primary domain
       const orgs = await getOrgsByDomain({
         serviceUrl,
-        serviceRegion,
+
         domain: suffix,
       });
       const orgToCheckForDiscovery =
@@ -211,7 +209,7 @@ export default async function Page(props: {
 
       const orgLoginSettings = await getLoginSettings({
         serviceUrl,
-        serviceRegion,
+
         organization: orgToCheckForDiscovery,
       });
       if (orgLoginSettings?.allowDomainDiscovery) {
@@ -232,7 +230,7 @@ export default async function Page(props: {
 
     const newUser = await addHuman({
       serviceUrl,
-      serviceRegion,
+
       request: userData,
     });
 

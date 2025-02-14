@@ -56,16 +56,14 @@ const gotoAccounts = ({
 
 async function loadSessions({
   serviceUrl,
-  serviceRegion,
   ids,
 }: {
   serviceUrl: string;
-  serviceRegion: string;
+
   ids: string[];
 }): Promise<Session[]> {
   const response = await listSessions({
     serviceUrl,
-    serviceRegion,
     ids: ids.filter((id: string | undefined) => !!id),
   });
 
@@ -78,7 +76,7 @@ const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
 export async function GET(request: NextRequest) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const searchParams = request.nextUrl.searchParams;
 
@@ -103,7 +101,7 @@ export async function GET(request: NextRequest) {
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {
-    sessions = await loadSessions({ serviceUrl, serviceRegion, ids });
+    sessions = await loadSessions({ serviceUrl, ids });
   }
 
   if (requestId && sessionId) {
@@ -111,7 +109,6 @@ export async function GET(request: NextRequest) {
       // this finishes the login process for OIDC
       await loginWithOIDCandSession({
         serviceUrl,
-        serviceRegion,
         authRequest: requestId.replace("oidc_", ""),
         sessionId,
         sessions,
@@ -122,7 +119,6 @@ export async function GET(request: NextRequest) {
       // this finishes the login process for SAML
       await loginWithSAMLandSession({
         serviceUrl,
-        serviceRegion,
         samlRequest: requestId.replace("saml_", ""),
         sessionId,
         sessions,
@@ -134,7 +130,6 @@ export async function GET(request: NextRequest) {
     if (requestId && requestId.startsWith("oidc_")) {
       const { authRequest } = await getAuthRequest({
         serviceUrl,
-        serviceRegion,
         authRequestId: requestId.replace("oidc_", ""),
       });
 
@@ -165,7 +160,7 @@ export async function GET(request: NextRequest) {
             if (orgDomain) {
               const orgs = await getOrgsByDomain({
                 serviceUrl,
-                serviceRegion,
+
                 domain: orgDomain,
               });
               if (orgs.result && orgs.result.length === 1) {
@@ -182,7 +177,7 @@ export async function GET(request: NextRequest) {
 
           const identityProviders = await getActiveIdentityProviders({
             serviceUrl,
-            serviceRegion,
+
             orgId: organization ? organization : undefined,
           }).then((resp) => {
             return resp.identityProviders;
@@ -208,7 +203,7 @@ export async function GET(request: NextRequest) {
 
             return startIdentityProviderFlow({
               serviceUrl,
-              serviceRegion,
+
               idpId,
               urls: {
                 successUrl:
@@ -305,7 +300,7 @@ export async function GET(request: NextRequest) {
            **/
           const selectedSession = await findValidSession({
             serviceUrl,
-            serviceRegion,
+
             sessions,
             authRequest,
           });
@@ -335,7 +330,7 @@ export async function GET(request: NextRequest) {
 
           const { callbackUrl } = await createCallback({
             serviceUrl,
-            serviceRegion,
+
             req: create(CreateCallbackRequestSchema, {
               authRequestId: requestId.replace("oidc_", ""),
               callbackKind: {
@@ -349,7 +344,6 @@ export async function GET(request: NextRequest) {
           // check for loginHint, userId hint and valid sessions
           let selectedSession = await findValidSession({
             serviceUrl,
-            serviceRegion,
             sessions,
             authRequest,
           });
@@ -384,7 +378,7 @@ export async function GET(request: NextRequest) {
           try {
             const { callbackUrl } = await createCallback({
               serviceUrl,
-              serviceRegion,
+
               req: create(CreateCallbackRequestSchema, {
                 authRequestId: requestId.replace("oidc_", ""),
                 callbackKind: {
@@ -426,7 +420,8 @@ export async function GET(request: NextRequest) {
         }
 
         if (organization) {
-          loginNameUrl.searchParams.set("organization", organization);
+          loginNameUrl.searchParams.append("organization", organization);
+          // loginNameUrl.searchParams.set("organization", organization);
         }
 
         return NextResponse.redirect(loginNameUrl);
@@ -435,11 +430,8 @@ export async function GET(request: NextRequest) {
       // handle saml request
       const { samlRequest } = await getSAMLRequest({
         serviceUrl,
-        serviceRegion,
         samlRequestId: requestId.replace("saml_", ""),
       });
-
-      samlRequest?.
     } else {
       return NextResponse.json(
         { error: "No authRequest nor samlRequest provided" },

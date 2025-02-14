@@ -25,11 +25,11 @@ export async function continueWithSession({
   ...session
 }: Session & { requestId?: string }) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: session.factors?.user?.organizationId,
   });
 
@@ -83,7 +83,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   }
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -103,7 +103,7 @@ export async function updateSession(options: UpdateSessionCommand) {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 
@@ -130,7 +130,7 @@ export async function updateSession(options: UpdateSessionCommand) {
   if (checks && checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
       serviceUrl,
-      serviceRegion,
+
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -152,7 +152,7 @@ type ClearSessionOptions = {
 
 export async function clearSession(options: ClearSessionOptions) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const { sessionId } = options;
 
@@ -160,7 +160,7 @@ export async function clearSession(options: ClearSessionOptions) {
 
   const deletedSession = await deleteSession({
     serviceUrl,
-    serviceRegion,
+
     sessionId: session.id,
     sessionToken: session.token,
   });
@@ -176,13 +176,13 @@ type CleanupSessionCommand = {
 
 export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const deleteResponse = await deleteSession({
     serviceUrl,
-    serviceRegion,
+
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });

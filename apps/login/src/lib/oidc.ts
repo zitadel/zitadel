@@ -12,7 +12,6 @@ import { isSessionValid } from "./session";
 
 type LoginWithOIDCandSession = {
   serviceUrl: string;
-  serviceRegion: string;
   authRequest: string;
   sessionId: string;
   sessions: Session[];
@@ -21,7 +20,6 @@ type LoginWithOIDCandSession = {
 };
 export async function loginWithOIDCandSession({
   serviceUrl,
-  serviceRegion,
   authRequest,
   sessionId,
   sessions,
@@ -39,7 +37,6 @@ export async function loginWithOIDCandSession({
 
     const isValid = await isSessionValid({
       serviceUrl,
-      serviceRegion,
       session: selectedSession,
     });
 
@@ -76,7 +73,6 @@ export async function loginWithOIDCandSession({
       try {
         const { callbackUrl } = await createCallback({
           serviceUrl,
-          serviceRegion,
           req: create(CreateCallbackRequestSchema, {
             authRequestId: authRequest,
             callbackKind: {
@@ -104,7 +100,6 @@ export async function loginWithOIDCandSession({
         ) {
           const loginSettings = await getLoginSettings({
             serviceUrl,
-            serviceRegion,
             organization: selectedSession.factors?.user?.organizationId,
           });
 

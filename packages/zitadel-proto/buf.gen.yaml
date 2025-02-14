@@ -7,3 +7,4 @@ plugins:
     include_imports: true
     opt:
       - json_types=true
+      - import_extension=js

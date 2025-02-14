@@ -47,7 +47,7 @@ type ResetPasswordCommand = {
 
 export async function resetPassword(command: ResetPasswordCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
@@ -56,7 +56,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
 
   const users = await listUsers({
     serviceUrl,
-    serviceRegion,
+
     loginName: command.loginName,
     organizationId: command.organization,
   });
@@ -72,7 +72,7 @@ export async function resetPassword(command: ResetPasswordCommand) {
 
   return passwordReset({
     serviceUrl,
-    serviceRegion,
+
     userId,
     urlTemplate:
       `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
@@ -89,7 +89,7 @@ export type UpdateSessionCommand = {
 
 export async function sendPassword(command: UpdateSessionCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   let sessionCookie = await getSessionCookieByLoginName({
     loginName: command.loginName,
@@ -105,7 +105,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (!sessionCookie) {
     const users = await listUsers({
       serviceUrl,
-      serviceRegion,
+
       loginName: command.loginName,
       organizationId: command.organization,
     });
@@ -120,7 +120,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
       loginSettings = await getLoginSettings({
         serviceUrl,
-        serviceRegion,
+
         organization: command.organization,
       });
 
@@ -135,7 +135,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
         if ("failedAttempts" in error && error.failedAttempts) {
           const lockoutSettings = await getLockoutSettings({
             serviceUrl,
-            serviceRegion,
+
             orgId: command.organization,
           });
 
@@ -167,7 +167,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
       if ("failedAttempts" in error && error.failedAttempts) {
         const lockoutSettings = await getLockoutSettings({
           serviceUrl,
-          serviceRegion,
+
           orgId: command.organization,
         });
 
@@ -189,7 +189,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
     const userResponse = await getUserByID({
       serviceUrl,
-      serviceRegion,
+
       userId: session?.factors?.user?.id,
     });
 
@@ -203,7 +203,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (!loginSettings) {
     loginSettings = await getLoginSettings({
       serviceUrl,
-      serviceRegion,
+
       organization:
         command.organization ?? session.factors?.user?.organizationId,
     });
@@ -217,7 +217,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
 
   const expirySettings = await getPasswordExpirySettings({
     serviceUrl,
-    serviceRegion,
+
     orgId: command.organization ?? session.factors?.user?.organizationId,
   });
 
@@ -256,7 +256,7 @@ export async function sendPassword(command: UpdateSessionCommand) {
   if (command.checks && command.checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes({
       serviceUrl,
-      serviceRegion,
+
       userId: session.factors.user.id,
     });
     if (response.authMethodTypes && response.authMethodTypes.length) {
@@ -311,12 +311,12 @@ export async function changePassword(command: {
   password: string;
 }) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   // check for init state
   const { user } = await getUserByID({
     serviceUrl,
-    serviceRegion,
+
     userId: command.userId,
   });
 
@@ -327,7 +327,7 @@ export async function changePassword(command: {
 
   return setUserPassword({
     serviceUrl,
-    serviceRegion,
+
     userId,
     password: command.password,
     user,
@@ -345,13 +345,13 @@ export async function checkSessionAndSetPassword({
   password,
 }: CheckSessionAndSetPasswordCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionCookie = await getSessionCookieById({ sessionId });
 
   const { session } = await getSession({
     serviceUrl,
-    serviceRegion,
+
     sessionId: sessionCookie.id,
     sessionToken: sessionCookie.token,
   });
@@ -370,7 +370,7 @@ export async function checkSessionAndSetPassword({
   // check if the user has no password set in order to set a password
   const authmethods = await listAuthenticationMethodTypes({
     serviceUrl,
-    serviceRegion,
+
     userId: session.factors.user.id,
   });
 
@@ -391,7 +391,7 @@ export async function checkSessionAndSetPassword({
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: session.factors.user.organizationId,
   });
 
@@ -401,16 +401,14 @@ export async function checkSessionAndSetPassword({
 
   // if the user has no MFA but MFA is enforced, we can set a password otherwise we use the token of the user
   if (forceMfa && hasNoMFAMethods) {
-    return setPassword({ serviceUrl, serviceRegion, payload }).catch(
-      (error) => {
-        // throw error if failed precondition (ex. User is not yet initialized)
-        if (error.code === 9 && error.message) {
-          return { error: "Failed precondition" };
-        } else {
-          throw error;
-        }
-      },
-    );
+    return setPassword({ serviceUrl, payload }).catch((error) => {
+      // throw error if failed precondition (ex. User is not yet initialized)
+      if (error.code === 9 && error.message) {
+        return { error: "Failed precondition" };
+      } else {
+        throw error;
+      }
+    });
   } else {
     const transport = async (serviceUrl: string, token: string) => {
       return createServerTransport(token, {

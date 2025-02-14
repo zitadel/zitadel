@@ -19,11 +19,11 @@ export default async function Page(props: {
   const { loginName, prompt, organization, requestId, userId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const session = await loadMostRecentSession({
     serviceUrl,
-    serviceRegion,
+
     sessionParams: {
       loginName,
       organization,
@@ -32,7 +32,7 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization,
   });
 

@@ -6,25 +6,21 @@
     "DEBUG",
     "VERCEL_URL",
     "EMAIL_VERIFICATION",
-    "EU1_AUDIENCE",
-    "EU1_SYSTEM_USER_ID",
-    "EU1_SYSTEM_USER_PRIVATE_KEY",
-    "US1_AUDIENCE",
-    "US1_SYSTEM_USER_ID",
-    "US1_SYSTEM_USER_PRIVATE_KEY",
     "AUDIENCE",
     "SYSTEM_USER_ID",
     "SYSTEM_USER_PRIVATE_KEY",
     "ZITADEL_API_URL",
     "ZITADEL_SERVICE_USER_ID",
     "ZITADEL_SERVICE_USER_TOKEN",
-    "NEXT_PUBLIC_BASE_PATH"
+    "NEXT_PUBLIC_BASE_PATH",
+    "ZITADEL_INSTANCE_HOST_HEADER"
   ],
   "tasks": {
     "generate": {
       "cache": true
     },
     "build": {},
+    "build:standalone": {},
     "test": {},
     "start": {},
     "start:built": {},

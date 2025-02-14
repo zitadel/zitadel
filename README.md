@@ -8,7 +8,7 @@ Login UI.
 [![npm package](https://img.shields.io/npm/v/@zitadel/proto.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/proto)
 [![npm package](https://img.shields.io/npm/v/@zitadel/client.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@zitadel/client)
 
-**⚠️ This repo and packages are in alpha state and subject to change ⚠️**
+**⚠️ This repo and packages are in beta state and subject to change ⚠️**
 
 The scope of functionality of this repo and packages is under active development.
 

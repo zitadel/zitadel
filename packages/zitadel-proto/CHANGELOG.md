@@ -1,5 +1,11 @@
 # @zitadel/proto
 
+## 1.0.3
+
+### Patch Changes
+
+- 90fbdd1: use node16/nodenext module resolution
+
 ## 1.0.2
 
 ### Patch Changes

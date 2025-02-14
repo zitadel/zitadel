@@ -9,7 +9,6 @@ import { isSessionValid } from "./session";
 
 type LoginWithSAMLandSession = {
   serviceUrl: string;
-  serviceRegion: string;
   samlRequest: string;
   sessionId: string;
   sessions: Session[];
@@ -19,7 +18,6 @@ type LoginWithSAMLandSession = {
 
 export async function loginWithSAMLandSession({
   serviceUrl,
-  serviceRegion,
   samlRequest,
   sessionId,
   sessions,
@@ -37,7 +35,6 @@ export async function loginWithSAMLandSession({
 
     const isValid = await isSessionValid({
       serviceUrl,
-      serviceRegion,
       session: selectedSession,
     });
 
@@ -74,7 +71,6 @@ export async function loginWithSAMLandSession({
       try {
         const { url } = await createResponse({
           serviceUrl,
-          serviceRegion,
           req: create(CreateResponseRequestSchema, {
             samlRequestId: samlRequest,
             responseKind: {
@@ -102,7 +98,6 @@ export async function loginWithSAMLandSession({
         ) {
           const loginSettings = await getLoginSettings({
             serviceUrl,
-            serviceRegion,
             organization: selectedSession.factors?.user?.organizationId,
           });
 

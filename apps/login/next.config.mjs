@@ -34,27 +34,39 @@ const secureHeaders = [
   },
 ];
 
+const imageRemotePatterns = [
+  {
+    protocol: "http",
+    hostname: "localhost",
+    port: "8080",
+    pathname: "/**",
+  },
+  {
+    protocol: "https",
+    hostname: "*.zitadel.*",
+    port: "",
+    pathname: "/**",
+  },
+];
+
+if (process.env.ZITADEL_API_URL) {
+  imageRemotePatterns.push({
+    protocol: "https",
+    hostname: process.env.ZITADEL_API_URL?.replace("https://", "") || "",
+    port: "",
+    pathname: "/**",
+  });
+}
+
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
+  output: process.env.NEXT_OUTPUT_MODE || undefined,
   reactStrictMode: true, // Recommended for the `pages` directory, default in `app`.
   experimental: {
     dynamicIO: true,
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: process.env.ZITADEL_API_URL?.replace("https://", "") || "",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "8080",
-        pathname: "/**",
-      },
-    ],
+    remotePatterns: imageRemotePatterns,
   },
   async headers() {
     return [

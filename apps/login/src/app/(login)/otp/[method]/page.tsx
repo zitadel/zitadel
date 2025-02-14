@@ -24,7 +24,7 @@ export default async function Page(props: {
   const tError = await getTranslations({ locale, namespace: "error" });
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host || typeof host !== "string") {
@@ -47,7 +47,7 @@ export default async function Page(props: {
     ? await loadSessionById(serviceUrl, sessionId, organization)
     : await loadMostRecentSession({
         serviceUrl,
-        serviceRegion,
+
         sessionParams: { loginName, organization },
       });
 
@@ -59,7 +59,7 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-      serviceRegion,
+
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((response) => {
@@ -72,13 +72,13 @@ export default async function Page(props: {
   // email links do not come with organization, thus we need to use the session's organization
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: organization ?? session?.factors?.user?.organizationId,
   });
 

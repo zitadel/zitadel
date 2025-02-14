@@ -30,11 +30,11 @@ export async function verifyTOTP(
   organization?: string,
 ) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   return loadMostRecentSession({
     serviceUrl,
-    serviceRegion,
+
     sessionParams: {
       loginName,
       organization,
@@ -43,7 +43,7 @@ export async function verifyTOTP(
     if (session?.factors?.user?.id) {
       return verifyTOTPRegistration({
         serviceUrl,
-        serviceRegion,
+
         code,
         userId: session.factors.user.id,
       });
@@ -64,12 +64,12 @@ type VerifyUserByEmailCommand = {
 
 export async function sendVerification(command: VerifyUserByEmailCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const verifyResponse = command.isInvite
     ? await verifyInviteCode({
         serviceUrl,
-        serviceRegion,
+
         userId: command.userId,
         verificationCode: command.code,
       }).catch(() => {
@@ -77,7 +77,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
       })
     : await verifyEmail({
         serviceUrl,
-        serviceRegion,
+
         userId: command.userId,
         verificationCode: command.code,
       }).catch(() => {
@@ -109,7 +109,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     session = await getSession({
       serviceUrl,
-      serviceRegion,
+
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -124,7 +124,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
     const userResponse = await getUserByID({
       serviceUrl,
-      serviceRegion,
+
       userId: session?.factors?.user?.id,
     });
 
@@ -136,7 +136,7 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
   } else {
     const userResponse = await getUserByID({
       serviceUrl,
-      serviceRegion,
+
       userId: command.userId,
     });
 
@@ -176,13 +176,13 @@ export async function sendVerification(command: VerifyUserByEmailCommand) {
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: user.details?.resourceOwner,
   });
 
   const authMethodResponse = await listAuthenticationMethodTypes({
     serviceUrl,
-    serviceRegion,
+
     userId: user.userId,
   });
 
@@ -253,7 +253,7 @@ type resendVerifyEmailCommand = {
 
 export async function resendVerification(command: resendVerifyEmailCommand) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
   const host = _headers.get("host");
 
   if (!host) {
@@ -261,11 +261,11 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
   }
 
   return command.isInvite
-    ? resendInviteCode({ serviceUrl, serviceRegion, userId: command.userId })
+    ? resendInviteCode({ serviceUrl, userId: command.userId })
     : resendEmailCode({
         userId: command.userId,
         serviceUrl,
-        serviceRegion,
+
         urlTemplate:
           `${host.includes("localhost") ? "http://" : "https://"}${host}/password/set?code={{.Code}}&userId={{.UserID}}&organization={{.OrgID}}` +
           (command.requestId ? `&requestId=${command.requestId}` : ""),
@@ -274,7 +274,7 @@ export async function resendVerification(command: resendVerifyEmailCommand) {
 
 type sendEmailCommand = {
   serviceUrl: string;
-  serviceRegion: string;
+
   userId: string;
   urlTemplate: string;
 };
@@ -282,7 +282,6 @@ type sendEmailCommand = {
 export async function sendEmailCode(command: sendEmailCommand) {
   return zitadelSendEmailCode({
     serviceUrl: command.serviceUrl,
-    serviceRegion: command.serviceRegion,
     userId: command.userId,
     urlTemplate: command.urlTemplate,
   });
@@ -300,7 +299,7 @@ export async function sendVerificationRedirectWithoutCheck(
   command: SendVerificationRedirectWithoutCheckCommand,
 ) {
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   if (!("loginName" in command || "userId" in command)) {
     return { error: "No userId, nor loginname provided" };
@@ -323,7 +322,7 @@ export async function sendVerificationRedirectWithoutCheck(
 
     session = await getSession({
       serviceUrl,
-      serviceRegion,
+
       sessionId: sessionCookie.id,
       sessionToken: sessionCookie.token,
     }).then((response) => {
@@ -338,7 +337,7 @@ export async function sendVerificationRedirectWithoutCheck(
 
     const userResponse = await getUserByID({
       serviceUrl,
-      serviceRegion,
+
       userId: session?.factors?.user?.id,
     });
 
@@ -350,7 +349,7 @@ export async function sendVerificationRedirectWithoutCheck(
   } else if ("userId" in command) {
     const userResponse = await getUserByID({
       serviceUrl,
-      serviceRegion,
+
       userId: command.userId,
     });
 
@@ -390,7 +389,7 @@ export async function sendVerificationRedirectWithoutCheck(
 
   const authMethodResponse = await listAuthenticationMethodTypes({
     serviceUrl,
-    serviceRegion,
+
     userId: user.userId,
   });
 
@@ -416,7 +415,7 @@ export async function sendVerificationRedirectWithoutCheck(
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: user.details?.resourceOwner,
   });
 

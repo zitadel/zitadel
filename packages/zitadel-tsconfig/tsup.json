@@ -1,9 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "tsup",
-  "extends": "./node20.json",
-  "compilerOptions": {
-    "module": "preserve",
-    "moduleResolution": "Bundler"
-  }
+  "extends": "./node20.json"
 }

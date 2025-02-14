@@ -2,7 +2,7 @@ import { Int32Value } from "@bufbuild/protobuf/wkt";
 import { compileService } from "@bufbuild/protocompile";
 import { createRouterTransport, HandlerContext } from "@connectrpc/connect";
 import { describe, expect, test, vitest } from "vitest";
-import { NewAuthorizationBearerInterceptor } from "./interceptors";
+import { NewAuthorizationBearerInterceptor } from "./interceptors.js";
 
 const TestService = compileService(`
   syntax = "proto3";

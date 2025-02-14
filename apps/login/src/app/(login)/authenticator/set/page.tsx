@@ -30,7 +30,7 @@ export default async function Page(props: {
   const { loginName, requestId, organization, sessionId } = searchParams;
 
   const _headers = await headers();
-  const { serviceUrl, serviceRegion } = getServiceUrlFromHeaders(_headers);
+  const { serviceUrl } = getServiceUrlFromHeaders(_headers);
 
   const sessionWithData = sessionId
     ? await loadSessionById(serviceUrl, sessionId, organization)
@@ -38,7 +38,7 @@ export default async function Page(props: {
 
   async function getAuthMethodsAndUser(
     serviceUrl: string,
-    serviceRegion: string,
+
     session?: Session,
   ) {
     const userId = session?.factors?.user?.id;
@@ -49,10 +49,10 @@ export default async function Page(props: {
 
     return listAuthenticationMethodTypes({
       serviceUrl,
-      serviceRegion,
+
       userId,
     }).then((methods) => {
-      return getUserByID({ serviceUrl, serviceRegion, userId }).then((user) => {
+      return getUserByID({ serviceUrl, userId }).then((user) => {
         const humanUser =
           user.user?.type.case === "human" ? user.user?.type.value : undefined;
 
@@ -74,13 +74,13 @@ export default async function Page(props: {
   ) {
     return loadMostRecentSession({
       serviceUrl,
-      serviceRegion,
+
       sessionParams: {
         loginName,
         organization,
       },
     }).then((session) => {
-      return getAuthMethodsAndUser(serviceUrl, serviceRegion, session);
+      return getAuthMethodsAndUser(serviceUrl, session);
     });
   }
 
@@ -92,13 +92,13 @@ export default async function Page(props: {
     const recent = await getSessionCookieById({ sessionId, organization });
     return getSession({
       serviceUrl,
-      serviceRegion,
+
       sessionId: recent.id,
       sessionToken: recent.token,
     }).then((sessionResponse) => {
       return getAuthMethodsAndUser(
         serviceUrl,
-        serviceRegion,
+
         sessionResponse.session,
       );
     });
@@ -110,19 +110,19 @@ export default async function Page(props: {
 
   const branding = await getBrandingSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const loginSettings = await getLoginSettings({
     serviceUrl,
-    serviceRegion,
+
     organization: sessionWithData.factors?.user?.organizationId,
   });
 
   const identityProviders = await getActiveIdentityProviders({
     serviceUrl,
-    serviceRegion,
+
     orgId: sessionWithData.factors?.user?.organizationId,
     linking_allowed: true,
   }).then((resp) => {
