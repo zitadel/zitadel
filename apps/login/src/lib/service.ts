@@ -20,7 +20,6 @@ type ServiceClass =
 export async function createServiceForHost<T extends ServiceClass>(
   service: T,
   serviceUrl: string,
-  serviceRegion?: string,
 ) {
   let token;
 
