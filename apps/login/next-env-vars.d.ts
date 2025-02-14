@@ -20,7 +20,7 @@ declare namespace NodeJS {
      * The default is x-zitadel-instance-host.
      * Most users don't need to set this variable.
      */
-    ZITADEL_INSTANCE_HOST_HEADER: string
+    ZITADEL_INSTANCE_HOST_HEADER: string;
 
     /**
      * Self hosting: The service user id
