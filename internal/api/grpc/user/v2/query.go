@@ -216,7 +216,7 @@ func userFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 func userQueriesToQuery(queries []*user.SearchQuery, level uint8) (_ []query.SearchQuery, filterOrgId string, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		if orgFilter := query.GetOrganizationIdQuery(); orgFilter.OrganizationId != "" {
+		if orgFilter := query.GetOrganizationIdQuery(); orgFilter != nil {
 			filterOrgId = orgFilter.OrganizationId
 		}
 		q[i], err = userQueryToQuery(query, level)
