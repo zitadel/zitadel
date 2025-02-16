@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   devcontainer:
     image: mcr.microsoft.com/devcontainers/base:ubuntu
