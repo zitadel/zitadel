@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"go.opentelemetry.io/otel/attribute"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
@@ -34,6 +35,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -43,6 +45,9 @@ const (
 	queryRelayState            = "RelayState"
 	queryMethod                = "method"
 	tmplExternalNotFoundOption = "externalnotfoundoption"
+	// Metrics
+	loginByExternalIDPCounter     = "zitadel_login_by_external_idp"
+	loginByExternalIDPCounterDesc = "Number of logins by external IDP"
 )
 
 type externalIDPData struct {
@@ -271,6 +276,26 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.externalAuthCallbackFailed(w, r, authReq, nil, nil, err)
 		return
 	}
+
+	// Handle some metrics
+	err = metrics.RegisterCounter(loginByExternalIDPCounter, loginByExternalIDPCounterDesc)
+	if err != nil {
+		logging.WithFields(
+			"instance", authz.GetInstance(r.Context()).InstanceID(),
+			"providerID", identityProvider.ID,
+		).WithError(err).Info("failed to register login by external IDP counter")
+		return
+	}
+	err2 := metrics.AddCount(r.Context(), loginByExternalIDPCounter, 1, map[string]attribute.Value{
+		"idp_type": attribute.StringValue(identityProvider.Type.DisplayName()),
+	})
+	if err2 != nil {
+		logging.WithFields(
+			"instance", authz.GetInstance(r.Context()).InstanceID(),
+			"providerID", identityProvider.ID,
+		).WithError(err2).Info("failed to add login by external IDP counter")
+	}
+
 	var provider idp.Provider
 	var session idp.Session
 	switch identityProvider.Type {
