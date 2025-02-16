@@ -7,7 +7,12 @@
   <div class="user-create-main-content">
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-    <form *ngIf="pwdForm$ | async as pwdForm" [formGroup]="userForm" (ngSubmit)="createUser(pwdForm)" class="user-create-form">
+    <form
+      *ngIf="pwdForm$ | async as pwdForm"
+      [formGroup]="userForm"
+      (ngSubmit)="createUser(pwdForm)"
+      class="user-create-form"
+    >
       <div class="user-create-content">
         <p class="user-create-section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
 
@@ -46,7 +51,11 @@
           <mat-checkbox class="block-checkbox" formControlName="isVerified">
             {{ 'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate }}
           </mat-checkbox>
-          <mat-checkbox *ngIf="(useV2Api$ | async) && !usePassword || !userForm.controls.isVerified.value" class="block-checkbox" formControlName="sendEmail" >
+          <mat-checkbox
+            *ngIf="((useV2Api$ | async) && !usePassword) || !userForm.controls.isVerified.value"
+            class="block-checkbox"
+            formControlName="sendEmail"
+          >
             {{ 'SEND INVITE' | translate }}
           </mat-checkbox>
           <mat-checkbox class="block-checkbox" [(ngModel)]="usePassword" [ngModelOptions]="{ standalone: true }">
@@ -58,7 +67,11 @@
         </div>
 
         <div class="pwd-section" *ngIf="usePassword && (passwordComplexityPolicy$ | async) as passwordComplexityPolicy">
-          <cnsl-password-complexity-view class="complexity-view" [policy]="passwordComplexityPolicy" [password]="pwdForm.controls.password">
+          <cnsl-password-complexity-view
+            class="complexity-view"
+            [policy]="passwordComplexityPolicy"
+            [password]="pwdForm.controls.password"
+          >
           </cnsl-password-complexity-view>
 
           <form [formGroup]="pwdForm">
