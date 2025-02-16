@@ -1,9 +1,19 @@
 import { Location } from '@angular/common';
-import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { Component, DestroyRef, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, debounceTime, defer, of, Observable, shareReplay, firstValueFrom } from 'rxjs';
-import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
+import {
+  debounceTime,
+  defer,
+  of,
+  Observable,
+  shareReplay,
+  firstValueFrom,
+  forkJoin,
+  ObservedValueOf,
+  EMPTY,
+  ReplaySubject,
+} from 'rxjs';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -32,7 +42,7 @@ import { SetHumanPhoneSchema } from '@zitadel/proto/zitadel/user/v2/phone_pb';
 import { PasswordSchema } from '@zitadel/proto/zitadel/user/v2/password_pb';
 import { SetHumanEmailSchema } from '@zitadel/proto/zitadel/user/v2/email_pb';
 import { FeatureService } from 'src/app/services/feature.service';
-import { catchError, map, timeout } from 'rxjs/operators';
+import { catchError, filter, map, startWith, timeout } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -40,42 +50,52 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './user-create.component.html',
   styleUrls: ['./user-create.component.scss'],
 })
-export class UserCreateComponent implements OnInit, OnDestroy {
-  public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
+export class UserCreateComponent implements OnInit {
+  public readonly genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
   public selected: CountryPhoneCode | undefined = {
     countryCallingCode: '1',
     countryCode: 'US',
     countryName: 'United States of America',
   };
-  public countryPhoneCodes: CountryPhoneCode[] = [];
-  public userForm!: UntypedFormGroup;
-  public pwdForm!: UntypedFormGroup;
-  private destroyed$: Subject<void> = new Subject();
+  public readonly countryPhoneCodes: CountryPhoneCode[];
 
-  public userLoginMustBeDomain: boolean = false;
   public loading: boolean = false;
 
-  @ViewChild('suffix') public suffix!: any;
-  private primaryDomain!: Domain.AsObject;
+  private suffix$ = new ReplaySubject<HTMLSpanElement>(1);
+  @ViewChild('suffix') public set suffix(suffix: ElementRef<HTMLSpanElement>) {
+    this.suffix$.next(suffix.nativeElement);
+  }
+
   public usePassword: boolean = false;
-  public policy!: PasswordComplexityPolicy.AsObject;
   protected readonly useV2Api$: Observable<boolean>;
+  protected readonly envSuffix$: Observable<string>;
+  protected readonly userForm: ReturnType<typeof this.buildUserForm>;
+  protected readonly pwdForm$: ReturnType<typeof this.buildPwdForm>;
+  protected readonly passwordComplexityPolicy$: Observable<PasswordComplexityPolicy.AsObject>;
+  protected readonly suffixPadding$: Observable<string>;
 
   constructor(
-    private router: Router,
-    private toast: ToastService,
-    private fb: UntypedFormBuilder,
-    private mgmtService: ManagementService,
-    private userService: UserService,
-    private changeDetRef: ChangeDetectorRef,
-    private _location: Location,
-    private countryCallingCodesService: CountryCallingCodesService,
-    public langSvc: LanguagesService,
-    breadcrumbService: BreadcrumbService,
+    private readonly router: Router,
+    private readonly toast: ToastService,
+    private readonly fb: FormBuilder,
+    private readonly mgmtService: ManagementService,
+    private readonly userService: UserService,
+    protected readonly location: Location,
+    public readonly langSvc: LanguagesService,
     private readonly featureService: FeatureService,
     private readonly destroyRef: DestroyRef,
+    countryCallingCodesService: CountryCallingCodesService,
+    breadcrumbService: BreadcrumbService,
   ) {
     this.useV2Api$ = this.getUseV2Api().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+    this.envSuffix$ = this.getEnvSuffix();
+    this.suffixPadding$ = this.getSuffixPadding();
+    this.passwordComplexityPolicy$ = this.getPasswordComplexityPolicy().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
+
+    this.userForm = this.buildUserForm();
+    this.pwdForm$ = this.buildPwdForm(this.passwordComplexityPolicy$);
+
+    this.countryPhoneCodes = countryCallingCodesService.getCountryCallingCodes();
 
     breadcrumbService.setBreadcrumb([
       new Breadcrumb({
@@ -83,25 +103,12 @@ export class UserCreateComponent implements OnInit, OnDestroy {
         routerLink: ['/org'],
       }),
     ]);
+  }
 
-    this.loading = true;
-    this.loadOrg().then();
-    this.mgmtService
-      .getDomainPolicy()
-      .then((resp) => {
-        if (resp.policy?.userLoginMustBeDomain) {
-          this.userLoginMustBeDomain = resp.policy.userLoginMustBeDomain;
-        }
-        this.initForm();
-        this.loading = false;
-        this.changeDetRef.detectChanges();
-      })
-      .catch((error) => {
-        console.error(error);
-        this.initForm();
-        this.loading = false;
-        this.changeDetRef.detectChanges();
-      });
+  ngOnInit(): void {
+    // already start loading if we should use v2 api
+    this.useV2Api$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.watchPhoneChanges();
   }
 
   private getUseV2Api(): Observable<boolean> {
@@ -112,153 +119,199 @@ export class UserCreateComponent implements OnInit, OnDestroy {
     );
   }
 
-  public close(): void {
-    this._location.back();
-  }
+  private getEnvSuffix() {
+    const domainPolicy$ = defer(() => this.mgmtService.getDomainPolicy());
+    const orgDomains$ = defer(() => this.mgmtService.listOrgDomains());
 
-  private async loadOrg(): Promise<void> {
-    const domains = await this.mgmtService.listOrgDomains();
-    const found = domains.resultList.find((resp) => resp.isPrimary);
-    if (found) {
-      this.primaryDomain = found;
-    }
-  }
-
-  private initForm(): void {
-    this.userForm = this.fb.group({
-      email: ['', [requiredValidator, emailValidator]],
-      userName: ['', [requiredValidator, minLengthValidator(2)]],
-      firstName: ['', requiredValidator],
-      lastName: ['', requiredValidator],
-      nickName: [''],
-      gender: [],
-      preferredLanguage: [''],
-      phone: ['', phoneValidator],
-      isVerified: [false, []],
-    });
-
-    const validators: Validators[] = [requiredValidator];
-
-    this.mgmtService.getPasswordComplexityPolicy().then((data) => {
-      if (data.policy) {
-        this.policy = data.policy;
-
-        if (this.policy.minLength) {
-          validators.push(minLengthValidator(this.policy.minLength));
+    return forkJoin([domainPolicy$, orgDomains$]).pipe(
+      map(([policy, domains]) => {
+        const userLoginMustBeDomain = policy.policy?.userLoginMustBeDomain;
+        const primaryDomain = domains.resultList.find((resp) => resp.isPrimary);
+        if (userLoginMustBeDomain && primaryDomain) {
+          return `@${primaryDomain.domainName}`;
+        } else {
+          return '';
         }
-        if (this.policy.hasLowercase) {
+      }),
+      catchError(() => of('')),
+    );
+  }
+
+  private getSuffixPadding() {
+    return this.suffix$.pipe(
+      map((suffix) => `${suffix.offsetWidth + 10}px`),
+      startWith('10px'),
+    );
+  }
+
+  private getPasswordComplexityPolicy() {
+    return defer(() => this.mgmtService.getPasswordComplexityPolicy()).pipe(
+      map(({ policy }) => policy),
+      filter(Boolean),
+      catchError((error) => {
+        this.toast.showError(error);
+        return EMPTY;
+      }),
+    );
+  }
+
+  public buildUserForm() {
+    return this.fb.group({
+      email: new FormControl('', { nonNullable: true, validators: [requiredValidator, emailValidator] }),
+      userName: new FormControl('', { nonNullable: true, validators: [requiredValidator, minLengthValidator(2)] }),
+      firstName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      lastName: new FormControl('', { nonNullable: true, validators: [requiredValidator] }),
+      nickName: new FormControl('', { nonNullable: true }),
+      gender: new FormControl(Gender.GENDER_UNSPECIFIED, { nonNullable: true, validators: [requiredValidator] }),
+      preferredLanguage: new FormControl('', { nonNullable: true }),
+      phone: new FormControl('', { nonNullable: true, validators: [phoneValidator] }),
+      isVerified: new FormControl(false, { nonNullable: true }),
+      sendEmail: new FormControl(false, { nonNullable: true }),
+    });
+  }
+
+  public buildPwdForm(passwordComplexityPolicy$: Observable<PasswordComplexityPolicy.AsObject>) {
+    return passwordComplexityPolicy$.pipe(
+      map((policy) => {
+        const validators: [ValidatorFn] = [requiredValidator];
+        if (policy.minLength) {
+          validators.push(minLengthValidator(policy.minLength));
+        }
+        if (policy.hasLowercase) {
           validators.push(containsLowerCaseValidator);
         }
-        if (this.policy.hasUppercase) {
+        if (policy.hasUppercase) {
           validators.push(containsUpperCaseValidator);
         }
-        if (this.policy.hasNumber) {
+        if (policy.hasNumber) {
           validators.push(containsNumberValidator);
         }
-        if (this.policy.hasSymbol) {
+        if (policy.hasSymbol) {
           validators.push(containsSymbolValidator);
         }
-        const pwdValidators = [...validators] as ValidatorFn[];
-        const confirmPwdValidators = [requiredValidator, passwordConfirmValidator()] as ValidatorFn[];
-
-        this.pwdForm = this.fb.group({
-          password: ['', pwdValidators],
-          confirmPassword: ['', confirmPwdValidators],
+        return this.fb.group({
+          password: new FormControl('', { nonNullable: true, validators }),
+          confirmPassword: new FormControl('', {
+            nonNullable: true,
+            validators: [requiredValidator, passwordConfirmValidator()],
+          }),
         });
-      }
-    });
+      }),
+    );
+  }
 
-    this.phone?.valueChanges.pipe(debounceTime(200)).subscribe((value: string) => {
+  private watchPhoneChanges(): void {
+    const phone = this.userForm.controls.phone;
+    phone.valueChanges.pipe(debounceTime(200), takeUntilDestroyed(this.destroyRef)).subscribe((value: string) => {
       const phoneNumber = formatPhone(value);
       if (phoneNumber) {
         this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
-        this.phone?.setValue(phoneNumber.phone);
+        phone.setValue(phoneNumber.phone);
       }
     });
   }
 
-  public async createUser(): Promise<void> {
+  public async createUser(pwdForm: ObservedValueOf<typeof this.pwdForm$>): Promise<void> {
     if (await firstValueFrom(this.useV2Api$)) {
-      this.createUserV2();
+      await this.createUserV2(pwdForm);
     } else {
-      this.createUserV1();
+      await this.createUserV1(pwdForm);
     }
   }
 
-  public createUserV1(): void {
+  public async createUserV1(pwdForm: ObservedValueOf<typeof this.pwdForm$>): Promise<void> {
     this.loading = true;
 
+    const controls = this.userForm.controls;
     const profileReq = new AddHumanUserRequest.Profile();
-    profileReq.setFirstName(this.firstName?.value);
-    profileReq.setLastName(this.lastName?.value);
-    profileReq.setNickName(this.nickName?.value);
-    profileReq.setPreferredLanguage(this.preferredLanguage?.value);
-    profileReq.setGender(this.gender?.value);
+    profileReq.setFirstName(controls.firstName.value);
+    profileReq.setLastName(controls.lastName.value);
+    profileReq.setNickName(controls.nickName.value);
+    profileReq.setPreferredLanguage(controls.preferredLanguage.value);
+    profileReq.setGender(controls.gender.value);
 
     const humanReq = new AddHumanUserRequest();
-    humanReq.setUserName(this.userName?.value);
+    humanReq.setUserName(controls.userName.value);
     humanReq.setProfile(profileReq);
 
     const emailreq = new AddHumanUserRequest.Email();
-    emailreq.setEmail(this.email?.value);
-    emailreq.setIsEmailVerified(this.isVerified?.value);
+    emailreq.setEmail(controls.email.value);
+    emailreq.setIsEmailVerified(controls.isVerified.value);
     humanReq.setEmail(emailreq);
 
-    if (this.usePassword && this.password?.value) {
-      humanReq.setInitialPassword(this.password.value);
+    if (this.usePassword) {
+      humanReq.setInitialPassword(pwdForm.controls.password.value);
     }
 
-    if (this.phone && this.phone.value) {
+    if (controls.phone.value) {
       // Try to parse number and format it according to country
-      const phoneNumber = formatPhone(this.phone.value);
+      const phoneNumber = formatPhone(controls.phone.value);
       if (phoneNumber) {
         this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
         humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(phoneNumber.phone));
       }
     }
 
-    this.mgmtService
-      .addHumanUser(humanReq)
-      .then((data) => {
-        this.loading = false;
-        this.toast.showInfo('USER.TOAST.CREATED', true);
-        this.router.navigate(['users', data.userId], { queryParams: { new: true } }).then();
-      })
-      .catch((error) => {
-        this.loading = false;
-        this.toast.showError(error);
-      });
+    try {
+      const data = await this.mgmtService.addHumanUser(humanReq);
+      this.loading = false;
+      this.toast.showInfo('USER.TOAST.CREATED', true);
+      this.router.navigate(['users', data.userId], { queryParams: { new: true } }).then();
+    } catch (error) {
+      this.loading = false;
+      this.toast.showError(error);
+    }
   }
 
-  public createUserV2(): void {
+  public async createUserV2(pwdForm: ObservedValueOf<typeof this.pwdForm$>): Promise<void> {
     this.loading = true;
 
+    const controls = this.userForm.controls;
     const humanReq = create(AddHumanUserRequestSchema, {
-      username: this.userName?.value,
+      username: controls.userName.value,
       profile: {
-        givenName: this.firstName?.value,
-        familyName: this.lastName?.value,
-        nickName: this.nickName?.value,
-        preferredLanguage: this.preferredLanguage?.value,
-        gender: this.gender?.value,
+        givenName: controls.firstName.value,
+        familyName: controls.lastName.value,
+        nickName: controls.nickName.value,
+        preferredLanguage: controls.preferredLanguage.value,
+        // the enum numbers of v1 gender are the same as v2 gender
+        gender: controls.gender.value as unknown as any,
       },
     });
 
-    if (this.usePassword && this.password?.value) {
-      const password = create(PasswordSchema, { password: this.password.value });
+    if (this.usePassword) {
+      const password = create(PasswordSchema, { password: pwdForm.controls.password.value });
       humanReq.passwordType = { case: 'password', value: password };
     }
-    if (this.isVerified?.value) {
+    if (controls.isVerified.value) {
       humanReq.email = create(SetHumanEmailSchema, {
-        email: this.email?.value,
+        email: controls.email.value,
         verification: {
           value: true,
           case: 'isVerified',
         },
       });
+    } else {
+      if (controls.sendEmail.value) {
+        humanReq.email = create(SetHumanEmailSchema, {
+          email: controls.email.value,
+          verification: {
+            case: 'sendCode',
+            value: {},
+          },
+        });
+      } else {
+        humanReq.email = create(SetHumanEmailSchema, {
+          email: controls.email.value,
+          verification: {
+            value: false,
+            case: 'isVerified',
+          },
+        });
+      }
     }
 
-    const phoneNumber = formatPhone(this.phone?.value);
+    const phoneNumber = formatPhone(controls.phone.value);
     if (phoneNumber) {
       const country = phoneNumber.country;
       this.selected = this.countryPhoneCodes.find((code) => code.countryCode === country);
@@ -270,85 +323,32 @@ export class UserCreateComponent implements OnInit, OnDestroy {
       });
     }
 
-    this.userService
-      .addHumanUser(humanReq)
-      .then((data) => {
-        this.loading = false;
-        this.toast.showInfo('USER.TOAST.CREATED', true);
-        return this.router.navigate(['users', data.userId], { queryParams: { new: true } });
-      })
-      .catch((error) => {
-        this.loading = false;
-        this.toast.showError(error);
-      });
+    try {
+      const data = await this.userService.addHumanUser(humanReq);
+      if (controls.isVerified.value && !this.usePassword && controls.sendEmail.value) {
+        await this.userService.passwordReset({
+          userId: data.userId,
+          medium: {
+            case: 'sendLink',
+            value: {},
+          },
+        });
+      }
+      this.loading = false;
+      this.toast.showInfo('USER.TOAST.CREATED', true);
+      await this.router.navigate(['users', data.userId], { queryParams: { new: true } });
+    } catch (error) {
+      this.loading = false;
+      this.toast.showError(error);
+    }
   }
 
   public setCountryCallingCode(): void {
-    let value = (this.phone?.value as string) || '';
+    let value = this.userForm.controls.phone.value;
     this.countryPhoneCodes.forEach((code) => (value = value.replace(`+${code.countryCallingCode}`, '')));
     value = value.trim();
-    this.phone?.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
-  }
 
-  ngOnInit(): void {
-    this.countryPhoneCodes = this.countryCallingCodesService.getCountryCallingCodes();
-    this.useV2Api$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
-
-  public get email(): AbstractControl | null {
-    return this.userForm.get('email');
-  }
-  public get isVerified(): AbstractControl | null {
-    return this.userForm.get('isVerified');
-  }
-  public get userName(): AbstractControl | null {
-    return this.userForm.get('userName');
-  }
-  public get firstName(): AbstractControl | null {
-    return this.userForm.get('firstName');
-  }
-  public get lastName(): AbstractControl | null {
-    return this.userForm.get('lastName');
-  }
-  public get nickName(): AbstractControl | null {
-    return this.userForm.get('nickName');
-  }
-  public get gender(): AbstractControl | null {
-    return this.userForm.get('gender');
-  }
-  public get preferredLanguage(): AbstractControl | null {
-    return this.userForm.get('preferredLanguage');
-  }
-  public get phone(): AbstractControl | null {
-    return this.userForm.get('phone');
-  }
-
-  public get password(): AbstractControl | null {
-    return this.pwdForm.get('password');
-  }
-  public get confirmPassword(): AbstractControl | null {
-    return this.pwdForm.get('confirmPassword');
-  }
-
-  public get envSuffix(): string {
-    if (this.userLoginMustBeDomain && this.primaryDomain?.domainName) {
-      return `@${this.primaryDomain.domainName}`;
-    } else {
-      return '';
-    }
-  }
-
-  public get suffixPadding(): string | undefined {
-    if (this.suffix?.nativeElement.offsetWidth) {
-      return `${(this.suffix.nativeElement as HTMLElement).offsetWidth + 10}px`;
-    } else {
-      return;
-    }
+    this.userForm.controls.phone.setValue('+' + this.selected?.countryCallingCode + ' ' + value);
   }
 
   public compareCountries(i1: CountryPhoneCode, i2: CountryPhoneCode) {

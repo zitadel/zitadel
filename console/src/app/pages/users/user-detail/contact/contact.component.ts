@@ -82,10 +82,17 @@ export class ContactComponent {
     this.editType.emit(type);
   }
 
-  protected get isVerified() {
+  protected get isPhoneVerified() {
     if (this.human.$typeName === 'zitadel.user.v2.HumanUser') {
       return !!this.human.phone?.isVerified;
     }
     return this.human.phone?.isPhoneVerified;
+  }
+
+  protected get isEmailVerified() {
+    if (this.human.$typeName === 'zitadel.user.v2.HumanUser') {
+      return !!this.human.email?.isVerified;
+    }
+    return this.human.email?.isEmailVerified;
   }
 }

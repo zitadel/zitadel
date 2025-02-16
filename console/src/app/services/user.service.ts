@@ -3,6 +3,8 @@ import { GrpcService } from './grpc.service';
 import {
   AddHumanUserRequestSchema,
   AddHumanUserResponse,
+  CreateInviteCodeRequestSchema,
+  CreateInviteCodeResponse,
   CreatePasskeyRegistrationLinkRequestSchema,
   CreatePasskeyRegistrationLinkResponse,
   DeactivateUserRequestSchema,
@@ -19,6 +21,7 @@ import {
   ListUsersResponse,
   LockUserRequestSchema,
   LockUserResponse,
+  PasswordResetRequestSchema,
   ReactivateUserRequestSchema,
   ReactivateUserResponse,
   RemoveOTPEmailRequestSchema,
@@ -192,6 +195,14 @@ export class UserService {
 
   public resendInviteCode(userId: string): Promise<ResendInviteCodeResponse> {
     return this.grpcService.userNew.resendInviteCode(create(ResendInviteCodeRequestSchema, { userId }));
+  }
+
+  public createInviteCode(req: MessageInitShape<typeof CreateInviteCodeRequestSchema>): Promise<CreateInviteCodeResponse> {
+    return this.grpcService.userNew.createInviteCode(create(CreateInviteCodeRequestSchema, req));
+  }
+
+  public passwordReset(req: MessageInitShape<typeof PasswordResetRequestSchema>) {
+    return this.grpcService.userNew.passwordReset(create(PasswordResetRequestSchema, req));
   }
 
   public setPassword(req: MessageInitShape<typeof SetPasswordRequestSchema>): Promise<SetPasswordResponse> {
