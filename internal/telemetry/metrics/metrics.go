@@ -8,15 +8,6 @@ import (
 	"go.opentelemetry.io/otel/metric"
 )
 
-const (
-	ActiveSessionCounter            = "zitadel.active_session_counter"
-	ActiveSessionCounterDescription = "Active session counter"
-	SpoolerDivCounter               = "zitadel.spooler_div_milliseconds"
-	SpoolerDivCounterDescription    = "Spooler div from last successful run to now in milliseconds"
-	Database                        = "database"
-	ViewName                        = "view_name"
-)
-
 type Metrics interface {
 	GetExporter() http.Handler
 	GetMetricsProvider() metric.MeterProvider

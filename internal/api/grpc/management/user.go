@@ -73,6 +73,9 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	if err != nil {
 		return nil, err
 	}
+
+	updateUserGaugeMetric(res.Count, req)
+
 	return &mgmt_pb.ListUsersResponse{
 		Result:  user_grpc.UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
 		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
