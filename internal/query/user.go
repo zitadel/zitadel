@@ -642,6 +642,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, f
 	}
 	if permissionCheck != nil && !authz.GetFeatures(ctx).PermissionCheckV2 {
 		usersCheckPermission(ctx, users, permissionCheck)
+		users.SearchResponse.Count = uint64(len(users.Users))
 	}
 	return users, nil
 }

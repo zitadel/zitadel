@@ -952,6 +952,7 @@ func TestServer_ListUsers(t *testing.T) {
 				require.NoError(ttt, err)
 
 				// always only give back dependency infos which are required for the response
+				require.Equal(ttt, tt.want.Details.TotalResult, got.Details.TotalResult)
 				require.Len(ttt, tt.want.Result, len(infos))
 				// always first check length, otherwise its failed anyway
 				if assert.Len(ttt, got.Result, len(tt.want.Result)) {
