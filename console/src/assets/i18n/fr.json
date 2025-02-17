@@ -809,6 +809,9 @@
       "EMAIL": "Courriel",
       "PHONE": "Numéro de téléphone",
       "PHONE_HINT": "Utilisez le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone.",
+      "PHONE_VERIFIED": "Numéro de téléphone vérifié",
+      "SEND_SMS": "Envoyer un SMS de vérification",
+      "SEND_EMAIL": "Envoyer un Courriel",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -948,6 +951,14 @@
       "4": "Verrouillé",
       "5": "Suspendu",
       "6": "Initial"
+    },
+    "STATEV2": {
+      "0": "Inconnu",
+      "1": "Actif",
+      "2": "Inactif",
+      "3": "Supprimé",
+      "4": "Verrouillé",
+      "5": "Initial"
     },
     "SEARCH": {
       "ADDITIONAL": "Nom de connexion (organisation actuelle)",
@@ -1486,7 +1497,9 @@
         "ENABLED": "\"Activé\" est hérité",
         "DISABLED": "\"Désactivé\" est hérité"
       },
-      "RESET": "Réinitialiser tout sur hérité"
+      "RESET": "Réinitialiser tout sur hérité",
+      "CONSOLEUSEV2USERAPI": "Utilisez l'API V2 dans la console pour la création d'utilisateurs",
+      "CONSOLEUSEV2USERAPI_DESCRIPTION": "Lorsque ce drapeau est activé, la console utilise l'API V2 User pour créer de nouveaux utilisateurs. Avec l'API V2, les nouveaux utilisateurs commencent sans état initial."
     },
     "DIALOG": {
       "RESET": {
