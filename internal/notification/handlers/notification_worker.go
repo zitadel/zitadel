@@ -48,7 +48,7 @@ type NotificationWorker struct {
 
 // Work implements [river.Worker].
 func (w *NotificationWorker) Work(ctx context.Context, job *river.Job[*command.NotificationRequest]) error {
-	ctx = ContextWithNotifier(ctx, job.Args.Aggregate())
+	ctx = ContextWithNotifier(ctx, job.Args.Aggregate)
 
 	// if the notification is too old, we can directly cancel
 	if job.CreatedAt.Add(w.config.MaxTtl).Before(w.now()) {
@@ -159,7 +159,7 @@ func (w *NotificationWorker) Start(ctx context.Context) {
 }
 
 func (w *NotificationWorker) reduceNotificationRequested(ctx, txCtx context.Context, tx *sql.Tx, event *notification.RequestedEvent) (err error) {
-	ctx = ContextWithNotifier(ctx, event.Aggregate())
+	ctx = ContextWithNotifier(ctx, event.Aggregate)
 
 	// if the notification is too old, we can directly cancel
 	if event.CreatedAt().Add(w.config.MaxTtl).Before(w.now()) {
@@ -267,9 +267,9 @@ func (w *NotificationWorker) sendNotification(ctx, txCtx context.Context, tx *sq
 		if err != nil {
 			return err
 		}
-		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, e)
+		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors)
 	case domain.NotificationTypeSms:
-		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, e, generatorInfo)
+		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, generatorInfo)
 	}
 
 	args := request.Args.ToMap()
@@ -328,9 +328,9 @@ func (w *NotificationWorker) sendNotificationQueue(ctx context.Context, request 
 		if err != nil {
 			return err
 		}
-		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors, e)
+		notify = types.SendEmail(ctx, w.channels, string(template.Template), translator, notifyUser, colors)
 	case domain.NotificationTypeSms:
-		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, e, generatorInfo)
+		notify = types.SendSMS(ctx, w.channels, translator, notifyUser, colors, generatorInfo)
 	}
 
 	args := request.Args.ToMap()
@@ -360,6 +360,7 @@ func (w *NotificationWorker) exponentialBackOff(current time.Duration) time.Dura
 func notificationEventToRequest(e notification.Request, notifyUser *query.NotifyUser, backoff time.Duration) *command.NotificationRetryRequest {
 	return &command.NotificationRetryRequest{
 		NotificationRequest: command.NotificationRequest{
+			Aggregate:                     e.Aggregate,
 			UserID:                        e.UserID,
 			UserResourceOwner:             e.UserResourceOwner,
 			TriggerOrigin:                 e.TriggeredAtOrigin,
@@ -371,8 +372,6 @@ func notificationEventToRequest(e notification.Request, notifyUser *query.Notify
 			MessageType:                   e.MessageType,
 			UnverifiedNotificationChannel: e.UnverifiedNotificationChannel,
 			Args:                          e.Args,
-			AggregateID:                   e.AggregateID,
-			AggregateResourceOwner:        e.AggregateResourceOwner,
 			IsOTP:                         e.IsOTP,
 		},
 		BackOff:    backoff,

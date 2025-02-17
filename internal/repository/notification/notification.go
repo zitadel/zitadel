@@ -19,10 +19,9 @@ const (
 )
 
 type Request struct {
+	Aggregate                     *eventstore.Aggregate         `json:"aggregate"`
 	UserID                        string                        `json:"userID"`
 	UserResourceOwner             string                        `json:"userResourceOwner"`
-	AggregateID                   string                        `json:"notificationAggregateID"`
-	AggregateResourceOwner        string                        `json:"notificationAggregateResourceOwner"`
 	TriggeredAtOrigin             string                        `json:"triggeredAtOrigin"`
 	EventType                     eventstore.EventType          `json:"eventType"`
 	MessageType                   string                        `json:"messageType"`
@@ -32,22 +31,22 @@ type Request struct {
 	Code                          *crypto.CryptoValue           `json:"code,omitempty"`
 	UnverifiedNotificationChannel bool                          `json:"unverifiedNotificationChannel,omitempty"`
 	IsOTP                         bool                          `json:"isOTP,omitempty"`
-	RequiresPreviousDomain        bool                          `json:"RequiresPreviousDomain,omitempty"`
+	RequiresPreviousDomain        bool                          `json:"requiresPreviousDomain,omitempty"`
 	Args                          *domain.NotificationArguments `json:"args,omitempty"`
 }
 
 func (e *Request) NotificationAggregateID() string {
-	if e.AggregateID == "" {
+	if e.Aggregate.ID == "" {
 		return e.UserID
 	}
-	return e.AggregateID
+	return e.Aggregate.ID
 }
 
 func (e *Request) NotificationAggregateResourceOwner() string {
-	if e.AggregateResourceOwner == "" {
+	if e.Aggregate.ResourceOwner == "" {
 		return e.UserResourceOwner
 	}
-	return e.AggregateResourceOwner
+	return e.Aggregate.ResourceOwner
 }
 
 type RequestedEvent struct {
@@ -76,8 +75,6 @@ func NewRequestedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userID,
 	userResourceOwner,
-	aggregateID,
-	aggregateResourceOwner,
 	triggerOrigin,
 	urlTemplate string,
 	code *crypto.CryptoValue,
@@ -97,10 +94,9 @@ func NewRequestedEvent(ctx context.Context,
 			RequestedType,
 		),
 		Request: Request{
+			Aggregate:                     aggregate,
 			UserID:                        userID,
 			UserResourceOwner:             userResourceOwner,
-			AggregateID:                   aggregateID,
-			AggregateResourceOwner:        aggregateResourceOwner,
 			TriggeredAtOrigin:             triggerOrigin,
 			EventType:                     eventType,
 			MessageType:                   messageType,
@@ -199,8 +195,6 @@ func NewRetryRequestedEvent(
 	aggregate *eventstore.Aggregate,
 	userID,
 	userResourceOwner,
-	aggregateID,
-	aggregateResourceOwner,
 	triggerOrigin,
 	urlTemplate string,
 	code *crypto.CryptoValue,
@@ -222,10 +216,9 @@ func NewRetryRequestedEvent(
 			RetryRequestedType,
 		),
 		Request: Request{
+			Aggregate:                     aggregate,
 			UserID:                        userID,
 			UserResourceOwner:             userResourceOwner,
-			AggregateID:                   aggregateID,
-			AggregateResourceOwner:        aggregateResourceOwner,
 			TriggeredAtOrigin:             triggerOrigin,
 			EventType:                     eventType,
 			MessageType:                   messageType,

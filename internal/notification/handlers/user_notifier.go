@@ -221,6 +221,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 		}
 		origin := http_util.DomainContext(ctx).Origin()
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			origin,
@@ -265,6 +266,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		}
 		origin := http_util.DomainContext(ctx).Origin()
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			origin,
@@ -315,6 +317,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		}
 		origin := http_util.DomainContext(ctx).Origin()
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			origin,
@@ -361,6 +364,7 @@ func (u *userNotifier) reduceOTPSMSCodeAdded(event eventstore.Event) (*handler.S
 			return err
 		}
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			http_util.DomainContext(ctx).Origin(),
@@ -408,6 +412,7 @@ func (u *userNotifier) reduceSessionOTPSMSChallenged(event eventstore.Event) (*h
 		args := otpArgs(ctx, e.Expiry)
 		args.SessionID = e.Aggregate().ID
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			s.UserFactor.UserID,
 			s.UserFactor.ResourceOwner,
 			http_util.DomainContext(ctx).Origin(),
@@ -453,6 +458,7 @@ func (u *userNotifier) reduceOTPEmailCodeAdded(event eventstore.Event) (*handler
 		args := otpArgs(ctx, e.Expiry)
 		args.AuthRequestID = authRequestID
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			origin,
@@ -501,6 +507,7 @@ func (u *userNotifier) reduceSessionOTPEmailChallenged(event eventstore.Event) (
 		args := otpArgs(ctx, e.Expiry)
 		args.SessionID = e.Aggregate().ID
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			s.UserFactor.UserID,
 			s.UserFactor.ResourceOwner,
 			origin,
@@ -554,6 +561,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 		}
 		origin := http_util.DomainContext(ctx).Origin()
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			origin,
@@ -595,6 +603,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		}
 		origin := http_util.DomainContext(ctx).Origin()
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			origin,
@@ -650,6 +659,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		origin := http_util.DomainContext(ctx).Origin()
 
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			origin,
@@ -690,6 +700,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		}
 
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			http_util.DomainContext(ctx).Origin(),
@@ -737,6 +748,7 @@ func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.S
 			applicationName = "ZITADEL"
 		}
 		return u.queue.Insert(ctx, command.NewNotificationRequest(
+			e.Aggregate(),
 			e.Aggregate().ID,
 			e.Aggregate().ResourceOwner,
 			origin,

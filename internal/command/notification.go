@@ -1,8 +1,6 @@
 package command
 
 import (
-	"context"
-	"database/sql"
 	"time"
 
 	"github.com/riverqueue/river"
@@ -10,10 +8,10 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/notification"
 )
 
 type NotificationRequest struct {
+	Aggregate                     *eventstore.Aggregate
 	UserID                        string
 	UserResourceOwner             string
 	TriggerOrigin                 string
@@ -25,8 +23,6 @@ type NotificationRequest struct {
 	MessageType                   string
 	UnverifiedNotificationChannel bool
 	Args                          *domain.NotificationArguments
-	AggregateID                   string
-	AggregateResourceOwner        string
 	IsOTP                         bool
 	RequiresPreviousDomain        bool
 }
@@ -40,12 +36,14 @@ type NotificationRetryRequest struct {
 var _ river.JobArgs = (*NotificationRequest)(nil)
 
 func NewNotificationRequest(
+	aggregate *eventstore.Aggregate,
 	userID, resourceOwner, triggerOrigin string,
 	eventType eventstore.EventType,
 	notificationType domain.NotificationType,
 	messageType string,
 ) *NotificationRequest {
 	return &NotificationRequest{
+		Aggregate:         aggregate,
 		UserID:            userID,
 		UserResourceOwner: resourceOwner,
 		TriggerOrigin:     triggerOrigin,
@@ -82,8 +80,8 @@ func (r *NotificationRequest) WithArgs(args *domain.NotificationArguments) *Noti
 }
 
 func (r *NotificationRequest) WithAggregate(id, resourceOwner string) *NotificationRequest {
-	r.AggregateID = id
-	r.AggregateResourceOwner = resourceOwner
+	r.Aggregate.ID = id
+	r.Aggregate.ResourceOwner = resourceOwner
 	return r
 }
 
@@ -95,76 +93,4 @@ func (r *NotificationRequest) WithOTP() *NotificationRequest {
 func (r *NotificationRequest) WithPreviousDomain() *NotificationRequest {
 	r.RequiresPreviousDomain = true
 	return r
-}
-
-// RequestNotification writes a new notification.RequestEvent with the notification.Aggregate to the eventstore
-func (c *Commands) RequestNotification(
-	ctx context.Context,
-	resourceOwner string,
-	request *NotificationRequest,
-) error {
-	id, err := c.idGenerator.Next()
-	if err != nil {
-		return err
-	}
-	_, err = c.eventstore.Push(ctx, notification.NewRequestedEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate,
-		request.UserID,
-		request.UserResourceOwner,
-		request.AggregateID,
-		request.AggregateResourceOwner,
-		request.TriggerOrigin,
-		request.URLTemplate,
-		request.Code,
-		request.CodeExpiry,
-		request.EventType,
-		request.NotificationType,
-		request.MessageType,
-		request.UnverifiedNotificationChannel,
-		request.IsOTP,
-		request.RequiresPreviousDomain,
-		request.Args))
-	return err
-}
-
-// NotificationCanceled writes a new notification.CanceledEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationCanceled(ctx context.Context, tx *sql.Tx, id, resourceOwner string, requestError error) error {
-	var errorMessage string
-	if requestError != nil {
-		errorMessage = requestError.Error()
-	}
-	_, err := c.eventstore.PushWithClient(ctx, tx, notification.NewCanceledEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate, errorMessage))
-	return err
-}
-
-// NotificationSent writes a new notification.SentEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationSent(ctx context.Context, tx *sql.Tx, id, resourceOwner string) error {
-	_, err := c.eventstore.PushWithClient(ctx, tx, notification.NewSentEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate))
-	return err
-}
-
-// NotificationRetryRequested writes a new notification.RetryRequestEvent with the notification.Aggregate to the eventstore
-func (c *Commands) NotificationRetryRequested(ctx context.Context, tx *sql.Tx, id, resourceOwner string, request *NotificationRetryRequest, requestError error) error {
-	var errorMessage string
-	if requestError != nil {
-		errorMessage = requestError.Error()
-	}
-	_, err := c.eventstore.PushWithClient(ctx, tx, notification.NewRetryRequestedEvent(ctx, &notification.NewAggregate(id, resourceOwner).Aggregate,
-		request.UserID,
-		request.UserResourceOwner,
-		request.AggregateID,
-		request.AggregateResourceOwner,
-		request.TriggerOrigin,
-		request.URLTemplate,
-		request.Code,
-		request.CodeExpiry,
-		request.EventType,
-		request.NotificationType,
-		request.MessageType,
-		request.UnverifiedNotificationChannel,
-		request.IsOTP,
-		request.Args,
-		request.NotifyUser,
-		request.BackOff,
-		errorMessage))
-	return err
 }
