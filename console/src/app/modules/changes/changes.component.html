@@ -25,7 +25,7 @@
         <div class="change-actions">
           <div class="change-action" *ngFor="let action of dayelement.eventTypes; index as j">
             <div>
-              <span class="msg">{{ action.localizedMessage }}</span>
+              <span class="msg">{{ action.localizedMessage ? action.localizedMessage : action.key }}</span>
               <span
                 class="block"
                 matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MM YYYY, HH:mm:ss.SSS' }}"
