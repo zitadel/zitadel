@@ -50,7 +50,6 @@ async function loadSession(
   } else if (requestId && requestId.startsWith("saml_")) {
     return createResponse({
       serviceUrl,
-      serviceRegion,
       req: create(CreateResponseRequestSchema, {
         samlRequestId: requestId.replace("saml_", ""),
         responseKind: {
