@@ -57,10 +57,7 @@ describe('machines', () => {
       }
       it('should delete a machine', () => {
         const rowSelector = `tr:contains('${machine.removeName}')`;
-        cy.get(rowSelector, { timeout: 10000 })
-          .should('be.visible')
-          .find('[data-e2e="enabled-delete-button"]')
-          .click({ force: true });
+        cy.get(rowSelector).should('be.visible').find('[data-e2e="enabled-delete-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.enabled').type(loginName);
         cy.get('[data-e2e="confirm-dialog-button"]').click();
         cy.shouldConfirmSuccess();
