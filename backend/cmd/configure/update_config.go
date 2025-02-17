@@ -84,11 +84,14 @@ func setField(field Updater, fields map[string]any, depth int) {
 			Label: fmt.Sprintf("Select one of %s: (%s)", f.Name(), f.Describe()),
 			Items: possibilities,
 		}
-		i, _, err := prompt.Run()
+		i, value, err := prompt.Run()
 		if err != nil {
+			fmt.Println("panic", err)
 			panic(err)
 		}
-		setField(f.Fields()[i], fields, depth+1)
+		fv := fields[value]
+		// TODO: fv is result of decoder (postgres.config in this case)
+		setField(f.Fields()[i], fv.(map[string]any), depth+1)
 	}
 }
 

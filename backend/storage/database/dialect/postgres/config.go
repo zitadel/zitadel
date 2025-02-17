@@ -43,7 +43,9 @@ func DecodeConfig(_ string, config any) (database.Connector, error) {
 		}
 		return &Config{config}, nil
 	case map[string]any:
-		return nil, errors.New("map configuration not implemented")
+		return &Config{
+			Config: &pgxpool.Config{},
+		}, nil
 	}
 	return nil, errors.New("invalid configuration")
 }
