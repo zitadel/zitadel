@@ -59,9 +59,9 @@ export class UserCreateComponent implements OnInit {
   };
   public readonly countryPhoneCodes: CountryPhoneCode[];
 
-  public loading: boolean = false;
+  public loading = false;
 
-  private suffix$ = new ReplaySubject<HTMLSpanElement>(1);
+  private readonly suffix$ = new ReplaySubject<HTMLSpanElement>(1);
   @ViewChild('suffix') public set suffix(suffix: ElementRef<HTMLSpanElement>) {
     this.suffix$.next(suffix.nativeElement);
   }
@@ -80,12 +80,12 @@ export class UserCreateComponent implements OnInit {
     private readonly fb: FormBuilder,
     private readonly mgmtService: ManagementService,
     private readonly userService: UserService,
-    protected readonly location: Location,
     public readonly langSvc: LanguagesService,
     private readonly featureService: FeatureService,
     private readonly destroyRef: DestroyRef,
+    private readonly breadcrumbService: BreadcrumbService,
+    protected readonly location: Location,
     countryCallingCodesService: CountryCallingCodesService,
-    breadcrumbService: BreadcrumbService,
   ) {
     this.useV2Api$ = this.getUseV2Api().pipe(shareReplay({ refCount: true, bufferSize: 1 }));
     this.envSuffix$ = this.getEnvSuffix();
@@ -96,19 +96,19 @@ export class UserCreateComponent implements OnInit {
     this.pwdForm$ = this.buildPwdForm(this.passwordComplexityPolicy$);
 
     this.countryPhoneCodes = countryCallingCodesService.getCountryCallingCodes();
-
-    breadcrumbService.setBreadcrumb([
-      new Breadcrumb({
-        type: BreadcrumbType.ORG,
-        routerLink: ['/org'],
-      }),
-    ]);
   }
 
   ngOnInit(): void {
     // already start loading if we should use v2 api
     this.useV2Api$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     this.watchPhoneChanges();
+
+    this.breadcrumbService.setBreadcrumb([
+      new Breadcrumb({
+        type: BreadcrumbType.ORG,
+        routerLink: ['/org'],
+      }),
+    ]);
   }
 
   private getUseV2Api(): Observable<boolean> {
@@ -165,8 +165,10 @@ export class UserCreateComponent implements OnInit {
       gender: new FormControl(Gender.GENDER_UNSPECIFIED, { nonNullable: true, validators: [requiredValidator] }),
       preferredLanguage: new FormControl('', { nonNullable: true }),
       phone: new FormControl('', { nonNullable: true, validators: [phoneValidator] }),
-      isVerified: new FormControl(false, { nonNullable: true }),
-      sendEmail: new FormControl(false, { nonNullable: true }),
+      emailVerified: new FormControl(false, { nonNullable: true }),
+      sendEmail: new FormControl(true, { nonNullable: true }),
+      phoneVerified: new FormControl(false, { nonNullable: true }),
+      sendSms: new FormControl(true, { nonNullable: true }),
     });
   }
 
@@ -202,7 +204,8 @@ export class UserCreateComponent implements OnInit {
 
   private watchPhoneChanges(): void {
     const phone = this.userForm.controls.phone;
-    phone.valueChanges.pipe(debounceTime(200), takeUntilDestroyed(this.destroyRef)).subscribe((value: string) => {
+
+    phone.valueChanges.pipe(debounceTime(200), takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
       const phoneNumber = formatPhone(value);
       if (phoneNumber) {
         this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
@@ -236,7 +239,7 @@ export class UserCreateComponent implements OnInit {
 
     const emailreq = new AddHumanUserRequest.Email();
     emailreq.setEmail(controls.email.value);
-    emailreq.setIsEmailVerified(controls.isVerified.value);
+    emailreq.setIsEmailVerified(controls.emailVerified.value);
     humanReq.setEmail(emailreq);
 
     if (this.usePassword) {
@@ -254,12 +257,12 @@ export class UserCreateComponent implements OnInit {
 
     try {
       const data = await this.mgmtService.addHumanUser(humanReq);
-      this.loading = false;
       this.toast.showInfo('USER.TOAST.CREATED', true);
       this.router.navigate(['users', data.userId], { queryParams: { new: true } }).then();
     } catch (error) {
-      this.loading = false;
       this.toast.showError(error);
+    } finally {
+      this.loading = false;
     }
   }
 
@@ -283,7 +286,7 @@ export class UserCreateComponent implements OnInit {
       const password = create(PasswordSchema, { password: pwdForm.controls.password.value });
       humanReq.passwordType = { case: 'password', value: password };
     }
-    if (controls.isVerified.value) {
+    if (controls.emailVerified.value) {
       humanReq.email = create(SetHumanEmailSchema, {
         email: controls.email.value,
         verification: {
@@ -315,17 +318,38 @@ export class UserCreateComponent implements OnInit {
     if (phoneNumber) {
       const country = phoneNumber.country;
       this.selected = this.countryPhoneCodes.find((code) => code.countryCode === country);
-      humanReq.phone = create(SetHumanPhoneSchema, {
-        phone: phoneNumber.phone,
-        verification: {
-          case: undefined,
-        },
-      });
+      if (controls.phoneVerified.value) {
+        humanReq.phone = create(SetHumanPhoneSchema, {
+          phone: phoneNumber.phone,
+          verification: {
+            case: 'isVerified',
+            value: true,
+          },
+        });
+      } else {
+        if (controls.sendSms.value) {
+          humanReq.phone = create(SetHumanPhoneSchema, {
+            phone: phoneNumber.phone,
+            verification: {
+              case: 'sendCode',
+              value: {},
+            },
+          });
+        } else {
+          humanReq.phone = create(SetHumanPhoneSchema, {
+            phone: phoneNumber.phone,
+            verification: {
+              case: 'isVerified',
+              value: false,
+            },
+          });
+        }
+      }
     }
 
     try {
       const data = await this.userService.addHumanUser(humanReq);
-      if (controls.isVerified.value && !this.usePassword && controls.sendEmail.value) {
+      if (this.sendEmailAfterCreation) {
         await this.userService.passwordReset({
           userId: data.userId,
           medium: {
@@ -334,13 +358,20 @@ export class UserCreateComponent implements OnInit {
           },
         });
       }
-      this.loading = false;
       this.toast.showInfo('USER.TOAST.CREATED', true);
       await this.router.navigate(['users', data.userId], { queryParams: { new: true } });
     } catch (error) {
-      this.loading = false;
       this.toast.showError(error);
+    } finally {
+      this.loading = false;
     }
+  }
+
+  public get sendEmailAfterCreation() {
+    const controls = this.userForm.controls;
+
+    const sendEmailAfterCreationIsAOption = controls.emailVerified.value && !this.usePassword;
+    return sendEmailAfterCreationIsAOption && controls.sendEmail.value;
   }
 
   public setCountryCallingCode(): void {
