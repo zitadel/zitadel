@@ -91,8 +91,8 @@ export class SearchGroupAutocompleteComponent implements OnInit, AfterContentChe
         this.isLoading = false;
         if (userresp) {
           const results = (userresp as ListGroupsResponse.AsObject).resultList;
-          this.filteredGroups = results.filter((filteredUser) => {
-            return !this.groups.map((u) => u.id).includes(filteredUser.id);
+          this.filteredGroups = results.filter((filteredGroup) => {
+            return !this.groups.map((u) => u.id).includes(filteredGroup.id);
           });
         }
       });
@@ -132,17 +132,18 @@ export class SearchGroupAutocompleteComponent implements OnInit, AfterContentChe
     }
   }
 
-  public remove(user: Group.AsObject): void {
-    const index = this.groups.indexOf(user);
+  public remove(group: Group.AsObject): void {
+    const index = this.groups.indexOf(group);
 
     if (index >= 0) {
       this.groups.splice(index, 1);
       this.selectionChanged.emit(this.groups);
+      this.filteredGroups.push(group);
     }
   }
 
   public selected(event: MatAutocompleteSelectedEvent): void {
-    const index = this.filteredGroups.findIndex((user) => user === event.option.value);
+    const index = this.filteredGroups.findIndex((group) => group === event.option.value);
     if (index !== -1) {
       if (this.groups && this.groups.length > 0) {
         this.groups.push(this.filteredGroups[index]);

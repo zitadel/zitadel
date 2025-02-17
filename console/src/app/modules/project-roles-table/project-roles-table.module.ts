@@ -18,6 +18,7 @@ import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
+import { FilterProjectRolesModule } from '../filter-project-roles/filter-project-roles.module';
 
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
@@ -50,6 +51,7 @@ import { ProjectRolesTableComponent } from './project-roles-table.component';
     ProjectRoleDetailDialogModule,
     MatMenuModule,
     TimestampToDatePipeModule,
+    FilterProjectRolesModule,
     RefreshTableModule,
     LocalizedDatePipeModule,
   ],

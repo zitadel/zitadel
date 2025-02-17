@@ -146,7 +146,6 @@ export class GroupTableComponent implements OnInit {
   private async getData(limit: number, offset: number, searchQueries?: GroupQuery[]): Promise<void> {
     this.loadingSubject.next(true);
 
-    let queryT = new GroupQuery();
     let sortingField: GroupFieldName | undefined = undefined;
     if (this.sort?.active && this.sort?.direction)
       switch (this.sort.active) {

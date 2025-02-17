@@ -559,6 +559,8 @@
     "TITLE": "Filter",
     "STATE": "Status",
     "DISPLAYNAME": "User Display Name",
+    "ROLEDISPLAYNAME": "Role Display Name",
+    "ROLEKEY": "Role Key",
     "EMAIL": "Email",
     "USERNAME": "User Name",
     "ORGNAME": "Organization Name",

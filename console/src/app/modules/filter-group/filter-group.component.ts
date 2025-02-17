@@ -3,7 +3,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { GroupNameQuery, GroupQuery, GroupState } from 'src/app/proto/generated/zitadel/group_pb';
+import { GroupNameQuery, GroupQuery } from 'src/app/proto/generated/zitadel/group_pb';
 import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
@@ -21,7 +21,6 @@ export class FilterGroupComponent extends FilterComponent implements OnInit {
   public SubQuery: any = SubQuery;
   public searchQueries: GroupQuery[] = [];
 
-  public states: GroupState[] = [GroupState.GROUP_STATE_ACTIVE, GroupState.GROUP_STATE_INACTIVE];
   constructor(router: Router, route: ActivatedRoute) {
     super(router, route);
   }

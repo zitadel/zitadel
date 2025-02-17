@@ -144,8 +144,6 @@ export class SearchProjectAutocompleteComponent implements OnInit, OnDestroy {
         ? (p as GrantedProject.AsObject).projectName
         : '';
 
-    console.log(name);
-
     this.selectionChanged.emit({
       project: p,
       name,

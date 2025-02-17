@@ -24,8 +24,8 @@
       <span class="smaller cnsl-secondary-text">{{ user.preferredLoginName }}</span>
     </div>
     <span class="fill-space"></span>
-    <button class="search-user-dl-btn" matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" mat-icon-button color="warn">
-      <i class="las la-minus-circle" (click)="users.splice(i, 1)"></i>
+    <button class="search-user-dl-btn" (click)="remove(user)" matTooltip="{{ 'ACTIONS.REMOVE' | translate }}" mat-icon-button color="warn">
+      <i class="las la-minus-circle"></i>
     </button>
   </div>
   <div class="add-user-row" *ngIf="!editState">

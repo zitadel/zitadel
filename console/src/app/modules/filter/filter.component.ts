@@ -5,13 +5,13 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { SearchQuery as MemberSearchQuery } from 'src/app/proto/generated/zitadel/member_pb';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
-import { ProjectQuery } from 'src/app/proto/generated/zitadel/project_pb';
+import { ProjectQuery, RoleQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { GroupQuery, GroupGrantQuery } from 'src/app/proto/generated/zitadel/group_pb';
 import { SearchQuery as UserSearchQuery, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { ActionKeysType } from '../action-keys/action-keys.component';
 
-type FilterSearchQuery = UserSearchQuery | MemberSearchQuery | UserGrantQuery | ProjectQuery | OrgQuery | GroupQuery | GroupGrantQuery;
+type FilterSearchQuery = UserSearchQuery | MemberSearchQuery | UserGrantQuery | ProjectQuery | OrgQuery | GroupQuery | GroupGrantQuery | RoleQuery;
 type FilterSearchQueryAsObject =
   | UserSearchQuery.AsObject
   | MemberSearchQuery.AsObject
@@ -19,7 +19,8 @@ type FilterSearchQueryAsObject =
   | ProjectQuery.AsObject
   | GroupQuery.AsObject
   | GroupGrantQuery.AsObject
-  | OrgQuery.AsObject;
+  | OrgQuery.AsObject
+  | RoleQuery.AsObject;
 
 @Component({
   selector: 'cnsl-filter',
