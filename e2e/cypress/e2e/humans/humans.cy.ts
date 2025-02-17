@@ -56,7 +56,6 @@ describe('humans', () => {
       });
 
       it('should delete a human user', () => {
-        cy.wait(2000);
         const rowSelector = `tr:contains(${user.removeName})`;
         cy.get(rowSelector).find('[data-e2e="enabled-delete-button"]').click({ force: true });
         cy.get('[data-e2e="confirm-dialog-input"]').focus().should('be.enabled').type(user.removeName);
