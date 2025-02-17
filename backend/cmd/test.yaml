@@ -1,5 +1,19 @@
 database:
-  postgres: 'something'
-  cockroach:
-    host: localhost
-    port: 26257
+    cockroach:
+        host: localhost
+        port: 26257
+    gosql:
+        fieldname: gosql
+        default: null
+        value: null
+        description: Configuration for connection string for gosql
+        version: 1
+    postgres:
+        fieldname: postgres
+        default: null
+        value: null
+        description: Configuration for connection string for postgres
+        version: 1
+step001:
+    databasename: zitadel
+    username: zitadel

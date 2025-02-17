@@ -11,7 +11,10 @@ import (
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
 
-var _ database.Connector = (*Config)(nil)
+var (
+	_    database.Connector = (*Config)(nil)
+	Name                    = "postgres"
+)
 
 type Config struct{ *pgxpool.Config }
 

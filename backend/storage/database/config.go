@@ -1,7 +1,7 @@
 package database
 
-var Config = make(map[string]any)
+import "context"
 
-func AddDatabaseConfig(name string, configure func(map[string]any) error) {
-	Config[name] = configure
+type Connector interface {
+	Connect(ctx context.Context) (Pool, error)
 }

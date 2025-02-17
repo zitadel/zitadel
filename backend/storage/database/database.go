@@ -12,7 +12,7 @@ type Row interface {
 type Rows interface {
 	Row
 	Next() bool
-	Close()
+	Close() error
 	Err() error
 }
 

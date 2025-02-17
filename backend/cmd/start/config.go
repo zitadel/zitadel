@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Database dialect.Config
+	Database dialect.Config `version:"v3"`
 }
 
 func (c Config) Hooks() []viper.DecoderConfigOption {

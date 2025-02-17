@@ -3,11 +3,14 @@ package dialect
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 
+	"github.com/zitadel/zitadel/backend/cmd/config"
+	"github.com/zitadel/zitadel/backend/cmd/configure"
 	"github.com/zitadel/zitadel/backend/storage/database"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect/gosql"
 	"github.com/zitadel/zitadel/backend/storage/database/dialect/postgres"
@@ -16,6 +19,7 @@ import (
 type Hook struct {
 	Match  func(string) bool
 	Decode func(name string, config any) (database.Connector, error)
+	Name   string
 }
 
 var hooks = make([]Hook, 0)
@@ -25,10 +29,12 @@ func init() {
 		Hook{
 			Match:  postgres.NameMatcher,
 			Decode: postgres.DecodeConfig,
+			Name:   postgres.Name,
 		},
 		Hook{
 			Match:  gosql.NameMatcher,
 			Decode: gosql.DecodeConfig,
+			Name:   gosql.Name,
 		},
 	)
 }
@@ -39,6 +45,42 @@ type Config struct {
 	connector database.Connector
 }
 
+// Fields implements [configure.StructUpdater].
+func (c *Config) Fields() []configure.Updater {
+	dialects := configure.OneOf{
+		FieldName:   "dialect",
+		Description: "The database dialect Zitadel connects to",
+		SubFields:   []configure.Updater{},
+	}
+	for _, hook := range hooks {
+		value := c.Dialects[hook.Name]
+		dialects.SubFields = append(dialects.SubFields, &configure.Field[any]{
+			FieldName:   hook.Name,
+			Default:     nil,
+			Description: fmt.Sprintf("Configuration for connection string for %s", hook.Name),
+			Version:     config.V3,
+			Value:       &value,
+		})
+	}
+
+	return []configure.Updater{
+		dialects,
+	}
+}
+
+// Name implements [configure.StructUpdater].
+func (c *Config) Name() string {
+	return "database"
+}
+
+func (c Config) Connect(ctx context.Context) (database.Pool, error) {
+	if len(c.Dialects) != 1 {
+		return nil, errors.New("Exactly one dialect must be configured")
+	}
+
+	return c.connector.Connect(ctx)
+}
+
 // Hooks implements [configure.Unmarshaller].
 func (c Config) Hooks() []viper.DecoderConfigOption {
 	return []viper.DecoderConfigOption{
@@ -46,8 +88,10 @@ func (c Config) Hooks() []viper.DecoderConfigOption {
 	}
 }
 
-func (c Config) Connect(ctx context.Context) (database.Pool, error) {
-	return c.connector.Connect(ctx)
+// var _ configure.StructUpdater = (*Config)(nil)
+
+func (c Config) Configure(v *viper.Viper, currentVersion config.Version) Config {
+	return c
 }
 
 func (c *Config) decodeDialect() error {

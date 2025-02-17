@@ -9,18 +9,17 @@ type Unmarshaller interface {
 	Hooks() []viper.DecoderConfigOption
 }
 
-func ReadConfigPreRun[C Unmarshaller](v *viper.Viper, config *C) func(cmd *cobra.Command, args []string) {
+func ReadConfigPreRun[C Unmarshaller](v *viper.Viper, config C) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		if err := v.Unmarshal(config, (*config).Hooks()...); err != nil {
+		if err := v.Unmarshal(config, config.Hooks()...); err != nil {
 			panic(err)
 		}
 	}
 }
 
-func ReadConfig[C Unmarshaller](v *viper.Viper) (*C, error) {
-	var config C
+func ReadConfig[C Unmarshaller](v *viper.Viper) (config C, err error) {
 	if err := v.Unmarshal(&config, config.Hooks()...); err != nil {
-		return nil, err
+		return config, err
 	}
-	return &config, nil
+	return config, nil
 }

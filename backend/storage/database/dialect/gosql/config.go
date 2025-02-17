@@ -9,7 +9,10 @@ import (
 	"github.com/zitadel/zitadel/backend/storage/database"
 )
 
-var _ database.Connector = (*Config)(nil)
+var (
+	_    database.Connector = (*Config)(nil)
+	Name                    = "gosql"
+)
 
 type Config struct {
 	db *sql.DB
