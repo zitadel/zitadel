@@ -171,7 +171,7 @@
           {{ 'USER.PROFILE.USERNAME' | translate }}
         </th>
         <td mat-cell *matCellDef="let user" [routerLink]="user.userId ? ['/users', user.userId] : null">
-          {{ user.userName }}
+          {{ user.username }}
         </td>
       </ng-container>
 
